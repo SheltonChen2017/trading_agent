@@ -29579,3 +29579,158 @@ Baseline-only correction reproducedred1failed/62deselected0.38s, finalagent64pas
 Correctedpublicsource comparison_20261029_projects.py 30977B/6dc87f33105de9d80e7a267a6cc737bb4262f47e49c43b65247592927a5788d7.
 Correctedpublicsource comparison_20261029_project_bundle.py 11486B/a5534dbebc994f3e6ffe301a721f210d9110384216e539f2c2d42c69e8fcb300.
 Correctedpublicsource comparison_20261029_project_probe.py 7002B/0d9fc4cfe89e79ec95aab5dead2c83b5f263f85b89233a771120819c4c6a505b.
+
+Freshproject phase TPR-CMP28-R107-BASELINE-002/c560f90ad0f41be73d09538969fd0d8e6e35e0e7985f5d13b7416539dbfe4ad8 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact baseline request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-CREATE-OFF-001/6f88554078f883ae722fb38d1feddaabe6b0bc15ff274a27f06b67c9079cb4da at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact create request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-CREATE-TPR050-001/cb027f56b3bd7d8b4e2c0406060ba45aa9a1f4b1afd5ca7b2dde0e0c6a919a40 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact create request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-CREATE-TPR100-001/5be22aecccbb453557aacc0d090798402303c716302fb059f088dfa98d9f2d40 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact create request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-CREATE-TPR200LONG-001/7fd694ddba34b17c66f0055dc5dbba0fb323b690321337cba3604e8b6cea839e at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact create request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-CREATE-PURE-001/1d62a2e22623b1f29ac8eb621300a7b08e46a781fef206c80bd218b353ac8f2e at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact create request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-READ-OFF-001/1b1366736145679ee0084f55a7c8349a2ce4c0125441e285b0a8d57ee30349fb at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact read request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-COLLAB-OFF-001/722051e11c76cf696e96b8cad2bf2fc9afce6df4851c437b73fb87f483bdf8c5 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact collaborators request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-READ-TPR050-001/642c6792dcc2cc1fe0b9b95721b1666795980a740abe5748ebdb94fad3452f7a at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact read request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-COLLAB-TPR050-001/ec70f536ff7656cb1831fe02329f1a870bd3e01aef172cfdae0749fd7c383161 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact collaborators request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-READ-TPR100-001/77509ab6c6b9808eb69dd2136963de06f1e6b35914906cbdf1be33e36ca6c581 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact read request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-COLLAB-TPR100-001/175e98576d58596883ea42b55866b86a23364ba6734938e3a212c46fd520f684 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact collaborators request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-READ-TPR200LONG-001/89c36e3dd790c582424d6c29a875ccd39785effc2dbbd06539b095cfb14e704f at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact read request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-COLLAB-TPR200LONG-001/ae1454a4f57818bb2fe92da173cbd5cd7b693d96814f118a60e8bd66cd1a1438 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact collaborators request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-READ-PURE-001/17845441292edb37f1f26b2b79676daeaecd761f3cfcba0ecc57c4e8c19eb9a7 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact read request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Freshproject phase TPR-CMP28-R107-COLLAB-PURE-001/4c7d9663795f218fe00b8c34fd7730763416e9f18a30134f96ff9b974e752041 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE one exact collaborators request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Fresh bounded private phase TPR-CMP28-R107-REGISTRY-001/6346f390037356c5bb78f9116facf0d4895383dd640e38af5c649555425fd4df at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 16 exact private inputs/120s; Assemble five-project owner/org/name/collaborator registry from exact sixteen fresh native phase receipts; no credential/source/data bodies read; fsync claim and directory retained.
+
+Actualfiveproject registry 154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1 at bb2220174fb69acba098d9ec9c8959ed6c412b7b; exactprojectmap {"OFF": {"collaborator_count": 1, "name": "TPR-CMP28-R107-20261029A-OFF", "nonowner_collaborator_count": 0, "project_id": 38609822}, "PURE": {"collaborator_count": 1, "name": "TPR-CMP28-R107-20261029A-PURE", "nonowner_collaborator_count": 0, "project_id": 38609840}, "TPR050": {"collaborator_count": 1, "name": "TPR-CMP28-R107-20261029A-TPR050", "nonowner_collaborator_count": 0, "project_id": 38609834}, "TPR100": {"collaborator_count": 1, "name": "TPR-CMP28-R107-20261029A-TPR100", "nonowner_collaborator_count": 0, "project_id": 38609836}, "TPR200LONG": {"collaborator_count": 1, "name": "TPR-CMP28-R107-20261029A-TPR200LONG", "nonowner_collaborator_count": 0, "project_id": 38609837}}. Documentedprivate-default plusactualowner/org/collaboratorchecks, no backendprivacyattestation. Exactly5successfulcreate,5exactread,5collaboratorread; oldprojectmetadata2reads, no oldwrite/sourceupload/compile/job.
+
+Fresh bounded private phase TPR-CMP28-R107-BUILD-001/8feda7f5e1e3de7363876644afc8397b751a81a3a478976d9a30273e1176dc3f at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/120s; Pure render allfive exactregistered project candidates and oneNONECONOMIC isolatedOFF probe; nopacket/provider/sourcearchive read or nativeeffects; fsync claim and directory retained.
+
+FreshR107financialreservations ONLY 1604f8b94c3ffcce877ad8fbfa7be98bd7deb86c41832bfa6c659e64869b4c10; five pureprojectrenders retained; noQCfinancialcompile/job/observedoutcome added. Isolatedprobe009 configec362ba12e63b8add1e9420772b6108795516f737628e98a3fb3dac613b923a2 main7331a79bb6e051633d433c85c97c2b4234274c74f4c08fc14f85a8530fd21e7e reserved separately; actualnativepermissions stillrequirefresh source/access manifest. BuildSAFE7b22c258c577cfdfe16eaba49127c812018d71b0dc962536bd1b2f16ae965c35.
+
+Fresh bounded private phase TPR-CMP29-API-R107-BASE-OFF-001-REGISTRY/39d722cf19214023ba102299a6465c9576e1eebd8f922e75310774e5d9c38341 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/120s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-BASE-OFF-001/a960e42efe09645abd97af774ace2292d31175ccb5e8e09a06f5ac01ee027443 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact requests/120s/4194304B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP29-API-R107-BASE-PURE-001-REGISTRY/bfd785f1c18c66d98b8d41d8a813185c70e2c00774412143e04db27d60bdd2c4 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/120s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-BASE-PURE-001/d749f075f9a87711b0c012e1d1437b106356193ef03548781ff599a2a8a54ea5 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact requests/120s/4194304B; registeredarm pure_tpr; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP29-API-R107-BASE-TPR050-001-REGISTRY/776219963ae948e23332281f1e2e10114a06ced9a5759311162b93a808e0a0aa at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/120s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-BASE-TPR050-001/6c1180c5f6c8c83c77e91cc7656d83230bfb0d1ada3c7c7898640c0bf82e948b at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact requests/120s/4194304B; registeredarm cap_tilt_50; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP29-API-R107-BASE-TPR100-001-REGISTRY/bbe4b804ffefa796486fd07297f0c6e6a26fbfb4ab01d2e15ff88c326cd2e8ed at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/120s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-BASE-TPR100-001/081bea50de193328bd05bf49358f4f951962aa12ea1173ae6caf1cf6888fe2be at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact requests/120s/4194304B; registeredarm cap_tilt_100; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP29-API-R107-BASE-TPR200LONG-001-REGISTRY/2418c08fe0f5f28466fc0ee795faf5963780dc471c57ccbaca5521bfe3cc26cc at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/120s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-BASE-TPR200LONG-001/cf02d07c4e1dd9de01ea8baef2283bfaae18882c0acb80c00a4cd3ab19bd4013 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact requests/120s/4194304B; registeredarm cap_tilt_200; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP29-API-R107-UPLOAD-OFF-001-SOURCE/83a402de01c7755f71ade19b7bf9ef05d528801ad01d48f96b9220a0718d8dc3 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/600s; Exact generated source snapshot only for registeredOFF upload; preserve freshdefaultresearch notebook; no licensed input read; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP29-API-R107-UPLOAD-OFF-001-REGISTRY/ccf0a898f8eaad895ec2d9ac8a014cbce7efc99d077f6fa9d3d28dda42195da0 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/600s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-UPLOAD-OFF-001/b1b364aeef1a8ace4e5bb1df5f125d16db5570a4cf1948b6499f9814fd2f919b at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 13 exact requests/600s/6291456B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+R107OFF upload exactsourceverified 3a4e04173f87ae27efb407120e111e9daafb3d82ad098c93aa23eda97948f803 files12; preservedfreshresearch.ipynb. Financialcompile/job countsremainunchanged; this is sourcepreparation only.
+
+Fresh bounded private phase TPR-CMP29-API-R107-UPLOAD-TPR050-001-SOURCE/676b7d29c87a10dc985374e45297e7810da0fcad27e750261fc00aa1b80639d5 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/600s; Exact generated source snapshot only for registeredTPR050 upload; preserve freshdefaultresearch notebook; no licensed input read; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP29-API-R107-UPLOAD-TPR050-001-REGISTRY/51768f2d5ce95d782b666417bc1c1cb48b769c624c76bf7e31eb824569ce4a88 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/600s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-UPLOAD-TPR050-001/36f7b3fefad894921a3fde1d00dcf8794226826c2637e3442910182690b901f9 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 17 exact requests/600s/6291456B; registeredarm cap_tilt_50; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+R107TPR050 upload exactsourceverified ca992efa154754f73a4a55be3998482883f6c2a057696df61236548fd6e43b2e files16; preservedfreshresearch.ipynb. Financialcompile/job countsremainunchanged; this is sourcepreparation only.
+
+Fresh bounded private phase TPR-CMP29-API-R107-UPLOAD-TPR100-001-SOURCE/78174da3cc5dd3bdbf6f305935e069ebaa2faf320d9e9a5d7c30b5d927418eaa at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/600s; Exact generated source snapshot only for registeredTPR100 upload; preserve freshdefaultresearch notebook; no licensed input read; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP29-API-R107-UPLOAD-TPR100-001-REGISTRY/99a4d17b1daaf9fcc5a736378fb79fa30d1e50fe8ac183c2fec11a0c84bd51a1 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/600s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-UPLOAD-TPR100-001/a66e60e6c48ffe02daef7f6cb5d09ab9ee06bdfb63f189eb7c39ec4aba6b4198 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 17 exact requests/600s/6291456B; registeredarm cap_tilt_100; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+R107TPR100 upload exactsourceverified 3a98b62008007bacac7eecba1f7454d4084337f06c032ab9425965f1542c7bff files16; preservedfreshresearch.ipynb. Financialcompile/job countsremainunchanged; this is sourcepreparation only.
+
+Fresh bounded private phase TPR-CMP29-API-R107-UPLOAD-TPR200LONG-001-SOURCE/f31d9d7c27e08ef33a145e62d99e3263395b42c82458e1de8c97adff06be0065 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/600s; Exact generated source snapshot only for registeredTPR200LONG upload; preserve freshdefaultresearch notebook; no licensed input read; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP29-API-R107-UPLOAD-TPR200LONG-001-REGISTRY/b9859d8302f33abf0c55fba60c7ee7da7cd7caaa25282893e2bfeef6c52105df at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/600s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-UPLOAD-TPR200LONG-001/0df8f6744a5619b6f93e8115f24df87e94cbee98e85d54fd613f748c67311aa5 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 17 exact requests/600s/6291456B; registeredarm cap_tilt_200; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+R107TPR200LONG upload exactsourceverified 7a4e3d78392f54f633c7a891a231362b63892d274028674f715d5b6ca8c266bd files16; preservedfreshresearch.ipynb. Financialcompile/job countsremainunchanged; this is sourcepreparation only.
+
+Fresh bounded private phase TPR-CMP29-API-R107-UPLOAD-PURE-001-SOURCE/77d800ba5914de173a8e3df5af3c10db6a814663fc7ca652ac139fbfb4d57c3f at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/600s; Exact generated source snapshot only for registeredPURE upload; preserve freshdefaultresearch notebook; no licensed input read; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP29-API-R107-UPLOAD-PURE-001-REGISTRY/991f724917a84b36f32a31d86219247bf1688f5d10e39dae088e2aa9a7a66d46 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/600s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-UPLOAD-PURE-001/2484439cc23fed0bff16dec83861cc8acecd5aa74ef7c8bb54590e84f7023679 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 17 exact requests/600s/6291456B; registeredarm pure_tpr; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+R107PURE upload exactsourceverified f5a846f7ef6d9627c57b0947b53564b104ef96affc2d067e4dd02b292f4ea1f2 files16; preservedfreshresearch.ipynb. Financialcompile/job countsremainunchanged; this is sourcepreparation only.
+
+Fresh bounded private phase TPR-CMP29-API-R107-PROBE009-UPLOAD-001-SOURCE/5a63c318f7c8098afe20094d550faf7888e0595072a662e7a3ae0548f90aa6de at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/120s; Exact NONECONOMIC isolatedOFF diagnostic main only; fullfinancialmodules andfreshnotebook preserved; nofinancialrerun; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP29-API-R107-PROBE009-UPLOAD-001-REGISTRY/647a9155a3f15068d90432e3fec9652542c6700222e87ff85342563e8e880168 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/120s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-PROBE009-UPLOAD-001/788e793ba16a69194bb08c41a3a63cbba85df26ea951f7b79c8d246eb4f78e71 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 3 exact requests/120s/6291456B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+BEFORE isolatedNONECONOMIC009 compile: retainedmain53695B/7331a79bb6e051633d433c85c97c2b4234274c74f4c08fc14f85a8530fd21e7e plusfull12fileinventory 13c9206bc6899449ce3c4931a57d041a29f7c089e0b67a9d39e9ffc47cebb1d9 at bb2220174fb69acba098d9ec9c8959ed6c412b7b; exactlyONE deliberate diagnosticcompile reservation. Existing8financialcompiles/8jobs unchanged; no financialcandidate is compiled by this phase.
+
+Fresh bounded private phase TPR-CMP29-API-R107-PROBE009-COMPILE-001-REGISTRY/de567f10465487b9c0eecb0c08681786a3d7f7442912fdc4dbb6c07049f0fdc8 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/120s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-PROBE009-COMPILE-001/4fb40cf7553f5a7486bbff6da75b763cab2d992ead9ce42b5034fbbaa9938bb7 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 3 exact requests/120s/6291456B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP29-API-R107-PROBE009-COMPILE-READ-001-REGISTRY/f2e15f8be33606df5e1de35470ed02c1d304dabd1fde684fd49085267f6b1ed1 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/60s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-PROBE009-COMPILE-READ-001/28700b32cacaa30666bfad016206a0d353805f264058a7d28f3a4645a3992a0a at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact requests/60s/131072B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+### 107.3 Additional owner-directed QC project cleanup
+
+Normalizedcleanupinstruction SHA256 9e18992045573478e564b4fff454c714443533daa07de24dcbc043a785a24fad. Owner explicitly requests searchthroughALLQCprojects, identifycreatedforthislane, preservefiveNEWprojects, anddeleteolderprojectsonlyifverification-onlyORnosuccessfulbacktest. This additivecleanup doesnotcancel fivearm/Mia continuation.
+
+CMP107-D006 bestjudgment: ALLprojectmetadata mayberead underfresh boundedcleanup manifests for identification/reverse-library dependencies; unrelatedprojectsource/jobs/data stayunread. Protect exactnewIDs38609822/38609834/38609836/38609837/38609840 regardlessnames/emptyhistory. Classify oldlaneownership fromexistingcreation/record/sourceprovenance, never name-only. A legitimate completednegative-return backtest stillcounts successfulexecution. Any potentiallyfinancialCompleted history isprotected unlesswholeprojectverification-only isproved; zeroacceptedfullwindowresults isnotzeroCompletedjobs. Archive exactmetadata/source/jobcensus/results beforedelete, prove noactive/unknownjob orretained-library/inputdependency, makeone-shot exactdelete with noautomaticretry, andreadbackactualresult. NoObjectStore objectdelete oraccountpermissionchange isgranted.
+
+OldOFF37650980 currentlyremains a nativewitness/signalkey dependency and hasmixedhistoricalCompletedfinancial-looking runs. Holditpendingactualclassification; currentdiagnosticmain alone doesnotprovewholeprojectverification-only. APIdelete recovery/source/result/ObjectStore preservation isnotassumed fromUIRecycleBin documentation.
+
+BEFORE isolatedNONECONOMIC009 nativejob: freshcandidate9/ordinal8actualprobe reservation; one exact oldOFF4witness contains/read<=4096B, four typedTrade/QuoteHistory calls for2021-02-10 04:00..20:00NY/961rowpercall/3844total/4nativecalendarcalls, <=64ASCII SID-derivedSymbol.Value privateQCloglabel. NoOHLC/quotevalue/volume/order/cash mutation, no financialarm/outcome. VerifiedBuildSuccess c7c808feb201d343d8611b9936f70d84-d90311a705644592f8ba5e1c192fc70d sourceinventory13c9206bc6899449ce3c4931a57d041a29f7c089e0b67a9d39e9ffc47cebb1d9 at bb2220174fb69acba098d9ec9c8959ed6c412b7b.
+
+Fresh bounded private phase TPR-CMP29-API-R107-PROBE009-LAUNCH-001-REGISTRY/7fc263801d067a895684d48f8b02e2dc018cd3290243bd63ff27353c3345028e at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/120s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-PROBE009-LAUNCH-001/65620d41b836c1b83a39bf9e576dfcebc8979e39840199b89101311e303d6c39 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 3 exact requests/120s/6291456B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP29-API-R107-PROBE009-READ-001-REGISTRY/65d61526664714abdf58dec2009c0d769db9e475183bba8f937abe257738ab27 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/150s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-PROBE009-READ-001/1f3d54b90db37f8b425b965ce2202a3b801b7030767e696fa9d1f37d57bfc089 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 4 exact requests/150s/6291456B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-R107-PROBE009-PROCESS-001/38d12711a42a8031db06cfade74fdabe3a0c14f4dc96793ba17a31fd38cc8b83 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/120s; Exact own isolatedNONECONOMIC009 native log; structural source/custody/counts only, privateSID-derivedlabel hash only, no OHLC/volume/performance projection; fsync claim and directory retained.
+
+Actualisolatedprobe009 CompletedTRUE atnewOFF38609822/job7c76bcb94216e8e347a7662cc834fde8; sourcebefore/after13c9206b... unchanged. SAFE5799B/ffe0f0b8b7c596fa4a75ef6d27d3f4a1a5a23f8db6c46c2691ed138332d7a5fa; diagnostic-only, nofinancialacceptance. Nativecounts/status {"end_runtime_custody": true, "history_calls": 4, "parent_hash_verified": true, "parent_schema_verified": true, "phase": "complete", "private_target_identity_label_sha256": "a73614e57f238f5a858575226dd9070820708c18ef7c7757f4ab110caaf3855b", "security_id_sha256": "1122fa5f1349f79e231e106127c098da27ef730836a97052d2154ecc46f1afc1", "status": "completed_bounded_extended_observations", "target_no_rows_observed_in_bound": {"quote": true, "trade": true}}.
+
+BEFOREgenuineMia006 UI/resource effect: freshboundedoneSend/read-onlysourceproposal scope 1904B/e0d7c7d99ae10849a311e52f9c5b3be6951350e5db090ae7d4bedf472c80c59e at bb2220174fb69acba098d9ec9c8959ed6c412b7b fornewOFF38609822/exactprobe009job. OneincidentalIDEbuild reservedunknown, no deliberatecompile/job/provider/ObjectStore/notebook effect permitted. Nativeprivateidentity label remainsQC-private andisSID-derived, notmappingproof. Preserve everypreexistingSafariwindow/tab; createoneownwindowonly andverifyUUIDbeforeclosing.
+
+Mia006 ownSafariwindow UUIDEDF5154B-6EB9-4055-B011-52CB8C32F95F openednewproject38609822; originalwindow3E42E372-248A-4340-96CF-B32036409D62/12tabs preserved. UIRequestingcodingenvironment only; noSendyet.
+
+Fresh bounded private phase TPR-CMP29-API-R107-MIA006-BEFORE-001-REGISTRY/b04382ada90dc49cd11541f8107232f5e51dd2c3214be9a976b5327d5ddd2b13 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 1 exact private inputs/90s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-MIA006-BEFORE-001/5e79215480784a87c1a4eaadb587114ab6bde10968c104bfe1a8e73f281d3794 at bb2220174fb69acba098d9ec9c8959ed6c412b7b BEFORE 2 exact requests/90s/3145728B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+BEFORESend genuineMia006 exactprompt 4637B/8168d527398229c00efa90d5da7e68bb3cfa8b02dffce5544883bff0364a8551 at bb2220174fb69acba098d9ec9c8959ed6c412b7b; source13c9206b.../oneownCompletedjob verified BEFORE. AskBeforeEdits selected; oneactualSend permitted, no source/compile/job effect authorized toMia. UIincidentalbuildnotice dabad9-d90311 observed onopening, fullID/newvsreplay unproved, reservedseparately; not a financialcompile/job.
+
+CMP107-D007 actualnativeisolation:009job7c76bcb94216e8e347a7662cc834fde8 CompletedTRUE, sourceguard13c9206b... stablebefore/aftercompile/launch/result. Exactparentwitness/sameSID/nativeSecurity/config/calendar provenwithinbounds; SPY895Trade/943Quote(390regulareach), target0/0 across04:00..20:00Feb10. SAFE5799B/ffe0f0b8b7c596fa4a75ef6d27d3f4a1a5a23f8db6c46c2691ed138332d7a5fa. FourbyteSID-derivedprivate labelhasha73614e57f238f5a858575226dd9070820708c18ef7c7757f4ab110caaf3855b onlyretainedpublicly; no current-ticker/map/no-trade/provider-hole/rootcause/financialrecovery proof. Eight priorfinancialRuntimeErrors/NULLfullwindowmetrics remain; actualnoneconomicprobesnow8, identifiers001R2/002/003/005/006/007/008/009, unused001R1/004retained. One diagnosticcompile/onejob added, zero newfinancialcompile/job/outcomelook.
+GenuineMia006 oneSend observed onownEDF5154Bwindow, newchat map resolution diff propose 2021-02-10 Running; AskBeforeEdits. Exactprompt4637B/8168d527398229c00efa90d5da7e68bb3cfa8b02dffce5544883bff0364a8551 retainedbeforeSend; UIprefixandvisiblefinaltail confirmed, fullAXecho truncated so no exactUIecho claim. One ownjoblogsearch observed, no edit/compile/job/toolproposal approval. InitialReadOnly/Mia lock isnot source-writer attribution or broaderhuman sharing proof.
+Cleanupsource review: fixed11historicalIDmembershipfrompublicrecordf3ded2bbc4978c919c612669292ae480ce4144a88f1ca1148a991786fa3d3c6e; ninehistoricalCompleted/mixed projects andfiveNEW projectsDELETEdenied; only37540166(REMXverification)/37650453(oldONunlaunched)prospectivecandidates afteractualnativecensus/archivechecks. Allaccountmetadata discovery isnotallsource/data authority. Sourceonlycleanupcommit leavesMia006 existingcloudsource13c9206b... unchanged andretains its bb222017generated-sourceepoch; noMiaeffect isresubmitted or expanded bythatcommit.
+Cleanupsoftware research/target_price_revisions_qc/comparison_20261029_cleanup_api.py 26389B/63497c54a20137f80166364b09b755521dc5090e45128c3c0ece0078d55749a9.
+Cleanupsoftware tests/target_price_revisions_qc/test_qc_comparison_20261029_cleanup_api.py 17120B/bafe75dafd463f38ddbdb46920adb2825027941cca72483c4ba422ca61727437.
+Cleanupfocusedauthor77passed0.99s; rootfocusedvalidation recordedaftercompletion. Existingfourprojectmodules286passed8.70s beforethisindependentclientaddition; nofullsuite or frozenfinancialsource modification.

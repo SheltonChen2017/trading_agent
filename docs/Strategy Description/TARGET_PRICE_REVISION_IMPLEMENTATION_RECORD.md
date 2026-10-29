@@ -1,31 +1,33 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Section 105 (2026-10-28) is the Claude review of the thirty Codex commits since
-section 101:** the section-102 counter-review, the section-103 offline preparation
-and the section-104 owner-released five-arm execution round. The owner released
-QC/Safari to Codex, waived Codex's review stops and asked for one push after the
-five requested full-window comparisons; the owner separately asked Claude, in the
-Claude chat, to review every unreviewed commit after that push. All five arms were
-launched. The eight deliberately launched financial jobs all ended Runtime Error;
-zero full-window financial results are accepted. Every failure is the same held-mark
-guard: the frozen valuation contract refuses to value a held stock on a session with
-no native bar for it, and Codex's bounded probes confirm such a session exists for
-one held name on 2021-02-10. Section 105 finds the blocker real but mostly a policy
-choice (`TPR-CR32-001`, owner decision), pins section 104's outcome in the guard, and
-adds two test corrections. No completed backtest or accepted performance exists.
-The lane is **not backtesting-ready**.
+**Current owner continuation (section106):** the owner explicitly directs
+genuineQC Mia to diagnose/fix the native data/routing issue, continue allfive
+frozen backtest arms using documented bestjudgment, skip further routineClaude
+checkpoints, and make exactlyone successful nonforce lane push when done.
+The exact incomingClaude range2cce8dfc..cf5157d8 is counter-reviewed in106.2;
+productionresearchsource is unchanged, and the observed currentbase/ACTUAL
+Targetremote was cf5157d8433d870dc24376d20a6e5c320e0503f7. Section105 remains
+the historical review, qualified by106.2; its owner-wait recommendation is not
+the current execution route. No stale mark or other valuation-policy change
+is silently authorized by a review recommendation. Existing8financialjobs/
+8RuntimeErrors/0acceptedfullwindowmetrics and all historical attempts/looks
+remain retained.
+Historicalsection104 outcome: The eight deliberately launched financial jobs all ended Runtime Error; zero full-window financial results are accepted. A fresh genuineMia diagnosis has completed under exactsource/
+HEAD/access/read limits; its bounded extended-day diagnostic proposal is being
+verified, with no financial-code fix or new performance accepted.
 
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
-`69ecaf91..2cce8dfc` IN SECTION 105: THE SECTION-102 COUNTER-REVIEW, THE
-SECTION-103 OFFLINE PREPARATION AND THE SECTION-104 FIVE-ARM EXECUTION ROUND.
-CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION (TWO TEST CORRECTIONS AND THE
-SECTION-104 GUARD PINS; NO PRODUCTION SOURCE CHANGED). EIGHT FINANCIAL JOBS, EIGHT
-RUNTIME ERRORS, ZERO ACCEPTED FULL-WINDOW RESULTS. NOT BACKTESTING-READY,
-PERFORMANCE OR CANONICAL ACCEPTANCE.**
-The last completed counter-review is section 102.
+Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
+`2cce8dfc..cf5157d8` IN SECTION 106. ACCEPTED AFTER RECORD/CURRENT-ROUTING
+CORRECTION; NO PRODUCTION SOURCE CHANGED BY THE INCOMING REVIEW. GENUINE MIA
+RECOVERY CONTINUES UNDER THE OWNER'S LATEST DIRECTION. EIGHT HISTORICAL NEWSTUDY
+FINANCIAL RUNTIME ERRORS, ZERO ACCEPTED FULL-WINDOW RESULTS. NO CANONICAL
+OR TRADING ACCEPTANCE.**
+Historicalsection105 review/disposition/fullrange remains intact in105.
+
+The last completed counter-review before this continuation was section 102; incomingsection105 disposition is in106.2.
 Section 94 reviewed the owner-skipped continuation of section 93.
 33 observed looks now (31cloud+2historical local).
 OFF has consumed all three Codex attempts under the former ceiling; the owner
@@ -53,7 +55,7 @@ locked. No new notebook/cell or native witness is claimed. Genuine original
 compiled source, missing source/unit
 provenance and full-window native orders/accounting cannot be inferred from
 saved source or a Completed. status. No protected dates, frozen economics,
-selection rules or attempts are reset. Codex next counter-reviews section 105 and this round's Claude commits; the five-arm rerun waits for the owner's held-mark policy decision in 105.7.
+selection rules or attempts are reset. Codex uses genuine QC Mia under fresh bounded scopes to diagnose and verify a native source/routing correction, then continues all five frozen arms; no routine Claude checkpoint or owner-answer gate is required by the latest continuation.
 Old standalone native-read programs and scope holders are retired from operational use;
 no expired scope is renewed. Percent units remain a hypothesis, not a verified diagnosis.
 The non-authorizing TPR-TR0-I implementation candidate is checkpointed but
@@ -414,24 +416,27 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-28:** Claude has independently reviewed the exact range
-`69ecaf91bd123d24138b915bcb5a37798d676b96..2cce8dfcec2077e7a06987055654eca3e6dfbcad`:
-thirty Codex commits carrying section 102 (counter-review of section 101),
-section 103 (offline OFF-recovery preparation) and section 104 (the owner-released
-five-arm execution round). The last completed counter-review is section 102.
-Section 94 reviewed the owner-skipped continuation of section 93. The owner's
-direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY.
-Section 105 accepts all thirty commits, three after correction: a test stub that
-could not detect a misspelled Morningstar group name, an accounting replay whose
-sell side was never exercised, and section 104 itself, whose execution outcome
-had no guard pin. Every section-100 to section-104 claim checked against Git,
-file hashes, the public Lean source and the private safe receipts reproduces.
-The five-arm result is eight financial jobs and eight Runtime Errors at the
-held-mark guard; the bounded native probes show one held name with no native
-bar on 2021-02-10 while the control had data. Section 105 finds that blocker
-real but mostly a consequence of the strict same-session valuation contract
-chosen under delegation (`TPR-CR32-001`): the owner decides the mark policy in
-105.7 before any rerun. The owner's instructions recorded by Codex stand: QC/Safari
+**Current qualification, owner-directedMia recovery (section106):**
+Codex counter-reviews the exact two incomingClaude commits in
+`2cce8dfcec2077e7a06987055654eca3e6dfbcad..cf5157d8433d870dc24376d20a6e5c320e0503f7`
+(short `2cce8dfc..cf5157d8`): testcorrection1ebb7208 is accepted;
+record/currentroutingcf5157d8 is accepted after the qualifications in106.2.
+Productionresearchsource is unchanged. Historicalsection105 reviewed the prior
+thirtyCodexcommits69ecaf91..2cce8dfc; section102's earliercounter-review remains
+historical. Currentnativeevidence remains8financialjobs/8RuntimeErrors/
+0acceptedfullwindowresults. OFF1failedunsupportedAPI; sevenlaterjobs are
+mark-related. Only the exactOFFFeb10nativepaths were independentlyprobed;
+rootcause prevalence and other-arm sameSID/dataabsence are not proved.
+The exact16:00Tickboundary is included; no auction-completeness inference.
+The latest ownerauthorizes genuineMia recovery/bestjudgment withoutanother
+routineClaude checkpoint or owner-answer stop. Frozen economics/custody/
+rights/per-effectfreshclaims remain. Codex uses genuine QC Mia under fresh bounded scopes to diagnose and verify a native source/routing correction, then continues all five frozen arms; no routine Claude checkpoint or owner-answer gate is required by the latest continuation.
+
+Historical workflow context: the last completed counter-review before this round was section 102. Section 94 reviewed the owner-skipped continuation of section 93. The direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY; section106 governs the current continuation.
+
+Historical source/attempt observations below remain attributed to their
+original rounds; they are not new currentIDE/operator/source inspections.
+The owner's instructions recorded by Codex stand: QC/Safari
 is released to Codex, Codex's review stops are waived, Mia may be consulted, and
 Claude reviews when the owner asks. Section 99's private census is attributed:
 the frozen packet's 49,716 corporate-action rows span 2025-10-13 to 2026-10-09;
@@ -587,7 +592,7 @@ authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
 Section 105 reviewed the section-102 counter-review, the section-103 offline preparation and the section-104 five-arm execution round.
-Codex next counter-reviews section 105 and this round's Claude commits; the five-arm rerun waits for the owner's held-mark policy decision in 105.7.
+The section105 next-role recommendation is historical and superseded by106.
 QC/Safari stays released to Codex by the owner; bounded per-effect claims remain required; QuantConnect access stays forbidden for Claude. The old section92
 skip was one-round only; the section-100 instruction waives Codex's progress
 stops for Claude checkpoints until further notice, and Claude reviews when the
@@ -29071,3 +29076,195 @@ Whichever you choose, Codex should implement it as an explicit policy change
 with a new policy hash and fresh reservations, not as a quiet relaxation. The
 unrelated open items are unchanged: the ON-arm Sharadar history gap
 (`TPR-OFF98-010`) and the derived-packet licence question (`TPR-CR32-011`).
+
+## 106. Owner-directed genuine Mia recovery and five-arm continuation
+
+Current owner continuation: instructionSHA256 abdd8bc5542b89ff0815b9d433a216279b1271f71755ddd7fc0bf779cdabd907
+authorizes genuineQuantConnectMia diagnosis/fix, allfivebacktests, documented
+bestjudgment, no further routineClaude checkpoint and exactlyone successful
+nonforcepush at this round's completed/concrete-blocked handoff. Existing
+privateaccess/custody/rights/nobroker/noaccountpurchase boundaries remain.
+All prior failedjobs/unusedreservations/attempts/looks/nominalproxy limitations
+remain retained. No outcome-chasing parameter sweep is authorized.
+
+### 106.1 Deliberate scope re-establishment, no silent advance
+
+The first commands guarded expected2cce8dfcec2077e7a06987055654eca3e6dfbcad
+and stopped BEFORE any file/QC reads or plannedwork when actualHEADwas
+cf5157d8433d870dc24376d20a6e5c320e0503f7. Physicalroot/branch were correct
+and statusclean. Read-only provenance then established exactincomingrange
+2cce8dfc..cf5157d8:1ebb720852820056ec6f30af8afd4fdbdc9eae8f(testcorrections)
+andcf5157d8433d870dc24376d20a6e5c320e0503f7(section105/docguard).
+ACTUALTargetremote equalscf5157d8433d870dc24376d20a6e5c320e0503f7.
+Productionresearchsource diff isEMPTY; changes are lane record/tests only.
+This observedpublishedtip is deliberately adopted as currentround base, with
+the two incomingcommit dispositions to be recorded below after counter-review.
+No fetch/branchswitch/siblingworktree/reset/historyrewrite occurred. Claimed
+author/Claude attribution is Gitprovenance, not an added grant of authority.
+Root delegated read-only percommit test/source and record/guard counter-review,
+with no private/nativeeffects or fullsuite; nativecorrections will not be
+accepted solely on a review assertion or a Mia Completed status.
+
+Source and historicalmarkcontract are unchanged at scope re-establishment.
+The current owner instructs Mia-led recovery rather than another unchanged
+rerun. Root will consult actual built-inMia under fresh bounded identities,
+verify any proposedsource/economic changes before use, and document decisions.
+A genericagent/APIlaunch or self-declared native marker is notMia.
+No newCloud/private/provider/Mia/compile/backtest effect has occurred yet in
+this section; every suchphase requires a fresh bounded manifest/claim BEFORE
+effect, without reopening oldD0/providercaptures incidentally.
+
+Fresh bounded native phase TPR-CMP28-API-MIA005-BEFORE-20261029-001/a5cdebbf2cbc214ea8673739df2f08f4287d086fefc1f2eac49f40c3db19a245 at cf5157d8433d870dc24376d20a6e5c320e0503f7 before2 exact requests/120s/6291456B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-MIA005-BEFORE-JOB-CENSUS-20261029-001/86ab4c5296b2224937ede34f48768a79408f6221913ca53bc6f994123e9f4ffb at cf5157d8433d870dc24376d20a6e5c320e0503f7 BEFORE 1 exact private inputs/120s; Exactownproject active-controller status only before genuineMia; no metrics/otherprojects; fsync claim and directory retained.
+
+Mia005freshownproject census31 jobs/0nonterminal; full24sourceinventory2e41ebcc971cfe976d971aa561b9785a1aeb053b4184612a021c1ebb4cbd7a13 unchanged. No competingMia/controllerjob observed in thisprivateproject; no otherproject inspected.
+
+Fresh bounded private phase TPR-CMP28-MIA005-UI-CAPABILITY-20261029-001/d6bdcacfcbc8df612bc076ef2c24f1d6b3a84a1a1e49ea61f2986f2894c8a4e4 at cf5157d8433d870dc24376d20a6e5c320e0503f7 BEFORE 12 exact private inputs/600s; Fresh genuineMia UI capability/context access; one NEW Safariwindow allowed, preserve all preexistingtabs; no Mia prompt/send/code-edit/provider/witnessbody/backtest yet; MAX1 incidentalWebIDEautocompile if actuallynewlyobserved mustbe retained separately, no relaunch/assumedjob; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-MIA005-DIAGNOSIS-20261029-001/90412d550d0a049b25b2f42c147947b05205b3420eedb341a82ede275abeb087 at cf5157d8433d870dc24376d20a6e5c320e0503f7 BEFORE 12 exact private inputs/600s; One genuinebuilt-inMia diagnosis Send under AskBeforeEdits; <=12exactproject source/logreadtools; ZEROfileedits/compiles/backtests/research/provider/account/deployment effects. Any proposedfix is untrusted until root verifies; no inference of native data availability from advice.; fsync claim and directory retained.
+
+Mia005genuineUIreservationf6544f3802a6ccee80f9adbc6f911f84915f4658647d5e0717b7b87cc1afc960 prompt7e2c11c95489251b5dd1d7c7db9cf7a4762e69791f3bfc62d37fc575830c31cd BEFOREONEdiagnosisSend; nativeQCprojectorigin37650980 observed, newSafariwindow7E18C8F2-D09C-438E-907C-EAFAF3BD1C4F, original12tabs preserved. UIauto-buildnotice84e0fd-ca9ffa observed during capabilityphase; retain as one incidental UIcompile notice/possibleattempt, fullcompileID/new-vs-replay notyet independentlyverified, ZEROnewfinancialjob inferred. OldMiachatCompleted restoredASDATAonly; unsupportedQCOM/ALTM/rootcause assertions are not adopted. NewMiachatcreated, AskBeforeEdits observed; no prompt sent before thisclaim.
+
+### 106.2 Exact incoming counter-review and current-authority routing
+
+| Incoming commit | Disposition | Verified basis and correction |
+|---|---|---|
+| `1ebb720852820056ec6f30af8afd4fdbdc9eae8f` | **Accepted** |Test-only closedMorningstar56-name stub matches officialLeanprimarysource including both10220aliases; misspellingmutation nowdetectable. Net-of-fee SELLregression has correctcash99899.70/6remaining/fees0.30/14absolute shares. No production source changed.|
+| `cf5157d8433d870dc24376d20a6e5c320e0503f7` | **Accepted after correction** |Historical104/105evidence retained. Thissectionqualifies all8heldmark/auction/rootcause assertions and supersedes currentowner-wait routing with the latest explicitgenuineMia continuation. Guardcurrentrouting is updated without weakening historical104outcome/105disposition pins or granting policy/nativeauthority.|
+
+Root used read-onlysubagents finish_off_preparation andoffline103_final_audit
+on exactpublishedcf5157 source, with rootreview of the incomingdiffs/record.
+Independent source/testchecks:325focusedpassed29.98s (twoaffectedmodules);
+separate narrowgroup/sellselection2passed/323deselected1.65s. Not327distincttests.
+Both used isolated49/52setup beforedispatch/configimports, networkdenied,
+nooperator/private/nativeeffects/edits by those reviewpasses; no fullsuite.
+Officialprimarysource:
+https://github.com/QuantConnect/Lean/blob/master/Common/Data/Fundamental/AssetClassificationHelper.cs
+Source/test corrections and assertions prove fixtures, not actualnative
+classification/marketinput/PIT/rights or financialrun acceptance.
+
+Counter-review ledger (allpriorCR32findings retained in105):
+| ID | Priority | Disposition | Verified correction/limitation |
+|---|---|---|---|
+|TPR-CCR32-001|P3|Corrected by currentrecord qualification|105preamble/intro/105.7 incorrectlysay all8diedatheldmarkguard. OFF1isunsupportedmarket-hoursAPI, explicitlyrecorded104.41/105.2. All8RuntimeError, sevenlatermark-related; no all8D009/rootcause inference.|
+|TPR-CCR32-002|P3|Corrected by currentrecord qualification|Tickproducer accepts start<=stamp<=end and counts exact16:00boundary; existingboundarytest provesit. Only timestampsAFTER16:00excluded, auctioncoverage/encodingunproved. No diagnosticwindow/source change needed.|
+|TPR-CCR32-003|P3|Corrected interpretation|CR32-001strictrefusalmechanism isconfirmed; 'improbable regardlessquality','mostlypolicy','gapnotlanecode' are hypotheses/recommendations, not establishedmapping/routing/backend diagnosis. Only OFFFeb10paths probed, otherarmsdataabsence/sameSIDnotproved. Ownerlatestbestjudgment/Mia continuation supersedes an owner-answer stop, while frozen economics are not silently changed.|
+|TPR-CCR32-004|P3|Currentrouting corrected|Currentpreamble/section8 nowroute106, not105.7owner-wait. Historical105recommendation/findings/dispositions stay intact; currentguardfollowup preserves historical104/105pins. No newClaude checkpoint/userapproval gate introduced.|
+
+CR32-002/003/004 are confirmedtest/guardcoverage improvements. The valid SELL
+case does not prove actualoversell/short-refusal coverage: a negativeNAVholding
+fixture is not a sellledger oversell test. InvalidMorningstarclassification
+refuses decisioncoverage; it is not a usefulcash-only acceptance.
+
+CR32-005captureinterruptdemotion,007publishedreceipt ordinaryclose reporting
+and008missingcancelled-with-jobterminal are source-supported limitations,
+not gates to this authorizedMia diagnosis; no inherited spentchain is replayed.
+CR32-006supersededownertext hygiene is not activeauthority. CR32-009 is partial:
+future25-filecapturefailsat24 and unusedcalendarconstant are real, while
+distinctbase/successor counts canbe intentional andcurrent24-fileMiawork is
+unaffected. CR32-010 ispartial: deterministicSIDhashlinkability is notanonymity,
+failing-nativecall attribution/redundanttotalbound are limitations; no actual
+stockidentity or universalanonymity claim is made, auctionassertion corrected.
+CR32-011records rights/PITprovenance limitations; hardpaths andprivateOFFproject
+reuseare deliberate scopechoices, not newOFFblockers. CR32-012testhashcensus
+completeness is documentary, not native/source admission. No private receipt/
+licenceaccount/body census was independently replayed by this counter-review.
+
+Fresh bounded private phase TPR-CMP28-MIA005-UI-RESPONSE-20261029-001/563d4ffce11220f6a25d50d234a02c143c2bd15c0563af09a21ce775cd19f057 at cf5157d8433d870dc24376d20a6e5c320e0503f7 BEFORE 12 exact private inputs/600s; ReadcurrentreservedMia diagnosis status/toolnames/finalresponse/diffproposal only; no newSend/approval/edit/compile/job. Preserveoriginalwindows; actual tool counts/status retained, proposalsnotacceptedbyterminalstatus.; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-MIA005-AFTER-20261029-001/6d8aafbdc0bdd87c9095a955d17d53122c33f713614fdc4c74bb9be168ac6741 at cf5157d8433d870dc24376d20a6e5c320e0503f7 before2 exact requests/120s/6291456B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-MIA005-COMPLETION-SUMMARY-20261029-001/446c96120504eca36f4deaa441d6bc74e42f23228810abfaebe0e6b67827a116 at cf5157d8433d870dc24376d20a6e5c320e0503f7 BEFORE 1 exact private inputs/120s; Retainhuman-readableparaphrase/observedtoolcounts androotdisposition of actualgenuineMia reply; no oldchat/capture/body reopened; aftereffectsource/jobbytehashcomparison alreadyobserved byfreshAPI; fsync claim and directory retained.
+
+Mia005actualcompleteddiagnosisreceipt6afa824c45b51fc8c430755bd139cf9fbb8875e3c8e340a286b177ee6c5fa90e;9observedreadtoolcards/ONEsend/0observedMiaedits/jobs. FreshAPIbefore/after full24source+31jobcensus bytehashes identical (nonatomiccontinuouscustodynotproved). Source/privatejobnochangeobserved; currentMiawindowclosed, original12tabs preserved. CMP106-D001 adopts only boundedextended-day diagnostic, qualifiesMiamapping/universalabsence/realno-trade overclaims; proposedcarriedmarkpolicy NOTimplemented/adopted, no afterhoursprice substitution.
+
+### 106.3 Actual genuineMia diagnosis, qualified before any native correction
+
+FreshMia005 UI/source/HEAD/access/prompt/turn/read scopes and reservations were
+durablyretained BEFOREeffects atcf5157. Prompt3865B/
+7e2c11c95489251b5dd1d7c7db9cf7a4762e69791f3bfc62d37fc575830c31cd;
+turnreservationf6544f3802a6ccee80f9adbc6f911f84915f4658647d5e0717b7b87cc1afc960.
+ActualauthenticatedQuantConnect project37650980 built-inMia was used, in a NEW
+Safariwindow, AskBeforeEdits mode. ONE deliberateSend observed. Chat
+'Tune validation bounds against native TradeBar cache fidelity' reachedCompleted.
+Foursource-read cards/onefilecontentsearch/fourbacktest-logsearch cards observed
+(9readtools, within12bound), no observededit/backtest/research/notebook/
+ObjectStore/provider/deployment/account actions byMia. ItsCompleted state is
+diagnosis completion only, not a completed financialrun or source acceptance.
+
+Freshbefore/afterAPIreceipts22ee86220a39dae14590d19bac362399aa30c89e6dca4f5e861fd259c218513b/
+b92054032a17722ff79e801ea8dc3db2dbbc14fe6a2ce5f4890363da43db1e31
+retain ALL24cloudsourcefiles; exactinventory2e41ebcc971cfe976d971aa561b9785a1aeb053b4184612a021c1ebb4cbd7a13
+and rawsource492877B/812e0e91342aa4740dce02c3428682b6220668e712e8bf59258a38517945f4df
+are identical before/after. Exact31jobcensus57668B/
+56b70cb1ea89e28fbda0c040e86aee4699bd4d0d9f3071ec3ad519e51cf2680c
+also identical,0activebefore/0newjobobserved. NoMiafinancialdiff or codeedit was
+proposed. This is bounded observedsource/job equality, not atomiccontinuous
+custody or a genericadapter native proof. IncidentalIDEauto-buildnotice
+84e0fd-ca9ffa duringcapabilityphase remains separatelyretained; fullcompileID/
+new-vs-replay unverified, not a newfinancialjob. OwnMiawindowclosed after
+matching itsUUID/completedchat; alloriginal12Safari tabs/windows preserved.
+
+Private human-readableMia completion/dispositionreceipt2743B/
+6afa824c45b51fc8c430755bd139cf9fbb8875e3c8e340a286b177ee6c5fa90e
+is a paraphrase of visiblefinalreply/toolcards, NOT a byte-exact fullchat export.
+No hiddenreasoning transcript, rawquotes/prices or licensedproviderrows are
+committed. Mia confirms the strictguard cannot accept zero same-session
+evidence, proposes no financialdiff, suggests one extended-day native typed
+TradeBar/QuoteBar probe and separately proposes an explicit prospective
+carried_mark state with origin/age/absent-evidence flags/hardcarrybound.
+The latter is NOTimplemented/adopted as authority, and noKis chosen from
+outcomes. No stale value is relabeledfresh, no afterhoursprice substitutes
+for requiredregularclose, and corporate-action/share-basis/accounting evidence
+is not inferred from naming a state.
+
+RootdecisionCMP106-D001 accepts ONLY the additional boundeddiagnostic. Mia's
+stronger claims are qualified/rejected as unproved: resuming data and sameSID/
+config do NOTruleout a one-day historicalmapping/routing/providerdefect;
+zero observations prove only boundedrequestpath observations, not universal
+datasetabsence; extended-hourspositive/regularzero cannotprove genuine
+regular-sessionno-trade or exclude a regular-hoursproviderhole. Otherarms
+sameSID/rootcause remainunproved. No terminalsource/statistical/PIT/rights/
+financialacceptance follows from Mia's advice or oldQCOM/ALTM stories.
+
+### 106.4 NEW extended-day discriminator, software candidate only
+
+finish_off_preparation authored a NEWpure successor to seven unchangedpinned
+predecessors, preserving Tick007's actualjob/project/mode/locked/clock and
+before/aftergetter configuration guards. API:
+build_extended_mark_probe(*,tick_source,native_post_gap_source,post_gap_source,
+control_source,base_probe_source,helper_source,producer_source,operation_id,git_head).
+Oneplaintextmain<=60000B (example53115B) performs atmost4typedMinuteHistorycalls:
+SPY/control and sameOFF4SIDtarget, TradeBar andQuoteBar separately, fixedplain
+2021-02-10 04:00..20:00NY, RAW/noFF/extended_market_hours=True. Actualnative
+Security/USA/NY regularcalendar checks use4native methods total; classify
+entirebarintervals against09:30..16:00. End09:30isPRE;16:00..16:01isPOST.
+NoOHLC/midpoint/bidask/quotevalue/volume read or export; quotesarenottrades.
+
+Everyencounteredrowspends961percall/3844total budgetBEFOREvalidation. Genuine
+typedbar/exactSID/nonFF/one-minute period/timeorder/requestbounds are checked.
+Naturalexhaustion vsincompletebound/accesserror staydistinct; no retries,
+widening/cachewrites/orders/derivedbars/valuationpolicy changes. No-trade/
+provider-hole-exclusion/native-route-fix/financial-recovery/canonical/rights/
+PIT/origin/backend guarantees remainfalse/unproved; deployedSDKABI/hardtimeout/
+preallocationbounds are not proved by fixtures. This is a newsource/request
+path, not a repeat of the unchanged failingfinancialcandidate.
+
+Source17403B/0526a563426c86b2c16d1a166591e70e78d0693103057c2765f7e8e08183d867;
+test25583B/b1a50675f6254401485a80021d08ff0da8f27a6ecb17cb432227c5d41c0c4243.
+Author81focusedpassed13.97s incl3in-memorysemanticmutants; root81passed14.38s
+under isolated49/52runner BEFOREdispatch/configimports. Independentreview
+is internalboundedQA, not a newClaudecheckpoint; actualnative effects remain
+pending fresh committedHEAD/source/access/attempt/look reservation.
+
+Currentroutingguard315216B/e89f8317308f938c7ef65e833fdd0e455ff619d691e9d649950d0b9caf86de86:
+author80focusedpassed/507deselected1.72s;15historical104/105declarations AST-
+identical tocf5157. Current106range/ownerhash/role pins accept boundedownerMia
+direction and reject staleowner/Claude waits, canonical/trading/purchase/
+credential/custody/freshclaim/economic-hash bypass mutants. Rootreviewed
+thecompleteguarddiff; no productionruntimeauthority is created by these tests.
+
+Independentextendedprobe boundedreview ACCEPTED atsource0526a563.../testb1a50675...:81focusedpassed14.26s, noverifiedresidual, noedits/private/nativeeffects. Rootsevenpredecessor hash+gitshowHEADbytes checks and3AST/inmemorycompiles passed; noactualSDK/data/rights/PIT admission. NoClaudecheckpoint introduced. Freshcommittedsource/HEAD/access/attempt/look remainsrequiredBEFOREupload/compile/job.
+
+Rootcurrentroutingpositive/provenance/historical104/105anchor selection3passed/584deselected0.99s aftercurrentrecordchanges, isolated49/52. Source/nativeeffectsremainunchanged; nofullsuite.

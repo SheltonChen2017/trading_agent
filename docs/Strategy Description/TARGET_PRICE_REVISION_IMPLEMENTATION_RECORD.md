@@ -1,5 +1,15 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
+**Current result, section107 (2026-10-29):** five separate lane-owned QC
+projects are created and source-verified; cleanup is complete with two older
+projects archived and moved to Recycle Bin. The two new native diagnostics
+completed, including a matching map/config trace with zero target bars in the
+tested session. Genuine Mia006/007 supplied no verified financial correction.
+All five financial backtests remain incomplete; full-window metrics are NULL.
+The concrete blocker is the lack of an admissible same-session native mark
+for the exact held OFF SID on2021-02-10. Section107.7 owns the next technical
+role and final counts; section106 retains the accepted Claude counter-review.
+
 **Current owner continuation (section107):** create FIVE separate private QC
 projects, one per frozen arm, preserve old project37650980 and its source-drift
 evidence, use genuine Mia for verified fixes, exercise documented bestjudgment,
@@ -41,15 +51,16 @@ owner-answer checkpoint is added by this factual blocked handoff.
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
-`2cce8dfc..cf5157d8` IN SECTION 106. ACCEPTED AFTER RECORD/CURRENT-ROUTING
-CORRECTION; NO PRODUCTION SOURCE CHANGED BY THE INCOMING REVIEW. GENUINE MIA
-RECOVERY CONTINUES UNDER THE OWNER'S LATEST DIRECTION. EIGHT HISTORICAL NEWSTUDY
-FINANCIAL RUNTIME ERRORS, ZERO ACCEPTED FULL-WINDOW RESULTS. NO CANONICAL
-OR TRADING ACCEPTANCE.**
+Status: **SECTION107 PROJECT SETUP AND CLEANUP COMPLETED; FIVE FINANCIAL
+BACKTESTS INCOMPLETE AT A CONCRETE NATIVE-INPUT LIMITATION. ZERO ACCEPTED
+FULL-WINDOW RESULTS. GENUINE MIA SUPPLIED NO VERIFIED FIX; NO FROZEN
+ECONOMICS CHANGED. CLAUDE CHECKPOINTS WAIVED; NO CANONICAL OR TRADING
+ACCEPTANCE.** The exact per-commit counter-review `2cce8dfc..cf5157d8`
+in106 remains accepted after its document/current-routing correction.
 Historicalsection105 review/disposition/fullrange remains intact in105.
 
-The last completed counter-review before this continuation was section 102; incomingsection105 disposition is in106.2.
+**Historical original-study observations (preserved; not current five-arm counters):**
+The last completed counter-review before that continuation was section 102; incomingsection105 disposition is in106.2.
 Section 94 reviewed the owner-skipped continuation of section 93.
 33 observed looks now (31cloud+2historical local).
 OFF has consumed all three Codex attempts under the former ceiling; the owner
@@ -438,7 +449,13 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, owner-directedMia recovery (section106):**
+**Current qualification, five-project continuation and native-input handoff (section107):**
+Section107 owns the current project IDs, cleanup disposition, fresh009/010
+evidence, no-fix Mia006/007 result and concrete native-input next step.
+The five financial tests remain incomplete; all full-window metrics are NULL.
+The following section106 counter-review provenance remains accepted history,
+with no new Claude checkpoint or retrospective authority granted.
+
 Codex counter-reviews the exact two incomingClaude commits in
 `2cce8dfcec2077e7a06987055654eca3e6dfbcad..cf5157d8433d870dc24376d20a6e5c320e0503f7`
 (short `2cce8dfc..cf5157d8`): testcorrection1ebb7208 is accepted;
@@ -454,7 +471,7 @@ The latest ownerauthorizes genuineMia recovery/bestjudgment withoutanother
 routineClaude checkpoint or owner-answer stop. Frozen economics/custody/
 rights/per-effectfreshclaims remain. Codex uses genuine QC Mia under fresh bounded scopes to diagnose and verify a native source/routing correction, then continues all five frozen arms; no routine Claude checkpoint or owner-answer gate is required by the latest continuation.
 
-Historical workflow context: the last completed counter-review before this round was section 102. Section 94 reviewed the owner-skipped continuation of section 93. The direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY; section106 governs the current continuation.
+Historical workflow context: the last completed counter-review before this round was section 102. Section 94 reviewed the owner-skipped continuation of section 93. The direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY; section106 retains that counter-review; section107 governs the current continuation.
 
 Historical source/attempt observations below remain attributed to their
 original rounds; they are not new currentIDE/operator/source inspections.
@@ -29479,7 +29496,7 @@ accountupgrade, broker/paper/live/deployment/operator actions are granted.
 
 CMP107-D001 (owner-directed project isolation): reserve exactlyfive unique
 names with round107/20261029A nonce, one per OFF/TPR050/TPR100/TPR200LONG/PURE.
-The oldOFF37650980 and ON37650453 receive no writes. Existing jobs, sources,
+At this opening project-creation phase, oldOFF37650980 and ON37650453 receive no writes. Later owner-directed cleanup107.3–107.4 expressly authorizes archiving/recycling eligible oldON37650453; it grants no oldOFF source write. Existing jobs, sources,
 failures and all limits remain. Newprojects are not proof that unattributed
 source drift is repaired; every upload/compile/launch needs exactsource
 before/after readback and actualproject/job custody. QC has no documented
@@ -29518,7 +29535,8 @@ Public primary sources:
 - https://www.quantconnect.com/docs/v2/writing-algorithms/object-store
 - https://github.com/QuantConnect/lean-cli/blob/master/lean/components/api/api_client.py
 
-No projectcreate/upload/compile/job/Mia/privateinput effect has yet occurred
+Opening-phase observation, before107.1 implementation and later native effects:
+no projectcreate/upload/compile/job/Mia/privateinput effect had yet occurred
 in107. Implement source-bound create/read/registered-arm transport/rendering
 successors first; focused offline software tests confer no native acceptance.
 
@@ -29841,7 +29859,7 @@ ExactlyONEdeletecallperproject: REMXacknowledgedHTTP200 at07:04:58UTC/receipt656
 
 ProcessdeviationCMP107-P002: thearchivephase declared18originalprivatecapture reads, then also re-readfour just-writtenmetadata copies fordescription hints (22reads total). Thosefourderivativecopies containedthealreadyauthorizedsameaccountmetadata, noadditionaldatasource/credentials/quotes, butthedeclaredreadcount wasexceededby4. No retrospectiveclaim iscreated. Deletioneligibility laterindependentlyre-readallindexedartifactsunderitsownfreshper-readclaims andstayedwiththetwoowner-authorizedeligibleprojects. Futurearchivehintscan mustreusebytesalreadyinmemory orreserveeachderivedreadbeforeeffect; Rootretains this actualbounded-count deviation without resetting any empiricalcounter.
 
-GenuineMia006 afterclose nativecheck: full12file sourceinventory13c9206b... identicaltoBEFORE, rawsource340009B/bf9fd99b60d49285037b554f194b06e368b1176610c17de842f67d5eabe4a17e; ownjobcensus1 unchanged750B/67eca58617c47b3e838da711b711e243d7d6f8ab3b079e8871c91b28d31070d1. AFTERreceipt8d07e15a87d8aefcdcd5db06187b78a2d85b8bc43df8dd4b794e6a89860c11cc. This provesnoobservedMiasource/jobdiffwithinchecks, not globalexclusivewriter/cryptographicnativeorigin/sourceauthority. RoutineClaudecheckpoint remainswaived; fullfivefinancialbacktests remainactive/unfulfilled while the verifiedmaptrace isbuilt, no earlypush atthiscleanup-only completion.
+GenuineMia006 afterclose nativecheck: full12file sourceinventory13c9206b... identicaltoBEFORE, rawsource340009B/bf9fd99b60d49285037b554f194b06e368b1176610c17de842f67d5eabe4a17e; ownjobcensus1 unchanged750B/67eca58617c47b3e838da711b711e243d7d6f8ab3b079e8871c91b28d31070d1. AFTERreceipt8d07e15a87d8aefcdcd5db06187b78a2d85b8bc43df8dd4b794e6a89860c11cc. This provesnoobservedMiasource/jobdiffwithinchecks, not globalexclusivewriter/cryptographicnativeorigin/sourceauthority. RoutineClaudecheckpoint remainswaived; the fullfivefinancialbacktest REQUEST remainsactive/unfulfilled while the verifiedmaptrace isbuilt, no earlypush atthiscleanup-only completion.
 
 ### 107.5 Verified Mia-proposed map observation successor before native effect
 
@@ -29876,7 +29894,7 @@ No010compile/job ispreasserted; freshregistryread/build/reservation/source
 before+after/nativeeffect manifest requirednext. Knownnewprojectcompletion/
 accounting/readergates stillrequirea narrowregistered-arm successor before
 accepting anyfullwindowresult; these areNOT gates tosafe010exploration.
-Allfinancialorder/fees/cash/NAV/exposure/clock/coverage metrics remainNULL/
+Allfull-window financialorder/fees/cash/NAV/exposure/clock/coverage metrics remainNULL/
 unaccepted untilactuallyproved, with everyhistoricalattempt/look retained.
 
 Postcleanupactualfourpagecensus confirmsall16laneIDs stillaccounted:
@@ -29884,3 +29902,257 @@ twoexpectedRecycleBin names, other14originalnamesincludingnew5/nineprotected
 historicalprojects unchanged. Source/job reads outside twoeligibleprojects
 didnotoccur forcleanup; unrelatedprojects receivedmetadata-only discovery.
 No permanentpurge/ObjectStoredelete/accountchange orresearchhistory reset.
+
+Fresh bounded private phase TPR-CMP28-R107-MAP010-BUILD-001/a3c83414bff81948fa533db8bc815bb61fdb051df6f3371e5646c37d53818c16 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/120s; PureMia006-derived initialized-provider010 trace build, exactregisteredOFF/oldwitness, no packet/provider/archive/credential read or nativeeffect; fsync claim and directory retained.
+
+BEFORE010 nativeeffects: freshbuild 14283ab024dd12e55d2013793a6a6c67f404f567d82874f4f63578cf756e4dfe 59891B/config8292239f62e01d20a221fe49f76b3c29a23e9089eed3d6468f0a0953cbbb02b3 root5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9; reservationeaf5fe1b3f54cbab7b73346945353bda65d26ba4972039d9675d99d68528f105. OriginalhelperSourceSHA6539... distinctrenderedhelperdefinitions042e497cbb41e3ce00a1c6865b9a32fef1657be136d227d95d19a5de9576b8e4; activev2guardsunchanged, publichistorypreserved, nofinancialcompile/job oroutcomelook yet. Boundedexistingprovider/map observations only; keepSDKpreallocation/timeout/nativeorigin/rights/PIT/recovery unproved.
+
+Fresh bounded private phase TPR-CMP29-API-R107-MAP010-UPLOAD-001-SOURCE/7465f8932a1ee83ce0d17340446a66798060e6a8f05a4daaf3552ecf0e528de0 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/120s; ExactMia-derived initialized-mapNONECONOMIC010 main59891B; fullfinancialmodules andnotebookpreserved; no financialrerun/privatepacketread; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP29-API-R107-MAP010-UPLOAD-001-REGISTRY/83d68dde39064aa05fa6f14eb96d9354479cd692b258403c3fe6ceb8161d0b0d at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/120s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-MAP010-UPLOAD-001/054f64e27c7a0da5f11f08fb3e4928a6ca2f0e1747da927ecbe512abd8392f2d at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 3 exact requests/120s/6291456B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-R107-MAP010-RECOVER-UPLOAD-001/a1d41e91d1a4c6bdc90e257d3191370efbf45b130604e1f8b38e77ae13a03161 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/120s; Recover exact own one-shot MAP010 upload result after terminal-output truncation; no retry, credentials, research packet or cloud request; fsync claim and directory retained.
+
+MAP010 upload own-result recovery observed e87eb51438255fd5a0ae8ad2dc654150e0d75e58a87b184cbff4d8557a751361; status failed_or_uncertain; no repeated upload/compile/launch.
+
+Fresh bounded private phase TPR-CMP28-R107-MAP010-SOURCE-DRIFT-001/9ce1281d218f4ee3f56afbd37e5a987c182d49055c57cac98bc74fca3db88c29 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 2 exact private inputs/120s; Exact own stopped upload source comparison to retained009; public function deltas only; no effects, packet/provider/operator/credential access; fsync claim and directory retained.
+
+MAP010 sourceguard stoppedBEFOREupdate: actual inventory 31ea3635ed9ed8c6b8a3c5224735af335df093ffc85b75a73e4c9f37a07489f1 changednames research.ipynb; exactprivate diff e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 retained; nowrite/compile/job. Writerunattributed pending re-establish scope.
+
+Fresh bounded private phase TPR-CMP29-API-R107-MAP010-RECONCILE-001-REGISTRY/67da9c160738b2766ed38240c0b0b14c4212e7d7c4b157adfe9732578280b2ed at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/90s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-MAP010-RECONCILE-001/091eb70b8b0fc5b3a34a97319a33173c38b81bf7d19b75d8e30dd430738ad642 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 2 exact requests/90s/3145728B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+CMP107-D009 sourcecustodyre-established conditionally: stopped010upload had0sourcewrites/compiles/jobs; all11algorithmPythonfiles match exact009 includingmain53695B/7331a79b. Onlyopaque research.ipynb changed1286/212a51.. to1029/af272005.., writerUNATTRIBUTED; doNOTexecute/readcells/overwriteit. Preserveactualnewnotebook hash inallsubsequentsourceguards. Thisdoesnotadmitnotebookasalgorithmorproveexclusivewriter. Currentexactsource/jobread completed; remotecheckunchanged792f6f793a245d8cdb80670aac0d35027a8954eb. Anyfurtheralgorithmchange/activejob meanshold.
+
+Fresh bounded private phase TPR-CMP29-API-R107-MAP010-UPLOAD-002-SOURCE/89e3eef4a29e2f544715b067b5a3ca57adad5cb64b7af23f8534500acb7679c9 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/120s; ExactretainedMap010 main only; preserveactualchangednotebook; freshsourceguards/sourceupdate only, no compile/job; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP29-API-R107-MAP010-UPLOAD-002-REGISTRY/3a59544275c06925c74c085daf05feaababbc14afdbdf33981f8e299da5cbd2f at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/120s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-MAP010-UPLOAD-002/33938eb4870fa76df72fc651833238a9b8d1d1068d4405b87b741108bd252d4a at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 3 exact requests/120s/6291456B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-R107-MAP010-AFTER-DRIFT-001/718eac9003ae8976c41c21d626fc57e35d72463f7927d7074597bea9eba93f3e at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 2 exact private inputs/120s; Exactown010postupload fullinventory/algorithm diff; notebookopaquehashonly; no effects/research/credentials/operator access; fsync claim and directory retained.
+
+010postupload sourceguard mismatch inventory 24da7efc7921d3c0193289dd258edb92329da57050429ad78bf2ae0c3f1ac5bd; exactdiff e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 retained. OneMainupdate acknowledged, zero compile/job. Do notcompile untilframing/sourcecustody re-established.
+
+CMP107-D010/P003 toolingframing correction: second010upload actuallymatchesALL12 expectedname/bytes/hash tuples, main59891/14283ab0 andpreservednotebook1029/af272005. Root computedpostinventoryusinglocalcanonicalJSONwithtrailingnewline, whereasnativeAPIusesno-newlinecanonical; expected24da7efc versusactual08c386c1 werefalseaggregate mismatch, not asecondcloudchange. Source/rawbytesretained50f78ceb; bothprivatealgorithm diffsareempty/e3b0c442. Neverreupload; useproductiona._canonical inventory08c386c1. OneMainupdate/0compile/0jobsofar; firstuploadcorrectlystoppedonrealnotebookchange.
+
+Fresh bounded private phase TPR-CMP29-API-R107-MAP010-COMPILE-001-REGISTRY/507a605eefd8ee579b9b55ac484a4ad155b5488b311e450227e6e00f67b94e57 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/120s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-MAP010-COMPILE-001/44d4edc15e3ac7c7b90771da66dc50c8c5672cf85b3e8b1d09afdb48dff9f1f8 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 3 exact requests/120s/6291456B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP29-API-R107-MAP010-COMPILE-READ-001-REGISTRY/f47e4decaa03c07f1b52b0537977e00d6706d03b61bcd833a3a3877f98254a89 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/60s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-MAP010-COMPILE-READ-001/1f9aaadd833496b5fa36c32988bf0f83224e0a8b324ec7a925c734cf82772d73 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact requests/60s/131072B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP29-API-R107-MAP010-LAUNCH-001-REGISTRY/6f97d3c4c58b766e4ef36fb091f2cd92496c31bf7a42e811b4ae7d87a1a510ae at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/120s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-MAP010-LAUNCH-001/8bc72e1574faf1fb4ab79d1534aa3f0faacd8098158695b891421cab86509750 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 3 exact requests/120s/6291456B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP29-API-R107-MAP010-READ-001-REGISTRY/e4caf289eb83824379b02edf5c88c1f30f3597515e00e4fea19defd525b6a42c at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/150s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-MAP010-READ-001/c5ee5676de1c4bd672a7d20d6a8dfd1ab2a7e842a64f2c7845c9afb81e62fb91 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 4 exact requests/150s/6291456B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-R107-MAP010-PROCESS-001/33bd1320b83735d1e03247daab5c579353472f3d5b38b15d1e556a4e897f90c5 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/120s; OwnNONECONOMIC010 exactnative log structural custody/mapcounts/equalities only; stripSIDderivedprivatelabel, no raw aliases/OHLC/volume/PnL/provider/capture access; fsync claim and directory retained.
+
+ActualMap010 result 3aa31d124b97582c46cc3510699fdd698280dcec2616666b4efbfbc712d51399 7692B retained, sourceinventory08c386c1 exactbefore/after nativejob4d401e93e4e23af30f6961b466394d9c CompletedTRUE; nestedmappingstatus bounded_initialized_map_observations; no financialacceptance/outcomelook.
+
+Fresh bounded private phase TPR-CMP29-API-R107-MIA007-BEFORE-001-REGISTRY/2d9742ab56888da019c8bc26f2c86f5a9fd8b98faea0f642b2d4dae27aecc798 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/90s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-MIA007-BEFORE-001/dfd5dacd108751d12a07c23175c905e4bb6ddee429add0e0484db03ac42327c4 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 2 exact requests/90s/3145728B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-R107-MIA007-SEND-001/df56070c046bba3459626ef7fcf681399e1cf17f2e39e7db6640ec842ae4aff6 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 0 exact private inputs/600s; GenuineauthenticatedbuiltinQC Mia007 innewOFF38609822; oneSend/AskBeforeEdits; main59891B14283ab0 inventory08c386c1 config8292239f actual010job4d401e93; <=50UIstates600s andoneMia mainfile<=4ranges/oneown010joblog/8officialpublicfetch; NO edits/compile/job/history/ObjectStore/provider/credentials/account/settings/otherproject effects; prompt f5aa026a90855f9bc2560f03e990a6d1a0598b2bf16d27a87e59b9bea7e27e70; fsync claim and directory retained.
+
+Mia007 exactlyoneSend observed inownedSafariwindowF2F206E8-C670-4F85-8BF2-8B8FC1570015/38609822 withAskBeforeEdits, no secondSend/reset. UI connection timedoutonce andwasread-only reconnected; consultationstillrunning, finalrecommendationnotyetaccepted. IncidentalIDEbuildnotice ac3a96-0042f3 onopeningcurrentproject, fullcompileID/newversusreplayunknown; reserveonepossibleadditionalincidentalNONECONOMICcompileidentity, no financialattempt/job invented. Internalreasoningdisplay isnotretainedorreported; useonlydeliveredfinalafterCompleted.
+
+Fresh bounded private phase TPR-CMP29-API-R107-MIA007-AFTER-001-REGISTRY/402c8ee6c724a4efc07e0885943376028e43ec3da031d5a8b2a1fb6d3e7afdc1 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/90s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-MIA007-AFTER-001/227b1b66db3a8baa0c61ab6c8e20e0e8f81e36804f26fb4681467009fa1e28f7 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 2 exact requests/90s/3145728B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+GenuineMia007 Completed chat Verify native-sdk correction for exact-SID mark, ownwindowF2F206E8-C670-4F85-8BF2-8B8FC1570015. OneSend, AskBeforeEdits; Mia finalreportsZEROfile/log/publicsource reads, edits, compiles/jobs inturn, recommendationbasedonsupplied010measurements. Finalrecommends no verifieddiff andexactSID/session QC-side datainvestigation. RootacceptsONLY noverifiedfix andboundedmissingadmissiblemark; rejects exhaustive-clean-endtoend/providerlevel-totalabsence/causalexclusions/QCOManecdote/siblinghistory orfullauctionTickcoverage assertions. 010fourMinutehistories doNOTproveuniversalabsence/no-trade/delisting/datahole/rights/PIT/nativeorigin. No sourcecodeisportedbecauseMia suppliednone. FutureQC-sideinvestigationmustestablishactualnativeinputavailability/routing andnotassumerestoration guaranteed. No supportmessage/email/dataissuesreportwasSent; consultationauthoritydoesnotinferaspecificthirdpartycontactinstruction. Internalreasoningnotretained/quoted. OwnCompletedwindowclosed; original3E42E372-248A-4340-96CF-B32036409D62 andits12tabs observedintact. Nativeafterread completed; source/jobscomparetoexactBEFORE next.
+
+Fresh bounded private phase TPR-CMP29-API-R107-FINAL-TPR050-001-REGISTRY/47ef351e064aa2fd77dd2e8d98d5718e9fc0b83238e5b224534460b945365bff at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/90s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-FINAL-TPR050-001/819598f51e1c0a41472232f04875c30b7ced896904cff8d2de4a0175eac0ae3e at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 2 exact requests/90s/3145728B; registeredarm cap_tilt_50; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Final registeredarm TPR050 project38609834 actualsource ca992efa154754f73a4a55be3998482883f6c2a057696df61236548fd6e43b2e status completed; ownjobcount 0; no financialcompile/job/outcome added.
+
+Fresh bounded private phase TPR-CMP29-API-R107-FINAL-TPR100-001-REGISTRY/f2567d16b1db9a2f900f69af7fab85853e196a2217bba46a3d67872617dd42ea at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/90s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-FINAL-TPR100-001/43a7baa4fe5eac0155aa2a6a62b53820f0788f6bac2a9859c23855fe565eff44 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 2 exact requests/90s/3145728B; registeredarm cap_tilt_100; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Final registeredarm TPR100 project38609836 actualsource 3a98b62008007bacac7eecba1f7454d4084337f06c032ab9425965f1542c7bff status completed; ownjobcount 0; no financialcompile/job/outcome added.
+
+Fresh bounded private phase TPR-CMP29-API-R107-FINAL-TPR200LONG-001-REGISTRY/b9142932034acd5eb55749743bff6b2f0916b67e115b68136bb9d28f98b14431 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/90s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-FINAL-TPR200LONG-001/34f6b981b9ca9f1490da76aa4c80044aba22b5a3769d55a4579f5ad52000fa13 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 2 exact requests/90s/3145728B; registeredarm cap_tilt_200; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Final registeredarm TPR200LONG project38609837 actualsource 7a4e3d78392f54f633c7a891a231362b63892d274028674f715d5b6ca8c266bd status completed; ownjobcount 0; no financialcompile/job/outcome added.
+
+Fresh bounded private phase TPR-CMP29-API-R107-FINAL-PURE-001-REGISTRY/a6406b5defe520edac530e6c0387787f64ecc76fdfbe2ca9ee04fafbc9021944 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 1 exact private inputs/90s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-FINAL-PURE-001/e311f953761dd94834dcdd785df8ec0271719b39203fe346f95aceeb993d7590 at 5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9 BEFORE 2 exact requests/90s/3145728B; registeredarm pure_tpr; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Final registeredarm PURE project38609840 actualsource f5a846f7ef6d9627c57b0947b53564b104ef96affc2d067e4dd02b292f4ea1f2 status completed; ownjobcount 0; no financialcompile/job/outcome added.
+
+### 107.6 Actual map010 outcome and genuine Mia007 disposition
+
+At source HEAD `5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9`, the
+noneconomic mapping diagnostic compiled with BuildSuccess:
+`5a660bb68162311c6c21fa54eb2f4382-0042f3d2f05959af943787fe52465c00`.
+Job `4d401e93e4e23af30f6961b466394d9c` in new OFF project38609822
+actually completed. Main59891B/SHA
+`14283ab024dd12e55d2013793a6a6c67f404f567d82874f4f63578cf756e4dfe`,
+config `8292239f62e01d20a221fe49f76b3c29a23e9089eed3d6468f0a0953cbbb02b3`,
+and full12-file inventory
+`08c386c17a93d934d54f30715a407fef3b91c1ac841bd575b8a3d5ae081f6ae1`
+were checked before/after compile, launch and result. The retained native
+result receipt is `f4f4992119a8fe5287ca4e097cc2100b2ce11d35321035da5649911bb6343f2b`;
+raw log8324B/`0a7a22051aa5ed7829ffc950bf6032bd0bb57a7f12a6119ed85651b47629761b`;
+private SAFE projection7692B/
+`3aa31d124b97582c46cc3510699fdd698280dcec2616666b4efbfbc712d51399`.
+
+The nested map trace is complete: exactly one existing typed provider, one
+resolver, two map rows, five mode-aware aliases and five HasData queries.
+All Feb8–12 aliases equal the actual current configuration and explicit map
+row; the SID first identity matches. Before/after configuration hashes are
+identical `52135ce44018d53dad4ca99b6ca820e2b89b61b5bd3023bfb647af2854b14c75`,
+including native reference equality. No provider construction, initialization
+or mapping mutation occurred. HasData establishes map-date coverage only.
+
+The four unchanged typed Minute history calls still returned SPY895Trade/
+943Quote (390 regular rows each) versus target0Trade/0Quote for Feb10
+04:00–20:00 New York. Parent OFF4 witness1343B/
+`eef08aca32b99056dee0ce00389c53a8ee6a1628c29188afd8bebd362fe183dd`
+and exact historical SID hash
+`1122fa5f1349f79e231e106127c098da27ef730836a97052d2154ecc46f1afc1`
+remain bound. The cached mark is one day before the required close. This
+diagnostic supplies no admissible same-session financial mark. It does not
+prove a provider hole, halt/no-trade day, universal absence, exact backend
+origin, PIT/rights, daily absence in every request form, or full-auction Tick
+coverage. No price, volume, order, cash, cache or financial policy changed.
+
+CMP107-D011: genuine builtin Mia007 received one fresh bounded request
+(`f5aa026a90855f9bc2560f03e990a6d1a0598b2bf16d27a87e59b9bea7e27e70`,
+4371B) in the new OFF project, Ask Before Edits. The completed chat is
+**Verify native-sdk correction for exact-SID mark**. Its delivered final
+recommendation reports no file/log/public-source reads or native jobs in this
+turn and provides no verified fix or diff. It recommends QC-side investigation
+of the exact SID/session. Root accepts the absence of a verified correction
+and the need to establish actual input availability. Root rejects Mia's
+stronger claims of exhaustive routing proof, causal exclusion, provider-wide
+absence, sibling anecdotes and auction completeness. Its recommendation is
+not independent empirical corroboration because it consumed the supplied
+measurements without new reads. No financial correction was ported.
+
+Before/after Mia007 source bytes/inventory and the two-job census are equal:
+source345980B/`50f78ceb777f45a1ea987d20a2b9471e384979c2319e884e3a6055a9418357c0`;
+jobs1446B/`d3c624f1d0ae5eea0e54a76dedc251a8fc1c69396034ea816a21f9f71e0e0c86`;
+AFTER receipt
+`86af35bc2360a40d450c4db63cbe48a0cd1c8db54c063db62c334010ff52491f`.
+The owned completed Safari window was closed; the original window and12tabs
+remain. No other project/window, account setting, support message, provider
+account, research packet, broker or operator state was touched by this turn.
+
+CMP107-A005/A006: finish_off_preparation authored and comparison_accounting_auditor
+independently reviewed the public map renderer, with72 focused passes per
+recorded run. The latter independently agrees that010 supplies no verified
+economic-preserving correction. CMP107-A007: offline103_final_audit checked
+public cleanup criteria/counts and current-record routing at5ef4, with no
+private/native reads or repeated tests; it found no material cleanup omission.
+Root applied its current-pointer/history/NULL-scope wording corrections.
+These delegated decisions confer no native or financial authority.
+
+### 107.7 Concrete native-input handoff; five financial tests still incomplete
+
+**Disposition:** project creation, source preparation, two new bounded native
+diagnostics and the owner-requested cleanup are completed. The requested five
+useful full-window financial backtests are **not completed**. This is a
+concrete native-input limitation handoff, not a claim of successful financial
+testing, a review checkpoint, an exhausted prospective attempt allowance, or
+a request to retune the study.
+
+| Arm | New protected QC project | Latest actual financial outcome (retained old project) | New project financial jobs |
+|---|---|---|---|
+| OFF | TPR-CMP28-R107-20261029A-OFF /38609822 | Attempt4, job12dd4732ba5d9d8f57950beb2a371c79, RuntimeError2021-02-10 | 0; two Completed noneconomic probes009/010 |
+| TPR50 | TPR-CMP28-R107-20261029A-TPR050 /38609834 | Attempt1, job00c71aa64b3f0fa231ef5dba172dc56f, RuntimeError2021-02-10 | 0 |
+| TPR100 | TPR-CMP28-R107-20261029A-TPR100 /38609836 | Attempt1, jobf9f9afa0f2b5200f06f11fe1442adb6c, RuntimeError2023-09-26 | 0 |
+| TPR200 long-only | TPR-CMP28-R107-20261029A-TPR200LONG /38609837 | Attempt1, jobdf338f3dc811e509884195f94986c552, RuntimeError2023-09-26 | 0 |
+| PureTPR | TPR-CMP28-R107-20261029A-PURE /38609840 | Attempt1, jobca9fec3941e1e60c63afd8547dfe97ea, RuntimeError2022-08-30 | 0 |
+
+All five full-window returns, finalNAV, sleeve P&L, order/fill/fee/cash/
+exposure/clock reconciliations and accepted coverage metrics remain NULL/
+unaccepted. Historical partial observations remain retained; NULL does not
+erase partial jobs/orders or imply zero. The exact dates/SID prevalence of
+the other arms' failures have not been independently diagnosed by010.
+
+Fresh final source/job readbacks confirmed the four signal project inventories
+match their original uploads and each has0jobs; OFF matches010 and has2jobs.
+Final receipt hashes, ordered50/100/200/Pure:
+`81cf0717cf486b31089be0293c889f667a2fbcb8a1aee0b1c1017a2243648b1b`,
+`6810e98c1ed2160002e454022cbc7edaac19a1a5cc612a4d5101aef6242a14a6`,
+`818be1e89a6af3899e1acfb4e82348fde3abafb198b7c016e6ef39b87127502a`,
+`85ce9b240a61e8123bc4c4e6cd77e1d7a74eefaae2d3692050469d8a4262223e`.
+OFF remains a diagnostic main; the reserved OFF financial candidate is
+retained privately and must be restored only under a fresh manifest and
+before/after source check after meaningful input/routing recovery.
+
+Counter ledger: this round adds0 financial compiles/launches/jobs/outcome
+looks; the prior8 deliberate financial compiles/9launch requests/8actual
+RuntimeError jobs remain. OFF5 and signal-arm2 are reservations, not spent
+financial attempts. Two actual diagnostic compiles and two actual Completed
+jobs009/010 are added; total actual noneconomic diagnostic jobs now9:
+001R2/002/003/005/006/007/008/009/010, with unused001R1/004 retained.
+Two IDE build notices during the two new Mia windows are separately recorded
+as possible incidental compile observations (full identity/new-versus-replay
+unproved), not additional financial jobs. Mia006/007 each had exactly one
+deliberate Send; neither delivered a financial fix or ran a financial job.
+Original-study OFF3failures/ON0/33observedlooks remain separate historical
+counts; consolidated economic outcome looks are still UNRECONCILED.
+
+CMP107-D012 next role: QC-side input/backend investigation must establish
+whether the exact held SID has genuine RAW trade data for2021-02-10 and repair
+a verified request/backend mismatch or restore genuinely available data if
+appropriate. The evidence package is the private parent witness and009/010
+job/source/config hashes above; no raw licensed identity/quotes are published
+here. A support submission is not sent without explicit communication
+authority. Absence from these requests alone is not upstream absence. An
+independent daily value alone cannot satisfy the frozen earlier-minute/daily
+parity rule when no admissible same-session minute has been observed.
+
+After a verified input/routing correction, Codex resumes OFF first with a new
+source/HEAD/access/attempt/look reservation, then all four unchanged frozen
+signal arms, retrieving every failed/Completed result. Native Completed is
+followed by exact-source and independent full-window accounting acceptance.
+The registered-project completion/accounting/reader successor described in
+the public audit must still replace four old hardcoded project-ID gates
+before accepting a new-project financial result; it was not implemented or
+falsely claimed necessary for safe diagnostics. No stale carry, synthetic
+price, exclusion, date extension, changed universe/fees, purchase or automatic
+unchanged rerun is authorized. Routine Claude review remains waived and the
+prospective attempt ceiling remains superseded without resetting history.
+Canonical TR0-I/TPR-1/TPR-0B, rights/PIT and trading gates remain distinct.
+
+Cleanup is fully complete: all300 account project metadata entries were
+searched;16 lane IDs identified; exactly37540166(verification-only REMX) and
+37650453(unlaunched old ON) were archived and moved to Recycle Bin, each
+acknowledgement and independent readback retained in107.4. All five new
+projects and nine older projects with Completed history or current
+dependencies are preserved. No permanent purge, ObjectStore deletion,
+unrelated source/job reads or research-history reset occurred.
+
+Validation remains focused: projects64, registered API132, bundle63,
+isolated-project probe27 (root four-module union286passed8.70s), cleanup84,
+map72 with the separately recorded author/root/independent runs; no complete
+lane/repository suite. Fixtures do not establish Windows signer/ACL custody,
+native origin or accepted financial backtests. Process deviationsP001/P002
+and the root newline framing mistakeP003 remain recorded with their actual
+limits; no retrospective permission or positive outcome is invented.
+
+Final record assembly observed 2026-10-29T07:48:41.588408+00:00; source/effect HEAD5ef4eaac0b3ba4e08f82c6d460e598ec6b3957c9; final publication commit and actual local/remote equality will be verified after the single non-force lane push. No additional native controller is running.
+
+Finalfocused active-document check initially1failed/2passed0.72s: currentStatuscondensation omittedtheexacthistoricalshortcounterreviewrange fromtheboundedpreamble. Restoredacceptedrange2cce8dfc..cf5157d8 toStatusprovenance; no testweakened/production/nativeeffect. Rerunonlythesame3focusedchecks aftercorrection.
+
+Finalfocusedvalidation: correctedactive-document/current-routing selection3passed0.52s. Nofullsuite; allnewsoftwarefunctions remainatpreviouslytestedhashes. Full-window per-arm orders/fills/fees/slippage/cash/exposure/NAV/coverage/accounting remainNULL/unaccepted; actualQCcreditusage/spendwasnotreadandisNULL, neverassumedzero. Diagnostic009/010 submit0orders. Finalpublicationwillcontainonlysixnewlane-scopedmodules/theirsixfocusedtestfilesandthe solelane record, preservingallhistoricalmodules/privateartifacts.

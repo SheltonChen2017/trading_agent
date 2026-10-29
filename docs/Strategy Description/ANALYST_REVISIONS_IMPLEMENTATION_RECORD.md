@@ -2356,6 +2356,9 @@ Section 332 records the later owner-requested Analyst-only QC cleanup. The
 owner explicitly waives Claude review of section 332 under the standing
 until-further-notice lane direction. That bounded metadata/recycling task is
 the only QC exception; Safari and backtest submission remain held.
+The cleanup is now complete in332.8: thirteen confirmed recoverable removals,
+with successful research and current dependencies retained. No further QC or
+Safari step follows from this completed exception; retain the resource hold.
 
 Section 328 is Claude's independent review of `3c905d42..0d38c59d`, the
 seventy-four Codex commits of sections 323 (Mac recovery) and 324–327.
@@ -4345,6 +4348,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-28 | Codex section328 counter-review, owner-released coverage preparation, then newly held offline checkpoint | `287952427b0e847d5f47261fc5d97c2057a04d17` -> this final handoff commit (five recorded predecessors through `02679fc7`, SIX total) | Accept incoming two-commit review after qualifications; prepare exact native dated coverage and bounded verification/result mechanisms | A first target passed once and is spent; four public QC code files installed before the new hold; two downloads retained with collision qualification; B/C/D remain uninvoked; no explicit compile/backtest | Root final250distinct focused passes7.96s plus four in-memory compilation checks/import absence; earlier counts and failures remain qualified in329; no full suite;337/259/53/699 unchanged | I329-001/002 P2 and I329-003 P3 corrected before use; existing price/actual-holdings/buy-sizing/source/PIT gates remain; no independent acceptance | ONE nonforce matching-lane push; then retain the new QC/Safari resource hold. Approved Ask-download preference awaits release. Fresh exact source verification, run/result freezes and genuine gates precede any coverage job or six/eight strategy submission |
 | 2026-10-28 | Claude owner-directed corrections of the section-328 findings | `f23ca94c` -> `8381e0cb` (W5 cash bound) -> `6c7c80a9` (pin closures, resolver guard) -> this record commit | Section 330; all fourteen findings dispositioned; `-003` erratum (the owner quote exists in 312.6) | W5 cash-limited buys sized on max(ask, engine price) by owner override of 329.2; twenty spent-caller pin closures restored through the post-merge manifest; resolver-literal guard; five reversible fingerprints and the owner's display name withheld | 29 focused files 1,986 passed; native channels 10 passed under their harness; 2 redaction tests; 2/2 mutations caught; 86 record gates; no full suite, no QC/Safari/provider access; 0 looks, 337/259/53/699 unchanged | `-004`, `-006`, `-007`, `-009` corrected; `-002` corrected forward; `-011` transport size and `-012` open; new P3 `ARV2R330-001` | Codex counter-reviews section 330; the 329.10 resource hold stays |
 | 2026-10-28 | Codex section330 counter-review under QC/Safari hold | `b065e98c664aecffe795f51bbe6a1045468be047` -> `619425b0591ce7ac37396acf9150bd88d43809e2` -> this final handoff commit; TWO total | All three incoming commits accepted after scoped corrections; all fourteen earlier findings and new330 observation dispositioned in331 | Removed residual low-entropy test fingerprints; corrected resolver guard and declared W5 source delta; retained owner-approved cash bound and all historical pins/spent controls | Focused final validation and exact overlaps/failures in331.4–5; four in-memory compilations and source/profile pins verified; no full suite or private/operational replay;337/259/53/699 unchanged | One P2 and three P3 corrected in current tree; source/price/transport/formal gates stay open; history privacy not retroactively repaired | ONE nonforce matching-lane final push; retain QC/Safari hold, no new milestone or launch. Resource release and separate source/run gates precede continuation |
+| 2026-10-28/29 PDT | Codex owner-directed Analyst-only QC cleanup | `e18e306959e9172e23fff78b21358b0628149104` -> this final handoff commit; FIVE recorded predecessors through `0f637a41`, SIX total | No incoming Claude review; bounded cleanup scope and standing waiver, same-round advice is not independent acceptance | Catalog300,134namespace plus one corroborated legacy;13Analyst projects recoverably removed:9verification,2zero-run,2failed-only. B first-delete postcondition2 retained; D confirms it, E0 confirms remaining12. Protected/successful/other-lane projects excluded | Latest232focused passes5.48s; pre-A207/pre-B202overlap; code compilation/inverse/mutation evidence in332; actual A0/C0/B2/D0/E0 and pinned reports; no full suite.204dispatch attempts,13deletes;337/259/53/699 unchanged | Four P2s corrected prospectively; original refusals/ambiguity and historical successful R280 retained; no strategy/source/financial gate clearance | ONE nonforce matching-lane final push; cleanup concludes. QC/Safari/backtesting remain held pending owner release and exact subsequent source/run gates; no monitor/automatic continuation |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -71508,3 +71512,78 @@ Root final pre-E focused selection232passes5.48s (60V2policy+75Erecycle+
 11resolver-template+86documents), two in-memory compilations and unchanged
 used B/V2 pins; native network/artifact/Keychain/security denial, no shared
 conftest or dispatch_fence. No full suite; prior202/207counts overlap.
+
+### 332.8 Actual E success, cleanup completion and final handoff
+
+E ran ONCE at clean0f637a415ed349ace9a8a76e0bf0fae80c70fb6a, source
+a59befce06c23aea46df2b916dc345dfb884c5b33aa8c572281f1a3a6e0c0ee3,
+V2policya9dd7c3b6fb426ab59e729923684c8f0f6e05a30315691cd3e416cdc5cccf0cf,
+record1e6b231f5386de4c8fef78907307aece6089cdeb6b95290114c5383a1a8cf5ac,
+and exact remaining12plan6657649895820d68c8e99d7c8edbb1cc18c95922d47e5ed8253ccad1c556b98a.
+Actualparent0/child0/output_accepted=true, complete=true, recycled_count12;
+61intents/application dispatch attempts, physical requests unmeasured.
+Finished2026-10-29T07:14:34.395739Z (October29PDT). Reconstructed report
+2705bytes SHA256706dcd8cdd0626e1e25ed3f49f6dbfb93208fda2a417f570edd8a0a0df682632.
+Every target passed fresh raw V2 project/history checks and refreshed library/
+target metadata, then its single delete and same-ID exact timestamped Recycle
+Bin post-read. Legacy37017548 exact pair was again present and preserved.
+No ambiguous target remains. E and all its used code/policy/control are spent/
+frozen; no operational output/control was re-read to obtain this evidence.
+
+The complete requested cleanup comprises the THIRTEEN exact332.5 targets:
+36561231 is separately confirmed by D after B's verifier error; the other
+twelve are confirmed by E. Nine verification-only projects, two zero-run
+projects36561231/36642921, and two failed-only projects36935685/36935869.
+No delete was repeated, no permanent purge or other project mutation attempted.
+Current source/book dependencies38522505/38364439/37165262, historical
+owner-preserved36823601, historically successful37163942 and legacy37017548
+were excluded; other successful economic research projects, including R246,
+were retained. A identified134namespace-confirmed projects; B/E additionally
+confirmed the retained legacy pair. These135 form the corroborated inventory,
+not an atomic census at one instant. Possible unproven renames remain preserved,
+rather than treated as permission to modify unrelated projects.
+The catalog had300entries and was not a creation-log or continuous-state proof.
+
+Total cleanup A/C/B/D/E accounting:204application dispatch attempts/intents,
+of which13delete attempts and191metadata requests; no physical-request
+measurement. All mutations targeted only the named Analyst IDs. No Safari,
+Mia, capacity/node query, project file/code upload, compile, strategy job,
+result/statistic/log/order/holding/ObjectStore read or write, brokerage or
+funded/paper/live action occurred. No new research look, development evaluation,
+infrastructure look or result cell:337/259/53/699 remains. The root/shared
+ledger and other-lane files stay unchanged. Earlier technical refusals,
+R247/R279 exhaustion and open source/financial/PIT/master/readiness gates stay.
+
+| Local commit | Disposition/scope |
+|---|---|
+|7060a4b9833956d00c55252adb3d0098132c05be|Initial tested pure scope policy/A inventory and uninvoked B preparation; A successful observation retained despite V1classification defect.|
+|970e07171e5b92751061e3cac55a4d31a382abf4|Actual A receipt and separate one-project C metadata-shape freeze; no deletion.|
+|e5692dba2597ed3f9272d0df4a043541fe1031b6|C receipt, additive V2correct interpretation, historical purpose/success retention and exact first B plan.|
+|37b36c4f1ccdc6b98ff05f879954b5089ffd540d|Actual B2/first-delete ambiguity preserved; separate D current-catalog reconciliation freeze.|
+|0f637a415ed349ace9a8a76e0bf0fae80c70fb6a|D first-project confirmation, strict timestamp-aware E successor and remaining12 first-use decision.|
+|This final handoff commit|E0/12confirmations, completed thirteen-project cleanup, issues/validation/ledger and retained operational hold.|
+
+All six are bounded owner-directed implementation/recovery records; no
+independent acceptance is claimed. CR332-001eligibility-after-refusal and
+CR332-002ID-only verification-purpose defects were fixed before any use;
+CR332-003unsupported runtime-enum interpretation was corrected prospectively
+by V2 after the spent no-delete A observation and C diagnosis;
+CR332-004post-delete naming assumption was corrected only in E after B2 and
+D confirmation. No P0/P1; four P2s corrected/qualified with original failures
+retained. Corrected cleanup implementation assessment8/10 for this completed
+scope, with nonatomic API-state and unproven-rename limitations explicit.
+
+Latest root code validation remains232distinct focused passes5.48s, two
+in-memory compilations; prior202/207and author subsets overlap. No full suite,
+no operational replay after completion. Final document/diff/status checks are
+recorded before the single push. Outgoing continuous range is
+e18e306959e9172e23fff78b21358b0628149104..this final handoff commit,
+exactly SIX local commits, accumulated for ONE nonforce matching-lane final
+push after root/branch/HEAD/status/live-tip checks. Verify local/tracking/live
+agreement and clean status afterward. This concludes the cleanup only. Keep
+QC/Safari/backtesting on hold until the owner releases the resources; R329
+source verification and subsequent separately frozen coverage/run gates remain
+the next substantive step after release. No automatic continuation or monitor.
+Final native-denied document-only confirmation86passes1.16s, exit0, is a
+repeat of the86document cases in232, not additive. Final diff/status and narrow
+added-document secret-shape checks passed; no operational revalidation followed.

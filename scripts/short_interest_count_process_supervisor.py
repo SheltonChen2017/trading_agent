@@ -8,6 +8,7 @@ Main decisions. A parent-observed OS-child exit is NOT a Codex exec-session
 receipt, original count closure or checkpoint-loader v1 admission.
 """
 import argparse
+import errno
 import json
 import math
 import os
@@ -26,19 +27,27 @@ ROOT = Path("/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__shor
 BRANCH, REF = "codex/strategy-short-interest", "refs/heads/codex/strategy-short-interest"
 PYTHON = "/Users/sheltonchen/.venvs/trading_agent-py313/bin/python"
 MODULE = "scripts.short_interest_count_process_supervisor"
-NAMESPACE = ROOT / "artifacts/short_interest/count-process-supervisor-proof-v1"
-LABEL = "com.openai.codex.short-interest-process-proof-v1"
-PROOF_POLICY_SHA256 = "8071caa437d7d07dfbf5c8f70c6f9577ddc03cef03aa5e98d6bc8e4104b370a9"
+NAMESPACE = ROOT / "artifacts/short_interest/count-process-supervisor-proof-v2"
+LABEL = "com.openai.codex.short-interest-process-proof-v2"
+PROOF_POLICY_SHA256 = "c83bb95c7912d20d12b88cf145ccb3ea35a22d66ba2cfb2539108361ffc8f217"
 WORKER_SECONDS, MAXIMUM_SECONDS, MAXIMUM_LOG_BYTES = 2, 5, 4096
-FILES = ("job.plist", "launch.spec.json", "result.json", "stdout.jsonl")
+MAXIMUM_TERMINAL_BYTES = 2048
+FILES = ("job.plist", "launch.spec.json", "result.json", "stdout.jsonl", "run.refused.json", "supervisor.jsonl")
 CODE_FILES = ("data/__init__.py", "data/hashing.py", "scripts/short_interest_count_process_supervisor.py")
 _CHILDREN, _WAITS, _EXITS, _HELD = {}, {}, {}, []
+_FAILURES, _FIELDS, _REFUSALS = {}, {}, {}
+_CLI_CHANNEL = None
+_STAGE = "registration"
+_STAGES = frozenset("registration lane_guard current_code namespace_open launch_spec channel_binding child_launch child_observation terminal_code result_publication stdout_audit context_cleanup post_context_audit reporter_cleanup public_summary terminal_cli preparation".split())
+_STAMP_FIELDS = ("dev", "ino", "uid", "gid", "mode", "nlink", "size", "mtime_ns", "ctime_ns")
+_ERRNOS = {getattr(errno, name): name for name in ("EACCES", "EPERM", "EIO", "EBADF", "ENOSPC", "EFBIG", "EROFS", "EMFILE", "ENFILE", "EINTR", "EAGAIN", "ENOENT", "EEXIST")}
 _CODES = frozenset("""supervisor_proof_unregistered supervisor_source_mode_unregistered
 supervisor_arguments_refused supervisor_lane_changed supervisor_Git_refused
 supervisor_code_changed supervisor_namespace_changed supervisor_file_changed
 supervisor_write_refused supervisor_spec_changed supervisor_child_changed
 supervisor_stdout_refused supervisor_clock_refused supervisor_deadline
-supervisor_result_unavailable supervisor_exit_factory_required supervisor_exit_changed""".split())
+supervisor_result_unavailable supervisor_exit_factory_required supervisor_exit_changed
+supervisor_channel_changed supervisor_terminal_refused""".split())
 
 
 class ProcessSupervisorRefusal(ValueError): pass
@@ -46,6 +55,54 @@ class ProcessSupervisorRefusal(ValueError): pass
 
 def require(value, code):
     if not value: raise ProcessSupervisorRefusal("REFUSED: " + code)
+
+
+def _stage(name):
+    global _STAGE
+    require(type(name) is str and name in _STAGES, "supervisor_terminal_refused")
+    _STAGE = name
+
+
+def _same_stamp(actual, original, code="supervisor_file_changed"):
+    """Project names only from this exact original-comparison failure."""
+    if actual != original:
+        error = ProcessSupervisorRefusal("REFUSED: " + code)
+        if (type(actual) is tuple and type(original) is tuple and len(actual) == len(original) == len(_STAMP_FIELDS)
+                and all(type(v) is int for v in (*actual, *original))):
+            _FIELDS[id(error)] = error, tuple(name for name, a, b in zip(_STAMP_FIELDS, actual, original) if a != b)
+        raise error
+
+
+def _remember(error):
+    old = _FAILURES.get(id(error))
+    if type(old) is tuple and old[0] is error:
+        result = dict(old[1]); result["mismatching_fields"] = list(result["mismatching_fields"])
+        return result
+    code = None
+    if type(error) is ProcessSupervisorRefusal:
+        arguments = BaseException.args.__get__(error, BaseException)
+        if type(arguments) is tuple and len(arguments) == 1 and type(arguments[0]) is str:
+            code = next((v for v in _CODES if arguments[0] == "REFUSED: " + v), None)
+    number = OSError.errno.__get__(error, OSError) if isinstance(error, OSError) else None
+    number = number if type(number) is int else None
+    fields = _FIELDS.get(id(error))
+    detail = {"stage": _STAGE if _STAGE in _STAGES else "registration",
+        "category": "local_contract_refusal" if code else "local_os_error" if number in _ERRNOS else "unknown_local_error",
+        "contract_code": code, "errno_name": _ERRNOS.get(number),
+        "mismatching_fields": fields[1] if type(fields) is tuple and fields[0] is error else ()}
+    _FAILURES[id(error)] = error, tuple(detail.items())
+    detail["mismatching_fields"] = list(detail["mismatching_fields"])
+    return detail
+
+
+def failure_summary(error): return _remember(error)
+
+
+def _close_fd(fd, primary_error=None):
+    """One close attempt; a secondary cleanup error cannot replace a primary."""
+    try: os.close(fd)
+    except BaseException:
+        if primary_error is None: raise
 
 
 def authority():
@@ -56,7 +113,7 @@ def authority():
 
 
 def policy():
-    return {"schema": "si-count-process-supervisor-proof-policy-v1", "root": str(ROOT),
+    return {"schema": "si-count-process-supervisor-proof-policy-v2", "root": str(ROOT),
         "branch": BRANCH, "ref": REF, "module": MODULE, "python": PYTHON, "namespace": str(NAMESPACE),
         "files": list(FILES), "code_paths": list(CODE_FILES), "worker_seconds": WORKER_SECONDS,
         "maximum_observation_seconds": MAXIMUM_SECONDS, "maximum_stdout_bytes": MAXIMUM_LOG_BYTES,
@@ -64,6 +121,12 @@ def policy():
         "dispatch_claim": "original_exclusive_stdout_file_before_one_child_Popen_no_retry",
         "exit": "original_parent_child_handle_wait_only_never_PID_absence_or_JSON_completion",
         "unknown": "retain_original_process_handle_FDs_no_kill_restart_or_positive_exit_claim",
+        "negative": "exclusive_dominating_run_refused_from_original_live_anchors_and_one_original_dup_pair_through_terminal_audits_no_reopen_after_cleanup",
+        "final_membership": "exact_five_positive_roles_no_negative_entry_after_final_original_reporter_cleanup_before_witness",
+        "cleanup": "drain_both_original_namespace_anchors_preserve_first_function_local_actual_exception_never_ambient_caller_exception_attempt_each_original_FD_close_once_clean_close_failure_refuses",
+        "terminal_channel": "precreated0600_singlelink_zero_byte_original_full_stamp_in_spec_launchd_FD1_original_spec_identity_first6_and_size0_required_for_diagnostics_full_stamp_and_named_binding_required_for_child_or_success_one_fixed_bounded_line_Root_independent_postexit_revalidation",
+        "maximum_terminal_bytes": MAXIMUM_TERMINAL_BYTES,
+        "diagnostics": "fixed_entered_phase_category_allowlisted_contract_errno_and_exact_original_comparison_field_names_only_never_exception_formatting",
         "capture": "unregistered_and_unconditionally_refused", "authority": authority()}
 
 
@@ -128,13 +191,16 @@ def _code_manifest(head, remote):
         path = ROOT / name
         require(path.resolve() == path and not path.is_symlink(), "supervisor_code_changed")
         fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+        primary = None
         try:
             before = os.fstat(fd)
             require(stat.S_ISREG(before.st_mode) and before.st_size <= 262144, "supervisor_code_changed")
             raw = os.read(fd, 262145)
             require(_stamp(before) == _stamp(os.fstat(fd)) == _stamp(path.lstat())
                 and raw == committed, "supervisor_code_changed")
-        finally: os.close(fd)
+        except BaseException as error:
+            primary = error; raise
+        finally: _close_fd(fd, primary)
         result[name] = hash_bytes(raw)
     _guard(head, remote)
     return result
@@ -173,7 +239,9 @@ class _Namespace:
             self.pin = _directory(os.fstat(self.fd), owner_only=True)
             self.check()
         except BaseException:
-            self.close(); raise
+            try: self.close()
+            except BaseException: pass
+            raise
     def check(self):
         require(NAMESPACE.resolve() == NAMESPACE and NAMESPACE.parent.resolve() == NAMESPACE.parent
             and _directory(os.fstat(self.parent), owner_only=False) == self.parent_pin
@@ -183,21 +251,35 @@ class _Namespace:
             == _directory(NAMESPACE.lstat(), owner_only=True), "supervisor_namespace_changed")
         require(set(os.listdir(self.fd)) <= set(FILES), "supervisor_namespace_changed")
     def close(self):
-        failures = []
+        first = None
         for name in ("fd", "parent"):
             fd = getattr(self, name, None)
             if fd is not None:
                 try: os.close(fd)
-                except OSError: failures.append(True)
+                except BaseException as error:
+                    if first is None: first = error
                 finally: setattr(self, name, None)
-        require(not failures, "supervisor_file_changed")
+        if first is not None: raise first
+    def duplicate_original(self):
+        """Two bounded original dup anchors; no path is opened or adopted."""
+        self.check()
+        other = object.__new__(_Namespace)
+        other.parent = other.fd = None
+        other.parent_pin, other.pin = self.parent_pin, self.pin
+        try:
+            other.parent = os.dup(self.parent); other.fd = os.dup(self.fd)
+            other.check(); return other
+        except BaseException:
+            try: other.close()
+            except BaseException: pass
+            raise
     def create(self, name):
         self.check(); require(name in FILES, "supervisor_file_changed")
         fd = os.open(name, os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=self.fd)
         try:
             os.fchmod(fd, 0o600); self.validate(fd, name, 0)
-        except BaseException:
-            os.close(fd); raise
+        except BaseException as error:
+            _close_fd(fd, error); raise
         return fd
     def validate(self, fd, name, size):
         self.check()
@@ -208,12 +290,15 @@ class _Namespace:
     def write(self, name, raw):
         require(type(raw) is bytes and 0 < len(raw) <= MAXIMUM_LOG_BYTES, "supervisor_write_refused")
         fd = self.create(name)
+        primary = None
         try:
             _write(fd, raw); self.validate(fd, name, len(raw)); os.fsync(fd); os.fsync(self.fd); os.fsync(self.parent)
             seal = _stamp(os.fstat(fd)); os.lseek(fd, 0, os.SEEK_SET)
             require(os.read(fd, len(raw) + 1) == raw, "supervisor_file_changed")
             self.validate(fd, name, len(raw)); require(_stamp(os.fstat(fd)) == seal, "supervisor_file_changed")
-        finally: os.close(fd)
+        except BaseException as error:
+            primary = error; raise
+        finally: _close_fd(fd, primary)
         self.check()
         require(_stamp(os.stat(name, dir_fd=self.fd, follow_symlinks=False)) == seal, "supervisor_file_changed")
     def read(self, name):
@@ -226,12 +311,15 @@ class _Namespace:
             "supervisor_file_changed")
         before, size = _stamp(named), named.st_size
         fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=self.fd)
+        primary = None
         try:
             require(_stamp(os.fstat(fd)) == before, "supervisor_file_changed")
             self.validate(fd, name, size); raw = os.read(fd, size + 1)
             self.validate(fd, name, size); require(_stamp(os.fstat(fd)) == before and len(raw) == size,
                 "supervisor_file_changed")
-        finally: os.close(fd)
+        except BaseException as error:
+            primary = error; raise
+        finally: _close_fd(fd, primary)
         self.check()
         require(_stamp(os.stat(name, dir_fd=self.fd, follow_symlinks=False)) == before,
             "supervisor_file_changed")
@@ -246,9 +334,79 @@ def _write(fd, raw):
         offset += count
 
 
-def _spec(head, remote, manifest):
-    return {"schema": "si-count-process-proof-launch-v1", "runtime_head": head, "actual_remote": remote,
+def _terminal_fd(): return 1
+
+
+class _TerminalChannel:
+    """Already-open launchd diagnostic FD, never a reopened namespace."""
+    def __init__(self):
+        self.fd, self.attempted = _terminal_fd(), False
+        self.diagnostic_authorized, self.bound = False, False
+        info = os.fstat(self.fd)
+        self.original = _stamp(info)
+        require(stat.S_ISREG(info.st_mode) and info.st_uid == os.getuid()
+            and stat.S_IMODE(info.st_mode) == 0o600 and info.st_nlink == 1 and info.st_size == 0,
+            "supervisor_channel_changed")
+
+    def bind(self, ns, original):
+        # The fixed spec has already been authenticated. Diagnostic-only
+        # authority requires its ORIGINAL inode/protection, never a new FD's
+        # self-captured stamp. Full original seals below still gate dispatch.
+        require(self.original[:7] == original[:7], "supervisor_channel_changed")
+        self.diagnostic_authorized = True
+        _same_stamp(self.original, original, "supervisor_channel_changed")
+        _same_stamp(_stamp(os.fstat(self.fd)), original, "supervisor_channel_changed")
+        _same_stamp(_stamp(os.stat("supervisor.jsonl", dir_fd=ns.fd, follow_symlinks=False)),
+            original, "supervisor_channel_changed")
+        ns.validate(self.fd, "supervisor.jsonl", 0)
+        self.bound = True
+
+    def emit(self, status, *, failure=None, refusal_record="not_applicable", child_exit=None):
+        require(not self.attempted, "supervisor_terminal_refused")
+        self.attempted = True  # Partial output can never be retried/appended as another terminal line.
+        require(self.diagnostic_authorized is True, "supervisor_channel_changed")
+        require(type(status) is str and status in ("proof_supervisor_contexts_closed", "refused")
+            and type(refusal_record) is str and refusal_record in ("not_applicable", "published", "unavailable", "original_anchors_closed")
+            and (child_exit is None or type(child_exit) is int and -255 <= child_exit <= 255),
+            "supervisor_terminal_refused")
+        if failure is not None:
+            require(type(failure) is dict and set(failure) == {"stage", "category", "contract_code", "errno_name", "mismatching_fields"}
+                and type(failure["stage"]) is str and failure["stage"] in _STAGES
+                and type(failure["category"]) is str and failure["category"] in ("local_contract_refusal", "local_os_error", "unknown_local_error")
+                and (failure["contract_code"] is None or type(failure["contract_code"]) is str and failure["contract_code"] in _CODES)
+                and (failure["errno_name"] is None or type(failure["errno_name"]) is str and failure["errno_name"] in _ERRNOS.values())
+                and type(failure["mismatching_fields"]) is list
+                and all(type(v) is str and v in _STAMP_FIELDS for v in failure["mismatching_fields"])
+                and len(failure["mismatching_fields"]) <= len(_STAMP_FIELDS), "supervisor_terminal_refused")
+        require((status == "refused") == (failure is not None), "supervisor_terminal_refused")
+        require((status != "proof_supervisor_contexts_closed" or self.bound is True and child_exit == 0 and refusal_record == "not_applicable")
+            and (status != "refused" or refusal_record != "not_applicable"), "supervisor_terminal_refused")
+        payload = {"schema": "si-count-process-proof-terminal-v2", "status": status,
+            "failure": failure, "refusal_record": refusal_record, "actual_child_exit": child_exit,
+            "supervisor_process_exit_attested": False, "launcher_independence_verified": False,
+            "authority": authority()}
+        raw = canonical_json(payload).encode() + b"\n"
+        require(0 < len(raw) <= MAXIMUM_TERMINAL_BYTES and raw.count(b"\n") == 1,
+            "supervisor_terminal_refused")
+        _same_stamp(_stamp(os.fstat(self.fd)), self.original, "supervisor_channel_changed")
+        _write(self.fd, raw); os.fsync(self.fd)
+        after = os.fstat(self.fd)
+        require(_stamp(after)[:6] == self.original[:6] and stat.S_ISREG(after.st_mode)
+            and after.st_size == len(raw), "supervisor_channel_changed")
+
+
+def _channel_stamp(value):
+    require(type(value) in (tuple, list) and len(value) == len(_STAMP_FIELDS)
+        and all(type(v) is int and 0 <= v <= 2 ** 64 for v in value)
+        and value[2] == os.getuid() and tuple(value[4:7]) == (0o600, 1, 0), "supervisor_channel_changed")
+    return tuple(value)
+
+
+def _spec(head, remote, manifest, channel_stamp):
+    original = _channel_stamp(channel_stamp)
+    return {"schema": "si-count-process-proof-launch-v2", "runtime_head": head, "actual_remote": remote,
         "proof_policy_sha256": PROOF_POLICY_SHA256, "code_manifest": manifest,
+        "supervisor_stdout_initial_stamp": list(original),
         "worker_arguments": [PYTHON, "-B", "-m", MODULE, "proof-worker", "--head", head, "--remote", remote],
         "authority": authority()}
 
@@ -260,20 +418,37 @@ def build_launchd_plist(head, remote, spec_sha256):
     return {"Label": LABEL, "ProgramArguments": [PYTHON, "-B", "-m", MODULE, "supervise-proof",
         "--head", head, "--remote", remote, "--spec-sha256", spec_sha256], "WorkingDirectory": str(ROOT),
         "EnvironmentVariables": _environment(), "RunAtLoad": True, "KeepAlive": False,
-        "StandardOutPath": "/dev/null", "StandardErrorPath": "/dev/null"}
+        "StandardOutPath": str(NAMESPACE / "supervisor.jsonl"), "StandardErrorPath": "/dev/null"}
 
 
 def prepare_proof(head, remote):
+    _stage("preparation")
     _registered_proof(); _guard(head, remote); manifest = _code_manifest(head, remote)
-    raw = canonical_json(_spec(head, remote, manifest)).encode()
-    spec_sha = hash_bytes(raw); ns = _Namespace(create=True)
+    ns = _Namespace(create=True)
+    primary = None
     try:
+        fd = ns.create("supervisor.jsonl")
+        channel_primary = None
+        try:
+            os.fsync(fd); os.fsync(ns.fd); os.fsync(ns.parent)
+            ns.validate(fd, "supervisor.jsonl", 0); channel_stamp = _stamp(os.fstat(fd))
+        except BaseException as error:
+            channel_primary = error; raise
+        finally: _close_fd(fd, channel_primary)
+        _same_stamp(_stamp(os.stat("supervisor.jsonl", dir_fd=ns.fd, follow_symlinks=False)), channel_stamp)
+        raw = canonical_json(_spec(head, remote, manifest, channel_stamp)).encode()
+        spec_sha = hash_bytes(raw)
         ns.write("launch.spec.json", raw)
         ns.write("job.plist", plistlib.dumps(build_launchd_plist(head, remote, spec_sha), sort_keys=True))
         _guard(head, remote); ns.check()
         return {"schema": "si-count-process-proof-prepared-v1", "launch_spec_sha256": spec_sha,
             "job_label": LABEL, "job_submitted": False, "authority": authority()}
-    finally: ns.close()
+    except BaseException as error:
+        primary = error; raise
+    finally:
+        try: ns.close()
+        except BaseException:
+            if primary is None: raise
 
 
 def _worker_line(stage, pid, parent_pid):
@@ -299,6 +474,7 @@ def _now():
 def _collect(process, ns, log_fd, began):
     pending = b""; output = b""; stages = ["entered", "completed"]
     selector = selectors.DefaultSelector()
+    primary = None
     try:
         os.set_blocking(process.stdout.fileno(), False)
         selector.register(process.stdout, selectors.EVENT_READ)
@@ -334,7 +510,12 @@ def _collect(process, ns, log_fd, began):
         require(os.read(log_fd, MAXIMUM_LOG_BYTES + 1) == output and _stamp(os.fstat(log_fd)) == seal,
             "supervisor_file_changed")
         return status, hash_bytes(output), seal
-    finally: selector.close()
+    except BaseException as error:
+        primary = error; raise
+    finally:
+        try: selector.close()
+        except BaseException:
+            if primary is None: raise
 
 
 class ParentObservedProofExit:
@@ -359,90 +540,167 @@ def _hold_unknown(process, ns, log_fd):
     while True: time.sleep(30)  # No kill, retry, restart, source operation or invented terminal result.
 
 
+def _known_exit(process):
+    original = _WAITS.get(process) if process is not None else None
+    return (original[1] if type(original) is tuple and len(original) == 3
+        and original[0] is _CHILDREN.get(process) and type(original[1]) is int else None)
+
+
+def _record_refusal(error, ns, process):
+    detail = _remember(error)
+    previous = _REFUSALS.get(id(error))
+    if type(previous) is tuple and previous[0] is error: return previous[1]
+    state = "original_anchors_closed"
+    if ns is not None and ns.fd is not None and ns.parent is not None:
+        state = "unavailable"
+        try:
+            ns.write("run.refused.json", canonical_json({
+                "schema": "si-count-process-proof-refusal-v2", "status": "proof_supervisor_refused",
+                "failure": detail, "actual_child_exit": _known_exit(process),
+                "proof_policy_sha256": PROOF_POLICY_SHA256, "authority": authority()}).encode())
+            state = "published"
+        except BaseException:
+            pass  # Retain the first actual failure, not a failed diagnostic-write replacement.
+    _REFUSALS[id(error)] = error, state
+    return state
+
+
 def supervise_proof(head, remote, spec_sha256):
-    _registered_proof(); _guard(head, remote); manifest = _code_manifest(head, remote)
-    wanted = canonical_json(_spec(head, remote, manifest)).encode()
-    require(type(spec_sha256) is str and hash_bytes(wanted) == spec_sha256, "supervisor_spec_changed")
-    ns = _Namespace(create=False); log_fd = process = completed = None
+    _stage("registration")
+    ns = reporter = log_fd = process = completed = None
+    failure = None
     try:
-        require(ns.read("launch.spec.json") == wanted and set(os.listdir(ns.fd)) == {"launch.spec.json", "job.plist"}
-            and ns.read("job.plist") == plistlib.dumps(build_launchd_plist(head, remote, spec_sha256), sort_keys=True),
-            "supervisor_spec_changed")
-        log_fd = ns.create("stdout.jsonl")  # The irreversible one-launch claim, before Popen.
-        os.fsync(log_fd); os.fsync(ns.fd); os.fsync(ns.parent)
-        _guard(head, remote); began = _now()
-        process = subprocess.Popen(_spec(head, remote, manifest)["worker_arguments"], cwd=ROOT,
-            env=_environment(), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-            shell=False, close_fds=True, start_new_session=True)
-        require(type(process.pid) is int and process.pid > 0 and process.stdout is not None,
-            "supervisor_child_changed")
-        _CHILDREN[process] = process, spec_sha256, manifest, object()
-        status, stdout_sha, log_seal = _collect(process, ns, log_fd, began)
-        _guard(head, remote)
-        require(_code_manifest(head, remote) == manifest and _CHILDREN.get(process)[0] is process,
-            "supervisor_code_changed")
-        result = {"schema": "si-parent-observed-proof-process-exit-v1", "status": "proof_child_exit_observed",
-            "parent_process_id": os.getpid(), "child_process_id": process.pid, "actual_process_exit": status,
-            "supervisor_parent_process_id": os.getppid(),
-            "runtime_head": head, "actual_remote": remote, "launch_spec_sha256": spec_sha256,
-            "stdout_sha256": stdout_sha, "launcher_independence_verified": False,
-            "supervisor_process_exit_attested": False, "known_Codex_exec_session": None, "authority": authority()}
-        raw = canonical_json(result).encode(); ns.write("result.json", raw)
-        ns.validate(log_fd, "stdout.jsonl", log_seal[6]); os.lseek(log_fd, 0, os.SEEK_SET)
-        require(_stamp(os.fstat(log_fd)) == log_seal
-            and hash_bytes(os.read(log_fd, MAXIMUM_LOG_BYTES + 1)) == stdout_sha
-            and _stamp(os.fstat(log_fd)) == log_seal, "supervisor_file_changed")
-        result_seal = _stamp(os.stat("result.json", dir_fd=ns.fd, follow_symlinks=False))
-        completed = process, _CHILDREN[process], raw.decode(), object()
-    except BaseException:
-        if process is not None:
-            waited = _WAITS.get(process)
-            if (type(waited) is tuple and len(waited) == 3 and waited[0] is _CHILDREN.get(process)
-                    and type(waited[1]) is int):
-                try:
-                    ns.write("result.json", canonical_json({"schema": "si-count-process-proof-rejected-v1",
-                        "status": "proof_rejected_after_known_child_exit", "actual_process_exit": waited[1],
-                        "child_process_id": process.pid, "authority": authority()}).encode())
-                except BaseException: pass
-            else: _hold_unknown(process, ns, log_fd)
+        try:
+            _registered_proof(); _stage("lane_guard"); _guard(head, remote)
+            _stage("current_code"); manifest = _code_manifest(head, remote)
+            _stage("namespace_open"); ns = _Namespace(create=False)
+            reporter = ns.duplicate_original()
+            _stage("launch_spec"); raw_spec = ns.read("launch.spec.json")
+            require(type(spec_sha256) is str and hash_bytes(raw_spec) == spec_sha256, "supervisor_spec_changed")
+            parsed = json.loads(raw_spec)
+            require(type(parsed) is dict, "supervisor_spec_changed")
+            original_channel = _channel_stamp(parsed.get("supervisor_stdout_initial_stamp"))
+            wanted = canonical_json(_spec(head, remote, manifest, original_channel)).encode()
+            require(raw_spec == wanted and set(os.listdir(ns.fd)) == {"launch.spec.json", "job.plist", "supervisor.jsonl"}
+                and ns.read("job.plist") == plistlib.dumps(build_launchd_plist(head, remote, spec_sha256), sort_keys=True),
+                "supervisor_spec_changed")
+            _stage("channel_binding")
+            channel = _CLI_CHANNEL if type(_CLI_CHANNEL) is _TerminalChannel else _TerminalChannel()
+            channel.bind(ns, original_channel)
+            log_fd = ns.create("stdout.jsonl")  # Exclusive irreversible one-launch claim.
+            os.fsync(log_fd); os.fsync(ns.fd); os.fsync(ns.parent)
+            _stage("child_launch"); _guard(head, remote); began = _now()
+            process = subprocess.Popen(_spec(head, remote, manifest, original_channel)["worker_arguments"], cwd=ROOT,
+                env=_environment(), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                shell=False, close_fds=True, start_new_session=True)
+            require(type(process.pid) is int and process.pid > 0 and process.stdout is not None, "supervisor_child_changed")
+            _CHILDREN[process] = process, spec_sha256, manifest, object()
+            _stage("child_observation"); status, stdout_sha, log_seal = _collect(process, ns, log_fd, began)
+            _stage("terminal_code"); _guard(head, remote)
+            require(_code_manifest(head, remote) == manifest and _CHILDREN.get(process)[0] is process,
+                "supervisor_code_changed")
+            result = {"schema": "si-parent-observed-proof-process-exit-v2", "status": "proof_child_exit_observed",
+                "parent_process_id": os.getpid(), "child_process_id": process.pid, "actual_process_exit": status,
+                "supervisor_parent_process_id": os.getppid(),
+                "runtime_head": head, "actual_remote": remote, "launch_spec_sha256": spec_sha256,
+                "stdout_sha256": stdout_sha, "launcher_independence_verified": False,
+                "supervisor_process_exit_attested": False, "known_Codex_exec_session": None, "authority": authority()}
+            _stage("result_publication"); raw = canonical_json(result).encode(); ns.write("result.json", raw)
+            _stage("stdout_audit"); ns.validate(log_fd, "stdout.jsonl", log_seal[6]); os.lseek(log_fd, 0, os.SEEK_SET)
+            _same_stamp(_stamp(os.fstat(log_fd)), log_seal)
+            require(hash_bytes(os.read(log_fd, MAXIMUM_LOG_BYTES + 1)) == stdout_sha, "supervisor_file_changed")
+            _same_stamp(_stamp(os.fstat(log_fd)), log_seal)
+            result_seal = _stamp(os.stat("result.json", dir_fd=ns.fd, follow_symlinks=False))
+            completed = process, _CHILDREN[process], raw.decode(), object()
+        except BaseException as error:
+            failure = error; _record_refusal(error, reporter if reporter is not None else ns, process)
+            if process is not None and _known_exit(process) is None:
+                if type(_CLI_CHANNEL) is _TerminalChannel:
+                    try: _CLI_CHANNEL.emit("refused", failure=_remember(error), refusal_record=_REFUSALS[id(error)][1])
+                    except BaseException: pass
+                _hold_unknown(process, ns, log_fd)
+        finally:
+            if not any(item[0] is process and item[1] is ns for item in _HELD):
+                _stage("context_cleanup")
+                close_actions = []
+                if process is not None and process.stdout is not None: close_actions.append(process.stdout.close)
+                if log_fd is not None: close_actions.append(lambda: os.close(log_fd))
+                if ns is not None: close_actions.append(ns.close)
+                for close in close_actions:
+                    try: close()
+                    except BaseException as error:
+                        if failure is None:
+                            failure = error; _record_refusal(error, reporter if reporter is not None else ns, process)
+                if failure is not None: raise failure
+        _stage("post_context_audit")
+        require(completed is not None and _directory(NAMESPACE.parent.lstat(), owner_only=False) == ns.parent_pin
+            and _directory(NAMESPACE.lstat(), owner_only=True) == ns.pin
+            and NAMESPACE.resolve() == NAMESPACE, "supervisor_file_changed")
+        _same_stamp(_stamp((NAMESPACE / "stdout.jsonl").lstat()), log_seal)
+        _same_stamp(_stamp((NAMESPACE / "result.json").lstat()), result_seal)
+        require(set(os.listdir(NAMESPACE)) == {"launch.spec.json", "job.plist", "supervisor.jsonl", "stdout.jsonl", "result.json"},
+            "supervisor_file_changed")
+        reporter.check(); _stage("reporter_cleanup"); reporter.close(); reporter = None
+        # Final reporter cleanup cannot mint a witness before these original
+        # named seals are checked again. No reporter is reopened on failure.
+        _stage("post_context_audit")
+        require(_directory(NAMESPACE.parent.lstat(), owner_only=False) == ns.parent_pin
+            and _directory(NAMESPACE.lstat(), owner_only=True) == ns.pin
+            and NAMESPACE.resolve() == NAMESPACE, "supervisor_file_changed")
+        _same_stamp(_stamp((NAMESPACE / "stdout.jsonl").lstat()), log_seal)
+        _same_stamp(_stamp((NAMESPACE / "result.json").lstat()), result_seal)
+        require(set(os.listdir(NAMESPACE)) == {"launch.spec.json", "job.plist", "supervisor.jsonl", "stdout.jsonl", "result.json"},
+            "supervisor_file_changed")
+        witness = object.__new__(ParentObservedProofExit)
+        witness._anchor = witness._identity = completed; _EXITS[witness] = completed
+        return witness
+    except BaseException as error:
+        if failure is None: failure = error
+        _record_refusal(error, reporter if reporter is not None else ns, process)
         raise
     finally:
-        if not any(item[0] is process and item[1] is ns for item in _HELD):
-            failures = []
-            for close in ((process.stdout.close,) if process is not None and process.stdout is not None else ()):
-                try: close()
-                except BaseException: failures.append(True)
-            if log_fd is not None:
-                try: os.close(log_fd)
-                except BaseException: failures.append(True)
-            try: ns.close()
-            except BaseException: failures.append(True)
-            require(not failures, "supervisor_file_changed")
-    require(completed is not None and _directory(NAMESPACE.parent.lstat(), owner_only=False) == ns.parent_pin
-        and _directory(NAMESPACE.lstat(), owner_only=True) == ns.pin
-        and NAMESPACE.resolve() == NAMESPACE and _stamp((NAMESPACE / "stdout.jsonl").lstat()) == log_seal
-        and _stamp((NAMESPACE / "result.json").lstat()) == result_seal, "supervisor_file_changed")
-    witness = object.__new__(ParentObservedProofExit)
-    witness._anchor = witness._identity = completed; _EXITS[witness] = completed
-    return witness
+        if reporter is not None:
+            try: reporter.close()
+            except BaseException as error:
+                if failure is None:
+                    _remember(error)
+                    raise
 
 
 def main(argv=None):
+    global _CLI_CHANNEL
     parser = argparse.ArgumentParser(description="Registered one-shot source-free process-lifetime proof")
     parser.add_argument("mode", choices=("prepare-proof", "supervise-proof", "proof-worker", "capture"))
     parser.add_argument("--head"); parser.add_argument("--remote"); parser.add_argument("--spec-sha256")
     args = parser.parse_args(argv)
+    channel = None
     try:
+        _stage("registration")
         if args.mode == "capture": _capture_refused()
-        if args.mode == "prepare-proof": result = prepare_proof(args.head, args.remote)
-        elif args.mode == "supervise-proof": result = supervise_proof(args.head, args.remote, args.spec_sha256).public_summary()
-        else: return proof_worker(args.head, args.remote)
-        print(canonical_json(result)); return 0
+        if args.mode == "prepare-proof":
+            result = prepare_proof(args.head, args.remote)
+            print(canonical_json(result)); return 0
+        if args.mode == "proof-worker": return proof_worker(args.head, args.remote)
+        _stage("channel_binding"); channel = _TerminalChannel(); _CLI_CHANNEL = channel
+        witness = supervise_proof(args.head, args.remote, args.spec_sha256)
+        _stage("public_summary")
+        result = witness.public_summary()
+        _stage("terminal_cli")
+        channel.emit("proof_supervisor_contexts_closed", child_exit=result["actual_process_exit"])
+        return 0
     except BaseException as error:
-        arguments = BaseException.args.__get__(error, BaseException) if type(error) is ProcessSupervisorRefusal else ()
-        code = next((value for value in _CODES if type(arguments) is tuple and len(arguments) == 1
-            and type(arguments[0]) is str and arguments[0] == "REFUSED: " + value), None)
-        print(canonical_json({"status": "refused", "contract_code": code, "authority": authority()})); return 2
+        detail = _remember(error)
+        if channel is not None:
+            state = _REFUSALS.get(id(error))
+            try:
+                channel.emit("refused", failure=detail,
+                    refusal_record=state[1] if type(state) is tuple and state[0] is error else "original_anchors_closed")
+            except BaseException: pass  # Partial output is never retried or replaced.
+        elif args.mode != "supervise-proof":
+            print(canonical_json({"status": "refused", "failure": detail, "authority": authority()}))
+        return 2
+    finally:
+        _CLI_CHANNEL = None
 
 
 if __name__ == "__main__":

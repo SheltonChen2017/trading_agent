@@ -27047,3 +27047,186 @@ metadata after root/Git-root/branch/HEAD/status guards. Retain any live
 private bytes/FDs on failure. Document actual results and any verified causal
 fix before a fresh policy. No source capture, QC/Safari, purchase, new
 credential, outcome look or push has occurred at this checkpoint.
+
+### 132.5 Actual negative-resolution closure and first supervisor result
+
+The preparatory checkpoint is local commit
+b1b5fd6faf12b5873f2609d7869ea728806da697, based on published
+f27d836ab0c7422463ea19b2f6fa3bba86535c4c. Main invoked the registered read-only
+resolver ONCE as exec6837 on clean B1B5 and matching tracking/actual F27.
+Its initial old_archive_replay message was observed and actual termination
+was **exit0**, with status negative_evidence_closed_only. It authenticated
+the original B3 archive and original E756 claim/code, current complete code
+and full retained footprint, owner-history prerequisite, all original
+context exits and terminal metadata/clock checks. No output/claim namespace,
+credential read, provider request or original source mutation was made.
+
+| Actual resolver observation | SHA256 |
+| --- | --- |
+| Original claim bytes | af721cf3f1d5b0934ee18c2691143cdde9c7e11ced8276aaaabe39ddfcbbb891 |
+| Original E756 code manifest | 662615638960744fe8c67e9e5cc47093370bfaf201181f8098d7d672660c21d6 |
+| Current B1B5 code manifest | 083df0ec4341702cf5a280743dffa5581ea923b2400bb6d2339bb31eb6509252 |
+| Retained footprint | 4ccd8d758682f1d4bb877361f2a1d50595b0e21ade119ff976b6a705cfae29c8 |
+| Owner-history binding | 847d80331f87c077bcef5bd88fae28664025fda7c435fa6f211bac2732525671 |
+| Genuine negative exposure | 8cd5fcb67d675a2b80762d8d66132977bd91dfece124eea09ac61cf7031095e0 |
+
+This supports the separately permanent8-START/16MiB floor and first-eight
+possible-try allocation in132.2. Old actual HTTP/START/bytes and process exit
+were all explicitly null, coverage0, old admission/refund/source authority
+false. It does not reopen the old claim or erase its unknown original error,
+and the current unconditional source gate remains closed pending the distinct
+supervision/dispatch integration. SI-BUILD-20261028-052 is not a completed
+source-recovery or readiness gate merely because this negative slice closed.
+
+Main then prepared the one fixed source-free proof-v1 namespace exactly once
+(exec88380 exit0), authenticated its original exclusive metadata, and submitted
+its exact job to gui/501 once (exec6904 exit0). Preparing/bootstrap exit0 is
+not a child or supervisor success. The launched supervisor64979 was owned
+by parent1. An exact-PID tccd query projected only fixed keywords and confirmed
+a SystemPolicyDocumentsFolder AUTHREQ/PROMPTING event before any child-launch
+marker existed. Main asked the owner to allow the native Python Documents
+prompt; the owner replied "done". No privacy database, permission setting,
+process, original file or job was changed or signalled by Codex.
+
+After the permission response, launchd reports **runs1, not running, last
+exit code2**. Independent read-only nofollow authentication found exactly
+job.plist, launch.spec.json, stdout.jsonl and result.json, all original
+protected regular files. The two fixed worker lines bind child70907 to
+original supervisor64979; the persisted result records original-child wait
+exit0 and supervisor parent1. The result's launcher-independence and
+supervisor-exit-attested booleans remain false. Actual supervisor2 vetoes
+the earlier child-success result: **the overall proof is NOT accepted**.
+There is no Codex-exec-session receipt and no source/capture authority.
+
+| Original proof-v1 file | SHA256 |
+| --- | --- |
+| launch.spec.json | 5f24dd6cf4f0572d935ec06af54cf1584200213c928b10b9c79696c8ce465a62 |
+| job.plist | dade56e20216d16471ebeb05b8d1cd93364f20b10f6f7b42c6023f8c5d1bac62 |
+| stdout.jsonl | 0793a524fccf3a45476c9cba08b8b1cada6268ba1f3fceab851fa40f8ca4d663 |
+| result.json | 2f77ef685b82c43c02a9ce02ef044771f219e8b1b94edac0fa7117147c59b5ef |
+
+**SI-BUILD-20261028-053, P2, verified diagnostics defect; correction pending:**
+after result.json is published, the supervisor's rejection branch attempts
+another O_EXCL publication to that same existing name and swallows its failure.
+Later cleanup and post-close audits also lie outside that rejection handler.
+The CLI routes its fixed refusal to /dev/null. Consequently supervisor2 can
+retain the earlier truthful child-exit observation without a durable rejection
+boundary. This is reproduced by the existing changed-stdout fabricated path;
+it is a reporting defect, not proof that stdout changed in the actual run.
+The exact actual failing guard/cause remains UNKNOWN. Do not attribute it to
+TCC, ctime, the filesystem, a provider, Keychain or another agent.
+
+The old proof namespace/job/files remain immutable and are never restarted,
+reused, overwritten or relabelled successful. A separately frozen source-free
+diagnostic successor may follow only after correcting053 with causal tests,
+retaining every full-stamp/code/cleanup/actual-exit guard and the same finite
+windows. It must expose a dominating negative or independent bounded fixed
+CLI refusal if original anchored reporting cannot complete. No new provider
+claim/request, source credential, outcome/look, QC/Safari, purchase or push
+has occurred. Work remains short of pre-QC readiness.
+
+### 132.6 Remaining dependency and budget-scope audit
+
+Main and a read-only delegated architecture audit confirmed a distinct gap
+after future transport closure: RequalifiedCountTransportCorpus currently
+exposes only closed_summary() and keeps source/count/denominator/actual-input
+authority false. compile_native_source() accepts only the three older exact
+sealed registry types; the old recovery factory requires exact parent/child
+ParallelCountInventory objects. A new genuine corpus-to-count semantic bridge
+must preserve native/date/class/query origins, disjoint coverage, negative and
+retry provenance before the compiler can accept it. No cast or complete flag
+can replace that qualification. This audit read public code, not source rows.
+
+Later dependencies remain whole fresh576 missing DAILY chains and the1169-day
+union, reuse of112 retained monthly panels without recapture, exact dated
+native/class/CIK/USD and own-class denominator composition, eligibility,
+corporate actions, factual cash/terminal clocks, processing rights and sealed
+actual-input representation checks. Public code alone proves neither that
+these external facts are unavailable nor that they are admitted. Audit the
+authorized retained evidence before declaring a concrete external blocker;
+do not invent a dividend-pay clock, cash proxy, source right or historical
+PIT availability. No outcome/backtest/QC action follows this planning audit.
+
+Budget scope was raised with the owner asynchronously and is pending. Current
+count SourceAUTH explicitly excludes DAILY, while the older DAILY scope
+subtracts original spent debits from its separate frozen ceiling. If the
+latest84005/4GiB instruction instead means ONE combined lane envelope, a lower
+bound is13992 known count STARTs +8 permanent unknown upper debits +3586
+historical DAILY STARTs +67885 missing count queries +at least576 fresh DAILY
+STARTs =86047, already2042 above84005 before retries or multipage days.
+Combined known charged bytes plus the new unknown floor would be
+966979249+23452681+16777216=1007209146, leaving3287758150 under one4GiB
+ceiling before new count retrieval. This conditional scope arithmetic does
+not attribute any new actual spending to exec13448. Do not silently allocate
+both source envelopes or change the frozen study. New source retrieval stays
+held pending explicit scope reconciliation and all custody/dispatch gates.
+
+### 132.7 Frozen source-free diagnostics successor; actual proof pending
+
+**SI-DEC-20261028-02**, under continuing SI-AUTH-20261028-02, corrects053
+prospectively in the supervisor and its fabricated tests only. The original
+v1 job/files/results remain unchanged. V2 uses the distinct fixed namespace
+artifacts/short_interest/count-process-supervisor-proof-v2 and label
+com.openai.codex.short-interest-process-proof-v2. Six allowed roles are
+job.plist, launch.spec.json, stdout.jsonl, result.json, run.refused.json and
+supervisor.jsonl. Preparation creates only the spec/job and one exclusive
+0600/single-link/zero-byte terminal channel, whose original full9-field stamp
+is bound into the spec. No job has yet been submitted for v2.
+
+Original namespace/parent dup FDs survive primary cleanup and terminal audits
+solely to publish an exclusive dominating negative. They are never reopened
+or adopted after close. Failure of the final original reporter cleanup or a
+later summary uses only the already-open independently launchd-directed
+terminal channel, when its ORIGINAL spec-bound identity is authenticated.
+Replacement or pre-spec channels remain unavailable; a newly observed empty
+private file cannot grant write authority. Full original stamp/name/protection
+checks remain mandatory before child dispatch or success. The terminal line
+is one fixed allowlisted JSON record, at most2048 bytes, with no arbitrary
+exception formatting/paths/values. Partial output is never retried. Native
+launchd exit2/nonzero/unknown still overrides every earlier child observation.
+
+All old full-stamp, code, actual original-child wait, cleanup and finite2/5s
+proof checks remain. The final exact positive-five-role set/no-negative check
+also runs after the LAST original reporter cleanup before a witness. CLI
+success says only proof_supervisor_contexts_closed; supervisor exit attestation
+and launcher-independence booleans remain false until Main independently
+authenticates the original metadata/line plus actual kernel terminal evidence.
+There is no source/old-run/input/QC authority or v1 Codex-exec-session receipt.
+
+| Finding | Priority | Software disposition and causal evidence |
+| --- | --- | --- |
+| SI-BUILD-20261028-053 | P2 | Corrected prospectively: separate anchored negative plus bounded original-FD terminal fallback covers post-result/context failure. Initial2 fabricated RED cases exposed the v1 diagnostic gap. Actual v1 failing guard/cause remains UNKNOWN. |
+| SI-BUILD-20261028-054 | P2 | Corrected before v2 release: a negative created during final reporter cleanup previously coexisted with main0/witness1. Final exact membership/no-negative sweep now vetoes it; causal RED then GREEN. |
+| SI-BUILD-20261028-055 | P3 | Corrected first-cause fidelity: original metadata close/dup/read/write errors drain all original FDs without replacing a primary failure with secondary cleanup/reporting errors. Nested and double-fault cases failed before correction. |
+| SI-BUILD-20261028-056 | P2 | Corrected original-channel custody: a pre-launch replacement FD previously received a712-byte refusal despite failed bind. Original spec-bound identity now gates even diagnostic writes; replacement/pre-spec channels receive0 bytes. Full bind still gates child/success. |
+| SI-BUILD-20261028-057 | P2 | Corrected before release: ambient caller sys.exc_info had suppressed a clean-path close EIO and allowed main0/witness1. Only explicitly captured FUNCTION-LOCAL primary errors may preserve an earlier failure; unrelated caller errors cannot suppress cleanup refusal. |
+
+Frozen proof-v2 policy SHA256:
+c83bb95c7912d20d12b88cf145ccb3ea35a22d66ba2cfb2539108361ffc8f217.
+Source SHA2560b11afcc9a7026fe9727cca1131c5bf1ddea7d37cd716b1d1874ff636ff23565;
+test SHA2560755fc7f4478797b2b7c6ae54c9aad6ca40a15805f5a145dc7c852a12e995816.
+Main independently checked policy equality and compiled88 held/proof/test paths
+in memory. Main8 relevant focused files passed249/2.30s, no skips/warnings
+reported; prior post-result record selection98/1.67s passed. Every test run
+used sanitized environment, bytecode/cache disabled and OS network denial.
+No full lane/repository suite ran. All historical record bytes remain a prefix.
+
+Separately attributed author final supervisor/import selection65/1.02s and
+peer supervisor-only56/.52s passed. Peer accepted after the verified changes;
+this is delegated review, not independent Claude review. Additional original-
+anchor, negative-membership, channel-identity and local-primary memory-only
+causal reversals failed as expected and were restored. These are fabricated
+tests; they do not prove the next actual job closes or diagnose original v1.
+
+At the resulting clean commit with actual/tracking origin still F27, Main may
+prepare this separately registered v2 ONCE, authenticate its original spec/job
+and empty channel stamp, and bootstrap its exact one-shot job ONCE. No old
+namespace/job is restarted. Freeze all authors/tests while it runs; guard the
+exact worktree/branch/HEAD/status before every status read. Require actual
+kernel supervisor exit0, original wait exit0, exact protected controls/logs,
+original terminal inode/protection, bounded canonical terminal success and no
+negative sibling. Failure remains failure; do not enlarge windows or weaken
+guards to obtain a pass. Document the true result before any source activation.
+Source dispatch and capture mode remain blocked; the DAILY scope question is
+still pending. No new provider request/claim/key read, look, QC/Safari,
+purchase or push occurred during this software correction.

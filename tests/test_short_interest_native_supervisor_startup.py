@@ -566,13 +566,13 @@ def test_outer_observer_reports_failure_before_subject_channel_exists(fabricated
 
 @pytest.mark.parametrize("hazard", ["nonce", "digest", "pid", "duplicate", "partial", "unrelated", "raw_prefix", "foreign_field"])
 def test_private_raw_filter_never_emits_unrelated_or_uncorrelated_text(fabricated, hazard):
-    value = {"schema": "si-startup-PTY-observation-v6", "nonce": _OBSERVER["nonce"], "spec_sha256": "c" * 64,
+    value = {"schema": "si-startup-PTY-observation-v7", "nonce": _OBSERVER["nonce"], "spec_sha256": "c" * 64,
         "pid": 456, "status": "readonly_predicates_passed_observation_only", "failure": None, "authority": diag.authority()}
     if hazard == "nonce": value["nonce"] = "2" * 32
     elif hazard == "digest": value["spec_sha256"] = "d" * 64
     elif hazard == "pid": value["pid"] = 457
     elif hazard == "foreign_field": value["raw"] = "PRIVATE_STARTUP_TEXT"
-    raw = canonical_json(value).encode() + b"\n"
+    raw = diag._wire_encode(value)
     if hazard == "duplicate": raw += raw
     elif hazard == "partial": raw = raw[:-1]
     elif hazard == "unrelated": raw = b"PRIVATE_PYTHON_TRACEBACK\n"
@@ -654,7 +654,7 @@ def test_persistent_control_child_orders_barrier_single_start_and_terminal_ack(c
         result = diag.control_readonly(HEAD, diag.REMOTE, controller_child.digest, _OBSERVER, control_fd, ack_fd, controller_child.pins)
         messages = [json.loads(v) for v in os.read(read_fd, diag.MAX_RAW).splitlines()]
         assert controller_child.calls == ["query", "query", "query", "start", "query"]
-        assert messages[0]["schema"] == "si-startup-prestart-barrier-v6"
+        assert messages[0]["schema"] == "si-startup-prestart-barrier-v7"
         assert messages[1]["target_pid"] == 456 and result["kernel"]["exit"] == 2
         assert result["authority"]["source_dispatch_authority"] is False
     finally: os.close(read_fd)
@@ -700,7 +700,7 @@ def root_controller(fabricated, monkeypatch):
             def line(self, value): os.write(writer, canonical_json(value).encode() + b"\n")
             def receipt(self, early=False):
                 error = diag.StartupRefusal("REFUSED: startup_control")
-                return {"schema": "si-startup-control-v6", "nonce": observer["nonce"], "spec_sha256": digest,
+                return {"schema": "si-startup-control-v7", "nonce": observer["nonce"], "spec_sha256": digest,
                     "control_pid": self.pid, "target_pid": None if early else 456,
                     "kernel": diag._kernel(kernel_bytes() if early else kernel_bytes(1, exit_code=2)),
                     "status": "refused" if early else "terminal_observed", "failure": diag.failure_summary(error, HEAD) if early else None,
@@ -709,7 +709,7 @@ def root_controller(fabricated, monkeypatch):
                 if self.step == 0:
                     os.write(slave, b"PRIVATE_CONTROL_SETUP_BANNER\n")
                     if h.early: self.line(self.receipt(True))
-                    else: self.line({"schema": "si-startup-prestart-barrier-v6", "nonce": observer["nonce"],
+                    else: self.line({"schema": "si-startup-prestart-barrier-v7", "nonce": observer["nonce"],
                         "spec_sha256": digest, "control_pid": self.pid, "status": "runs0_before_initial_start"})
                     self.step = 1; return None
                 if self.step == 1:
@@ -720,9 +720,9 @@ def root_controller(fabricated, monkeypatch):
                     if h.early: self.exit = 2
                     else:
                         h.started = True; h.actions.append("initial_start")
-                        body = {"schema": "si-startup-PTY-observation-v6", "nonce": observer["nonce"], "spec_sha256": digest,
+                        body = {"schema": "si-startup-PTY-observation-v7", "nonce": observer["nonce"], "spec_sha256": digest,
                             "pid": 456, "status": "refused", "failure": diag.failure_summary(diag.StartupRefusal("REFUSED: startup_config"), HEAD), "authority": diag.authority()}
-                        self.pending = h.raw_after_start + canonical_json(body).encode() + b"\n"
+                        self.pending = h.raw_after_start + diag._wire_encode(body)
                         self.step = 15; return None
                 elif self.step == 15:
                     written = os.write(slave, self.pending[:512]); self.pending = self.pending[written:]
@@ -759,6 +759,7 @@ def root_controller(fabricated, monkeypatch):
 def test_root_private_controller_barrier_captures_only_poststart_correlated_line(root_controller):
     result = diag.observe_readonly(HEAD, diag.REMOTE)
     assert result["status"] == "terminal_observation_only" and result["kernel"]["exit"] == 2
+    assert result["target_pid"] == 456
     assert result["observer"]["status"] == "refused" and result["control_failure"] is None
     assert root_controller.actions.count("initial_start") == 1 and root_controller.actions.count("ack1") == 1
     assert root_controller.actions.index("ack1") < root_controller.actions.index("initial_start") < root_controller.actions.index("ack2")
@@ -770,6 +771,7 @@ def test_root_private_controller_preserves_prebarrier_refusal_without_start_or_h
     root_controller.early = True
     result = diag.observe_readonly(HEAD, diag.REMOTE)
     assert result["status"] == "control_refused_before_initial_start" and result["target_started"] is False
+    assert result["target_pid"] is None
     assert result["controller_exit"] == 2 and result["control_failure"]["contract_code"] == "startup_control"
     assert result["observer"]["status"] == "observer_unavailable"
     assert "ack1" not in root_controller.actions and "initial_start" not in root_controller.actions
@@ -1065,3 +1067,221 @@ def test_native_session_child_keeps_explicit_endpoints_without_controlling_owner
         # unknown test child keeps all originals rather than being killed/lost.
         if not held:
             os.close(slave); os.close(master)
+
+
+def test_v7_wrapper_transport_is_fixed_policy_bound_and_job_remains_bounded(fabricated):
+    import ast, base64, zlib
+    wrapper = diag._import_wrapper(); body = diag._import_body()
+    encoded = next(node.args[0].value for node in ast.walk(ast.parse(wrapper))
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "b64decode")
+    assert zlib.decompress(base64.b64decode(encoded)).decode() == body
+    descriptor = diag.policy()["import_wrapper"]
+    assert descriptor["body_sha256"] == hash_bytes(body.encode()) and descriptor["inline_sha256"] == hash_bytes(wrapper.encode())
+    digest = prepare(); job = diag.build_launchd_plist(HEAD, diag.REMOTE, digest, _OBSERVER)
+    assert len(plistlib.dumps(job, sort_keys=True)) <= diag.MAX_CONFIG == 4096
+    assert job["ProgramArguments"][:4] == [diag.worker.PYTHON, "-B", "-c", wrapper]
+    assert job["ProgramArguments"][4:] == ["run-readonly", "--head", HEAD, "--remote", diag.REMOTE,
+        "--spec-sha256", digest, "--observer", canonical_json(_OBSERVER)]
+    assert "__import__('scripts.diagnose_short_interest_native_supervisor_startup',fromlist=['main'])" in body
+
+
+def test_v7_wire_authority_hash_is_exact_no_alternate_or_default_authority_form():
+    value = {"schema": "si-startup-PTY-observation-v7", "nonce": _OBSERVER["nonce"], "spec_sha256": "c" * 64,
+        "pid": 456, "status": "readonly_predicates_passed_observation_only", "failure": None, "authority": diag.authority()}
+    wire = diag._wire_encode(value); parsed = json.loads(wire)
+    assert "authority" not in parsed and parsed["authority_sha256"] == hash_payload(diag.authority())
+    assert diag.filter_observer(wire, _OBSERVER, "c" * 64, 456)["authority"] == diag.authority()
+    for altered in ({**parsed, "authority_sha256": "0" * 64}, {k: v for k, v in parsed.items() if k != "authority_sha256"}, value):
+        result = diag.filter_observer(canonical_json(altered).encode() + b"\n", _OBSERVER, "c" * 64, 456)
+        assert result["status"] == "observer_unavailable"
+
+
+def test_finite_wire_bound_covers_every_fixed_failure_family_and_stamp_domain():
+    longest = lambda values: max(values, key=len)
+    detail = {"stage": longest(diag._STAGES), "stage_scope": "entered_phase_including_callbacks_not_forensic_cause",
+        "category": "local_contract_refusal", "contract_code": longest(diag._CODES),
+        "upstream_contract_code": longest(diag.proof._CODES | diag.worker._CODES | diag.proof.native._CODES),
+        "errno_name": longest(set(diag._ERRNOS.values()) | set(diag.proof._ERRNOS.values()) | set(diag.worker._ERRNOS.values()) | set(diag.proof.native._ERRNOS.values())),
+        "mismatching_fields": [longest(diag.proof._STAMP_NAMES)] * 9,
+        "original_Git": {"role": "actual_matching_ref", "code_ordinal": 6, "returncode": -32768},
+        "original_query": {"returncode": -32768}}
+    value = {"schema": "si-startup-PTY-observation-v7", "nonce": "f" * 32, "spec_sha256": "f" * 64,
+        "pid": 2147483647, "status": "readonly_predicates_passed_observation_only", "failure": detail, "authority": diag.authority()}
+    worst = len(diag._wire_encode(value))
+    assert worst == diag._wire_bound() <= diag.MAX_WIRE == 1024 < diag.MAX_STATUS == 2048
+    for code in diag._CODES:
+        detail["contract_code"] = code
+        assert len(diag._wire_encode(value)) <= worst
+
+
+_WRAPPER_CHILD = '''import sys,os,json,builtins,errno,types
+wrapper,mode,encoded=sys.argv[1:]
+args=json.loads(encoded)
+original=builtins.__import__
+def intercepted(name,*a,**k):
+ if name=='scripts.diagnose_short_interest_native_supervisor_startup':
+  if mode in ('import_oserror','partial_write'):raise OSError(errno.EACCES,'PRIVATE_IMPORT_PATH_AND_TEXT')
+  if mode=='import_unknown':raise RuntimeError('PRIVATE_DYNAMIC_EXCEPTION')
+  def main(actual):
+   if mode=='handoff_error':raise RuntimeError('PRIVATE_LATER_MAIN')
+   return 0 if actual==args else 2
+  return types.SimpleNamespace(main=main)
+ if mode=='decoder_error' and name=='zlib':raise RuntimeError('PRIVATE_DECODER')
+ return original(name,*a,**k)
+builtins.__import__=intercepted
+if mode=='partial_write':
+ original_write=os.write
+ def partial(fd,body):
+  if fd==2:return original_write(fd,body[:10])
+  return original_write(fd,body)
+ os.write=partial
+sys.argv=['-c',*args]
+exec(wrapper)
+'''
+
+
+def _private_wrapper_child(mode, *, bad_channel=False):
+    master, slave = os.openpty(); os.set_blocking(master, False)
+    settings = termios.tcgetattr(slave); settings[1] &= ~termios.ONLCR; settings[3] &= ~termios.ECHO
+    termios.tcsetattr(slave, termios.TCSANOW, settings)
+    observer = {"nonce": "4" * 32, "terminal": list(diag._tty_pin(slave)), "slave_path": os.ttyname(slave)}
+    if bad_channel: observer["terminal"][1] += 1
+    args = ["run-readonly", "--head", HEAD, "--remote", diag.REMOTE, "--spec-sha256", "c" * 64, "--observer", canonical_json(observer)]
+    process = None; held = False; private = b""
+    try:
+        process = ORIGINAL_POPEN([diag.worker.PYTHON, "-B", "-c", _WRAPPER_CHILD, diag._import_wrapper(), mode, canonical_json(args)],
+            cwd=diag.ROOT, env=diag.worker._environment(), stdin=slave, stdout=slave, stderr=slave,
+            start_new_session=True, close_fds=True, shell=False)
+        try: actual_exit = process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            held = True; _NATIVE_CHILD_HELD.append((process, master, slave)); pytest.fail("fixed wrapper test child unknown; originals retained")
+        for unused in range(4):
+            try: block = os.read(master, 4096)
+            except BlockingIOError: break
+            if not block: break
+            private += block
+        return actual_exit, process.pid, observer, private
+    finally:
+        if not held: os.close(slave); os.close(master)
+
+
+@pytest.mark.parametrize("mode,expected_errno", [("import_oserror", "EACCES"), ("import_unknown", None)])
+def test_preimport_wrapper_emits_one_authenticated_fixed_import_failure(mode, expected_errno):
+    actual_exit, pid, observer, private = _private_wrapper_child(mode)
+    assert actual_exit == 2
+    result = diag.filter_observer(private, observer, "c" * 64, pid)
+    assert result["status"] == "refused" and result["failure"]["stage"] == "startup_import"
+    assert result["failure"]["contract_code"] == "startup_import_failed" and result["failure"]["errno_name"] == expected_errno
+    assert result["failure"]["original_query"] == {"returncode": None}
+    safe = b"PRIVATE" not in private
+    assert safe and len(private) <= 1024 and private.count(b"\n") == 1
+
+
+@pytest.mark.parametrize("mode,expected_exit", [("success", 0), ("decoder_error", 2), ("handoff_error", 2)])
+def test_wrapper_success_or_nonimport_failure_has_no_prelude_or_relabelled_import_line(mode, expected_exit):
+    actual_exit, unused_pid, unused_observer, private = _private_wrapper_child(mode)
+    assert actual_exit == expected_exit
+    empty = private == b""
+    assert empty
+
+
+def test_wrapper_invalid_destination_never_writes_or_imports_target():
+    actual_exit, unused_pid, unused_observer, private = _private_wrapper_child("import_oserror", bad_channel=True)
+    assert actual_exit == 2
+    empty = private == b""
+    assert empty
+
+
+@pytest.mark.parametrize("hazard,code", [("target", "startup_kernel_target"), ("path", "startup_kernel_path"),
+    ("runs", "startup_kernel_runs_field"), ("state_field", "startup_kernel_state_field"),
+    ("active", "startup_kernel_active_field"), ("pid", "startup_kernel_pid_field"),
+    ("exit_duplicate", "startup_kernel_exit_field"), ("exit_format", "startup_kernel_exit_format"),
+    ("annotation", "startup_kernel_exit_annotation"), ("state_catalogue", "startup_kernel_state_catalogue"),
+    ("never", "startup_kernel_never_exited"), ("bounds", "startup_kernel_bounds")])
+def test_kernel_refusal_families_distinguish_unchanged_rejected_predicates(fabricated, hazard, code):
+    raw = kernel_bytes()
+    if hazard == "target": raw = raw.replace(diag._target().encode(), b"PRIVATE_FOREIGN_TARGET", 1)
+    elif hazard == "path": raw = raw.replace(str(diag.ROOT / diag.PARENT / diag.BOOTSTRAP / "job.plist").encode(), b"PRIVATE_FOREIGN_PATH")
+    elif hazard == "runs": raw += b"\truns = 0\n"
+    elif hazard == "state_field": raw = raw.replace(b"\tstate = not running", b"\tstate = PRIVATE_UNRECOGNIZED_STATE")
+    elif hazard == "active": raw += b"\tactive count = 0\n"
+    elif hazard == "pid": raw += b"\tpid = PRIVATE_INVALID\n"
+    elif hazard == "exit_duplicate": raw += b"\tlast exit code = 0\n"
+    elif hazard == "exit_format": raw = raw.replace(b"(never exited)", b"PRIVATE_UNKNOWN_EXIT")
+    elif hazard == "annotation": raw = kernel_bytes(1, exit_code=78).replace(b"78\n", b"78: EX_USAGE\n")
+    elif hazard == "state_catalogue": raw = raw.replace(b"\tstate = not running", b"\tstate = spawn scheduled")
+    elif hazard == "never": raw = raw.replace(b"\truns = 0", b"\truns = 1")
+    else: raw = kernel_bytes(2, exit_code=0)
+    with pytest.raises(diag.StartupRefusal) as error: diag._kernel(raw)
+    detail = diag.failure_summary(error.value, HEAD)
+    assert detail["contract_code"] == code and "PRIVATE" not in canonical_json(detail)
+
+
+def test_query_returncode_projection_requires_genuine_original_frame(controller_child, monkeypatch):
+    original = diag.subprocess.run
+    def run(args, **kwargs):
+        if args == diag._launch_argv("query"): return subprocess.CompletedProcess(args, 124, stdout=b"PRIVATE_RETURN_BODY")
+        return original(args, **kwargs)
+    monkeypatch.setattr(diag.subprocess, "run", run)
+    with pytest.raises(diag.StartupRefusal) as error: diag._query(HEAD)
+    detail = diag.failure_summary(error.value, HEAD)
+    assert detail["contract_code"] == "startup_query_return" and detail["original_query"] == {"returncode": 124}
+    def fake_query(head):
+        result = subprocess.CompletedProcess(diag._launch_argv("query"), 0, stdout=b"")
+        raise diag.StartupRefusal("REFUSED: startup_query_return")
+    with pytest.raises(diag.StartupRefusal) as forged: fake_query(HEAD)
+    assert diag.failure_summary(forged.value, HEAD)["original_query"] == {"returncode": None}
+
+
+def test_actual_query_zero_return_with_refused_body_is_not_invented_success(controller_child, monkeypatch):
+    original = diag.subprocess.run
+    def run(args, **kwargs):
+        if args == diag._launch_argv("query"): return subprocess.CompletedProcess(args, 0, stdout=b"PRIVATE_INVALID_BODY")
+        return original(args, **kwargs)
+    monkeypatch.setattr(diag.subprocess, "run", run)
+    with pytest.raises(diag.StartupRefusal) as error: diag._query(HEAD)
+    detail = diag.failure_summary(error.value, HEAD)
+    assert detail["contract_code"] == "startup_kernel_target" and detail["original_query"] == {"returncode": 0}
+
+
+def test_failed_poststart_query_clears_prestart_kernel_row_in_control_receipt(controller_child):
+    controller_child.query_states[-1] = kernel_bytes(1).replace(b"\tstate = not running", b"\tstate = spawn scheduled")
+    read_fd, control_fd = os.pipe(); ack_fd, ack_write = os.pipe(); os.write(ack_write, b"12"); os.close(ack_write)
+    try:
+        with pytest.raises(diag.StartupRefusal): diag.control_readonly(HEAD, diag.REMOTE, controller_child.digest, _OBSERVER, control_fd, ack_fd, controller_child.pins)
+        receipt = json.loads(os.read(read_fd, diag.MAX_RAW).splitlines()[-1])
+        assert receipt["target_pid"] == 456 and receipt["kernel"] is None
+        assert receipt["failure"]["contract_code"] == "startup_kernel_state_catalogue"
+        assert receipt["failure"]["original_query"] == {"returncode": 0}
+    finally: os.close(read_fd)
+
+
+def test_postquery_pid_binding_failure_has_distinct_code_and_no_borrowed_query_frame(controller_child):
+    controller_child.query_states[-1] = kernel_bytes(1, running=True, pid=457)
+    read_fd, control_fd = os.pipe(); ack_fd, ack_write = os.pipe(); os.write(ack_write, b"12"); os.close(ack_write)
+    try:
+        with pytest.raises(diag.StartupRefusal): diag.control_readonly(HEAD, diag.REMOTE, controller_child.digest, _OBSERVER, control_fd, ack_fd, controller_child.pins)
+        receipt = json.loads(os.read(read_fd, diag.MAX_RAW).splitlines()[-1])
+        assert receipt["failure"]["contract_code"] == "startup_kernel_pid_binding"
+        assert receipt["failure"]["original_query"] == {"returncode": None}
+    finally: os.close(read_fd)
+
+
+def test_fixed_bootstrap_body_checks_the_single_actual_write_count():
+    import ast
+    body = ast.parse(diag._import_body())
+    writes = [node for node in ast.walk(body) if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+        and isinstance(node.func.value, ast.Name) and node.func.value.id == "os" and node.func.attr == "write"]
+    assert len(writes) == 1
+    assignments = [node for node in ast.walk(body) if isinstance(node, ast.Assign) and node.value is writes[0]]
+    assert len(assignments) == 1 and isinstance(assignments[0].targets[0], ast.Name)
+    count = assignments[0].targets[0].id
+    guards = [node for node in ast.walk(body) if isinstance(node, ast.If) and isinstance(node.test, ast.BoolOp)
+        and ast.unparse(node.test) == "type(" + count + ") is not int or " + count + " != len(B)"]
+    assert len(guards) == 1 and any(isinstance(node, ast.Raise) for node in guards[0].body)
+
+
+def test_bootstrap_partial_write_is_one_attempt_and_never_a_complete_observation():
+    actual_exit, pid, observer, private = _private_wrapper_child("partial_write")
+    assert actual_exit == 2 and len(private) == 10
+    assert diag.filter_observer(private, observer, "c" * 64, pid)["status"] == "observer_unavailable"

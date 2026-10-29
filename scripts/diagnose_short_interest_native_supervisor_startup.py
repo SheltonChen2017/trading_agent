@@ -6,6 +6,8 @@ predicates still run through the unchanged original guard and code reader.
 """
 import argparse
 import builtins
+import base64
+import zlib
 import io
 from contextlib import contextmanager
 import errno
@@ -34,10 +36,10 @@ worker = proof.worker
 ROOT, PARENT = proof.ROOT, proof.PARENT
 MODULE = "scripts.diagnose_short_interest_native_supervisor_startup"
 DRIVER = "scripts/diagnose_short_interest_native_supervisor_startup.py"
-BOOTSTRAP = "count-native-supervisor-startup-diagnostic-v6"
-STATUS = "count-native-supervisor-startup-diagnostic-v6.jsonl"
-LABEL = "com.openai.codex.short-interest-native-startup-diagnostic-v6"
-POLICY_SHA256 = "607b2895b19d6ed817d07e6ec301781d05398176a8065f3a90002d94f43d6976"
+BOOTSTRAP = "count-native-supervisor-startup-diagnostic-v7"
+STATUS = "count-native-supervisor-startup-diagnostic-v7.jsonl"
+LABEL = "com.openai.codex.short-interest-native-startup-diagnostic-v7"
+POLICY_SHA256 = "42677ed04df11f1c077691764301d9d52ff1ce79e9c3491d2e52543300216b97"
 TARGET_HEAD = "b58f992ac73451f8e4ec1384061ad7030d8afffa"
 REMOTE = "f27d836ab0c7422463ea19b2f6fa3bba86535c4c"
 TARGET_SPEC = "28220a7af8aea2acc70da2a61fbceddd86cc831226cfc56c560ec13e0da2e8a6"
@@ -49,6 +51,7 @@ TARGET_MANIFEST = {
     "scripts/short_interest_isolated_custody_volume.py": "3baf4977794e30864cbc1a6d59869daccde5161140aee59684fd5fac6e6ba6b8"}
 CODE_FILES = (*proof.CODE_FILES, DRIVER)
 MAX_CONFIG, MAX_STATUS, MAX_SECONDS, MAX_GIT = 4096, 2048, 300, 128
+MAX_WIRE = 1024
 LAUNCHCTL = "/bin/launchctl"
 MAX_RAW, MAX_POLLS = 65536, 300
 _SYSEXITS = dict(enumerate(("EX_USAGE", "EX_DATAERR", "EX_NOINPUT", "EX_NOUSER", "EX_NOHOST", "EX_UNAVAILABLE", "EX_SOFTWARE", "EX_OSERR", "EX_OSFILE", "EX_CANTCREAT", "EX_IOERR", "EX_TEMPFAIL", "EX_PROTOCOL", "EX_NOPERM", "EX_CONFIG"), 64))
@@ -56,8 +59,9 @@ _CONTROLLER_HELD, _PREPARED_INPUTS = [], {}
 _ORIGINAL_GIT, _GIT_CODE = worker._git, worker._git.__code__
 _ORIGINAL_GUARD, _ORIGINAL_CODE, _ORIGINAL_READ = worker._guard, proof._Code, proof._read_bootstrap
 _STAGE, _USED = "registration", False
-_STAGES = frozenset("registration config_auth status_bind live_guard current_code historical_config terminal_code original_audit cleanup named_audit status_publication observer_binding controller_load controller_prestart controller_barrier controller_initial_start controller_terminal".split())
+_STAGES = frozenset("registration config_auth status_bind live_guard current_code historical_config terminal_code original_audit cleanup named_audit status_publication startup_import observer_binding controller_load controller_prestart controller_barrier controller_initial_start controller_terminal".split())
 _CODES = frozenset("startup_unregistered startup_arguments startup_config startup_status startup_code startup_stamp startup_deadline startup_clock startup_forbidden startup_git_budget startup_already_used startup_write startup_membership startup_observer startup_control startup_control_state startup_control_unknown".split())
+_CODES = _CODES | frozenset("startup_import_failed startup_query_return startup_kernel_body startup_kernel_target startup_kernel_path startup_kernel_runs_field startup_kernel_state_field startup_kernel_active_field startup_kernel_pid_field startup_kernel_exit_field startup_kernel_exit_format startup_kernel_exit_annotation startup_kernel_state_catalogue startup_kernel_never_exited startup_kernel_bounds startup_kernel_pid_binding".split())
 _ERRNOS = {getattr(errno, n): n for n in ("EACCES", "EPERM", "ENOENT", "EEXIST", "ENOSPC", "EIO", "EBADF", "EMFILE", "ENFILE", "EROFS", "EINTR", "EAGAIN")}
 _FAILURES = {}
 
@@ -79,7 +83,7 @@ def authority():
 
 
 def policy():
-    return {"schema": "si-native-startup-diagnostic-policy-v6", "root": str(ROOT), "parent": str(PARENT),
+    return {"schema": "si-native-startup-diagnostic-policy-v7", "root": str(ROOT), "parent": str(PARENT),
         "bootstrap": BOOTSTRAP, "status": STATUS, "label": LABEL, "code_files": list(CODE_FILES),
         "target_head": TARGET_HEAD, "target_remote": REMOTE, "target_spec_sha256": TARGET_SPEC,
         "target_manifest": TARGET_MANIFEST, "maximum_config_bytes": MAX_CONFIG, "maximum_status_bytes": MAX_STATUS,
@@ -87,7 +91,8 @@ def policy():
         "deadline": "elapsed_acceptance_at_phase_and_terminal_boundaries_not_hard_wall_kill",
         "preauth": "externally_pinned_canonical_config_only_live_root_branch_HEAD_status_unknown_until_original_guard",
         "configuration": "exact_spec_job_roles_original_first7_and_canonical_expected_bytes_SHA_across_phases_fresh_full9_FD_named_stability_each_read_including_close_no_evidence_capability_original_creator_pin_preserved_prepare_initial_Runtime_pin_configuration_only",
-        "retired": "startup_diagnostic_v1_v2_v3_v4_v5_namespaces_status_and_jobs_preserved_never_reused",
+        "retired": "startup_diagnostic_v1_v2_v3_v4_v5_v6_namespaces_status_and_jobs_preserved_never_reused",
+        "wire": {"profile": "exact_v7_authority_sha256_expand_full_false_authority_before_validation_not_authenticity", "maximum_bytes": MAX_WIRE, "authority_sha256": hash_payload(authority()), "conservative_maximum_bytes": _wire_bound()},
         "observer": "Root_CLI_original_TTY_dev_ino_rdev_UID_GID_mode_isatty_observation_only_before_registration_fence_clock_config_one2048_nonblocking_write_no_retry_fsync_readback_nonce_specDigest_PID_correlated_no_exclusive_writer_or_own_kernel_claim",
         "load_consumption": "same_process_original_prepare_first7_canonical_bytes_SHA_fresh_full9_held_FD_named_epoch_across_single_bootstrap_load_and_postcleanup_exact_loaded_target_canonicaljobpath_neverstarted0_child_original_config_reauth_before_prestart_and_initial_start_no_debug_no_SourceAuthority",
         "controller": "one_private_PTY_persistent_private_session_leader_controlchild_no_controlling_terminal_fixed_label_load_RunAtLoadFalse_KeepAliveFalse_runs0_canonical_original_slave_devfs_StandardErrorPath_no_debug_verify_runs0_private_prestart_drain_ack_barrier_initial_kickstart_p_no_k_Root_terminal_capture_ack_then_session_release_no_kill_restart",
@@ -97,6 +102,9 @@ def policy():
         "raw": "private_RAM_only_max65536_plus_one4096_read_no_raw_tool_chat_partial_unrelated_duplicate_or_bad_nonce_PID_unavailable",
         "status_role": "original_first7_empty0600_singlelink_nofollow_parentfd_WRONLY_NONBLOCK_no_CREATE_TRUNC_APPEND_full9_each_operation_one_bounded_line_no_evidence_capability",
         "runtime": "unchanged_original_guard_Code5_at_newruntimeHEAD_plus_own_Code6_then_original_historical_bootstrap_at_targetHEAD_no_global_mutation",
+        "import_wrapper": {"body_sha256": hash_bytes(_import_body().encode()), "body_bytes": len(_import_body().encode()), "inline_sha256": hash_bytes(_import_wrapper().encode()), "inline_bytes": len(_import_wrapper().encode()), "fixed_module": MODULE, "authority": "destination_observation_only_before_import_no_live_code_or_evidence_auth"},
+        "observer_result": "exact_already_bound_target_pid_or_null_retained_for_readonly_correlation_not_exit_or_source_evidence",
+        "query_failure": "fixed_predicate_families_unique_complete_original_query_frame_actual_typed_returncode_or_null_no_raw_or_requery_poststart_kernel_cleared_before_fresh_query",
         "git_failure": "complete_trace_within128_unique_original_function_code_and_globals_frame_exact_arguments_CompletedProcess_returncode_only_no_output_stderr_paths_values_or_type",
         "operation": "read_only_fixed_Git_only_exact_devnull_O_RDWR_character_device_standard_channel_exception_no_source_write_native_provider_socket_DNS_capture_or_child_operation_no_retry",
         "authority": authority()}
@@ -104,7 +112,7 @@ def policy():
 
 def registered():
     require(type(POLICY_SHA256) is str and re.fullmatch("[0-9a-f]{64}", POLICY_SHA256)
-        and hash_payload(policy()) == POLICY_SHA256, "startup_unregistered")
+        and hash_payload(policy()) == POLICY_SHA256 and _wire_bound() <= MAX_WIRE <= MAX_STATUS, "startup_unregistered")
     require(worker._git is _ORIGINAL_GIT and worker._guard is _ORIGINAL_GUARD
         and proof._Code is _ORIGINAL_CODE and proof._read_bootstrap is _ORIGINAL_READ, "startup_code")
 
@@ -152,6 +160,21 @@ def _git_failure(error, head):
     return {"role": role[0], "code_ordinal": role[1], "returncode": number}
 
 
+
+def _query_failure(error, head):
+    trace = BaseException.__traceback__.__get__(error, BaseException); found = []
+    for unused in range(128):
+        if trace is None: break
+        frame = trace.tb_frame
+        if frame.f_code is _QUERY_CODE and frame.f_globals is globals(): found.append(frame)
+        trace = trace.tb_next
+    number = None
+    if trace is None and len(found) == 1 and found[0].f_locals.get("head") == head:
+        result = found[0].f_locals.get("result")
+        if type(result) is subprocess.CompletedProcess and type(result.args) is list and all(type(v) is str for v in result.args) and result.args == _launch_argv("query"):
+            if type(result.returncode) is int and -32768 <= result.returncode <= 32767: number = result.returncode
+    return {"returncode": number}
+
 def failure_summary(error, head):
     previous = _FAILURES.get(id(error))
     if previous is not None and previous[0] is error: return json.loads(previous[1])
@@ -166,7 +189,7 @@ def failure_summary(error, head):
         "category": "local_contract_refusal" if code or upstream["contract_code"] or upstream["upstream_contract_code"] else "local_os_error" if number in _ERRNOS else "unknown_local_error",
         "contract_code": code, "upstream_contract_code": upstream["contract_code"] or upstream["upstream_contract_code"],
         "errno_name": _ERRNOS.get(number) or upstream["errno_name"], "mismatching_fields": upstream["mismatching_fields"],
-        "original_Git": _git_failure(error, head)}
+        "original_Git": _git_failure(error, head), "original_query": _query_failure(error, head)}
     _FAILURES[id(error)] = error, canonical_json(detail); return detail
 
 
@@ -258,16 +281,65 @@ class _OwnCode:
 
 
 def _payload(head, remote, manifest, pin, observer):
-    return {"schema": "si-native-startup-bootstrap-v6", "policy_sha256": POLICY_SHA256,
+    return {"schema": "si-native-startup-bootstrap-v7", "policy_sha256": POLICY_SHA256,
         "runtime_head": head, "actual_remote": remote, "code_manifest": manifest,
         "target_head": TARGET_HEAD, "target_remote": REMOTE, "target_spec_sha256": TARGET_SPEC,
         "target_manifest": TARGET_MANIFEST, "status_name": STATUS, "status_original_identity": list(proof._status_pin(pin)),
         "config_role": "input_only_live_branch_HEAD_status_unknown_until_original_guard", "observer": _observer_config(observer), "authority": authority()}
 
 
+
+_IMPORT_BODY = r"""import sys,stat,json,re,errno
+A=sys.argv[1:]
+J=lambda v:json.dumps(v,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False)
+try:
+ if len(A)!=9 or A[0:2]!=['run-readonly','--head'] or A[3]!='--remote' or A[5]!='--spec-sha256' or A[7]!='--observer':raise ValueError()
+ if any(re.fullmatch('[0-9a-f]{'+str(n)+'}',v) is None for v,n in ((A[2],40),(A[4],40),(A[6],64))):raise ValueError()
+ O=json.loads(A[8]);D=A[6];I=os.getpid()
+ if type(I)is not int or not 0<I<2**31:raise ValueError()
+ if type(O)is not dict or set(O)!={'nonce','terminal','slave_path'} or J(O)!=A[8] or re.fullmatch('[0-9a-f]{32}',O['nonce'])is None:raise ValueError()
+ P=O['terminal'];N=O['slave_path']
+ if type(P)is not list or len(P)!=6 or any(type(i)is not int or not 0<=i<=2**64 for i in P) or type(N)is not str:raise ValueError()
+ def C():
+  i=os.fstat(2)
+  if not stat.S_ISCHR(i.st_mode) or not os.isatty(2) or [i.st_dev,i.st_ino,i.st_rdev,i.st_uid,i.st_gid,stat.S_IMODE(i.st_mode)]!=P or os.ttyname(2)!=N:raise ValueError()
+  if re.fullmatch('/dev/(ttys[0-9A-Za-z]+|pts/[0-9]+)',N)is None or os.path.realpath(N)!=N:raise ValueError()
+  for q in {'/dev',os.path.dirname(N)}:
+   t=os.lstat(q)
+   if not stat.S_ISDIR(t.st_mode) or t.st_uid!=0 or stat.S_IMODE(t.st_mode)&18:raise ValueError()
+  i=os.lstat(N)
+  if not stat.S_ISCHR(i.st_mode) or [i.st_dev,i.st_ino,i.st_rdev,i.st_uid,i.st_gid,stat.S_IMODE(i.st_mode)]!=P:raise ValueError()
+ C()
+except BaseException:os._exit(2)
+try:M=__import__('scripts.diagnose_short_interest_native_supervisor_startup',fromlist=['main'])
+except BaseException as E:
+ try:
+  n=OSError.errno.__get__(E,OSError) if isinstance(E,OSError) else None
+  n={getattr(errno,k):k for k in ('EACCES','EPERM','ENOENT','EEXIST','ENOSPC','EIO','EBADF','EMFILE','ENFILE','EROFS','EINTR','EAGAIN')}.get(n) if type(n)is int else None
+  F={'stage':'startup_import','stage_scope':'entered_phase_including_callbacks_not_forensic_cause','category':'local_os_error' if n else 'local_contract_refusal','contract_code':'startup_import_failed','upstream_contract_code':None,'errno_name':n,'mismatching_fields':[],'original_Git':{'role':None,'code_ordinal':None,'returncode':None},'original_query':{'returncode':None}}
+  R={'schema':'si-startup-PTY-observation-v7','nonce':O['nonce'],'spec_sha256':D,'pid':I,'status':'refused','failure':F,'authority_sha256':AUTHORITY_HASH_LITERAL}
+  B=J(R).encode()+b'\n';C()
+  if 0<len(B)<=1024:
+   os.set_blocking(2,False);W=os.write(2,B)
+   if type(W)is not int or W!=len(B):raise ValueError()
+ except BaseException:pass
+ os._exit(2)
+try:R=M.main(A)
+except BaseException:os._exit(2)
+os._exit(R if type(R)is int and R in (0,2) else 2)
+"""
+
+
+def _import_body(): return _IMPORT_BODY.replace("AUTHORITY_HASH_LITERAL", repr(hash_payload(authority())))
+
+
+def _import_wrapper():
+    encoded = base64.b64encode(zlib.compress(_import_body().encode(), 9)).decode("ascii")
+    return "import os\ntry:\n import base64,zlib\n exec(zlib.decompress(base64.b64decode(" + repr(encoded) + ")))\nexcept BaseException:\n os._exit(2)\n"
+
 def build_launchd_plist(head, remote, digest, observer):
     require(_hash(head, 40) and remote == REMOTE and _hash(digest), "startup_arguments")
-    return {"Label": LABEL, "ProgramArguments": [worker.PYTHON, "-B", "-m", MODULE, "run-readonly", "--head", head, "--remote", remote, "--spec-sha256", digest, "--observer", canonical_json(_observer_config(observer))],
+    return {"Label": LABEL, "ProgramArguments": [worker.PYTHON, "-B", "-c", _import_wrapper(), "run-readonly", "--head", head, "--remote", remote, "--spec-sha256", digest, "--observer", canonical_json(_observer_config(observer))],
         "WorkingDirectory": str(ROOT), "EnvironmentVariables": worker._environment(), "RunAtLoad": False,
         "KeepAlive": False, "Debug": True, "StandardOutPath": "/dev/null", "StandardErrorPath": _observer_config(observer)["slave_path"]}
 
@@ -373,7 +445,7 @@ class _Status:
     def emit(self, detail):
         require(not self.attempted, "startup_status"); self.attempted = True
         if detail is not None:
-            keys = {"stage", "stage_scope", "category", "contract_code", "upstream_contract_code", "errno_name", "mismatching_fields", "original_Git"}
+            keys = {"stage", "stage_scope", "category", "contract_code", "upstream_contract_code", "errno_name", "mismatching_fields", "original_Git", "original_query"}
             require(type(detail) is dict and all(type(v) is str for v in detail) and set(detail) == keys and type(detail["stage"]) is str and detail["stage"] in _STAGES
                 and type(detail["stage_scope"]) is str and detail["stage_scope"] == "entered_phase_including_callbacks_not_forensic_cause"
                 and type(detail["category"]) is str and detail["category"] in ("local_contract_refusal", "local_os_error", "unknown_local_error")
@@ -387,9 +459,12 @@ class _Status:
                 and (git["role"] is None or type(git["role"]) is str and git["role"] in ("root", "status", "tracking", "actual_matching_ref", "code_file"))
                 and (git["code_ordinal"] is None or type(git["code_ordinal"]) is int and 0 <= git["code_ordinal"] <= 6)
                 and (git["returncode"] is None or type(git["returncode"]) is int and -32768 <= git["returncode"] <= 32767), "startup_status")
+            query = detail["original_query"]
+            require(type(query) is dict and set(query) == {"returncode"}
+                and (query["returncode"] is None or type(query["returncode"]) is int and -32768 <= query["returncode"] <= 32767), "startup_status")
         try:
             self.check(0)
-            raw = canonical_json({"schema": "si-native-startup-observation-v6", "status": "refused" if detail is not None else "readonly_predicates_passed_observation_only",
+            raw = canonical_json({"schema": "si-native-startup-observation-v7", "status": "refused" if detail is not None else "readonly_predicates_passed_observation_only",
                 "failure": detail, "authority": authority()}).encode() + b"\n"
             require(0 < len(raw) <= MAX_STATUS and raw.count(b"\n") == 1, "startup_status")
             proof._write(self.fd, raw); os.fsync(self.fd); self.check(len(raw))
@@ -565,28 +640,52 @@ class _Observer:
         require(not self.attempted, "startup_observer"); self.attempted = True
         _tty_check(self.fd, self.config)
         if detail is not None: _validate_detail(detail)
-        payload = {"schema": "si-startup-PTY-observation-v6", "nonce": self.config["nonce"],
-            "spec_sha256": self.digest, "pid": os.getpid(),
+        pid = os.getpid(); require(type(pid) is int and 0 < pid < 2 ** 31, "startup_observer")
+        payload = {"schema": "si-startup-PTY-observation-v7", "nonce": self.config["nonce"],
+            "spec_sha256": self.digest, "pid": pid,
             "status": "refused" if detail is not None else "readonly_predicates_passed_observation_only",
             "failure": detail, "authority": authority()}
-        raw = canonical_json(payload).encode() + b"\n"
-        require(0 < len(raw) <= MAX_STATUS and raw.count(b"\n") == 1, "startup_observer")
+        raw = _wire_encode(payload)
         # One nonblocking attempt, no deadline gate on a negative diagnostic.
         os.set_blocking(self.fd, False)
         written = os.write(self.fd, raw)
         require(type(written) is int and written == len(raw), "startup_observer")
 
 
+
+def _wire_encode(payload):
+    require(type(payload) is dict and payload.get("authority") == authority(), "startup_observer")
+    wire = {key: value for key, value in payload.items() if key != "authority"}
+    wire["authority_sha256"] = hash_payload(authority())
+    raw = canonical_json(wire).encode() + b"\n"
+    require(0 < len(raw) <= MAX_WIRE <= MAX_STATUS and raw.count(b"\n") == 1, "startup_observer")
+    return raw
+
+
+def _wire_bound():
+    detail = {"stage": max(_STAGES, key=len), "stage_scope": "entered_phase_including_callbacks_not_forensic_cause",
+        "category": "local_contract_refusal", "contract_code": max(_CODES, key=len),
+        "upstream_contract_code": max(proof._CODES | worker._CODES | proof.native._CODES, key=len),
+        "errno_name": max(set(_ERRNOS.values()) | set(proof._ERRNOS.values()) | set(worker._ERRNOS.values()) | set(proof.native._ERRNOS.values()), key=len),
+        "mismatching_fields": [max(proof._STAMP_NAMES, key=len)] * 9,
+        "original_Git": {"role": "actual_matching_ref", "code_ordinal": 6, "returncode": -32768},
+        "original_query": {"returncode": -32768}}
+    raw = canonical_json({"schema": "si-startup-PTY-observation-v7", "nonce": "f" * 32, "spec_sha256": "f" * 64,
+        "pid": 2147483647, "status": "readonly_predicates_passed_observation_only", "failure": detail,
+        "authority_sha256": hash_payload(authority())}).encode() + b"\n"
+    return len(raw)
+
 def filter_observer(raw, config, digest, pid):
     """Raw startup/OS text stays private and cannot become a reported finding."""
     unavailable = {"status": "observer_unavailable", "authority": authority()}
     try:
         expected = _observer_config(config)
-        if type(raw) is not bytes or len(raw) > MAX_RAW or raw.count(b"\n") != 1 or len(raw) > MAX_STATUS: return unavailable
+        if type(raw) is not bytes or len(raw) > MAX_RAW or raw.count(b"\n") != 1 or len(raw) > MAX_WIRE: return unavailable
         value = json.loads(raw)
-        if type(value) is not dict or set(value) != {"schema", "nonce", "spec_sha256", "pid", "status", "failure", "authority"}: return unavailable
-        if raw != canonical_json(value).encode() + b"\n" or value["schema"] != "si-startup-PTY-observation-v6" or value["nonce"] != expected["nonce"] or value["spec_sha256"] != digest: return unavailable
-        if type(pid) is not int or pid <= 0 or type(value["pid"]) is not int or value["pid"] != pid or value["authority"] != authority(): return unavailable
+        if type(value) is not dict or set(value) != {"schema", "nonce", "spec_sha256", "pid", "status", "failure", "authority_sha256"}: return unavailable
+        if raw != canonical_json(value).encode() + b"\n" or value["schema"] != "si-startup-PTY-observation-v7" or value["nonce"] != expected["nonce"] or value["spec_sha256"] != digest: return unavailable
+        if type(pid) is not int or not 0 < pid < 2 ** 31 or type(value["pid"]) is not int or value["pid"] != pid or value["authority_sha256"] != hash_payload(authority()): return unavailable
+        value = {key: part for key, part in value.items() if key != "authority_sha256"}; value["authority"] = authority()
         if value["status"] not in ("refused", "readonly_predicates_passed_observation_only"): return unavailable
         detail = value["failure"]
         if (value["status"] == "refused") != (type(detail) is dict): return unavailable
@@ -599,7 +698,7 @@ def filter_observer(raw, config, digest, pid):
 
 
 def _validate_detail(detail):
-    keys = {"stage", "stage_scope", "category", "contract_code", "upstream_contract_code", "errno_name", "mismatching_fields", "original_Git"}
+    keys = {"stage", "stage_scope", "category", "contract_code", "upstream_contract_code", "errno_name", "mismatching_fields", "original_Git", "original_query"}
     require(type(detail) is dict and set(detail) == keys and all(type(k) is str for k in detail)
         and type(detail["stage"]) is str and detail["stage"] in _STAGES
         and detail["stage_scope"] == "entered_phase_including_callbacks_not_forensic_cause"
@@ -614,6 +713,9 @@ def _validate_detail(detail):
         and (git["role"] is None or type(git["role"]) is str and git["role"] in ("root", "status", "tracking", "actual_matching_ref", "code_file"))
         and (git["code_ordinal"] is None or type(git["code_ordinal"]) is int and 0 <= git["code_ordinal"] <= 6)
         and (git["returncode"] is None or type(git["returncode"]) is int and -32768 <= git["returncode"] <= 32767), "startup_observer")
+    query = detail["original_query"]
+    require(type(query) is dict and set(query) == {"returncode"}
+        and (query["returncode"] is None or type(query["returncode"]) is int and -32768 <= query["returncode"] <= 32767), "startup_observer")
 
 
 
@@ -651,35 +753,38 @@ def _launch(role):
 
 
 def _kernel(raw):
-    require(type(raw) is bytes and len(raw) <= MAX_RAW, "startup_control_state")
+    require(type(raw) is bytes and len(raw) <= MAX_RAW, "startup_kernel_body")
     text = raw.decode("utf-8"); result = {}
-    require(text.splitlines()[:1] == [_target() + " = {"], "startup_control_state")
+    require(text.splitlines()[:1] == [_target() + " = {"], "startup_kernel_target")
     paths = re.findall(r"(?m)^\tpath = ([^\r\n]+)$", text)
-    require(paths == [str(ROOT / PARENT / BOOTSTRAP / "job.plist")], "startup_control_state")
+    require(paths == [str(ROOT / PARENT / BOOTSTRAP / "job.plist")], "startup_kernel_path")
     for key, label, pattern in (("runs", "runs", r"(?m)^\truns = ([0-9]+)[ \t]*$"),
         ("state", "state", r"(?m)^\tstate = ([a-z ]+)[ \t]*$"),
         ("active_count", "active count", r"(?m)^\tactive count = ([0-9]+)[ \t]*$"),
         ("pid", "pid", r"(?m)^\tpid = ([0-9]+)[ \t]*$")):
         values = re.findall(pattern, text)
-        require(len(values) <= 1 and len(re.findall(r"(?m)^\t" + label + r" =", text)) == len(values), "startup_control_state")
+        field_codes = {"runs": "startup_kernel_runs_field", "state": "startup_kernel_state_field", "active_count": "startup_kernel_active_field", "pid": "startup_kernel_pid_field"}
+        require(len(values) <= 1 and len(re.findall(r"(?m)^\t" + label + r" =", text)) == len(values), field_codes[key])
         result[key] = values[0] if values else None
     exits = re.findall(r"(?m)^\tlast exit code = ([^\r\n]+)$", text)
-    require(len(exits) <= 1 and len(re.findall(r"(?m)^\tlast exit code =", text)) == len(exits), "startup_control_state")
+    require(len(exits) <= 1 and len(re.findall(r"(?m)^\tlast exit code =", text)) == len(exits), "startup_kernel_exit_field")
     exit_code = None; never_exited = exits == ["(never exited)"]
     if exits and not never_exited:
         numeric = re.fullmatch(r"(-?[0-9]+)(?:: ([A-Z_]+))?[ \t]*", exits[0])
-        require(numeric is not None, "startup_control_state")
+        require(numeric is not None, "startup_kernel_exit_format")
         exit_code = int(numeric[1]); symbol = numeric[2]
-        require(not symbol or _SYSEXITS.get(exit_code) == symbol, "startup_control_state")
-    require(result["runs"] is not None and result["active_count"] is not None
-        and result["state"] in ("running", "not running"), "startup_control_state")
+        require(not symbol or _SYSEXITS.get(exit_code) == symbol, "startup_kernel_exit_annotation")
+    require(result["runs"] is not None, "startup_kernel_runs_field")
+    require(result["active_count"] is not None, "startup_kernel_active_field")
+    require(result["state"] is not None, "startup_kernel_state_field")
+    require(result["state"] in ("running", "not running"), "startup_kernel_state_catalogue")
     value = {"runs": int(result["runs"]), "running": result["state"] == "running", "active_count": int(result["active_count"]),
         "pid": int(result["pid"]) if result["pid"] is not None else None, "exit": exit_code}
     require(not never_exited or value["runs"] == 0 and value["running"] is False
-        and value["active_count"] == 0 and value["pid"] is None, "startup_control_state")
+        and value["active_count"] == 0 and value["pid"] is None, "startup_kernel_never_exited")
     require(value["runs"] in (0, 1) and value["active_count"] in (0, 1)
         and (value["pid"] is None or 0 < value["pid"] < 2 ** 31)
-        and (value["exit"] is None or -32768 <= value["exit"] <= 32767), "startup_control_state")
+        and (value["exit"] is None or -32768 <= value["exit"] <= 32767), "startup_kernel_bounds")
     return value
 
 
@@ -689,8 +794,10 @@ def _query_result(head):
 
 
 def _query(head):
-    result = _query_result(head); require(result.returncode == 0, "startup_control_state"); return _kernel(result.stdout)
+    result = _query_result(head); require(result.returncode == 0, "startup_query_return"); return _kernel(result.stdout)
 
+
+_QUERY_CODE = _query.__code__
 
 def _never_started(value):
     require(value["runs"] == 0 and value["running"] is False and value["active_count"] == 0 and value["pid"] is None, "startup_control_state")
@@ -732,7 +839,7 @@ def _control_readonly(head, remote, digest, observer, control_fd, ack_fd, config
         _phase("controller_prestart", clock)
         _controller_config(head, remote, digest, observer, config_pins, {**code.manifest, DRIVER: own.digest}); _tty_check(2, observer)
         _never_started(_query(head)); _phase("controller_barrier", clock)
-        _control_message(control_fd, {"schema": "si-startup-prestart-barrier-v6", "nonce": observer["nonce"],
+        _control_message(control_fd, {"schema": "si-startup-prestart-barrier-v7", "nonce": observer["nonce"],
             "spec_sha256": digest, "control_pid": os.getpid(), "status": "runs0_before_initial_start"})
         require(type(ack_fd) is int and ack_fd > 2 and stat.S_ISFIFO(os.fstat(ack_fd).st_mode)
             and fcntl.fcntl(ack_fd, fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDONLY, "startup_control")
@@ -742,11 +849,12 @@ def _control_readonly(head, remote, digest, observer, control_fd, ack_fd, config
         _never_started(_query(head))
         _phase("controller_initial_start", clock); _tty_check(2, observer)
         started = _launch("start"); require(started.returncode == 0 and re.fullmatch(rb"[1-9][0-9]{0,9}\n?", started.stdout) is not None, "startup_control")
-        pid = int(started.stdout); require(pid < 2 ** 31, "startup_control")
+        pid = int(started.stdout); require(pid < 2 ** 31, "startup_control"); kernel = None
         _phase("controller_terminal", clock)
         for unused in range(MAX_POLLS):
+            kernel = None  # A failed fresh query must not borrow a prestart/prior row.
             kernel = _query(head)
-            require(kernel["runs"] in (0, 1) and (kernel["pid"] is None or kernel["pid"] == pid), "startup_control_state")
+            require(kernel["runs"] in (0, 1) and (kernel["pid"] is None or kernel["pid"] == pid), "startup_kernel_pid_binding")
             if kernel["runs"] == 1 and not kernel["running"] and kernel["active_count"] == 0 and kernel["exit"] is not None: break
             clock.check(); time.sleep(1)
         require(kernel is not None and kernel["runs"] == 1 and not kernel["running"] and kernel["active_count"] == 0 and kernel["exit"] is not None, "startup_control_unknown")
@@ -764,7 +872,7 @@ def _control_readonly(head, remote, digest, observer, control_fd, ack_fd, config
             except BaseException as error: failure = error; failure_summary(error, head)
         # Target may be unknown. Never kill/restart; parent retains original PTY
         # and child handle and independently queries the exact fresh service.
-        message = {"schema": "si-startup-control-v6", "nonce": observer["nonce"], "spec_sha256": digest,
+        message = {"schema": "si-startup-control-v7", "nonce": observer["nonce"], "spec_sha256": digest,
             "control_pid": os.getpid(), "target_pid": pid, "kernel": kernel,
             "status": "refused" if failure is not None else "terminal_observed", "failure": failure_summary(failure, head) if failure is not None else None,
             "authority": authority()}
@@ -895,7 +1003,7 @@ def _controller_config(head, remote, digest, observer, pins, manifest):
 
 def _control_receipt(value, observer, digest, pid):
     require(type(value) is dict and set(value) == {"schema", "nonce", "spec_sha256", "control_pid", "target_pid", "kernel", "status", "failure", "authority"}
-        and value["schema"] == "si-startup-control-v6" and value["nonce"] == observer["nonce"]
+        and value["schema"] == "si-startup-control-v7" and value["nonce"] == observer["nonce"]
         and value["spec_sha256"] == digest and type(value["control_pid"]) is int and value["control_pid"] == pid
         and value["authority"] == authority() and value["status"] in ("terminal_observed", "refused"), "startup_control")
     require(value["target_pid"] is None or type(value["target_pid"]) is int and 0 < value["target_pid"] < 2 ** 31, "startup_control")
@@ -961,8 +1069,8 @@ def _observe_readonly(head, remote):
             if not acknowledged and not terminal_acknowledged and complete:
                 first_value = json.loads(complete[0])
                 require(complete[0] == canonical_json(first_value).encode() + b"\n", "startup_control")
-                if type(first_value) is dict and first_value.get("schema") == "si-startup-prestart-barrier-v6":
-                    require(first_value == {"schema": "si-startup-prestart-barrier-v6", "nonce": observer["nonce"],
+                if type(first_value) is dict and first_value.get("schema") == "si-startup-prestart-barrier-v7":
+                    require(first_value == {"schema": "si-startup-prestart-barrier-v7", "nonce": observer["nonce"],
                         "spec_sha256": digest, "control_pid": process.pid, "status": "runs0_before_initial_start"}, "startup_control")
                     kernel = _query(head); _never_started(kernel)
                     raw = _drain_to_eagain(master, raw)  # No initial start is possible before acknowledgment.
@@ -978,6 +1086,7 @@ def _observe_readonly(head, remote):
             if acknowledged and not terminal_acknowledged and len(complete) == 2:
                 value = json.loads(complete[1]); require(complete[1] == canonical_json(value).encode() + b"\n", "startup_control")
                 receipt = _control_receipt(value, observer, digest, process.pid)
+                kernel = None
                 kernel = _query(head)
                 require(not kernel["running"] and kernel["active_count"] == 0 and kernel["runs"] in (0, 1), "startup_control_unknown")
                 if receipt["target_pid"] is None: _never_started(kernel)
@@ -995,6 +1104,7 @@ def _observe_readonly(head, remote):
         raw = _drain_to_eagain(master, raw); control = _drain_to_eagain(read_fd, control)
         require(receipt is not None and terminal_acknowledged and type(child_exit) is int, "startup_control")
         require(control.count(b"\n") == (2 if acknowledged else 1), "startup_control")
+        kernel = None
         kernel = _query(head)
         pid = receipt["target_pid"]
         if pid is None:
@@ -1006,7 +1116,7 @@ def _observe_readonly(head, remote):
             result = filter_observer(raw, observer, digest, pid)
         _control_guard(head, remote); _tty_check(slave, observer); clock.check()
         return {"status": "control_refused_before_initial_start" if pid is None else "terminal_observation_only",
-            "target_started": pid is not None, "controller_exit": child_exit, "control_failure": receipt["failure"],
+            "target_started": pid is not None, "target_pid": pid, "controller_exit": child_exit, "control_failure": receipt["failure"],
             "kernel": kernel, "observer": result, "authority": authority()}
     except BaseException as error:
         failure = error; failure_summary(error, head)

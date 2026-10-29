@@ -28376,3 +28376,128 @@ only, not the required native-supervisor proof or source budget release.
 All data/spent and unknown debits, count84005/4GiB and separate existing DAILY
 budget stay unchanged; source START/HTTP/key reads0, outcome/looks0, QC/Safari0,
 purchases0 and pushes0 in this continuation.
+
+### 132.29 Actual v6 retained endpoints; startup target still negative
+
+Checkpointb05d30dd83a69c38273c1fb700b0d23847da5a6d contains132.27..28.
+Main post-record98/1.02s passed before commit. Exact clean lane and matching
+actual/tracking F27, fresh v6 paths and absent exact service113 were verified.
+Main dispatched ONE observe-readonly operation, exec84099, with all agents
+and tests frozen. It terminated outer exit0 with terminal_observation_only,
+target_started=true, genuine control-child wait exit2 and independent exact
+kernel runs1/not-running/active0/no PID/exit2. The controller reported fixed
+startup_control_state in entered controller_terminal, original_Git null.
+The filtered target observation is UNAVAILABLE, not a success or a diagnosed
+target cause. All Root post-wait endpoint checks now passed; the actual route
+no longer fails from the verified controlling-terminal teardown conflict.
+
+Independent guarded protected read/close authentication found unchanged empty
+original status, original spec2532bytes SHA
+9178af7ea86c8d92a7348056089517a71ff952ec92c096da3e003639397de717
+and job1647bytes SHA
+37a8783dbe485897ea9fef0a7914474aa4c66ee60743a5aafb0ef41bc327e5c0.
+Current stability is not historical closure. An exact-label local log query
+returned0 and two events but established no startup-denial/root-cause fact.
+No raw PTY/log text was published. Preserve v6 files and terminal job; no
+restart/adoption, source/native proof, claim or budget release follows.
+
+Read-only causal audit verified TWO diagnostic defects independent of the
+unknown v6 target failure. First, startup_control_state combines query return,
+header/path binding, field cardinality/format, state catalogue, bounds,
+never-exited consistency and PID checks. It cannot identify which predicate
+actually refused. Second, assignment kernel=_query(...) leaves a prior row
+untouched if the new query raises; that receipt row is then not the refused
+response. Independent Root terminal query still prevents admission. No
+transient-state or PID-mismatch cause is asserted without original evidence.
+
+A further verified observation gap is architectural: the target's repository
+module imports execute before _Observer is constructed, so an import failure
+can exit without the existing safe reporter. This does not establish that
+such an import failure occurred. **SI-DEC-20261028-13** authorizes only bounded
+prospective observability corrections: fixed predicate-specific IDs preserving
+all kernel conditions, original-result returncode projection without raw text,
+clear stale query rows before querying, and a registered fixed inline stdlib
+pre-import observer for this source-free target. It may report only a correlated
+fixed import-stage refusal/allowlisted errno with every authority false, then
+handoff exact existing run-readonly args when imports succeed. No arbitrary
+module, exception formatting, path/value, successful-prelude line, fallback,
+retry or original-check removal is permitted. The fixed wrapper must bind into
+canonical job/policy and retain config/line caps. Require focused causal tests
+and review before a separately frozen v7; no speculative source invocation.
+
+Findings SI-BUILD-20261028-071/072 (P2) track the overloaded/stale-query and
+pre-import reporting gaps. V6 remains terminal NEGATIVE; its exact target
+cause is UNKNOWN. All old/current data, negatives, claims and spent/unknown
+charges remain; count84005/4GiB and DAILY's separate residual envelope stay
+unchanged. New source START/HTTP/key0, outcome/looks0, QC/Safari0, purchases0,
+external messages0 and pushes0 in this continuation.
+
+### 132.30 Frozen v7 bounded import/query diagnostics; actual pending
+
+SI-DEC-20261028-13 is implemented only in the startup diagnostic/test and
+this append-only record. Each kernel/query refusal now has a fixed predicate
+family without accepting another state or value. Query-return projection is
+available only from one complete exact original _query code/globals/head frame
+with its genuine typed matching CompletedProcess; otherwise it stays null.
+Post-start kernel is cleared BEFORE every new query so a failure cannot borrow
+an old prestart/earlier row. Full control/file/decoded failure schemas retain
+original_Git and original_query, including explicit nulls.
+
+The target job uses a fixed inline stdlib-only wrapper, authenticating its
+original FD2/named character endpoint and correlated nonce/spec/PID BEFORE
+importing the one literal repository module. Only import exceptions may emit
+the fixed startup_import refusal/allowlisted errno. Decoder/setup failures
+and later-main exceptions exit2 quietly; they are not falsely relabelled as
+an import cause. No success/prelude, arbitrary module/code selection, raw
+traceback/exception formatting, source or evidence authority is introduced.
+Readable body2707bytes and deterministic compressed inline1911bytes are BOTH
+hash/length bound in policy and canonical original job. Existing XML config
+cap4096, overall status cap2048 and all original config/code/source/native
+checks remain unchanged. Root's validated target PID is retained only as
+bounded operational metadata for precise later local-log correlation.
+
+Native tests exposed an additional prospective wire defect: some expanded
+one-attempt nonblocking PTY messages were truncated at1024bytes without a
+newline. This does NOT prove why v6's original message was unavailable.
+Finding SI-BUILD-20261028-073 (P2) is corrected with a strict v7 wire profile:
+exact registered authority SHA256 replaces the long authority dictionary ON
+THE WIRE ONLY. The private filter requires that exact version/keyset/hash,
+expands solely to the unchanged all-false authority and validates the complete
+failure again; no absent/default/alternate authority is accepted. This hash
+is not an authenticity or evidence capability. Conservative maximum across
+fixed enum domains/nine longest stamp entries is859bytes including newline,
+under new narrower wire1024 and unchanged overall2048. Both import/module
+producers check bounds before ONE nonblocking write, verify its exact count
+and never retry. Full file/control/report semantics are retained.
+
+Finding SI-BUILD-20261028-074 (P3) was corrected before release: the first new
+inline import emitter omitted the explicit write-count predicate. It always
+exited2 and partial filtering already refused; no admission bypass is claimed.
+The actual private partial-write child emits10bytes once, waits/exits2 and is
+unavailable to the strict filter. Count-predicate reversal caused the expected
+RED1/.74s, then was restored. Stale-reset reversal RED1/.75s and import-capture
+reversal RED2/.80s were likewise restored, not production failures.
+
+Author final152 focused/3.21s and independent peer143 startup/2.67s passed.
+Main pre-release482/4.34s is prior to the count-predicate correction. After
+peer freeze Main changed ONLY PENDING to computed policy and the final
+registered10-file focused selection passed **484/4.79s**. Sanitized environment,
+OS network denial/no bytecode/cache remained; expressly bounded private
+source-free children were actually waited, not launchd/source operations.
+Main92-path compile plus body/inline compile, six-file closure, old-five
+committed bytes/target hashes, policy/wire bound, historical prefix and
+whitespace checks passed. No full lane/repository suite or Claude review ran.
+
+Policy42677ed04df11f1c077691764301d9d52ff1ce79e9c3491d2e52543300216b97;
+final sourceb66341ec6af52df9228ba150816d9414029749ff0d91be54cd43e5f5c21caecb;
+test743109cac8c9955b1f4440517cbaad8186edb3fc7e3bfab76d0ae711d76cb62e.
+Peer's pre-literal source is
+b6fb8512ea4b311599cc1a9d4640b1edfdb0c4671a820fdf065758dd84fdc89c.
+Actual v7 is PENDING. After clean commit, exact matching actual/tracking F27,
+fresh v7 names and absent exact service113, ONE registered observe-readonly
+operation may run with every author/test frozen. Preserve all retired v1..6
+files/jobs; no old invocation is restarted. A filtered failure remains a
+negative, and even observation success is not native proof or source release.
+All original data/spent/unknown charges and both separate source budgets
+remain intact. Source START/HTTP/key0, looks0, QC/Safari0, purchases0 and
+pushes0 in this continuation.

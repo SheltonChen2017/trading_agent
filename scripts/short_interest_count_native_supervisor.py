@@ -25,10 +25,12 @@ ROOT = worker.ROOT
 MODULE = "scripts.short_interest_count_native_supervisor"
 DRIVER = "scripts/short_interest_count_native_supervisor.py"
 PARENT = Path("artifacts/short_interest")
-BOOTSTRAP = "count-process-supervisor-native-bootstrap-v2"
-DOMAIN = "count-process-supervisor-native-domain-v2"
-LABEL = "com.openai.codex.short-interest-native-process-proof-v2"
-POLICY_SHA256 = "616753db5fd9db215ad7b31883e96aae6e9a896c0f501050f557c6e97e138b1e"
+BOOTSTRAP = "count-process-supervisor-native-bootstrap-v3"
+DOMAIN = "count-process-supervisor-native-domain-v3"
+LABEL = "com.openai.codex.short-interest-native-process-proof-v3"
+STATUS_NAME = "count-process-supervisor-native-status-v3.jsonl"
+MAXIMUM_STATUS_BYTES = 2048
+POLICY_SHA256 = "cbc98e5fb6672065c20f5944f90c04e4015481112ba908570e9eb146f5f6c168"
 CODE_FILES = ("data/__init__.py", "data/hashing.py", DRIVER,
     "scripts/short_interest_count_process_supervisor.py", "scripts/short_interest_isolated_custody_volume.py")
 MAXIMUM_SECONDS, COMMAND_SECONDS, VIRTUAL_BYTES = 300, 120, 8 * 1024 ** 3
@@ -43,10 +45,13 @@ _BUFFER_ORIGINS = {}
 _PRESERVATION_ORIGINS = {}
 _USED, _STAGE = False, "registration"
 _COMPONENT, _ORDINAL = "registration", 0
-_COMPONENTS = frozenset(("operation", "registration", "lane_guard", "code_file", "code_context", "bootstrap_directory", "bootstrap_spec", "bootstrap_job", "config_context", "terminal_clock"))
+_COMPONENTS = frozenset(("operation", "registration", "lane_guard", "code_file", "code_context", "bootstrap_directory", "bootstrap_spec", "bootstrap_job", "config_context", "terminal_clock", "status_channel",
+    "native_platform", "native_parent", "native_host", "native_before_info", "native_create", "native_backing", "native_under_mount", "native_attach", "native_initial_info", "native_association", "native_mount_open", "native_contract", "native_capacity", "native_root_mode", "native_system", "native_first_check"))
+_CLI_STATUS = None
 _HELD, _RESULTS, _FAILURES, _FIELDS = [], {}, {}, {}
-_STAGES = frozenset("registration bootstrap current_code native_creation native_association output_creation child_launch child_observation terminal_code terminal_native provisional_publication original_audit cleanup named_audit".split())
+_STAGES = frozenset("registration bootstrap current_code native_creation native_association output_creation child_launch child_observation terminal_code terminal_native provisional_publication original_audit cleanup named_audit status_publication".split())
 _CODES = frozenset("native_proof_unregistered native_proof_source_refused native_proof_arguments native_proof_clock native_proof_deadline native_proof_path native_proof_protection native_proof_membership native_proof_exists native_proof_write native_proof_stamp native_proof_code native_proof_command native_proof_plist native_proof_association native_proof_mount native_proof_backing native_proof_capacity native_proof_already_used native_proof_wait native_proof_result_factory native_proof_result_changed".split())
+_CODES = _CODES | frozenset(("native_status_refused",))
 _ERRNOS = {getattr(errno, n): n for n in ("EACCES", "EPERM", "ENOENT", "EEXIST", "ENOSPC", "EIO", "EBADF", "EMFILE", "ENFILE", "EROFS", "EINTR", "EAGAIN")}
 _STAMP_NAMES = ("dev", "ino", "uid", "gid", "mode", "nlink", "size", "mtime_ns", "ctime_ns")
 
@@ -66,7 +71,7 @@ def authority():
 
 
 def policy():
-    return {"schema": "si-native-process-proof-policy-v2", "root": str(ROOT), "parent": str(PARENT),
+    return {"schema": "si-native-process-proof-policy-v3", "root": str(ROOT), "parent": str(PARENT),
         "bootstrap": BOOTSTRAP, "domain": DOMAIN, "label": LABEL, "code_files": list(CODE_FILES),
         "virtual_bytes": VIRTUAL_BYTES, "whole_seconds": MAXIMUM_SECONDS, "command_seconds": COMMAND_SECONDS,
         "native_output_bytes": MAXIMUM_NATIVE_BYTES, "control_bytes": MAXIMUM_CONTROL_BYTES,
@@ -74,7 +79,9 @@ def policy():
         "native_output_limit_kind": "post_capture_acceptance_of_fixed_local_command_output_not_hard_capture_memory_bound",
         "roles": list(ROLES), "worker_policy_sha256": worker.PROOF_POLICY_SHA256,
         "worker": "unchanged_two_second_worker_original_collect_wait_within_five_seconds",
-        "host": "bootstrap_spec_job_bytes_only_no_host_creation_stamp_admission_stdout_stderr_devnull",
+        "host": "bootstrap_spec_job_bytes_only_no_host_creation_stamp_admission_stderr_devnull_stdout_fixed_observability_only_sibling",
+        "status_name": STATUS_NAME, "maximum_status_bytes": MAXIMUM_STATUS_BYTES,
+        "status_role": "original_first7_in_canonical_spec_empty0600_singlelink_FD1_and_nofollow_name_before_volume_and_emit_one_allowlisted_line_no_source_or_own_exit_authority_current_read_full9_not_creator_epoch_seal",
         "configuration": "exact_two_roles_only_original_dev_ino_UID_GID_mode_nlink_size_and_canonical_bytes_SHA_across_phases_full9_stability_each_original_descriptor_read_write_timestamps_observations_not_evidence_caps",
         "retired": "all_previous_bootstrap_and_domain_namespaces_retired_even_if_absent_never_reused",
         "prepare_diagnostics": "fixed_entered_phase_component_catalogue_ordinal_includes_callbacks_not_forensic_actor_or_historical64753_attribution",
@@ -104,7 +111,7 @@ def _phase(name):
 
 def _component(name, ordinal=0):
     global _COMPONENT, _ORDINAL
-    require(type(name) is str and name in _COMPONENTS and type(ordinal) is int and 0 <= ordinal <= len(CODE_FILES),
+    require(type(name) is str and name in _COMPONENTS and type(ordinal) is int and 0 <= ordinal <= 32,
         "native_proof_arguments")
     _COMPONENT, _ORDINAL = name, ordinal
 
@@ -300,6 +307,91 @@ Timestamp changes between phases confer no creation/evidence authority.
         pass  # Each original descriptor is closed exactly once in its owning method.
 
 
+def _status_identity(info, size=0):
+    require(stat.S_ISREG(info.st_mode) and info.st_uid == os.getuid()
+        and stat.S_IMODE(info.st_mode) == 0o600 and info.st_nlink == 1 and info.st_size == size,
+        "native_status_refused")
+    return _stamp(info)[:7]
+
+
+def _status_pin(value):
+    require(type(value) in (tuple, list) and len(value) == 7
+        and all(type(v) is int and 0 <= v <= 2 ** 64 for v in value)
+        and value[2] == os.getuid() and tuple(value[4:]) == (0o600, 1, 0), "native_status_refused")
+    return tuple(value)
+
+
+def _prepare_status(directory):
+    """Empty observation file only; never an evidence creation capability."""
+    _component("status_channel", 1); directory.check()
+    fd = os.open(STATUS_NAME, os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=directory.parent)
+    primary = None
+    try:
+        os.fchmod(fd, 0o600); pin = _status_identity(os.fstat(fd))
+        require(_status_identity(os.stat(STATUS_NAME, dir_fd=directory.parent, follow_symlinks=False)) == pin,
+            "native_status_refused")
+        os.fsync(fd); os.fsync(directory.parent)
+        require(_status_identity(os.fstat(fd)) == pin, "native_status_refused")
+    except BaseException as error:
+        primary = error; failure_summary(error); raise
+    finally: _close(fd, primary)
+    # Cross-phase host timestamps are observations, not proof admission.
+    require(_status_identity(os.stat(STATUS_NAME, dir_fd=directory.parent, follow_symlinks=False)) == pin,
+        "native_status_refused")
+    return pin
+
+
+def _status_fd(): return 1
+
+
+class _Status:
+    """Original-spec-bound FD1 for one safe line; no evidence/source authority."""
+    def __init__(self):
+        self.fd, self.expected, self.parent_pin, self.attempted = _status_fd(), None, None, False
+        _status_identity(os.fstat(self.fd))  # Protection alone does NOT authorize output.
+    def bind(self, directory, original):
+        expected = _status_pin(original); directory.check()
+        require(_status_identity(os.fstat(self.fd)) == expected
+            == _status_identity(os.stat(STATUS_NAME, dir_fd=directory.parent, follow_symlinks=False)),
+            "native_status_refused")
+        self.parent_pin = _dir(os.fstat(directory.parent)); self.expected = expected
+        self.check(0)
+    def check(self, size):
+        require(self.expected is not None and self.parent_pin is not None, "native_status_refused")
+        parent = ROOT / PARENT; path = parent / STATUS_NAME
+        require(ROOT.resolve() == ROOT and parent.resolve() == parent and path.resolve() == path
+            and _dir(parent.lstat()) == self.parent_pin, "native_status_refused")
+        left, right = os.fstat(self.fd), path.lstat()
+        require(_status_identity(left, size)[:6] == self.expected[:6]
+            == _status_identity(right, size)[:6], "native_status_refused")
+        _same(_stamp(left), _stamp(right))
+    def emit(self, detail=None):
+        require(not self.attempted, "native_status_refused"); self.attempted = True
+        self.check(0)
+        if detail is not None:
+            keys = {"stage", "component", "ordinal", "component_scope", "category", "contract_code", "upstream_contract_code", "errno_name", "mismatching_fields"}
+            require(type(detail) is dict and all(type(k) is str for k in detail) and set(detail) == keys
+                and type(detail["stage"]) is str and detail["stage"] in _STAGES
+                and type(detail["component"]) is str and detail["component"] in _COMPONENTS
+                and type(detail["ordinal"]) is int and 0 <= detail["ordinal"] <= 32
+                and type(detail["component_scope"]) is str and detail["component_scope"] == "entered_phase_including_callbacks_not_forensic_attribution"
+                and type(detail["category"]) is str and detail["category"] in ("local_contract_refusal", "local_os_error", "unknown_local_error")
+                and (detail["contract_code"] is None or type(detail["contract_code"]) is str and detail["contract_code"] in _CODES)
+                and (detail["upstream_contract_code"] is None or type(detail["upstream_contract_code"]) is str and detail["upstream_contract_code"] in worker._CODES | native._CODES)
+                and (detail["errno_name"] is None or type(detail["errno_name"]) is str and detail["errno_name"] in set(_ERRNOS.values()) | set(native._ERRNOS.values()) | set(worker._ERRNOS.values()))
+                and type(detail["mismatching_fields"]) is list and len(detail["mismatching_fields"]) <= 9
+                and all(type(v) is str and v in _STAMP_NAMES for v in detail["mismatching_fields"]), "native_status_refused")
+        payload = {"schema": "si-native-status-observation-v3", "status_role": "observability_only",
+            "status": "refused" if detail is not None else "producer_checks_complete_provisional", "failure": detail,
+            "supervisor_process_exit_attested": False, "launcher_independence_verified": False,
+            "readback_claimed": False, "authority": authority()}
+        raw = canonical_json(payload).encode() + b"\n"
+        require(0 < len(raw) <= MAXIMUM_STATUS_BYTES and raw.count(b"\n") == 1, "native_status_refused")
+        _write(self.fd, raw); os.fsync(self.fd); self.check(len(raw))
+        # FD1 belongs to the process runtime. No readback or future kernel
+        # exit is claimed; Main independently verifies both after termination.
+
+
 class _Files:
     def __init__(self, fd, parent, path, check, roles):
         self.fd, self.parent, self.path, self.callback, self.roles = fd, parent, path, check, frozenset(roles)
@@ -391,9 +483,11 @@ class _Code:
     def close(self): _drain(self.fds)
 
 
-def _spec(head, remote, manifest):
-    return {"schema": "si-native-process-bootstrap-v2", "runtime_head": head, "actual_remote": remote,
-        "policy_sha256": POLICY_SHA256, "code_manifest": manifest, "domain": DOMAIN, "authority": authority()}
+def _spec(head, remote, manifest, status_pin):
+    return {"schema": "si-native-process-bootstrap-v3", "runtime_head": head, "actual_remote": remote,
+        "policy_sha256": POLICY_SHA256, "code_manifest": manifest, "domain": DOMAIN,
+        "status_original_identity": list(_status_pin(status_pin)), "status_name": STATUS_NAME,
+        "authority": authority()}
 
 
 def build_launchd_plist(head, remote, digest):
@@ -402,7 +496,7 @@ def build_launchd_plist(head, remote, digest):
     return {"Label": LABEL, "ProgramArguments": [worker.PYTHON, "-B", "-m", MODULE, "run-proof",
         "--head", head, "--remote", remote, "--bootstrap-sha256", digest], "WorkingDirectory": str(ROOT),
         "EnvironmentVariables": worker._environment(), "RunAtLoad": True, "KeepAlive": False,
-        "StandardOutPath": "/dev/null", "StandardErrorPath": "/dev/null"}
+        "StandardOutPath": str(ROOT / PARENT / STATUS_NAME), "StandardErrorPath": "/dev/null"}
 
 
 def prepare_bootstrap(head, remote):
@@ -411,9 +505,11 @@ def prepare_bootstrap(head, remote):
     code = directory = files = None; primary = None
     try:
         _phase("current_code"); _component("code_context")
-        code = _Code(head, remote, clock); raw = canonical_json(_spec(head, remote, code.manifest)).encode(); digest = hash_bytes(raw)
+        code = _Code(head, remote, clock)
         _phase("bootstrap"); _component("bootstrap_directory")
         directory = _Directory(BOOTSTRAP, create=True)
+        status_pin = _prepare_status(directory)
+        raw = canonical_json(_spec(head, remote, code.manifest, status_pin)).encode(); digest = hash_bytes(raw)
         files = _Config(directory)
         _component("bootstrap_spec", 1); files.write("launch.spec.json", raw)
         _component("bootstrap_job", 2); files.write("job.plist", plistlib.dumps(build_launchd_plist(head, remote, digest), sort_keys=True))
@@ -433,7 +529,7 @@ def prepare_bootstrap(head, remote):
         if primary is None and first is not None: raise first
     _phase("named_audit"); _component("code_context"); code.named()
     _component("config_context"); files.named(); _component("terminal_clock"); clock.check()
-    return {"schema": "si-native-process-bootstrap-prepared-v2", "bootstrap_sha256": digest,
+    return {"schema": "si-native-process-bootstrap-prepared-v3", "bootstrap_sha256": digest,
         "job_submitted": False, "native_created": False, "authority": authority()}
 
 
@@ -441,17 +537,23 @@ def _read_bootstrap(head, remote, manifest, digest):
     directory = _Directory(BOOTSTRAP, create=False); rows = []; primary = None
     directory.bootstrap_rows = []
     try:
-        expected = {"launch.spec.json": canonical_json(_spec(head, remote, manifest)).encode(),
-            "job.plist": plistlib.dumps(build_launchd_plist(head, remote, digest), sort_keys=True)}
-        require(set(os.listdir(directory.fd)) == set(expected) and hash_bytes(expected["launch.spec.json"]) == digest,
-            "native_proof_code")
+        require(set(os.listdir(directory.fd)) == {"launch.spec.json", "job.plist"}, "native_proof_code")
+        expected = {"launch.spec.json": None, "job.plist": plistlib.dumps(build_launchd_plist(head, remote, digest), sort_keys=True)}
         for name, raw in expected.items():
             info = os.stat(name, dir_fd=directory.fd, follow_symlinks=False)
             require(stat.S_ISREG(info.st_mode) and info.st_uid == os.getuid() and stat.S_IMODE(info.st_mode) == 0o600
-                and info.st_nlink == 1 and info.st_size == len(raw), "native_proof_protection")
+                and info.st_nlink == 1 and 0 < info.st_size <= MAXIMUM_CONTROL_BYTES
+                and (raw is None or info.st_size == len(raw)), "native_proof_protection")
             fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=directory.fd); rows.append(fd)
             before = _stamp(info); _same(_stamp(os.fstat(fd)), before)
-            require(os.read(fd, len(raw) + 1) == raw, "native_proof_code")
+            observed = os.read(fd, info.st_size + 1)
+            if name == "launch.spec.json":
+                require(type(digest) is str and hash_bytes(observed) == digest, "native_proof_code")
+                parsed = json.loads(observed)
+                require(type(parsed) is dict, "native_proof_code")
+                directory.status_pin = _status_pin(parsed.get("status_original_identity"))
+                raw = canonical_json(_spec(head, remote, manifest, directory.status_pin)).encode()
+            require(observed == raw, "native_proof_code")
             _same(_stamp(os.fstat(fd)), before)
             directory.bootstrap_rows.append((name, fd, before, raw))
         _bootstrap_audit(directory)
@@ -479,46 +581,61 @@ def _bootstrap_audit(directory, *, named=False):
 
 class _Volume:
     def __init__(self, clock):
+        _component("native_platform", 1)
         native._platform()
         clock.check()
+        _component("native_parent", 2)
         self.clock, self.directory, self.fds, self.origins = clock, _Directory(DOMAIN, create=True), [], {}
         self.path = self.directory.path; self.image = self.path / "backing.sparseimage"; self.mount = self.path / "mount"
         self.mount_fd = None
         try:
+            _component("native_host", 3)
             host = native._native_statfs(self.directory.fd)
             require(host["flags"] & native.MNT_LOCAL and not host["flags"] & native.MNT_IGNORE_OWNERSHIP
                 and host["bsize"] * host["bavail"] >= VIRTUAL_BYTES + 1024 ** 3, "native_proof_capacity")
             self.host_device = os.fstat(self.directory.fd).st_dev
+            _component("native_before_info", 4)
             self.command("before", "info"); self._association(self.origins["before"], absent=True)
+            _component("native_create", 5)
             self.command("create", "create")
             require(set(os.listdir(self.directory.fd)) == {"backing.sparseimage"}, "native_proof_membership")
+            _component("native_backing", 6)
             fd = os.open("backing.sparseimage", os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=self.directory.fd)
             self.fds.append(fd); self.backing_fd = fd
             require(stat.S_ISREG(os.fstat(fd).st_mode) and os.fstat(fd).st_uid == os.getuid() and os.fstat(fd).st_nlink == 1,
                 "native_proof_backing"); os.fchmod(fd, 0o600); self.backing_pin = native._backing(os.fstat(fd))
+            _component("native_under_mount", 7)
             os.mkdir("mount", 0o700, dir_fd=self.directory.fd)
             self.under_fd = os.open("mount", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=self.directory.fd)
             self.fds.append(self.under_fd); self.under_pin = _dir(os.fstat(self.under_fd), True)
             require(not os.listdir(self.under_fd), "native_proof_membership")
+            _component("native_attach", 8)
             self.command("attach", "attach"); self.attach_entities = native._entities(plistlib.loads(self.origins["attach"]))
+            _component("native_initial_info", 9)
             self.command("initial", "info"); self.device = self._association(self.origins["initial"])
+            _component("native_mount_open", 11)
             self.mount_fd = os.open("mount", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=self.directory.fd)
             self.fds.append(self.mount_fd); info = os.fstat(self.mount_fd)
             self.creation = native._fresh_root_identity(info); current = native._native_statfs(self.mount_fd)
             self.mount_native = native._mount_identity(current); self.node = native._node_pin(self.device, info.st_dev)
             self._native(current)
+            _component("native_capacity", 13)
             require(type(current["bsize"]) is int and current["bsize"] > 0
                 and type(current["blocks"]) is int and 4 * 1024 ** 3 <= current["blocks"] * current["bsize"] <= VIRTUAL_BYTES
                 and type(current["bavail"]) is int and current["bavail"] * current["bsize"] >= 4 * 1024 ** 3,
                 "native_proof_capacity")
             require(info.st_dev != self.host_device and self.creation == native._fresh_root_identity(self.mount.lstat()), "native_proof_mount")
+            _component("native_root_mode", 14)
             os.fchmod(self.mount_fd, 0o700); os.fsync(self.mount_fd); self.mount_pin = _dir(os.fstat(self.mount_fd), True)
             require(native._fresh_root_identity(os.fstat(self.mount_fd)) == self.creation, "native_proof_mount")
+            _component("native_system", 15)
             self.system = None
             require(set(os.listdir(self.mount_fd)) <= {".fseventsd"}, "native_proof_membership")
             if ".fseventsd" in os.listdir(self.mount_fd): self.system = self._system()
+            _component("native_first_check", 16)
             self.check()
-        except BaseException:
+        except BaseException as error:
+            failure_summary(error)
             try: self.close()
             except BaseException: pass
             raise
@@ -561,6 +678,7 @@ class _Volume:
         else:
             require(role == "terminal", "native_proof_command"); self.check()
     def _association(self, raw, absent=False):
+        _component("native_association", 10)
         parsed = plistlib.loads(raw); images = parsed.get("images")
         require(type(images) is list and len(images) <= 256 and all(type(r) is dict for r in images), "native_proof_association")
         matching = [r for r in images if r.get("image-path") == str(self.image)]
@@ -582,26 +700,33 @@ class _Volume:
             mounts += sum(r.get("mount-point") == str(self.mount) for r in rows)
         require(mounts == 1 and all(count == 1 for count in device_counts.values()), "native_proof_association"); return device
     def _native(self, current):
+        _component("native_contract", 12)
         require(current["fstype"] == "apfs" and current["owner"] == os.getuid()
             and current["flags"] & native.MNT_LOCAL and current["flags"] & native.MNT_DONTBROWSE
             and not current["flags"] & (native.MNT_RDONLY | native.MNT_IGNORE_OWNERSHIP)
             and current["mounted_on"] == str(self.mount) and current["mounted_from"] == self.device
             and native._mount_identity(current) == self.mount_native, "native_proof_mount")
     def _system(self):
+        _component("native_system", 15)
         info = os.stat(".fseventsd", dir_fd=self.mount_fd, follow_symlinks=False)
         require(stat.S_ISDIR(info.st_mode) and stat.S_IMODE(info.st_mode) == 0o700 and info.st_uid == 0
             and info.st_gid == os.fstat(self.mount_fd).st_gid and info.st_dev == os.fstat(self.mount_fd).st_dev,
             "native_proof_protection")
         return _stamp(info)[:6]
     def check(self):
+        _component("native_parent", 2)
         self.clock.check(); self.directory.check()
         require(set(os.listdir(self.directory.fd)) == {"backing.sparseimage", "mount"}, "native_proof_membership")
+        _component("native_backing", 6)
         require(native._backing(os.fstat(self.backing_fd)) == native._backing(self.image.lstat()) == self.backing_pin,
             "native_proof_backing")
+        _component("native_under_mount", 7)
         require(_dir(os.fstat(self.under_fd), True) == self.under_pin and self.mount.resolve() == self.mount
             and _dir(os.fstat(self.mount_fd), True) == _dir(self.mount.lstat(), True) == self.mount_pin, "native_proof_mount")
         self._native(native._native_statfs(self.mount_fd))
+        _component("native_mount_open", 11)
         require(native._node_pin(self.device, os.fstat(self.mount_fd).st_dev) == self.node, "native_proof_mount")
+        _component("native_system", 15)
         expected = ({".fseventsd"} if self.system is not None else set()) | ({"proof"} if hasattr(self, "proof_pin") else set())
         require(set(os.listdir(self.mount_fd)) == expected, "native_proof_membership")
         if self.system is not None: require(self._system() == self.system, "native_proof_protection")
@@ -741,6 +866,9 @@ def run_registered(head, remote, bootstrap_sha256):
     try:
         _phase("current_code"); worker._guard(head, remote); code = _Code(head, remote, clock)
         _phase("bootstrap"); bootstrap, bootstrap_fds = _read_bootstrap(head, remote, code.manifest, bootstrap_sha256)
+        _component("status_channel", 1)
+        status = _CLI_STATUS if type(_CLI_STATUS) is _Status else _Status()
+        status.bind(bootstrap, bootstrap.status_pin)
         _phase("native_creation"); volume = _Volume(clock)
         _phase("output_creation"); outputs = volume.outputs()
         for role in ("before", "create", "attach", "initial"): outputs.write("native." + role + ".plist", volume.origins[role])
@@ -824,17 +952,31 @@ def run_registered(head, remote, bootstrap_sha256):
 
 
 def main(argv=None):
+    global _CLI_STATUS
     parser = argparse.ArgumentParser(description="One registered source-free native process proof")
     parser.add_argument("command", choices=("prepare-proof", "run-proof", "capture"))
     parser.add_argument("--head"); parser.add_argument("--remote"); parser.add_argument("--bootstrap-sha256")
     args = parser.parse_args(argv)
+    status = None
     try:
         if args.command == "capture": raise NativeProofRefusal("REFUSED: native_proof_source_refused")
         if args.command == "prepare-proof": result = prepare_bootstrap(args.head, args.remote)
-        else: result = run_registered(args.head, args.remote, args.bootstrap_sha256).public_summary()
+        else:
+            _phase("status_publication"); _component("status_channel", 1)
+            status = _Status(); _CLI_STATUS = status
+            result = run_registered(args.head, args.remote, args.bootstrap_sha256).public_summary()
+            _phase("status_publication"); _component("status_channel", 1); status.emit()
+            return 0
         print(canonical_json(result)); return 0
     except BaseException as error:
-        print(canonical_json({"status": "refused", "failure": failure_summary(error), "authority": authority()})); return 2
+        detail = failure_summary(error)
+        if args.command == "run-proof":
+            if status is not None:
+                try: status.emit(detail)
+                except BaseException: pass  # No retry/exception formatting if reporting itself refuses.
+        else: print(canonical_json({"status": "refused", "failure": detail, "authority": authority()}))
+        return 2
+    finally: _CLI_STATUS = None
 
 
 if __name__ == "__main__": raise SystemExit(main())

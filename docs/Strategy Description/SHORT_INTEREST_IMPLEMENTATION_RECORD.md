@@ -27468,3 +27468,107 @@ retry, old-name reuse, relaxed evidence checks or invented closure. Provider
 retrieval and capture remain blocked; count/DAILY scope clarification is still
 pending. No provider START/HTTP/key read, source claim, look, QC/Safari,
 purchase or push has occurred.
+
+### 132.12 Actual native-v2 one-shot termination; no proof acceptance
+
+The configuration checkpoint is local e1ed26a195d9901630c81cbe4b9749de12b6fa9a;
+Main post-record98/1.12s passed before commit. On clean E1ED with matching
+tracking/actual F27, Main verified both v2 paths and exact job absent. Registered
+prepare exec55535 terminated **exit0**, returning bootstrap SHA
+4484c2519d832534c32dcf9a82428c0f60fb89b3d3d227b2d580a851360edbfd.
+Independent current configuration authentication also terminated exit0,
+binding original identities/protection/bytes and the exact five-file committed
+manifest. Job SHA31929703190a1b3d33376000ba6f5e8724c4844cc88f53c7d75aa3ec11a25f13
+matched the exact registered one-shot definition. No creator-evidence authority
+was inferred from configuration timestamps.
+
+Main bootstrapped that job ONCE (command exit0). The later exact kernel query
+reports **runs1/not running/last exit2**. Actual exit2 vetoes this proof.
+Guarded read-only metadata then established that the fresh domain contains
+exactly backing.sparseimage and a mounted root; that root has .fseventsd only,
+with no proof directory, result/inventory/control or child-exit observation.
+The invocation reached image creation/attachment but failed before output
+creation. Its exact original failed predicate, component and actor remain
+UNKNOWN because the early constructor failure had no inner output and the
+fixed CLI projection went to /dev/null. No child success or old-data repair
+is claimed. There is no native-proof/source/input/backtest admission.
+
+A separate CURRENT read-only observation (not reconstructed original closure)
+found APFS/local/nobrowse/owners-honored/writable, native owner and root UID
+matching current user, root0700, backing0600/single-link, exact native mounted
+path/device association, and .fseventsd directory UID0/GID matching root/0700.
+Current total8380178432 and available8353775616 bytes fit the virtual bounds.
+Selected current native-info SHA is
+b856ec02b97be34f4bac144660041cd40044237cf61c04c881c559766b34909a.
+These present checks do not undo the failed original invocation or identify
+its cause; no success is inferred from their passing today.
+
+The actual v2 image/mount/config/job remain preserved and retired without
+restart, detach, remount, adoption, reseal, overwrite or flag clearing. No
+source claim/START/HTTP/credential read, outcome/look, QC/Safari, purchase or
+push occurred. Native proof metadata allocation is not provider spending.
+Before any further native invocation, diagnose a verified adapter cause or
+correct the verified missing EARLY fixed diagnostic channel; do not create
+another equivalent namespace merely to guess. Any diagnostic channel must
+remain observation-only, incapable of evidence/source admission, and keep
+original identity/protection plus stable per-read validation. ALL actual code,
+native and inner evidence checks stay unchanged. Scope clarification for the
+later count/DAILY budget is still pending, and source dispatch remains blocked.
+
+### 132.13 Registered early observability correction; native v3 pending
+
+**SI-DEC-20261028-05** corrects the verified loss of pre-proof-directory
+diagnostics through /dev/null. No native guard failure has been diagnosed or
+waived. Only the native driver/test and this record changed. Fresh fixed
+bootstrap/domain/label suffixes are v3; v2 image/mount/job and every older name
+remain preserved and retired without reuse or modification.
+
+A distinct sibling count-process-supervisor-native-status-v3.jsonl is created
+ONCE O_EXCL0600/single-link/empty under the original guarded parent. Its original
+first7 identity is bound into the canonical spec/hash. It is OBSERVABILITY
+only, separate from _Config's exact two roles and from all inner evidence.
+After canonical bootstrap authentication, the parent must match FD1 AND the
+nofollow named status file to that ORIGINAL identity before _Volume and before
+any output. Constructor-only capture of a replacement cannot authorize a write.
+Cross-phase host status timestamps grant no creator/evidence capability.
+Root will verify original identity/protection, stable full9 during its actual
+read and one bounded canonical line after known kernel termination.
+
+The channel emits at most one2048-byte allowlisted line containing only fixed
+phase/component/ordinal/category/contract/errno and genuine mismatch FIELD
+NAMES, or a provisional completion observation. No exception formatting,
+paths/values, raw native output, private buffers or source rows may escape.
+Readback, own kernel-exit, launcher-independence, source and budget authority
+are explicitly false; the channel cannot establish any closure or readiness.
+Actual nonzero/unknown kernel status and any negative override everything.
+Native constructor labels precede each major guard; the first failure is
+captured before cleanup can change its entered context, without actor claims.
+
+Original-identity/protection/replacement/nonempty, no-progress/fsync/close and
+original-cause-survives-report-failure fabricated regressions passed. The old
+pre-proof-directory diagnostic-loss case was reproduced RED before correction.
+ALL code/native/inner/live-bootstrap full9 checks and2/5/300/120s bounds remain
+unchanged. No fixed status output is used as a substitute for native evidence.
+
+Registered policy:
+cbc98e5fb6672065c20f5944f90c04e4015481112ba908570e9eb146f5f6c168.
+Source SHA25614c88a29b947b20e1c1fbb9413ca5681ac301f1c09bfa23411c015162c51c08d;
+test SHA2567213d9cef407ccedc754f6873447b1c0f59527b2edbf5ec37fe984dad88620be.
+Main9 relevant focused files passed **327/2.86s**, no skips/warnings reported;
+all90 held/proof/test paths compile in memory, with policy equality, old
+dependency byte equality, record-prefix preservation and whitespace checks.
+Author87 native/import checks/1.58s and delegated peer78 native-only/.94s are
+separately attributed. Peer accepted; Root changed only the registration
+literal after freeze before327 checks. Sanitized environment, OS network
+denial and no bytecode/cache remained; no full suite or actual operation ran.
+
+After the resulting clean commit and fresh matching tracking/actual F27 check,
+Root may prepare this separately frozen bootstrap/status ONCE and submit the
+exact RunAtLoad/KeepAlive=false job ONCE. Freeze all authors/tests while active.
+Require actual terminal kernel evidence plus original native inventory/controls,
+original wait0 and no negative for any proof acceptance; status alone never
+suffices. Preserve any failed/partial evidence, with no automatic restart,
+equivalent new namespace to guess, relaxed check or source invocation. Document
+the actual safe diagnostic/result before a causally justified next policy.
+Provider retrieval/capture and QC/Safari remain blocked; no source START/HTTP/
+key read/claim, look, purchase or push occurred. Budget scope is still pending.

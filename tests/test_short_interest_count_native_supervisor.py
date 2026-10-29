@@ -25,6 +25,7 @@ def deny_external(monkeypatch):
     monkeypatch.setattr(proof.native.ctypes, "CDLL", denied)
     for name, value in (("_USED", False), ("_HELD", []), ("_RESULTS", {}), ("_FAILURES", {}), ("_FIELDS", {}), ("_BUFFER_ORIGINS", {}), ("_PRESERVATION_ORIGINS", {})):
         monkeypatch.setattr(proof, name, value)
+    monkeypatch.setattr(proof, "_CLI_STATUS", None)
     monkeypatch.setattr(proof.worker, "_CHILDREN", {}); monkeypatch.setattr(proof.worker, "_WAITS", {})
 
 
@@ -36,7 +37,11 @@ def fabricated(tmp_path, monkeypatch):
         path = tmp_path / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(b"# NAMED FABRICATED CODE\n")
     monkeypatch.setattr(proof, "POLICY_SHA256", hash_payload(proof.policy()))
     h = SimpleNamespace(events=[], processes=[], status=0, raw=None, terminal_callback=None,
-        named_callback=None, close_callback=None, volumes=[], wait_error=None)
+        named_callback=None, close_callback=None, volumes=[], wait_error=None, status_fd=None)
+    def status_fd():
+        if h.status_fd is None: h.status_fd = os.open(proof.ROOT / proof.PARENT / proof.STATUS_NAME, os.O_WRONLY | os.O_NOFOLLOW)
+        return h.status_fd
+    monkeypatch.setattr(proof, "_status_fd", status_fd)
     monkeypatch.setattr(proof.worker, "_guard", lambda *args: None)
     def git(arguments):
         assert arguments[:1] == ["show"] and arguments[1].startswith(HEAD + ":")
@@ -93,6 +98,7 @@ def fabricated(tmp_path, monkeypatch):
             if process.stdout is not None: process.stdout.close()
         for child in h.processes:
             if not child.stdout.closed: child.stdout.close()
+        if h.status_fd is not None: os.close(h.status_fd)
 
 
 def prepare(): return proof.prepare_bootstrap(HEAD, REMOTE)["bootstrap_sha256"]
@@ -114,6 +120,147 @@ def test_capture_cli_refuses_before_registration_or_domain(monkeypatch, capsys):
     assert result["authority"]["provider_HTTP"] == 0
 
 
+def test_fabricated_ctor_failure_survives_devnull_cli_via_observability_only_channel(fabricated, monkeypatch):
+    digest = prepare()
+    status_path = proof.ROOT / proof.PARENT / "count-process-supervisor-native-status-v3.jsonl"
+    descriptor = None
+    if status_path.exists():
+        descriptor = os.open(status_path, os.O_WRONLY | os.O_NOFOLLOW)
+        monkeypatch.setattr(proof, "_status_fd", lambda: descriptor, raising=False)
+    def refused(clock): raise proof.NativeProofRefusal("REFUSED: native_proof_mount")
+    monkeypatch.setattr(proof, "_Volume", refused)
+    monkeypatch.setattr("builtins.print", lambda *a, **k: None)  # Exact old launchd /dev/null observability gap.
+    try:
+        assert proof.main(["run-proof", "--head", HEAD, "--remote", REMOTE, "--bootstrap-sha256", digest]) == 2
+        raw = status_path.read_bytes()
+        assert raw.count(b"\n") == 1 and len(raw) <= 2048
+        result = json.loads(raw)
+        assert result["failure"]["contract_code"] == "native_proof_mount"
+        assert result["supervisor_process_exit_attested"] is False
+        assert result["authority"]["source_dispatch_authority"] is False
+    finally:
+        if descriptor is not None: os.close(descriptor)
+
+
+def cli(digest):
+    return proof.main(["run-proof", "--head", HEAD, "--remote", REMOTE, "--bootstrap-sha256", digest])
+
+
+def status_line():
+    raw = (proof.ROOT / proof.PARENT / proof.STATUS_NAME).read_bytes()
+    assert raw.count(b"\n") == 1 and len(raw) <= proof.MAXIMUM_STATUS_BYTES
+    return json.loads(raw)
+
+
+def test_status_original_first7_is_in_canonical_spec_and_not_config_or_inner_evidence(fabricated):
+    prepare(); parent = proof.ROOT / proof.PARENT
+    spec = json.loads((parent / proof.BOOTSTRAP / "launch.spec.json").read_bytes())
+    assert spec["status_original_identity"] == list(proof._status_identity((parent / proof.STATUS_NAME).lstat()))
+    assert spec["status_name"] == proof.STATUS_NAME
+    assert proof.STATUS_NAME not in proof._Config.ROLES and proof.STATUS_NAME not in proof.ROLES
+
+
+def test_status_cli_return_is_provisional_and_not_a_kernel_or_source_attestation(fabricated, capsys):
+    assert cli(prepare()) == 0
+    result = status_line()
+    assert result["status"] == "producer_checks_complete_provisional"
+    assert result["status_role"] == "observability_only"
+    assert result["supervisor_process_exit_attested"] is result["launcher_independence_verified"] is False
+    assert result["readback_claimed"] is False and result["authority"]["source_dispatch_authority"] is False
+    assert capsys.readouterr().out == ""
+
+
+@pytest.mark.parametrize("hazard", ["wrong_inode", "mode", "hardlink", "nonempty"])
+def test_wrong_status_channel_cannot_dispatch_or_write_an_unrelated_file(fabricated, monkeypatch, hazard):
+    digest = prepare(); path = proof.ROOT / proof.PARENT / proof.STATUS_NAME
+    unrelated = proof.ROOT / "unrelated-empty-private"; unrelated.write_bytes(b""); unrelated.chmod(0o600)
+    extra_fd = None
+    if hazard == "wrong_inode":
+        extra_fd = os.open(unrelated, os.O_WRONLY | os.O_NOFOLLOW)
+        monkeypatch.setattr(proof, "_status_fd", lambda: extra_fd)
+    elif hazard == "mode": path.chmod(0o644)
+    elif hazard == "hardlink": os.link(path, proof.ROOT / "extra-link")
+    else: path.write_bytes(b"PREEXISTING")
+    before = path.read_bytes()
+    try:
+        assert cli(digest) == 2 and not fabricated.events
+        assert path.read_bytes() == before and unrelated.read_bytes() == b""
+    finally:
+        if extra_fd is not None: os.close(extra_fd)
+
+
+def test_status_nofollow_name_must_still_identify_original_fd_before_volume(fabricated):
+    digest = prepare(); path = proof.ROOT / proof.PARENT / proof.STATUS_NAME
+    fabricated.status_fd = os.open(path, os.O_WRONLY | os.O_NOFOLLOW)
+    original = proof.ROOT / "preserved-original-status"; path.rename(original)
+    path.write_bytes(b""); path.chmod(0o600)
+    assert cli(digest) == 2 and not fabricated.events
+    assert path.read_bytes() == original.read_bytes() == b""
+
+
+@pytest.mark.parametrize("failure", ["zero_progress", "fsync"])
+def test_status_publication_failure_keeps_kernel_return_negative_and_never_retries(fabricated, monkeypatch, failure):
+    digest = prepare(); original_write, original_fsync = os.write, os.fsync; calls = []
+    def write(fd, raw):
+        if fd == fabricated.status_fd and failure == "zero_progress": calls.append(True); return 0
+        return original_write(fd, raw)
+    def fsync(fd):
+        if fd == fabricated.status_fd and failure == "fsync": calls.append(True); raise OSError(5, "PRIVATE_STATUS_FSYNC")
+        return original_fsync(fd)
+    monkeypatch.setattr(proof.os, "write", write); monkeypatch.setattr(proof.os, "fsync", fsync)
+    assert cli(digest) == 2 and calls == [True]
+    raw = (proof.ROOT / proof.PARENT / proof.STATUS_NAME).read_bytes()
+    if failure == "zero_progress": assert raw == b""
+    else:
+        result = json.loads(raw)
+        assert result["status"] == "producer_checks_complete_provisional" and result["supervisor_process_exit_attested"] is False
+
+
+@pytest.mark.parametrize("failure", ["fsync", "close"])
+def test_status_creation_io_failure_is_fatal_before_native_or_job(fabricated, monkeypatch, failure):
+    monkeypatch.setattr(proof.native, "_platform", lambda: None)  # Named wrapped-open platform seam.
+    original_open, original_close, original_fsync = os.open, os.close, os.fsync
+    target, failed = set(), []
+    def opened(path, flags, *args, **kwargs):
+        fd = original_open(path, flags, *args, **kwargs)
+        if path == proof.STATUS_NAME and flags & os.O_CREAT: target.add(fd)
+        return fd
+    def close(fd):
+        value = original_close(fd)
+        if failure == "close" and fd in target and not failed: failed.append(True); raise OSError(5, "PRIVATE_STATUS_CLOSE")
+        return value
+    def fsync(fd):
+        if failure == "fsync" and fd in target: failed.append(True); raise OSError(5, "PRIVATE_STATUS_CREATE_FSYNC")
+        return original_fsync(fd)
+    monkeypatch.setattr(proof.os, "open", opened); monkeypatch.setattr(proof.os, "close", close); monkeypatch.setattr(proof.os, "fsync", fsync)
+    with pytest.raises(OSError): prepare()
+    assert failed and not fabricated.events
+    assert not (proof.ROOT / proof.PARENT / proof.DOMAIN).exists()
+
+
+def test_native_ctor_first_failure_has_entered_component_before_outputs(fabricated, monkeypatch):
+    digest = prepare(); monkeypatch.setattr(proof, "_Volume", REAL_VOLUME)
+    monkeypatch.setattr(proof.native, "_native_statfs", lambda fd: {"flags": proof.native.MNT_LOCAL, "bsize": 4096, "bavail": 0})
+    assert cli(digest) == 2
+    detail = status_line()["failure"]
+    assert (detail["stage"], detail["component"], detail["ordinal"]) == ("native_creation", "native_host", 3)
+    assert detail["contract_code"] == "native_proof_capacity"
+    assert not (proof.ROOT / proof.PARENT / proof.DOMAIN / "mount/proof").exists()
+
+
+def test_reporting_failure_cannot_replace_the_original_ctor_cause(fabricated, monkeypatch):
+    digest = prepare(); original_fsync = os.fsync
+    def refused(clock): raise proof.NativeProofRefusal("REFUSED: native_proof_mount")
+    def fsync(fd):
+        if fd == fabricated.status_fd: raise OSError(5, "PRIVATE_REPORTING_FAILURE")
+        return original_fsync(fd)
+    monkeypatch.setattr(proof, "_Volume", refused); monkeypatch.setattr(proof.os, "fsync", fsync)
+    assert cli(digest) == 2
+    result = status_line()
+    assert result["failure"]["contract_code"] == "native_proof_mount"
+    assert result["failure"]["errno_name"] is None and "PRIVATE" not in canonical_json(result)
+
+
 def test_bootstrap_never_creates_native_domain_and_job_is_one_shot(fabricated):
     digest = prepare(); base = proof.ROOT / proof.PARENT / proof.BOOTSTRAP
     assert set(os.listdir(base)) == {"launch.spec.json", "job.plist"}
@@ -121,7 +268,8 @@ def test_bootstrap_never_creates_native_domain_and_job_is_one_shot(fabricated):
     job = plistlib.loads((base / "job.plist").read_bytes())
     assert job == proof.build_launchd_plist(HEAD, REMOTE, digest)
     assert job["RunAtLoad"] is True and job["KeepAlive"] is False
-    assert job["StandardOutPath"] == job["StandardErrorPath"] == "/dev/null"
+    assert job["StandardOutPath"] == str(proof.ROOT / proof.PARENT / proof.STATUS_NAME)
+    assert job["StandardErrorPath"] == "/dev/null"
     assert not {"StartInterval", "StartCalendarInterval", "WatchPaths", "QueueDirectories"} & set(job)
     with pytest.raises(proof.NativeProofRefusal, match="exists"): prepare()
 

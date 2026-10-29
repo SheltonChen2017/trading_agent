@@ -28266,3 +28266,113 @@ kernel/control-child results and only the privately filtered line; a refusal
 remains negative and observation0 never admits native/source/input evidence.
 Preserve all old labels/data/claims/debits and both caps. No source START/HTTP/
 key read, outcome/look, QC/Safari, purchase or push occurred.
+
+### 132.27 Actual v5 terminal negative; controlling-terminal lifetime conflict
+
+Main committed the registered v5 backend at
+64c5ece4ea0c8e022370a4da37cb5d49d6c01e07; post-record98/0.89s passed
+in a separately observed focused rerun (the prior consumed session output was
+unavailable). Clean64C5/matching tracking and actual F27, fresh names and
+exact new-job absence113 were verified before ONE observe-readonly invocation,
+exec23051. All authors/tests were frozen for that invocation.
+
+The outer process terminated exit2 with fixed local_os_error / EBADF during
+entered phase controller_load, original_Git null, no filtered observer result.
+That phase also includes later callbacks/collection/cleanup and is NOT exact
+forensic attribution. Independent guarded post-exit query found the exact
+v5 service at runs1/not-running/active0/no PID/exit2. Thus a target DID run;
+there is no accepted original control-child wait result or target observation.
+The earlier no-start interpretation based only on the entered phase is
+withdrawn. A later exact module/runtime process inventory found no matching
+startup process remaining; absence is not a successful child-wait receipt.
+
+Protected original config/status read-close checks passed with matching
+original FD/named stamps throughout that read: spec2532bytes SHA
+8f70002e4be5202d168c7eb147d5ac23fc3a60cc7180acf141c9ea6b6bcc8407,
+job1647bytes SHA
+8e5e7513974687b006fd1ca5df46bff0f2507683c3dd1ddae78ca75e7dd9a033,
+status0bytes. Current stable reads do not repair old closure. Preserve every
+v5 file and the terminal label unchanged; never restart or adopt that job.
+
+Main then ran a paired SOURCE-FREE, in-memory PTY/session test, with no
+launchd job, artifact namespace, source claim, private rows or provider seam.
+Both original children exited0 and were waited by their original parent.
+After setsid WITHOUT TIOCSCTTY, the parent's held slave still passed
+fstat/isatty/ttyname. With TIOCSCTTY, the SAME post-wait operations yielded
+fstat/ttyname EBADF and isatty=false. This verifies an actual native lifetime
+incompatibility in the present backend, not a persisted traceback proving
+which original v5 expression first failed or any historical custody cause.
+The fabricated controller fixture had replaced ioctl with a no-op and did
+not exercise this teardown behavior.
+
+**SI-DEC-20261028-12** authorizes a causal prospective correction ONLY to the
+source-free diagnostic: the direct StandardErrorPath backend does not need
+its private controller to own a controlling terminal. Remove TIOCSCTTY while
+retaining the distinct session/process, original endpoint checks before and
+AFTER child wait, original code/source/config/full9 checks, private barriers,
+exact one initial start, independent terminal query and false authorities.
+Do not drop a post-wait check, rebaseline an invalid descriptor, adopt old
+endpoints, or change original native/source implementations. Require causal
+native-child regressions and independent review before a fresh registered v6.
+
+Finding SI-BUILD-20261028-070 (P2) is verified as a prospective backend/test
+lifetime defect; its correspondence to the original EBADF expression remains
+unproven. V5 remains a terminal NEGATIVE, with no source/native/input admission.
+All existing data, spent/unknown reservations and both separate budgets stay
+preserved. No source START/HTTP/key read, outcome/look, QC/Safari, purchase,
+external message or push occurred.
+
+### 132.28 Frozen v6 explicit-descriptor controller; actual observation pending
+
+Under SI-DEC-20261028-12, the source-free controller now calls a small exact
+_control_session check for its original three endpoints and getsid==pid;
+it does NOT acquire a controlling terminal. Popen retains start_new_session.
+The ordinary direct StandardErrorPath already names the original held slave;
+no command needs /dev/tty or TIOCSCTTY. Original before/after-load, last-prestart,
+post-terminal and post-wait endpoint checks remain in place. No custody check
+was removed or rebaselined to accept a revoked descriptor. Old native five,
+source/capture implementations and retired v5 files/job are unchanged.
+
+The fresh v6 names/schemas/policy preserve the same one initial start,
+RunAtLoad/KeepAlive=false, canonical original config load-consumption, private
+barriers, full9 source/code/input operation checks, correlated safe observer
+filter, original child wait and independent terminal snapshot. Native/source/
+input/backtest authority remains false. Unknown process state still retains
+original handles privately while parent lives; no kill/restart/claim release.
+
+The actual macOS paired regression launches only the exact private source-free
+Python child through original Popen, with no launchd/image/provider/source
+call. It invokes the real _control_session helper. The legacy branch then
+adds TIOCSCTTY and reproduces revoked original slave fstat/ttyname EBADF;
+the prospective branch keeps the original endpoint valid after actual wait0.
+The existing fabricated controller fixture now FAILS on any ioctl rather
+than silently replacing it with success. This proves the necessary lifetime
+correction; it does not reconstruct the uncaptured original v5 traceback.
+
+Author125 focused/2.37s and independent peer116 startup/1.60s passed.
+Main10 focused files457/3.82s passed before the final registration literal;
+after peer freeze Main changed ONLY PENDING to the computed policy and ran
+registered startup116/1.76s. Tests used sanitized environment, OS network
+denial and no bytecode/cache; the paired native children both actually
+terminated and were waited0. Main static92-path in-memory compile, closure6,
+policy equality, old-five committed byte/target hashes, historical record
+prefix and whitespace checks passed. No complete lane/repository suite ran.
+
+Registered v6 policySHA
+607b2895b19d6ed817d07e6ec301781d05398176a8065f3a90002d94f43d6976;
+final sourceSHA
+a726152a89e8b6f005595a53a55c87034a1a9caea63855274d5cb3ae7892ea58;
+testSHA
+85819e60f91044c120b4bac42cfb839d5e1f35564ac4d52d9c26b9276d5be1db.
+Peer accepted the pre-literal source96340124ad7a1bd9d2619b47f858b6b9b824e2be174343c1ce23d022b5caf50f;
+the final literal does not alter control flow. Actual v6 result is PENDING.
+
+After clean commit and fresh matching actual/tracking F27 with all authors
+and tests frozen, ONE registered v6 observe-readonly invocation is authorized.
+Fresh names and exact service absence113 must precede it; old labels are
+never started again. Independently establish actual terminal results and
+preserve any negative. Even a successful filtered diagnostic is observation
+only, not the required native-supervisor proof or source budget release.
+All data/spent and unknown debits, count84005/4GiB and separate existing DAILY
+budget stay unchanged; source START/HTTP/key reads0, outcome/looks0, QC/Safari0,
+purchases0 and pushes0 in this continuation.

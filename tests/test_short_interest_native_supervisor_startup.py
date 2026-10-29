@@ -1,5 +1,7 @@
 """Original startup guards with fabricated Git; no launchd/image/provider calls."""
 import json
+import errno
+import sys
 import os
 from pathlib import Path
 import plistlib
@@ -564,7 +566,7 @@ def test_outer_observer_reports_failure_before_subject_channel_exists(fabricated
 
 @pytest.mark.parametrize("hazard", ["nonce", "digest", "pid", "duplicate", "partial", "unrelated", "raw_prefix", "foreign_field"])
 def test_private_raw_filter_never_emits_unrelated_or_uncorrelated_text(fabricated, hazard):
-    value = {"schema": "si-startup-PTY-observation-v5", "nonce": _OBSERVER["nonce"], "spec_sha256": "c" * 64,
+    value = {"schema": "si-startup-PTY-observation-v6", "nonce": _OBSERVER["nonce"], "spec_sha256": "c" * 64,
         "pid": 456, "status": "readonly_predicates_passed_observation_only", "failure": None, "authority": diag.authority()}
     if hazard == "nonce": value["nonce"] = "2" * 32
     elif hazard == "digest": value["spec_sha256"] = "d" * 64
@@ -642,7 +644,7 @@ def controller_child(fabricated, monkeypatch):
     monkeypatch.setattr(diag.subprocess, "run", run)
     monkeypatch.setattr(diag, "_tty_check", lambda fd, value: tuple(value["terminal"]))
     monkeypatch.setattr(diag.os, "getsid", lambda pid: os.getpid())
-    monkeypatch.setattr(diag.fcntl, "ioctl", lambda fd, command, value: 0)
+    monkeypatch.setattr(diag.fcntl, "ioctl", lambda *args: pytest.fail("controller must not acquire a controlling terminal"))
     return h
 
 
@@ -652,7 +654,7 @@ def test_persistent_control_child_orders_barrier_single_start_and_terminal_ack(c
         result = diag.control_readonly(HEAD, diag.REMOTE, controller_child.digest, _OBSERVER, control_fd, ack_fd, controller_child.pins)
         messages = [json.loads(v) for v in os.read(read_fd, diag.MAX_RAW).splitlines()]
         assert controller_child.calls == ["query", "query", "query", "start", "query"]
-        assert messages[0]["schema"] == "si-startup-prestart-barrier-v5"
+        assert messages[0]["schema"] == "si-startup-prestart-barrier-v6"
         assert messages[1]["target_pid"] == 456 and result["kernel"]["exit"] == 2
         assert result["authority"]["source_dispatch_authority"] is False
     finally: os.close(read_fd)
@@ -698,7 +700,7 @@ def root_controller(fabricated, monkeypatch):
             def line(self, value): os.write(writer, canonical_json(value).encode() + b"\n")
             def receipt(self, early=False):
                 error = diag.StartupRefusal("REFUSED: startup_control")
-                return {"schema": "si-startup-control-v5", "nonce": observer["nonce"], "spec_sha256": digest,
+                return {"schema": "si-startup-control-v6", "nonce": observer["nonce"], "spec_sha256": digest,
                     "control_pid": self.pid, "target_pid": None if early else 456,
                     "kernel": diag._kernel(kernel_bytes() if early else kernel_bytes(1, exit_code=2)),
                     "status": "refused" if early else "terminal_observed", "failure": diag.failure_summary(error, HEAD) if early else None,
@@ -707,7 +709,7 @@ def root_controller(fabricated, monkeypatch):
                 if self.step == 0:
                     os.write(slave, b"PRIVATE_CONTROL_SETUP_BANNER\n")
                     if h.early: self.line(self.receipt(True))
-                    else: self.line({"schema": "si-startup-prestart-barrier-v5", "nonce": observer["nonce"],
+                    else: self.line({"schema": "si-startup-prestart-barrier-v6", "nonce": observer["nonce"],
                         "spec_sha256": digest, "control_pid": self.pid, "status": "runs0_before_initial_start"})
                     self.step = 1; return None
                 if self.step == 1:
@@ -718,7 +720,7 @@ def root_controller(fabricated, monkeypatch):
                     if h.early: self.exit = 2
                     else:
                         h.started = True; h.actions.append("initial_start")
-                        body = {"schema": "si-startup-PTY-observation-v5", "nonce": observer["nonce"], "spec_sha256": digest,
+                        body = {"schema": "si-startup-PTY-observation-v6", "nonce": observer["nonce"], "spec_sha256": digest,
                             "pid": 456, "status": "refused", "failure": diag.failure_summary(diag.StartupRefusal("REFUSED: startup_config"), HEAD), "authority": diag.authority()}
                         self.pending = h.raw_after_start + canonical_json(body).encode() + b"\n"
                         self.step = 15; return None
@@ -1015,3 +1017,51 @@ def test_endpoint_drift_in_last_prestart_query_prevents_the_initial_start(contro
         with pytest.raises(diag.StartupRefusal): diag.control_readonly(HEAD, diag.REMOTE, controller_child.digest, _OBSERVER, control_fd, ack_fd, controller_child.pins)
         assert changed == [True] and "start" not in controller_child.calls
     finally: os.close(read_fd)
+
+
+_NATIVE_CHILD_HELD = []
+_NATIVE_SESSION_CHILD = '''import json, sys
+from scripts import diagnose_short_interest_native_supervisor_startup as d
+observer = json.loads(sys.argv[1])
+d._control_session(observer)
+if sys.argv[2] == "legacy_ctty":
+    import fcntl, termios
+    fcntl.ioctl(2, termios.TIOCSCTTY, 0)
+'''
+
+
+@pytest.mark.skipif(sys.platform != "darwin", reason="Actual macOS devfs session-leader revocation regression")
+@pytest.mark.parametrize("mode", ["legacy_ctty", "explicit_fds"])
+def test_native_session_child_keeps_explicit_endpoints_without_controlling_ownership(mode):
+    master, slave = os.openpty(); os.set_blocking(master, False)
+    observer = {"nonce": "3" * 32, "terminal": list(diag._tty_pin(slave)), "slave_path": os.ttyname(slave)}
+    process = None; held = False; raw_private = b""
+    try:
+        process = ORIGINAL_POPEN([diag.worker.PYTHON, "-B", "-c", _NATIVE_SESSION_CHILD, canonical_json(observer), mode],
+            cwd=diag.ROOT, env=diag.worker._environment(), stdin=slave, stdout=slave, stderr=slave,
+            start_new_session=True, close_fds=True, shell=False)
+        try: actual_exit = process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            held = True; _NATIVE_CHILD_HELD.append((process, master, slave))
+            pytest.fail("source-free test child termination unknown; original handle and endpoints retained")
+        assert actual_exit == 0
+        try:
+            for unused in range(4):
+                block = os.read(master, 4096)
+                if not block: break
+                raw_private += block
+        except (BlockingIOError, OSError): pass
+        if mode == "legacy_ctty":
+            with pytest.raises(OSError) as failed: os.fstat(slave)
+            assert failed.value.errno == errno.EBADF
+            with pytest.raises(OSError) as failed: os.ttyname(slave)
+            assert failed.value.errno == errno.EBADF and os.isatty(slave) is False
+        else:
+            assert diag._tty_check(slave, observer) == tuple(observer["terminal"])
+            assert os.isatty(slave) and os.ttyname(slave) == observer["slave_path"]
+            assert os.fstat(slave).st_ino == observer["terminal"][1]
+    finally:
+        # No raw startup text is emitted or included in an assertion. A genuinely
+        # unknown test child keeps all originals rather than being killed/lost.
+        if not held:
+            os.close(slave); os.close(master)

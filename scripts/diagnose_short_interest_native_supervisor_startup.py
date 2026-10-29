@@ -34,10 +34,10 @@ worker = proof.worker
 ROOT, PARENT = proof.ROOT, proof.PARENT
 MODULE = "scripts.diagnose_short_interest_native_supervisor_startup"
 DRIVER = "scripts/diagnose_short_interest_native_supervisor_startup.py"
-BOOTSTRAP = "count-native-supervisor-startup-diagnostic-v5"
-STATUS = "count-native-supervisor-startup-diagnostic-v5.jsonl"
-LABEL = "com.openai.codex.short-interest-native-startup-diagnostic-v5"
-POLICY_SHA256 = "858d85488e9bc447070e63f1c9e7e0c234d3ee917d991f3bf6b857c3dbf0b000"
+BOOTSTRAP = "count-native-supervisor-startup-diagnostic-v6"
+STATUS = "count-native-supervisor-startup-diagnostic-v6.jsonl"
+LABEL = "com.openai.codex.short-interest-native-startup-diagnostic-v6"
+POLICY_SHA256 = "607b2895b19d6ed817d07e6ec301781d05398176a8065f3a90002d94f43d6976"
 TARGET_HEAD = "b58f992ac73451f8e4ec1384061ad7030d8afffa"
 REMOTE = "f27d836ab0c7422463ea19b2f6fa3bba86535c4c"
 TARGET_SPEC = "28220a7af8aea2acc70da2a61fbceddd86cc831226cfc56c560ec13e0da2e8a6"
@@ -79,7 +79,7 @@ def authority():
 
 
 def policy():
-    return {"schema": "si-native-startup-diagnostic-policy-v5", "root": str(ROOT), "parent": str(PARENT),
+    return {"schema": "si-native-startup-diagnostic-policy-v6", "root": str(ROOT), "parent": str(PARENT),
         "bootstrap": BOOTSTRAP, "status": STATUS, "label": LABEL, "code_files": list(CODE_FILES),
         "target_head": TARGET_HEAD, "target_remote": REMOTE, "target_spec_sha256": TARGET_SPEC,
         "target_manifest": TARGET_MANIFEST, "maximum_config_bytes": MAX_CONFIG, "maximum_status_bytes": MAX_STATUS,
@@ -87,10 +87,10 @@ def policy():
         "deadline": "elapsed_acceptance_at_phase_and_terminal_boundaries_not_hard_wall_kill",
         "preauth": "externally_pinned_canonical_config_only_live_root_branch_HEAD_status_unknown_until_original_guard",
         "configuration": "exact_spec_job_roles_original_first7_and_canonical_expected_bytes_SHA_across_phases_fresh_full9_FD_named_stability_each_read_including_close_no_evidence_capability_original_creator_pin_preserved_prepare_initial_Runtime_pin_configuration_only",
-        "retired": "startup_diagnostic_v1_v2_v3_v4_namespaces_status_and_jobs_preserved_never_reused",
+        "retired": "startup_diagnostic_v1_v2_v3_v4_v5_namespaces_status_and_jobs_preserved_never_reused",
         "observer": "Root_CLI_original_TTY_dev_ino_rdev_UID_GID_mode_isatty_observation_only_before_registration_fence_clock_config_one2048_nonblocking_write_no_retry_fsync_readback_nonce_specDigest_PID_correlated_no_exclusive_writer_or_own_kernel_claim",
         "load_consumption": "same_process_original_prepare_first7_canonical_bytes_SHA_fresh_full9_held_FD_named_epoch_across_single_bootstrap_load_and_postcleanup_exact_loaded_target_canonicaljobpath_neverstarted0_child_original_config_reauth_before_prestart_and_initial_start_no_debug_no_SourceAuthority",
-        "controller": "one_private_PTY_persistent_session_leader_controlchild_TIOCSCTTY_fixed_label_load_RunAtLoadFalse_KeepAliveFalse_runs0_canonical_original_slave_devfs_StandardErrorPath_no_debug_verify_runs0_private_prestart_drain_ack_barrier_initial_kickstart_p_no_k_Root_terminal_capture_ack_then_session_release_no_kill_restart",
+        "controller": "one_private_PTY_persistent_private_session_leader_controlchild_no_controlling_terminal_fixed_label_load_RunAtLoadFalse_KeepAliveFalse_runs0_canonical_original_slave_devfs_StandardErrorPath_no_debug_verify_runs0_private_prestart_drain_ack_barrier_initial_kickstart_p_no_k_Root_terminal_capture_ack_then_session_release_no_kill_restart",
         "kernel": "original_local_snapshot_before_every_query_top_level_one_tab_state_activecount_runs_exit_numeric_or_exact64_78_sysexit_pair_never_exited_None_only_runs0_notrunning_active0_noPID_no_PIDabsence_inference",
         "controller_unknown": "retain_original_PTY_pipes_child_handle_private_buffers_continue_draining_while_parent_lives_no_command_retry_restart_kill_or_proof_if_parent_interrupted_retention_unknown",
         "device_path": "exact_os_ttyname_original_slave_private_devfs_node_trusted_dev_ancestry_named_char_and_FD_dev_ino_rdev_UID_GID_mode_isatty_before_after_load_before_start_after_terminal_not_launchd_nofollow_or_nocreate_claim_no_exclusive_writer",
@@ -258,7 +258,7 @@ class _OwnCode:
 
 
 def _payload(head, remote, manifest, pin, observer):
-    return {"schema": "si-native-startup-bootstrap-v5", "policy_sha256": POLICY_SHA256,
+    return {"schema": "si-native-startup-bootstrap-v6", "policy_sha256": POLICY_SHA256,
         "runtime_head": head, "actual_remote": remote, "code_manifest": manifest,
         "target_head": TARGET_HEAD, "target_remote": REMOTE, "target_spec_sha256": TARGET_SPEC,
         "target_manifest": TARGET_MANIFEST, "status_name": STATUS, "status_original_identity": list(proof._status_pin(pin)),
@@ -389,7 +389,7 @@ class _Status:
                 and (git["returncode"] is None or type(git["returncode"]) is int and -32768 <= git["returncode"] <= 32767), "startup_status")
         try:
             self.check(0)
-            raw = canonical_json({"schema": "si-native-startup-observation-v5", "status": "refused" if detail is not None else "readonly_predicates_passed_observation_only",
+            raw = canonical_json({"schema": "si-native-startup-observation-v6", "status": "refused" if detail is not None else "readonly_predicates_passed_observation_only",
                 "failure": detail, "authority": authority()}).encode() + b"\n"
             require(0 < len(raw) <= MAX_STATUS and raw.count(b"\n") == 1, "startup_status")
             proof._write(self.fd, raw); os.fsync(self.fd); self.check(len(raw))
@@ -565,7 +565,7 @@ class _Observer:
         require(not self.attempted, "startup_observer"); self.attempted = True
         _tty_check(self.fd, self.config)
         if detail is not None: _validate_detail(detail)
-        payload = {"schema": "si-startup-PTY-observation-v5", "nonce": self.config["nonce"],
+        payload = {"schema": "si-startup-PTY-observation-v6", "nonce": self.config["nonce"],
             "spec_sha256": self.digest, "pid": os.getpid(),
             "status": "refused" if detail is not None else "readonly_predicates_passed_observation_only",
             "failure": detail, "authority": authority()}
@@ -585,7 +585,7 @@ def filter_observer(raw, config, digest, pid):
         if type(raw) is not bytes or len(raw) > MAX_RAW or raw.count(b"\n") != 1 or len(raw) > MAX_STATUS: return unavailable
         value = json.loads(raw)
         if type(value) is not dict or set(value) != {"schema", "nonce", "spec_sha256", "pid", "status", "failure", "authority"}: return unavailable
-        if raw != canonical_json(value).encode() + b"\n" or value["schema"] != "si-startup-PTY-observation-v5" or value["nonce"] != expected["nonce"] or value["spec_sha256"] != digest: return unavailable
+        if raw != canonical_json(value).encode() + b"\n" or value["schema"] != "si-startup-PTY-observation-v6" or value["nonce"] != expected["nonce"] or value["spec_sha256"] != digest: return unavailable
         if type(pid) is not int or pid <= 0 or type(value["pid"]) is not int or value["pid"] != pid or value["authority"] != authority(): return unavailable
         if value["status"] not in ("refused", "readonly_predicates_passed_observation_only"): return unavailable
         detail = value["failure"]
@@ -711,15 +711,19 @@ def control_readonly(head, remote, digest, observer, control_fd, ack_fd, config_
     with _controller_scope(): return _control_readonly(head, remote, digest, observer, control_fd, ack_fd, config_pins)
 
 
+def _control_session(observer):
+    """Explicit inherited slave descriptors need no controlling-terminal owner."""
+    require(_tty_check(0, observer) == _tty_check(1, observer) == _tty_check(2, observer)
+        and os.getsid(0) == os.getpid(), "startup_observer")
+
+
 def _control_readonly(head, remote, digest, observer, control_fd, ack_fd, config_pins):
-    """One persistent child owns the controlling session through target exit."""
+    """One persistent private session retains explicit slave descriptors only."""
     require(os.name == "posix" and fcntl is not None and termios is not None, "startup_observer")
     observer = _observer_config(observer); clock = _Clock(); failure = None; pid = None; kernel = None
     code = own = None
     try:
-        require(_tty_check(0, observer) == _tty_check(1, observer) == _tty_check(2, observer)
-            and os.getsid(0) == os.getpid(), "startup_observer")
-        fcntl.ioctl(2, termios.TIOCSCTTY, 0)
+        _control_session(observer)
         registered(); require(_hash(head, 40) and remote == REMOTE and _hash(digest), "startup_arguments")
         with _fence(head):
             worker._guard(head, remote); code = proof._Code(head, remote, clock); own = _OwnCode(head, remote, clock)
@@ -728,7 +732,7 @@ def _control_readonly(head, remote, digest, observer, control_fd, ack_fd, config
         _phase("controller_prestart", clock)
         _controller_config(head, remote, digest, observer, config_pins, {**code.manifest, DRIVER: own.digest}); _tty_check(2, observer)
         _never_started(_query(head)); _phase("controller_barrier", clock)
-        _control_message(control_fd, {"schema": "si-startup-prestart-barrier-v5", "nonce": observer["nonce"],
+        _control_message(control_fd, {"schema": "si-startup-prestart-barrier-v6", "nonce": observer["nonce"],
             "spec_sha256": digest, "control_pid": os.getpid(), "status": "runs0_before_initial_start"})
         require(type(ack_fd) is int and ack_fd > 2 and stat.S_ISFIFO(os.fstat(ack_fd).st_mode)
             and fcntl.fcntl(ack_fd, fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDONLY, "startup_control")
@@ -760,7 +764,7 @@ def _control_readonly(head, remote, digest, observer, control_fd, ack_fd, config
             except BaseException as error: failure = error; failure_summary(error, head)
         # Target may be unknown. Never kill/restart; parent retains original PTY
         # and child handle and independently queries the exact fresh service.
-        message = {"schema": "si-startup-control-v5", "nonce": observer["nonce"], "spec_sha256": digest,
+        message = {"schema": "si-startup-control-v6", "nonce": observer["nonce"], "spec_sha256": digest,
             "control_pid": os.getpid(), "target_pid": pid, "kernel": kernel,
             "status": "refused" if failure is not None else "terminal_observed", "failure": failure_summary(failure, head) if failure is not None else None,
             "authority": authority()}
@@ -891,7 +895,7 @@ def _controller_config(head, remote, digest, observer, pins, manifest):
 
 def _control_receipt(value, observer, digest, pid):
     require(type(value) is dict and set(value) == {"schema", "nonce", "spec_sha256", "control_pid", "target_pid", "kernel", "status", "failure", "authority"}
-        and value["schema"] == "si-startup-control-v5" and value["nonce"] == observer["nonce"]
+        and value["schema"] == "si-startup-control-v6" and value["nonce"] == observer["nonce"]
         and value["spec_sha256"] == digest and type(value["control_pid"]) is int and value["control_pid"] == pid
         and value["authority"] == authority() and value["status"] in ("terminal_observed", "refused"), "startup_control")
     require(value["target_pid"] is None or type(value["target_pid"]) is int and 0 < value["target_pid"] < 2 ** 31, "startup_control")
@@ -957,8 +961,8 @@ def _observe_readonly(head, remote):
             if not acknowledged and not terminal_acknowledged and complete:
                 first_value = json.loads(complete[0])
                 require(complete[0] == canonical_json(first_value).encode() + b"\n", "startup_control")
-                if type(first_value) is dict and first_value.get("schema") == "si-startup-prestart-barrier-v5":
-                    require(first_value == {"schema": "si-startup-prestart-barrier-v5", "nonce": observer["nonce"],
+                if type(first_value) is dict and first_value.get("schema") == "si-startup-prestart-barrier-v6":
+                    require(first_value == {"schema": "si-startup-prestart-barrier-v6", "nonce": observer["nonce"],
                         "spec_sha256": digest, "control_pid": process.pid, "status": "runs0_before_initial_start"}, "startup_control")
                     kernel = _query(head); _never_started(kernel)
                     raw = _drain_to_eagain(master, raw)  # No initial start is possible before acknowledgment.

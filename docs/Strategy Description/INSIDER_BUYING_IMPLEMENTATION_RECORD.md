@@ -1,15 +1,14 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 347 RECORDS THE ACTIVE MASSIVE/SHARADAR REPLY MONITOR
-AND THE OWNER'S NEW NO-VENDOR-REPLY HOLD. THE EXISTING SAME-CHAT HEARTBEAT
-CHECKS EVERY FIVE MINUTES; ITS OBSOLETE V3-RESUME PROMPT IS REPLACED. SHARADAR
-HAS ASKED FOR THE SUBSCRIBER EMAIL, WITH NO ARCHIVE ANSWER OR SAMPLE; THAT
-QUESTION IS HELD AND DOES NOT STOP MASSIVE MONITORING. MASSIVE HAS NO REPLY
-AT THE OBSERVED CHECK. NO SAMPLE HAS BEEN QUALIFIED. CONTINUED OFFLINE BUILD
-IS AUTHORIZED WHEN GENUINE INPUTS/GATES PERMIT; NO PURCHASE, UPGRADE OR QC
-ACCESS. TWELVE P2 FINDINGS REMAIN OPEN; NO OPEN P0/P1. THE LANE IS NOT
-BACKTEST-READY. SECTION 348 IS THE MONITOR HANDOFF. NO FUNDED/PAPER/LIVE/
-CAPITAL/REAL-ORDER/TRADING AUTHORITY.**
+Status: **SECTION 349 RECORDS THE OWNER-DISARMED ARCHIVE REPLY MONITOR
+(PAUSED) AND READ-ONLY CONFIRMATION OF THE ALREADY COMPLETED ANALYST REVISIONS
+QC CLEANUP. ALL THIRTEEN RECYCLED ANALYST PROJECTS ARE CONFIRMED IN THE
+CURRENT INVENTORY; NO ADDITIONAL PROJECT IS DELETED HERE. OTHER LANES AND
+INSIDER QC PROJECTS ARE UNTOUCHED. THE CLEANUP REQUEST AUTHORIZES THAT
+LIMITED QC METADATA CHECK, NOT NEW RESEARCH/BACKTEST ACCESS. NO VENDOR REPLY,
+PURCHASE OR UPGRADE. TWELVE P2 FINDINGS REMAIN OPEN; NO OPEN P0/P1. THE LANE
+IS NOT BACKTEST-READY. NO FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING
+AUTHORITY.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -316,6 +315,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-28 | Codex counter-review only | Exact incoming `c0a44004..d1990c49`, ten Claude commits, zero merges; separate final handoff344 | Counter-review341/342 and every source/test/documentation commit; no next milestone | All ten accepted at precise scopes; no new production correction required. Consumption stop, registered-root binding, planner receipt, malformed-URL refusal and NC padding/accounting protections verified. | Native-denied focused selections and guard reversals343.4; main124 documents/imports/EXACT and15 changed Python images compiled. No full suite, private evidence replay, source request, credential read, QC or outcome. | Twelve OPENP2s unchanged; exact prior P3 closures/successor rules preserved. Historical availability and real cohort/PIT evidence remain factual blockers. | One final matching-lane push after completed-record checks; no automatic monitor, acquisition or next milestone. |
 | 2026-10-28 | Codex owner-authorized archive support outreach | Starting clean local/origin`0113863658cad27aabad7990a7f23f985a7578ad`; incoming EMPTY; separate final handoff346 | Contact Massive first, then Sharadar for an existing-subscription historical archive sample | Two explicit support messages verified SENT with exact body/recipient/subject readback. No supplier replies or samples observed. Earlier no-outreach decision superseded for these two inquiries only. | Message body hashes/UTC/PDT order345.2; focused document/record/boundary checks below. No production code change, private source replay, credential/provider-API access, licensed-row ingestion, SEC or QC action. | Archive capability still UNCONFIRMED; all twelve OPENP2s and historical closures preserved. No paid activation or new research readiness. | Review authentic replies/samples for exact version, historical available-by, coverage and existing rights. No purchase/upgrade/QC or duplicate inquiry inferred. |
 | 2026-10-28 | Codex owner-directed reply monitor and held Sharadar account question | Starting clean local/origin`9a35d71e3a1629c0b1e3927d1560265c4b74cf12`; incoming EMPTY; final handoff348 | Monitor existing Massive/Sharadar threads; qualify genuine samples and continue non-QC build when factual gates permit | Existing same-chat source-completion heartbeat reactivated with wholly replaced safe reply-monitor prompt, five-minute cadence. Sharadar asks subscriber email; no sample/coverage answer, no reply sent. Massive unchanged. | Gmail thread/status read; persisted automation fields/hold/baseline verified; document/boundary checks below. No new provider API, credential, source, sample ingestion or QC action. | Twelve OPENP2s retained; archive still UNCONFIRMED. Known account question notified once and deduplicated. All vendor replies/follow-ups held by latest owner instruction. | Watch both threads independently; authentic sample/provenance/clock/rights qualification before offline continuation, no purchases/upgrades/QC. No repeated source request or stale v3 resume. |
+| 2026-10-29 | Codex monitor disarm and scoped cleanup reconciliation | Starting clean Insider`2f9ee6e8906c048e8b4852dbe60334d36cbfdf23`; prior Analyst completion`57bd3213ab78145118a67e2ae753579e22cec59d` | Pause archive monitor; user limits QC cleanup to Analyst Revisions only | Existing source-completion heartbeat PAUSED, instructions retained. Exact cleanup already completed in Analyst chat; current two read-only QC metadata calls confirm300 projects, empty nextpage and all13 expected projects inRecycleBin. No new deletion. | App configuration readback; prior Analyst completed-turn evidence; current metadata inventory; record checks below. No browser, job, strategy result/statistics read, source or vendor message. | Successful research/current dependencies and other lanes preserved. Cleanup does not release Insider QC/backtest/source/rights gates. Twelve OPENP2s unchanged. | Do not rearm monitor or repeat deletion; use Analyst record for cleanup receipts. Any later Insider continuation retains no-reply/purchase/QC restrictions except the completed metadata-check scope. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -40557,3 +40557,67 @@ no-reply/deduplication/stale-v3 protections, while the unrelated monitor is
 PAUSED. No vendor message is sent under the new hold. Whitespace, record-only
 status and added-line secret-shape checks precede the final same-lane commit
 and one push; no sample/readiness claim follows from these checks.
+
+
+## 349. Owner-disarmed monitor and Analyst-only QC cleanup reconciliation (2026-10-29)
+
+The owner directs "disarm the monitor" and requests QC project cleanup,
+explicitly limiting it to **Analyst Revisions lane projects only**. That final
+scope controls the earlier ambiguous "this lane" phrase. No Insider, Short
+Interest, Target Price or other-lane project deletion is inferred. The QC
+cleanup instruction permits the scoped inventory/history/deletion work needed
+for that task, not new research, strategy launches or a general release of the
+Insider NO-QC hold. Vendor replies, purchases and upgrades remain prohibited.
+
+The existing `insider-buying-source-completion` heartbeat is changed to
+**PAUSED** through the app automation tool. Saved configuration readback
+confirms PAUSED with its complete instructions retained. No new automation,
+automatic rearm or vendor reply is created.
+
+The existing **"Feature - Analyst Revision"** chat has already completed the
+same cleanup request. Its completed turn records thirteen projects moved to
+QC's Recycle Bin: nine verification-only, two empty and two failed-only, with
+successful research projects and current dependencies retained. Its final
+handoff is `57bd3213ab78145118a67e2ae753579e22cec59d`;232 focused checks and
+actual deletion/reconciliation evidence remain attributed to that Analyst
+execution. A first timestamped-Recycle-Bin confirmation was reconciled there;
+the continuation did not repeat the first deletion. This chat reads that
+record/turn, not messages another chat or mutates its checkout.
+
+To avoid repeating a completed destructive operation, this chat independently
+makes only **two authenticated QC project-metadata reads** using the existing
+configured environment credential pair: the current project list returns300
+unique projects; the explicit300–600 page returns zero. All thirteen exact
+previously recycled project IDs are present under QC's timestamped
+`Recycle Bin/` paths. All six protected dependency/project IDs are still
+present. These current metadata facts independently confirm the earlier
+recycling; they do not re-run the prior backtest-history audit or claim a new
+profitable strategy result. No additional delete/update/rename, permanent
+purge or restore is performed. No active dependency is removed simply to
+repeat the cleanup. Safari, source files, Object Store and other lanes remain
+untouched. The only current QC access is project metadata; no backtest results,
+statistics, orders, datasets, compile/job/launch or live endpoint is read or
+invoked. Credential values and unrelated account/project details are not
+printed or placed in Git.
+
+All repository operations stay in the designated Insider worktree/branch;
+no alternate checkout, branch switch, other-lane code/record edit, reset or
+force push. Only this lane record changes to correct its previously ACTIVE
+monitor status and preserve the explicit scope/observed reconciliation.
+Existing P0-P3 dispositions and all frozen inputs/consumed-source boundaries
+remain unchanged. Historical availability is still unresolved and no sample
+is qualified. The monitor stays PAUSED until an explicit later rearm request.
+Before the one final record publication, verify designated root/branch/HEAD,
+record-only status, unchanged matching origin, focused record checks and
+whitespace/secret-shape scans; no new production behavior requires a suite or
+compilation. No supplier message or QC backtest follows from this cleanup.
+
+Final validation: **124 passed3.85s**, no skips/warnings, for the current
+active-document/record/lane-import/EXACT package checks under cleared
+environment and effective process-tree native network/security-exec denial,
+with freshTMP-only writes. No full suite or new Python compilation is needed
+for this record-only change. Matching origin remains exact2f9ee6e8 and the
+incoming range is empty; whitespace checks pass. Monitor readback is PAUSED
+with its saved instructions preserved. The current QC inventory checks are
+read-only; the prior thirteen deletions and232 checks remain attributed to
+the completed Analyst round, not repeated or claimed as new actions here.

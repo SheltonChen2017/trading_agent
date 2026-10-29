@@ -170,8 +170,9 @@ METHODS = r'''    def _map_configs(self,symbol,label):
                     current=next(frame[0][7] for frame in before if frame[0][1]=='QuantConnect.Data.Market.TradeBar')
                     dates[at.date().isoformat()]={'has_data':present,'mapped_present':bool(alias),
                         'explicit_row_available':explicit is not None,'mapped_matches_explicit_row':alias==explicit if explicit is not None else None,
-                        'mapped_equals_current_config':alias==current if alias else None,
-                        'mapped_alias_sha256':_sha(alias.encode()) if alias else None}
+                        # TPR-CR33-005: no per-alias digest; sha256 of a short plain
+                        # ticker is reversible, so only these comparisons leave the job.
+                        'mapped_equals_current_config':alias==current if alias else None}
                 cell['sessions']=dates
             except ProbeRefusal:raise
             except Exception as error:first=error

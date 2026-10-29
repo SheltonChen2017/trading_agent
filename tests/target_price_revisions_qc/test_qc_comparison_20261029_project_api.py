@@ -5,15 +5,36 @@ import hashlib
 import json
 from pathlib import Path
 import stat
+import sys
 
 import pytest
 
 from research.target_price_revisions_qc import comparison_20261029_project_api as m
+from research.target_price_revisions_qc import extended_operations as _custody_ops
 
 NOW=datetime(2026,10,28,17,tzinfo=timezone.utc)
 OP='TPR-CMP29-API-SYNTHETIC-001'
-PROJECT=49000001
+PROJECT=m.REGISTERED_PROJECTS['OFF']
+OTHER=m.REGISTERED_PROJECTS['TPR050']  # another registered arm's project
 ROOT=Path(__file__).resolve().parents[2]
+
+
+MAC_CUSTODY_REASON = (
+    "Owner-selected Mac-only native custody (TPR-CR25-003): POSIX no-follow/UID/mode/directory-fsync "
+    "custody is not Windows custody evidence"
+)
+
+
+@pytest.fixture(autouse=True)
+def mac_only_native_custody(monkeypatch):
+    """TPR-CR33-003: skip exactly where execution reaches POSIX private custody off the Mac.
+
+    Portable plan, builder and refusal checks keep running on every host.
+    """
+    if sys.platform != "darwin":
+        def custody(*_args, **_kwargs):
+            pytest.skip(MAC_CUSTODY_REASON)
+        monkeypatch.setattr(_custody_ops, "_custody", custody)
 
 
 
@@ -28,7 +49,7 @@ def registry():
         'baseline_receipt_sha256':'d'*64,
         'privacy_basis':'documented_private_default_and_observed_collaborators',
         'explicit_privacy_flag_observed':False,'independent_native_origin_attested':False,
-        'projects':{key:{'project_id':PROJECT+i,'name':'TPR-CMP28-R107-20261029A-'+key,
+        'projects':{key:{'project_id':m.REGISTERED_PROJECTS[key],'name':'TPR-CMP28-R107-20261029A-'+key,
             'organization_id':'a'*32,'owner_id':123,'language':'Py',
             'create_receipt_sha256':m._sha(('create-'+key).encode()),
             'read_receipt_sha256':m._sha(('read-'+key).encode()),
@@ -74,6 +95,19 @@ def inventory(files):return {name:{'bytes':len(text.encode()),'sha256':m._sha(te
 
 def source_response(files):return {'success':True,'projectId':PROJECT,
     'files':[{'name':name,'content':text} for name,text in files.items()]}
+
+
+PINNED={'main.py':'# compiled exact source\n','research.ipynb':'{"cells":[]}\n'}
+
+
+def pinned(identity):
+    return row('files/read',{'projectId':PROJECT},identity,
+        source_inventory_sha256=m._sha(m._canonical(inventory(PINNED))))
+
+
+def around(effect):
+    """TPR-CR33-001: compile and launch need the pinned first/last source readback."""
+    return [pinned('before'),effect,pinned('after')]
 
 
 def upload_plan():
@@ -192,10 +226,13 @@ def test_changed_after_extra_fails_without_rollback_or_further_effect(tmp_path):
 
 
 def test_compile_claim_spends_identity_but_adds_no_backtest_or_look(tmp_path):
-    p=plan([row('compile/create',{'projectId':PROJECT})],attempt_id='attempt-4',reserved_look_id='reserved-34')
-    result=execute(tmp_path,p,lambda *_:response({'success':True,'compileId':'compile-4','state':'BuildQueued'}))
+    p=plan(around(row('compile/create',{'projectId':PROJECT})),attempt_id='attempt-4',reserved_look_id='reserved-34')
+    def transport(endpoint,*_):
+        if endpoint=='files/read':return response(source_response(PINNED))
+        return response({'success':True,'compileId':'compile-4','state':'BuildQueued'})
+    result=execute(tmp_path,p,transport)
     assert result['compile_requests_attempted']==1
-    assert result['requests'][0]['compile_id']=='compile-4' and result['requests'][0]['compile_state']=='BuildQueued'
+    assert result['requests'][1]['compile_id']=='compile-4' and result['requests'][1]['compile_state']=='BuildQueued'
     assert result['actual_new_backtests']==result['new_observed_looks']==0
 
 
@@ -223,7 +260,7 @@ def chart_payload():
     'end_past_freeze','short_count','oversized_count','bool_count','bad_job','missing_end','extra_key','live_endpoint'])
 def test_chart_read_is_closed_to_exact_own_nav_frozen_window(fault):
     payload=chart_payload();endpoint='backtests/chart/read'
-    if fault=='foreign_project':payload['projectId']=PROJECT+1
+    if fault=='foreign_project':payload['projectId']=OTHER
     elif fault=='foreign_chart':payload['name']='Strategy Equity'
     elif fault=='chart_case':payload['name']='EXT26 account NAV'
     elif fault=='arbitrary_window':payload['start']+=86400
@@ -265,7 +302,7 @@ def test_chart_read_claims_then_retains_only_private_raw_body_and_no_acceptance(
 @pytest.mark.parametrize('fault',['foreign_project','foreign_job','foreign_chart','missing_chart','unrecognized_loading'])
 def test_chart_read_retains_but_refuses_foreign_identity_or_unrecognized_body(tmp_path,fault):
     payload=chart_payload();body={'success':True,'chart':{'name':'EXT26 Account NAV'}}
-    if fault=='foreign_project':body['chart']['projectId']=PROJECT+1
+    if fault=='foreign_project':body['chart']['projectId']=OTHER
     elif fault=='foreign_job':body['chart']['backtestId']='other-native-job'
     elif fault=='foreign_chart':body['chart']['name']='Strategy Equity'
     elif fault=='missing_chart':body.pop('chart')
@@ -300,9 +337,10 @@ def test_chart_response_budget_is_enforced_before_retention_and_no_retry(tmp_pat
 
 @pytest.mark.parametrize('mode',['success','unknown','cancelled'])
 def test_launch_counts_only_actual_returned_job_and_uncertainty_stops(tmp_path,mode):
-    p=plan([row('backtests/create',{'projectId':PROJECT,'compileId':'compile-4','backtestName':'candidate-attempt-4'})],
+    p=plan(around(row('backtests/create',{'projectId':PROJECT,'compileId':'compile-4','backtestName':'candidate-attempt-4'})),
         attempt_id='attempt-4',reserved_look_id='reserved-34')
-    def transport(*_):
+    def transport(endpoint,*_):
+        if endpoint=='files/read':return response(source_response(PINNED))
         if mode=='unknown':raise TimeoutError('synthetic-private-body')
         if mode=='cancelled':raise KeyboardInterrupt('synthetic-private-body')
         return response({'success':True,'backtest':{'projectId':PROJECT,'backtestId':'job-4'}})
@@ -361,9 +399,9 @@ def test_closed_endpoint_source_identity_budget_guards(fault,tmp_path):
         args.update(allowed_source_hashes={name:m._sha(b'#bad')},attempt_id='a',reserved_look_id='l')
     elif fault=='hash':requests[0]['payload_sha256']='c'*64
     elif fault=='endpoint':requests[0]['endpoint']='projects/create'
-    elif fault=='no_attempt':requests=[row('compile/create',{'projectId':PROJECT})]
+    elif fault=='no_attempt':requests=around(row('compile/create',{'projectId':PROJECT}))
     elif fault=='no_precondition':requests=[row('files/update',{'projectId':PROJECT,'name':'main.py','content':'#x'})];args.update(allowed_source_hashes={'main.py':m._sha(b'#x')},attempt_id='a',reserved_look_id='l')
-    elif fault=='too_many_compile':requests=[row('compile/create',{'projectId':PROJECT},'one'),row('compile/create',{'projectId':PROJECT},'two')];args.update(attempt_id='a',reserved_look_id='l')
+    elif fault=='too_many_compile':requests=[pinned('before'),row('compile/create',{'projectId':PROJECT},'one'),row('compile/create',{'projectId':PROJECT},'two'),pinned('after')];args.update(attempt_id='a',reserved_look_id='l')
     elif fault=='budget':args['max_total_response_bytes']=1
     else:args['expires_utc']=(NOW-timedelta(seconds=1)).isoformat()
     with pytest.raises(m.APIRefusal):plan(requests,**args)
@@ -476,7 +514,7 @@ def test_exact_accounting_helper_creation_preserves_all_existing_24_files(tmp_pa
     ('cap_off','OFF',0),('cap_tilt_50','TPR050',1),('cap_tilt_100','TPR100',2),
     ('cap_tilt_200','TPR200LONG',3),('pure_tpr','PURE',4)])
 def test_exact_registered_arm_selects_only_its_own_project_and_binds_manifest(tmp_path,arm,key,index):
-    project=PROJECT+index
+    project=m.REGISTERED_PROJECTS[key]
     p=plan([row('files/read',{'projectId':project})],arm=arm)
     assert p['project_id']==project and p['project_registration_key']==key
     calls=[]
@@ -493,7 +531,7 @@ def test_exact_registered_arm_selects_only_its_own_project_and_binds_manifest(tm
     assert report['new_observed_looks_semantics']=='returned_native_job_ids_not_financial_outcome_looks'
 
 
-@pytest.mark.parametrize('project',[37650980,37650453,1,49000002,True])
+@pytest.mark.parametrize('project',[37650980,37650453,1,OTHER,True])
 def test_foreign_or_old_project_payload_refuses_before_any_effect(project):
     with pytest.raises(m.APIRefusal):plan([row('files/read',{'projectId':project})])
 
@@ -527,7 +565,7 @@ def test_registry_receipt_provenance_and_source_binding_are_not_optional(fault):
 
 
 @pytest.mark.parametrize('field,value',[
-    ('project_id',49000002),('project_registration_key','PURE'),('arm','pure_tpr'),
+    ('project_id',OTHER),('project_registration_key','PURE'),('arm','pure_tpr'),
     ('candidate_attempt',6),('candidate_config_sha256','e'*64),('project_bindings_sha256','d'*64)])
 def test_changed_frozen_binding_or_arm_plan_cannot_reach_transport(tmp_path,field,value):
     p=plan();p[field]=value;calls=[]
@@ -537,13 +575,13 @@ def test_changed_frozen_binding_or_arm_plan_cannot_reach_transport(tmp_path,fiel
 
 
 @pytest.mark.parametrize('endpoint,body',[
-    ('files/read',{'success':True,'projectId':49000002,'files':[]}),
-    ('files/read',{'success':True,'files':[{'name':'main.py','content':'#foreign','projectId':49000002}]}),
-    ('compile/read',{'success':True,'projectId':49000002,'compileId':'expected','state':'BuildSuccess'}),
-    ('backtests/create',{'success':True,'backtest':{'projectId':49000002,'backtestId':'foreign-job'}}),
-    ('backtests/read',{'success':True,'backtest':{'projectId':49000002,'backtestId':'expected-job','completed':True,'status':'Completed'}}),
-    ('backtests/list',{'success':True,'backtests':[{'projectId':49000002,'backtestId':'other'}]}),
-    ('backtests/orders/read',{'success':True,'orders':[{'projectId':49000002,'backtestId':'expected-job'}]}),
+    ('files/read',{'success':True,'projectId':OTHER,'files':[]}),
+    ('files/read',{'success':True,'files':[{'name':'main.py','content':'#foreign','projectId':OTHER}]}),
+    ('compile/read',{'success':True,'projectId':OTHER,'compileId':'expected','state':'BuildSuccess'}),
+    ('backtests/create',{'success':True,'backtest':{'projectId':OTHER,'backtestId':'foreign-job'}}),
+    ('backtests/read',{'success':True,'backtest':{'projectId':OTHER,'backtestId':'expected-job','completed':True,'status':'Completed'}}),
+    ('backtests/list',{'success':True,'backtests':[{'projectId':OTHER,'backtestId':'other'}]}),
+    ('backtests/orders/read',{'success':True,'orders':[{'projectId':OTHER,'backtestId':'expected-job'}]}),
 ])
 def test_returned_other_registered_project_is_still_foreign_for_selected_arm(tmp_path,endpoint,body):
     payload={'projectId':PROJECT};extra={}
@@ -554,9 +592,14 @@ def test_returned_other_registered_project_is_still_foreign_for_selected_arm(tmp
     elif endpoint in {'backtests/read','backtests/orders/read'}:
         payload['backtestId']='expected-job'
         if endpoint=='backtests/orders/read':payload.update(start=0,end=20)
-    result=execute(tmp_path,plan([row(endpoint,payload)],**extra),lambda *_:response(body))
+    requests=[row(endpoint,payload)]
+    if endpoint=='backtests/create':requests=around(requests[0])
+    def transport(sent,*_):
+        if endpoint=='backtests/create' and sent=='files/read':return response(source_response(PINNED))
+        return response(body)
+    result=execute(tmp_path,plan(requests,**extra),transport)
     assert result['status']=='failed_or_uncertain' and result['receipt_published']
-    assert result['requests'][0]['raw_response'] is not None
+    assert result['requests'][-1 if endpoint!='backtests/create' else 1]['raw_response'] is not None
     assert result['economics_accepted'] is False
 
 
@@ -597,6 +640,9 @@ def test_real_source_guard_requires_exact_lane_loaded_adapter_and_committed_byte
     monkeypatch.setattr(m.subprocess,'run',git)
     if fault=='wrong_loaded_adapter':monkeypatch.setattr(m.projects,'__file__','/foreign/projects.py')
     if fault is None:
+        if sys.platform != "darwin":
+            # The positive guard needs the loaded modules at the owner-pinned Mac lane root.
+            pytest.skip(MAC_CUSTODY_REASON)
         m._guard(p)
         shown={args[1].split(':',1)[1] for args in calls if args[0]=='show'}
         assert shown==set(p['source_hashes']) and m.PROJECTS_MODULE in shown and m.predecessor.MODULE in shown
@@ -616,3 +662,52 @@ def test_source_guard_failure_after_effect_retains_receipt_and_never_retries(tmp
     assert result['status']=='failed_or_uncertain' and result['receipt_published'] and calls==[True]
     assert result['requests'][0]['raw_response'] is not None
     assert 'source changed' not in json.dumps(result)
+
+
+COMPILE=row('compile/create',{'projectId':PROJECT},'compile')
+LAUNCH=row('backtests/create',{'projectId':PROJECT,'compileId':'compile-7','backtestName':'arm-7'},'launch')
+WRITE=row('files/update',{'projectId':PROJECT,'name':'main.py','content':PINNED['main.py']},'write')
+EFFECT_ARGS=dict(attempt_id='attempt-7',reserved_look_id='look-7')
+
+
+@pytest.mark.parametrize('case',['compile_only','launch_only','compile_unpinned_end','launch_unpinned_start',
+    'compile_before_write','launch_with_write','compile_pins_differ','launch_pins_differ'])
+def test_compile_and_launch_require_pinned_unchanged_source_readback(case):
+    """TPR-CR33-001: a compile or launch can no longer act on unverified project source."""
+    other=row('files/read',{'projectId':PROJECT},'after',source_inventory_sha256='e'*64)
+    requests={
+        'compile_only':[COMPILE],
+        'launch_only':[LAUNCH],
+        'compile_unpinned_end':[pinned('before'),COMPILE,row('files/read',{'projectId':PROJECT},'after')],
+        'launch_unpinned_start':[row('files/read',{'projectId':PROJECT},'before'),LAUNCH,pinned('after')],
+        'compile_before_write':[pinned('before'),COMPILE,WRITE,pinned('after')],
+        'launch_with_write':[pinned('before'),WRITE,LAUNCH,pinned('after')],
+        'compile_pins_differ':[pinned('before'),COMPILE,other],
+        'launch_pins_differ':[pinned('before'),LAUNCH,other],
+    }[case]
+    with pytest.raises(m.APIRefusal):
+        plan(requests,allowed_source_hashes={'main.py':m._sha(PINNED['main.py'].encode())},**EFFECT_ARGS)
+
+
+@pytest.mark.parametrize('case',['compile','launch','write_then_compile'])
+def test_pinned_compile_launch_and_post_upload_compile_remain_admissible(case):
+    requests={'compile':around(COMPILE),'launch':around(LAUNCH),
+        'write_then_compile':[pinned('before'),WRITE,COMPILE,
+            row('files/read',{'projectId':PROJECT},'after',source_inventory_sha256='e'*64)]}[case]
+    prepared=plan(requests,allowed_source_hashes={'main.py':m._sha(PINNED['main.py'].encode())},**EFFECT_ARGS)
+    assert [item['endpoint'] for item in prepared['requests']][0]=='files/read'
+
+
+@pytest.mark.parametrize('change',['foreign_id','swapped_arms'])
+def test_self_consistent_registry_cannot_redirect_or_swap_registered_projects(change):
+    """TPR-CR33-002: a framing-valid registry naming another project, or swapping two arms, refuses."""
+    body=registry()
+    if change=='foreign_id':body['projects']['OFF']['project_id']=38000001
+    else:
+        rows=body['projects'];rows['OFF']['project_id'],rows['TPR050']['project_id']=(
+            rows['TPR050']['project_id'],rows['OFF']['project_id'])
+    raw=m._canonical(body);target=body['projects']['OFF']['project_id']
+    # The request names the forged registry's own OFF project, so only the pin can refuse it.
+    with pytest.raises(m.APIRefusal):
+        plan([row('files/read',{'projectId':target})],project_bindings_raw=raw,
+            expected_project_bindings_sha256=m._sha(raw))

@@ -4,10 +4,12 @@ import hashlib
 import json
 from pathlib import Path
 import stat
+import sys
 
 import pytest
 
 from research.target_price_revisions_qc import comparison_20261029_cleanup_api as m
+from research.target_price_revisions_qc import extended_operations as _custody_ops
 
 ROOT=Path(__file__).resolve().parents[2]
 NOW=datetime(2026,10,29,12,tzinfo=timezone.utc)
@@ -16,6 +18,24 @@ ORG='a'*32
 TOKEN='SYNTHETIC-SECRET-NEVER-RETAIN'
 PROJECT=37540166
 JOB='1'*32
+
+MAC_CUSTODY_REASON = (
+    "Owner-selected Mac-only native custody (TPR-CR25-003): POSIX no-follow/UID/mode/directory-fsync "
+    "custody is not Windows custody evidence"
+)
+
+
+@pytest.fixture(autouse=True)
+def mac_only_native_custody(monkeypatch):
+    """TPR-CR33-003: skip exactly where execution reaches POSIX private custody off the Mac.
+
+    Portable plan, builder and refusal checks keep running on every host.
+    """
+    if sys.platform != "darwin":
+        def custody(*_args, **_kwargs):
+            pytest.skip(MAC_CUSTODY_REASON)
+        monkeypatch.setattr(_custody_ops, "_custody", custody)
+
 
 
 @pytest.fixture(autouse=True)
@@ -194,8 +214,14 @@ def test_delete_refuses_missing_or_conflicting_native_evidence_before_effect(tmp
 
 @pytest.mark.parametrize('pid',sorted(m.OLD_IDS-m.DELETE_CANDIDATES))
 def test_completed_or_mixed_historical_projects_are_always_delete_protected(tmp_path,pid):
-    registry=fixture_registry(tmp_path/'inputs')
-    with pytest.raises(m.CleanupRefusal):plan(registry,'delete',project_id=pid)
+    # TPR-CR33-004: give the plan valid archive and criteria descriptors, so
+    # only the delete-candidate guard can refuse; the candidate control proves it.
+    for part in ('historical','candidate'):(tmp_path/part).mkdir()
+    registry,index,criteria,*_=archived(tmp_path/'historical',pid=pid)
+    with pytest.raises(m.CleanupRefusal):
+        plan(registry,'delete','delete',project_id=pid,archive_index=index,criteria_file=criteria)
+    registry,index,criteria,*_=archived(tmp_path/'candidate')
+    assert delete_plan(registry,index,criteria)['project_id']==PROJECT
 
 
 @pytest.mark.parametrize('fault',['timeout','500','secret'])
@@ -295,3 +321,27 @@ def test_unfamiliar_completed_zero_order_job_is_not_public_verification_provenan
     registry,index,criteria,*_=archived(tmp_path,status='Completed.',basis='verification_only',orders='0')
     out=run(tmp_path,delete_plan(registry,index,criteria),lambda *_:response({'success':True}))
     assert out['status']=='failed_or_uncertain' and out['request_attempted'] is False
+
+
+def evidence(tmp_path,**changes):
+    """Run the pure delete-eligibility check on synthetic archives; portable, no custody I/O."""
+    registry_file,index,criteria,*_=archived(tmp_path,**changes)
+    prepared=delete_plan(registry_file,index,criteria)
+    registry=m.projects.validate_bindings((tmp_path/'inputs'/registry_file['name']).read_bytes(),
+        expected_sha256=registry_file['sha256'])
+    def load(_label,descriptor):
+        raw=(tmp_path/'inputs'/descriptor['name']).read_bytes()
+        assert m._sha(raw)==descriptor['sha256'];return raw
+    return m._delete_evidence(prepared,registry,load)
+
+
+def test_pure_delete_evidence_accepts_the_exact_no_completed_archive(tmp_path):
+    assert evidence(tmp_path)['basis']=='no_completed_backtest'
+
+
+@pytest.mark.parametrize('fault',['list_detail_status_disagree','target_not_owned'])
+def test_pure_delete_evidence_refuses_unpinned_eligibility_faults(tmp_path,fault):
+    """TPR-CR33-004: list/detail status disagreement and a non-owner target each refuse."""
+    changes={'list_detail_status_disagree':dict(jobs=[{'backtestId':JOB,'status':'Completed.'}],
+        job_changes={'status':'Runtime Error'}),'target_not_owned':dict(meta_changes={'owner':False})}[fault]
+    with pytest.raises(m.CleanupRefusal):evidence(tmp_path,**changes)

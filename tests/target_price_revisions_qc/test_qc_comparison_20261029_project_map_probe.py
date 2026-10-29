@@ -144,6 +144,8 @@ def native(sources,bindings,monkeypatch):
 def result(case):
     out=extended.result(case);raw=case.logs[-1]
     assert not any(secret in raw for secret in ('PRIVATE_ALIAS','PRIVATE.SID','PRIVATE-MAP-PATH','PRIVATE-MAP-ERROR'))
+    # TPR-CR33-005: an unsalted digest of a short ticker is the ticker; none may leave the job.
+    assert not any(sha(alias.encode()) in raw for alias in ('PRIVATE_ALIAS','PRIVATE_OLD_ALIAS'))
     assert out['alias_exported'] is False
     return out
 
@@ -161,7 +163,7 @@ def test_post_history_initialized_exact_sid_map_observations_are_bounded_private
     assert set(cell['sessions'])=={'2021-02-'+f'{day:02}' for day in range(8,13)}
     for row in cell['sessions'].values():
         assert row['has_data'] is row['mapped_present'] is row['mapped_matches_explicit_row'] is row['mapped_equals_current_config'] is True
-        assert row['mapped_alias_sha256']==sha(b'PRIVATE_ALIAS')
+        assert 'mapped_alias_sha256' not in row
     assert native.control.events[-2:]==['configs','configs']
     assert all(cell[name] is False for name in ('provider_initialized','provider_constructed','fallback_used','alias_exported',
         'raw_map_rows_exported','native_origin_authenticated','historical_pit_authenticated','financial_recovery_proven'))
@@ -210,8 +212,7 @@ def test_native_row_end_dates_and_nullable_actual_modes_are_compared_without_exp
         native.MapRow(datetime(2030,1,1),'PRIVATE_ALIAS',None)]
     native.algo._probe();out=result(native);cells=out['map_trace']['sessions']
     assert all(row['mapped_matches_explicit_row'] is True for row in cells.values())
-    assert cells['2021-02-09']['mapped_alias_sha256']==sha(b'PRIVATE_OLD_ALIAS')
-    assert cells['2021-02-10']['mapped_alias_sha256']==sha(b'PRIVATE_ALIAS')
+    assert cells['2021-02-10']['mapped_equals_current_config'] is True
     assert cells['2021-02-09']['mapped_equals_current_config'] is False
     assert 'PRIVATE_OLD_ALIAS' not in native.logs[-1]
 

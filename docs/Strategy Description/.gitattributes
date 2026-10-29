@@ -1,0 +1,4 @@
+# Only this lane's record (TPR-CR33-003): its document guard pins byte sizes and
+# digests of historical spans, which a CRLF Windows checkout changes. Other
+# records in this shared directory are deliberately left unchanged.
+TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md text eol=lf

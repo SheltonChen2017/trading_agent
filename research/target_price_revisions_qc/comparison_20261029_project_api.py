@@ -33,6 +33,11 @@ REQUIRED_SOURCES = predecessor.REQUIRED_SOURCES | frozenset((MODULE, PROJECTS_MO
 PRIVATE_ROOT = ops.PRIVATE_PARENT / 'TPR-SIX-UNIVERSE-FIVE-ARM-20261028-v1' / 'project-api-20261029'
 PROJECT_KEYS = {'cap_off':'OFF','cap_tilt_50':'TPR050','cap_tilt_100':'TPR100',
     'cap_tilt_200':'TPR200LONG','pure_tpr':'PURE'}
+# TPR-CR33-002: the five actual section-107 projects. A supplied registry is
+# framing-checked only, so the write target is pinned here rather than taken
+# from a self-consistent registry that could name any other project or swap arms.
+REGISTERED_PROJECTS = {'OFF':38609822,'TPR050':38609834,'TPR100':38609836,
+    'TPR200LONG':38609837,'PURE':38609840}
 ENDPOINTS = frozenset(('files/read','files/create','files/update','compile/create','compile/read',
     'backtests/create','backtests/read','backtests/list','backtests/read/log','backtests/orders/read',
     'backtests/chart/read'))
@@ -61,6 +66,8 @@ def _project_binding(raw, expected_sha256, arm, config_sha256, attempt):
         _fail()
     _hash(expected_sha256); _hash(config_sha256); _integer(attempt, 2**31-1, 1)
     registry = projects.validate_bindings(raw, expected_sha256=expected_sha256)
+    if {key: row['project_id'] for key, row in registry['projects'].items()} != REGISTERED_PROJECTS:
+        _fail()
     return registry, PROJECT_KEYS[arm], registry['projects'][PROJECT_KEYS[arm]]['project_id']
 
 
@@ -110,8 +117,9 @@ def prepare_plan(*, project_bindings_raw, expected_project_bindings_sha256, arm,
 
     Each request has ``id, endpoint, payload, payload_file, payload_sha256,
     max_response_bytes, seconds``; files/read may additionally require an exact
-    ``source_inventory_sha256``. Upload operations require this precondition
-    on their first and last reads, preserving all extras. QC has no atomic
+    ``source_inventory_sha256``. Upload, compile and launch operations require
+    this precondition on their first and last reads, preserving all extras; a
+    compile follows the last write, and a launch plan contains no write. QC has no atomic
     compare-and-swap: a residual remote race remains between API calls.
     Choose one payload form:
     inline dict, or same-private-root descriptor ``name, bytes, sha256``.
@@ -174,8 +182,20 @@ def prepare_plan(*, project_bindings_raw, expected_project_bindings_sha256, arm,
             compiles+=row['endpoint']=='compile/create'; launches+=row['endpoint']=='backtests/create'
             writes+=row['endpoint'] in {'files/create','files/update'}
         if compiles>1 or launches>1: _fail()
-        if writes and any(row['endpoint']!='files/read' or 'source_inventory_sha256' not in row
-                          for row in (requests[0],requests[-1])):_fail()
+        # TPR-CR33-001: compile and launch act on whatever source the project
+        # holds, so they need the same pinned first/last readback as uploads.
+        if (writes or compiles or launches) and any(row['endpoint']!='files/read'
+                or 'source_inventory_sha256' not in row for row in (requests[0],requests[-1])):_fail()
+        endpoints=[row['endpoint'] for row in requests]
+        last_write=max((index for index,endpoint in enumerate(endpoints)
+                        if endpoint in {'files/create','files/update'}),default=-1)
+        # A compile must capture the final uploaded bytes, never a pre-upload
+        # state; a launch never shares a plan with writes, and without writes
+        # the source must read back identically before and after the effect.
+        if compiles and endpoints.index('compile/create')<last_write:_fail()
+        if launches and writes:_fail()
+        if ((compiles or launches) and not writes
+                and requests[0]['source_inventory_sha256']!=requests[-1]['source_inventory_sha256']):_fail()
         if total>_integer(max_total_response_bytes,MAX_TOTAL,1) or seconds>(expires-issued).total_seconds(): _fail()
         if mutations:
             _identity(attempt_id); _identity(reserved_look_id)

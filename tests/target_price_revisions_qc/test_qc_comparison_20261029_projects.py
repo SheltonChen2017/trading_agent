@@ -4,16 +4,36 @@ import hashlib
 import json
 from pathlib import Path
 import stat
+import sys
 
 import pytest
 
 from research.target_price_revisions_qc import comparison_20261029_projects as p
+from research.target_price_revisions_qc import extended_operations as _custody_ops
 
 NOW=datetime(2026,10,29,10,tzinfo=timezone.utc)
 OWNER=42
 ORG='a'*32
 TOKEN='SYNTHETIC-SECRET-NEVER-RETAIN'
 ROOT=Path(__file__).resolve().parents[2]
+
+MAC_CUSTODY_REASON = (
+    "Owner-selected Mac-only native custody (TPR-CR25-003): POSIX no-follow/UID/mode/directory-fsync "
+    "custody is not Windows custody evidence"
+)
+
+
+@pytest.fixture(autouse=True)
+def mac_only_native_custody(monkeypatch):
+    """TPR-CR33-003: skip exactly where execution reaches POSIX private custody off the Mac.
+
+    Portable plan, builder and refusal checks keep running on every host.
+    """
+    if sys.platform != "darwin":
+        def custody(*_args, **_kwargs):
+            pytest.skip(MAC_CUSTODY_REASON)
+        monkeypatch.setattr(_custody_ops, "_custody", custody)
+
 
 
 @pytest.fixture(autouse=True)

@@ -564,7 +564,7 @@ def test_outer_observer_reports_failure_before_subject_channel_exists(fabricated
 
 @pytest.mark.parametrize("hazard", ["nonce", "digest", "pid", "duplicate", "partial", "unrelated", "raw_prefix", "foreign_field"])
 def test_private_raw_filter_never_emits_unrelated_or_uncorrelated_text(fabricated, hazard):
-    value = {"schema": "si-startup-PTY-observation-v3", "nonce": _OBSERVER["nonce"], "spec_sha256": "c" * 64,
+    value = {"schema": "si-startup-PTY-observation-v4", "nonce": _OBSERVER["nonce"], "spec_sha256": "c" * 64,
         "pid": 456, "status": "readonly_predicates_passed_observation_only", "failure": None, "authority": diag.authority()}
     if hazard == "nonce": value["nonce"] = "2" * 32
     elif hazard == "digest": value["spec_sha256"] = "d" * 64
@@ -614,6 +614,7 @@ def kernel_bytes(runs=0, *, running=False, pid=None, exit_code=None):
     raw = (diag._target() + " = {\n\tpath = " + str(diag.ROOT / diag.PARENT / diag.BOOTSTRAP / "job.plist") + "\n\tstate = ").encode() + (b"running" if running else b"not running") + b"\n\tactive count = " + (b"1" if running else b"0") + b"\n\truns = " + str(runs).encode() + b"\n"
     if pid is not None: raw += b"\tpid = " + str(pid).encode() + b"\n"
     if exit_code is not None: raw += b"\tlast exit code = " + str(exit_code).encode() + b"\n"
+    elif runs == 0 and not running and pid is None: raw += b"\tlast exit code = (never exited)\n"
     return raw + b"\tcoalition = {\n\t\tstate = active\n\t\tactive count = 1\n\t}\n}\n"
 
 
@@ -654,7 +655,7 @@ def test_persistent_control_child_orders_debug_barrier_single_start_and_terminal
         result = diag.control_readonly(HEAD, diag.REMOTE, controller_child.digest, _OBSERVER, control_fd, ack_fd, controller_child.pins)
         messages = [json.loads(v) for v in os.read(read_fd, diag.MAX_RAW).splitlines()]
         assert controller_child.calls == ["query", "debug", "query", "query", "start", "query"]
-        assert messages[0]["schema"] == "si-startup-prestart-barrier-v3"
+        assert messages[0]["schema"] == "si-startup-prestart-barrier-v4"
         assert messages[1]["target_pid"] == 456 and result["kernel"]["exit"] == 2
         assert result["authority"]["source_dispatch_authority"] is False
     finally: os.close(read_fd)
@@ -700,7 +701,7 @@ def root_controller(fabricated, monkeypatch):
             def line(self, value): os.write(writer, canonical_json(value).encode() + b"\n")
             def receipt(self, early=False):
                 error = diag.StartupRefusal("REFUSED: startup_control")
-                return {"schema": "si-startup-control-v3", "nonce": observer["nonce"], "spec_sha256": digest,
+                return {"schema": "si-startup-control-v4", "nonce": observer["nonce"], "spec_sha256": digest,
                     "control_pid": self.pid, "target_pid": None if early else 456,
                     "kernel": diag._kernel(kernel_bytes() if early else kernel_bytes(1, exit_code=2)),
                     "status": "refused" if early else "terminal_observed", "failure": diag.failure_summary(error, HEAD) if early else None,
@@ -709,7 +710,7 @@ def root_controller(fabricated, monkeypatch):
                 if self.step == 0:
                     os.write(slave, b"PRIVATE_DEBUG_SETUP_BANNER\n")
                     if h.early: self.line(self.receipt(True))
-                    else: self.line({"schema": "si-startup-prestart-barrier-v3", "nonce": observer["nonce"],
+                    else: self.line({"schema": "si-startup-prestart-barrier-v4", "nonce": observer["nonce"],
                         "spec_sha256": digest, "control_pid": self.pid, "status": "runs0_before_initial_start"})
                     self.step = 1; return None
                 if self.step == 1:
@@ -720,7 +721,7 @@ def root_controller(fabricated, monkeypatch):
                     if h.early: self.exit = 2
                     else:
                         h.started = True; h.actions.append("initial_start")
-                        body = {"schema": "si-startup-PTY-observation-v3", "nonce": observer["nonce"], "spec_sha256": digest,
+                        body = {"schema": "si-startup-PTY-observation-v4", "nonce": observer["nonce"], "spec_sha256": digest,
                             "pid": 456, "status": "refused", "failure": diag.failure_summary(diag.StartupRefusal("REFUSED: startup_config"), HEAD), "authority": diag.authority()}
                         self.pending = h.raw_after_start + canonical_json(body).encode() + b"\n"
                         self.step = 15; return None
@@ -875,3 +876,45 @@ def test_load_transaction_includes_original_ancestry_full9_during_load(root_cont
     monkeypatch.setattr(diag.os, "fstat", lambda fd: observed(real_fstat(fd)))
     with pytest.raises(diag.proof.NativeProofRefusal): diag.observe_readonly(HEAD, diag.REMOTE)
     assert changed == [True] and not root_controller.children
+
+
+def test_actual_never_exited_marker_is_unknown_exit_only_for_never_started_service():
+    raw = kernel_bytes()
+    value = diag._kernel(raw)
+    assert value == {"runs": 0, "running": False, "active_count": 0, "pid": None, "exit": None}
+    assert value["exit"] != 0
+
+
+@pytest.mark.parametrize("hazard", ["runs1", "running", "pid", "numeric", "duplicate", "malformed"])
+def test_never_exited_marker_refuses_started_conflicting_or_duplicate_states(hazard):
+    raw = {"runs1": lambda: kernel_bytes(1) + b"\tlast exit code = (never exited)\n",
+        "running": lambda: kernel_bytes(0, running=True) + b"\tlast exit code = (never exited)\n",
+        "pid": lambda: kernel_bytes(0, pid=123) + b"\tlast exit code = (never exited)\n",
+        "numeric": lambda: kernel_bytes() + b"\tlast exit code = 0\n",
+        "duplicate": lambda: kernel_bytes() + b"\tlast exit code = (never exited)\n",
+        "malformed": lambda: kernel_bytes().replace(b"(never exited)", b"(never exited): EX_CONFIG")}[hazard]()
+    with pytest.raises(diag.StartupRefusal): diag._kernel(raw)
+
+
+def test_known_never_started_without_control_child_releases_only_owned_observer_fds(root_controller, monkeypatch):
+    original, calls = diag._control_guard, []
+    def guard(head, remote):
+        calls.append(True)
+        if len(calls) == 3: raise diag.StartupRefusal("REFUSED: startup_control")
+        return original(head, remote)
+    monkeypatch.setattr(diag, "_control_guard", guard)
+    with pytest.raises(diag.StartupRefusal): diag.observe_readonly(HEAD, diag.REMOTE)
+    assert root_controller.loaded and not root_controller.started and not root_controller.children and not root_controller.held
+    assert root_controller.actions.count("load") == 1 and "initial_start" not in root_controller.actions
+
+
+def test_loaded_unknown_state_still_retains_original_observation_endpoints(root_controller, monkeypatch):
+    original = diag._kernel
+    def kernel(raw):
+        if root_controller.loaded: raise diag.StartupRefusal("REFUSED: startup_control_state")
+        return original(raw)
+    monkeypatch.setattr(diag, "_kernel", kernel)
+    with pytest.raises(diag.StartupRefusal): diag.observe_readonly(HEAD, diag.REMOTE)
+    assert len(root_controller.held) == 1 and not root_controller.children and not root_controller.started
+    state = root_controller.held[0]
+    assert os.isatty(state["master"]) and os.isatty(state["slave"])

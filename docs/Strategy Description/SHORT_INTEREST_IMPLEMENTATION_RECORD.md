@@ -27898,6 +27898,50 @@ being retried, no actor is asserted, and no source gate is released. All data,
 claims/debits and the separately approved budgets remain intact; no source
 START/HTTP/key read, look, QC/Safari, purchase or push occurred.
 
+### 132.24 Frozen exact never-started parser correction; v4 pending
+
+SI-DEC-20261028-10 now has the narrow parser correction. The actual top-level
+literal (never exited) maps to exit=None ONLY when runs0, not-running, active0
+and no PID are independently parsed. It is not a successful exit or a child
+completion. Duplicate/mixed numeric/marker, malformed/symbol-conflicting and
+started/running/PID states refuse. The production unknown-hold branch is
+unchanged; an explicit fabricated known0/no-child failure cleans only owned
+observer endpoints, whereas a parse-unknown case retains originals.
+
+Only diagnostic/test and this record changed. Fresh fixed v4 names/schemas
+retire v3 without starting/restarting it. All old native/code/source/historical
+guards, private-terminal/controller/load transaction, finite one-initial-start
+order, false admission authorities and budgets remain unchanged. Causal actual
+marker test was RED1/90deselected/.73s before correction, then GREEN. Every
+fabricated loaded-service baseline now includes the actual never-exited field.
+
+| Finding | Priority | Disposition |
+| --- | --- | --- |
+| SI-BUILD-20261028-067 | P2 | Corrected prospectively: the real never-started exit marker was rejected as an unknown field shape. Strict None semantics now preserve its actual meaning without inventing exit0 or relaxing unknown-state holds. |
+
+Registered policy:
+280e53a9aad3b4fcab24f3b292f27bc288fa295645ff19e5e284606715dee6c9.
+Source SHA256c118edfb6d2db201698a1eef29570978576ad644bd7ddc826c5166853b9c8824;
+test SHA2564264370f0312f49a005a02dd3f62591dd40753c1c28bd57e60b4899931819236.
+Main10 relevant files passed **440/3.67s**, no skips/warnings reported; all92
+held/proof/test paths compile in memory. Policy equality, six-file closure,
+old dependency/target hashes, historical-record prefix and whitespace passed.
+Separately attributed author108/1.92s and peer99 startup tests/1.34s passed;
+peer accepted final registered bytes. All tests were fabricated with sanitized
+environment, OS network denial/no bytecode/cache. No full suite, actual v4
+operation or Claude review occurred in development.
+
+After clean commit and fresh matching actual/tracking F27, Main may execute
+this ONE new registered private-terminal diagnostic with all authors/tests
+frozen. The controller must reauthenticate original canonical inputs at load,
+observe exact fresh target/path/never-started state, configure only next-run
+stderr to its held private terminal, and perform ONE initial start after all
+barriers/guards. No-k, no old label restart, no source/native capability or
+budget release. Preserve any refusal and independently assess actual kernel/
+control-child/filtered observation before the next verified correction.
+All original data, claims/debits and separate approved caps remain intact;
+no source START/HTTP/key read, look, QC/Safari, purchase or push occurred.
+
 ### 132.20 Frozen diagnostic-v2 configuration role correction
 
 SI-DEC-20261028-08 now has the narrowly tested two-role implementation. Only
@@ -28079,3 +28123,49 @@ observation before any causal correction or native proof. Source access,
 capture/input/QC/Safari gates remain closed; data, spent claims, permanent
 unknown debits and both approved budgets remain intact. No source START/HTTP/
 key read, look, purchase or push occurred.
+
+### 132.23 Actual v3 controller refusal before any initial service start
+
+Checkpoint77d551bc0558c476431d3dbe06b7bc1f19b46aa5 contains132.21..22 and
+the private-terminal controller. Main post-record98/.98s passed before commit.
+On clean77D/matching tracking and actual F27, new paths/job were absent. Main
+invoked observe-readonly ONCE as exec86016. It prepared/loaded the v3 job with
+RunAtLoad=false/KeepAlive=false, then parked before creating its control child.
+No debug or initial kickstart was executed.
+
+Read-only kernel evidence twice established exact fresh label/path, runs0,
+not running, active0 and no PID. The literal top-level field was
+last exit code = (never exited). The current parser counted that field but
+matched only numeric/sysexit forms, so it necessarily raised
+startup_control_state before returning kernel data. The loaded+unknown-state
+parent branch then retained its endpoints. This is a VERIFIED parser defect
+for the actual never-started form, not a Git/privacy/native/capture diagnosis.
+
+Main independently identified only its exact observe process PID33409 with
+the77D invocation and no child, rechecked the never-started service, and sent
+SIGINT ONLY to that source-free waiting observer. Original exec86016 then
+terminated exit2 and preserved its FIRST controlled failure: controller_load /
+startup_control_state; no upstream code/errno/fields or original Git result.
+This was a bounded operator interruption after known unstarted state, not an
+automatic unknown-state release or an owner-cancelled suite. It is not success
+or retention after parent death. No old capture process was signalled.
+
+All v3 original inputs and the loaded NEVER-STARTED job remain retired and
+untouched. Current protected read/close hashes are spec
+14e70e86bbba581228fe8bfda4c66ec3775f831a1e34090cbf140427183beb02
+(2504bytes), job
+a655d90a4e99d513280eb5203b6934d20f64db42f3a5c4729ecb20e7478b4131
+(1616bytes), and empty original status. Source impact is zero because this
+registered diagnostic has no native/provider/key/capture path and no target
+ever started; a never-exited marker alone is not evidence about old spending.
+No historical claim/debit was changed or refunded.
+
+**SI-DEC-20261028-10** authorizes a narrow prospective parser correction and
+separately frozen v4 diagnostic only after causal tests/review: exactly one
+top-level never-exited marker is accepted ONLY with runs0/not-running/active0/
+no PID and represented as exit=None. It must never fabricate exit0/Completed,
+old child closure or admission. Mixed numeric/marker, duplicates, malformed or
+started/running/PID states refuse. All old native/code/source/live-bootstrap
+guards and the no-restart rules for retired labels remain unchanged. Data,
+spent/unknown debits and both source budgets remain preserved; no source
+START/HTTP/key read, look, QC/Safari, purchase or push occurred.

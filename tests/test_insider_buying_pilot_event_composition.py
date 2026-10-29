@@ -15,6 +15,8 @@ import zipfile
 import pytest
 
 from data.hashing import hash_bytes, hash_payload
+
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 from research import insider_buying_pilot_event_composition as m
 from test_insider_buying_pilot_production_composition import (
     ingredients as original_ingredients, _registration_inputs, _source,

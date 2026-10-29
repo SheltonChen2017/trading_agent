@@ -21,6 +21,7 @@ from types import SimpleNamespace
 
 import pytest
 
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 from research import insider_buying_affected_quarter_selector_launcher_v3 as module
 from research import insider_buying_affected_quarter_selector_verification_v2 as front
 

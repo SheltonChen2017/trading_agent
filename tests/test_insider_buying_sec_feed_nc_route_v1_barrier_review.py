@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 _SPEC = importlib.util.spec_from_file_location(
     "nc_route_v1_test_helpers", Path(__file__).with_name("test_insider_buying_sec_feed_nc_route_v1.py"))
 t = importlib.util.module_from_spec(_SPEC)

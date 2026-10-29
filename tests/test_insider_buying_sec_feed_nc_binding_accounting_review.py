@@ -3,6 +3,10 @@ flag is derived from the route batch, not a tautology.
 
 Kept outside the binder's pinned test file so its pinned hash is unchanged.
 """
+
+import pytest
+
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 from research import insider_buying_sec_feed_nc_source_binding_v1 as binder
 
 

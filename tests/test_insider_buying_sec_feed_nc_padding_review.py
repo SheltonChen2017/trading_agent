@@ -6,6 +6,9 @@ Invented prefixes only, in a separate file so pinned test hashes are unchanged.
 import importlib.util
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 from research import insider_buying_sec_feed_nc_source_binding_observe_v1 as observe
 
 _SPEC = importlib.util.spec_from_file_location(

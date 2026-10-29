@@ -100,7 +100,10 @@
   "platform_provided_imports": {
     "trading_assistant": [],
     "strategy_research": [
-      "AlgorithmImports"
+      "AlgorithmImports",
+      "IPython",
+      "QuantConnect",
+      "clr"
     ]
   },
   "composition_hosts": {

@@ -6,6 +6,7 @@ import json
 
 import pytest
 
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 from research import insider_buying_sec_feed_nc_route_v1 as m
 
 

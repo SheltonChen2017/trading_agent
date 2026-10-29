@@ -1,14 +1,19 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 349 RECORDS THE OWNER-DISARMED ARCHIVE REPLY MONITOR
-(PAUSED) AND READ-ONLY CONFIRMATION OF THE ALREADY COMPLETED ANALYST REVISIONS
-QC CLEANUP. ALL THIRTEEN RECYCLED ANALYST PROJECTS ARE CONFIRMED IN THE
-CURRENT INVENTORY; NO ADDITIONAL PROJECT IS DELETED HERE. OTHER LANES AND
-INSIDER QC PROJECTS ARE UNTOUCHED. THE CLEANUP REQUEST AUTHORIZES THAT
-LIMITED QC METADATA CHECK, NOT NEW RESEARCH/BACKTEST ACCESS. NO VENDOR REPLY,
-PURCHASE OR UPGRADE. TWELVE P2 FINDINGS REMAIN OPEN; NO OPEN P0/P1. THE LANE
-IS NOT BACKTEST-READY. NO FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING
-AUTHORITY.**
+Status: **SECTION 350 (CLAUDE, WINDOWS SESSION) REVIEWS `d1990c49..1635900d`
+(SECTIONS 343-349, RECORD-ONLY); ALL FOUR COMMITS ARE ACCEPTED. UNDER THE
+OWNER'S 2026-10-29 FIX-NOT-LOG DIRECTION TWO FINDINGS ARE CORRECTED IN
+`0f70bbe0`: `IBWIN-CR02` (42 LANE TESTS ADDED AFTER SECTION 161
+REACHED `fcntl` UNGUARDED, SO WINDOWS COLLECTION ERRORED ON 42 OF 200 FILES)
+IS FIXED BY GUARDS PLUS A CONVENTION TEST THAT ENFORCES THE RULE FOR EVERY LANE
+TEST, AND `IBSH-CR02` IS FIXED BY DECLARING `IPython`, `QuantConnect` AND `clr`
+AS HOSTED PLATFORM IMPORTS IN THE SHARED SEP-2 MANIFEST (FLAGGED SHARED EDIT;
+BOTH PROJECT-SEPARATION TESTS NOW PASS). `IBQC-SHARED-META01` STAYS OPEN WITH
+ITS PROPOSED PATCH AND BLOCKER. TEN P2 FINDINGS REMAIN OPEN; NO OPEN P0/P1.
+THE LANE IS NOT BACKTEST-READY; ARCHIVE REPLIES ARE STILL PENDING AND THE
+MONITOR STAYS PAUSED. NO VENDOR REPLY, PURCHASE, UPGRADE, QC JOB, OUTCOME LOOK,
+BACKTEST OR TRADING IN THIS ROUND; LOOKS 0/0/0. CODEX COUNTER-REVIEW OF THIS
+ROUND IS NEXT. NO FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -316,6 +321,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-28 | Codex owner-authorized archive support outreach | Starting clean local/origin`0113863658cad27aabad7990a7f23f985a7578ad`; incoming EMPTY; separate final handoff346 | Contact Massive first, then Sharadar for an existing-subscription historical archive sample | Two explicit support messages verified SENT with exact body/recipient/subject readback. No supplier replies or samples observed. Earlier no-outreach decision superseded for these two inquiries only. | Message body hashes/UTC/PDT order345.2; focused document/record/boundary checks below. No production code change, private source replay, credential/provider-API access, licensed-row ingestion, SEC or QC action. | Archive capability still UNCONFIRMED; all twelve OPENP2s and historical closures preserved. No paid activation or new research readiness. | Review authentic replies/samples for exact version, historical available-by, coverage and existing rights. No purchase/upgrade/QC or duplicate inquiry inferred. |
 | 2026-10-28 | Codex owner-directed reply monitor and held Sharadar account question | Starting clean local/origin`9a35d71e3a1629c0b1e3927d1560265c4b74cf12`; incoming EMPTY; final handoff348 | Monitor existing Massive/Sharadar threads; qualify genuine samples and continue non-QC build when factual gates permit | Existing same-chat source-completion heartbeat reactivated with wholly replaced safe reply-monitor prompt, five-minute cadence. Sharadar asks subscriber email; no sample/coverage answer, no reply sent. Massive unchanged. | Gmail thread/status read; persisted automation fields/hold/baseline verified; document/boundary checks below. No new provider API, credential, source, sample ingestion or QC action. | Twelve OPENP2s retained; archive still UNCONFIRMED. Known account question notified once and deduplicated. All vendor replies/follow-ups held by latest owner instruction. | Watch both threads independently; authentic sample/provenance/clock/rights qualification before offline continuation, no purchases/upgrades/QC. No repeated source request or stale v3 resume. |
 | 2026-10-29 | Codex monitor disarm and scoped cleanup reconciliation | Starting clean Insider`2f9ee6e8906c048e8b4852dbe60334d36cbfdf23`; prior Analyst completion`57bd3213ab78145118a67e2ae753579e22cec59d` | Pause archive monitor; user limits QC cleanup to Analyst Revisions only | Existing source-completion heartbeat PAUSED, instructions retained. Exact cleanup already completed in Analyst chat; current two read-only QC metadata calls confirm300 projects, empty nextpage and all13 expected projects inRecycleBin. No new deletion. | App configuration readback; prior Analyst completed-turn evidence; current metadata inventory; record checks below. No browser, job, strategy result/statistics read, source or vendor message. | Successful research/current dependencies and other lanes preserved. Cleanup does not release Insider QC/backtest/source/rights gates. Twelve OPENP2s unchanged. | Do not rearm monitor or repeat deletion; use Analyst record for cleanup receipts. Any later Insider continuation retains no-reply/purchase/QC restrictions except the completed metadata-check scope. |
+| 2026-10-29 | Claude review (Windows session) and corrections | `1635900d` -> `0f70bbe0` (42 collection guards, custody-platform convention test, SEP-2 manifest declaration) -> this review record | Review of `d1990c49..1635900d` (four record-only Codex commits: sections 343-349, zero merges); every earlier commit since `86700b1c` carries a disposition from the macOS Claude session in sections 159-342. Owner direction for this round: fix, do not just log. | All four commits accepted after verifying hashes, counts, time conversions, append-only status edits, and the absence of contact or credential shapes. Corrections: `IBWIN-CR02` (42 lane tests added after section 161 reached `fcntl` unguarded, so Windows collection errored on 42 of 200 lane files) fixed by guards plus a convention test that enforces the rule for every lane test; `IBSH-CR02` fixed by declaring `IPython`, `QuantConnect`, `clr` as hosted platform imports in the shared SEP-2 manifest (flagged shared edit); `IBQC-SHARED-META01` left open with the exact proposed patch and blocker. Full detail in section 350, including the required 1-10 rating. | All runs under proven process-level network denial. Windows lane-set collection 6,770 tests, 0 errors (was 42); custody-platform file 61 passed, 58 skipped; 44 guarded files 44 skipped; project-separation files 35 passed (was 2 failed); boundary/package/document selection 1 failed, 156 passed (the one failure is the section-155 harness artifact: the denial harness preloads `socket`; the test passes without the harness); record/active-document gates **72 passed** (measured on the tree carrying this section; the re-run after this value was written reported the same count); compileall tests+research exit 0; `git diff --check` clean. No full lane gate or complete repository suite on this host. No SEC/EDGAR, provider, Gmail, QC, credential, journal, custody, broker, or trading access; **0 research looks**. | `01138636`, `9a35d71e`, `2f9ee6e8`, `1635900d` accepted (the last with a cross-lane QC-read note). Open P2s: ten remain (twelve minus `IBSH-CR02`, plus none new; `IBWIN-CR02` opened and fixed in the same round). | Codex counter-reviews this round, including the shared manifest edit; `IBQC-SHARED-META01` waits for one captured real orders response under a permitted QC round; substantive blockers unchanged from 344/348. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -40621,3 +40627,157 @@ incoming range is empty; whitespace checks pass. Monitor readback is PAUSED
 with its saved instructions preserved. The current QC inventory checks are
 read-only; the prior thirteen deletions and232 checks remain attributed to
 the completed Analyst round, not repeated or claimed as new actions here.
+
+## 350. Claude review - sections 343-349, with corrections: Windows collection guards and the SEP-2 manifest (2026-10-29 UTC)
+
+Reviewer: Claude, the Windows lane session, in the lane worktree
+`C:\git\customizedAgent\trading_agent_insider` on `codex/strategy-insider-buying`.
+No branch, worktree, fork, or handoff was created or switched to; the
+worktree was fast-forwarded from `c0ee6957` to the published head `1635900d`
+and was clean. This session last pushed `86700b1c` (section 155,
+2026-10-12). Every commit from there through `d1990c49` carries a Claude
+disposition in sections 159, 194, 201, 218, 330, 341, and 342, written by the
+macOS Claude session; those commits are not re-reviewed. The unreviewed range
+is therefore `d1990c49..1635900d`: `01138636` (sections 343-344),
+`9a35d71e` (345-346), `2f9ee6e8` (347-348), and `1635900d` (349), all
+record-only, zero merges.
+
+Owner instruction for this round (2026-10-29): "do not just log the
+findings. Make effort to fix the issue you find." This section therefore
+corrects what is fixable from the lane, states exactly what it changed, and
+for anything still open gives the proposed patch and the precise blocker
+rather than a bare "documented, not fixed".
+
+Host facts: Windows 11, Python 3.13.14, `core.autocrlf=true`. Every test ran
+under the proven process-level network denial of section 155. No SEC, EDGAR,
+provider, Gmail, QuantConnect, or network request was made; no journal,
+custody file, credential, or trading surface was touched; research looks
+**0**.
+
+### 350.1 Isolation and scope
+
+The reviewed range touches only this record. Across the whole
+`86700b1c..1635900d` range the only out-of-lane path is `research/.gitattributes`
+(`bd848b4e`, dispositioned in section 159). This review's own code commit
+`0f70bbe0` changes 42 lane test files, the lane's custody-platform
+test, and **one shared file**, `architecture/entry_points.json` (350.3).
+That shared edit is additive, lane-caused, and conflict-free: no branch has
+touched the file since `242f8eb7` (2026-08-28). It is flagged here and in
+the chat so the owner or Codex can veto it.
+
+### 350.2 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `01138636` | Section 343 counter-review of Claude's ten commits; 344 handoff | **Accepted.** The range `c0a44004..d1990c49` is exactly ten commits, each with a 343.2 row; the twelve-P2 enumeration counts to twelve; deleted lines are the status block only. |
+| `9a35d71e` | Sections 345-346: two owner-authorized archive inquiries | **Accepted.** Send times and the 55-second ordering reconcile (22:33:50 and 22:34:45 UTC); only the vendors' public support addresses appear; no credential, account, or message-ID shape is in the added text. |
+| `2f9ee6e8` | Sections 347-348: reply monitor and the held Sharadar account question | **Accepted.** The inbound timestamp converts correctly (04:50:39+04:00 is 00:50:39 UTC and 17:50:39 PDT). The monitor is Codex's app automation, not repository state. |
+| `1635900d` | Section 349: monitor paused; Analyst-only QC cleanup reconciliation | **Accepted with a note.** Two authenticated QC project-metadata reads were made from the Insider chat under the owner's cleanup scope; the record says no Insider project was touched. That is read-only and owner-scoped, but it cannot be verified from this host, which has no QC access. `57bd3213` resolves on the Analyst branch. |
+
+### 350.3 Corrections made this round
+
+**`IBWIN-CR02` (P2, lane-specific, FIXED in `0f70bbe0`).**
+`IBWIN-CR01` was closed "at support scope" in section 161 (`e6f5fb51`) by
+guarding sixteen test files. Since then the lane grew to 200 test files and
+37 production modules that import `fcntl`, and **42** test files were added
+whose module-level loads reach `fcntl` with no guard, so on Windows every
+one of them failed at collection (`ModuleNotFoundError: No module named
+'fcntl'`; 42 of 200 files). The fix: the section-161 guard line was added to
+all 42 files before their first lane load, and
+`tests/test_insider_buying_custody_platform.py` now (a) runs its red/green
+probes over those 42 files against their pre-guard commit `1635900d` as well
+as the original sixteen against `85c7755d`, (b) recognizes sibling-test
+imports, `spec_from_file_location` loads, and direct `fcntl` imports when
+it cuts the collection prefix, (c) re-adds the parent's `site-packages` in
+the `-I` probe child so `pytest` resolves on user-site installs such as this
+host, and (d) adds a convention test: every lane test whose module-level
+import closure reaches `fcntl` (directly, through `research` modules, or
+through a sibling test) must guard before its first lane load. The rule is
+AST-only, so it runs identically on macOS. On this host after the fix: the
+lane set collects **6,770 tests with 0 errors**; the 44 guarded files run
+directly report **44 skipped**; the custody-platform file reports **61
+passed, 58 skipped** (the 58 skips are the POSIX-only green-path controls);
+and a POSIX emulation with an `fcntl` stand-in shows **57 of 58** guarded
+files running past their guard to their first lane load, the one exception
+being `test_insider_buying_sec_2006q1_parent_bootstrap.py`, whose older
+`os.name != "posix"` skip fires on Windows regardless of `fcntl`.
+
+**`IBSH-CR02` (P2, shared, lane-caused, FIXED in `0f70bbe0`).**
+`architecture/entry_points.json` now lists `IPython`, `QuantConnect`, and
+`clr` under `platform_provided_imports.strategy_research`, beside the
+existing `AlgorithmImports`. The three roots are imported only inside the
+hosted-only functions of `insider_buying_qc_native_access_probe.py` and
+`insider_buying_qc_sdk_metadata_cell.py`, and QuantConnect's hosted research
+environment provides them. Both previously failing SEP-2 tests pass, and the
+two project-separation files report **35 passed**. The definition-of-done
+certificate binds flags to named guards, not to a manifest hash, so no
+other document changes.
+
+**`IBQC-SHARED-META01` (P2, shared; OPEN with a proposed patch).**
+`research/quantconnect.py` refuses any response whose `success` is not
+exactly `True`, and its own comment requires a captured real response shape
+before loosening that rule. The proposed patch is an endpoint-scoped
+envelope table in the client's request path: for `backtests/orders/read`
+accept a JSON object whose documented keys `orders` and `length` are present
+with the right types when `success` is absent, and keep the universal rule
+everywhere else, with a regression test built from one captured real
+response. Blocker: the lane is under the owner's NO-QC hold, so no real
+orders response can be captured, and the client is shared by every lane's
+QC path. Not changed here.
+
+The other nine OPEN P2s (`IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`,
+`IBSRC-CCR01`, `IBARCHIVE-OBS-01`, `IBARCHIVE-OBS-02`,
+`IBPARENT-PLAN-OBS01`, `IBPUBLIC-KNOWNBY-01`, `IBQC-ACK-33001`,
+`IBPILOT-COMP-33001`) are evidence, data, or design items: they need a
+qualified historical archive, real parents, an owner design choice, or a
+later milestone, and no review-round code change can close them honestly.
+
+### 350.4 Findings
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBWIN-CR02 | P2 | **FIXED in `0f70bbe0`** (lane tests only) | Pre-existing: 42 test files added between `e6f5fb51` and `1635900d` | `tests/test_insider_buying_*` (42 files); `tests/test_insider_buying_custody_platform.py` | After the section-161 "support scope" closure of `IBWIN-CR01`, 42 later lane tests reached `fcntl` at module level with no guard, so Windows collection errored on 42 of 200 lane files and the lane set could not be collected on the repository's supported Windows environment. The section-161 rule was a list of sixteen files, not a rule, so it could not see new files. | Collect-only census on `1635900d`: 42 `ERROR` files, all `ModuleNotFoundError: No module named 'fcntl'`; AST scan reproduces exactly those 42 (no extras, none missing). | A declared support boundary that new files silently cross is not enforced; CLAUDE.md expects the Windows environment to collect the suite. | Guard added before the first lane load in all 42 files (identical wording to section 161); custody-platform test extended with the 42 red/green probes against `1635900d`, sibling/spec/direct-`fcntl` load recognition, a `-I` child that re-adds the parent's `site-packages`, and a convention test enforcing the rule for every lane test file. | 350.6: 6,770 collected / 0 errors; 44 skipped directly; custody file 61 passed, 58 skipped; POSIX emulation 57 of 58 with the one exception explained in 350.3. |
+| IBSH-CR02 | P2, shared, lane-caused | **FIXED in `0f70bbe0`** (one shared file, flagged) | `3e21c6db` (origin); fix in this round | `architecture/entry_points.json` `platform_provided_imports.strategy_research` | Hosted-only imports of `QuantConnect`, `IPython`, and `clr` in two lane modules were undeclared, so `test_product_dependency_manifests_cover_actual_imports` and `test_sep2_definition_of_done_is_reconstructed_not_self_asserted` failed on every host, and the complete suite stayed red by exactly those two tests since section 153. | 2 failed before; 2 passed after; both separation files 35 passed. No other branch has changed the file since `242f8eb7`. | The owner's 2026-10-29 instruction to fix rather than log; the edit is additive and declares facts about QuantConnect's hosted environment. | Three names added to the list; nothing else in the manifest changed. | 350.6. Codex or the owner may veto the shared edit in counter-review. |
+| IBQC-SHARED-META01 | P2, shared | **OPEN; proposed patch recorded** | `195012fd` (origin) | `research/quantconnect.py` request path | Universal `success is True` rule refuses the documented orders/length envelope. | 143.3; client comments. | The client's own policy requires a captured real response before loosening. | None here; endpoint-scoped envelope table proposed in 350.3, to be applied with a regression built from one real captured orders response. | Blocked by the NO-QC hold and shared ownership. |
+| IBREC-349-OBS01 | P3 | **OPEN; observation, nothing to change** | `1635900d` | Section 349 | Two authenticated QC project-metadata reads were made from the Insider chat to confirm the Analyst-lane cleanup; read-only and owner-scoped, but a cross-lane action recorded in this lane's record, and not verifiable from a host without QC access. | 349 text. | None; stated so the lane's own NO-QC hold is read correctly as unaffected. | None. | n/a |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01, IBARCHIVE-OBS-01, IBARCHIVE-OBS-02, IBPARENT-PLAN-OBS01, IBPUBLIC-KNOWNBY-01, IBQC-ACK-33001, IBPILOT-COMP-33001 | P2 | **OPEN, retained** | earlier | earlier | Evidence, data, or design items; see 350.3. | Sections 119-349. | Not closable by a review-round code change. | None. | n/a |
+| IBSH-CR01 | P3, shared | **OPEN, retained** | `226c4c1` | Shared coordination documents | Unchanged. | 68-72. | n/a | None. | n/a |
+
+### 350.5 Implementation-quality rating
+
+Per the review process (mandatory 1-10 rating), the four record commits
+`01138636..1635900d` rate **9 of 10**. Every hash they cite resolves, every
+count and time conversion checked here reconciles, each commit replaces only
+the mutable status block, the outreach text keeps private sender and message
+identifiers out of Git while leaving the two threads findable, and the
+monitor and cleanup sections state their scope limits plainly. The one
+deduction is for the lane as a whole rather than these commits: the Windows
+support boundary declared in section 161 was a list, not a rule, so 42 new
+files crossed it unnoticed until this round (`IBWIN-CR02`). Nothing here is
+evidence about archive availability, readiness, or market edge.
+
+### 350.6 Validation
+
+| Check (all under process-level network denial) | Result on the final tree, this host |
+|---|---|
+| Windows collect-only census, lane set (200 Insider files + 4 boundary files) | 6,770 collected, 0 errors (was 42 errors) |
+| Custody-platform guard file | 61 passed, 58 skipped (POSIX-only controls) |
+| 44 guarded files run directly | 44 skipped |
+| POSIX emulation of the green-path control | 57 of 58 (bootstrap file skips on `os.name`, see 350.3) |
+| `tests/test_project_separation_entrypoints.py` + `_boundary.py` | 35 passed (was 2 failed) |
+| Boundary/package/document selection (section 154's 156-selection) | 1 failed, 156 passed (the one failure is the section-155 harness artifact: the denial harness preloads `socket`; the test passes without the harness) |
+| Record and active-document gates on the final tree | **72 passed** (measured on the tree carrying this section; the re-run after this value was written reported the same count) |
+| `compileall` of `tests` and `research` | exit 0 |
+| `git diff --check` | clean |
+
+No full lane gate or complete repository suite was run on this host and
+none is represented; after record-only edits only the document guard is
+rerun, per the owner's standing direction.
+
+### 350.7 Next step
+
+Codex counter-reviews this round, including the shared manifest edit and
+the guard convention. The lane's substantive blockers are unchanged from
+344 and 348: a qualified historical archive sample and the identity/PIT
+inputs. `IBQC-SHARED-META01` waits for one captured real orders response
+under a permitted QC round. Nothing is started by inference.

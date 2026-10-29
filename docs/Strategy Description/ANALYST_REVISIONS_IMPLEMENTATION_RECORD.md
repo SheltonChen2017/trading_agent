@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–327 retain the milestone, review, preregistration, QC
+strategy. Sections 1–332 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -530,7 +530,14 @@ that snapshot. Mac section323 owns the separate recovery evidence; section325
 records the owner-approved merge and identity reconciliation at its floor
 **336 / 259 / 52 / 699**, without duplicate looks or operational pin refresh.
 Current section326.27 then books the one newly created native-source job:
-**337 / 259 / 53 / 699**, with no strategy result cell.**
+**337 / 259 / 53 / 699**, with no strategy result cell.
+Review snapshot R333 is the Windows-host Claude session's independent review
+of `6076ef20..57bd3213` (0 P0, 0 P1, 1 P2, 6 P3): every commit accepted, the
+fourteen owner-waived Codex commits of sections 329, 331 and 332 reviewed
+after the fact, the thirteen-project cleanup confirmed by census, one
+unbooked R298 rerun booked to **338 / 259 / 54 / 699**, three whitespace
+defects corrected in place, and the W5 source project found without its
+`main.py` (R333.3).**
 
 Current continuation, 2026-10-13: section 292 accepts Claude's two-commit
 section-291 review after documentary qualifications and reproduces both new
@@ -2359,6 +2366,16 @@ the only QC exception; Safari and backtest submission remain held.
 The cleanup is now complete in332.8: thirteen confirmed recoverable removals,
 with successful research and current dependencies retained. No further QC or
 Safari step follows from this completed exception; retain the resource hold.
+Review snapshot R333 is the Windows-host Claude session's independent review
+of the exact pushed range `6076ef20..57bd3213` (sections 323–332), including
+the fourteen owner-waived Codex commits of sections 329, 331 and 332 reviewed
+after the fact; it books one unbooked R298 rerun (floor **338 / 259 / 54 /
+699**), corrects three whitespace defects in place, and finds project
+38522505 without its `main.py`. The immediate next step is that Codex must
+counter-review review snapshot R333, re-establish Main in project 38522505
+from the retained A-stage bytes under a new committed freeze before any
+source read-back or coverage job, record who modified that project after
+the hold, and reconcile the booked rerun by identity.
 
 Section 328 is Claude's independent review of `3c905d42..0d38c59d`, the
 seventy-four Codex commits of sections 323 (Mac recovery) and 324–327.
@@ -2535,7 +2552,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–322
+findings, outcomes, and per-run accounting remain in numbered sections 1–332
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -4349,6 +4366,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-28 | Claude owner-directed corrections of the section-328 findings | `f23ca94c` -> `8381e0cb` (W5 cash bound) -> `6c7c80a9` (pin closures, resolver guard) -> this record commit | Section 330; all fourteen findings dispositioned; `-003` erratum (the owner quote exists in 312.6) | W5 cash-limited buys sized on max(ask, engine price) by owner override of 329.2; twenty spent-caller pin closures restored through the post-merge manifest; resolver-literal guard; five reversible fingerprints and the owner's display name withheld | 29 focused files 1,986 passed; native channels 10 passed under their harness; 2 redaction tests; 2/2 mutations caught; 86 record gates; no full suite, no QC/Safari/provider access; 0 looks, 337/259/53/699 unchanged | `-004`, `-006`, `-007`, `-009` corrected; `-002` corrected forward; `-011` transport size and `-012` open; new P3 `ARV2R330-001` | Codex counter-reviews section 330; the 329.10 resource hold stays |
 | 2026-10-28 | Codex section330 counter-review under QC/Safari hold | `b065e98c664aecffe795f51bbe6a1045468be047` -> `619425b0591ce7ac37396acf9150bd88d43809e2` -> this final handoff commit; TWO total | All three incoming commits accepted after scoped corrections; all fourteen earlier findings and new330 observation dispositioned in331 | Removed residual low-entropy test fingerprints; corrected resolver guard and declared W5 source delta; retained owner-approved cash bound and all historical pins/spent controls | Focused final validation and exact overlaps/failures in331.4–5; four in-memory compilations and source/profile pins verified; no full suite or private/operational replay;337/259/53/699 unchanged | One P2 and three P3 corrected in current tree; source/price/transport/formal gates stay open; history privacy not retroactively repaired | ONE nonforce matching-lane final push; retain QC/Safari hold, no new milestone or launch. Resource release and separate source/run gates precede continuation |
 | 2026-10-28/29 PDT | Codex owner-directed Analyst-only QC cleanup | `e18e306959e9172e23fff78b21358b0628149104` -> this final handoff commit; FIVE recorded predecessors through `0f637a41`, SIX total | No incoming Claude review; bounded cleanup scope and standing waiver, same-round advice is not independent acceptance | Catalog300,134namespace plus one corroborated legacy;13Analyst projects recoverably removed:9verification,2zero-run,2failed-only. B first-delete postcondition2 retained; D confirms it, E0 confirms remaining12. Protected/successful/other-lane projects excluded | Latest232focused passes5.48s; pre-A207/pre-B202overlap; code compilation/inverse/mutation evidence in332; actual A0/C0/B2/D0/E0 and pinned reports; no full suite.204dispatch attempts,13deletes;337/259/53/699 unchanged | Four P2s corrected prospectively; original refusals/ambiguity and historical successful R280 retained; no strategy/source/financial gate clearance | ONE nonforce matching-lane final push; cleanup concludes. QC/Safari/backtesting remain held pending owner release and exact subsequent source/run gates; no monitor/automatic continuation |
+| 2026-10-29 | Claude (Windows host) review snapshot R333 of `6076ef20..57bd3213`: sections 323–328 confirmed through the Mac reviews, the fourteen owner-waived Codex commits of sections 329, 331 and 332 reviewed after the fact, sixth QC census, three fixes | `57bd3213` -> `60580c90` -> `9a18d8e2` -> this record commit | Review of the ninety-three commits pushed since `6076ef20`: the Mac session's section 328 and 330 and Codex's counter-reviews confirmed by this host's gates; the fourteen tail commits (W5 native coverage tooling, the section-331 corrections, the thirteen-project QC cleanup) reviewed individually (R333) | Synced the lane clone by fast-forward from a clean tree. Immutability of V16–V19, the cap-90 bridge runtime and the three trust roots re-verified. The R-298 ledger chain reproduces to 337/259/53/699. Endpoint census of every changed script with both quote styles: eleven single-launch helpers, two plan-bound delete executors, no live, order or account endpoint. QC administrative reads (zero looks) confirm the thirteen recycled projects by name and time, find one unbooked R298 rerun, and find the W5 source project without its `main.py` (P2, cloud state, not repairable here). Fixed: three EOF blank lines in place with digests recorded, the rerun booked to **338/259/54/699**, stale ranges corrected. | Real tree at `57bd3213`: record and active-document gates **86 passed**; final record bytes **86 passed**; `compileall` exit 0; `git diff --check` clean on `6076ef20..HEAD` after the fix. Complete lane suite at `3c905d42` (owed from R323): 3422 failed, 15522 passed, 1357 skipped, 3182 errors in 3:20:42, host classes; at `57bd3213`: 27,253 collected with 100 collection errors; **not run to completion at push time**: the detached run started at 10:56 local on 2026-10-29 was stopped after the dependency diagnosis above, and the restart with a corrected environment was still pending at this push; the previous tip's counts are recorded in this table and this tip's counts are to be recorded in the next round. | 0 P0, 0 P1. `ARV2R333-001` (P2, open for Codex): project 38522505 has no `main.py`. `ARV2R333-002`/`-003`/`-004` (P3, corrected). `ARV2R333-005`/`-006`/`-007` (P3, documented). Carried P2s unchanged. | Codex counter-reviews R333, re-establishes Main under a new freeze before any coverage job, and reconciles the booked rerun by identity; the hold of 329.10 remains; no attempt, launch, replacement project, six/eight cell, paper/live deployment, broker, funded-account, real-order or trading action is authorised. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -71587,3 +71605,173 @@ the next substantive step after release. No automatic continuation or monitor.
 Final native-denied document-only confirmation86passes1.16s, exit0, is a
 repeat of the86document cases in232, not additive. Final diff/status and narrow
 added-document secret-shape checks passed; no operational revalidation followed.
+
+## R333. Independent Claude review of `6076ef20..57bd3213` on the Windows host: sections 323–328 confirmed through the Mac session's reviews, the fourteen owner-waived Codex commits of sections 329, 331 and 332 reviewed after the fact, and a sixth QC census, 2026-10-29
+
+### R333.1 Range, method and disposition summary
+
+**Range:** the ninety-three commits pushed after this session's `6076ef20`,
+from `e3afe7ef` (the Mac's section 323 recovery) to `57bd3213` (section
+332), taken by fast-forward into the lane clone from a clean tree.
+Seventy-four of them, through `0d38c59d` (sections 323–327, including Codex's
+section 324 counter-review of this session's four previous commits and the
+section 325 merge that renamed this session's section 323 to review snapshot
+R323), carry the Mac session's independent review in section 328, which Codex
+counter-reviewed in section 329. The Mac session's own five commits
+(`41295615`, `28795242`, `8381e0cb`, `6c7c80a9`, `b065e98c`) are
+counter-reviewed by Codex in sections 329 and 331 and are not re-reviewed
+here. The remaining fourteen Codex commits had no Claude review and are
+reviewed individually in R333.2: the six of section 329 (`e843202f`,
+`2e01ffec`, `cb0f1da0`, `82aaec7d`, `02679fc7`, `f23ca94c`), the two of
+section 331 (`619425b0`, `e18e3069`) and the six of section 332 (`7060a4b9`,
+`970e0717`, `e5692dba`, `37b36c4f`, `0f637a41`, `57bd3213`). Every one ran
+under the owner's standing waiver quoted in those sections ("hold released.
+proceed", "counter review claude's changes", the owner-requested cleanup).
+
+**Owner-authorized QC access, zero looks.** `projects/read` and
+`backtests/list` for every project the census rule selects (210 projects,
+345 backtests, reduced in process to id, name, status, completed flag and
+creation time); `files/read` for projects `38522505` and `38364439` reduced
+to names, byte counts, in-process digests and modified times, plus one
+by-name `files/read` for `main.py`; status-only `backtests/read`
+projections for the two projects' backtests. No `backtests/create`, no
+delete, no statistic, chart, order, log, price, provider row, return or
+Object Store payload was read; credentials were never printed.
+
+**Acknowledging section 324.** Codex's `ARV2CR324-001` against review
+snapshot R323 is right: this session's launch census grepped double-quoted
+endpoint strings only and so missed six single-quoted `launch_once`
+definitions. The census in R333.5 matches both quote styles and every
+`api/v2/...` literal, and it is reported as a string census, not an AST or
+dynamic-endpoint proof.
+
+**Verdict.** All ninety-three commits are accepted; the fourteen tail
+commits individually (R333.2). **0 P0, 0 P1, 1 P2, 6 P3** new. This round
+corrects three whitespace defects in place (R333.6), books one unbooked
+launch (R333.4) and corrects two stale ranges; the P2 is a cloud-state defect
+this host cannot repair (R333.3). The carried P2s of sections 248, 287 and
+305 stay open as last recorded.
+
+### R333.2 Per-commit dispositions
+
+| Commits | What they are | Disposition | Basis |
+|---|---|---|---|
+| `e3afe7ef` .. `0d38c59d` (74) | sections 323–327: the Mac's R298 execution and diagnostics, Codex's 324 counter-review of R323, the 325 merge, the R326 five-source RAW recovery, the R327 matched-period and EODHD work | accepted | Reviewed per commit by the Mac session in section 328 and counter-reviewed in 329; the record, active-document and whole-tree compilation gates are green at `57bd3213` on this host; the five runtime blobs and the three trust roots are unchanged (R333.7). |
+| `41295615`, `28795242`, `8381e0cb`, `6c7c80a9`, `b065e98c` (5) | the Mac session's parser correction, section 328, the W5 cash-bound change, the pin-closure restoration and section 330 | not re-reviewed (Claude commits) | Counter-reviewed by Codex in sections 329 and 331. |
+| `e843202f` | section 329: counter-review of 328, runtime-limit tests, owner release | accepted | Record plus `test_r329_runtime_limits.py`; no production change. |
+| `2e01ffec` | the W5 native coverage module, its projection, the offline A stage, the bounded outer collector, the pure result parser and the B readback verifier; the D1 freeze | accepted | Endpoint census: none of these scripts names a QC endpoint; the coverage runtime asserts no orders and emits one bounded statistic. |
+| `cb0f1da0`, `82aaec7d` | the locale fix after the D1 outer refusal; the A stage success and the D2 install freeze | accepted | Offline stage only; the A report pin and eleven-file projection are recorded, no cloud job. |
+| `02679fc7`, `f23ca94c` | the Safari install and download-collision record with the B filename correction; the C recorder and D readback verifier; the renewed hold | accepted | `verify_arv2_r329_qc_source_readback.py` names only `api/v2/files/read`; B, C and D are uninvoked. The cloud state the install produced is not what the record believes (R333.3). |
+| `619425b0`, `e18e3069` | section 331: four test/source corrections after the Mac's section 330 and the record | accepted | Corrections to tests and a projector docstring/profile; no economics beyond the owner's recorded cash-bound override. |
+| `7060a4b9`, `970e0717`, `e5692dba`, `37b36c4f`, `0f637a41`, `57bd3213` | section 332: the owner-requested cleanup policy, inventory, project-environment and recycle-state diagnostics, the recycle executors and their results | accepted | The executors reach only `projects/read`, `backtests/list` and `projects/delete`, each delete bound to a committed thirteen-id plan and followed by a same-id Recycle Bin read-back. The census confirms exactly those thirteen projects renamed into `Recycle Bin/` between 07:04:07 and 07:14:33 UTC on 2026-10-29 (R333.4). |
+
+### R333.3 The W5 source project has no `main.py`
+
+Section 329.8 records the Safari install into project `38522505`: three new
+modules uploaded, then `main.py` replaced last, the editor showing the new
+coverage-only Main. The cloud today holds **eleven files, none of them
+`main.py`**: ten `.py` files and `research.ipynb`. The ten `.py` files total
+232,257 bytes, which is exactly the recorded eleven-file projection total
+of 239,149 bytes less the recorded 6,892-byte Main; the seven original
+dependencies carry their 2026-10-27 11:11:52 UTC upload time and the three
+new modules 2026-10-28 16:44:26 UTC, the install time. A by-name read
+answers `File not found in project: main.py`. `research.ipynb`, which 329.4
+and 329.7 say stays untouched, carries a modified time of 2026-10-28
+19:49:20 UTC, after the owner's 17:29 UTC hold. So the Main was removed
+after the install, by an actor and at a time the record does not know, and
+the project cannot compile as recorded (`ARV2R333-001`, P2).
+
+This host cannot repair it: the exact Main bytes exist only in the Mac's
+spent A-stage output, the owner's hold applies to that lane's QC writes, and
+a re-upload needs its own committed freeze. The lane's own uninvoked D
+readback would refuse at the first missing name, so no silent launch is
+possible. The repair path is on the Mac: re-establish `main.py` from the
+retained `R329-20261028-A` bytes under a new freeze, re-read all eleven
+files, then record who or what modified the project at 19:49:20 UTC.
+
+### R333.4 Sixth QC census
+
+The census rule of 248.4 now selects **210 projects and 345 backtests**.
+Against the 2026-10-26 census:
+
+| Observation | Result |
+|---|---|
+| Section 332 cleanup | the thirteen planned Analyst projects, and no other Analyst project, were renamed into `Recycle Bin/<timestamp> <name>` between 2026-10-29 07:04:07 and 07:14:33 UTC, in the order and at the times 332.6–332.8 record; `36561231` carries the exact D-confirmed name |
+| Other lanes during the cleanup window | two target-price lane projects (`TPR-QC6-REMX-v1-private`, `TPR-CAP-TILT-EXT26-ON-BASE-v1-private`) were recycled at 07:04:57 and 07:05:05 UTC, between B's single delete and D; section 332 claims one delete for B and none for D, so their actor is outside this lane's record (`ARV2R333-005`) |
+| Analyst launches since 2026-10-26 | one: `5633b9955d98a08fb503f3bd78cb7de5` (`R298-N-asis-rerun-20221024-20261026`, `Completed.`, 2026-10-26 18:10:44 UTC, engine window 2022-10-25) in project `38364439`, in neither document; booked at the owner's direction as one infrastructure look (`ARV2R333-003`) |
+| The R326 native source job | `d366867e9ca3a657baea9beb9b660b41` in project `38522505`, `Completed.`, 2026-10-27 11:11:56 UTC, engine window 2026-10-14, as the ledger's AJ entry books |
+| Other lanes' launches since 2026-10-12 | thirty-three further target-price lane backtests and five new target-price projects, outside this lane's ledger and gates |
+
+**Ledger chain.** From this session's 333 / 256 / 52 / 699, Codex's
+individual A12–A19, N and R/P entries and the merge reconciliation restate
+**336 / 259 / 52 / 699**, the AJ source job books **337 / 259 / 53 / 699**,
+and the rerun booked here makes the pushed floor **338 / 259 / 54 / 699**.
+Each step is one shared look; the chain reproduces.
+
+### R333.5 Code read on this host
+
+- **Endpoint census, both quote styles and `api/v2` literals.** Of the
+  scripts changed in the range, eleven can create a backtest:
+  `arv2_r298_plain_launch.py` and the ten `*_remote.py` helpers of the
+  quote, RAW-reference, reference-feed, reference-identity and
+  reference-series-phase diagnostics (with their A14, A16 and A18 variants),
+  each through one `launch-create` call after `BuildSuccess`, ownership,
+  complete file read-back and a capacity read. Two can delete:
+  `recycle_arv2_r332_qc_projects.py` and `_v2.py`, each bound to a committed
+  plan and a same-id read-back. No changed script names a `live/`, order or
+  account endpoint. The section-329 scripts name only `api/v2/files/read`.
+- **Whitespace closure.** The three files corrected in R333.6 are pinned
+  by `SOURCE_PINS`/`NEW_PINS` in three spent section-327 callers
+  (`arv2_r327_eodhd_fmp_query_plan.py`, `prepare_arv2_r298_eodhd_crosswalk.py`,
+  `read_arv2_r298_eodhd_crosswalk_gaps.py`); none of their tests compares
+  those pins with the files on disk, and the three are outside the 157-pin
+  baseline of `arv2_r298_post_merge_source_pins.py`, so the spent callers keep
+  their historical pins and fail closed, as sections 324.3 and 330 chose for
+  the previous five files.
+
+### R333.6 Corrections made in this round
+
+| Fix | Change |
+|---|---|
+| `ARV2R333-002` | `scripts/arv2_r298_ba_source_binding.py` `fdc6cd8e…` → `c794da93a8f6c4fa6ddc9bfc9a56a27430034fcd15b0d0c92f1072a79dbe8090`; `scripts/arv2_r298_bb_source_binding.py` `8aa1f5c9…` → `c46265039342c70ef5374064d016cdb763593fd1c08f710da37f1b830aa13c99`; `scripts/read_arv2_r298_eodhd_retained_pair.py` `58aa5e2b…` → `aaf8daf1e2b5dec69dc20588979a129b3a96f04877ed756ac022491313e82ff9`. One trailing newline removed from each; the range `6076ef20..HEAD` now passes `git diff --check`. The pre-correction pins in sections 326–327 remain true of the spent runs. |
+| `ARV2R333-003` | one shared-ledger entry books the unbooked rerun; floor **338 / 259 / 54 / 699**. |
+| `ARV2R333-004` | banner "Sections 1–327 retain" and section 4 "numbered sections 1–322" corrected to 1–332. |
+
+### R333.7 Validation on this host
+
+| Check | Scope | Result |
+|---|---|---|
+| Record and active-document gates | real lane tree at `57bd3213`, then again on the final record bytes | **86 passed**; final record bytes **86 passed** |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2` and `research/analyst_revisions_v2_qc`, real tree; the three corrected files | exit 0 |
+| `git diff --check` | the range `6076ef20..57bd3213` | red on three files before R333.6; clean on `6076ef20..HEAD` after it, and clean on this round's commits |
+| Immutability | `git show HEAD:…` SHA-256 | V16 `998cb19b…`, V17 `8049d90e…`, V18 `40d38321…`, V19 `f79ea5c7…`, cap-90 bridge runtime `60b0e300…` unchanged; trust roots `3152aca0…`, `23f23d19…`, `e8c1a2a7…` as in 231.3 |
+| Complete Analyst lane suite, previous tip | guarded LF scratch worktree at `3c905d42`, the run R323 could not wait for (2026-10-26) | **3422 failed, 15522 passed, 1357 skipped, 3182 errors in 3:20:42**; the host classes of `ARV2R165-001` |
+| Complete Analyst lane suite, this tip | guarded LF scratch worktree at `57bd3213`: 27,253 tests collected, **100 collection errors** (83 `requests` not importable under the scripts' isolated bootstrap, 7 `fcntl`, 5 `resource`, 3 `public_bootstrap`, 2 `os.getuid`) | **not run to completion at push time**: the detached run started at 10:56 local on 2026-10-29 was stopped after the dependency diagnosis above, and the restart with a corrected environment was still pending at this push; the previous tip's counts are recorded in this table and this tip's counts are to be recorded in the next round |
+| QC access | administrative census, two file inventories, one by-name file read, status-only backtest reads | zero looks; no result, statistic, chart, order, log, price, provider row, return or Object Store payload read |
+
+### R333.8 Findings ledger
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| `ARV2R333-001` | P2 | Project `38522505` has no `main.py`: the ten `.py` files total exactly the projection less Main, a by-name read answers "File not found", and `research.ipynb` was modified at 2026-10-28 19:49:20 UTC after the hold. The recorded install state and the cloud state differ, and the actor is unknown. | Documented with the repair path (R333.3); not repairable from this host. Codex must re-establish Main under a new freeze and read back all eleven files before any coverage job. |
+| `ARV2R333-002` | P3 | Three files of sections 326–327 ended with a blank line and failed `git diff --check` on the range. | Corrected in place; digests recorded (R333.6). |
+| `ARV2R333-003` | P3 | One R298 launch of 2026-10-26 was in neither document. | Booked (R333.4). |
+| `ARV2R333-004` | P3 | Stale banner and section-4 ranges. | Corrected. |
+| `ARV2R333-005` | P3 | Two target-price lane projects were recycled inside the Analyst cleanup window by an actor this lane's record does not claim. | Documented for the owner and the target-price lane. |
+| `ARV2R333-006` | P3 | On this host the project's pinned `requests` is installed in the user site, which the lane scripts' isolated bootstrap does not see, so 83 test files fail collection; a dedicated virtual environment could not be built because the host's package feed returns 404 for `databento` and the public index retry was still running at this push. | Host class; the suite run of this tip is reported as it stands. |
+| `ARV2R333-007` | P3 | This session's R323 launch census missed single-quoted endpoints (`ARV2CR324-001`). | Corrected method in R333.5. |
+
+Carried open: `ARV2R248-002`, `-003`, `-004`, `ARV2D287-001` and the other
+P2 items last listed in section 305; `ARV2R328-012` (source/split admission);
+`ARV2CR28-008` (out of lane).
+
+### R333.9 Next gate
+
+Codex counter-reviews review snapshot R333, re-establishes `main.py` in
+project `38522505` from the retained A-stage bytes under a new committed
+freeze before any source read-back or coverage job, records who modified
+that project at 19:49:20 UTC, and reconciles the booked rerun by identity.
+The pushed floor **338 / 259 / 54 / 699** stands. The owner's QC and Safari
+hold of 329.10 remains; no attempt, launch, replacement project, six/eight
+cell, paper/live deployment, broker, funded-account, real-order or trading
+action is authorised by this review.

@@ -13,7 +13,15 @@ Section 102 remains the completed counter-review of both section-101 Claude
 commits, accepted after three P3 corrections. Its published corrections and
 all historical tests/failures are retained, not reviewed a second time here.
 The prospective attempt-cap supersession retains all attempts and looks.
-The new study remains **not backtesting-ready** until its native inputs/source and execution are verified; offline preparation is not native proof.
+**Latest execution handoff, 2026-10-29 UTC (section104.43):** all five arms
+have actual terminal native runs. The eight deliberately launched financial
+jobs all ended Runtime Error; zero full-window financial results are accepted.
+The round is at a concrete native mark-input blocker, with no active job in
+private project37650980 at the final census. Next work is verified source/
+routing repair under fresh scope; no unchanged relaunch or Claude checkpoint.
+The sole final lane push is performed only after the recorded final checks;
+its exact commit/remote equality is reported in chat and a private receipt.
+This is execution/failure evidence, not a claim of completed financial backtests.
 
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
@@ -28423,3 +28431,460 @@ ca9fec3941e1e60c63afd8547dfe97ea remains viable/InProgress as last observed.
 Continue it naturally; do not cancel it or infer full-window performance.
 Final one successful nonforce push remains withheld until stable completed
 or concrete factual/external/safety-blocked handoff, all outcomes accounted.
+
+Fresh bounded private phase TPR-CMP28-TICK007-PRIOR-SOURCE-METADATA-20261029-001/bc34a956405160be8e921155e18e301d247e463be7acd6012b97ec198a9a7116 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; Own006source descriptor AS DATA ONLY; never reuse spent scope; prepare fresh tick007; no licensed witness/source body in metadata read; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-TICK007-BEFORE-PURESTATUS-20261029-002/4ed91ec8b61fd14996c08ea986815bd63a7360a4fed64d5e1932082f5a8035ad at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before2 exact requests/120s/6291456B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-TICK007-SOURCE-PREPARATION-20261029-001/eef77688e35d28717218f5e64a96432304492c6961baab841dc58b781a55dd84 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/600s; Fresh tick007 source-only preparation from exact006source snapshot; preserve23otherfiles/PUREcompiledjob; no witness/provider/inputbody read; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-TICK007-SOURCE-PREPARATION-20261029-002/b41533785962982d2e2b957ca1982509f7af6863bb7c5e3839c2246bbc67c081 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/600s; Fresh tick007 source-only preparation; correct inherited MARK-PROBE operation prefix after pure build refusal; prior scope/unused look retained; no witness/Historyinput read; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-TICK007-RESERVE-UPLOAD-SOURCE-20261029-001/53fd41954ed31bc57e41becc56dd63e00304c65a774ce72da36f5009056940d0 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 3 exact private inputs/600s; Fresh tick007 final reservation/source/payload preparation only; preserve006snapshots/all23otherfiles/runningPURE; 2History/100000encounteredrows max; no licensed witness/Historybody read; fsync claim and directory retained.
+
+D025tick007freshreservation9a29bc42d347e34b072cca9fd7bc6f67e629a595ea9e7f9b508f482ead375781 at2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFOREeffect, sourcese327940ff9dc233abd29a18f36230930555279c7c821535ca4363f8483c5519a configcfc4b21a0043f837853b84c37007442f8c9c65b9cff3664fa037a0a5ed626ea9 main772d56019104bb0a77297a31e730f32478b571e269e9c60b792634ce3cef098f; mainonly24fileinventoryb4b28a70cb48161294336cf0c7758c9aa4c83b89cc0b90f1ac6250b63ced82d6->2e41ebcc971cfe976d971aa561b9785a1aeb053b4184612a021c1ebb4cbd7a13; preserve23/PUREcompiledjob; parentwitness1/4096B,2mixedTickHistory/100000encounteredrows,0calendar/0orders/0cache/0barwrites. Two localpreflight prefixrefusals occurred BEFOREAPIplan/effects or nativecompile; no financial attempt/job/outcome count increment, unused first ticklook retained.
+
+Freshtick007uploadplan630aa80d5029cf544877e1b6b1e35b008a3811965a13111de835660419b90e17 BEFOREcredentials/effects; exactmain/preserve23; PUREcompiledjobunchanged.
+
+Fresh bounded native phase TPR-CMP28-API-TICK007-COMPILE-20261029-001/31817032f92fbbdf650778a4befa51b155981838e27b8233b338f57be430fc1f at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before3 exact requests/120s/4456448B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-TICK007-COMPILEREAD-20261029-001/cdaffc4f1bdee17d4e5dfee72736e9c7f648f0b1ee07a6aac4415aaf5cb452a0 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-TICK007-LAUNCH-20261029-001/ae0e63d5cbefb7781de70ccb287a8fc0be3f336de21d820b389e4716a0eabc1a at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before3 exact requests/120s/4456448B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-20261029-002/fb0bdd9eec1519f319609ecd8441d267af7defe05195b639ad5dd843460b7a01 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; OwnPUREjob operational status/progress/uptime only; no prices/orders/performance acceptance or new outcome look; fsync claim and directory retained.
+
+PUREoperationalmetadata {"completed":false,"financial_performance_accepted":false,"has_error":false,"job_id":"ca9fec3941e1e60c63afd8547dfe97ea","progress_raw":0.156,"runtime_statistics":{},"status":"In Progress..."} safe2b858274d287b300b730ea2b576fe670fbe952cd61a506e56700788be75d03c4; coverage/financialreturns unaccepted.
+
+Fresh bounded native phase TPR-CMP28-API-TICK007-PURE-STATUS-20261029-001/b69e14413417fc87a71f70dce395b04c0cc9b3778d84b92ffb359bdc187cf4e7 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before2 exact requests/120s/8388608B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded native phase TPR-CMP28-API-TICK007-SAFE-RESULT-20261029-001/61e6deeea3b475352bbbb2dd59cd971f2fee3c963b4b5567745210af86f6a4a1 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/262144B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-TICK007-RESULT-PROCESS-20261029-001/951e8bc6bd787018116d6180fec57ffefec860675ff79e1a153e48d90be2a871 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; Exact actualnative tick007 SAFEcounts/types/custody only; no rawticks/prices/quotes/quantity/SIDbody; no financial recovery/acceptance; fsync claim and directory retained.
+
+D025007actualsafe result {"actual_child_job_id":"469fa6569a6b0553589dafb4361db470","backend_durability_proven":false,"cache_updated":false,"canonical_admission":false,"cash_changes_made":false,"clock_bars":960,"config_sha256":"cfc4b21a0043f837853b84c37007442f8c9c65b9cff3664fa037a0a5ed626ea9","contains_calls":1,"control_daily":null,"control_minute":null,"control_request_path_status":"positive_trade_ticks_observed","control_ticks":{"close_boundary_trade_rows":0,"complete":true,"final_minute_trade_rows":4935,"invalid_row_rows":0,"invalid_source_flag_rows":0,"price_or_quantity_exported":false,"quote_price_consumed":false,"quote_rows":44434,"request_attempted":true,"request_returned":true,"row_bound_reached_result_may_be_incomplete":false,"rows_encountered":49369,"rows_validated":49369,"status":"complete_bounded_observation","suspicious_rows":0,"trade_rows":4935,"unknown_type_rows":0},"daily":null,"derived_bar_created":false,"diagnostic_only_no_financial_recovery":true,"end_runtime_custody":true,"error_class":null,"external_manifest_attested":false,"external_operation_manifest_required":true,"financial_recovery_proven":false,"helper_sha256":"6539ae749aefb4884ed52258fc2f0f77c9481a5e8ee37ea80ec7065218f0da95","history_calls":2,"minute":null,"minute_daily_close_price_parity":null,"mixed_trade_quote_request":true,"native_clock_class_attested":false,"native_daily_precise_setting":true,"native_exact_subscription":{"add_security_calls":1,"all_external_exact_sid":true,"all_external_raw":true,"config_reads":1,"config_rows_examined":2,"external_config_count":2,"native_config_kind_counts":{"other_native":0,"quote_bar":1,"trade_bar":1,"untyped":0},"registered_exact_native_reference":true,"regular_nonfillforward_raw_minute_quote_configs":1,"regular_nonfillforward_raw_minute_trade_configs":1,"returned_exact_sid":true,"returned_native_security":true,"unrecognized_external_config_count":0,"verified":true},"native_identity_roundtrip":true,"native_origin_authenticated":false,"native_permission":false,"noneconomic_diagnostic":true,"one_of_five_economic_arms":false,"operation_id":"TPR-CMP28-MARK-PROBE-TICK-007-20261029","orders_authorized":false,"orders_submitted":0,"parent_contains":true,"parent_hash_verified":true,"parent_job_id":"12dd4732ba5d9d8f57950beb2a371c79","parent_key_sha256":"7a27356ccf09e0674b56dac39adaad4d1a0ef7a2cee7ef7f948982f20004e13f","parent_observed_minus_expected_microseconds":-86400000000,"parent_predicates":{"expected_date_equals_algorithm":true,"observed_date_equals_session":false,"observed_equals_expected":false,"observed_relation":"before"},"parent_schema_verified":true,"parent_session_matches_config":true,"parent_witness_bytes":1343,"parent_witness_sha256":"eef08aca32b99056dee0ce00389c53a8ee6a1628c29188afd8bebd362fe183dd","phase":"complete","point_in_time_verified":false,"read_calls":1,"rights_verified":false,"root_head":"2d3bbe2b98b1a0957f8e984916d19fbd534783d5","schema":"tpr-cmp28-native-mark-tick-probe-result-v1","sdk_hard_timeout_proven":false,"sdk_preallocation_byte_bound_proven":false,"security_id_sha256":"1122fa5f1349f79e231e106127c098da27ef730836a97052d2154ecc46f1afc1","source_inputs_admitted":false,"status":"completed_bounded_tick_observations","strategy_accepted":false,"target_data_gap_proven":false,"target_no_trade_ticks_observed_in_bound":true,"target_ticks":{"close_boundary_trade_rows":0,"complete":true,"final_minute_trade_rows":0,"invalid_row_rows":0,"invalid_source_flag_rows":0,"price_or_quantity_exported":false,"quote_price_consumed":false,"quote_rows":0,"request_attempted":true,"request_returned":true,"row_bound_reached_result_may_be_incomplete":false,"rows_encountered":0,"rows_validated":0,"status":"complete_bounded_observation","suspicious_rows":0,"trade_rows":0,"unknown_type_rows":0},"target_trade_ticks_observed":false,"terminal_proven":false,"tick_rows_encountered":49369,"trading_authority":false,"universal_absence_proven":false} retained8cb6269a71a6cb8ec475d58b0e4ac5b1178326db90cabe693c02250a481e0eed; diagnostic only, not economic backtest/recovery/PIT/rights/input admission.
+
+### 104.40 D025007 genuine closing-minute observations; OFF external input gate
+
+Tick007 fresh reservation9a29bc42d347e34b072cca9fd7bc6f67e629a595ea9e7f9b508f482ead375781
+at2d3bbe2b98b1a0957f8e984916d19fbd534783d5 preceded source upload/compile/job.
+Source snapshot493423B/e327940ff9dc233abd29a18f36230930555279c7c821535ca4363f8483c5519a;
+configcfc4b21a0043f837853b84c37007442f8c9c65b9cff3664fa037a0a5ed626ea9;
+main48270B/772d56019104bb0a77297a31e730f32478b571e269e9c60b792634ce3cef098f.
+Full24inventoryb4b28...->2e41ebcc971cfe976d971aa561b9785a1aeb053b4184612a021c1ebb4cbd7a13;
+all23otherfiles preserved, before/after upload/compile/launch exactly matched.
+Compile091b8bbe928d4e95aef62b19389fcf0c-ca9ffa1f2e11a035653589238c20d080
+BuildSuccess; actualchild469fa6569a6b0553589dafb4361db470 Completed.
+Launchreceiptb2cf2bd90f89dc8aa8284f12810f663cd815ad0f7b59e5f255c988a42d5d1799.
+Separate compile/native diagnostic attempt, NOT a financial arm or P&L look.
+
+Fresh SAFEprocessing3898B/8cb6269a71a6cb8ec475d58b0e4ac5b1178326db90cabe693c02250a481e0eed
+reports completed_bounded_tick_observations,2Historycalls/errornull/endcustodytrue,
+sameOFF4witness/hash/schema/nativeSIDroundtrip/exactsubscription verified.
+SPY49369encountered/validated rows:4935trade+44434quote,0unknown/invalid/suspicious,
+all4935trades inside15:59..16:00 half-open minute,0exact16:00boundary trades.
+Target0encountered/trade/quote rows, both iterators completed naturally BELOW
+their50000limits; no bound-incomplete or access-error-to-zero conversion.
+No quote price, raw tick price/quantity, SID body, stale mark or fabricated bar
+exported/admitted. Parentidentityhash1122fa5f... unchanged. SDK timeout/
+preallocation/nativeorigin/PIT/rights/universalabsence/terminality/backend
+durability/financialrecovery/canonicaladmission still false/unproved.
+
+Root decision CMP104-D025-R1: together with controlled003 and five-session006,
+this establishes zero target observations on these exact native minute/daily/
+closing-minute tick request paths, with positive SPYcontrols and targetdata
+resuming on both later days. It is a concrete currently-unmet OFF native input
+requirement, NOT a universal absence proof. No verified drop-in recovery exists.
+Do NOT repeat unchanged OFF or50, exclude the holding, carry its stale price,
+inject/cache-write a derived bar, renormalize holdings or invent payoff/NAV.
+
+Public-source recovery assessment from finish_off_preparation, source-limited:
+comparison_20261028_algorithm._daily_audit requires the invested actualSecurity
+nonFFsame-session1minTradeBar before D009; D009 also binds actualcache/state and
+equal nativeRAWdailyclose. Upstream AlgorithmManager actualTimeSlice updates
+Security separately from its consolidator loop; nativeTick keeps Tick type;
+History uses a separate internal Security/cache. No reviewed automatic
+missing-minute-file->Tick reconstruction route was found. Positive ticks would
+only discriminate source availability, not satisfy this unchanged contract.
+References:
+https://github.com/QuantConnect/Lean/blob/master/Engine/AlgorithmManager.cs
+https://github.com/QuantConnect/Lean/blob/master/Common/Securities/SecurityCache.cs
+https://github.com/QuantConnect/Lean/blob/master/Engine/HistoricalData/SubscriptionDataReaderHistoryProvider.cs
+https://github.com/QuantConnect/Lean/blob/master/Engine/DataFeeds/FileSystemDataFeed.cs
+These upstream master references document inspected behavior, not an attestation
+of the deployed QCengine version or source-file completeness.
+
+Smallest valid recovery: demonstrate an actual wrong/inactive minute mapping/
+subscription route and correct that lane defect, OR obtain a genuine QCsource/
+backend repair with changed source/data lineage; then fresh exact-source
+reservation/rerun and full financial accounting. Re-adding the already proved
+sameSID minute subscription is not evidence of correction. No provider purchase
+or account upgrade is warranted by these observations. ON history gap remains
+separate; none of TR0-I/TPR-1/TPR-0B is automatically opened/closed by this test.
+
+Optional currentMia public capability review found Chat-mode file/notebook
+approval documentation, but no verified built-inUI zero-job permission boundary
+or protection against stale editor autosave. GeneralAgentManagement configuration
+was NOT presented as genuineMia. No newMia effects/credentials/UI reads occurred
+during D025; previous genuineMia consultations and source-discrepancy incidents
+remain retained. This is not a new canonical blocker to safe native work.
+Mia remains owner-authorized when a genuine controllable bounded interface can
+be used; an unverified prompt-only restriction is not relabeled native custody.
+https://www.quantconnect.com/docs/v2/ai-assistance/agents#04-Permissions-and-Human-Oversight
+https://www.quantconnect.com/docs/v2/cloud-platform/projects/ide#06-AI-Chats
+https://www.quantconnect.com/docs/v2/cloud-platform/projects/ide#09-Split-the-Editor
+
+PUREactualca9fec3941e1e60c63afd8547dfe97ea remains InProgress/noerror, last
+operationalprogress.156 (not accepted coverage/return). It is not cancelled.
+Four financial arms retain failures; zero full-window financial comparisons
+accepted. Continue PURE naturally and reconcile all actual outcomes/reservations
+before final stable handoff and exactly ONE successful nonforce lane push.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-005/6cc6634f02637a1700adf78eba03b76eebd6f4752d78e17779d80a60b9f5aa33 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-20261029-005/35728689594700c7296b797867b52f908af9e7494a1600183ece5c9b0a4aaab4 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; OwnPureoperationalstatus/progress/errorpresence only; no performance data/acceptance or financial outcome look; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-006/8e2536bb657c29b642968f942853c922f75e14e6151790519ba05e7ab41a706c at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-20261029-006/840826f7d7845725c1954ab937695854858d78b1059c69d645f6b1ae838a0808 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; OwnPureoperationalstatus/progress/errorpresence only; no performance data/acceptance or financial outcome look; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-007/855f28ce5659ddb136d7e413b1e699843eeafd7bbd41652b344fc7651ad2862b at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-20261029-007/2288aefc4f2e8b7c7188ba9eb21aed9e3eecd7dd6d8bcd22454a322aba2ab6bf at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; OwnPureoperationalstatus/progress/errorpresence only; no performance data/acceptance or financial outcome look; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-SCHEMA-20261029-001/0abe272b42e253be44fd1dd81342148e5d6d366905caf4665388d328fb5f8330 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; OwncurrentPUREoperational schema/resource telemetry only, no price/order/performance body projection; fsync claim and directory retained.
+
+### 104.41 D026 financial-attempt ledger reconciliation while Pure continues
+
+Root decision CMP104-D026-R1 separates financial compiles, requests, returned
+jobs, observations and reservations. comparison_accounting_auditor performed
+public-record-only reconciliation at2d3bbe2b98b1a0957f8e984916d19fbd534783d5;
+record snapshot2507540B/bfdc4496e27ccfe03454294a98487c214d3fd96eee7a4f801cd960d9424f11e1.
+No private reads/native effects/new financial evidence or source edits by agent.
+Disposition accepted as bounded ledger reconciliation, not native acceptance.
+
+| New study arm | Deliberate successful compile/create | Launch requests | Returned financial jobs | Current terminal disposition |
+|---|---:|---:|---:|---|
+| OFF |4|4|4|4 RuntimeError jobs |
+| TPR50 tilt |1|1|1|RuntimeError2021-02-10 |
+| TPR100 tilt |1|1|1|RuntimeError2023-09-26 |
+| TPR200 tilt |1|2|1|1capacity rejection/nojob, then RuntimeError2023-09-26 |
+| PureTPR |1|1|1|ca9fec3941e1e60c63afd8547dfe97ea InProgress |
+| Total |8|9|8|7failed jobs across4arms;1activejob |
+
+OFFattempt1 074dd39863bfe50fa2ecdf2bb091ee47 unsupportedmarket-hoursmethod;
+attempt2 33bbbe164f5389f4ea2abe903f3b047f strictclosepredicate;
+attempt3 4344595d56ea9e57134490dd5e759e04 RuntimeError financialattempt
+despite diagnostic instrumentation; attempt4 12dd4732ba5d9d8f57950beb2a371c79
+wrong-day heldnativecache. Their separate corrected sources/reservations,
+receipts and failures remain in104.15/16/21and intermediate entries.
+Other actualfinancialjobs50:00c71aa64b3f0fa231ef5dba172dc56f,
+100:f9f9afa0f2b5200f06f11fe1442adb6c,200:df338f3dc811e509884195f94986c552.
+
+Excluded from invented counts: original unusedOFFsource-version1 and50reserve;
+partial upload with0compile/job;200capacityrejection0job; fresh200LOOK002
+reused samecompiledcandidate; Pureoriginalcompile/freshlaunch are onecandidate/
+onejob; restoration/accessscopes add0financialjobs. Tickpreflightprefixrefusals
+were local construction refusals before API/compile/nativeeffects, not jobs.
+The six bounded native diagnostic jobs001R2/002/003/005/006/007 have their own
+compile/job receipts and terminalCompleted statuses, explicitly noneconomic.
+Originalprobe001R1 andpostgap004 remainunused; no failures or captures erased.
+
+Eight is the count of deliberately reserved successful FINANCIAL compile/create
+requests, NOT all cloud builds. BackgroundIDEbuildnotice/fullIDs/new-versus-
+replay remain unreconciled; no fictitious total is supplied. OldstudyOFF3failed/
+ON0/33observedlooks remains a distinct historical baseline. Currentstudy outcome-
+look consolidation is NOT CLOSED: record retains the explicit partialoutcomeUI
+view of existingOFFlook003 and every bound operation. JobID/APInew_observed_looks
+is not a financial metric-view count; do not report33+8 or reset33. Compile
+failure spends an attempt without inventing a nativejob or economic outcome.
+All five full-window financial outcomes remain unaccepted/null, not zero P&L.
+
+Purefreshreadonlystatus007 nowreports progress.206/noerror/InProgress;
+safe168B/ca287f51385b323c76b14c8c2bd723481f86f1d4ac8730618898223152e34c79.
+These operational reads do not admit coverage, view interim return or choose
+parameters. Continue the viable originaljob naturally, preserve frozen study
+and four failed arms, and withhold final onepush until all results accounted.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-008/dc3650ef85180990d1ed9879fee8a8db1ea1d490d498f22a2aba710570f9cf2b at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-20261029-008/f46e40c98cdd3693d90652dff8ba70595259bbbcd30c7c008052b2b5c5c837d7 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; OwnPureoperationalstatus/progress/errorpresence only; no performance data/acceptance or financial outcome look; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-009/4f79936bbbb1f324e2f0fc81c1190b1c5ca8583101fc61260e930d70b64af560 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-20261029-009/c3ee5e7c0b540781d7761ea3c1915330391e1840f83be5285d888ce579237ec9 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; OwnPureoperationalstatus/progress/errorpresence only; no performance data/acceptance or financial outcome look; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-010/c09932d8f5f7516494f1074f54a2a71a35fce459491f6e4299a1f2553fa7f3f4 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-20261029-010/6784d62a36cfc801603d1da99ddf2cbc5d5947e883662477153643c7ce23082b at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; OwnPureoperationalstatus/progress/errorpresence only; no performance data/acceptance or financial outcome look; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-011/36329b53c9cc269a95c9eadb27c327d6d83463523199c7495def394bfc6a59c9 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-20261029-011/bf58139011f65bcb9b35a4bb3b462be8f11d98a9daa91c166478cfae24103dd0 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; OwnPureoperationalstatus/progress/errorpresence only; no performance data/acceptance or financial outcome look; fsync claim and directory retained.
+
+### 104.42 D027–D029 completion protocol and remaining source limits
+
+CMP104-D027. comparison_accounting_auditor performed public committed-source/
+official-primary-doc review only at2d3bbe2b98b1a0957f8e984916d19fbd534783d5;
+no edits/tests/private/native effects. Root adopts the bounded completion
+sequence, conditional on actual terminal result, not a declaration of success:
+fresh terminal receipt; exactsingleCMP28_MULTI_SUMMARY and
+CMP28_MULTI_EVIDENCE_INDEX filteredlines; bind actualjob/compile/config/
+source/policy/calendar/priorattempt-look ledger/terminalreceipthash; independently
+page own orders with end-start<=99 and require exact full1449-session
+EXT26 Account NAV at16:01NY/DST; replay privatejournal insideQC; then independent
+fill/fee/quantity/cash/NAV/chart checks using compact ownAPIobservations and the
+committed accounting reader. Submitted omittedfee fields remain unknown,
+not inferredzero. Same-node publish/readback is not backend durability.
+No journalchunks are to be downloaded/exported locally incidentally.
+
+Existing supported pure signatures:
+validate_completion(summary_raw,index_raw,config_raw,calendar_raw,source_calendar_raw,*,binding);
+chunk_replay_plan(samefive,*,binding); replay_chunks(samefive,*,binding,chunks);
+build_native_result_reader(*,public_sources,binding,summary_raw,config_raw,index_key,operation_id,git_head);
+normalize_api_observations(order_pages,chart_raw,api_binding,*,binding,source_calendar_raw,normalizer_source_sha256=None);
+build_native_accounting_reader(*,public_sources,binding,summary_raw,config_raw,index_key,operation_id,git_head,compact_raw,expected_compact_sha256,expected_normalizer_source_sha256).
+Use exact actual parentPureconfig1815710938c921963bbbb0d1e2266f98b9c3bcd1a4639d1a3e7d27a5dc180be0.
+Main/helper<=60000B each, cloudfiles<=25, nativeindex<=2MiB/1024chunks each
+<=512KiB/256MiB/300000records, accountingcompact<=16KiB; each private/native
+effect needs its own fresh bounded claim/reservation before effect. No claim
+of SDK/backend guarantees beyond those actual controls.
+
+CurrentAPI4MiB response/32MiB total/64requests/40s each/600s plan/noautoretry
+remain unchanged. Official backtests/read has no documented field filter or
+byte-size guarantee; possible growth is NOT an observed oversizedfailure.
+If one occurs, retain it honestly; listbacktests offers smaller status/progress
+summaries without completedboolean, and exact selection needs a fresh private
+processingclaim. Do not add guessed fields or silently widen/retry.
+Currentclosedlistpayload accepts projectId only, not includeStatistics.
+Filteredlogs are separate exact200-line boundedrequests; chartcount2000 is a
+request bound, not proof of actual1449-axis completeness; loading/sampled/
+truncated/ambiguous outputs are not complete evidence. References:
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/backtest-statistics
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/list-backtests
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/logs
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/orders
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/charts
+
+CMP104-D028. finish_off_preparation public-source readiness review, no effects/
+edits/tests/privatepacketreads: events.py331–337/425–435 preserve trulyabsent/
+noeligible scores as unknown/missing/null, with event-date nativebinding/cutoff/
+80-sessioneligibility. comparison_20261028.construct_pure_tpr346–364 excludes
+unavailable scores; no capfallback/missing-as-zero. All-unavailable means empty
+targets/gross0/cash1. multi_algorithm435–451 requests scores for the complete
+currentuniverse and bypassescapvaluegate; membership/XLFclassification still
+required. on_end590–594 requires fills>0 for internally_useful_order_run, so an
+entirecash-only fullrun cannot become useful merely by reachingCompleted.
+Earlycash then genuine latertrades is permitted and must be reported.
+
+Public104.10/.11provenance: distinctMassivepacket74monthlywindows2020-09..2026-10-09,
+386projections/349018retainedrows,279672nominalrevisions/69346unavailable,
+withoutzerosubstitution. Configured windows/census are not usable-score proof
+for each2021..24SID/decision. No publicper-yearusablescorecensus found; actual
+run state/binding/scorecensuses are needed. OldSharadar2025..26census does NOT
+prove absence in this separateMassivepacket. No new blocker or invented input
+admission follows from this software review. Nominalproxy/PIT/rights/sharebasis/
+canonicalTPR limitations remain exactly as frozen, no valuationpolicy change.
+
+CMP104-D029. Publicrefusal-pointer schema review only: financialpointer and
+CMP28_MARK_REFUSAL line omitSIDhash/absolutefailuredate. They contain schema/
+status/key/bytes/witnesshash/readback/type/reason/mode and four relativeclock
+predicates. validate_pointer_v2 adds noSIDhash; project_witness_v2 computes it
+only from separately hash-verified privatebody. DifferentwitnessSHA is NOT
+differentSIDproof because job/config/clocks also differ. Thus100/200 sameQC
+errorclock2023-09-26 still does NOT establish sameSID. Root does not launch
+another job or reopen a witness merely to assert equality; existing per-arm
+guardfamily/failure receipts are reported with this limitation preserved.
+
+Purelatestfreshstatus011: progress.256, uptime1h29m58s, CPU146.2%, RAM2063/8192MB,
+serverreportedLEANv2.5.0.0.18209, noerror/InProgress. This reports a version
+string, not a hash attestation of inspected upstreammaster. Safe314B/
+3fbbd050a3d829efe4f3379f290fb397a711605fa228cc193c001ac142029cdc.
+No interimreturn/price/outcome metric was projected from these operational
+reads. Continue sameviablejob unchanged; source/economic/fullwindow acceptance
+stillpending, final onepush withheld.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-012/b7620767a380746fe82e07eacbeed5dc11164915181d76a476b3260e4a13cfcc at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-20261029-012/b327c425f785ed97f58ec39dd3645026c79e7492c999f11a1bd5555c9f1ab9b5 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; OwnPureoperationalstatus/progress/errorpresence only; no performance data/acceptance or financial outcome look; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-013/2c658320d27a9aa4b31b27897c71e4261721e3a8626a42005c96876a4d6fbff8 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-20261029-013/bc529486b5f39ee7bed9d1d90eae6a9f87d923eec218fa06db98850a84261a05 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; OwnPureoperationalstatus/progress/errorpresence only; no performance data/acceptance or financial outcome look; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-014/29c9769533ab7eae9cdc63655290ce02fb4c63790b7945982c8f5286ff407c09 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-20261029-014/781658c9117e687b91fee6e286543821ab90f5eaea99a7fd1881bdcebab31b2c at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; OwnPureoperationalstatus/progress/errorpresence only; no performance data/acceptance or financial outcome look; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-STATUS-20261029-015/9ba4c50dcd224668d1f4f942764d9ab00ea65d356980bf03b838d7e571f48c65 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/4194304B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-OPERATIONAL-20261029-015/a0e0ea0d8731214eab611454838b09e928b3d50ee8d5b1f35a72b8b56660db5c at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; OwnPureoperationalstatus/progress/errorpresence only; no performance data/acceptance or financial outcome look; fsync claim and directory retained.
+
+Fresh bounded private phase TPR-CMP28-PURE-FAILURE-PROCESS-20261029-001/5ad15e53f059da6d4711873fa31bc469234d3fbfa20bf3092cca2d225bcc5921 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; Exact ownPUREterminal error/clock/safe witness pointer metadata only; no provisional financial PnL/price/order metrics or licensed witnessbody read; fsync claim and directory retained.
+
+Fresh bounded native phase TPR-CMP28-API-PURE-REFUSAL-LOG-20261029-001/fed8e5857928cc757a6b7cdbc1ac5348a17a89734637e9595ca50c06c44097a6 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before1 exact requests/60s/262144B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-PURE-FAILURE-PROCESS-20261029-002/345af090117988da54c1992b88ec4c7c817309b2316377371bc73d5f28a53c0c at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 2 exact private inputs/120s; Exact ownPUREterminal error/clock and nativeSAFErefusal-log pointer; correct metadata parser framing after001localdecodefailure; no witnessbody/PnL/price/order metrics read; fsync claim and directory retained.
+
+PUREterminalfailure {"completed":true,"error_bytes":1346,"error_sha256":"f0aaf7e6b97d850b23054b648fd1b30b63d0a4362a881ef4009dbfef6c8920b0","financial_performance_accepted":false,"full_window_completed":false,"job_id":"ca9fec3941e1e60c63afd8547dfe97ea","other_error_clocks":["2022-08-30 16:01:00"],"outer_log_clocks":["2022-08-30 16:01:00"],"pointer":{"bytes":1353,"data_type":"trade_bar","expected_sha256":"56e73acaf0173fc36670011e40499becccd450d4d7c0d2e81417da1305e41f32","key":"tpr-cmp28/evidence/TPR-SIX-UNIVERSE-FIVE-ARM-20261028-v1/TPR-CMP28-PURETPR-ATTEMPT001-20261028/1815710938c921963bbbb0d1e2266f98b9c3bcd1a4639d1a3e7d27a5dc180be0/attempt-1/37650980/ca9fec3941e1e60c63afd8547dfe97ea/mark-refusal.json","predicates":{"expected_date_equals_algorithm":true,"observed_date_equals_session":false,"observed_equals_expected":false,"observed_relation":"before"},"readback_verified":true,"reason_code":"minute_or_native_close_wrong_day_or_future","schema":"tpr-cmp28-mark-refusal-pointer-v2","status":"verified","valuation_verification_mode":"strict_minute_or_raw_daily_equal_close_v1","verified_sha256":"56e73acaf0173fc36670011e40499becccd450d4d7c0d2e81417da1305e41f32"},"pointer_wire_bytes":821,"pointer_wire_sha256":"d997267c937ac9307c587cc200eb4d1a6abfe3eba0f53ea02a67b35fcda943c7","same_sid_as_other_arm_proven":false,"source_config_path_matches_expected":true,"stack_bytes":1071,"stack_sha256":"f57e108f4afc063410e981702913d6d48eed9dbae44c6bd60c70b01cbba458c6","terminal_status":"Runtime Error","witness_body_read":false} safe52859aeae2ae30cbb571a6d7e81a825ed93767dcd1eddbe41fe43f0d8d95ff71; earlier001localmetadatadecodefailure/consumedscope retained, no new compile/nativejob or PnLlook invented. Allfivearms terminal, zeroacceptedfullwindowmetrics.
+
+Fresh bounded native phase TPR-CMP28-API-FINAL-OWN-CENSUS-20261029-001/5d53fe3bf04abbda27d049af57f392fc89fe6b0bbec231fde00328814c4c442c at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 before2 exact requests/120s/6291456B; no reused scope, unchanged attempt/job identity; no strategy acceptance implied.
+
+Fresh bounded private phase TPR-CMP28-FINAL-OWN-CENSUS-PROCESS-20261029-001/e5c0cdcef8731cd376009d2c7b18b51de5ba6e093779fe23b7c67c701c7f9872 at 2d3bbe2b98b1a0957f8e984916d19fbd534783d5 BEFORE 1 exact private inputs/120s; Final exact private-lane project job status/count/controller census only; no performance metrics/otherprojects/providerdata; fsync claim and directory retained.
+
+Final ownproject statuscensus {"active_job_ids":[],"all_eight_financial_runtime_error":true,"census_count":31,"financial_jobs":[{"job_id":"074dd39863bfe50fa2ecdf2bb091ee47","status":"Runtime Error"},{"job_id":"33bbbe164f5389f4ea2abe903f3b047f","status":"Runtime Error"},{"job_id":"4344595d56ea9e57134490dd5e759e04","status":"Runtime Error"},{"job_id":"12dd4732ba5d9d8f57950beb2a371c79","status":"Runtime Error"},{"job_id":"00c71aa64b3f0fa231ef5dba172dc56f","status":"Runtime Error"},{"job_id":"f9f9afa0f2b5200f06f11fe1442adb6c","status":"Runtime Error"},{"job_id":"df338f3dc811e509884195f94986c552","status":"Runtime Error"},{"job_id":"ca9fec3941e1e60c63afd8547dfe97ea","status":"Runtime Error"}],"financial_performance_accepted":false,"list_completed_boolean_supplied":false,"project_id":37650980,"status_counts":{"Completed.":8,"Runtime Error":23},"unknown_status":[]} safe344d0e865597fc5f060f939b1c0994b28c22fe1ba6b987e48cf08eaebb1d1af3; full24sourcecurrent2e41ebcc971cfe976d971aa561b9785a1aeb053b4184612a021c1ebb4cbd7a13 unchanged, no activefinancial/controllerjob is inferred from differentproject/monitor existence.
+
+### 104.43 Final five-arm execution handoff — concrete native input blocker
+
+**Current as2026-10-29UTC; supersedes earlier InProgress/next-role summaries.**
+Owner authority remains the2026-10-28five-arm request, bestjudgment/documented
+decisions, no further Claude checkpoint, continued attempts as needed with
+all historical attempts/looks retained, and exactly ONE successful nonforce
+lane push after this stable handoff. The Analyst monitor remains deleted;
+no automation or sibling/provider/operator state was re-opened in this phase.
+
+All five requested arms have actual native terminal executions. None achieved
+a financially accepted full-window backtest. Legitimate failure is retained;
+there is no strategy return/CAGR/Sharpe/drawdown/sleeve-PnL comparison.
+
+| Arm | Latest actual financial job | Native terminal | Observed failure clockNY | Accepted full-window orders/fills/fees/cash/exposure/NAV/clock/accounting/returns |
+|---|---|---|---|---|
+| Market-cap OFF |12dd4732ba5d9d8f57950beb2a371c79|RuntimeError|2021-02-10 16:01|NULL/unaccepted |
+| Cap selection +TPR50% |00c71aa64b3f0fa231ef5dba172dc56f|RuntimeError|2021-02-10 16:01|NULL/unaccepted |
+| Cap selection +TPR100% |f9f9afa0f2b5200f06f11fe1442adb6c|RuntimeError|2023-09-26 16:01|NULL/unaccepted |
+| Cap selection +TPR200% long-only |df338f3dc811e509884195f94986c552|RuntimeError|2023-09-26 16:01|NULL/unaccepted |
+| PureTPR selection |ca9fec3941e1e60c63afd8547dfe97ea|RuntimeError|2022-08-30 16:01|NULL/unaccepted |
+
+The frozen newstudy remainsTPR-SIX-UNIVERSE-FIVE-ARM-20261028-v1,2021-01-04..
+2026-10-09/warmup2020-09-01,1449requiredvaluations/301weeklydecisions, sixSTOCK
+sleevesSPY/XLE/REMX/KIE/XLFexcludinginsurance/IWM. Marketcap selects top10per
+sleeve for OFF/tilts; pureTPR has no capfallback. Existing tied-midrank formula
+uses50/100/200coefficients, with owner-approved200long-only funded transfers,
+donors stop0/unusedtilt reported. Fixed60slots, capital100000, timing/cash/
+volume/namecaps/fees/slippage/nativeRAWcorporate-actions and missingness rules
+remain unchanged; ARdisabled. No exclusion/renormalization/clipping/stale mark/
+quote-as-trade/price fabrication/date extension/ETF-only reinterpretation.
+Nominaltarget-revisionproxy remains exploratory, not canonicalTPR/PIT/
+share-basis/rights admission. CanonicalTR0-I/TPR-1/TPR-0B stay distinct/unclosed.
+
+Final newstudy deliberatefinancial ledger is8successful compile/create,
+9launchrequests,8returnedfinancialjobs,8RuntimeError terminaljobs. The200
+capacity rejection supplied0job; all unusedreservations/source versions/
+restorations/privateaccessscopes remain distinct. All four OFFjobs remain
+financialattempts even when instrumentation was added. OldstudyOFF3failures/
+ON0/33observedlooks remains separate and unreset. Six specified mark-diagnostic
+jobs001R2/002/003/005/006/007 are noneconomic; their Completed statuses do NOT
+become financial successes. BackgroundIDEbuildnotice totals/fullIDs/new-vs-
+replay remain unreconciled, so8is NOT represented as allcloudbuilds. Current
+economic-outcome-look consolidation remains unclosed; every bound identity/
+request/response/failed scope remains retained, including the prior explicit
+partialOFFlook003UIview. Do not infer33+8 from jobID/APIlook projections.
+
+Pureactualcompile dcd28696390467fc65ac77a2e0302b06-a1d20fd596b91972306a6335759b6e6f
+and originalcandidateTPR-CMP28-PURETPR-ATTEMPT001-20261028/sourceHEAD0300ef6e...
+config1815710938c921963bbbb0d1e2266f98b9c3bcd1a4639d1a3e7d27a5dc180be0
+were retained unchanged by launchactorTPR-CMP28-PURETPR-LAUNCH001-COMPILED001-20261028.
+Launchreceipt0d13d713483d3cc2f25cda0ca1c21b4a30fbbb0e7d7bac3220273e4b62cf9435,
+original24sourceinventory1e8337a0f1845f10ef74a4e316ea1303afae22bc7c7e36ca12856deea20e8a97.
+No secondPurecompile/financialjob/cancellation occurred. The viable job was
+allowed to end naturally; finalserveruptime2h00m38s, RAM2445/8192MB, CPU131.2%,
+reportedLEANv2.5.0.0.18209. Errorprogress1 is NOT1449-session coverage.
+
+Fresh actualterminalraw1185391B/
+d040c6ecb54c1b23894afe6da75c339d54189767c6a708c7e0dc6925b7571efe;
+statusreceiptcf3f2ee0c2ee35da0a2a70a1ec4aa3e07e1dee3601caf47027b8f7c8a9122f1c.
+Error1346B/f0aaf7e6b97d850b23054b648fd1b30b63d0a4362a881ef4009dbfef6c8920b0;
+stack1071B/f57e108f4afc063410e981702913d6d48eed9dbae44c6bd60c70b01cbba458c6.
+Fresh exactSAFElog1208B/f643a21dcc73e99bca0f98932a9843b24d68086deb499cd8e149a1f2def02f78
+confirmed outerclock2022-08-30 16:01 and reason
+minute_or_native_close_wrong_day_or_future, mode
+strict_minute_or_raw_daily_equal_close_v1. Pointer verified/readbacktrue,
+trade_bar, observed-before/observed_date_equals_sessionfalse/
+observed_equals_expectedfalse/expected_date_equals_algorithmtrue.
+Extracted pointerwire821B/d997267c937ac9307c587cc200eb4d1a6abfe3eba0f53ea02a67b35fcda943c7;
+referenced privatewitness1353B/56e73acaf0173fc36670011e40499becccd450d4d7c0d2e81417da1305e41f32
+at tpr-cmp28/evidence/TPR-SIX-UNIVERSE-FIVE-ARM-20261028-v1/TPR-CMP28-PURETPR-ATTEMPT001-20261028/1815710938c921963bbbb0d1e2266f98b9c3bcd1a4639d1a3e7d27a5dc180be0/attempt-1/37650980/ca9fec3941e1e60c63afd8547dfe97ea/mark-refusal.json.
+FreshprocessingSAFE1508B/52859aeae2ae30cbb571a6d7e81a825ed93767dcd1eddbe41fe43f0d8d95ff71.
+Its witnessbody was NOT read; no sameSID claim versus any other arm.
+The earlier localerror-metadataJSONdecode refusal/spent001scope is retained;
+corrected002used the exact filtered nativeSAFElog, with0newcompile/job and no
+provisionalP&Lprojection. This is a parser framing correction, not a retry of
+a financial strategy or erasure of an attempt/look.
+
+Concrete blocker CMP104-D030: latestOFFactualheldmark was previoussession,
+and independent exactSID native controlled paths returned no data on2021-02-10:
+failuredayTradeBarMinute0/Daily0; closingminuteTickTrade0/Quote0; positiveSPY
+controls; targetminute369/319/0/369/384 anddaily1/1/0/1/1 overFeb8..12.
+ExactnativeSecurity/RAW/nonFF/regularminuteTradeBar+QuoteBar subscriptions,
+nativehours/clock checks and bodyhash/SIDroundtrip were verified in003/006/007.
+This is bounded empirical input unavailability on those paths, not universal
+backendabsence, terminality or a deployedmappingaudit. There is no verified
+lane correction that supplies the heldSecurity required same-session genuine
+TradeBar/RAWdailyclose without altering the frozen valuation contract.
+History/Tick/consolidation cannot be relabeled an actual investedSecurity
+cache mark; no cachewrite, stale carry, exclusion or invented value is used.
+Other arm errors are sameguardfamily only, not independentlyproved dataabsence/
+sameSID. No unchangedfinancialrelaunch is justified by these terminal results.
+
+**Exact next role/action:** genuineQC source/routing recovery within this
+private lane, beginning with OFF's SIDhash1122fa5f1349f79e231e106127c098da27ef730836a97052d2154ecc46f1afc1
+for2021-02-10 and actualjob12dd4732ba5d9d8f57950beb2a371c79/witnesseef08aca....
+Show an actual wrong/inactive historicalsubscription/mapping route and correct
+that verified defect, or obtain a genuineQC historicaldata/backend correction
+with preserved lineage. Then create fresh source/HEAD/access/attempt/look
+claims and rerun the exact five frozenarms, verifying full orders/fills/fees/
+cash/exposure/NAV/clock/accounting. No purchase/upgrade/accountchange is
+justified or performed. Further Claude review is not required. Mia may be
+consulted through a genuine available controllable interface; a genericagent/
+APIlaunch or marker cannot establishMia/native authority. No user answer is
+needed to publish this factual blocked handoff; no parameter sweep or changed
+mark policy is silently substituted. The ONSharadarinput gap and canonical
+custody gates are not invented as causes of this OFFnativeinput blocker.
+
+Final ownprivateproject census31jobs:8Completed./23RuntimeError,0active/
+0unknownstatuses. All8specifiednewfinancialjobs independently selected from
+that census areRuntimeError; listmetadata does not itself supply completedbool.
+Safe841B/344d0e865597fc5f060f939b1c0994b28c22fe1ba6b987e48cf08eaebb1d1af3,
+APIreceiptbdc6c9203d690d95dd8078d53611136f310df593f6c1a876ef62af022ae02e2b.
+No otherproject/sibling/operator/provideraccount was inspected. Latest complete
+24cloudfiles inventory2e41ebcc971cfe976d971aa561b9785a1aeb053b4184612a021c1ebb4cbd7a13
+is unchanged; main.py is the final noneconomic tick007 diagnostic, NOT an
+unlabelled financial candidate. Other23files preserved; all financial/native
+source bundles, rawfailed results, witnesses, private receipts and protected
+inputs remain retained. Do not run the diagnostic main as a financial arm.
+ON37650453/unrelatedprojects were not changed.
+
+Full-window fees/slippage/cash/exposure/orderaccounting/1449clocks/301decisions/
+NAV/returns remainNULL/unaccepted for everyarm; NULL is not zero/no-trade
+performance. The earlier OFF4partial ownAPI134orders/268events (134Submitted
+with omittedzero-fill fees,134Filled withUSDfees) remains diagnosticpartial
+evidence, not a completed full-window ledger. No new partial P&L was viewed
+from Pure/other terminal bodies in this final scope. The committed result/
+accounting readers are software-ready under their stated bounds, but no new
+full-window acceptance reader/job was launched for a RuntimeError parent.
+
+Focused source/test/import/inmemory checks already retained: rootTick65pass,
+independent65pass+AST2/2 aftergetterguardcorrection; earlierrootpostgap42pass,
+accounting156pass, reader51pass/API87pass in their recorded exactsource phases.
+No complete lane/repositorysuite or additionalClaude checkpoint was run.
+Final doc/hash/diff/staged/root/branch/HEAD/ACTUALremote checks precede commit
+and onepush. Snapshotbeforefinaldocumentationcommit is2d3bbe2b98b1a0957f8e984916d19fbd534783d5;
+expectedactualTargetremotea0a45fc32f5bb66b93ec6dcd3e0ffd677dff3420.
+Unexpectedadvance/mismatch stops publication; no fetch/overwrite/force/reset/
+sideworktree/historyrewrite. The final published snapshot is the commit
+containing this entry; its exact hash, actualremoteequality and cleanstatus
+are reported in thischat after actualverification. Planned privatepostpush
+receipt:artifacts/target_price_qc_recovery_20261028/TPR-CMP28-FINAL-PUBLICATION-20261029-001.json.
+That path is not a claim that publication has already succeeded.
+
+Final prepublication validation atsourceHEAD2d3bbe2b98b1a0957f8e984916d19fbd534783d5:
+rootverified6explicitpublicsource/test SHA256pins and byteequality togitshowHEAD,
+AST/inmemorycompile6/6 withoutimports/execution; onlythelane recordmodified,
+nocachedforeignfiles; diff--checkpassed; ACTUALTargetremotea0a45fc32f5bb66b93ec6dcd3e0ffd677dff3420.
+offline103_final_audit independently reviewed ONLYthepublicrecord top/104.39–43/
+currentdiff at2539240B/45650ecbf530040b6a3580d241dceac47cbcf0ac32bcc9579f67a9d37746827e:
+ACCEPTEDwithinthatboundedpublicdocumentscope, noverifiedcontradiction/overclaim,
+no private/nativeinspection/tests/edits or independentnativeproof. Root adopts
+the disposition; no Claudecheckpoint/ownerapproval is introduced. The final
+commit/push guard and postpublication actualequality/cleanstatus check remain
+mandatory, and success is not preasserted by these notes.

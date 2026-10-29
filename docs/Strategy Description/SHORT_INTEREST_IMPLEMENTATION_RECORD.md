@@ -27230,3 +27230,137 @@ guards to obtain a pass. Document the true result before any source activation.
 Source dispatch and capture mode remain blocked; the DAILY scope question is
 still pending. No new provider request/claim/key read, look, QC/Safari,
 purchase or push occurred during this software correction.
+
+### 132.8 Actual v2 preparation; prelaunch refusal before any bootstrap
+
+The reviewed diagnostic checkpoint is local commit
+edbd13a047f1e8646d79c143c5e2398ce6b1b26a. Main post-record98 checks passed
+again/.85s before commit. At clean EDBD and matching tracking/actual F27,
+Main verified the v2 namespace and exact launchd job absent, then invoked
+prepare-proof ONCE as exec3833. Actual preparation exit0 returned spec SHA
+c85beb416c80e2a68174ffb6bdc3c33ff9b1faf4f74a9824c32628e7b236bb34,
+job_submitted=false. Preparation is not a successful operational proof.
+
+Main's independent prelaunch script authenticated the protected original
+spec/job and committed-code reconstruction, then refused (exit1) at the
+original terminal-channel full-stamp comparison BEFORE bootstrap. A separate
+read-only original nofollow FD observation authenticated that same spec SHA,
+regular0600/current-UID/single-link/zero-byte terminal file and stable current
+FD/named stamp. Its CURRENT comparison against the original spec differs in
+FIELD NAMES ONLY **[ctime_ns]**; original dev/ino/uid/gid/mode/nlink/size and
+empty bytes remain unchanged. This is a new current observation; the prior
+failed script did not persist its exact failed comparison values/fields.
+The three original files are exactly job.plist, launch.spec.json and
+supervisor.jsonl. No result, worker log or negative control was manufactured.
+
+The exact v2 kernel query reports service absent (query exit113). **Bootstrap
+was never performed; no supervisor or child was started.** There is no actual
+supervisor exit to invent. No source claim/START/HTTP/key read, budget debit,
+private row, old-image change, QC/Safari, purchase or push occurred. The failed
+v2 prepared namespace is retired without retry, adoption, reseal or overwrite.
+
+The ctime-changing actor remains UNKNOWN. This observation does not establish
+the old v1 post-result failure's cause or the original count-run13448 cause.
+It does establish that this newly created host-domain terminal inode did not
+retain its original full stamp through prelaunch. Do not weaken full-stamp
+checks, wait for a new baseline, widen windows or repeatedly create equivalent
+host namespaces to guess around it. The next offline design under assessment
+is a separately registered supervisor that CREATES its own fresh isolated
+native APFS metadata domain and retains original creator/native/file FDs
+through worker wait and terminal checks, following the previously proved
+lane body-custody storage pattern. All actual evidence controls would stay
+inside that domain with unchanged strict seals; host bootstrap spec/job are
+configuration only. No old image/claim/evidence would be copied or adopted.
+This design has not been implemented or invoked and grants no source access.
+
+### 132.9 Registered prospective native-domain supervisor checkpoint
+
+**SI-DEC-20261028-03** implements that separate offline domain correction under
+continuing SI-AUTH-20261028-02. Only two new files were added:
+scripts/short_interest_count_native_supervisor.py and its matching test file.
+Every old supervisor, volume, source, claim and evidence byte stays unchanged.
+This follows the authenticated host-channel ctime drift and the previously
+proved APFS custody pattern; it is not another equivalent host-file retry.
+Actual host v2 remains retired, and its ctime actor and v1 failure cause remain
+UNKNOWN.
+
+The new one-shot parent creates its OWN fresh isolated APFS domain in the
+launchd-owned process. Fixed bootstrap directory:
+artifacts/short_interest/count-process-supervisor-native-bootstrap-v1 (spec/job
+only); fresh domain: artifacts/short_interest/count-process-supervisor-native-domain-v1
+(backing.sparseimage/mount); exact label:
+com.openai.codex.short-interest-native-process-proof-v1. Bootstrap bytes are
+authenticated configuration, never transferred creator-volume capabilities.
+Only stateless native/parsing primitives from the frozen isolated helper and
+the unchanged c83 two-second worker/original five-second collector are reused.
+No old factory, image, mount, module namespace/policy mutation or adoption is
+permitted.
+
+The proven fixed8GiB VIRTUAL sparse-image format is a metadata-proof container,
+not a provider-data allocation or enlargement of4GiB. Whole initialization/
+closure is bounded300s; each fixed local native command120s. There is no
+detach, remount, shadow, overwrite, retry or cleanup. Pure platform checks
+precede namespace effects. Original nofollow ancestry/backing/mount/file FDs,
+APFS/local/nobrowse/owners/writable masks, device/fsid/block-node observations,
+globally unique ALL-own-device/mount association and strict full9-field inner
+seals remain enforced. Only .fseventsd metadata is observed, never its contents.
+Backing times/size remain mutable-container facts rather than evidence seals.
+
+A separate private inventory binds preceding original control names/bytes/
+SHA/full9 stamps, original native/backing/mount/device/system observations and
+the exact five-project-file code manifest. The provisional completed marker
+binds the inventory's original body/hash/seal. Inventory/marker are excluded
+from their own roster, avoiding self-reference. All code/Git/native-command
+callbacks finish before the final original metadata/member/clock audits and
+cleanup/named checks. Every producer record remains explicitly PROVISIONAL;
+own kernel-exit and launcher-independence attestation stay false. Main must
+independently observe actual kernel exit0 and original child wait0, verify
+the original inventory/controls and reject any negative/nonzero/unknown exit.
+Neither an OS PID nor JSON is a v1 Codex-exec-session receipt or source admission.
+
+Collection failure retains its exact original failure-frame buffers privately.
+Newly drained remaining-pipe blocks are strongly retained BEFORE cap/write
+checks; secondary preservation errors/frames stay reachable in the hold.
+Only complete authenticated persistence plus a later ORIGINAL-handle wait
+can close that failure negatively. Late0 never becomes success. Missing
+buffer provenance or failed persistence retains ALL original process/code/
+bootstrap/native/output anchors, with no kill, retry, restart or release.
+Late final-cleanup/named failures may have no writable negative after all
+anchors close; their actual nonzero exit still vetoes every provisional file.
+This diagnostic limitation is explicit, not a fabricated closure.
+
+Pre-release causal findings retained: role-incorrect dict-only create-plist
+adapter (valid exact singleton path list rejected); bootstrap named checks
+after rather than before native effects; global owned-parent-device alias;
+stale original backing/under-mount names reaching attach; newly consumed
+preservation buffers lost after persistence failure; failed collection with
+unavailable frame provenance treated as absent buffers; and unsupported
+platform namespace creation before preflight. Each was reproduced RED with
+temporary files/fake kernel/process seams and corrected before registration.
+No actual occurrence or old actor/cause is inferred from these fabricated cases.
+
+Frozen policy SHA256:
+9df40f358d3f48b66e605b2fe768646e90e2f2b47892a05788453e36e9a25484.
+Registered source SHA256:
+bd39069ce0f022a8cf4527c6dbb8ebb117c039f370104ffad6e382fe230f1345;
+test SHA2561fe7435ec7097a992255278f4f73645208ac5aec4a30e7289223da56f89b62b6.
+Main9 relevant focused files passed **295/2.91s**, no skips/warnings reported;
+all90 held/proof/test paths compiled in memory. Policy equality, five-file
+transitive project closure, old dependency byte equality, historical record
+prefix and whitespace checks passed. Author55 driver/import checks/1.49s and
+independent delegated peer46 driver tests/.72s are separately attributed.
+Peer accepted after the verified corrections; no Claude review is claimed.
+Tests used sanitized environment, OS network denial and no bytecode/cache.
+No full lane/repository suite ran; no actual native/process/job operation was
+performed while developing this checkpoint.
+
+After the resulting clean commit and fresh matching tracking/actual F27 check,
+Main may prepare the NEW bootstrap ONCE and submit its exact registered
+one-shot job ONCE. Freeze all authors/tests while active. Require actual
+terminal kernel evidence and independent original native metadata/control
+authentication; absence alone is not closure. Preserve a refused/partial
+namespace without retry or relaxed checks, and document any real result or
+causally verified correction before further work. Current source/capture gates
+remain blocked; DAILY/count aggregate-scope reconciliation is still pending.
+No new provider START/HTTP/key read, source claim, outcome/look, QC/Safari,
+purchase or push has occurred. This remains short of pre-QC readiness.

@@ -1,38 +1,29 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current owner direction, 2026-10-28 (section 104):** QC/Safari is now
-available by direct owner release for OFF recovery and all five requested
-full-window comparisons. The owner waives Claude review and delegates remaining
-technical questions to Codex's best judgment with documented decisions. One
-push follows completion of the requested tests; no intermediate push occurs.
-The former Analyst-push monitor stays deleted. Each actual private/native/
-compile/job effect still needs a fresh bounded source/HEAD scope. No completed
-backtest or accepted performance is asserted by this new direction.
-
-Section 102 remains the completed counter-review of both section-101 Claude
-commits, accepted after three P3 corrections. Its published corrections and
-all historical tests/failures are retained, not reviewed a second time here.
-The prospective attempt-cap supersession retains all attempts and looks.
-**Latest execution handoff, 2026-10-29 UTC (section104.43):** all five arms
-have actual terminal native runs. The eight deliberately launched financial
-jobs all ended Runtime Error; zero full-window financial results are accepted.
-The round is at a concrete native mark-input blocker, with no active job in
-private project37650980 at the final census. Next work is verified source/
-routing repair under fresh scope; no unchanged relaunch or Claude checkpoint.
-The sole final lane push is performed only after the recorded final checks;
-its exact commit/remote equality is reported in chat and a private receipt.
-This is execution/failure evidence, not a claim of completed financial backtests.
+**Section 105 (2026-10-28) is the Claude review of the thirty Codex commits since
+section 101:** the section-102 counter-review, the section-103 offline preparation
+and the section-104 owner-released five-arm execution round. The owner released
+QC/Safari to Codex, waived Codex's review stops and asked for one push after the
+five requested full-window comparisons; the owner separately asked Claude, in the
+Claude chat, to review every unreviewed commit after that push. All five arms were
+launched. The eight deliberately launched financial jobs all ended Runtime Error;
+zero full-window financial results are accepted. Every failure is the same held-mark
+guard: the frozen valuation contract refuses to value a held stock on a session with
+no native bar for it, and Codex's bounded probes confirm such a session exists for
+one held name on 2021-02-10. Section 105 finds the blocker real but mostly a policy
+choice (`TPR-CR32-001`, owner decision), pins section 104's outcome in the guard, and
+adds two test corrections. No completed backtest or accepted performance exists.
+The lane is **not backtesting-ready**.
 
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Historical section-102 status, retained verbatim as attributed facts:
-Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
-`12be4894..69ecaf91` IN SECTION 102. ACCEPTED AFTER THREE P3 CORRECTIONS;
-PORTABLE SYNTHETIC SOFTWARE CHECKS DO NOT PROVE MAC CUSTODY. NINE INHERITED
-WINDOWS WORKING-BYTE ANCHOR FAILURES ARE RETAINED, NOT CALLED GREEN.
-NO EXECUTED CLOUD
-CANDIDATE OR PRIVATE RECEIPT CHANGED; NO QC ACCESS. NOT BACKTESTING-READY,
+Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
+`69ecaf91..2cce8dfc` IN SECTION 105: THE SECTION-102 COUNTER-REVIEW, THE
+SECTION-103 OFFLINE PREPARATION AND THE SECTION-104 FIVE-ARM EXECUTION ROUND.
+CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION (TWO TEST CORRECTIONS AND THE
+SECTION-104 GUARD PINS; NO PRODUCTION SOURCE CHANGED). EIGHT FINANCIAL JOBS, EIGHT
+RUNTIME ERRORS, ZERO ACCEPTED FULL-WINDOW RESULTS. NOT BACKTESTING-READY,
 PERFORMANCE OR CANONICAL ACCEPTANCE.**
 The last completed counter-review is section 102.
 Section 94 reviewed the owner-skipped continuation of section 93.
@@ -62,7 +53,7 @@ locked. No new notebook/cell or native witness is claimed. Genuine original
 compiled source, missing source/unit
 provenance and full-window native orders/accounting cannot be inferred from
 saved source or a Completed. status. No protected dates, frozen economics,
-selection rules or attempts are reset. Codex proceeds with owner-released OFF recovery and the five-arm full-window comparison, without a Claude checkpoint.
+selection rules or attempts are reset. Codex next counter-reviews section 105 and this round's Claude commits; the five-arm rerun waits for the owner's held-mark policy decision in 105.7.
 Old standalone native-read programs and scope holders are retired from operational use;
 no expired scope is renewed. Percent units remain a hypothesis, not a verified diagnosis.
 The non-authorizing TPR-TR0-I implementation candidate is checkpointed but
@@ -423,35 +414,33 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-26:** Codex has counter-reviewed the exact range
-`12be489416af00e266c3a47286f2cabafbf74e27..69ecaf91bd123d24138b915bcb5a37798d676b96`:
-the two Claude commits carrying section 101's controller/test correction and
-its record/guard handoff. Both are accepted after the three P3 corrections
-in section 102; no executed input/cloud source or receipt changed. Portable
-synthetic checks are not native custody proof, and the nine inherited Windows
-working-byte anchor failures remain explicit. The last completed
-counter-review is section 102. Section 94
-reviewed the owner-skipped continuation of section 93. The owner's direction
-"skip 1, proceed to 2 and 3 directly" applied to that round ONLY. Section 101
-accepts the counter-review after one correction: the controller relabelled
-every unpublished stop receipt as post_read, and an ordinary error on the
-final directory close after a failed publication reported generic cleanup
-rather than receipt-unavailable; both are fixed with regressions. Section
-100's attribution correction of section 99 (the history design and its test
-belong to the second section-98 commit) and its evidence qualifications are
-verified against Git and accepted. The owner's later instruction, recorded by
-Codex, waives Codex's progress stops for Claude checkpoints until further
-notice and supersedes the three-attempt ceiling prospectively. Section 103
-records the later monitor-stop and offline-only directions: another lane is
-using QC/Safari, and no automatic Analyst trigger or new review checkpoint
-is inferred. Section 99's private census is attributed: the frozen packet's
-49,716 corporate-action rows span 2025-10-13 to 2026-10-09; the missing `from`
-is verified in public code/freeze and supports the default-window explanation.
-The ON identity-input question remains open; no private packet is replayed.
-Old native programs/holders and both raw operator archives are forensic-only
-predecessors, not replay authority. The Sharadar 5-year restriction is
-confirmed from the redacted receipts; a 10-year history with an explicit
-lower bound is the smallest option covering the frozen window.
+**Current qualification, 2026-10-28:** Claude has independently reviewed the exact range
+`69ecaf91bd123d24138b915bcb5a37798d676b96..2cce8dfcec2077e7a06987055654eca3e6dfbcad`:
+thirty Codex commits carrying section 102 (counter-review of section 101),
+section 103 (offline OFF-recovery preparation) and section 104 (the owner-released
+five-arm execution round). The last completed counter-review is section 102.
+Section 94 reviewed the owner-skipped continuation of section 93. The owner's
+direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY.
+Section 105 accepts all thirty commits, three after correction: a test stub that
+could not detect a misspelled Morningstar group name, an accounting replay whose
+sell side was never exercised, and section 104 itself, whose execution outcome
+had no guard pin. Every section-100 to section-104 claim checked against Git,
+file hashes, the public Lean source and the private safe receipts reproduces.
+The five-arm result is eight financial jobs and eight Runtime Errors at the
+held-mark guard; the bounded native probes show one held name with no native
+bar on 2021-02-10 while the control had data. Section 105 finds that blocker
+real but mostly a consequence of the strict same-session valuation contract
+chosen under delegation (`TPR-CR32-001`): the owner decides the mark policy in
+105.7 before any rerun. The owner's instructions recorded by Codex stand: QC/Safari
+is released to Codex, Codex's review stops are waived, Mia may be consulted, and
+Claude reviews when the owner asks. Section 99's private census is attributed:
+the frozen packet's 49,716 corporate-action rows span 2025-10-13 to 2026-10-09;
+the missing `from` is verified in public code/freeze and supports the
+default-window explanation. The ON identity-input question remains open; no
+private packet is replayed. Old native programs/holders and both raw operator
+archives are forensic-only predecessors, not replay authority. The Sharadar
+5-year restriction is confirmed from the redacted receipts; a 10-year history
+with an explicit lower bound is the smallest option covering the frozen window.
 33 observed looks now (31cloud+2historical local).
 OFF has consumed all three Codex attempts under the former ceiling; the owner
 supersedes that ceiling prospectively, retaining all failures and counts.
@@ -597,10 +586,9 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Section 102 completes the requested counter-review of both section-101 Claude commits;
-section 103 is the completed offline preparation and section104 is the later owner-released five-arm recovery round.
-Codex proceeds with owner-released OFF recovery and the five-arm full-window comparison, without a Claude checkpoint.
-The owner provided that fresh resource release; bounded per-effect claims remain required. The old section92
+Section 105 reviewed the section-102 counter-review, the section-103 offline preparation and the section-104 five-arm execution round.
+Codex next counter-reviews section 105 and this round's Claude commits; the five-arm rerun waits for the owner's held-mark policy decision in 105.7.
+QC/Safari stays released to Codex by the owner; bounded per-effect claims remain required; QuantConnect access stays forbidden for Claude. The old section92
 skip was one-round only; the section-100 instruction waives Codex's progress
 stops for Claude checkpoints until further notice, and Claude reviews when the
 owner asks. A historical Mac lock prevented
@@ -995,6 +983,7 @@ known.
 | 2026-10-25 | Claude review | `7a6fd7e22568bf4fa820a729d7058fca2d49c30b..6bdd0c1cfb0ee9a45845bdca48a53c6c95409469` reviewed; correction commit `d44925a7` and this record/guard commit on this same lane branch | Independent review of section 98 (owner-waived offline controller and program preparation, local Sharadar census, history design); no feature milestone | Dispositioned both Codex commits. Reproduced the census from the private repair projections: 21,007 TICKERS rows, 49,716 ACTIONS rows spanning 2025-10-13 to 2026-10-09, none before late 2021 and none in the warm-up, and the frozen query's missing lower bound. Fixed, not only documented: the controller's unenforced synthetic-only mode, its text-only lane boundary and three receipt-durability gaps; the census's text-only lane boundary and cleanup status; the history design's missing request bounds and weak boundary-year check. Nine mutants killed. No executed candidate, receipt, shared document or shared test changed; no provider or QC access. | Whole QC test package plus the development and offline test files on the final code tree, designated worktree, network-denied (figures in 99.5); no full lane suite and no complete suite, per the owner. Provider requests **0**; QC requests **0**; raw licensed rows read **0** by Claude beyond counts and dates recomputed locally from the private projections; looks **0** by Claude. | No P0. `TPR-CR30-001`, `TPR-CR30-002`, `TPR-CR30-003` (P2) closed by correction; `TPR-CR30-004` (P3) closed by correction; `TPR-CR30-005` (P2) documented (controller design limits for the future adapter); `TPR-CR30-006` (P3) documented; `TPR-OFF98-010` (P1, Codex) reproduced and open; `TPR-CR29-004` qualified. `TPR-CCR28-003`, `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added; QC access stays forbidden. | Make this round's one push. Codex counter-reviews section 99; the owner decides on the explicit-range Sharadar re-capture (99.7). |
 | 2026-10-25 | Claude review | `b07fafdc17590185809d7a5a7059302496997605..12be489416af00e266c3a47286f2cabafbf74e27` reviewed; correction commit `40e7901d` and this record/guard commit on this same lane branch | Independent review of section 100 (Codex counter-review of section 99 with controller, census and history-design corrections); no feature milestone | Dispositioned the one Codex commit: accepted after correction. Verified every section-100 claim against Git, file hashes, the section-99 digest, the frozen capture bounds and the Analyst ref. Fixed, not only documented: the controller relabelled every unpublished stop receipt as post_read, and an ordinary final-close error after a failed publication hid that no receipt exists. Three regressions red on the received module. No executed candidate, receipt, shared document or shared test changed; no provider or QC access. | Controller, program and runtime modules, the three changed QC modules, the whole QC test package excluding Codex's untracked in-progress test, the document guards, compileall and `git diff --check` on the final tree, designated worktree, network-denied (figures in 101.5); no full lane suite and no complete suite, per the owner. Provider requests **0**; QC requests **0**; private rows read **0**; looks **0** by Claude. | No P0. `TPR-CR31-001`, `TPR-CR31-002` (P3) closed by correction; `TPR-CR31-003`, `TPR-CR31-004` (P3) documented. `TPR-OFF98-010` (P1) open; `TPR-CR30-005`, `TPR-CCR28-003`, `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added; QC access stays forbidden until the owner's conditional release. | Make this round's one push. Codex counter-reviews section 101 when it next commits and continues its bounded QC recovery after the Analyst release; no Claude checkpoint blocks it. |
 | 2026-10-26 | Codex counter-review | Reviewed `12be489416af00e266c3a47286f2cabafbf74e27..69ecaf91bd123d24138b915bcb5a37798d676b96`; exact outgoing correction/handoff identities follow in section 102 | Counter-review only; no next milestone | Accepted both Claude commits after three P3 corrections: unpublished close-stop accounting, publisher cancellation/fatal priority and appended contradictory scope guards. Native custody, shipped closed policy, frozen source/inputs and shared documents remain unchanged. | Separate red/green, 703 independent direct model cases and exact final selected counts/limitations in section 102. Nine inherited Windows byte-anchor failures remain visible; no full-suite or Mac-native green claim. | CCR31-001/002/003 closed by scoped corrections. CR31-003 public figures confirmed; CR31-004 historical untracked work not absorbed. Runtime/input/canonical findings stay open. | None; zero QC/provider/private/operator access, attempts, jobs and looks. No monitor or sibling change. | No implementation milestone started. Later resource-release verification and fresh scope remain distinct from this counter-review; retained future-checkpoint waiver is not rescinded. |
+| 2026-10-28 | Claude review | `69ecaf91bd123d24138b915bcb5a37798d676b96..2cce8dfcec2077e7a06987055654eca3e6dfbcad` reviewed; test-correction commit `1ebb7208` and this record/guard commit on this same lane branch | Independent review of sections 102, 103 and 104 (counter-review, offline preparation, owner-released five-arm execution with eight financial jobs); no feature milestone | Dispositioned all thirty Codex commits: twenty-seven accepted, three accepted after correction. Verified the claimed file hashes, section digests, Git attribution, the Lean primary source for the Morningstar group names, and the private safe census and publication receipts. Fixed, not only documented: the open Morningstar stub (now closed to Lean's 56 names, with a misspelling mutant), the untested sell side of the accounting replay (buy-then-sell regression with gross-credit and debit negatives), and the unpinned section-104 outcome (guard pins with outcome-drift and grant mutants). Documented the held-mark policy blocker for the owner's decision. No production source, executed candidate, receipt, shared document or shared test changed; no provider or QC access by Claude. | Algorithm and accounting test modules, the four document-guard modules, the whole QC test package, compileall and `git diff --check` on the final tree, designated worktree, network-denied (figures in 105.5); no full lane suite and no complete suite, per the owner. Provider requests **0**; QC requests **0**; private rows read **0** (safe receipts only); looks **0** by Claude. | No P0. `TPR-CR32-001` (P1) documented for the owner's decision; `TPR-CR32-003`, `TPR-CR32-004` (P2) closed by correction; `TPR-CR32-002` (P3) closed by correction; `TPR-CR32-005` through `TPR-CR32-012` (P3) documented. `TPR-OFF98-010` (P1) open; `TPR-CR30-005`, `TPR-CCR28-003`, `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added; QuantConnect access stays forbidden for Claude. | Make this round's one push. Codex counter-reviews section 105; the owner decides the held-mark policy (105.7) before any five-arm rerun. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 | 2026-10-05 | Codex counter-review and TPR-D0 implementation | Reviewed `9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`; corrections/decisions `cf11788f39a2148d7bc3b801e88807bd2caca5ea`; D0 implementation `8dcfb71851ff22db6f0727395e18292c19f080ef`; this record-only handoff follows | Four-commit Claude counter-review, five bounded owner selections, strict D0 plan and one retained structural audit | Accepted the cumulative Claude range after three record/encoding corrections; selected explicit native/host test variants without changing production trust policy. Implemented the separate standard-library D0 package and immutable aggregate artifacts; retained-source inventory/hashes and all canonical freezes match. Sections 46/47 contain exact dispositions, scope, evidence and remaining limitations. | Cumulative focused suite 491 passed, 5 symlink-permission skips; final routing/artifact guards 107 passed. Standard suite blocked by 110 Analyst `fcntl` collection errors, with zero tests executed. Optional continuation diagnostics capped and incomplete, not reported as totals. Compileall exit 0; diff hygiene clean; Python 3.13.14 / pytest 9.1.1. | CCR16-001/002/003 closed; no new in-lane P0/P1/P2. Six canonical findings remain open and parked. TPR-OOL-017 opened for Windows Analyst collection, documented only. | Exact local retained-structure scope only, expiring 2026-10-12; 587,046 retained rows audited. Provider/outcome/QC/development-look/trading counts zero. No vendor-rights attestation or canonical admission. | One matching-branch non-force push of this Codex round, then independent Claude review of every commit after `c0bfb213` through the exact pushed tip. No automatic D1; later action/source scope must be selected after review and counter-review. |
 
@@ -28888,3 +28877,197 @@ no private/nativeinspection/tests/edits or independentnativeproof. Root adopts
 the disposition; no Claudecheckpoint/ownerapproval is introduced. The final
 commit/push guard and postpublication actualequality/cleanstatus check remain
 mandatory, and success is not preasserted by these notes.
+
+## 105. Claude review of the five-arm execution round - 2026-10-28
+
+**Disposition: accepted after correction.** The owner asked me, in the Claude
+chat, to watch for Codex's next push and then review every unreviewed commit.
+Thirty Codex commits landed in one push: the section-102 counter-review of my
+section 101, the section-103 offline preparation, and section 104, in which the
+owner released QC/Safari to Codex and asked for all five full-window comparison
+arms. Codex launched every arm. All eight financial jobs ended in Runtime Error
+at the same held-mark guard, and Codex's bounded probes show the cause for the
+first failure: one held stock has no native minute, daily or tick row on
+2021-02-10 while the control instrument has data on every session around it.
+I verified Codex's record against Git, the file hashes, the public Lean source
+and the private safe receipts; everything reproduces. I accept all thirty
+commits, three after correction, and I classify the blocker as real but mostly
+a consequence of the valuation contract Codex chose under delegation. That is
+the owner's decision to make, and section 105.7 sets out the options. No
+production source changed in this round; QuantConnect was not touched by Claude.
+
+### 105.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Branch and worktree | `codex/strategy-target-price-revisions`; the lane worktree resolved from `git worktree list`; clean, local equal to remote at the start of the review |
+| Reviewed range | `69ecaf91bd123d24138b915bcb5a37798d676b96..2cce8dfcec2077e7a06987055654eca3e6dfbcad` (thirty commits, no merges, in `git rev-list --reverse` order below) |
+| Commit 1 | `6605d4410cbb40f41303942b98b3231c9bfde410` - Counter-review CR31 and preserve stop accounting and scope guards |
+| Commit 2 | `990e53672533cf27e466235bfe4184cec0bd32bb` - Record section 102 exact counter-review evidence and handoff |
+| Commit 3 | `ee5c0b4b95466c8ef1154e97f5320ffcedd6483e` - Prepare offline Target-Price OFF recovery before QC setup |
+| Commit 4 | `a0a45fc32f5bb66b93ec6dcd3e0ffd677dff3420` - Record clean-tree offline OFF preparation evidence |
+| Commit 5 | `5845c4591441b3f17aedaf0dc815ae7a4a86139c` - Add five-arm policy and source-bound native recovery diagnostic |
+| Commit 6 | `60cca1ef216f03fa5dcf84db449298f8af53b8e2` - Build OFF native driver and bounded recovery input tools |
+| Commit 7 | `7a47aa469b6b669cf0d64b9d2b80c9f0f72c0365` - Bind OFF source bundle and retained event bridge |
+| Commit 8 | `e322931228ccfb0b557ba6d789146d8f51f825e6` - Add bounded native comparison API operations |
+| Commit 9 | `4a34f582904d6bfea0825db69077f3a30569d699` - Use readable plain JSON for native comparison evidence |
+| Commit 10 | `3e8a13a06133b14b6591c696a80fd8ee8e6dce02` - Prepare plain signal custody and four TPR comparison arms |
+| Commit 11 | `f89456b54ac104c6503d5dcbf820b7db768c66e7` - Correct native close lookup and exact missing-key response |
+| Commit 12 | `cc1d6a9e2028607deda4c4b12f827daeaba1c51b` - Bound and diagnose private plain-packet transfer recovery |
+| Commit 13 | `78d08b0eefe9a1cf31ced44196b7fb436ba80fc8` - Retain private native mark-refusal witness without relaxing close guard |
+| Commit 14 | `d9e2e995fd585d3c870ceaabb350109c12ae8b3e` - Validate retained mark diagnostics without object export or native effects |
+| Commit 15 | `a3d60ed60ef5a138f9f5f1620bc6613c8b47c676` - Corroborate native session closes with immutable access claims and equal prices |
+| Commit 16 | `1832f57c1a09ad581bf75d30619ac252638e3008` - Bind the exact public signal helper in comparison API source manifests |
+| Commit 17 | `b5e5be34151acf3973a63f0cc3dfe3d9093ac689` - Diagnose exact native mark availability in a bounded private one-day probe |
+| Commit 18 | `a5d4d02c78cd58c193adf200734ebeac2f800a9f` - Add controlled native mark diagnostic before OFF recovery |
+| Commit 19 | `51270cbdabff727e76aecfaaa710ed661f7687cb` - Verify equity quote companion in bounded native mark probe |
+| Commit 20 | `0300ef6e0703bcadd505165832b8f8ce5504058a` - Bind signal packet access to actual native backtest runtime |
+| Commit 21 | `90d02e29e7d0c38ccc007905d87918e7d94dd268` - Prepare bounded native availability probe around failed session |
+| Commit 22 | `4b0e0d396888be48d5b4042fcd98be58dc624901` - Read only the frozen own-account NAV chart for native audit |
+| Commit 23 | `ec4e31f25cb542231a7272dc90df4a010b3b717e` - Validate bounded new-study completion evidence and reported NAV axis |
+| Commit 24 | `062696952256a36c0a9600856337e799eb6e5fab` - Prepare source-bound private QC result reader with drift denial |
+| Commit 25 | `374cea343bdea44d0d746608cbefd27a4344ef3e` - Record native run progress and exact pure source recovery |
+| Commit 26 | `5a7dd2a6c6203cef59096d02970cb27e3abe86b1` - Bound native order result pages below one hundred |
+| Commit 27 | `5413b06f77a526135045342c19d65604aa58d16a` - Add bounded private accounting reconciliation for comparison runs |
+| Commit 28 | `2f18f93ae7549494910bd3d7e896fee144635b63` - Use fixed native diagnostic request endpoint without loosening scope |
+| Commit 29 | `2d3bbe2b98b1a0957f8e984916d19fbd534783d5` - Add bounded native tick availability diagnostic |
+| Commit 30 | `2cce8dfcec2077e7a06987055654eca3e6dfbcad` - Record five-arm native failures and concrete input blocker |
+| Files changed | 58; +22,783 / -51: this record, 23 new comparison and recovery modules and the policy JSON, three section-103 modules, the controller, 28 new test modules and the lane guard |
+| Claude commits this round | `1ebb720852820056ec6f30af8afd4fdbdc9eae8f` (test corrections), this record/guard commit |
+| Scope checks | Lane-only paths; `git diff --check` clean; no credential, token or URL beyond public QuantConnect and Lean documentation in the diff; the only tickers are the six public ETF sleeve names; no licensed row; no provider or QC access by this review |
+
+### 105.2 Commit-by-commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `6605d4410cbb40f41303942b98b3231c9bfde410` | **Accepted** | Counter-review of section 101: the publisher now keeps cancellation over the first fatal over an ordinary cleanup error, the final-close handler relabels an unpublished candidate, and a portable stop-accounting test model was added. Verified: the three file hashes and the unchanged section 99/100/101 digests. One untested branch remains (`TPR-CR32-007`). |
+| `990e53672533cf27e466235bfe4184cec0bd32bb` | **Accepted** | Record-only handoff for section 102 with foundation and blob hashes; verified against Git. |
+| `ee5c0b4b95466c8ef1154e97f5320ffcedd6483e` | **Accepted** | Offline OFF-recovery preparation: attempt-continuation drafts, a descriptor-chain CLI and a pure preparation manifest with their tests. The CLI embeds the owner's chat text where only its hash is used (`TPR-CR32-006`); the continuation ledger has no honest terminal for a cancelled job (`TPR-CR32-008`). |
+| `a0a45fc32f5bb66b93ec6dcd3e0ffd677dff3420` | **Accepted** | Record-only clean-tree CLI smoke evidence; the CLI cannot be rerun here (it needs a clean tree and the pinned root), so the observation stays attributed. |
+| `5845c4591441b3f17aedaf0dc815ae7a4a86139c` | **Accepted** | Five-arm policy JSON and comparison constructors, plus the native recovery cell builder. The allocation arithmetic was re-derived: no negative weights, donors bounded by remaining weight, receivers bounded by the aggregate name cap, no renormalization, deterministic ties. |
+| `60cca1ef216f03fa5dcf84db449298f8af53b8e2` | **Accepted after correction** | OFF driver, source capture successor, Massive index inventory and cell installer. The driver's 56-name Morningstar group list is correct against Lean's primary source, but the test stub accepted any name; corrected in tests (`TPR-CR32-002`). The capture successor inherits the predecessor's swallowed KeyboardInterrupt (`TPR-CR32-005`). |
+| `7a47aa469b6b669cf0d64b9d2b80c9f0f72c0365` | **Accepted** | OFF bundle pins and the retained-page event bridge; pins verified equal to the worktree bytes. One dead calendar pin (`TPR-CR32-009`). |
+| `e322931228ccfb0b557ba6d789146d8f51f825e6` | **Accepted** | Bounded QuantConnect API operations with exclusive claims before credentials; credentials never enter receipts or exceptions. |
+| `4a34f582904d6bfea0825db69077f3a30569d699` | **Accepted** | Readable plain-JSON journals after QC refused the gzip import; the deletion is one enumerated AST edit. |
+| `3e8a13a06133b14b6591c696a80fd8ee8e6dce02` | **Accepted** | Plain signal provider, four-arm driver, multi bundle and the plain-packet uploader; uploader bounds and the organization binding verified by reading. |
+| `f89456b54ac104c6503d5dcbf820b7db768c66e7` | **Accepted** | Supported market-hours call and the exact missing-key response form; the earlier unsupported call was the first runtime failure. |
+| `cc1d6a9e2028607deda4c4b12f827daeaba1c51b` | **Accepted** | Longer bounded transfer window with telemetry and a new compatible key; no retry loop. |
+| `78d08b0eefe9a1cf31ced44196b7fb436ba80fc8` | **Accepted** | Private mark-refusal witness retained before the strict guard; the guard itself unchanged. |
+| `d9e2e995fd585d3c870ceaabb350109c12ae8b3e` | **Accepted** | Pure witness validator and projector; exports only hashed identity and relative clocks (`TPR-CR32-010` on the unsalted hash). |
+| `a3d60ed60ef5a138f9f5f1620bc6613c8b47c676` | **Accepted** | D009 daily-close corroboration and D010 safe error pointer; this is the valuation contract behind every later failure (`TPR-CR32-001`). |
+| `1832f57c1a09ad581bf75d30619ac252638e3008` | **Accepted** | Exact optional public template path in the API allowlist; no broader path access. |
+| `b5e5be34151acf3973a63f0cc3dfe3d9093ac689` | **Accepted** | One-day native mark probe; custody checks before every effect; probe refusals never become zero rows. |
+| `a5d4d02c78cd58c193adf200734ebeac2f800a9f` | **Accepted** | Controlled probe with SPY positives and exact-SID registration. |
+| `51270cbdabff727e76aecfaaa710ed661f7687cb` | **Accepted** | Quote-bar companion accepted alongside exactly one trade-bar configuration. |
+| `0300ef6e0703bcadd505165832b8f8ce5504058a` | **Accepted** | Packet read moved to first use under actual job custody; renderer pins rotated. |
+| `90d02e29e7d0c38ccc007905d87918e7d94dd268` | **Accepted** | Five-session availability probe, source-only. |
+| `4b0e0d396888be48d5b4042fcd98be58dc624901` | **Accepted** | One read endpoint for the frozen account NAV chart; count is a bound, not completeness proof. |
+| `ec4e31f25cb542231a7272dc90df4a010b3b717e` | **Accepted** | Pure completion framing and chunk replay; three semantic mutants killed by Codex's tests. |
+| `062696952256a36c0a9600856337e799eb6e5fab` | **Accepted** | Optional private result reader with pre- and post-getter configuration binding, accepted by Codex after its own cross-audit correction. |
+| `374cea343bdea44d0d746608cbefd27a4344ef3e` | **Accepted** | Record-only run progress and the exact PURE source restoration after an unattributed cloud change. |
+| `5a7dd2a6c6203cef59096d02970cb27e3abe86b1` | **Accepted** | Orders page bound narrowed to the documented strict limit; boundary tests present. |
+| `5413b06f77a526135045342c19d65604aa58d16a` | **Accepted after correction** | Accounting reconciliation and reader: exact rational replay, dividend-before-split, fractional-split cash unknown, microsecond ISO parser. Its tests never exercised a sell; corrected in tests (`TPR-CR32-003`). The accounting-helper file-count extension disagrees with the capture ceiling (`TPR-CR32-009`). |
+| `2f18f93ae7549494910bd3d7e896fee144635b63` | **Accepted** | Fixed request endpoint for the post-gap probe; the type predicates are unchanged. |
+| `2d3bbe2b98b1a0957f8e984916d19fbd534783d5` | **Accepted** | Tick discriminator with pre- and post-getter configuration checks; the window excludes the 16:00:00 closing print and one bound can never fire (`TPR-CR32-010`). |
+| `2cce8dfcec2077e7a06987055654eca3e6dfbcad` | **Accepted after correction** | Section 104's final handoff: eight financial jobs, eight Runtime Errors, the blocker and the final census. Its facts reproduce from the private safe receipts, but nothing pinned them; corrected in the guard (`TPR-CR32-004`). |
+
+**Cumulative disposition: accepted after correction.**
+
+### 105.3 P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CR32-001` | P1 | **Documented** | `a3d60ed6` | `comparison_20261028_policy.json` valuation contract; `comparison_20261028_algorithm.py` `_daily_audit` | The frozen valuation contract (decision D009, chosen by Codex under delegation) requires, for every held stock on every valuation session, a real same-session one-minute trade bar ending at the native close, or a same-session earlier real minute bar corroborated by an equal RAW daily close; anything else raises a refusal that terminates the backtest. Halts, suspensions and data holes are ordinary events in a 60-name small-cap universe over six years, so the contract makes a full-window run improbable regardless of strategy quality. The three distinct failure sessions across the arms are consistent with that. | Section 104.15 to 104.43; `_daily_audit` lines 826 to 861; the probes in 104.23, 104.26, 104.38 and 104.40 (zero target rows on 2021-02-10 with positive controls, data resuming on later sessions). | This is why the owner has no result after eight launches. The data gap is real; the decision to abort rather than account for it is a policy choice that only the owner can change. | None in this round; 105.7 puts the choice to the owner. | Not applicable. |
+| `TPR-CR32-002` | P3 | **Closed by correction** | `60cca1ef` | `tests/target_price_revisions_qc/test_qc_comparison_20261028_algorithm.py` Morningstar stub | The stub returned a value for any attribute name, so a misspelled or split group name in the driver's 56-name literal could not be detected, although one unknown name makes every classification None and refuses every decision day. The literal itself is correct: Lean's primary source defines both `Furnishings` and `FixturesAndAppliances`. | Lean `Common/Data/Fundamental/AssetClassificationHelper.cs` (master, fetched 2026-10-28) lists 56 members matching the driver's list; the cloud jobs traded, consistent with that. | A one-token error would silently turn every arm into a cash-only run. | The stub is closed to Lean's 56 names; a new test asserts the literal equals that set and that an in-memory driver mutant with the plausible misspelling classifies every row as None. | Red under the previous open stub; 168 passed in the module. |
+| `TPR-CR32-003` | P2 | **Closed by correction** | `5413b06f` | `tests/target_price_revisions_qc/test_qc_comparison_20261028_accounting.py` | No test built a fill with negative quantity, so the sell side of the cash replay, the long-only guard and the absolute-share census were never exercised. | Test reading; a sell-sign mutant of the replay (`abs(quantity)`) passed the received suite. | A sign error on sells would pass unnoticed into the full-window reconciliation. | A buy-then-sell package: the sale credits cash net of its fee, leaves six shares, counts fourteen absolute shares and reconciles; a gross credit or a debit of the sale is refused. | Red under the sell-sign mutant, green on the committed module; 157 passed in the module. |
+| `TPR-CR32-004` | P2 | **Closed by correction** | `2cce8dfc` | `tests/target_price_revisions/test_document_consistency.py` | Section 104, the lane's largest execution record, had no guard pin: only its next-role sentence was checked. Its five-arm outcome table, the D026 ledger totals and the "none achieved" statements could drift silently. | Guard reading. | The record is the lane's status; an unpinned execution outcome is exactly what the guards exist to prevent. | New pins for the five-arm table (job, terminal status, clock), the ledger totals, the no-relaunch statement and the preamble sentence, with outcome-drift and appended-grant mutants. | Mutants refused; 645 guard tests passed. |
+| `TPR-CR32-005` | P3 | **Documented** | `60cca1ef` | `comparison_20261028_capture.py` lines 458 and 530 | `except (Exception, KeyboardInterrupt)` turns an operator interrupt into a FAILED_OR_UNCERTAIN receipt and an ordinary non-zero exit instead of a cancellation; inherited verbatim from `extended_mia_capture_notebook_successor.py` and locked by the AST-equivalence test. | Code reading. | Observability only: the scope is spent either way and no effect repeats. Fixing it means changing the predecessor chain too. | None here; Codex's call when it next touches the capture chain. | Not applicable. |
+| `TPR-CR32-006` | P3 | **Documented** | `ee5c0b4b` | `extended_off_recovery_cli.py` `OWNER_INSTRUCTION` | The owner's chat lines are embedded verbatim although only their SHA-256 reaches the manifest, and the test pins the phrases. No secret or licensed content. | Code reading. | Hygiene: process directives in a public module, and every new owner message would force a source edit and hash rotation. | None here; the hash constant alone would do, but the module is superseded tooling with pinned identities. | Not applicable. |
+| `TPR-CR32-007` | P3 | **Documented** | `6605d441` | `extended_refusal_witness_controller_successor.py` final close handler | When the receipt was published and the final directory close raises an ordinary error, the controller raises a bare refusal that carries no receipt, so the caller cannot tell a published completed run from a refusal; the branch has no test. | Code reading; the portable model covers published-plus-stop and unpublished-plus-error only. | Low: the on-disk receipt is already fsynced. Editing the controller rotates the preparation module's pin and the frozen closure hashes. | None here. | Not applicable. |
+| `TPR-CR32-008` | P3 | **Documented** | `ee5c0b4b` | `extended_off_attempt_continuation.py` terminals | A cancelled attempt that already returned a job can only be closed as unresolved, which blocks every later continuation, or mislabelled as a runtime error. | Code reading. | Ledger honesty for a plausible operator action. | None here. | Not applicable. |
+| `TPR-CR32-009` | P3 | **Documented** | `5413b06f` | `comparison_20261028_api.py` 25-file census; `comparison_20261028_capture.py` MAX_FILES 24; `comparison_20261028_native_result_reader.py` 23 preserved; `comparison_20261028_events.py` unused calendar pin | The three file-count ceilings disagree, so a capture after the accounting helper is created fails closed; the API's completion flag means finished, not succeeded, and readers must branch on the status string; one calendar pin is defined and never enforced. | Code reading. | Surprises, not safety. | None here. | Not applicable. |
+| `TPR-CR32-010` | P3 | **Documented** | `2d3bbe2b` | mark probes and tick probe | The safe projections hash the SID without a salt, so the hash identifies the stock to anyone with Lean's SID table; a custody drift during a failing native call is attributed to the native failure; the tick window ends at 16:00:00 inclusive and so excludes the closing-auction print; the 100,000-row total bound can never fire. | Code reading and a scratch reproduction of the attribution case. | Interpretation and privacy notes for anyone reading the safe witnesses; no leak and no wrong conclusion in section 104. | None here. | Not applicable. |
+| `TPR-CR32-011` | P3 | **Documented** | `3e8a13a0` | `comparison_20261028_object_upload.py`; absolute lane paths in several modules; tilt bindings carrying the OFF project id | A 280,105,389-byte plain JSON packet derived from the licensed Massive capture now sits in the owner's private QuantConnect Object Store; the record notes rights and point-in-time status as unproved. Several modules hardcode the owner's home-directory path; tilt and pure bindings reuse the OFF project id by design. | Sections 104.11 to 104.17; code reading. | The data-licence question is the owner's, outside the lane; the paths are a shared-project concern. | None here. | Not applicable. |
+| `TPR-CR32-012` | P3 | **Documented** | `2cce8dfc` | section 104 hash tables | The final hashes of ten test and guard files are not named anywhere in the record, although every research module's final hash is. | Hash census of the 58 changed paths against the record text. | Qualification of the record's completeness, not a defect. | None. | Not applicable. |
+
+### 105.4 Independent reproduction and verification evidence
+
+- **Git and hashes.** The thirty commits are linear; the 58 changed paths and
+  +22,783 / -51 reproduce. Every research module's final SHA-256 appears in
+  the record. The section-102 blob hashes, the unchanged section 99, 100 and
+  101 digests, the section-103 eight-file table and the section-104 per-file
+  tables all match `git show` or the worktree bytes.
+- **Private safe receipts** (names, counts and statuses only; no raw body,
+  price or identifier read): the recovery root holds 705 files; the final
+  census names the eight financial jobs, all Runtime Error, 31 jobs in the
+  project (8 Completed diagnostics, 23 Runtime Error), none active; the final
+  publication receipt records the push of `2cce8dfc`, exit 0, remote equal,
+  clean status. The five-arm table in 104.43 matches that census.
+- **Lean primary source.** `MorningstarIndustryGroupCode` defines all 56
+  names in the driver's literal, including the two aliases for group 10220.
+- **Policy and allocation.** The policy JSON bytes equal the constructor's
+  output; the tilt allocation keeps every weight non-negative, bounds donors by
+  their remaining weight and receivers by the aggregate name cap, never
+  renormalizes, and breaks ties deterministically; the pure arm ranks measured
+  zeros and excludes missing scores. Window and warm-up match the frozen study.
+- **Mark guard.** `_daily_audit` refuses any held name whose last bar is not a
+  real same-session minute bar, or whose session close is on another date, and
+  the refusal terminates the run; D009 corroboration needs an earlier real
+  minute bar from the same session. The three failure sessions and the probe
+  results are consistent with one missing session per failing name.
+- **Review agents.** Four read-only review passes covered every new module and
+  test (policy and algorithms; API, capture, upload and signal provider; mark
+  probes and recovery cells; accounting and offline preparation). They ran the
+  group test files (611, 303, 408 and 602 passed) and found no P0 or P1; their
+  findings are the ledger entries above after my verification.
+- **Regressions** (designated worktree, network-denied):
+
+| Case | Received tree | After the correction |
+|---|---|---|
+| Morningstar stub closed; driver literal equals Lean's 56 names; split-name mutant classifies every row None | red (open stub resolves any name) | green |
+| Buy-then-sell replay: net-of-fee credit, six held, fourteen absolute shares; gross credit and debit refused | passes on the received module; red under a sell-sign mutant of the replay | green; mutant red |
+| Section 104 five-arm table, ledger totals, no-relaunch statement and preamble sentence pinned; outcome-drift and appended-grant mutants | no pin existed | green; mutants refused |
+
+### 105.5 Validation on the final tree
+
+All runs in the designated lane worktree, network-denied
+(`sandbox-exec` deny network), isolated plugin loading, no conftest, no
+cache; no full lane suite and no complete repository suite, per the owner.
+
+| Scope | Result |
+|---|---|
+| Algorithm and accounting test modules with this round's two regressions | 325 passed (168 and 157) |
+| Four review-agent group runs of every new test module (policy and algorithms; API and transport; probes and recovery; accounting and offline preparation) | 611, 303, 408 and 602 passed |
+| Document guards: lane record consistency (rotated, with the section-104 pins), shared active-document consistency, offline coverage handoff, offline-103 handoff | 645 passed |
+| Whole `tests/target_price_revisions_qc` package on the final tree | 7,160 passed, 67 skipped (the audit-key cases that need the cloud-only plugin) |
+| Received-tree baseline of the same package at the pushed head | 7,158 passed, 67 skipped |
+| `compileall` on the changed Python files; `git diff --check` on both commits | clean |
+
+Provider requests 0; QuantConnect requests 0; private rows read 0 (safe
+receipts only, by name, count and status); looks 0.
+
+### 105.6 Milestone and authority decision
+
+No milestone is advanced. The five-arm comparison produced no accepted result:
+eight financial jobs, eight Runtime Errors, every full-window metric NULL. This review grants nothing: canonical admission is not authorized, no real-row canonical D1 is authorized, and no QuantConnect launch, Mia launch, ON launch, broker, paper, live, capital or trading authority is granted by it. QuantConnect access stays forbidden for Claude; Codex's access is the owner's release and is not changed here. The superseded attempt ceiling and the retained attempt and look counts are unchanged. Codex next counter-reviews section 105 and this round's Claude commits; the five-arm rerun waits for the owner's held-mark policy decision in 105.7.
+
+### 105.7 Recommendation to the owner
+
+One decision is needed before any rerun, and it is yours: how a held stock is
+valued on a session with no native bar. Every one of the eight launches died on
+that rule. Three options, in my order of preference:
+
+1. **Carry the last real mark and flag the session.** Standard backtest
+   practice and what Lean itself does; the accounting journal records the
+   stale-mark sessions per name so the result is auditable, and a run with too
+   many flagged sessions can be rejected afterwards rather than aborted.
+2. **Exclude the name for that session and hold cash**, with the same flag.
+   Cleaner valuation, but it changes positions on data events rather than on
+   signals.
+3. **Keep the strict contract.** Then expect no full-window result from this
+   universe; the probes show the gap is in the data, not in the lane's code.
+
+Whichever you choose, Codex should implement it as an explicit policy change
+with a new policy hash and fresh reservations, not as a quiet relaxation. The
+unrelated open items are unchanged: the ON-arm Sharadar history gap
+(`TPR-OFF98-010`) and the derived-packet licence question (`TPR-CR32-011`).

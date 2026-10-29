@@ -1224,7 +1224,7 @@ def _assert_section93_current_facts(text: str) -> None:
     """Positive, bounded current facts; never scan old sections for stale dates."""
     normalized = " ".join(text.split()).lower()
     _assert_retained_release_scope(text)
-    for required in (*SECTION93_CURRENT_FACTS, SECTION104_NEXT_ROLE,
+    for required in (*SECTION93_CURRENT_FACTS, SECTION105_NEXT_ROLE,
                      "last completed counter-review", "skip 1, proceed to 2 and 3 directly"):
         assert required.lower() in normalized, required
     assert SECTION92_NEXT_ROLE.lower() not in normalized, "section92-only routing is superseded for this round"
@@ -1238,6 +1238,7 @@ def _assert_section93_current_facts(text: str) -> None:
     assert SECTION101_NEXT_ROLE.lower() not in normalized, "section101 review is counter-reviewed, not pending"
     assert SECTION102_NEXT_ROLE.lower() not in normalized, "section102 is historical counter-review, not the current offline build"
     assert SECTION103_NEXT_ROLE.lower() not in normalized, "section103 resource wait is superseded by the direct owner release"
+    assert SECTION104_NEXT_ROLE.lower() not in normalized, "section104 execution round is reviewed, not current"
 
 
 @pytest.mark.parametrize("missing", ["opening", "closing"])
@@ -1290,11 +1291,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION102_RANGE]
+    ) == [SECTION105_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Codex has counter-reviewed the exact range"
+        "Claude has independently reviewed the exact range"
         in normalized_current
     )
     assert (
@@ -1308,7 +1309,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert SECTION104_NEXT_ROLE in normalized_current
+    assert SECTION105_NEXT_ROLE in normalized_current
+    assert SECTION104_NEXT_ROLE not in normalized_current
     assert SECTION103_NEXT_ROLE not in normalized_current
     assert SECTION102_NEXT_ROLE not in normalized_current
     assert SECTION101_NEXT_ROLE not in normalized_current
@@ -1401,7 +1403,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION102_SHORT_RANGE]
+        ) == [SECTION105_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
         _assert_section93_current_facts(summary_pointer)
         assert SECTION91_NEXT_ROLE.lower() not in normalized_summary_lower
@@ -4645,6 +4647,7 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "counterreviewed100": "Codex continues bounded QC recovery after the Analyst Revisions release; further Claude checkpoints are waived",
     "reviewed101": "Codex next counter-reviews section 101 and this round's Claude commits; bounded QC recovery after the Analyst Revisions release continues without a mandatory Claude checkpoint",
     "counterreviewed102": "The next bounded action is resource-release verification before any separately scoped QC recovery; this requested round implements no next milestone",
+    "released104": "Codex proceeds with owner-released OFF recovery and the five-arm full-window comparison, without a Claude checkpoint",
 }
 
 
@@ -4665,16 +4668,17 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "current_counterreviewed100_role", "preamble_counterreviewed100_role",
     "current_reviewed101_role", "preamble_reviewed101_role",
     "current_counterreviewed102_role", "preamble_counterreviewed102_role",
+    "current_released104_role", "preamble_released104_role",
 ))
-def test_section_104_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+def test_section_105_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
     """Retain old routing mutants; reject routing only to the skipped checkpoint."""
     test_exact_next_step_names_the_current_artifacts()
-    current_next = SECTION104_NEXT_ROLE
+    current_next = SECTION105_NEXT_ROLE
     stale_next = SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], "")
     if fault.startswith("current_"):
         original_section = _record_section
         section = original_section("## 8. Exact next step")
-        old, new = (SECTION102_RANGE, SECTION101_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION105_RANGE, SECTION102_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, section) is not None
@@ -4683,7 +4687,7 @@ def test_section_104_current_routing_refuses_stale_range_or_role(monkeypatch, fa
             lambda heading: mutated if heading.startswith("## 8.") else original_section(heading))
     else:
         preamble = _record_preamble()
-        old, new = (SECTION102_SHORT_RANGE, SECTION101_SHORT_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION105_SHORT_RANGE, SECTION102_SHORT_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, preamble, flags=re.I) is not None
@@ -5687,6 +5691,75 @@ SECTION102_COMMITS = ("40e7901d60d96fccc1addaf9088e2caed5f71d74", SECTION102_HEA
 SECTION102_NEXT_ROLE = "The next bounded action is resource-release verification before any separately scoped QC recovery; this requested round implements no next milestone"
 SECTION103_NEXT_ROLE = "Codex stops before QC setup; resume only after a fresh owner resource release, with no mandatory Claude checkpoint"
 SECTION104_NEXT_ROLE = "Codex proceeds with owner-released OFF recovery and the five-arm full-window comparison, without a Claude checkpoint"
+SECTION105_BASE = "69ecaf91bd123d24138b915bcb5a37798d676b96"
+SECTION105_HEAD = "2cce8dfcec2077e7a06987055654eca3e6dfbcad"
+SECTION105_RANGE = f"{SECTION105_BASE}..{SECTION105_HEAD}"
+SECTION105_SHORT_RANGE = "69ecaf91..2cce8dfc"
+SECTION105_COMMITS = (
+    "6605d4410cbb40f41303942b98b3231c9bfde410",
+    "990e53672533cf27e466235bfe4184cec0bd32bb",
+    "ee5c0b4b95466c8ef1154e97f5320ffcedd6483e",
+    "a0a45fc32f5bb66b93ec6dcd3e0ffd677dff3420",
+    "5845c4591441b3f17aedaf0dc815ae7a4a86139c",
+    "60cca1ef216f03fa5dcf84db449298f8af53b8e2",
+    "7a47aa469b6b669cf0d64b9d2b80c9f0f72c0365",
+    "e322931228ccfb0b557ba6d789146d8f51f825e6",
+    "4a34f582904d6bfea0825db69077f3a30569d699",
+    "3e8a13a06133b14b6591c696a80fd8ee8e6dce02",
+    "f89456b54ac104c6503d5dcbf820b7db768c66e7",
+    "cc1d6a9e2028607deda4c4b12f827daeaba1c51b",
+    "78d08b0eefe9a1cf31ced44196b7fb436ba80fc8",
+    "d9e2e995fd585d3c870ceaabb350109c12ae8b3e",
+    "a3d60ed60ef5a138f9f5f1620bc6613c8b47c676",
+    "1832f57c1a09ad581bf75d30619ac252638e3008",
+    "b5e5be34151acf3973a63f0cc3dfe3d9093ac689",
+    "a5d4d02c78cd58c193adf200734ebeac2f800a9f",
+    "51270cbdabff727e76aecfaaa710ed661f7687cb",
+    "0300ef6e0703bcadd505165832b8f8ce5504058a",
+    "90d02e29e7d0c38ccc007905d87918e7d94dd268",
+    "4b0e0d396888be48d5b4042fcd98be58dc624901",
+    "ec4e31f25cb542231a7272dc90df4a010b3b717e",
+    "062696952256a36c0a9600856337e799eb6e5fab",
+    "374cea343bdea44d0d746608cbefd27a4344ef3e",
+    "5a7dd2a6c6203cef59096d02970cb27e3abe86b1",
+    "5413b06f77a526135045342c19d65604aa58d16a",
+    "2f18f93ae7549494910bd3d7e896fee144635b63",
+    "2d3bbe2b98b1a0957f8e984916d19fbd534783d5",
+    "2cce8dfcec2077e7a06987055654eca3e6dfbcad",
+)
+SECTION105_DISPOSITIONS = (
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted after correction",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted",
+    "accepted after correction",
+    "accepted",
+    "accepted",
+    "accepted after correction",
+)
+SECTION105_NEXT_ROLE = "Codex next counter-reviews section 105 and this round's Claude commits; the five-arm rerun waits for the owner's held-mark policy decision in 105.7"
 SECTION101_EFFECT_GRANT = (
     rf"(?:{SECTION81_GRANT})|"
     r"(?:^|[.!?|:;])\s*(?:QuantConnect|QC|Safari)\s+access\s+is\s+authorized\b"
@@ -6200,3 +6273,147 @@ def test_section102_guard_rejects_clean_first_review_scope_and_authority_drift(m
         lambda heading: mutated if heading.startswith("## 102.") else original_section(heading))
     with pytest.raises(AssertionError):
         test_section102_counterreview_exact_range_ledger_and_zero_effect_scope()
+
+
+SECTION104_FINANCIAL_ARMS = (
+    ("Market-cap OFF", "12dd4732ba5d9d8f57950beb2a371c79", "2021-02-10 16:01"),
+    ("Cap selection +TPR50%", "00c71aa64b3f0fa231ef5dba172dc56f", "2021-02-10 16:01"),
+    ("Cap selection +TPR100%", "f9f9afa0f2b5200f06f11fe1442adb6c", "2023-09-26 16:01"),
+    ("Cap selection +TPR200% long-only", "df338f3dc811e509884195f94986c552", "2023-09-26 16:01"),
+    ("PureTPR selection", "ca9fec3941e1e60c63afd8547dfe97ea", "2022-08-30 16:01"),
+)
+
+
+def _assert_section104_execution_ledger(section: str) -> None:
+    """TPR-CR32: pin section 104's execution outcome; it was recorded without a guard."""
+    handoff = section.partition("### 104.43 Final five-arm execution handoff")[2]
+    assert handoff, "section 104.43 handoff present"
+    for arm, job, clock in SECTION104_FINANCIAL_ARMS:
+        assert f"| {arm} |{job}|RuntimeError|{clock}|NULL/unaccepted |" in handoff, arm
+    assert "| Total |8|9|8|7failed jobs across4arms;1activejob |" in section
+    assert "Final newstudy deliberatefinancial ledger is8successful compile/create," in handoff
+    assert "None achieved\na financially accepted full-window backtest" in handoff
+    assert "No unchangedfinancialrelaunch is justified by these terminal results." in handoff
+    _assert_retained_release_scope(section, label="section104")
+    folded = " ".join(section.split()).casefold()
+    for contradiction in ("full-window backtest is accepted", "financial performance is accepted",
+                          "all five arms completed successfully"):
+        assert contradiction not in folded, contradiction
+
+
+def test_section_104_execution_outcome_is_pinned() -> None:
+    section = _record_section("## 104. Owner resource release and expanded comparison")
+    _assert_section104_execution_ledger(section)
+    preamble = " ".join(_record_preamble().split())
+    assert "The eight deliberately launched financial jobs all ended Runtime Error; zero full-window financial results are accepted." in preamble
+
+
+@pytest.mark.parametrize("before,after", [
+    ("|12dd4732ba5d9d8f57950beb2a371c79|RuntimeError|", "|12dd4732ba5d9d8f57950beb2a371c79|Completed|"),
+    ("| Total |8|9|8|7failed jobs across4arms;1activejob |", "| Total |8|9|8|0failed jobs;5completed |"),
+    ("None achieved\na financially accepted full-window backtest", "Every arm achieved\na financially accepted full-window backtest"),
+    ("No unchangedfinancialrelaunch is justified by these terminal results.", "An unchanged financial relaunch is justified by these terminal results."),
+])
+def test_section_104_guard_refuses_outcome_drift(monkeypatch, before: str, after: str) -> None:
+    original_section = _record_section
+    section = original_section("## 104.")
+    assert before in section
+    mutated = section.replace(before, after, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 104.") else original_section(heading))
+    with pytest.raises(AssertionError):
+        test_section_104_execution_outcome_is_pinned()
+
+
+@pytest.mark.parametrize("added_grant", [
+    "QuantConnect launch is authorized.",
+    "QC access is authorized immediately before the Analyst Revisions push.",
+    "Live trading is authorized.",
+])
+def test_section_104_guard_refuses_appended_grants(monkeypatch, added_grant: str) -> None:
+    original_section = _record_section
+    section = original_section("## 104.")
+    mutated = section + "\n\n" + added_grant + "\n"
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 104.") else original_section(heading))
+    with pytest.raises(AssertionError, match="contradictory section104 authority"):
+        test_section_104_execution_outcome_is_pinned()
+
+
+def test_section_105_review_records_every_commit_and_grants_nothing() -> None:
+    """TPR-CR32: pin the review of the five-arm execution round."""
+    section = _record_section("## 105. Claude review of the five-arm execution round")
+    assert SECTION105_RANGE in section
+    ordered = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines() if re.match(r"[|] Commit [0-9]+ [|]", line)
+    )
+    assert ordered == SECTION105_COMMITS, "ordered section 105 commits"
+    assert ordered == tuple(_git_lines("rev-list", "--reverse", SECTION105_RANGE))
+    dispositions = _bounded(section, "### 105.2 Commit-by-commit dispositions", "### 105.3 P0-P3 ledger", "section 105 dispositions")
+    rows = tuple(
+        (match.group(1), match.group(2).lower())
+        for line in dispositions.splitlines()
+        if (match := re.match(r"\| `([0-9a-f]{40})` \| \*\*([A-Za-z ]+)\*\* \|", line))
+    )
+    assert rows == tuple(zip(SECTION105_COMMITS, SECTION105_DISPOSITIONS)), "exact section 105 dispositions"
+    assert "Cumulative disposition: accepted after correction." in section
+    ledger = _bounded(section, "### 105.3 P0-P3 ledger", "### 105.4 Independent reproduction and verification evidence", "section 105 ledger")
+    statuses = dict(re.findall(r"^\| `(TPR-CR32-[0-9]{3})` \| P[0-3] \| \*\*([^*]+)\*\*", ledger, re.M))
+    assert statuses == {
+        "TPR-CR32-001": "Documented",
+        "TPR-CR32-002": "Closed by correction",
+        "TPR-CR32-003": "Closed by correction",
+        "TPR-CR32-004": "Closed by correction",
+        **{f"TPR-CR32-{number:03}": "Documented" for number in range(5, 13)},
+    }
+    assert re.search(r"^\| `TPR-CR32-001` \| P1 \|", ledger, re.M) is not None, "the held-mark policy finding stays P1"
+    assert "eight financial jobs, eight Runtime Errors" in " ".join(section.split())
+    marker = "### 105.6 Milestone and authority decision"
+    assert section.count(marker) == 1
+    authority = _normalized_authority_sentences(section.partition(marker)[2])
+    for required in (
+        "canonical admission is not authorized",
+        "no real-row canonical D1 is authorized",
+        SECTION105_NEXT_ROLE,
+        "QuantConnect launch",
+        "trading authority",
+        "QuantConnect access stays forbidden for Claude",
+    ):
+        assert required in authority, required
+    _assert_retained_release_scope(authority, label="section 105")
+
+
+@pytest.mark.parametrize("index", [0, 5, 25, 29])
+def test_section_105_guard_refuses_disposition_drift(monkeypatch, index: int) -> None:
+    test_section_105_review_records_every_commit_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 105.")
+    commit, disposition = SECTION105_COMMITS[index], SECTION105_DISPOSITIONS[index]
+    original = f"| `{commit}` | **{disposition.capitalize()}** |"
+    assert section.count(original) == 1, original
+    mutated = section.replace(original, f"| `{commit}` | **Rejected** |", 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 105.") else original_section(heading))
+    with pytest.raises(AssertionError, match="exact section 105 dispositions"):
+        test_section_105_review_records_every_commit_and_grants_nothing()
+
+
+@pytest.mark.parametrize("added_grant", [
+    "Canonical admission is authorized.",
+    "Live trading is authorized.",
+    "ON launch is authorized.",
+    "QC access is authorized immediately before the Analyst Revisions push.",
+    "Paper trading is authorized.",
+])
+def test_section_105_guard_refuses_contradictory_authority(monkeypatch, added_grant: str) -> None:
+    test_section_105_review_records_every_commit_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 105.")
+    marker = "### 105.7 Recommendation to the owner"
+    assert section.count(marker) == 1
+    mutated = section.replace(marker, added_grant + "\n\n" + marker, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 105.") else original_section(heading))
+    with pytest.raises(AssertionError, match="contradictory section 105 authority"):
+        test_section_105_review_records_every_commit_and_grants_nothing()

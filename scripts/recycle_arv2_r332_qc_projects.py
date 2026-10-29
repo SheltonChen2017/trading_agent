@@ -16,7 +16,7 @@ import time
 ROOT = Path('/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2')
 SOURCE = ROOT / 'scripts/recycle_arv2_r332_qc_projects.py'
 INVENTORY = ROOT / 'scripts/inspect_arv2_r332_qc_cleanup.py'
-POLICY = ROOT / 'scripts/arv2_r332_qc_cleanup_policy.py'
+POLICY = ROOT / 'scripts/arv2_r332_qc_cleanup_policy_v2.py'
 RECORD = ROOT / 'docs/Strategy Description/ANALYST_REVISIONS_IMPLEMENTATION_RECORD.md'
 CONTROL = ROOT / 'artifacts/analyst_revisions_v2/qc_cleanup/R332-20261028-B'
 PYTHON = '/Users/sheltonchen/.venvs/trading_agent-py313/bin/python'
@@ -97,7 +97,13 @@ def catalog(api, policy):
 
 
 def recycle(api, policy, record_raw, user_id, plan):
-    _, references = catalog(api, policy)
+    initial, references = catalog(api, policy)
+    # A record-confirmed Analyst study has a legacy name without ARV2.
+    # Report only this explicit scope exception; it is protected, never a target.
+    legacy = [row for row in initial if row['projectId'] == 37017548]
+    retained = {'legacy_37017548_present': len(legacy) == 1,
+        'legacy_37017548_exact_name': len(legacy) == 1
+            and legacy[0].get('name') == 'Systematic Weekly Large-Cap Equity'}
     rows = []
     for expected in plan:
         project_id = expected['project_id']
@@ -139,10 +145,10 @@ def recycle(api, policy, record_raw, user_id, plan):
             result['reason'] = safe_failure(error)
             result['deletion_outcome_ambiguous'] = result.get('delete_attempted') is True
             rows.append(result)
-            return {'complete': False, 'projects': rows, 'planned_count': len(plan),
+            return {**retained, 'complete': False, 'projects': rows, 'planned_count': len(plan),
                 'recycled_count': sum(row['recycled'] for row in rows)}
         rows.append(result)
-    return {'complete': True, 'projects': rows, 'planned_count': len(plan),
+    return {**retained, 'complete': True, 'projects': rows, 'planned_count': len(plan),
         'recycled_count': sum(row['recycled'] for row in rows)}
 
 

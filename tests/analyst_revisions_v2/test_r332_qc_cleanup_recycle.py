@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from scripts import arv2_r332_qc_cleanup_policy as policy
+from scripts import arv2_r332_qc_cleanup_policy_v2 as policy
 from scripts import inspect_arv2_r332_qc_cleanup as inventory
 from scripts import recycle_arv2_r332_qc_projects as m
 
@@ -15,7 +15,7 @@ def project(identity=PID, **changes):
     row = {'projectId': identity, 'name': 'ARV2 Synthetic Disposable ' + str(identity),
         'ownerId': USER, 'owner': True, 'codeRunning': False, 'language': 'Py',
         'collaborators': [{'uid': USER, 'owner': True}], 'libraries': [],
-        'isLibrary': False, 'lastLiveDeployment': None, 'leanEnvironment': 0}
+        'isLibrary': False, 'lastLiveDeployment': None, 'leanEnvironment': 1}
     row.update(changes)
     return row
 
@@ -143,6 +143,16 @@ def test_changed_unsafe_or_other_lane_current_metadata_stops_before_delete(chang
 def test_protected_dependency_refuses_even_with_matching_external_plan(identity):
     row, packet = project(identity), history()
     api = FakeAPI([row], {identity: packet})
+    result = run(api, [plan_for(row, packet)])
+    assert not result['complete'] and not api.deleted
+    assert result['projects'][0]['reason'] == 'changed_or_ineligible'
+
+
+def test_historical_success_with_later_runtime_status_drift_is_preserved():
+    # R280's original record authenticates a valid result; current Runtime
+    # Error status must not erase that history or make its source disposable.
+    row, packet = project(37163942), history('Runtime Error')
+    api = FakeAPI([row], {row['projectId']: packet})
     result = run(api, [plan_for(row, packet)])
     assert not result['complete'] and not api.deleted
     assert result['projects'][0]['reason'] == 'changed_or_ineligible'

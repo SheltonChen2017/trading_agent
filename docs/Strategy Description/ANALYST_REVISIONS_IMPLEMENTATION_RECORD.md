@@ -71326,3 +71326,91 @@ actualparent0/child0 and matching reconstructed report, preserve refusal and
 never retry unchanged. A separately versioned V2 interpretation and exact B
 plan still precede deletion; current read-shape permission is not deletion
 clearance. Original V1 source/history/pins and all evidence remain unchanged.
+### 332.5 Actual C, corrected V2 interpretation and exact B freeze
+
+C ran once at clean970e07171e5b92751061e3cac55a4d31a382abf4, record
+940d07a41064fc8894a9842fb8ca2fa08d3f510b911981f826287302b2459bed.
+Actualparent0/child0, output_accepted=true; one intent/application dispatch,
+HTTP200, no deletion. Report936bytes SHA256
+3e9b5c0b83f57192d4e71fa753b32c7b2bc384622b0fd32b068a357f0128647a;
+child output1069bytes/6766e6a769226f412b779058e51fdc2df2eff317359ef39ffda729c2a504892e.
+Finished2026-10-29T06:52:50.235605Z. Selected37705240 owner_match=true,
+codeRunning=false, leanEnvironment=1 exact integer, lastLiveDeployment=null.
+This confirms V1's unsupported enum interpretation caused this false refusal;
+it is not a live-account observation or proof about all134raw metadata rows.
+C is now spent/frozen and no control reader/retry is permitted.
+
+Additive policyV2 is9447bytes SHA256
+a9dd7c3b6fb426ab59e729923684c8f0f6e05a30315691cd3e416cdc5cccf0cf;
+V2 tests9004bytes/e2e06874b4d467127393c8d319aafc839c460b38c6f7dc435b838a498511fa2d.
+V1 remains exact230d7e47...unchanged. V2 requires the runtime enum to be a
+present exact nonnegative bounded integer, without calling that enum a live
+flag. The separately required lastLiveDeployment must be present and null or
+empty; real dates, zero-date sentinels, missing/malformed values still preserve.
+Fresh raw B metadata, not a caller Boolean, must satisfy this interpretation.
+
+The purpose audit found eight additional exact verification-only pairs:
+36643367(89.2),36644379(89.3),36644829(89.4),36645473(89.5) are outcome-free
+PIT canaries;36854638(173) and36982551(193) count coverage without prices,
+orders or returns;37097547(212) and37163330(219.1–2) are input/clock probes.
+No current W5/R329 dependency on those two old spent projects was found.
+R247's unresolved248/256audit/source issues remain documented, not cured by
+recycling. R24637072332 is an economic mechanism experiment and is retained.
+R28037163942 has historical authenticated Completed./run_valid=true evidence
+in219.3 despite A's current Runtime Error status; it is explicitly protected.
+Historical success cannot be erased by a later status list. Legacy Analyst
+project37017548, exact name Systematic Weekly Large-Cap Equity, is corroborated
+in213.1/248, and protected despite lacking an ARV2 namespace. Its exact pair is
+the only additive ownership exception; unknown/generic names stay preserved.
+
+The UNINVOKED B executor was corrected prospectively to select V2 and report
+that one legacy project's catalog presence/exact-name match. Current source
+scripts/recycle_arv2_r332_qc_projects.py14548bytes SHA256
+223a3d1d57bed0b23930209f529cd51a7bb763610c81f7731554c98f464b2439.
+Its earlier332.2pin remains historical preparation, never a used B contract.
+Current recycle tests13434bytes/
+6aab389f49cd0af6c6c291ef3af10e26299732cc19eaf4b67ef739f9cef07411.
+Author V2 tests60passes0.10s and recycle45passes0.13s overlap the root final
+selection; protected-history expected-red and AST declared-delta checks pass.
+No used caller or policy was modified.
+
+B's exact prospective plan is3635canonical bytes SHA256
+a0bbcfa109bdeea075b4b664739f4ce177b816c9b9d79a0f2272e17276c1396f,
+THIRTEEN targets:9exact verification-only,2zero-run and2failure-only.
+Names/history pins come from A's already supplied authenticated metadata.
+The summary pins deliberately bind the PROSPECTIVE V2condition live_presence=false
+while preserving every other selected A field; they do not claim A proved raw
+current live state or retroactively accept A's classification. B must re-read
+each raw project/history, re-evaluate V2 and match that exact expected summary,
+then refresh global references/target metadata before its one delete.
+Any mismatch, ambiguity, failure or unconfirmed post-read stops without retry.
+
+| Project ID | Exact current name | Criterion | History SHA256 | Prospective V2 summary SHA256 |
+|---|---|---|---|---|
+|36561231|1 ARV2_ACCEPTED_RISK_PRELIMINARY - 20260914_R053_c381be82|no_successful_backtest|4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945|bf895b493ac11d01afb8480683e5dc04ad8bbfd0565d66c2383a688358a34b54|
+|36642921|25 ARV2_PIT_MARKET_CAP_MEMBERSHIP_COVERAGE - 20260916|no_successful_backtest|4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945|3d937c6fb1d86f43ed61dd5395f0cf398c4b258ac2bdb14cf16a217889e7b7d3|
+|36643367|26 ARV2_PIT_MARKET_CAP_MEMBERSHIP_COVERAGE_RETRY - 20260917|verification_only|e972feb8f42d6d1b19b9b6816b92cd12b671d383c68c5b70ac1b02cc09bc4c53|9bcb142dfbdc03089fa1bb6482c3e447694d6e3e34af0b61cf637f7e99815c7c|
+|36644379|28 ARV2_PIT_MARKET_CAP_MEMBERSHIP_SUMMARY_R080 - 20260917|verification_only|06b40b90febfe4ea4b288501c81d8399edd091573b02b232e74d09546c211131|bd5ad4d9aba19db5a2963b404d7e6619804fb71274d6af11476aaecb56108149|
+|36644829|29 ARV2_PIT_MARKET_CAP_MEMBERSHIP_SUMMARY_R081 - 20260917|verification_only|a059ec46fc0ea8b5e5bbe6688741f553bedc03b0b7fb5cbe108158fa85dd300e|9aadafda177b73c1a3ba21cc7d9d01f3174ba2c406a55590c6c12e5ff7cb5c91|
+|36645473|30 ARV2_PIT_MARKET_CAP_MEMBERSHIP_SUMMARY_R082 - 20260917|verification_only|9255bd12c66cb1bc1f5644b084f499874ed2556f483f5c6aedebf14a4e312037|a67a95210a912dd509b19d8b487b9b6387af6ca31c86d14af8ba4f494f60e684|
+|36854638|103 ARV2 SIX COVERAGE R180 2021 2025|verification_only|0fee9e26d2bf94a1b7c913dcd3a99017a95d93373f6bbd0fba14d49b77d4da1c|f2822689e05b7997b9d58f69c4eee507222e2753a4bd96a529bbf246a65c7f89|
+|36935685|110 ARV2 SIX CAP90 TILT70 R187 2021 2025|no_successful_backtest|1a57fbeeceb94ecae6eed3af03ecdcc415c70d528b1a0ddc235f4f401c53f4a2|be64f3844fe0defe9bdd29495829ab44ee2de8cba54cbb074a8cc7b197ee1533|
+|36935869|112 ARV2 SIX CAP90 TILT50 R189 2021 2025|no_successful_backtest|958773cf3088bf95110f66c6c38366df7dd75f17cdebc1a685562056103053f6|3a8414e904bb8cefec2f22f8f20a1586364a8ccbdd60f5ad6ac5010019056b7e|
+|36982551|131 ARV2 SIX RECENT COVERAGE R209 202508 202609|verification_only|516208236604a2d10a6428a2449c75c61de57f2ba51043e6827c874b3d936f5a|060ff185a9634e76b6c4f8af1c8dbc787ecf88ea0717df2ad84088f073032fa5|
+|37097547|ARV2 R247 FRESH SIX INPUT 20260925|verification_only|f11c791eb22dad9cfc598b57e84c4b4805e2f107e2ada0d9a3a3c8a921a98d62|1a154cfef455652092ca9d384c5e70fee76a3b1fcfba3b00d046f68cf47d49f0|
+|37163330|ARV2 R279 FRESH SIX CLOCK 20260928|verification_only|0bcd7873d07a546fb39958fa436cfee9ca1d66a386e4c9b6f59f99a8b703a7d6|529403caa805cf6076ff3999ee1ae9b60a598dc76ca168038f9273278abe2d89|
+|37705240|ARV2 R284 PUBLIC SEVEN IDENTITY 20261007|verification_only|bebef3129b52fec5713cd71cea20f975857c99edfe35efbf39a964b141d412fb|a92e36bf00f6b12e7996733e73742dc2cd6e0fb70a7d63b182b5a54fd25c7132|
+
+After the final focused checks, commit this V2/source/plan decision and invoke
+B ONCE from that resulting clean HEAD using its exact caller, frozen inventory,
+V2policy, record and plan pins. ControlB remains uninspected/unallocated before
+that dispatch. Actualparent0/child0 and exact reconstructed report are required;
+the same-ID Recycle Bin post-read confirms every individual removal. Preserve
+all other projects and all previous receipts. This is the explicit owner-
+requested cleanup scope only, not strategy contact or release of Safari.
+Root final pre-B selection passed202distinct tests5.45s:60V2policy,
+45V2recycle,11resolver-template and86document checks. Four new/updated files
+compiled in memory, dispatch_fence absent, native all-network/production-
+artifact/both-Keychain/security denial; no full suite. Earlier207pre-A and
+author/subset counts overlap and are not summed. Current V1/A/C pins were
+rechecked unchanged; V2/B pins match this separate first-use freeze.

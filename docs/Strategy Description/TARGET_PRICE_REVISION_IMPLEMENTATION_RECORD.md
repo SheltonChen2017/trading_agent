@@ -29762,3 +29762,125 @@ or reverse-dependency acceptance is asserted until a fresh compact-output
 inventory is fullyreconciled beforedeletion. Allknown16laneIDs observedpage0,
 no othernamepatternmatch observed in parsedpages; unread/truncatedpage100 is
 not silentlytreatedempty. No unrelatedprojectsource/job was read.
+
+Fresh bounded private phase TPR-CMP28-R107-MIA006-OBSERVE-002/489ef85cf9a911b56201f1f02926debc65c9ad0225f7e79e725d76c4e2c43735 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE 0 exact private inputs/600s; FreshREADONLY continuation of alreadySentMia006 inownwindowEDF5154B; exactnewOFF38609822/source13c9206b/probe009. AtcurrentHEADcleanup-onlysource additions leaveMia sourceepochbb222017 unchanged. Observe<=20UIstates/600s, no newSend/edit/compile/job/provider/ObjectStore/otherproject permission; original oneSend remains spent.; fsync claim and directory retained.
+
+Freshcleanup phase TPR-R107-CLEANUP-INVENTORY2-0000/82b9b91afc8d301425c10df8129ab66cd1951c4185d8f018ace5936efbcf192f at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-INVENTORY2-0100/7c806ab3d58aa36a95e5750b2be1157db917051c3e48fa1e17b48a5aba34079e at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-INVENTORY2-0200/41476b0086a3122b55b8b08cdaaf5cabfa6b9a3da202677d821a34bb44a8a838 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-INVENTORY2-0300/3cbf8ed68d3237ff860d86ea63f6e8fbeec4dd54e66f3a31db04cce3ddd4cad1 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-SOURCE-37540166-001/17498d9c7a8245c148c929ad15065a43f3c15f6d6dab4dd5c54716098772193c at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactlane_sources native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-JOBS-37540166-001/f05a5c01c1b60133bcdef524b03c2b44e867ad3675e71f135b5147522ff88782 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactlane_jobs native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-SOURCE-37650453-001/01475a91a02d0f4a5183447705591f98209735ecfdd1fdf0dcc4903d28c7ab90 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactlane_sources native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-JOBS-37650453-001/d57f52188e4a2f739ae0ff5486c45a0a65a580d9fa0b7e04857b1b1ac2b30ddd at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactlane_jobs native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-JOB-REMX-001/dac757b786878b7efab6dfa6556edfbc389c85b92a16ac264454cba2a9955715 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactlane_job native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+GenuineMia006 Completed; onefilemain53695B/three rangedreads, oneownjoblog, eightpublicLEANsourceops stated initsfinalanswer. No sourceedit/compile/job/notebook/ObjectStore/provider financialrequest stated. Finaldeliveredrecommendation: NOverifiedfinancialfix; proposes bounded sameSID maptrace withSDKuncertainties. RootdoesNOTadopt its provider-holeby-elimination, exclusivefaultmodels, version/terminal exclusions orQCOManecdote asproof. Rootrejects Initialize/newprovider fallback onComposer-returnedsharedobjects; useonlyanexistingtypedinitializedprovider, orhonestunsupportedrefusal. Allsource/origin/rights/PIT/priceacceptance remainunproved.
+
+OwnMiawindowEDF5154B close requested, SafariLeavePageconfirmation thenaccepted; subsequentFULLAXverifiedownUUIDabsent/original3E42E372UUIDpresent/12originaltabsunchanged. No otherwindow/tab orprojectclosed. FreshAFTERsource/jobcensus follows.
+
+Fresh bounded private phase TPR-CMP29-API-R107-MIA006-AFTER-001-REGISTRY/50980946d7e97fb513be25dd408bb7a31fe9b73706623e8f94fc82edf51599fc at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE 1 exact private inputs/90s; Exact fresh registered-project plan preparation; no raw source/data/operator access beyond described phase; fsync claim and directory retained.
+
+FreshR107native phase TPR-CMP29-API-R107-MIA006-AFTER-001/cbc79434cbdcfc1ea0fd7acc3552c8b8ce9e1665dd905326b7b2aacbf59cbbc7 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE 2 exact requests/90s/3145728B; registeredarm cap_off; no oldprojectwrite, no automaticretry, no acceptance implied.
+
+Freshcleanup phase TPR-R107-CLEANUP-FINALINV-0000/a898be56fe4d8ced206d9b666f8687123256e202926571b70e569193fb893f84 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-FINALINV-0100/d5e4c66ca99899159ba8fc63fbf97662090998219158eeeb7c2d2521a9a3e1b3 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-FINALINV-0200/9bc0732cc6918b89f7cc438debe108e200b063fc341dc7ecb009f3d3d063e3bf at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-FINALINV-0300/4314da4f7a77745af414901d920c4dcf43a14cdc7c843f038ee46c54226aacca at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-FINALSOURCE-37540166-001/ff579dc41221ef9e1876e74a92f9058ad6e54784494d01fde6b306673e5bb461 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactlane_sources native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-FINALJOBS-37540166-001/3b2e8c571f169c9b3912fc675d93f3a8fb8c84e0772ea059b5244c7e5170f020 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactlane_jobs native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-FINALJOB-b4f867f6/35ae23b851708209d1ba3221da4d3039caedf47ed4fe418a06a1597515192b74 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactlane_job native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-FINALSOURCE-37650453-001/eb55eea72c5d8877906d415defbc39deee50c50d3d112ca42ef455e10628996d at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactlane_sources native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-FINALJOBS-37650453-001/faad895ad26718789a6ffdabe2b3cf2fc13043e723fb9bf33fed46d734db0154 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactlane_jobs native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Fresh bounded private phase TPR-CMP28-R107-CLEANUP-ARCHIVE-001/75f58d2ad750a0af1e25a8664ff6d108fb144c1a457e4a5445ca724466fa13c8 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE 18 exact private inputs/180s; Freshactualcleanup capture archival only: fullprojectsource/defaultnotebooks as opaquehashed bytes, ownjobmetadata/results retained privately; metadata description hints/ownership/libraries only, no cell execution/research metric interpretation/oldD0 research reuse/public exports; fsync claim and directory retained.
+
+BEFOREdelete: freshfourpage300unique metadata census/0extraTargetPrice descriptionhints, exactsource/job baselines unchanged, fullrawsources+defaultnotebooks+allownjobdetails/nativecapture receipts archivedopaque/private withchain80489225f6753bfc77500d25bd1bb00a6d9971f416185c5a2d4497d3c5b83158. Rootinputdependencyreview: newfiveactualconfigs andnativeprobe referenceoldOFF37650980 key only;37540166/37650453 are notactiveinputs. This isscopedrootreview, not backendgraphattestation. Ninehistoricalprojects andnewfive are hardprotected; ObjectStore hasnodeleteendpoint. No strategylook/reset or financialacceptance iscreatedbyarchival.
+
+Freshcleanup phase TPR-R107-CLEANUP-DELETE-37540166-001/dc77b3333836107143b694d8fb2de18ddc075f8680fc826ffef7a69e8e3ce01d at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactdelete native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-READBACK-37540166-001/ed72fc8aedf6b5e243830dc758b691ef6261baefd9193d96a7b73ad6566e6f40 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactdelete_readback native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-DELETE-37650453-001/302b5ab2ab576856758ac9a073bdf8c0daf98dcfca39a69a508432ed87ba75c8 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactdelete native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-READBACK-37650453-001/20dc37d82b22ac6482949b809f3ab98f53b1da39891090cd90f0173d6080de5a at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactdelete_readback native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-AFTER-0000/8c29e03adcc49870cb67c3f04e24893d452bbd7fcd95939d0cc712633957c5d8 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-AFTER-0100/62f5b29e19394bdfbe073aac669d205334ab80aca39c7245c4e3a70683fdd208 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-AFTER-0200/5d9c092cbea3e36704ebe692993ef23983e09233c79fb6d6dea35c24ab174215 at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-AFTER-0300/25055e3f69da1ac84409cb4517e12f9778d2952c2274aa798fcffdb53ca27dcc at 1bb94d006c6944b1359e824abbc16e1110e99065 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+### 107.4 Completed owner-requested cleanup, with private archives retained
+
+Freshactualnativefinalcensus at2026-10-29 07:04:40..45UTC returned300uniqueprojects across100/100/100/0rows, noadditionalTargetPrice descriptionhints, no reverse lane librarydependency observed. Onlytwoeligibleoldprojects were changed. Allsource/job hashes were rechecked againsttheearlier deliberatebaselines BEFORE archival; no unexpectedadvance wasabsorbed.
+
+37540166 TPR-QC6-REMX-v1-private: threefiles archived, soleactualCompleted job b4f867f657b98fa29a070be9f7942693 hascompletedTRUE/TotalOrders0 andexactpublicverificationpurpose. 37650453 TPR-CAP-TILT-EXT26-ON-BASE-v1-private: two defaultfiles archived/zerojobs. Nine otherhistoricalprojects includingmixedCompleted/currentinput-dependent37650980 andallfiveNEWprojects areprotected; negativefinancialCompleted runs arepreserved, notfilteredbyreturns.
+
+Rawmetadata/source/notebooks-as-opaque-bytes/jobcensus/owndetail/nativecapture receipts retainedprivately BEFOREdelete; no cells/code executed andno archivedperformance interpreted. Capturechain3931B/80489225f6753bfc77500d25bd1bb00a6d9971f416185c5a2d4497d3c5b83158. REMXarchiveindex1647B/4fab0fd97b3b6fccbbeb9255167691110f2a09afdf09dba4126c254830cfdfc6; ONindex1449B/6a9c2e630dea528c818ae34ba5a88598ac419b8c3911db1303cb83bdf135f6dc. Eachdeletionindependentlyreplayedandhashed fresharchiveevidence undernewper-readclaims, checkedactualowner/org/zeroactivity/noLiveDeployment/knownCompletehistory/reverselibraries/scopedinputdependencyreview. No eligibilitymarker substitutedforactualprivateevidence; backendgraph/CAS completeness remainsunattested.
+
+ExactlyONEdeletecallperproject: REMXacknowledgedHTTP200 at07:04:58UTC/receipt6563666467803b6eb3724264fc06b56bed9eb654121fead57455af433552733d; actualreadback07:04:59UTC observedRecycleBin/receiptddabe6d6b5017ce43c134f4a422bb6264fd3fac7bc52c12d1da08f3cfbc0e367. ONacknowledgedHTTP200 at07:05:05UTC/receiptaa35c747a51964f3382f5149ff05d4a5d1b6e1601bbe94151c37c781fdcd25a2; actualreadback07:05:07UTC observedRecycleBin/receipt59868373abcb4976f847a5c0f77449b7cc20ccd909776fbd3cb93c6eb70fd842. No permanentpurge/rollbackpromise, noObjectStoredelete/sourcewrite/compile/job/cancel/accountupgrade/broker action. Historicalattempts/looks/modules/privateinputs/sourcebundles/failures remain inthisrecord/privatearchives; movingprojects doesnoterase researchhistory orprove financialsuccess.
+
+ProcessdeviationCMP107-P002: thearchivephase declared18originalprivatecapture reads, then also re-readfour just-writtenmetadata copies fordescription hints (22reads total). Thosefourderivativecopies containedthealreadyauthorizedsameaccountmetadata, noadditionaldatasource/credentials/quotes, butthedeclaredreadcount wasexceededby4. No retrospectiveclaim iscreated. Deletioneligibility laterindependentlyre-readallindexedartifactsunderitsownfreshper-readclaims andstayedwiththetwoowner-authorizedeligibleprojects. Futurearchivehintscan mustreusebytesalreadyinmemory orreserveeachderivedreadbeforeeffect; Rootretains this actualbounded-count deviation without resetting any empiricalcounter.
+
+GenuineMia006 afterclose nativecheck: full12file sourceinventory13c9206b... identicaltoBEFORE, rawsource340009B/bf9fd99b60d49285037b554f194b06e368b1176610c17de842f67d5eabe4a17e; ownjobcensus1 unchanged750B/67eca58617c47b3e838da711b711e243d7d6f8ab3b079e8871c91b28d31070d1. AFTERreceipt8d07e15a87d8aefcdcd5db06187b78a2d85b8bc43df8dd4b794e6a89860c11cc. This provesnoobservedMiasource/jobdiffwithinchecks, not globalexclusivewriter/cryptographicnativeorigin/sourceauthority. RoutineClaudecheckpoint remainswaived; fullfivefinancialbacktests remainactive/unfulfilled while the verifiedmaptrace isbuilt, no earlypush atthiscleanup-only completion.
+
+### 107.5 Verified Mia-proposed map observation successor before native effect
+
+CMP107-D008: Root selects the boundedinitialized-provider trace fromMia006,
+without a furtherownerquestion/Claude checkpoint. GenuineMia delivered NO
+verifiedfinancialfix/noactualdiff; its finalmap-proposal is verified/ported
+onlywithinthisnewdiagnostic scope. No provider-hole/elimination/QCOManecdote
+oractualno-trade conclusion isadopted. Composer.GetParts returnsalreadyadded
+parts (officialsource checkedindependently); useEXACTone typedexisting
+IMapFileProvider via<=2encounteredparts, neverconstruct/Initialize/fallback
+or mutate engine mappings. ReadoneUSAresolver/oneexactSIDMapFile,
+<=64typedrows+65thsentinel, fiveFeb8..12 explicitmode-aware aliases/HasData
+pairs; verifyactualnativeconfigs/CLRreferencesbefore/after. Hashes/counts/
+equalities only, no aliases/paths/SID/price/volume export, noorder/cache
+mutation, noextrahistory. Fourtypedhistoriesandactiveparent/project/job/
+clock/config/_effect/_register_parent guards stayunchangedAST. HasData is
+map-datebounds, neverobservedtradeavailability orfinancialadmission.
+
+Newrenderer19101B/95501a9dad4909d55a2818b9fa18a035e21168c14974210354cab23ef0763634;
+test18855B/5a3025019f3d65480a1ba0015dca33d2fe89ac243a602b425f9349f23b5ced6e.
+Author72passed14.50s/independent72passed14.00s/root72passed onexacttree;
+isolated49/52 beforedispatch/configimports, networkdenied, nofullsuite.
+Tofit60000Bflatmain, ONLYunreferencedhistoricalv1_binding/validate_pointer/
+project_witness plusnonexecutingdoc/2unusedURLconstants are selectedout;
+historicalpublicfiles arebyteunchanged. Fulloriginalhelperprefix isNOT
+claimedpreserved: buildmetadata separatesoriginal_helper_source_sha256 from
+rendered_helper_definition_sha256/bytes andfull_original_helper_bytes_preserved
+FALSE; remainingactivehelperdefinitions areAST-identical. This isexplicit
+source-generation lineage, not relabellinga syntheticadapter asnative.
+
+No010compile/job ispreasserted; freshregistryread/build/reservation/source
+before+after/nativeeffect manifest requirednext. Knownnewprojectcompletion/
+accounting/readergates stillrequirea narrowregistered-arm successor before
+accepting anyfullwindowresult; these areNOT gates tosafe010exploration.
+Allfinancialorder/fees/cash/NAV/exposure/clock/coverage metrics remainNULL/
+unaccepted untilactuallyproved, with everyhistoricalattempt/look retained.
+
+Postcleanupactualfourpagecensus confirmsall16laneIDs stillaccounted:
+twoexpectedRecycleBin names, other14originalnamesincludingnew5/nineprotected
+historicalprojects unchanged. Source/job reads outside twoeligibleprojects
+didnotoccur forcleanup; unrelatedprojects receivedmetadata-only discovery.
+No permanentpurge/ObjectStoredelete/accountchange orresearchhistory reset.

@@ -71268,3 +71268,61 @@ the parameter collection; these are invalid proof, superseded by four direct
 assertion failures. No operational caller or control had been invoked at these
 checks. One successful final push will follow actual inventory/cleanup handoff,
 with local preparation commits accumulated until that endpoint.
+
+### 332.3 Actual A inventory; no deletion, metadata interpretation barrier
+
+A ran once at clean7060a4b9833956d00c55252adb3d0098132c05be, with the exact
+source/policy pins above and record66e1036b5d38d5bf2cb643f92aa9943aba74fa3d26beaab13a1e0e9cf81847e7.
+Actual parent0/child0 and matching reconstructed report pin were returned.
+Finished_utc in the source report is2026-10-29T06:45:45.271389Z (October28
+PDT); the external post-dispatch clock observation06:44:58UTC was while the
+process ran, not an exact request-start timestamp. Report67768bytes SHA256
+0517aac31cccd99150403fd16c41ec707fa6360f00fedea7e8f652da250b3396;
+bounded child output67903bytes/eca10bfc1cb79cc19b682b57ff8c548574a71480dcc5678f56653181561e2447.
+Catalog300, confirmed Analyst134, other/recycled/unconfirmed166;135request
+intents/application dispatch attempts, physical requests not measured.
+All selected history lists validated, but V1 retained130 at live_metadata_present
+and4protected. No project was deleted. A/control/policyV1 are now frozen/spent.
+
+The underlying supplied status metadata identifies six POTENTIAL candidates:
+36561231/36642921 have zero runs;36935685/36935869/37163942 each one Runtime
+Error;37705240 one Completed. verification diagnostic. All six selected owner,
+idle and sole-owner fields passed, but A did NOT prove their live-metadata
+condition. No full history/control/report reread was performed; this analysis
+used A's already supplied bounded metadata only. Other projects have completed
+research runs or are protected; no financial statistic was selected.
+
+CR332-003 is an open pre-deletion interpretation defect: policyV1 treated any
+leanEnvironment!=0 as live, although the official Project schema describes it
+only as a LEAN runtime environment; nonempty default lastLiveDeployment may
+also need exact interpretation. The combined Boolean retained by A cannot
+identify which field triggered. Do not guess its numeric value, fabricate a
+live-account observation, simply drop the guard or rerun A unchanged.
+
+### 332.4 Separately frozen current metadata-shape diagnostic C
+
+New scripts/diagnose_arv2_r332_project_environment.py14521bytes SHA256
+f9c6f255ffb46b0c0a510c4a9713e697ea59258f2e3e818d2c40da26ef2c077e
+reuses only the exact frozen A transport library84a17a710ea1de2acb1a63ffa162c26200f8f6dbb5325ea1d48465a9053083a5.
+It invokes neither A nor its control. Fresh C at qc_cleanup/R332-20261028-C
+is uninspected/unallocated before its first dispatch. C permits exactly ONE
+projects/read payloadprojectId37705240, no catalog/history/deletion or other
+endpoint. Purpose is current field-shape/value diagnosis, not capture replay.
+Retain only projectID/name, owner-matchBoolean, exact codeRunningBoolean/null,
+numeric leanEnvironment, finite lastLiveDeployment class and field types.
+No raw last-live value, liveForm, account/user identifier or credential output.
+Unexpected metadata refuses or remains unknown. No live API or brokerage.
+
+Same exact Mac/root/branch/Python, source/record clean-HEAD binding and private
+one-use stdin handoff. Own exclusive C claim precedes credential use/DNS/API;
+parent90seconds/worker60seconds plus the same startup/I/O/reap qualifications.
+Native policy1518bytes/f5bf7395e5b5a188a52065368dd629ac70a3e1e5606057f7c10ffd6f9a6d7122
+permits only C control; no A/B read/write. B remains uninvoked/unbound.
+Before C, native-denied memory compilation and eight synthetic classification
+plus four selected-shape checks passed. No operational source/CA/control was
+inspected by those checks. Commit this source and exact C decision, then use
+only its resulting clean HEAD/caller/record pins for one invocation. Require
+actualparent0/child0 and matching reconstructed report, preserve refusal and
+never retry unchanged. A separately versioned V2 interpretation and exact B
+plan still precede deletion; current read-shape permission is not deletion
+clearance. Original V1 source/history/pins and all evidence remain unchanged.

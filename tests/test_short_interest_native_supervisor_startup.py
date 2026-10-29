@@ -5,6 +5,10 @@ from pathlib import Path
 import plistlib
 import socket
 import stat
+try:
+    import termios
+except ImportError:
+    termios = None
 import subprocess
 from types import SimpleNamespace
 
@@ -25,7 +29,20 @@ def external_denied(monkeypatch):
     monkeypatch.setattr(diag.proof.native.ctypes, "CDLL", denied)
     for name in ("connect", "connect_ex"): monkeypatch.setattr(socket.socket, name, denied)
     monkeypatch.setattr(diag, "_USED", False); monkeypatch.setattr(diag, "_FAILURES", {})
+    monkeypatch.setattr(diag, "_PREPARED_INPUTS", {}); monkeypatch.setattr(diag, "_CONTROLLER_HELD", [])
     monkeypatch.setattr(diag.proof, "_FAILURES", {}); monkeypatch.setattr(diag.proof, "_FIELDS", {})
+
+
+@pytest.fixture(autouse=True)
+def private_observer_endpoint(monkeypatch):
+    global _OBSERVER, _OBSERVER_MASTER
+    master, slave = os.openpty(); os.set_blocking(master, False)
+    settings = termios.tcgetattr(slave); settings[1] &= ~termios.ONLCR; settings[3] &= ~termios.ECHO
+    termios.tcsetattr(slave, termios.TCSANOW, settings)
+    _OBSERVER = {"nonce": "1" * 32, "terminal": list(diag._tty_pin(slave))}; _OBSERVER_MASTER = master
+    monkeypatch.setattr(diag, "_observer_fd", lambda: slave)
+    try: yield master, slave
+    finally: os.close(slave); os.close(master)
 
 
 @pytest.fixture
@@ -74,10 +91,10 @@ def fabricated(tmp_path, monkeypatch):
     return h
 
 
-def prepare(): return diag.prepare_readonly(HEAD, diag.REMOTE)["spec_sha256"]
+def prepare(): return diag.prepare_readonly(HEAD, diag.REMOTE, _OBSERVER)["spec_sha256"]
 
 
-def cli(digest): return diag.main(["run-readonly", "--head", HEAD, "--remote", diag.REMOTE, "--spec-sha256", digest])
+def cli(digest): return diag.main(["run-readonly", "--head", HEAD, "--remote", diag.REMOTE, "--spec-sha256", digest, "--observer", canonical_json(_OBSERVER)])
 
 
 def observation():
@@ -89,7 +106,7 @@ def observation():
 
 def test_pending_policy_refuses_before_git_or_config(tmp_path, monkeypatch):
     monkeypatch.setattr(diag, "POLICY_SHA256", "PENDING")
-    with pytest.raises(diag.StartupRefusal, match="unregistered"): diag.prepare_readonly(HEAD, diag.REMOTE)
+    with pytest.raises(diag.StartupRefusal, match="unregistered"): diag.prepare_readonly(HEAD, diag.REMOTE, _OBSERVER)
     assert not (tmp_path / diag.BOOTSTRAP).exists()
 
 
@@ -176,8 +193,8 @@ def test_job_is_one_shot_no_native_domain_and_no_spec_job_hash_cycle(fabricated)
     digest = prepare(); path = diag.ROOT / diag.PARENT / diag.BOOTSTRAP
     spec = json.loads((path / "launch.spec.json").read_bytes()); job = plistlib.loads((path / "job.plist").read_bytes())
     assert set(os.listdir(path)) == {"launch.spec.json", "job.plist"}
-    assert "job_sha256" not in spec and job == diag.build_launchd_plist(HEAD, diag.REMOTE, digest)
-    assert job["KeepAlive"] is False and job["RunAtLoad"] is True and job["StandardOutPath"] == job["StandardErrorPath"] == "/dev/null"
+    assert "job_sha256" not in spec and job == diag.build_launchd_plist(HEAD, diag.REMOTE, digest, _OBSERVER)
+    assert job["KeepAlive"] is False and job["RunAtLoad"] is False and job["StandardOutPath"] == job["StandardErrorPath"] == "/dev/null"
     assert not {"StartInterval", "StartCalendarInterval", "WatchPaths", "QueueDirectories"} & set(job)
     with pytest.raises(diag.proof.NativeProofRefusal): prepare()
 
@@ -517,3 +534,344 @@ def test_prepare_carries_original_creator_pin_between_separate_config_operations
     monkeypatch.setattr(diag, "_config_write", write)
     with pytest.raises(diag.StartupRefusal, match="config"): prepare()
     assert changed == [True]
+
+
+def tty_bytes():
+    raw = b""
+    while True:
+        try: block = os.read(_OBSERVER_MASTER, 4096)
+        except BlockingIOError: break
+        if not block: break
+        raw += block
+    return raw
+
+
+@pytest.mark.parametrize("early", ["registration", "fence", "clock", "config"])
+def test_outer_observer_reports_failure_before_subject_channel_exists(fabricated, monkeypatch, early):
+    from contextlib import contextmanager
+    digest = "c" * 64
+    if early == "registration": monkeypatch.setattr(diag, "POLICY_SHA256", "PENDING")
+    elif early == "fence":
+        @contextmanager
+        def refused(*args, **kwargs): raise diag.StartupRefusal("REFUSED: startup_forbidden"); yield
+        monkeypatch.setattr(diag, "_fence", refused)
+    elif early == "clock": monkeypatch.setattr(diag, "_Clock", lambda: (_ for _ in ()).throw(diag.StartupRefusal("REFUSED: startup_clock")))
+    assert cli(digest) == 2
+    result = diag.filter_observer(tty_bytes(), _OBSERVER, digest, os.getpid())
+    assert result["status"] == "refused" and result["authority"]["source_dispatch_authority"] is False
+    assert not (diag.ROOT / diag.PARENT / diag.STATUS).exists()
+
+
+@pytest.mark.parametrize("hazard", ["nonce", "digest", "pid", "duplicate", "partial", "unrelated", "raw_prefix", "foreign_field"])
+def test_private_raw_filter_never_emits_unrelated_or_uncorrelated_text(fabricated, hazard):
+    value = {"schema": "si-startup-PTY-observation-v3", "nonce": _OBSERVER["nonce"], "spec_sha256": "c" * 64,
+        "pid": 456, "status": "readonly_predicates_passed_observation_only", "failure": None, "authority": diag.authority()}
+    if hazard == "nonce": value["nonce"] = "2" * 32
+    elif hazard == "digest": value["spec_sha256"] = "d" * 64
+    elif hazard == "pid": value["pid"] = 457
+    elif hazard == "foreign_field": value["raw"] = "PRIVATE_STARTUP_TEXT"
+    raw = canonical_json(value).encode() + b"\n"
+    if hazard == "duplicate": raw += raw
+    elif hazard == "partial": raw = raw[:-1]
+    elif hazard == "unrelated": raw = b"PRIVATE_PYTHON_TRACEBACK\n"
+    elif hazard == "raw_prefix": raw = b"PRIVATE_DEBUG_BANNER\n" + raw
+    result = diag.filter_observer(raw, _OBSERVER, "c" * 64, 456)
+    assert result["status"] == "observer_unavailable" and "PRIVATE" not in canonical_json(result)
+
+
+def test_observer_one_nonblocking_attempt_no_fsync_retry_or_readback(fabricated, monkeypatch):
+    observer = diag._Observer(_OBSERVER, "c" * 64); fd = observer.fd; original_write, calls = os.write, []
+    def write(target, raw):
+        if target == fd: calls.append(len(raw)); return len(raw) - 1
+        return original_write(target, raw)
+    monkeypatch.setattr(diag.os, "write", write)
+    monkeypatch.setattr(diag.os, "fsync", lambda target: pytest.fail("observer fsync is forbidden"))
+    with pytest.raises(diag.StartupRefusal): observer.emit(None)
+    with pytest.raises(diag.StartupRefusal): observer.emit(None)
+    assert len(calls) == 1 and not os.get_blocking(fd)
+
+
+def test_observer_rejects_wrong_endpoint_and_arbitrary_failure_payload(fabricated):
+    wrong = {"nonce": _OBSERVER["nonce"], "terminal": [v + 1 for v in _OBSERVER["terminal"]]}
+    with pytest.raises(diag.StartupRefusal): diag._Observer(wrong, "c" * 64)
+    observer = diag._Observer(_OBSERVER, "c" * 64)
+    with pytest.raises(diag.StartupRefusal): observer.emit({"exception": "PRIVATE_RAW"})
+    assert tty_bytes() == b""
+
+
+def test_job_initial_start_is_explicit_and_has_no_restart_or_auto_trigger(fabricated):
+    digest = prepare(); job = diag.build_launchd_plist(HEAD, diag.REMOTE, digest, _OBSERVER)
+    assert job["RunAtLoad"] is job["KeepAlive"] is False
+    assert not {"StartInterval", "StartCalendarInterval", "WatchPaths", "QueueDirectories", "Sockets"} & set(job)
+    assert job["ProgramArguments"][-2:] == ["--observer", canonical_json(_OBSERVER)]
+    assert diag._launch_argv("debug") == [diag.LAUNCHCTL, "debug", diag._target(), "--stderr"]
+    assert diag._launch_argv("start") == [diag.LAUNCHCTL, "kickstart", "-p", diag._target()]
+    assert "-k" not in diag._launch_argv("start")
+    with pytest.raises(diag.StartupRefusal): diag._launch_argv("restart")
+
+
+def kernel_bytes(runs=0, *, running=False, pid=None, exit_code=None):
+    raw = (diag._target() + " = {\n\tpath = " + str(diag.ROOT / diag.PARENT / diag.BOOTSTRAP / "job.plist") + "\n\tstate = ").encode() + (b"running" if running else b"not running") + b"\n\tactive count = " + (b"1" if running else b"0") + b"\n\truns = " + str(runs).encode() + b"\n"
+    if pid is not None: raw += b"\tpid = " + str(pid).encode() + b"\n"
+    if exit_code is not None: raw += b"\tlast exit code = " + str(exit_code).encode() + b"\n"
+    return raw + b"\tcoalition = {\n\t\tstate = active\n\t\tactive count = 1\n\t}\n}\n"
+
+
+def test_kernel_parser_uses_top_level_fields_not_nested_coalitions():
+    result = diag._kernel(kernel_bytes())
+    assert result == {"runs": 0, "running": False, "active_count": 0, "pid": None, "exit": None}
+    for raw in (b"", kernel_bytes().replace(b"\tstate = not running\n", b""), kernel_bytes() + b"\truns = 0\n"):
+        with pytest.raises(diag.StartupRefusal): diag._kernel(raw)
+
+
+@pytest.fixture
+def controller_child(fabricated, monkeypatch):
+    digest = prepare()
+    original_run, calls = diag.subprocess.run, []
+    h = SimpleNamespace(digest=digest, pins=diag._creator_pins(HEAD, diag.REMOTE, digest, _OBSERVER), calls=calls, query_states=[kernel_bytes(), kernel_bytes(), kernel_bytes(), kernel_bytes(1, exit_code=2)],
+        debug_code=0, start_code=0, target_pid=456)
+    def run(args, **kwargs):
+        if args[:1] == ["git"]: return original_run(args, **kwargs)
+        role = next((name for name in ("query", "debug", "start", "load") if args == diag._launch_argv(name)), None)
+        assert role is not None and kwargs["shell"] is False and kwargs["timeout"] == 30
+        calls.append(role)
+        if role == "query": body, code = h.query_states.pop(0), 0
+        elif role == "debug":
+            assert kwargs["stdin"] is kwargs["stdout"] is kwargs["stderr"] is None
+            body, code = None, h.debug_code
+        else: body, code = str(h.target_pid).encode() + b"\n", h.start_code
+        return subprocess.CompletedProcess(args, code, stdout=body, stderr=b"PRIVATE_CONTROL_TEXT")
+    monkeypatch.setattr(diag.subprocess, "run", run)
+    monkeypatch.setattr(diag, "_tty_pin", lambda fd: tuple(_OBSERVER["terminal"]))
+    monkeypatch.setattr(diag.os, "getsid", lambda pid: os.getpid())
+    monkeypatch.setattr(diag.fcntl, "ioctl", lambda fd, command, value: 0)
+    return h
+
+
+def test_persistent_control_child_orders_debug_barrier_single_start_and_terminal_ack(controller_child):
+    read_fd, control_fd = os.pipe(); ack_fd, ack_write = os.pipe(); os.write(ack_write, b"12"); os.close(ack_write)
+    try:
+        result = diag.control_readonly(HEAD, diag.REMOTE, controller_child.digest, _OBSERVER, control_fd, ack_fd, controller_child.pins)
+        messages = [json.loads(v) for v in os.read(read_fd, diag.MAX_RAW).splitlines()]
+        assert controller_child.calls == ["query", "debug", "query", "query", "start", "query"]
+        assert messages[0]["schema"] == "si-startup-prestart-barrier-v3"
+        assert messages[1]["target_pid"] == 456 and result["kernel"]["exit"] == 2
+        assert result["authority"]["source_dispatch_authority"] is False
+    finally: os.close(read_fd)
+
+
+def test_control_child_wont_start_already_running_or_debug_failure(controller_child):
+    controller_child.query_states[0] = kernel_bytes(1, running=True, pid=456)
+    read_fd, control_fd = os.pipe(); ack_fd, ack_write = os.pipe(); os.write(ack_write, b"2"); os.close(ack_write)
+    try:
+        with pytest.raises(diag.StartupRefusal): diag.control_readonly(HEAD, diag.REMOTE, controller_child.digest, _OBSERVER, control_fd, ack_fd, controller_child.pins)
+        assert controller_child.calls == ["query"] and "start" not in controller_child.calls
+    finally: os.close(read_fd)
+
+
+@pytest.fixture
+def root_controller(fabricated, monkeypatch):
+    original_run = diag.subprocess.run
+    h = SimpleNamespace(loaded=False, started=False, actions=[], children=[], early=False, raw_after_start=b"", held=[], query_git_counts=[], load_callback=None)
+    def run(args, **kwargs):
+        if args[:1] == ["git"]: return original_run(args, **kwargs)
+        role = next((v for v in ("query", "load", "debug", "start") if args == diag._launch_argv(v)), None)
+        assert role in ("query", "load") and kwargs["shell"] is False
+        h.actions.append(role)
+        if role == "load":
+            h.loaded = True; body, code = b"", 0
+            if h.load_callback: h.load_callback()
+        elif not h.loaded: body, code = b"PRIVATE_ABSENT_MESSAGE", 113
+        else: body, code = kernel_bytes(1, exit_code=2) if h.started else kernel_bytes(), 0
+        if role == "query":
+            assert fabricated.calls[-2:] == [("root", 0), ("status", 0)]
+            h.query_git_counts.append(len(fabricated.calls))
+        return subprocess.CompletedProcess(args, code, stdout=body, stderr=b"PRIVATE_NATIVE_ERROR")
+    def popen(args, **kwargs):
+        assert args[:5] == [diag.worker.PYTHON, "-B", "-m", diag.MODULE, "control-readonly"]
+        assert kwargs["stdin"] == kwargs["stdout"] == kwargs["stderr"]
+        assert kwargs["start_new_session"] is kwargs["close_fds"] is True and kwargs["shell"] is False
+        values = dict(zip(args[5::2], args[6::2])); observer = json.loads(values["--observer"]); digest = values["--spec-sha256"]
+        writer = os.dup(int(values["--control-fd"])); reader = os.dup(int(values["--ack-fd"])); slave = os.dup(kwargs["stderr"])
+        os.set_blocking(reader, False)
+        class Child:
+            pid = 999
+            def __init__(self): self.step = 0; self.exit = None; self.waits = []; self.fds = [writer, reader, slave]
+            def line(self, value): os.write(writer, canonical_json(value).encode() + b"\n")
+            def receipt(self, early=False):
+                error = diag.StartupRefusal("REFUSED: startup_control")
+                return {"schema": "si-startup-control-v3", "nonce": observer["nonce"], "spec_sha256": digest,
+                    "control_pid": self.pid, "target_pid": None if early else 456,
+                    "kernel": diag._kernel(kernel_bytes() if early else kernel_bytes(1, exit_code=2)),
+                    "status": "refused" if early else "terminal_observed", "failure": diag.failure_summary(error, HEAD) if early else None,
+                    "authority": diag.authority()}
+            def poll(self):
+                if self.step == 0:
+                    os.write(slave, b"PRIVATE_DEBUG_SETUP_BANNER\n")
+                    if h.early: self.line(self.receipt(True))
+                    else: self.line({"schema": "si-startup-prestart-barrier-v3", "nonce": observer["nonce"],
+                        "spec_sha256": digest, "control_pid": self.pid, "status": "runs0_before_initial_start"})
+                    self.step = 1; return None
+                if self.step == 1:
+                    try: ack = os.read(reader, 1)
+                    except BlockingIOError: return None
+                    assert ack == (b"2" if h.early else b"1")
+                    h.actions.append("ack" + ack.decode())
+                    if h.early: self.exit = 2
+                    else:
+                        h.started = True; h.actions.append("initial_start")
+                        body = {"schema": "si-startup-PTY-observation-v3", "nonce": observer["nonce"], "spec_sha256": digest,
+                            "pid": 456, "status": "refused", "failure": diag.failure_summary(diag.StartupRefusal("REFUSED: startup_config"), HEAD), "authority": diag.authority()}
+                        self.pending = h.raw_after_start + canonical_json(body).encode() + b"\n"
+                        self.step = 15; return None
+                elif self.step == 15:
+                    written = os.write(slave, self.pending[:512]); self.pending = self.pending[written:]
+                    if not self.pending: self.line(self.receipt()); self.step = 2
+                    return None
+                elif self.step == 2:
+                    try: ack = os.read(reader, 1)
+                    except BlockingIOError: return None
+                    assert ack == b"2"; h.actions.append("ack2"); self.exit = 0
+                if self.exit is not None:
+                    for fd in self.fds: os.close(fd)
+                    self.fds.clear(); self.step = 3
+                return self.exit
+            def wait(self, *, timeout): self.waits.append(timeout); assert self.exit is not None; return self.exit
+        child = Child(); h.children.append(child); return child
+    monkeypatch.setattr(diag.subprocess, "run", run); monkeypatch.setattr(diag.subprocess, "Popen", popen)
+    monkeypatch.setattr(diag.time, "sleep", lambda seconds: None)
+    class Held(BaseException): pass
+    def hold(state): h.held.append(state); raise Held()
+    monkeypatch.setattr(diag, "_hold_private_controller", hold)
+    try: yield h
+    finally:
+        for child in h.children:
+            for fd in child.fds:
+                try: os.close(fd)
+                except OSError: pass
+        for state in h.held:
+            for key in ("master", "slave", "read_fd", "write_fd", "ack_read", "ack_write"):
+                if state[key] is not None:
+                    try: os.close(state[key])
+                    except OSError: pass
+
+
+def test_root_private_controller_barrier_captures_only_poststart_correlated_line(root_controller):
+    result = diag.observe_readonly(HEAD, diag.REMOTE)
+    assert result["status"] == "terminal_observation_only" and result["kernel"]["exit"] == 2
+    assert result["observer"]["status"] == "refused" and result["control_failure"] is None
+    assert root_controller.actions.count("initial_start") == 1 and root_controller.actions.count("ack1") == 1
+    assert root_controller.actions.index("ack1") < root_controller.actions.index("initial_start") < root_controller.actions.index("ack2")
+    assert root_controller.children[0].waits == [0] and not root_controller.held
+    assert "PRIVATE" not in canonical_json(result)
+
+
+def test_root_private_controller_preserves_prebarrier_refusal_without_start_or_hold(root_controller):
+    root_controller.early = True
+    result = diag.observe_readonly(HEAD, diag.REMOTE)
+    assert result["status"] == "control_refused_before_initial_start" and result["target_started"] is False
+    assert result["controller_exit"] == 2 and result["control_failure"]["contract_code"] == "startup_control"
+    assert result["observer"]["status"] == "observer_unavailable"
+    assert "ack1" not in root_controller.actions and "initial_start" not in root_controller.actions
+    assert root_controller.actions.count("ack2") == 1 and not root_controller.held
+
+
+def test_poststart_raw_text_is_unavailable_never_filtered_into_a_diagnosis(root_controller):
+    root_controller.raw_after_start = b"PRIVATE_UNRELATED_STARTUP_TRACEBACK\n"
+    result = diag.observe_readonly(HEAD, diag.REMOTE)
+    assert result["observer"]["status"] == "observer_unavailable"
+    assert "PRIVATE" not in canonical_json(result) and root_controller.actions.count("initial_start") == 1
+
+
+def test_actual_ex_config_annotation_is_terminal_but_conflicts_are_refused():
+    raw = kernel_bytes(1, exit_code=78).replace(b"last exit code = 78", b"last exit code = 78: EX_CONFIG")
+    assert diag._kernel(raw)["exit"] == 78
+    for altered in (raw.replace(b"EX_CONFIG", b"EX_USAGE"), raw.replace(b"EX_CONFIG", b"PRIVATE_UNKNOWN"),
+        raw + b"\tlast exit code = 78: EX_CONFIG\n", raw.replace(b"78: EX_CONFIG", b"unavailable")):
+        with pytest.raises(diag.StartupRefusal): diag._kernel(altered)
+    assert diag._kernel(kernel_bytes(1))["exit"] is None
+
+
+def test_control_child_debug_failure_is_a_single_safe_prebarrier_receipt(controller_child):
+    controller_child.debug_code = 1
+    read_fd, control_fd = os.pipe(); ack_fd, ack_write = os.pipe(); os.write(ack_write, b"2"); os.close(ack_write)
+    try:
+        with pytest.raises(diag.StartupRefusal): diag.control_readonly(HEAD, diag.REMOTE, controller_child.digest, _OBSERVER, control_fd, ack_fd, controller_child.pins)
+        messages = [json.loads(v) for v in os.read(read_fd, diag.MAX_RAW).splitlines()]
+        assert controller_child.calls == ["query", "debug"] and len(messages) == 1
+        assert messages[0]["status"] == "refused" and messages[0]["target_pid"] is None
+        assert messages[0]["failure"]["stage"] == "controller_debug"
+    finally: os.close(read_fd)
+
+
+def test_root_controller_cleanup_close_error_is_fatal_after_known_terminal(root_controller, monkeypatch):
+    original_openpty, original_close, originals, failed = os.openpty, os.close, [], []
+    def openpty():
+        pair = original_openpty(); originals.extend(pair); return pair
+    def close(fd):
+        result = original_close(fd)
+        if originals and fd == originals[0] and not failed: failed.append(True); raise OSError(5, "PRIVATE_FINAL_CLOSE")
+        return result
+    monkeypatch.setattr(diag.os, "openpty", openpty); monkeypatch.setattr(diag.os, "close", close)
+    with pytest.raises(OSError): diag.observe_readonly(HEAD, diag.REMOTE)
+    assert failed == [True] and not root_controller.held
+    for fd in originals:
+        with pytest.raises(OSError): os.fstat(fd)
+
+
+@pytest.mark.parametrize("hazard", ["bytes", "replacement"])
+def test_controller_authenticates_original_canonical_job_at_load_consumption(root_controller, monkeypatch, hazard):
+    original = diag.prepare_readonly
+    def prepared(*args):
+        result = original(*args); path = diag.ROOT / diag.PARENT / diag.BOOTSTRAP / "job.plist"; raw = path.read_bytes()
+        if hazard == "bytes": path.write_bytes(b"X" + raw[1:])
+        else:
+            path.rename(diag.ROOT / "retained-original-job"); path.write_bytes(raw); path.chmod(0o600)
+        return result
+    monkeypatch.setattr(diag, "prepare_readonly", prepared)
+    with pytest.raises(diag.StartupRefusal): diag.observe_readonly(HEAD, diag.REMOTE)
+    assert "load" not in root_controller.actions and not root_controller.children and not root_controller.held
+
+
+def test_controller_detects_same_size_change_during_single_load_before_any_start(root_controller):
+    def changed():
+        path = diag.ROOT / diag.PARENT / diag.BOOTSTRAP / "job.plist"; raw = path.read_bytes(); path.write_bytes(b"X" + raw[1:])
+    root_controller.load_callback = changed
+    with pytest.raises(diag.proof.NativeProofRefusal): diag.observe_readonly(HEAD, diag.REMOTE)
+    assert root_controller.actions.count("load") == 1 and not root_controller.children
+    assert "initial_start" not in root_controller.actions and len(root_controller.held) == 1
+
+
+def test_loaded_kernel_target_and_canonical_job_path_are_required(fabricated):
+    raw = kernel_bytes()
+    for changed in (raw.replace(diag._target().encode(), b"gui/501/FOREIGN", 1),
+        raw.replace(str(diag.ROOT / diag.PARENT / diag.BOOTSTRAP / "job.plist").encode(), b"/PRIVATE_FOREIGN_JOB"),
+        raw + b"\tpath = /PRIVATE_SECOND_PATH\n"):
+        with pytest.raises(diag.StartupRefusal): diag._kernel(changed)
+
+
+def test_child_reauthenticates_same_original_configuration_before_debug(controller_child, monkeypatch):
+    original_run = diag.subprocess.run; changed = []
+    def run(args, **kwargs):
+        result = original_run(args, **kwargs)
+        if args == diag._launch_argv("query") and not changed:
+            path = diag.ROOT / diag.PARENT / diag.BOOTSTRAP / "job.plist"; raw = path.read_bytes(); path.write_bytes(b"X" + raw[1:]); changed.append(True)
+        return result
+    monkeypatch.setattr(diag.subprocess, "run", run)
+    read_fd, control_fd = os.pipe(); ack_fd, ack_write = os.pipe(); os.write(ack_write, b"2"); os.close(ack_write)
+    try:
+        with pytest.raises(diag.StartupRefusal): diag.control_readonly(HEAD, diag.REMOTE, controller_child.digest, _OBSERVER, control_fd, ack_fd, controller_child.pins)
+        assert controller_child.calls == ["query"] and "debug" not in controller_child.calls and "start" not in controller_child.calls
+    finally: os.close(read_fd)
+
+
+def test_load_transaction_includes_original_ancestry_full9_during_load(root_controller, monkeypatch):
+    real_stat, real_fstat, changed = os.stat, os.fstat, []
+    def observed(info):
+        if changed and stat.S_ISDIR(info.st_mode): return ProjectedStat(info, st_ctime_ns=info.st_ctime_ns + 1)
+        return info
+    root_controller.load_callback = lambda: changed.append(True)
+    monkeypatch.setattr(diag.os, "stat", lambda *a, **k: observed(real_stat(*a, **k)))
+    monkeypatch.setattr(diag.os, "fstat", lambda fd: observed(real_fstat(fd)))
+    with pytest.raises(diag.proof.NativeProofRefusal): diag.observe_readonly(HEAD, diag.REMOTE)
+    assert changed == [True] and not root_controller.children

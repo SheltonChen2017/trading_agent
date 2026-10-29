@@ -27952,3 +27952,130 @@ write fences, elapsed-acceptance bounds and ALL false admission authorities
 remain. Observe actual kernel termination and original bounded status; neither
 diagnostic0 nor current input reauthentication is native/source qualification.
 No source START/HTTP/key read/claim, look, QC/Safari, purchase or push occurred.
+
+### 132.21 Actual diagnostic-v2 background refusal; no predicate recovered
+
+Checkpoint08f334ba3894f5b44c0c1ce4c69e41c181158bf3 contains132.19..20 and the
+configuration correction. Main post-record98/.95s passed before commit.
+On clean08F with matching tracking/actual F27 and exact new paths/job absent,
+registered prepare exec52390 terminated exit0. Spec SHA
+f1bf123f309aa117f44a8bd9a09e0a0c6c046a9fe93842f56047433a28ec3299
+and job SHAd5cc23932a445c0c74df5957f19b332a25eeb4114a33f98203225fbeeb3acd87
+matched independent canonical/current-original-status authentication and
+the six-file committed mapping. Main submitted the exact one-shot job ONCE,
+command exit0. Within the first15-second observation interval, the exact
+kernel state was runs1/not running/last exit2.
+
+Independent original-status read/close validation found the same first6
+identity/protection and zero bytes, empty SHAe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.
+No safe startup predicate was recovered. Current flags are64, with immutable/
+append flags false; original input bytes, exact two-member namespace and
+searchable physical ancestry/protection also pass CURRENT read-only checks.
+These facts do not reconstruct the failed background interval or identify
+an actor, Git, privacy, code or custody cause. All v2 inputs/status/job remain
+retired and untouched; no restart, native image or source operation occurred.
+
+Read-only source audit confirms a remaining observation boundary: module/
+argument/registration/fence/clock and config-authentication failures can precede
+status binding; binding or emission refusal can also leave no bytes. The
+actual empty status does not distinguish them. The elapsed-acceptance check
+can suppress late reporting after300s, but this observed sub15s termination
+does not support that explanation. No deterministic static adapter defect
+or guaranteed emission-schema mismatch was found.
+
+Do not continue equivalent file-channel/native-proof namespace attempts.
+An independent observation transport covering preauthentication would be a
+separate diagnostic design requiring a frozen bounded policy and causal
+review. Installed launchctl documentation may be consulted READ-ONLY for
+that purpose; none of its debug/start commands has been invoked. All source,
+native-proof and input gates remain closed, and all historical data/claims/
+debits/budgets are preserved. No source START/HTTP/key read, look, QC/Safari,
+purchase, external chat message or push occurred.
+
+### 132.22 Frozen private-terminal startup observation transport
+
+**SI-DEC-20261028-09** registers a different observation TRANSPORT for the
+remaining preauthentication blind spot. Only the existing diagnostic/test and
+this record changed; original native/code/source dependencies remain unchanged.
+New fixed v3 names preserve all earlier files/jobs without reuse. Existing
+file-channel/configuration/guard predicates remain the diagnostic SUBJECT;
+none was removed to make a result pass.
+
+Installed launchctl.1 documents debug properties applying to the NEXT invocation
+and then clearing, no-path --stderr using the current terminal, and kickstart
+without-k requesting a run. The new job has RunAtLoad=false/KeepAlive=false.
+Root's private controller owns original PTY master/slave and a persistent
+session-leader control child; raw bytes never reach the tool/chat. Original
+slave dev/ino/rdev/UID/GID/mode/isatty is pinned into Root CLI/config input.
+The target validates that destination BEFORE registration/fence/clock/config,
+without requiring that the independent launchd target share the controller's
+session or foreground group. Terminal identity is not exclusive-writer proof.
+
+The outer observer attempts at most ONE nonblocking2048-byte write, with no
+retry/fsync/readback or negative-report deadline gate. Only fixed validated
+failure fields, fresh invocation nonce, spec SHA and safe PID may enter it.
+The parent accepts only a complete exact-schema nonce/spec/PID-correlated line;
+partial/duplicate/unrelated/raw startup text remains private and unavailable.
+Raw memory is bounded65536 plus one4096-byte read. Every authority remains
+false, including lane/native-proof/source/budget/input/readback/own kernel.
+
+Control order is fixed: absent113; canonical prepare; one bootstrap into the
+domain with no auto-start; exact target/path/runs0; debug --stderr with NOpath/
+program/argv/env override; runs0; private prestart barrier; parent drains
+setup-only text to EAGAIN while start is impossible; ack1; fresh lane/actual
+remote/config checks; ONE initial kickstart-p with NO-k; exact runs1 terminal
+observation; parent captures raw tail and independent kernel state BEFORE ack2
+releases the persistent terminal session; original child wait. No retired job
+is kickstarted/restarted. Early setup refusal instead requires independent
+runs0, ack2 ONLY, original nonzero child wait and preservation of its first
+safe failure; no initial start occurs. Unknown state retains original endpoints
+while the parent lives and never kills/retries or claims post-parent retention.
+
+Every query checks unchanged original local root/branch/HEAD/clean snapshot;
+actual matching remote is freshly guarded around load/start/end. Kernel parse
+uses only exact one-tab TOP fields, excluding nested coalition state, and
+accepts annotated sysexits only with exact installed numeric/symbol pairs.
+Old status/config/full9 code and historical B58 reader checks still run.
+
+The loader receipt uses trusted synchronous launchd bootstrap semantics, not
+an invented loaded-environment parser. Same-process original prepare first7
+and canonical bytes are retained. Immediately before load, original FD/named
+file and ancestry full9 are held across ONLY that synchronous consumption
+operation, then audited through cleanup BEFORE debug/start. Absent113 →
+bootstrap0 → exact fresh target/canonical job path/runs0 is the finite receipt.
+The child reauthenticates original config before debug and before start.
+No future stability, generalized capture-load approval or source authority
+follows from this source-free receipt.
+
+| Finding | Priority | Disposition |
+| --- | --- | --- |
+| SI-BUILD-20261028-064 | P2 | Corrected before operation: postprepare config changes could reach launchd consumption. Original-pin/canonical/full9 single-load transaction and strict fresh loader receipt now refuse same-size/replacement/during-load bytes or ancestry changes before initial start. |
+| SI-BUILD-20261028-065 | P2 | Corrected before operation: a pre-barrier controller refusal was mistaken for a barrier and could park despite verified runs0. Explicit no-start refusal/ack2/original wait preserves the first error and never sends ack1. |
+| SI-BUILD-20261028-066 | P3 | Corrected before operation: known terminal78:EX_CONFIG was previously treated as missing exit. Strict installed sysexit pairs now parse; contradictory/duplicate/malformed metadata refuses. PID absence never supplies an exit. |
+
+Registered policy:
+fd48bf3fb699577126bbb2a0530f5ee54427b7c087282ce8fa4c089d43b03574.
+Source SHA2564a37c6c4afbc1362f62cb1e2a0457f74a2d2d8d3a23ae0d809b54a06e38aa795;
+test SHA2561c81da283ff60efcac7a462f1eda821aa9950a589c5e84c85f3a67cdea849399.
+Main10 relevant files passed **431/3.42s**, no skips/warnings reported; all92
+held/proof/test paths compile in memory. Six-file closure, policy equality,
+old dependency/target hashes, historical-record prefix and whitespace passed.
+Separately attributed author99/1.75s and peer90 startup tests/1.24s passed.
+Peer accepted frozen semantics; Root changed only the registration literal
+before431 checks. Delegated memory-only load-transaction removal caused the
+expected2failures/88deselected/.46s and was restored. One delegated fabricated
+same-thread PTY producer test was interrupted for buffer deadlock, then fixed
+to deliver bounded chunks; no production/service process was involved.
+Tests remained fabricated, empty-env/OS-network-denied/no bytecode/cache;
+no full suite, real launchd/native/source operation or Claude review ran.
+
+After clean commit and matching actual/tracking F27, Main may run this ONE
+registered private-terminal diagnostic. Freeze all authors/tests while active.
+Its fixed controller prepares and verifies inputs, loads without autostart,
+and performs the above bounded initial-start protocol once. A debug permission
+or setup refusal is a material result, never grounds for privilege bypass or
+retry. Independently inspect actual kernel/child outcomes and only the filtered
+observation before any causal correction or native proof. Source access,
+capture/input/QC/Safari gates remain closed; data, spent claims, permanent
+unknown debits and both approved budgets remain intact. No source START/HTTP/
+key read, look, purchase or push occurred.

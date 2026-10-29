@@ -27725,3 +27725,135 @@ preserve it and require a verified launcher/platform cause before another
 invocation. Source dispatch and all later semantic/input gates stay blocked;
 the resolved separate budgets do not release them. No source START/HTTP/key
 read/claim, outcome/look, QC/Safari, purchase or push has occurred.
+
+### 132.17 Actual native-v4 startup refusal; source gate remains closed
+
+Checkpoint b58f992ac73451f8e4ec1384061ad7030d8afffa contains132.14..16 and
+the producer-owned status correction. Main post-record98/.83s passed before
+commit. Clean B58 with matching tracking/actual F27 was reverified; exact
+new names/job were absent. Registered prepare exec38663 terminated exit0,
+bootstrap SHA28220a7af8aea2acc70da2a61fbceddd86cc831226cfc56c560ec13e0da2e8a6.
+Independent canonical/configuration/original-status authentication exited0;
+job SHAeee30875e8bd724fec677a346fd13d8e75d81a1aa0a594e1dd3e19bc269cf526.
+Main submitted the exact job ONCE, command exit0. Later exact kernel state is
+runs1/not running/last exit2. That actual nonzero vetoes the proof.
+
+The original v4 status identity/protection remains unchanged and empty, with
+the empty-byte SHAe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.
+Native domain is absent. No original native/child/inventory/closure evidence
+exists, and no safe failure component was published. Exact original failing
+startup predicate remains UNKNOWN. All v4 names/job are preserved and retired;
+no restart, new equivalent native-proof namespace, adoption or reseal follows.
+
+A distinct READ-ONLY startup replay in Codex's process subsequently passed
+original registered/platform, exact lane guard, five-file _Code and original
+bootstrap authentication/cleanup. Python writes other than /dev/null and
+non-Git child commands were denied; status was never opened for writing and
+no native/source operation ran. The first harness refused its own mistaken
+absolute /usr/bin/git allowlist; static inspection verified the original uses
+git under fixed PATH, and that harness-only correction preceded the successful
+read-only replay. Neither replay reconstructs the failed background context.
+
+Bounded actual OS logs correlate background Python and its Git child with
+DocumentsFolder grants. A separate AllFiles denial does not establish a
+Documents denial or a required Full Disk Access grant. No privacy/platform/
+Keychain/provider cause is asserted. Independent read-only review again found
+the exact intended launch configuration and no verified configuration defect.
+The current safe observation cannot identify failure before its own binding.
+Before another native proof, obtain a precise background startup diagnostic;
+do not cycle proof namespaces. Source/capture/input authority and readiness
+remain false. No source START/HTTP/key read/claim, outcome/look, QC/Safari,
+purchase or push occurred; all spent and unknown debits remain intact.
+
+Two READ-ONLY public-code audits refined the pre-dispatch work. Historical
+producer/helper/manifest/receipt lineage preserves the ACTUAL selected
+Content-Type string for both retained families (47 original and13943 refused-
+prefix bodies); no missing-media recapture requirement was established.
+This does not establish actual recorded header values or source fitness.
+Legacy selection proves neither unique-header/framing checks nor the newer
+duplicate-header/CL/TE contract. Legacy acceptance also allowed vendor JSON,
+where the current semantic response parser requires application/json. Before
+new spending, a separately registered bounded OFFLINE compatibility pass must
+use exact authenticated recorded media/bodies and existing semantic checks,
+preserve refusals, keep results/rows private and grant no incomplete-source
+admission. A code-only accepted flag cannot invent an observed header.
+
+The previously noted zero-ticket directory-catalogue omission is ALREADY
+corrected in current negative._catalogue: its three preclaim capture containers
+are unconditional members. It is not an open current defect or a diagnosis
+of13448. Its existing causal test coverage/activation boundaries remain under
+read-only review; no additional correction or source execution was made.
+
+### 132.18 Frozen read-only background predicate diagnostic
+
+**SI-DEC-20261028-07**, under continuing offline implementation authority,
+registers a DIFFERENT startup diagnostic rather than another native-proof
+namespace. Only two new diagnostic/test files and this record changed.
+All original five native dependencies remain byte-for-byte unchanged. No native
+domain, image creation, provider/socket/DNS/key/capture call or source claim is
+part of the diagnostic. Its fixed new bootstrap/status/label suffix is
+startup-diagnostic-v1; no old status or creation capability is adopted.
+
+Main first validates the clean committed lane/code and matching actual origin,
+then prepares an original empty0600/single-link status and canonical fixed
+configuration. The external spec SHA in the one-shot launch arguments pins
+that input, six-file mapping and original status first7. Payload does not hash
+the job that references its SHA, avoiding a hash cycle. At runtime those
+configuration inputs and the observation inode authenticate BEFORE Git.
+This is CONFIGURATION INPUT authority only: live branch/HEAD/clean status are
+UNKNOWN until the unchanged original lane guard succeeds. The existing status
+is opened under the original parent FD without create/truncate/append,
+nofollow/nonblock and original identity/protection/full9 checks.
+
+Then the UNCHANGED original guard/_Code use the NEW diagnostic runtime HEAD.
+The own sixth code FD is also held/audited against working bytes, committed Git
+and the pinned mapping. The original historical bootstrap reader uses the
+SEPARATE target B58/F27/specSHA28220a7af8aea2acc70da2a61fbceddd86cc831226cfc56c560ec13e0da2e8a6
+and original five-file manifest. That old configuration read is neither live
+runtime identity nor old native-proof admission. No module-global namespace
+replacement or guard monkeypatch is used in production.
+
+Failure projection requires one exact original _git code/globals frame in a
+COMPLETE traceback of at most128 frames, finite argument role and an exact
+CompletedProcess for any reported actual returncode. Missing evidence stays
+null, never invented0. Only fixed entered-phase/contract/errno/mismatch FIELD
+NAMES and Git operation/code-file ordinal/returncode may escape in ONE2048-byte
+observation. No stdout/stderr, paths/URLs, private values or exception formatting
+is emitted. No failed-Git requery is registered. The command fence allows only
+fixed original Git calls/kwargs (maximum128, each original timeout30s), denies
+native/provider/socket/DNS operations and Python writes beyond that existing
+observation channel plus exact verified /dev/null/O_RDWR stdlib I/O. The300s
+limit is ELAPSED ACCEPTANCE at phase/terminal boundaries, not a hard wall kill
+inside unchanged original Git calls. Context/cleanup failures and actual
+nonzero/unknown kernel status remain negative. Even diagnostic0 grants no
+source, budget, lane, native-proof or backtest admission.
+
+| Finding | Priority | Disposition |
+| --- | --- | --- |
+| SI-BUILD-20261028-060 | P2 | Corrected before first invocation: the draft write-open fence blocked original stdlib Popen._get_devnull. A no-child ORIGINAL stdlib causal test was RED then GREEN after the exact character-device /dev/null/O_RDWR exception. Other writes remain denied; unrelated to v4's cause. |
+| SI-BUILD-20261028-061 | P3 | Corrected before release: a truncated traceback could not prove uniqueness of the original Git frame. An unscanned tail now suppresses projection; causal RED then GREEN. |
+| SI-BUILD-20261028-062 | P2 | Corrected before release: prepare's fresh job read must equal retained canonical job_raw after writer close. Same-size in-place close-time mutation was causally RED then GREEN; timestamps/evidence checks were not relaxed. |
+
+Registered policy:
+0fbb3142c3269f6d38c41be469ebb1c2b50307ea1f36e56f09e6ac83899f02d8.
+Source SHA256d49b82a75be368fe051bed321102ef99636864d667c1ee2d55139a0af5519041;
+test SHA256eefdbb8aaf63ee38e031936be6d9b89c095c8820400f2ad22de060689f7233f2.
+Main10 relevant focused files passed **388/2.93s**, no skips/warnings reported;
+all92 held/proof/test paths compile in memory. Policy equality, exact six-file
+closure, all original five native dependency bytes/target hashes, historical
+record prefix and whitespace passed. Main's earlier387/3.12s was BEFORE062;
+the388 run supersedes it for current validation. Separately attributed author
+56/1.33s and independent peer47 diagnostic tests/.77s passed. Peer accepted
+the final registered bytes. Empty environment, OS network denial and no
+bytecode/cache remained; no full suite or actual diagnostic ran in development.
+
+After a clean commit and fresh matching origin check, Main may prepare this
+new diagnostic ONCE, independently authenticate its exact canonical job/spec
+and original status identity, then submit its RunAtLoad/KeepAlive=false job
+ONCE. Freeze all editing/testing while active. Observe its actual kernel
+termination and authenticate the original bounded status independently before
+using any projected predicate to decide a fix. Preserve every result and all
+old evidence; do not restart a namespace or launch another native proof before
+a verified causal diagnosis. Source access, claims, input and QC/Safari remain
+blocked. The separate approved budgets and all historical/unknown debits stay
+unchanged; no source START/HTTP/key read, look, purchase or push occurred.

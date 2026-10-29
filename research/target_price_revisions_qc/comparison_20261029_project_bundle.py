@@ -22,7 +22,7 @@ OFF_PATH=PREFIX+'comparison_20261028_bundle.py'
 MULTI_PATH=PREFIX+'comparison_20261028_multi_bundle.py'
 PROJECTS_PATH=PREFIX+'comparison_20261029_projects.py'
 # Independently checked after the creation adapter's source-stable validation.
-PROJECTS_SHA256='57e9807fa7cb59d271347cc364f5fe5d94a34e99d99c516e8b8e2ea930dc5ca1'
+PROJECTS_SHA256='6dc87f33105de9d80e7a267a6cc737bb4262f47e49c43b65247592927a5788d7'
 PINS={**multi.PINS,MULTI_PATH:'7015c94867da28d31426627275ec607e9f8fb3d8f6cb38d97cbd6aa5511b7e28',
     PROJECTS_PATH:PROJECTS_SHA256}
 SOURCE_PATHS=tuple(PINS)

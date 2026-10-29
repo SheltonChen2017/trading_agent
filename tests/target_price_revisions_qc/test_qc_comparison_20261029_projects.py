@@ -197,7 +197,8 @@ def test_owner_only_collaborator_schema_is_observed_without_pii_projection(tmp_p
     {'uid':OWNER,'owner':True,'permission':'unknown','liveControl':False},
     {'uid':OWNER,'owner':True,'permission':'write','liveControl':None}])
 def test_nonowner_entire_org_and_unknown_collaborators_refuse(tmp_path,row):
-    out=run(tmp_path,plan(),lambda *_:response({'success':True,'projects':[metadata(collaborators=[row])]}))
+    base=baseline(tmp_path)
+    out=run(tmp_path,next_plan('create','OFF',base),lambda *_:response({'success':True,'projects':[metadata(400001,'OFF',collaborators=[row])]}))
     assert out['status']=='failed_or_uncertain' and out['metadata'] is None
 
 
@@ -275,3 +276,40 @@ def test_guard_change_after_request_never_accepts_a_result_or_retries(tmp_path):
     {'page_start':1,'page_end':101},{'page_start':0,'page_end':1000},{'mode':'native-marker'}])
 def test_closed_plan_cannot_widen_endpoint_arm_page_or_authority(changes):
     with pytest.raises(p.ProjectRefusal):plan(**changes)
+
+
+@pytest.mark.parametrize('privacy_changes',[{}, {'isPublic':True,'shared':True}])
+def test_old_baseline_null_uid_is_qualified_owner_org_only_metadata(tmp_path,privacy_changes):
+    known={'uid':OWNER,'owner':True,'permission':'write','liveControl':False}
+    unknown={'uid':None,'owner':False,'permission':'read','liveControl':False}
+    out=run(tmp_path,plan(),lambda *_:response({'success':True,'projects':[metadata(collaborators=[known,unknown],**privacy_changes)]}))
+    assert out['status']=='completed'
+    assert out['privacy_basis']=='baseline_owner_org_metadata_only'
+    assert out['metadata']['collaborator_count']==2
+    assert out['metadata']['nonowner_collaborator_count']==1
+    assert out['metadata']['unclassified_collaborator_count']==1
+    assert out['metadata']['known_nonowner_collaborator_count']==0
+    assert out['metadata']['old_project_privacy_clean_verified'] is False
+    assert out['metadata']['old_project_write_authorized'] is False
+    assert out['metadata']['nonowner_count_includes_unclassified'] is True
+    assert out['metadata']['collaborators_sha256']==p._sha(p.e.canonical(p.e.parse_json(p._canonical([known,unknown]))))
+    assert out['endpoint']=='projects/read' and out['payload']=={'projectId':p.OLD_PROJECT}
+
+
+@pytest.mark.parametrize('phase',['create','read','collaborators'])
+def test_identical_null_uid_in_new_project_phase_still_refuses(tmp_path,phase):
+    base=baseline(tmp_path)
+    unknown={'uid':None,'owner':False,'permission':'read','liveControl':False}
+    newmeta=metadata(400001,'OFF',collaborators=[unknown])
+    if phase=='create':
+        prepared=next_plan('create','OFF',base)
+    else:
+        created=run(tmp_path,next_plan('create','OFF',base),lambda *_:response({'success':True,'projects':[metadata(400001,'OFF')]}))
+        if phase=='read':prepared=next_plan('read','OFF',base,created)
+        else:
+            read=run(tmp_path,next_plan('read','OFF',base,created),lambda *_:response({'success':True,'projects':[metadata(400001,'OFF')]}))
+            prepared=next_plan('collaborators','OFF',base,read)
+    body={'success':True,'collaborators':[unknown],'userPermissions':'write'} if phase=='collaborators' else {'success':True,'projects':[newmeta]}
+    out=run(tmp_path,prepared,lambda *_:response(body))
+    assert out['status']=='failed_or_uncertain'
+    assert out['metadata'] is None and out['collaboration'] is None

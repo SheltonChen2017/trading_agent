@@ -16,7 +16,7 @@ from . import comparison_20261029_extended_mark_probe as prior
 MODULE = 'research/target_price_revisions_qc/comparison_20261029_project_probe.py'
 PRIOR_MODULE = 'research/target_price_revisions_qc/comparison_20261029_extended_mark_probe.py'
 REGISTRY_MODULE = 'research/target_price_revisions_qc/comparison_20261029_projects.py'
-REGISTRY_SHA256 = '57e9807fa7cb59d271347cc364f5fe5d94a34e99d99c516e8b8e2ea930dc5ca1'
+REGISTRY_SHA256 = '6dc87f33105de9d80e7a267a6cc737bb4262f47e49c43b65247592927a5788d7'
 PRIOR_SHA256 = '0526a563426c86b2c16d1a166591e70e78d0693103057c2765f7e8e08183d867'
 SOURCE_ARGUMENTS = {
     'tick_source':'comparison_20261029_mark_tick_probe.py',

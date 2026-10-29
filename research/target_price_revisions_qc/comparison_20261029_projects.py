@@ -39,6 +39,7 @@ HISTORICAL_PROJECTS = frozenset((37650980, 37650453))
 PRIVATE_ROOT = ops.PRIVATE_PARENT / 'TPR-SIX-UNIVERSE-FIVE-ARM-20261028-v1' / 'projects-20261029A'
 MAX_RESPONSE, MAX_RESULT, MAX_LIST = 2*1024*1024, 128*1024, 100
 PRIVACY_BASIS = 'documented_private_default_and_observed_collaborators'
+BASELINE_BASIS = 'baseline_owner_org_metadata_only'
 PHASES = frozenset(('baseline', 'create', 'read', 'collaborators', 'reconcile'))
 
 
@@ -200,9 +201,31 @@ def _collaborators(rows,owner):
         'collaborators_sha256':_sha(_canonical(sorted(safe,key=lambda item:item['uid'])))}
 
 
-def _metadata(row,*,owner,org=None,arm=None,project=None):
-    if type(row) is not dict: _fail()
+def _baseline_collaborators(rows,owner):
+    # Old project metadata establishes owner/org only. NULL/foreign/unknown
+    # collaborators remain counted and hashed; this grants no old-project write
+    # permission and makes no old-project private/owner-only-clean assertion.
+    if type(rows) is not list or len(rows)>100: _fail()
+    known_nonowner=unclassified=verified_owner=0
+    for row in rows:
+        if type(row) is not dict:
+            unclassified+=1;continue
+        try: uid=_integer(row.get('uid'))
+        except ProjectRefusal:
+            unclassified+=1;continue
+        if uid!=owner:known_nonowner+=1
+        elif row.get('owner') is True:verified_owner+=1
+        else:unclassified+=1
+    return {'collaborator_count':len(rows),'nonowner_collaborator_count':len(rows)-verified_owner,
+        'known_nonowner_collaborator_count':known_nonowner,'unclassified_collaborator_count':unclassified,
+        'nonowner_count_includes_unclassified':True,'collaborators_sha256':_sha(e.canonical(rows)),
+        'old_project_privacy_clean_verified':False,'old_project_write_authorized':False}
+
+
+def _metadata(row,*,owner,org=None,arm=None,project=None,baseline_only=False):
+    if type(row) is not dict or type(baseline_only) is not bool: _fail()
     pid=_integer(row.get('projectId'));oid=_integer(row.get('ownerId'))
+    if baseline_only and (pid!=OLD_PROJECT or project!=OLD_PROJECT or arm is not None): _fail()
     organization=row.get('organizationId');name=row.get('name')
     if (type(organization) is not str or re.fullmatch('[a-f0-9]{32}',organization) is None
             or oid!=owner or row.get('owner') is not True or row.get('language')!='Py'
@@ -214,7 +237,7 @@ def _metadata(row,*,owner,org=None,arm=None,project=None):
     for key,private_value in (('isPublic',False),('public',False),('isPrivate',True),('private',True),('shared',False)):
         if key in row:
             explicit=True
-            if row[key] is not private_value: _fail()
+            if row[key] is not private_value and not baseline_only: _fail()
     created=row.get('created');created_utc=None
     if created is not None:
         if type(created) is not str or not 1<=len(created)<=80: _fail()
@@ -225,7 +248,8 @@ def _metadata(row,*,owner,org=None,arm=None,project=None):
     result={'project_id':pid,'name':name,'organization_id':organization,'owner_id':oid,'language':'Py',
         'created_utc':created_utc,'created_value_sha256':_sha(_canonical(created)),
         'explicit_privacy_flag_observed':explicit}
-    return {**result,**_collaborators(row.get('collaborators'),owner)}
+    stats=_baseline_collaborators(row.get('collaborators'),owner) if baseline_only else _collaborators(row.get('collaborators'),owner)
+    return {**result,**stats}
 
 
 REPORT_KEYS = frozenset(('schema round_id operation_id git_head source_hashes owner_instruction_sha256 phase arm '
@@ -240,7 +264,7 @@ def _report(raw):
     body=json.loads(raw.decode('ascii'),object_pairs_hook=_pairs,parse_float=lambda _: _fail(),parse_constant=lambda _: _fail())
     _closed(body,REPORT_KEYS)
     if (body['schema']!='tpr-cmp28-project-result-v1' or body['round_id']!=ROUND_ID
-            or body['phase'] not in PHASES or body['privacy_basis']!=PRIVACY_BASIS
+            or body['phase'] not in PHASES or body['privacy_basis']!=(BASELINE_BASIS if body['phase']=='baseline' else PRIVACY_BASIS)
             or body['automatic_retry'] is not False or body['independent_native_origin_attested'] is not False): _fail()
     return body
 
@@ -294,7 +318,7 @@ def _execute(plan,root,*,transport,guard,clock,monotonic):
         status='failed_or_uncertain',request=False,http_status=None,endpoint=None,payload=None,payload_sha256=None,request_claim=None,
         baseline=plan['baseline'],prior=plan['prior'],input_read_claims=[],raw_response=None,metadata=None,collaboration=None,
         create_attempted=False,unknown_create=False,automatic_retry=False,receipt_published=False,
-        lock_cleanup_complete=False,privacy_basis=PRIVACY_BASIS,independent_native_origin_attested=False)
+        lock_cleanup_complete=False,privacy_basis=BASELINE_BASIS if phase=='baseline' else PRIVACY_BASIS,independent_native_origin_attested=False)
     _publish(root,operation+'.operation.spent.json',frozen)
     try:
         lock=os.open(root/'five-projects.lock',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
@@ -364,7 +388,7 @@ def _execute(plan,root,*,transport,guard,clock,monotonic):
             elif len(rows)!=1: _fail()
             if rows:
                 report['metadata']=_metadata(rows[0],owner=authenticated_owner,org=organization,arm=arm,
-                    project=OLD_PROJECT if phase=='baseline' else payload.get('projectId'))
+                    project=OLD_PROJECT if phase=='baseline' else payload.get('projectId'),baseline_only=phase=='baseline')
                 if phase in ('create','reconcile'):
                     earliest=_instant(prior['created_utc'] if phase=='reconcile' else plan['created_utc'])-timedelta(seconds=60)
                     observed=report['metadata']['created_utc']

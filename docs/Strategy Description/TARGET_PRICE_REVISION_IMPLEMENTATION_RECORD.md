@@ -29550,3 +29550,32 @@ Currentpublicsource comparison_20261029_project_api.py 27096B/20798f6ac52fca26b0
 Currentpublicsource comparison_20261029_project_bundle.py 11486B/42d02c35cf5cdb0399e9c3b66d654fefd1b152d1a0897f1c456b83425ca9e7fc.
 Currentpublicsource comparison_20261029_project_probe.py 7002B/23a1bc3932b0cb4c743108b979317c888d43bf17e009adacea14287e2690c940.
 DelegatedCMP107-A001/offline103 implemented projectbootstrap+schema fromofficialprimarysources; CMP107-A002/comparison_accounting implemented registered-arm API and qualifiedjob-ID/outcome-look counts; CMP107-A003/finish_off implemented purefinancialprojectrebinding with unchangedfunctionAST; CMP107-A004/comparison_accounting independentlyreviewed rootprobe and verifiedcorrectedpin/labelbounds. Scopepublicsoftware/syntheticfixtures only; no nativeacceptance or self-declared adapter permission.
+
+Freshproject phase TPR-CMP28-R107-BASELINE-001/39519a17f280a5ddb92d6b4f165d0fa3c25e60595f8ab7b64a0a4e4f6199ef5f at 6b25d904aedbc33b76cfb11e996932ad3cd4ec8b BEFORE one exact baseline request and bounded claimed receipt reads; no retry, no source/input upload, no financialjob.
+
+Fresh bounded private phase TPR-CMP28-R107-BASELINE-SHAPE-001/05b76b0bc16cd271d867f58076ebdcef1d32ecce0bd3bb5a470e02ef42c5130c at 6b25d904aedbc33b76cfb11e996932ad3cd4ec8b BEFORE 1 exact private inputs/120s; Bounded shape-only baseline parser diagnosis; no accountvalues, credentials, licensed inputs or sourcebody projection; fsync claim and directory retained.
+
+### 107.2 Actual metadata bootstrap and qualified baseline correction
+
+At6b25d904aedbc33b76cfb11e996932ad3cd4ec8b, nativebaseline001 made exactly
+ONE authenticated projects/read for old37650980. HTTP200/successtrue/oneproject,
+actualownertrue/Py/organization32hex. The strictcollaborator parser refused
+one row withUIDnull, alongside one integerUID row. No create/upload/compile/
+job was requested. Receipt222fdf0c654a3742c66c91193afedb4f7726f86cd74e801ace233adb977b3fa6;
+raw4038B/db77ebf76bc99f59882760404453872c4b3c1e6a676d68bebe86e365fcfab5c8.
+A fresh boundedprivate shape-only phase inspected that exactraw after claim;
+no ownerID/org/email/collaboratoridentity or source/data values were projected.
+
+CMP107-D005: oldbaseline is solely an owner/organization reference, not a
+claim of oldproject privatecollaborator cleanliness. Qualify and retain its
+actualcollaborator count/hash/unknownnonowner count; no unknownrow is zeroed.
+Newfiveproject create/read/collaborator checks remain strict. This narrowly
+corrects an unnecessaryoldbaseline precondition; no oldprojectwrite or new
+private-sharing/accountpermission is inferred. Read actualnewproject custody
+before any sourceupload. Nativebaseline001 and its failedparser receipt stay
+immutable; newcode/newHEAD requires a freshbaseline002, never spentscopereuse.
+
+Baseline-only correction reproducedred1failed/62deselected0.38s, finalagent64passed0.96s. Rootrotatedbundle/probeindependentprojectsourcepins and ran exactfourchangedmodules286passed8.70s. Strictnewprojectcollaborator/registryfunctions AST-identical to6b25snapshot; no existing module/economicrule changed.
+Correctedpublicsource comparison_20261029_projects.py 30977B/6dc87f33105de9d80e7a267a6cc737bb4262f47e49c43b65247592927a5788d7.
+Correctedpublicsource comparison_20261029_project_bundle.py 11486B/a5534dbebc994f3e6ffe301a721f210d9110384216e539f2c2d42c69e8fcb300.
+Correctedpublicsource comparison_20261029_project_probe.py 7002B/0d9fc4cfe89e79ec95aab5dead2c83b5f263f85b89233a771120819c4c6a505b.

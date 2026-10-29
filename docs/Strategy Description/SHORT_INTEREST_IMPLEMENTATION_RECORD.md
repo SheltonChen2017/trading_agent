@@ -28169,3 +28169,100 @@ started/running/PID states refuse. All old native/code/source/live-bootstrap
 guards and the no-restart rules for retired labels remain unchanged. Data,
 spent/unknown debits and both source budgets remain preserved; no source
 START/HTTP/key read, look, QC/Safari, purchase or push occurred.
+
+### 132.25 Actual v4 no-start refusal; root-only debug dispatcher identified
+
+Checkpoint5f96cbcd8da9255f0edb2240b2f5a61f41205a5b contains132.23..24 and
+the strict never-started correction. Main post-record98/1.10s passed before
+commit. Clean5F96/matching tracking and actual F27/new paths/job absent were
+verified. Main invoked the v4 observe controller ONCE as exec80189.
+
+The outer process terminated exit0 with a NEGATIVE structured result:
+control_refused_before_initial_start, target_started=false, control-child
+exit2, stage controller_debug / startup_control. Kernel is runs0/inactive/
+active0/no PID/exit=None. No target debug configuration or initial start
+succeeded, no target observation exists, and observer status is unavailable.
+Outer0 is not successful setup or source/native proof. Current protected
+original inputs remain specSHAa615113838000acdf8dcfbd9305b58eddb2ec6dbc92da7f0aa4b747229b3a4a2,
+jobSHA451b2d86d931f8773fa95ff9a9c030bc2bbb35d8dab24b15e72b67cb65535655
+(2504/1616bytes), plus empty status. All v4 files and loaded never-started
+label are preserved and retired without retry/modification.
+
+The safe result retained the command phase but not debug's individual return
+code/raw text. Read-only installed documentation alone did not prove its
+privilege rule. Main then ran INVALID launchctl debug with NO target or flags,
+which cannot configure any job: exit1 and the fixed dispatcher message
+"This subcommand requires root privileges: debug". This PRIMARY installed
+command evidence establishes a privilege gate without attributing it to
+Documents access, old capture failures, or a missing source credential.
+No sudo, privacy/UI change, root escalation or new credential was attempted.
+
+**SI-DEC-20261028-11** authorizes a different UNPRIVILEGED observation backend
+after causal tests/review: job StandardErrorPath may name only Root's already
+held private PTY slave CHARACTER device under trusted /dev ancestry. Bind the
+exact os.ttyname(original slave), nofollow named dev/ino/rdev/UID/GID/mode and
+isatty to original FDs before/after load, immediately before initial start and
+after terminal observation. Reject missing/symlink/regular/replaced endpoints;
+hold both originals until terminal capture. launchd still opens that external
+pathname under trusted devfs; no Python O_NOFOLLOW/create-free guarantee or
+exclusive-writer/evidence capability is asserted for launchd. Root-only debug
+must be REMOVED from the registered command catalogue, not retried or elevated.
+
+All old native/code/source/full9 guards, private filtering, fresh runs0,
+RunAtLoad/KeepAlive=false, one initial kickstart WITHOUT-k and false authority
+remain. New v5 names require separate frozen registration; no old label is
+started. This route uses ordinary owned-agent standard-error configuration,
+not privilege bypass. Data, spent claims, unknown debits and both source
+envelopes remain intact. No source START/HTTP/key read, look, QC/Safari,
+purchase, external message or push occurred.
+
+### 132.26 Frozen unprivileged device-endpoint backend; v5 pending
+
+SI-DEC-20261028-11 now has the bounded backend correction. Only the existing
+diagnostic/test and this record changed. New fixed v5 names/schemas preserve
+all v4 files and the unstarted service untouched. launchctl debug is absent
+from BOTH registered argv catalogue and control flow; no sudo/privilege or
+privacy change is available in this route.
+
+Root derives the exact os.ttyname of its original private slave and pins its
+character dev/ino/rdev/UID/GID/mode/isatty against the nofollow named node under
+trusted, non-writable-by-user /dev ancestry. StandardErrorPath names that
+EXISTING endpoint. Master/slave stay held throughout load/start/terminal
+capture. Missing/symlink/regular-file/wrong node/owner/mode/device endpoints
+refuse. Checks run before and after load, after the LAST Git/config/query
+callback immediately before initial start, and after terminal capture.
+launchd's external devfs pathname open is not claimed to have Python nofollow/
+no-create flags, and the terminal is never exclusive-writer/source evidence.
+
+All original file-channel, native/code/source/historical full9 checks, canonical
+load transaction, strict runs0/never-exited semantics, private prestart and
+terminal barriers, ONE initial kickstart without-k, nonce/spec/PID filtering
+and false admission authorities remain unchanged. The persistent control child
+is retained solely for the existing lifetime protocol. No regular-file stderr
+fallback, root-only debug call or old-job restart is permitted.
+
+| Finding | Priority | Disposition |
+| --- | --- | --- |
+| SI-BUILD-20261028-068 | P2 | Corrected prospectively: the prior transport depended on a root-only debug dispatcher. Exact held private slave StandardErrorPath replaces that call under ordinary owned-agent setup; no privilege bypass or old-label retry. |
+| SI-BUILD-20261028-069 | P2 | Corrected before release: endpoint check must follow the last prestart callback, not merely the earlier barrier. Direct and last-query drift regressions were RED then GREEN; no initial start on drift. |
+
+Registered policy:
+858d85488e9bc447070e63f1c9e7e0c234d3ee917d991f3bf6b857c3dbf0b000.
+Source SHA2562a2924b70cc391461ab7c1cf6c3701390199b6cd48ed6fdd1a72c92ed70648f1;
+test SHA2561c4c238d7ac1f8a725e430cd702c041942dade193ebd51146f54d4ca42429154.
+Main10 focused files passed **455/3.85s**, no skips/warnings reported; all92
+held/proof/test paths compile in memory. Policy equality, six-file closure,
+old dependency/target hashes, historical-prefix and whitespace checks passed.
+Main corrected placement of its uncommitted132.25 addition to the true end;
+all committed historical bytes remain unchanged. Separately attributed author
+123/2.24s and peer114 startup tests/1.58s passed. Peer accepted registered
+bytes and the final endpoint checks. Tests stayed fabricated, sanitized-env/
+OS-network-denied/no bytecode/cache; no full suite or actual operation ran.
+
+After clean commit/fresh matching actual and tracking F27, Main may execute
+this ONE new registered diagnostic with all authors/tests frozen. Original
+canonical load and endpoint checks precede one initial start. Observe actual
+kernel/control-child results and only the privately filtered line; a refusal
+remains negative and observation0 never admits native/source/input evidence.
+Preserve all old labels/data/claims/debits and both caps. No source START/HTTP/
+key read, outcome/look, QC/Safari, purchase or push occurred.

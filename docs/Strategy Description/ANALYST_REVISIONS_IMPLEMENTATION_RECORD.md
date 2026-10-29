@@ -71451,3 +71451,60 @@ decision and use its resulting clean HEAD/caller/record once. Require actual
 parent0/child0 plus reconstructed report; do not re-delete36561231. A/C/B stay
 spent. No remaining12deletion is authorized by this diagnostic-only freeze;
 first resolve the representation and separately freeze justified continuation.
+
+### 332.7 Actual D confirmation and separately frozen remaining12 continuation E
+
+D ran once at clean37b36c4f1ccdc6b98ff05f879954b5089ffd540d, record
+d7ed85bc05fe56c072b5673c6f4f99de0cee4008f46242a8b2fc4b0f2d4d1247.
+Actualparent0/child0/output accepted, one HTTP200 intent/application dispatch.
+Finished2026-10-29T07:08:48.664758Z; report967bytes SHA256
+96fec347a09ede65ea961aa183a13c6d0fcfeb086e83ae7934f5e7c8867d85a4,
+child output1100bytes/b6d3e7564afb4a181cb761d2a70a7a86ef2e9aae42c7489785d923097bcc8952.
+Catalog300; same36561231 present, owner_match=true/codeRunning=false, exactname
+Recycle Bin/2026-10-29 07-04-07 1 ARV2_ACCEPTED_RISK_PRELIMINARY - 20260914_R053_c381be82.
+This fresh bounded observation confirms the first project in QC's named
+Recycle Bin convention. D's generic proof flags remain false; it supplies the
+literal observation rather than certifying a whole-tree/storage property.
+No extra path/deletion fields were present. D is spent/frozen.
+
+CR332-004: B incorrectly required a slash immediately before the original
+project name. QC inserted a timestamp and SPACE in the same Recycle Bin path
+component. This is a confirmed local verification error after an accepted
+delete, not an API deletion refusal. Preserve actual B2, its ambiguous report
+and the later separate D confirmation; do not retroactively change B's result.
+No re-delete36561231 and no old control/read invocation.
+
+NEW scripts/recycle_arv2_r332_qc_projects_v2.py15192bytes SHA256
+a59befce06c23aea46df2b916dc345dfb884c5b33aa8c572281f1a3a6e0c0ee3
+is a separate first-use E successor, not a renamed unchanged B retry. Only
+declared changes are source/control/schema, datetime import, strict new name
+helper and postcondition call. Reversing these restores frozen B byte-for-byte.
+The exact observed timestamp-plus-space convention is recognized only with a
+valid canonical calendar timestamp and exact original name, no stripping,
+suffix guessing or arbitrary alternate success. Twelve pure author name checks
+and in-memory compilation passed. New E tests16420bytes SHA
+277aafbcc237720ff96b3b55b7dcdd2b87c115851ede67ab7fe6ed4e896d327c:
+75passed0.14s under native denial. A restored memory-only old-slash predicate
+caught1expectedfailure0.11s on the exact observed-format fixture; source restored.
+Old B source/test and all used A/C/D/V1/V2 policy pins remain unchanged.
+
+New fixed controlqc_cleanup/R332-20261029-E remains uninspected/unallocated.
+E uses identical bounded transport, current-metadata/history/namespace/owner/
+idle/protected/library controls, scope gate,1200/1100second deadlines and
+actual-exit/report protocol. Exact E plan is3342canonical bytes SHA256
+6657649895820d68c8e99d7c8edbb1cc18c95922d47e5ed8253ccad1c556b98a:
+332.5's exact list and all bindings, EXCLUDING ONLY consumed36561231. Twelve
+remaining targets, same nine verification-only plus one zero-run and two
+failure-only. No change to purpose/profile inputs or criteria, no new lane
+or attempt/look authority. This separate continuation is justified by the
+verified local representation fix and excludes the already affected target.
+
+After focused validation, commit this E source/test/decision and invoke E
+ONCE from its resulting clean HEAD with exact caller/frozen-inventory/V2policy/
+record/plan pins. Require actualparent0/child0 and same-ID strict timestamped
+Recycle Bin confirmations. Any ambiguity stops; no unchanged retry. Do not
+open Safari or other-lane projects. The strategy/backtest hold stays in force.
+Root final pre-E focused selection232passes5.48s (60V2policy+75Erecycle+
+11resolver-template+86documents), two in-memory compilations and unchanged
+used B/V2 pins; native network/artifact/Keychain/security denial, no shared
+conftest or dispatch_fence. No full suite; prior202/207counts overlap.

@@ -1,6 +1,15 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current owner continuation (section106):** the owner explicitly directs
+**Current owner continuation (section107):** create FIVE separate private QC
+projects, one per frozen arm, preserve old project37650980 and its source-drift
+evidence, use genuine Mia for verified fixes, exercise documented bestjudgment,
+skip routineClaude review, and push exactlyone time at the completed or
+concrete-blocked auditable handoff. The priorsection106 factual limitation is
+retained history, not a claim that newproject isolation repairs missingdata.
+Privateaccess/custody/rights/nobroker/noaccountpurchase boundaries remain.
+No frozen financialpolicy or historical attempts/looks are reset.
+
+**Historical owner continuation (section106):** the owner explicitly directs
 genuineQC Mia to diagnose/fix the native data/routing issue, continue allfive
 frozen backtest arms using documented bestjudgment, skip further routineClaude
 checkpoints, and make exactlyone successful nonforce lane push when done.
@@ -16,7 +25,7 @@ Historicalsection104 outcome: The eight deliberately launched financial jobs all
 HEAD/access/read limits; its extended-day diagnostic was verified only as a bounded native diagnostic,
 with no financial-code fix or new performance accepted.
 
-**Current factual handoff (106.5–106.6):** genuineMia completed9read-only
+**Retained factual handoff (106.5–106.6):** genuineMia completed9read-only
 checks with no financialdiff. Its proposed extended-day native diagnostic
 compiled/ranCompleted, but the exacttarget stillreturned0TradeBar/0QuoteBar
 rows across04:00..20:00. No verified source/routing correction was found.
@@ -29457,3 +29466,87 @@ the unattributed projectsource merely because the Gitround is published.
 Finalpublicrecordaudit at49d0e144 ACCEPTEDwithinpublicdocumentscope aftercurrent-wording qualifications (completeddiagnosticpasttense; FULL-WINDOWmetricsNULL preservesobservedpartialcounts). No private/nativevalidation/edits/testsbyreviewer. Priorhistoricaltext/attempts retained, no source-writer attribution or financialacceptance asserted.
 
 Finalrootfocusedcurrent-role/provenance/historicalanchor selection3passed/584deselected0.91s; latestwordingonlyclarifiescompleteddiagnosticandfull-windowNULL. Final3publiccode/testhashes+gitshowHEADbytes+AST/inmemorycompilespassed; onlylanerecorddirty, noforeignstagedfiles. No additionalQCwrite occurred afterdrift.
+
+## 107. Five separate private QC projects and continued frozen-arm recovery
+
+Exactlatestownerinstruction SHA256: ea2dd7037a0f33ab78771a2f6deb3016da34b164ab04f5b2c69f30c4ae31157f.
+Base/currentactualTargetremote observed792f6f793a245d8cdb80670aac0d35027a8954eb;
+clean worktree/branch/root verified. No incomingClaude review or repeated
+section106counter-review is required. Every private phase still requires a
+fresh bounded source/HEAD/access/operation/look manifest and durable claim
+BEFORE effect. No spent scope reuse, oldD0/provider capture reopening,
+accountupgrade, broker/paper/live/deployment/operator actions are granted.
+
+CMP107-D001 (owner-directed project isolation): reserve exactlyfive unique
+names with round107/20261029A nonce, one per OFF/TPR050/TPR100/TPR200LONG/PURE.
+The oldOFF37650980 and ON37650453 receive no writes. Existing jobs, sources,
+failures and all limits remain. Newprojects are not proof that unattributed
+source drift is repaired; every upload/compile/launch needs exactsource
+before/after readback and actualproject/job custody. QC has no documented
+atomic source CAS or project-create idempotency key. A create timeout,
+non-success or malformed response spends its name; fresh bounded read-only
+reconciliation precedes any decision, never a blind duplicate create.
+
+CMP107-D002 (privacy and organization): officialQC states code private by
+default unless shared. Published create/read schemas have no project-level
+private/isPublic boolean; versions.public describes LEAN versions, notprivacy.
+Use explicit verifiedexisting organization, exactreservedname/Py/owner/
+collaborator readbacks and record the limit of documented-private-default;
+do not invent a backendprivacy attestation or change account sharing/settings.
+ObjectStore is organization-wide; the immutable signalkey's37650980 namespace
+does not isolate backend data. Newprojects may read only the exactfrozen
+descriptor under their ownfresh native claims after sameorganization
+verification; no local280MBpacket copy/reopen is necessary or authorized here.
+
+CMP107-D003 (financial invariance): preserve sixstockuniverses, dates,
+selection/tilt/cash/fees/slippage/actions/marks and all frozen hashes.
+Rebinding a nativeproject identifier is a newsource/configepoch, not a
+strategy change or a historicalattempt reset. Separateprojects alone do not
+fix the exactSID's zero same-session native rows. No unchanged failing
+financial rerun, stale carry, fabricated same-session price, outcome-chasing
+parameter sweep or invented positive result. Genuine Mia diagnostics/fixes
+remain authorized with exactsource comparison and independent verification.
+The request for allfive useful completed backtests remains active until
+actually fulfilled or a concrete factual/external/safety limitation is proved.
+
+Public primary sources:
+- https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/create-project
+- https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/read-project
+- https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/collaboration/read-project-collaborators
+- https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip
+- https://github.com/QuantConnect/Lean/blob/master/Common/Api/Project.cs
+- https://www.quantconnect.com/docs/v2/writing-algorithms/object-store
+- https://github.com/QuantConnect/lean-cli/blob/master/lean/components/api/api_client.py
+
+No projectcreate/upload/compile/job/Mia/privateinput effect has yet occurred
+in107. Implement source-bound create/read/registered-arm transport/rendering
+successors first; focused offline software tests confer no native acceptance.
+
+### 107.1 Offline implementation and process observations before effects
+
+Rootisolatedprojectprobe focusedtests16passed0.76s: onlythree actualchild
+project comparisons are rebound, parent37650980 witness/key validation stays
+unchanged, nativeeffect/config/registration/history/clockguard functions retain
+their reviewed AST. The probe adds one<=64byte nativeSymbol.Value label inside
+the privateQC log for separately scoped genuineMia mapping diagnosis; no rawSID,
+OHLC/quotevalue/volume or performance is exported. Publicrecords receive only
+hashes/categorical findings, not that privateidentity label. Actualnative
+source/project/claim checks remain required; fixtures grant no nativeauthority.
+
+ProcessdeviationCMP107-P001: delegatedAPIagent reports TWO reads of the known
+local privateofflinevalidationhelper and TWO attempted executions before a
+freshbounded readclaim. First systemPython3.9 execution stopped at public
+dispatchfence dataclass slots incompatibility; second bundledruntime stopped
+at missingpytest after isolatedsetup. No helperhash was observed, and no
+retroactiveclaim is invented. Agent reports noQC/provider/credential/operator
+effects. Both reads/executions remain recorded; helperwillnotbereopened.
+Subsequentvalidation uses inline temporary49/52runtime/syntheticDB setup
+BEFOREdispatch/config imports, networkdenial and authoritativepy313interpreter.
+This processdeviation is not financialevidence or a new researchlook.
+
+CMP107-D004 source-bound adapters: create/read bootstrap59focusedpass; registered-arm API132pass; isolatedprojectbundle63pass; projectprobe27pass afterverifiedprovenancepin correction. RootAPI/projects/probe union218passed3.11s; rootcurrentroute3passed/584deselected0.97s. Focusedsoftwarechecks only, nofullsuite.
+Currentpublicsource comparison_20261029_projects.py 29430B/57e9807fa7cb59d271347cc364f5fe5d94a34e99d99c516e8b8e2ea930dc5ca1.
+Currentpublicsource comparison_20261029_project_api.py 27096B/20798f6ac52fca26b0c8a8a73d7b334a3466d939bc83ea157d8bc1e10ee2cd8b.
+Currentpublicsource comparison_20261029_project_bundle.py 11486B/42d02c35cf5cdb0399e9c3b66d654fefd1b152d1a0897f1c456b83425ca9e7fc.
+Currentpublicsource comparison_20261029_project_probe.py 7002B/23a1bc3932b0cb4c743108b979317c888d43bf17e009adacea14287e2690c940.
+DelegatedCMP107-A001/offline103 implemented projectbootstrap+schema fromofficialprimarysources; CMP107-A002/comparison_accounting implemented registered-arm API and qualifiedjob-ID/outcome-look counts; CMP107-A003/finish_off implemented purefinancialprojectrebinding with unchangedfunctionAST; CMP107-A004/comparison_accounting independentlyreviewed rootprobe and verifiedcorrectedpin/labelbounds. Scopepublicsoftware/syntheticfixtures only; no nativeacceptance or self-declared adapter permission.

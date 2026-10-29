@@ -2352,6 +2352,10 @@ from this offline counter-review.
 Under the standing scoped research-recovery direction, the owner explicitly
 waives Claude review of section 331; this is not independent acceptance of
 the corrections and does not release the QC/Safari hold.
+Section 332 records the later owner-requested Analyst-only QC cleanup. The
+owner explicitly waives Claude review of section 332 under the standing
+until-further-notice lane direction. That bounded metadata/recycling task is
+the only QC exception; Safari and backtest submission remain held.
 
 Section 328 is Claude's independent review of `3c905d42..0d38c59d`, the
 seventy-four Codex commits of sections 323 (Mac recovery) and 324–327.
@@ -71147,3 +71151,120 @@ frozen source verification, then a bounded coverage diagnostic and actual
 result handling under all source/price/identity/rights/attempt gates. All
 historical refusals, spent attempts and false PIT/master/readiness/paper/live
 flags remain. No live, paper, broker, funded or real-order authority exists.
+
+## 332. Owner-requested Analyst QC project cleanup, 2026-10-28
+
+### 332.1 Owner scope and conservative retention
+
+The owner asked to search all QC projects, identify only those created for
+Analyst Revisions, and delete projects used only for verification or with no
+successful backtest. This is direct metadata-inventory and recoverable-recycle
+authority, scoped to this lane. It supersedes the QC hold only for these
+cleanup endpoints. Safari, capacity/jobs, strategy submission and other lanes'
+projects remain outside the operation. No new monitor or Mia session.
+The standing until-further-notice review waiver applies to this bounded task;
+Codex's same-round checking is not independent final acceptance.
+
+The catalog may be read to find this lane and incoming library references,
+but no other-lane name/ID/account details are retained in the report. Project
+ownership selection requires both an Analyst/ARV2 namespace and an exact
+numeric project-ID witness in the committed lane record; that is corroborated
+scope evidence, not an independently authenticated creation log. Unknown or
+conflicting names, ownership or metadata are preserved. Backtest lists request
+includeStatistics=False; no statistic, source file, Object Store object,
+result/log/chart/order/holding or live endpoint is selected.
+
+Current dependencies38522505 (the only QC-local native book used by pending
+R329/W5),38364439 (R298 reference),37165262 (storage/completed reference) and
+the historically owner-preserved36823601 remain protected. Shared/referenced
+libraries, non-owner/shared/active/unknown/live-metadata projects are retained.
+Only documented verification-only ID37705240 with its exact current historical
+name ARV2 R284 PUBLIC SEVEN IDENTITY 20261007 may qualify despite a completed
+diagnostic. Renamed verification projects are preserved. IDs36561231/36642921
+qualify only from a fresh zero/no-success history. Other projects with any Completed./Completed
+run remain. Zero-run histories qualify under this new explicit scope, which
+is broader than171's failed-terminal-only cleanup; historical outcomes stand.
+Unknown/nonterminal statuses or malformed/incomplete history preserve the
+project. No permanent purge, source/evidence cleanup or storage deletion.
+
+QC's current official Projects Getting Started documentation says deletion
+moves a project to Recycle Bin and recovery is available for30days; the
+Delete Project API takes onlyprojectId. The Read Project and List Backtests
+documentation define the catalog, project state and statistics-disabled list.
+Public documentation browsing is not authenticated QC operational evidence.
+Official links: https://www.quantconnect.com/docs/v2/cloud-platform/projects/getting-started ;
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/delete-project ;
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/list-backtests .
+
+### 332.2 New bounded callers, source pins and first inventory freeze
+
+| New source | Bytes | SHA256 |
+|---|---:|---|
+|scripts/arv2_r332_qc_cleanup_policy.py|8499|230d7e47cad588e1cc30d89cd4b881bec2a9d751752eae9081079f085d7498ea|
+|scripts/inspect_arv2_r332_qc_cleanup.py|23364|84a17a710ea1de2acb1a63ffa162c26200f8f6dbb5325ea1d48465a9053083a5|
+|scripts/recycle_arv2_r332_qc_projects.py|14097|339ce08fce99e234676d7b7a879ac36ddfddeff4b2c65b90e73570558e9a0849|
+
+The designated Mac root/branch and Python3.13 remain fixed. Each parent checks
+exact clean committed HEAD, its supplied source/policy/record pins and host;
+credentials are selected only from the already configured QC environment pair
+and handed to its one own isolated native worker through stdin. No secret
+argument/output/file or Keychain access. New owned control is claimed before
+worker credential use/DNS/contact, retained even on failure; no retry/cleanup.
+The complete source/record bytes supplied to that dispatch are externally
+pinned; those are bindings, not authorization booleans or whole-interpreter
+integrity. The observed credential-pair presence check exposed values nowhere.
+
+A is a one-use inventory at artifacts/analyst_revisions_v2/qc_cleanup/
+R332-20261028-A, not inspected/allocated during preparation. Inventory permits
+one POST projects/read catalog and one backtests/list per confirmed Analyst
+project, up to1024 catalog projects. No deletion is implemented by A.
+Parent900seconds/worker600seconds, each HTTP15seconds, DNS5seconds; startup,
+uninterruptible I/O/suspension and own-child reap remain qualified. Exact held
+certifi CA240216bytes/9cc2a774b5198dcff14d9be1e66091f538975d867ce029a96bce15a55dfd730f
+is loaded into hostname-verified TLS>=1.2; one current global address, no
+fallback/proxy/redirect/retry,8MiB response bounds. Native policy admits only
+HTTPS/DNS/resolver IPC and new control/cache writes; old artifacts, both
+Keychain directories and security CLI are denied. This is not a domain fence,
+native ancestor ACL authentication or physical-request measurement.
+
+B is a separate, as-yet uninvoked recycle batch at the fresh fixed sibling
+R332-20261028-B. Its plan is initially unbound. Before B, pin the exact selected
+IDs/names/safe-metadata/history hashes in a separate committed decision using
+only A's supplied output. Fresh catalog references, then exact project/history
+reads precede each single delete. A further global-reference and target-metadata
+refresh immediately precedes every delete while other lanes may be active.
+Any mismatch or ambiguous operation stops
+the batch without retry. Same-ID Recycle Bin/name post-read is mandatory.
+These API reads do not grant an atomic lease against concurrent same-user
+changes. Parent1200seconds/worker1100seconds, same transport bounds. B reads
+neither A's control nor any old source/result control; its report and actual
+exit are separately bound. No bare delete or arbitrary endpoint is permitted.
+
+First A dispatch is authorized only after committing this preparation and
+focused checks, from the resulting clean HEAD, with exact current caller,
+policy and record hashes as CLI bindings. Sole invocation and its actual
+parent/child exits plus reconstructed report pin will be recorded. No B
+dispatch is authorized by this first freeze; it requires the separate plan.
+Both callers keep fsynced intent separate from application dispatch-attempt
+accounting, preserve finite numeric HTTP status on refusal, and never read a
+failed-response body. Parent output acceptance requires actualchild0 and
+matching bounded bindings/report pin; actualparent0 remains external evidence.
+No project result cell/look/accounting accrues from cleanup metadata access.
+
+Pre-use root validation:207distinct focused tests passed6.04s (63policy,
+5inventory,42recycle,11resolver-template,86document checks), with six source/
+test files compiled in memory, native all-network/old-artifact/both-Keychain/
+security-CLI denial and dispatch_fence absent. No full suite. Test pins:
+policy19045946e7d3aec2290d533e7de23297cd4475b598a0ea7fb930546702142e43;
+inventoryc8841167f88fbb27967308116986fba56f0252df24c3629069f6f37fba644f7b;
+recycled001fe46217cfa601b87bdc581ebdf9ae3f44248c83ecef8cd4b70c5182fc31d.
+Author selections overlap (policy63passes0.10s, inventory5passes0.12s,
+recycle42passes0.12s) and are not additive. Two pre-use P2s were corrected:
+inventory resets eligibility on later metadata refusal; verification purpose
+binds exact ID/name rather than ID alone. Expected-red cases caught those
+omissions; protected-set and late-reference omissions were restored safely.
+Two earlier attempted policy pytest mutations skipped because mutation emptied
+the parameter collection; these are invalid proof, superseded by four direct
+assertion failures. No operational caller or control had been invoked at these
+checks. One successful final push will follow actual inventory/cleanup handoff,
+with local preparation commits accumulated until that endpoint.

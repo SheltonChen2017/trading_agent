@@ -37,6 +37,7 @@ PROTECTED_IDS=frozenset((38609822,38609834,38609836,38609837,38609840))
 DELETE_CANDIDATES=frozenset((37540166,37650453))
 MEMBERSHIP_SHA256='f3ded2bbc4978c919c612669292ae480ce4144a88f1ca1148a991786fa3d3c6e'
 VERIFICATION_BASIS={37540166:'sole_lane_record_68.7.2_QC6_REMX_zero_selection_zero_trade'}
+VERIFICATION_JOB_IDS={37540166:frozenset(('b4f867f657b98fa29a070be9f7942693',))}
 PHASES=frozenset(('inventory','lane_sources','lane_jobs','lane_job','delete','delete_readback'))
 MAX_RESPONSE=2*1024*1024
 MAX_JOBS=1000
@@ -268,15 +269,15 @@ def _delete_evidence(plan,registry,load):
     completed=[]
     for ordinal,row in enumerate(jobs):
         actual=_job(load('job-'+str(ordinal),records[row['backtest_id']]),project,row['backtest_id'])
-        if actual['status']!=row['status']:_fail()
+        if actual['status']!=row['status'] or actual['completed'] is not True:_fail()
         if actual['status'] in COMPLETED:
-            if actual['completed'] is not True:_fail()
             completed.append(actual)
     basis=criteria['basis']
     if basis=='no_completed_backtest':
         if completed:_fail()
     elif basis=='verification_only':
-        if project not in VERIFICATION_BASIS or any(row['total_orders']!=0 for row in completed):_fail()
+        if (project not in VERIFICATION_BASIS or any(row['backtest_id'] not in VERIFICATION_JOB_IDS[project]
+                or row['total_orders']!=0 for row in completed)):_fail()
     else:_fail()
     return {'basis':basis,'source_inventory_sha256':source_hash,'job_census_sha256':jobs_hash,
         'archived_sources':len(sources),'archived_jobs':len(jobs),'completed_jobs':len(completed),

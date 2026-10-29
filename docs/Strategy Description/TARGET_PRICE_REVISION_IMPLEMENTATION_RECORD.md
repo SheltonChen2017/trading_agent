@@ -29734,3 +29734,31 @@ Cleanupsource review: fixed11historicalIDmembershipfrompublicrecordf3ded2bbc4978
 Cleanupsoftware research/target_price_revisions_qc/comparison_20261029_cleanup_api.py 26389B/63497c54a20137f80166364b09b755521dc5090e45128c3c0ece0078d55749a9.
 Cleanupsoftware tests/target_price_revisions_qc/test_qc_comparison_20261029_cleanup_api.py 17120B/bafe75dafd463f38ddbdb46920adb2825027941cca72483c4ba422ca61727437.
 Cleanupfocusedauthor77passed0.99s; rootfocusedvalidation recordedaftercompletion. Existingfourprojectmodules286passed8.70s beforethisindependentclientaddition; nofullsuite or frozenfinancialsource modification.
+
+Freshcleanup phase TPR-R107-CLEANUP-INVENTORY1-0000/0ef5c12f3cdaaca22203962ad2a92c29f5d68df75ab672f6e65191e5d99eabd8 at 614102cbe67a841d3b68a2e0a3c8f328cee83d07 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-INVENTORY1-0100/e0d56a507b8e223567b78a3c7b61f652aee57cccd49f4ed4bb08294d73dfa445 at 614102cbe67a841d3b68a2e0a3c8f328cee83d07 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-INVENTORY1-0200/c82fcfc46100e1d681813953342e8cda762cec87e1597c09ca0533deb49c0c1e at 614102cbe67a841d3b68a2e0a3c8f328cee83d07 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+Freshcleanup phase TPR-R107-CLEANUP-INVENTORY1-0300/3c07c994a5d986231d12914bd724553736bd3ff077b77eb6d09964a9d0527391 at 614102cbe67a841d3b68a2e0a3c8f328cee83d07 BEFORE one exactinventory native request and claimed boundedregistry/archive reads. No source/compile/job/ObjectStore effect, no retry.
+
+CMP107-CR001/P2 confirmed/resolved: terminal-looking RuntimeError/Stopped/etc
+with completedFALSE previouslypassed deletionactivity check; nowEVERY
+recognizedterminal detail requires completedTRUE. CMP107-CR002/P2 confirmed/
+resolved: unfamiliar zero-orderCompleted job couldinherit oldREMXverification
+purpose. Verificationbasis nowrequires exactdocumenteddiagnostic
+b4f867f657b98fa29a070be9f7942693 ANDzeroorders; unknownCompleteds retained.
+Sevenregressions RED before7failed/77deselected0.70s, agentfinal84passed0.80s;
+root84pass onexactcorrectedclient. No deletion hasbeenattempted. Freshcapture
+provenance and boundedrootinputdependency review remain external, never
+authenticated by an eligibility marker or rewrapping historicalcaptures.
+Correctedcleanupsource26527B/96a75ac7b5f18cc7b6ac53bd9a91578c47a31b08f4cb0b7022412d222d55e8ed;
+test18336B/51f332699881db7528a44a964cd3b20dd6d0383dbabdc05ba40f1e61aa081109.
+Firstactualnativeallaccountinventory executed4pages0/100/200/300, observed
+100/100/100/0rows. Tooloutputtruncation preventedrootfromparsingpage100receipt
+inline; rawprivateoutputsremainretained. No accountwidecompleteness/uniqueness
+or reverse-dependency acceptance is asserted until a fresh compact-output
+inventory is fullyreconciled beforedeletion. Allknown16laneIDs observedpage0,
+no othernamepatternmatch observed in parsedpages; unread/truncatedpage100 is
+not silentlytreatedempty. No unrelatedprojectsource/job was read.

@@ -83,7 +83,7 @@ def archived(tmp_path,*,pid=PROJECT,status='Runtime Error',orders='0',basis='no_
     jobs_raw=m._canonical({'success':True,'projectId':pid,'backtests':list_rows,'count':len(list_rows)})
     jobs_descriptor=store(root,'jobs.raw',jobs_raw);details={}
     for row in list_rows:
-        body=dict(backtestId=row['backtestId'],status=row['status'],completed=row['status'] in m.COMPLETED,
+        body=dict(backtestId=row['backtestId'],status=row['status'],completed=row['status'] in m.TERMINAL,
             statistics={} if orders is None else {'Total Orders':orders})
         body.update(job_changes or {})
         details[row['backtestId']]=store(root,'job-'+row['backtestId']+'.raw',{'success':True,'projectId':pid,'backtest':body})
@@ -153,7 +153,8 @@ def test_no_completed_candidate_requires_real_archives_and_claims_before_delete(
 
 
 def test_documented_verification_candidate_needs_actual_zero_order_completed_details(tmp_path):
-    registry,index,criteria,*_=archived(tmp_path,status='Completed.',basis='verification_only',orders='0')
+    registry,index,criteria,*_=archived(tmp_path,status='Completed.',basis='verification_only',orders='0',
+        jobs=[{'backtestId':'b4f867f657b98fa29a070be9f7942693','status':'Completed.'}])
     out=run(tmp_path,delete_plan(registry,index,criteria),lambda *_:response({'success':True}))
     assert out['status']=='delete_acknowledged_readback_required' and out['eligibility']['completed_jobs']==1
     assert out['eligibility']['public_verification_basis']==m.VERIFICATION_BASIS[PROJECT]
@@ -165,8 +166,10 @@ def test_documented_verification_candidate_needs_actual_zero_order_completed_det
 def test_delete_refuses_missing_or_conflicting_native_evidence_before_effect(tmp_path,fault):
     kwargs={}
     if fault=='completed':kwargs.update(status='Completed.',basis='no_completed_backtest')
-    elif fault=='nonzero_orders':kwargs.update(status='Completed.',basis='verification_only',orders='1')
-    elif fault=='unknown_orders':kwargs.update(status='Completed.',basis='verification_only',orders=None)
+    elif fault=='nonzero_orders':kwargs.update(status='Completed.',basis='verification_only',orders='1',
+        jobs=[{'backtestId':'b4f867f657b98fa29a070be9f7942693','status':'Completed.'}])
+    elif fault=='unknown_orders':kwargs.update(status='Completed.',basis='verification_only',orders=None,
+        jobs=[{'backtestId':'b4f867f657b98fa29a070be9f7942693','status':'Completed.'}])
     elif fault=='nonterminal':kwargs['status']='In Progress...'
     elif fault=='missing_completed':kwargs['job_changes']={'completed':None}
     elif fault=='code_running':kwargs['meta_changes']={'codeRunning':True}
@@ -278,3 +281,17 @@ def test_final_clock_fatal_cannot_leave_completed_status_or_private_body(tmp_pat
         m._execute_fixture(prepared,tmp_path/'cleanup',tmp_path/'inputs',transport=transport,clock=clock)
     assert caught.value.report['status']=='failed_or_uncertain'
     assert caught.value.report['receipt_published'] is True and 'PRIVATE-ERROR' not in str(caught.value)
+
+
+@pytest.mark.parametrize('status',['Runtime Error','RuntimeError','Error','Stopped','Cancelled','Canceled'])
+def test_recognized_terminal_status_requires_explicit_completed_true(tmp_path,status):
+    registry,index,criteria,*_=archived(tmp_path,status=status,job_changes={'completed':False})
+    out=run(tmp_path,delete_plan(registry,index,criteria),lambda *_:response({'success':True}))
+    assert out['status']=='failed_or_uncertain' and out['request_attempted'] is False
+    assert not (tmp_path/'cleanup'/('project.'+str(PROJECT)+'.delete.spent.json')).exists()
+
+
+def test_unfamiliar_completed_zero_order_job_is_not_public_verification_provenance(tmp_path):
+    registry,index,criteria,*_=archived(tmp_path,status='Completed.',basis='verification_only',orders='0')
+    out=run(tmp_path,delete_plan(registry,index,criteria),lambda *_:response({'success':True}))
+    assert out['status']=='failed_or_uncertain' and out['request_attempted'] is False

@@ -18,6 +18,18 @@ from scripts.qualify_sharadar_companion import SharadarCaptureRefusal
 from scripts.short_interest_keychain import KeychainSecret
 import research.short_interest_etf.native_daily_active_reference as contract
 from scripts import capture_short_interest_native_daily_active as runtime
+import os
+
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
 
 SECRET = 'FABRICATED-DAILY-ACTIVE-TOKEN/42'
 START = '2026-10-14T01:00:00Z'
@@ -95,6 +107,7 @@ def run(case):
         plan, index, **kwargs)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_all1169_actual_advertised_fabricated_day_chains_complete_only_active_panel(monkeypatch):
     case = setup(monkeypatch)
     value = run(case)
@@ -134,6 +147,7 @@ def gated_failure(monkeypatch, case, failure):
 
 
 @pytest.mark.parametrize('status', [403, 429, 500, None])
+@_POSIX_CAPTURE_ONLY
 def test_fatal_stops_new_days_drains_all8_and_retains_failure_status_no_body(monkeypatch, status):
     case = setup(monkeypatch)
     def failure():
@@ -153,6 +167,7 @@ def test_fatal_stops_new_days_drains_all8_and_retains_failure_status_no_body(mon
 
 
 @pytest.mark.parametrize('kind', ['ASCII', 'Unicode', 'percent', 'slash', 'media'])
+@_POSIX_CAPTURE_ONLY
 def test_echo_discard_precedes_hash_and_publication_all_started_work_drained(monkeypatch, kind):
     from urllib.parse import quote
     case = setup(monkeypatch)
@@ -176,6 +191,7 @@ def test_echo_discard_precedes_hash_and_publication_all_started_work_drained(mon
 
 @pytest.mark.parametrize('bad', [b'not JSON', b'{"status":"OK","results":[],"count":1}',
     b'{"status":"OK","status":"OK","results":[]}', b'{"status":"OK","results":{},"next_url":null}'])
+@_POSIX_CAPTURE_ONLY
 def test_bounded_nonsecret_bad_shape_raw_is_retained_but_day_and_full_capture_refuse(monkeypatch, bad):
     case = setup(monkeypatch)
     gated_failure(monkeypatch, case, (bad, 'application/json', 200))
@@ -186,6 +202,7 @@ def test_bounded_nonsecret_bad_shape_raw_is_retained_but_day_and_full_capture_re
     assert 'day-0001.qualified.private.json' not in case[3]
 
 
+@_POSIX_CAPTURE_ONLY
 def test_serial_cursor_inside_day_exact_chain_while8_days_overlap(monkeypatch):
     case = setup(monkeypatch)
     first_date = sessions()[0]
@@ -210,6 +227,7 @@ def test_serial_cursor_inside_day_exact_chain_while8_days_overlap(monkeypatch):
 @pytest.mark.parametrize('url', ['https://outside.invalid/v3/reference/tickers?cursor=x',
     contract.ENDPOINT + '?cursor=x&apiKey=other-secret', contract.ENDPOINT + '?cursor=x&active=false',
     contract.ENDPOINT + '?cursor=x&date=2027-01-01', contract.ENDPOINT + '?cursor=x&limit=2000'])
+@_POSIX_CAPTURE_ONLY
 def test_unsafe_cursor_retained_private_never_followed_or_reported_complete(monkeypatch, url):
     case = setup(monkeypatch)
     raw = canonical_json({'status': 'OK', 'results': [], 'next_url': url}).encode()
@@ -220,6 +238,7 @@ def test_unsafe_cursor_retained_private_never_followed_or_reported_complete(monk
     assert all(request.full_url != url for request in case[5])
 
 
+@_POSIX_CAPTURE_ONLY
 def test_unterminated64page_chain_never_calls65_or_completes_any_missing_day(monkeypatch):
     monkeypatch.setattr(contract, 'MAXIMUM_DAY_CHAINS', 1)  # Explicit smaller fabricated scheduling fixture.
     case = setup(monkeypatch)
@@ -235,6 +254,7 @@ def test_unterminated64page_chain_never_calls65_or_completes_any_missing_day(mon
     assert 'day-0001.refused.json' in case[3]
 
 
+@_POSIX_CAPTURE_ONLY
 def test_no_complete_or_source_admission_can_be_supplied_as_boolean(monkeypatch):
     case = setup(monkeypatch)
     monkeypatch.setattr(runtime, 'PLAN_SHA256', 'PENDING')
@@ -245,6 +265,7 @@ def test_no_complete_or_source_admission_can_be_supplied_as_boolean(monkeypatch)
         runtime.main()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_failed_key_retains_consumed_whole_claim_zero_HTTP_without_secret_diagnostics(monkeypatch):
     case = setup(monkeypatch)
     def key(_provider):
@@ -256,6 +277,7 @@ def test_failed_key_retains_consumed_whole_claim_zero_HTTP_without_secret_diagno
     assert case[3]['run.refused.json']['attempts_claimed'] == 0
 
 
+@_POSIX_CAPTURE_ONLY
 def test_missing_terminal_receipt_or_publication_failure_never_completes_and_drains(monkeypatch):
     case = setup(monkeypatch)
     original = case[2]['publish']
@@ -270,6 +292,7 @@ def test_missing_terminal_receipt_or_publication_failure_never_completes_and_dra
     assert 'day-0001-page-01.refused.json' in case[3]
 
 
+@_POSIX_CAPTURE_ONLY
 def test_native_worker_high_water_is_exactly8_not_more_and_all_chains_drain(monkeypatch):
     case = setup(monkeypatch)
     active, peak = 0, 0
@@ -291,6 +314,7 @@ def test_native_worker_high_water_is_exactly8_not_more_and_all_chains_drain(monk
     assert result['complete_frozen_sequence'] is True
 
 
+@_POSIX_CAPTURE_ONLY
 def test_actual_receipt_clock_inversion_across_days_is_kept_not_fabricated(monkeypatch):
     case = setup(monkeypatch)
     second_retained = threading.Event()
@@ -316,6 +340,7 @@ def test_actual_receipt_clock_inversion_across_days_is_kept_not_fabricated(monke
 
 
 @pytest.mark.parametrize('budget', ['bytes', 'rows'])
+@_POSIX_CAPTURE_ONLY
 def test_fullpage_reservation_blocks_extra_HTTP_until_unused_success_ceiling_is_known(monkeypatch, budget):
     # Smaller explicit fabricated allowance: enough actual empty bodies for
     # all1169 days but only one full page may be admitted concurrently.
@@ -356,6 +381,7 @@ def test_fullpage_reservation_blocks_extra_HTTP_until_unused_success_ceiling_is_
 
 
 @pytest.mark.parametrize('budget', ['bytes', 'rows'])
+@_POSIX_CAPTURE_ONLY
 def test_smaller_than_fullpage_allowance_never_invokes_HTTP_or_fakes_completed_days(monkeypatch, budget):
     if budget == 'bytes':
         monkeypatch.setattr(contract, 'MAXIMUM_TOTAL_BYTES', contract.MAXIMUM_RESPONSE_BYTES - 1)
@@ -368,6 +394,7 @@ def test_smaller_than_fullpage_allowance_never_invokes_HTTP_or_fakes_completed_d
     assert not any(n.endswith('.completed.json') for n in case[3])
 
 
+@_POSIX_CAPTURE_ONLY
 def test_request_receipt_custody_failure_claims_no_HTTP_and_drain_never_emits_success(monkeypatch):
     case = setup(monkeypatch)
     original = case[2]['publish_json']

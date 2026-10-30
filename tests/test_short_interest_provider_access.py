@@ -9,6 +9,18 @@ import pytest
 from scripts import audit_short_interest_provider_access as access
 from scripts import short_interest_keychain as keys
 from scripts.qualify_sharadar_companion import SharadarCaptureRefusal
+import os
+
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
 
 
 @pytest.fixture(autouse=True)
@@ -120,6 +132,7 @@ def test_account_original_never_hashed_or_persisted(tmp_path, monkeypatch):
     assert not projection['expiry_verified'] and not projection['licensing_verified']
 
 
+@_POSIX_CAPTURE_ONLY
 def test_stable_claim_blocks_second_run_before_key_even_changed_registration(tmp_path):
     h = Harness(tmp_path); directory = tmp_path / 'capture'; directory.mkdir(mode=0o700)
     access._prepared_capture(directory, check=lambda: None, registration={'head': 'a' * 40},
@@ -176,7 +189,10 @@ def test_unknown_or_explicit_failure_is_negative_and_not_retried(tmp_path, failu
 
 
 @pytest.mark.parametrize('body', [b'{}', b'{"a":NaN}', b'{"table":"stocks","table":"stocks"}',
-                                 b' ' * 65537, b'{"x":"\\ud800"}'])
+                                 b' ' * 65537, b'{"x":"\\ud800"}'],
+                         # Short ids: pytest exports the node id through PYTEST_CURRENT_TEST, and a
+                         # 65,537-byte id exceeds the 32,767-character environment limit on Windows.
+                         ids=['empty', 'nan', 'duplicate-key', '65537-spaces', 'lone-surrogate'])
 def test_malformed_or_large_body_never_stored(tmp_path, body):
     h = Harness(tmp_path); h.bodies[0] = (body, 'application/json', 200)
     result = h.run()
@@ -195,6 +211,7 @@ def test_out_of_date_or_extra_cap_rows_refused(tmp_path):
     assert 'route-06.raw' not in h.saved
 
 
+@_POSIX_CAPTURE_ONLY
 def test_registration_requires_complete_manifest_before_any_side_effect(monkeypatch):
     monkeypatch.setattr(access, '_prepare_capture_directory', lambda *a: pytest.fail('must not create output'))
     with pytest.raises(access.ProviderAccessRefusal, match='complete_current_code_manifest'):
@@ -214,6 +231,7 @@ def test_exponent_encoded_numeric_secret_refuses_before_any_hash():
         access._json(b'{"value":1.23456789e8}', (keys.KeychainSecret('123456789'),))
 
 
+@_POSIX_CAPTURE_ONLY
 def test_replaced_owned_output_cannot_receive_a_private_payload(tmp_path):
     directory = tmp_path / 'capture'; directory.mkdir(mode=0o700)
     h = Harness(tmp_path)

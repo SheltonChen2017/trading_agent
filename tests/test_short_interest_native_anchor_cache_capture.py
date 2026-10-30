@@ -10,6 +10,17 @@ import pytest
 from data.hashing import canonical_json, hash_bytes, hash_payload
 import scripts.capture_short_interest_native_anchor_cache as m
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 SPEC = importlib.util.spec_from_file_location("cache_round_source_fixtures",
         Path(__file__).with_name("test_short_interest_native_reported_anchor_plan.py"))
 f = importlib.util.module_from_spec(SPEC)
@@ -110,6 +121,7 @@ def register(monkeypatch, result):
     monkeypatch.setattr(m.contract, "REGISTERED_CLOSURE_SHA256", result["closure_sha256"])
 
 
+@_POSIX_CAPTURE_ONLY
 def test_writer_once_reader_once_retained_fd_checks_do_not_replay_or_rehash_parts(monkeypatch, tmp_path):
     root, plan, matrix, archives, summary, calls, guard = fixture(monkeypatch, tmp_path)
     result = m.write_cache(root, runtime_head=CREATOR, actual_remote=REMOTE)
@@ -128,6 +140,7 @@ def test_writer_once_reader_once_retained_fd_checks_do_not_replay_or_rehash_part
     assert ("merge-base", "--is-ancestor", CREATOR, CURRENT) in calls["git"]
 
 
+@_POSIX_CAPTURE_ONLY
 def test_duplicate_exclusive_target_refuses_before_twenty_minute_preflight(monkeypatch, tmp_path):
     root, plan, matrix, archives, summary, calls, guard = fixture(monkeypatch, tmp_path)
     m.write_cache(root, runtime_head=CREATOR, actual_remote=REMOTE)
@@ -138,6 +151,7 @@ def test_duplicate_exclusive_target_refuses_before_twenty_minute_preflight(monke
     assert before == {path.name: hash_bytes(path.read_bytes()) for path in (root / m.TARGET).iterdir()}
 
 
+@_POSIX_CAPTURE_ONLY
 def test_held_cache_inventory_cannot_gain_unbound_sixth_file_between_count_slots(monkeypatch, tmp_path):
     root, plan, matrix, archives, summary, calls, guard = fixture(monkeypatch, tmp_path)
     register(monkeypatch, m.write_cache(root, runtime_head=CREATOR, actual_remote=REMOTE))
@@ -148,6 +162,7 @@ def test_held_cache_inventory_cannot_gain_unbound_sixth_file_between_count_slots
 
 
 @pytest.mark.parametrize("kind", ["cache", "master", "code", "matrix"])
+@_POSIX_CAPTURE_ONLY
 def test_held_file_change_refuses_before_next_slot_without_any_source_reload(monkeypatch, tmp_path, kind):
     root, plan, matrix, archives, summary, calls, guard = fixture(monkeypatch, tmp_path)
     register(monkeypatch, m.write_cache(root, runtime_head=CREATOR, actual_remote=REMOTE))
@@ -179,6 +194,7 @@ def test_reader_pending_registration_refuses_before_protected_file_access(monkey
 
 
 @pytest.mark.parametrize("mode", ["replace", "symlink", "mode", "hardlink", "parent_mode"])
+@_POSIX_CAPTURE_ONLY
 def test_fd_inode_mode_link_or_directory_swap_is_fixed_refusal(monkeypatch, tmp_path, mode):
     monkeypatch.setattr(m, "_require_capture_platform", lambda: None)
     path = protected(tmp_path.resolve() / "owned" / "bound.bin", b"fabricated")
@@ -199,6 +215,7 @@ def test_fd_inode_mode_link_or_directory_swap_is_fixed_refusal(monkeypatch, tmp_
             held.check()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_failed_file_protection_constructor_closes_every_created_fd(monkeypatch, tmp_path):
     monkeypatch.setattr(m, "_require_capture_platform", lambda: None)
     path = protected(tmp_path.resolve() / "owned" / "bound.bin", b"fabricated", mode=0o644)

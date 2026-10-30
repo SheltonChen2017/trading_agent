@@ -15,6 +15,19 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
+
+# The runtime under test imports POSIX-only stdlib modules at import time, so
+# this module cannot even be collected on the supported Windows host; see the
+# lane record SI-CR18-001. Portable contract logic stays covered on POSIX.
+pytest.importorskip(
+    "resource",
+    reason=(
+        "the protected-capture runtime imports the POSIX-only module "
+        "resource at import time; it cannot execute on this host, see the "
+        "lane record SI-CR18-001"
+    ),
+)
+
 from scripts import capture_short_interest_durable_counts as outer
 from scripts import short_interest_count_durable_transport as transport
 from test_short_interest_count_durable_budget import genuine_plan, isolated_registries_and_no_network

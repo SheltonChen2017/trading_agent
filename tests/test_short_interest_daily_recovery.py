@@ -16,6 +16,30 @@ from scripts import continue_short_interest_native_identity as custody
 from scripts import short_interest_keychain as keys
 from test_short_interest_native_daily_active_capture import setup, run, EMPTY
 from test_short_interest_native_daily_operational import control
+import os
+from pathlib import Path
+from scripts import short_interest_lane_batch_guard as lane
+
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
+# These cases need the lane's pinned physical root: code manifests, protocol
+# paths and sibling imports are built from the designated macOS worktree.
+_DESIGNATED_ROOT_ONLY = pytest.mark.skipif(
+    Path.cwd().resolve() != lane.ROOT,
+    reason=(
+        "the lane pins its physical root, code manifest and protocol paths to the "
+        "designated macOS worktree; this host is not it, see the lane record SI-CR18-005"
+    ),
+)
 
 
 @pytest.fixture(autouse=True)
@@ -175,6 +199,7 @@ def capture_child(monkeypatch):
     return fixture, scope, claims[0], value
 
 
+@_POSIX_CAPTURE_ONLY
 def test_selected_whole_chains_start_fresh_and_never_complete_original(monkeypatch):
     fixture, scope, claim, value = capture_child(monkeypatch)
     assert value["complete_recovery_scope"] is True and value["complete_frozen_sequence"] is False
@@ -185,6 +210,7 @@ def test_selected_whole_chains_start_fresh_and_never_complete_original(monkeypat
     assert all(not name.startswith(("day-0001", "day-0003")) for name in fixture[0][3])
 
 
+@_POSIX_CAPTURE_ONLY
 def test_arbitrary_selected_list_is_not_a_factory_or_a_key_authority(monkeypatch):
     fixture = original(monkeypatch); case = fixture[0]
     case[2]["recovery_scope"] = {"days": [2, 4], "complete": True}
@@ -206,6 +232,7 @@ def publisher_case(monkeypatch, tmp_path):
     return publisher, owned, advanced
 
 
+@_DESIGNATED_ROOT_ONLY
 def test_existing_complete_day_is_not_permitted_in_child_output(monkeypatch, tmp_path):
     publisher, owned, _ = publisher_case(monkeypatch, tmp_path)
     try:
@@ -215,6 +242,7 @@ def test_existing_complete_day_is_not_permitted_in_child_output(monkeypatch, tmp
     finally: owned.close()
 
 
+@_DESIGNATED_ROOT_ONLY
 def test_unverified_caller_success_flag_does_not_complete_child(monkeypatch, tmp_path):
     publisher, owned, _ = publisher_case(monkeypatch, tmp_path)
     try:
@@ -225,6 +253,7 @@ def test_unverified_caller_success_flag_does_not_complete_child(monkeypatch, tmp
     finally: owned.close()
 
 
+@_DESIGNATED_ROOT_ONLY
 def test_postpublication_remote_drift_creates_dominant_negative(monkeypatch, tmp_path):
     publisher, owned, advanced = publisher_case(monkeypatch, tmp_path)
     publisher.json(publisher.directory, "inventory.private.json", completed_cache_fixture(publisher))
@@ -251,6 +280,7 @@ def test_negative_child_sibling_prevents_replay_before_positive_claim(monkeypatc
             child_claim_raw=b"{}", expected_registration={}, historical_code=lambda *args: b"", boundary=lambda: None))
 
 
+@_DESIGNATED_ROOT_ONLY
 def test_final_audit_publication_drift_cannot_return_completed_child(monkeypatch, tmp_path):
     publisher, owned, advanced = publisher_case(monkeypatch, tmp_path)
     publisher.json(publisher.directory, "inventory.private.json", completed_cache_fixture(publisher))
@@ -277,6 +307,7 @@ def completed_cache_fixture(publisher):
         "publication_failed": False, "days_returned": len(selected), "http_invocations": 0}
 
 
+@_DESIGNATED_ROOT_ONLY
 def test_failed_inventory_write_cannot_complete_from_memory(monkeypatch, tmp_path):
     publisher, owned, _ = publisher_case(monkeypatch, tmp_path)
     value = completed_cache_fixture(publisher)
@@ -293,6 +324,7 @@ def test_failed_inventory_write_cannot_complete_from_memory(monkeypatch, tmp_pat
     finally: owned.close()
 
 
+@_DESIGNATED_ROOT_ONLY
 def test_clean_durable_inventory_and_postpublication_check_close_child_only(monkeypatch, tmp_path):
     publisher, owned, _ = publisher_case(monkeypatch, tmp_path)
     try:
@@ -303,6 +335,7 @@ def test_clean_durable_inventory_and_postpublication_check_close_child_only(monk
     finally: owned.close()
 
 
+@_DESIGNATED_ROOT_ONLY
 def test_registered_runtime_raises_after_durable_negative_without_source_calls(monkeypatch, tmp_path):
     publisher, owned, _ = publisher_case(monkeypatch, tmp_path)
     owned.close()
@@ -324,6 +357,7 @@ def test_registered_runtime_raises_after_durable_negative_without_source_calls(m
 
 
 @pytest.mark.parametrize("reason", ["remote", "producer_error"])
+@_DESIGNATED_ROOT_ONLY
 def test_preclosure_drift_or_producer_error_cannot_complete_cached_qualified_days(monkeypatch, tmp_path, reason):
     publisher, owned, advanced = publisher_case(monkeypatch, tmp_path)
     try:
@@ -334,6 +368,7 @@ def test_preclosure_drift_or_producer_error_cannot_complete_cached_qualified_day
     finally: owned.close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_per_day_START_debits_reduce_child_page_budget(monkeypatch):
     monkeypatch.setattr(m.daily, "MAXIMUM_DAY_CHAINS", 1)  # Explicit serial fictional scheduler.
     fixture = original(monkeypatch); scope = scope_from(fixture); case = fixture[0]
@@ -379,6 +414,7 @@ def child_replay_fixture(monkeypatch):
     return scope, files, kwargs
 
 
+@_POSIX_CAPTURE_ONLY
 def test_whole_chain_combination_exhausts_all1169_and_does_not_change_parent(monkeypatch):
     scope, files, kwargs = child_replay_fixture(monkeypatch)
     actual = [report.to_payload()["day_ordinal"] for report in m.combined_reports(scope, **kwargs)]
@@ -386,6 +422,7 @@ def test_whole_chain_combination_exhausts_all1169_and_does_not_change_parent(mon
     assert scope.payload()["parent_status"] == "refused_original_claim_stays_spent"
 
 
+@_POSIX_CAPTURE_ONLY
 def test_missing_child_day_cannot_be_stitched_from_original_partial_pages(monkeypatch):
     scope, files, kwargs = child_replay_fixture(monkeypatch)
     del files["day-0002.completed.json"]

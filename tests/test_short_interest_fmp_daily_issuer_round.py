@@ -14,6 +14,18 @@ from scripts.continue_short_interest_native_identity import _OwnedOutput
 from scripts.qualify_sharadar_companion import SharadarCaptureRefusal
 from scripts.short_interest_keychain import KeychainSecret
 from scripts import capture_short_interest_fmp_daily_issuer_round as m
+import os
+
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
 
 HERE = Path.cwd() / "tests"
 sys.path.insert(0, str(HERE))
@@ -93,6 +105,7 @@ def replay(value):
         expected_code_identity_sha256=CODE, budget_raw=next(directory.parent.glob("budget-*.json")).read_bytes())
 
 
+@_POSIX_CAPTURE_ONLY
 def test_exact_v2_two_slots_header_key_original_provenance_and_same_day_USD_only(monkeypatch, tmp_path, indexed):
     value = setup(monkeypatch, tmp_path, indexed)
     result = run(value)
@@ -104,6 +117,7 @@ def test_exact_v2_two_slots_header_key_original_provenance_and_same_day_USD_only
     assert all(item["same_class_shares"] is None for item in bindings)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_no_large_index_hash_or_all_ticket_scan_per_start_or_publication(monkeypatch, tmp_path, indexed):
     value = setup(monkeypatch, tmp_path, indexed)
     monkeypatch.setattr(m.daily.DailyIssuerIndex, "sha256", property(lambda self: pytest.fail("large index rehash")))
@@ -112,6 +126,7 @@ def test_no_large_index_hash_or_all_ticket_scan_per_start_or_publication(monkeyp
     assert result["http_attempts"] == 2
 
 
+@_POSIX_CAPTURE_ONLY
 def test_duplicate_claim_never_rereads_named_key_or_changes_old_run(monkeypatch, tmp_path, indexed):
     value = setup(monkeypatch, tmp_path, indexed)
     run(value)
@@ -124,6 +139,7 @@ def test_duplicate_claim_never_rereads_named_key_or_changes_old_run(monkeypatch,
     assert before == {p.name: hash_bytes(p.read_bytes()) for p in value[1].iterdir()}
 
 
+@_POSIX_CAPTURE_ONLY
 def test_negative_lookup_retained_and_cap_skipped_without_budget_repurpose(monkeypatch, tmp_path, indexed):
     value = setup(monkeypatch, tmp_path, indexed)
     value[2]["http"] = lambda *args: (b"[]", "application/json", 200)
@@ -134,6 +150,7 @@ def test_negative_lookup_retained_and_cap_skipped_without_budget_repurpose(monke
 
 
 @pytest.mark.parametrize("kind", ["raw", "unicode", "percent", "media", "future_cap", "lookup_price"])
+@_POSIX_CAPTURE_ONLY
 def test_echo_scope_or_unknown_financial_field_refuses_before_body_hash_or_storage(monkeypatch, tmp_path, indexed, kind):
     value = setup(monkeypatch, tmp_path, indexed)
     encoded = KEY.encode() if kind == "raw" else ("".join("\\u%04x" % ord(c) for c in KEY).encode()
@@ -159,6 +176,7 @@ def test_echo_scope_or_unknown_financial_field_refuses_before_body_hash_or_stora
 
 
 @pytest.mark.parametrize("status", [403, 404, 429, 500, None])
+@_POSIX_CAPTURE_ONLY
 def test_material_route_failure_preserves_consumed_started_slot_no_retry(monkeypatch, tmp_path, indexed, status):
     value = setup(monkeypatch, tmp_path, indexed)
     def failed(opener, request, maximum):
@@ -174,6 +192,7 @@ def test_material_route_failure_preserves_consumed_started_slot_no_retry(monkeyp
     assert refused["charged_bytes"] == 1024 ** 2 and not (value[1] / "inventory.private.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_pending_source_closure_cannot_create_claim_read_key_or_contact_provider(monkeypatch, tmp_path, indexed):
     value = setup(monkeypatch, tmp_path, indexed)
     monkeypatch.setattr(m, "SOURCE_CLOSURE_SHA256", "PENDING")
@@ -183,6 +202,7 @@ def test_pending_source_closure_cannot_create_claim_read_key_or_contact_provider
 
 
 @pytest.mark.parametrize("change", ["code_head", "bool_attempt", "bool_skip", "claim_budget"])
+@_POSIX_CAPTURE_ONLY
 def test_replay_refuses_changed_code_exact_integer_or_spent_claim_before_acceptance(monkeypatch, tmp_path, indexed, change):
     value = setup(monkeypatch, tmp_path, indexed)
     if change == "bool_skip":

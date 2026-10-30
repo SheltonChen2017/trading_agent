@@ -51,7 +51,7 @@ def protocol():
             'initial_query': dict(PARAMS), 'population': 'all_reported_tickers_no_ticker_filter',
             'maximum_pages': MAXIMUM_PAGES, 'maximum_response_bytes': MAXIMUM_BYTES,
             'authentication': 'explicit_known_MASSIVE_API_KEY_after_verified_zero_HTTP_Keychain_refusal_header_only',
-            'previous_failed_claim': {'run': str(PRIOR_REFUSAL), 'head': PRIOR_HEAD,
+            'previous_failed_claim': {'run': PRIOR_REFUSAL.as_posix(), 'head': PRIOR_HEAD,
                                      'protocol_sha256': PRIOR_PROTOCOL, 'file_byte_pins': dict(PRIOR_BYTES),
                                      'budget_bytes_sha256': PRIOR_BUDGET_SHA256,
                                      'HTTP_attempts': 0, 'old_claim_retained_not_reset': True},

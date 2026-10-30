@@ -9,6 +9,17 @@ import pytest
 from data.hashing import hash_bytes, hash_payload
 import scripts.capture_short_interest_nominal_calendar as capture
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 HEAD, REMOTE = "a" * 40, "b" * 40
 START = "2026-10-14T00:00:00Z"
 _POSIX = pytest.mark.skipif(not hasattr(os, "getuid"), reason="protected0700/0600 publication requiresPOSIX")
@@ -117,6 +128,7 @@ def test_unsupported_host_before_source_read_or_output(monkeypatch, entry):
             else: capture.capture_pdfs(None, None, None, head=HEAD, remote=REMOTE, started_at=START)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_pending_or_changed_protocol_refuses_before_output(runtime, monkeypatch):
     root, calls = runtime
     monkeypatch.setattr(capture, "PROTOCOL_SHA256", "0" * 64)

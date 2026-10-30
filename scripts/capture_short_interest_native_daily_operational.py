@@ -17,6 +17,7 @@ from scripts import short_interest_lane_batch_guard as lane
 from scripts import continue_short_interest_native_identity as custody
 from scripts.short_interest_keychain import read_named_keychain
 from scripts.qualify_sharadar_companion import _http,_utc_now
+from scripts.qualify_finra_short_interest import _require_capture_platform
 from scripts.capture_short_interest_native_grouped_market import shared_calendar_source
 from research.short_interest_etf import sharadar_securities_master as master
 from research.short_interest_etf import native_daily_active_reference as daily
@@ -120,6 +121,10 @@ class HeldPinnedFile:
     def _parent_state(info):
         return info.st_dev,info.st_ino,info.st_uid,stat.S_IMODE(info.st_mode),info.st_nlink
     def __init__(self,path,sha,maximum,*,private=True,boundary=lambda:None):
+        # Fixed platform refusal before any boundary, stat or open: a host without POSIX
+        # ownership semantics must see protected_capture_platform_unavailable, never an
+        # AttributeError from os.O_DIRECTORY or os.getuid (lane record SI-CR18-006).
+        _require_capture_platform()
         boundary()
         require(type(path) is Path or isinstance(path,Path),"exact_pinned_path")
         require(path.is_absolute() and path.resolve()==path and type(sha) is str

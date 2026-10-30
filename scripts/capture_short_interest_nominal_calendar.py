@@ -43,7 +43,7 @@ def _require(condition, reason):
 def protocol():
     return {"schema": "si-nominal-calendar-capture-protocol-v1",
             "source_protocol_sha256": calendar.PROTOCOL_SHA256,
-            "source_protocol": calendar.calendar_protocol(), "parent": str(PARENT),
+            "source_protocol": calendar.calendar_protocol(), "parent": PARENT.as_posix(),
             "code_files": list(CODE_FILES),
             "maximum_attempts": 5, "retries": 0, "restart_or_resume": False,
             "authentication": "none_no_environment_Keychain_or_credential_reads",
@@ -129,7 +129,7 @@ def capture_pdfs(root, directory, opener, *, head, remote, started_at):
     _require(_clock(retrieved) <= _clock(completed), "calendar_completion_chronology")
     result = {"schema": "si-nominal-calendar-capture-complete-v1", "status": "calendar_PDF_capture_complete",
               "protocol_sha256": PROTOCOL_SHA256, "inventory_sha256": inventory["inventory_sha256"],
-              "code_head": head, "http_attempts": 5, "capture_path": str(directory.relative_to(root)),
+              "code_head": head, "http_attempts": 5, "capture_path": directory.relative_to(root).as_posix(),
               "completed_at": completed, "visual_transcriptions_pending": True,
               "credential_reads": 0, "market_row_requests": 0, "outcome_looks": 0,
               "qc_attempts": 0, "backtest_result_exists": False}

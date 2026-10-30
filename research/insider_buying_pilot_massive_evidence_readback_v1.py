@@ -13,9 +13,14 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import pwd
 import re
+import selectors
+import signal
 import stat
+import subprocess
 import sys
+import time
 
 from research import insider_buying_pilot_massive_evidence_probe_v2 as producer
 from research import insider_buying_sec_feed_archive_format_v3 as native
@@ -31,10 +36,13 @@ COMPLETE_SHA256 = "1a6d8e8ea61cd0cd2e9af752c0ba8ff405bf8c937a8f0554c3e8ce343e083
 EMPTY_CACHE_PREFIX = native.EMPTY_CACHE_PREFIX
 MAX_CONTROL = producer.MAX_CONTROL_BYTES
 WORKER_SECONDS = 90
+CLEANUP_SECONDS = 2
 OBSERVED_TOTAL_BYTES = 2355
 _raw, _sha = producer._raw, producer._sha
 _CODES = frozenset({"arguments_refused", "controls_refused", "retained_custody_refused",
-                    "producer_identity_refused", "projection_refused", "current_source_refused", "native_refused"})
+                    "producer_identity_refused", "projection_refused", "current_source_refused", "native_refused",
+                    "native_sandbox_launch_refused", "native_child_process_refused", "native_child_ipc_refused",
+                    "native_child_deadline"})
 _NAMES = frozenset({"reservation.json", "credential-read-started.json", "credential-read-completed.json", "complete.json"}
     | {f"{i:02d}-{part}.json" for i in range(1, 4) for part in ("started", "response", "metadata", "completed")})
 
@@ -254,14 +262,25 @@ def _identity(expected_head):
     return value
 
 
-def _worker(identity):
+def _health(identity):
+    return {"schema": SCHEMA + "/runtime-health", "readback_head": identity["head"],
+        "readback_source_inventory_sha256": identity["source_inventory_sha256"],
+        "readback_source_images": len(identity["source_sha256"]), "retained_inputs_opened": False,
+        "native_network_fork_allwrite_securityexec_denial": True, "memory_guard_live_through_stdout": True,
+        "new_requests": 0, "credential_reads": 0, "research_looks": 0, "qc_jobs": 0, "outcome_looks": 0, "backtests": 0,
+        **dict.fromkeys(producer.FALSE_FLAGS, False)}
+
+
+def _worker(identity, *, role="readback"):
     guard = None
     try:
+        _need(type(role) is str and role in {"health", "readback"}, "arguments_refused")
         native._isolated()
         native.batch.campaign.base._prove_isolation()
         guard = native._WorkerMemoryGuard()
         _current(identity)
-        result = {"ok": True, "value": _readback(LANE_ROOT, COMPLETE_SHA256, fixture=False)}
+        value = _health(identity) if role == "health" else _readback(LANE_ROOT, COMPLETE_SHA256, fixture=False)
+        result = {"ok": True, "value": value}
         _current(identity)
         guard.check()
     except Exception as error:
@@ -279,20 +298,139 @@ def _worker(identity):
             guard.close()
 
 
-def _command(identity):
-    code = "import sys,json;sys.path.insert(0," + repr(str(LANE_ROOT)) + ");from research import insider_buying_pilot_massive_evidence_readback_v1 as m;identity=json.loads(" + repr(_raw(identity).decode()) + ");\ntry:m._worker(identity)\nexcept Exception:print('{\"ok\":false,\"code\":\"native_refused\"}')"
+def _command(identity, *, role="readback"):
+    _need(type(role) is str and role in {"health", "readback"}, "arguments_refused")
+    code = "import sys,json;sys.path.insert(0," + repr(str(LANE_ROOT)) + ");from research import insider_buying_pilot_massive_evidence_readback_v1 as m;identity=json.loads(" + repr(_raw(identity).decode()) + ");\ntry:m._worker(identity,role=" + repr(role) + ")\nexcept Exception as error:sys.stdout.buffer.write(m._raw({'ok':False,'code':m._safe(error)})+b'\\n');sys.stdout.buffer.flush();sys.exit(2)"
     policy = '(version 1)(allow default)(deny network*)(deny process-fork)(deny file-write*)(deny process-exec (literal "/usr/bin/security"))'
+    if role == "health":
+        for private in (LANE_ROOT / "artifacts", Path(pwd.getpwuid(os.geteuid()).pw_dir) / "Library" / "Keychains"):
+            policy += "(deny file-read* (subpath " + json.dumps(str(private)) + "))"
     return ("/usr/bin/env", "-i", "PATH=/usr/bin:/bin:/usr/sbin:/sbin", "/usr/bin/sandbox-exec", "-p", policy,
         sys.executable, "-I", "-S", "-B", "-X", "pycache_prefix=" + EMPTY_CACHE_PREFIX, "-c", code)
+
+
+def _result_value(result):
+    _need(type(result) is dict and type(result.get("ok")) is bool, "native_child_ipc_refused")
+    if result["ok"] is False:
+        _need(set(result) == {"ok", "code"} and type(result["code"]) is str and result["code"] in _CODES,
+              "native_child_ipc_refused")
+        raise MassiveReadbackError(result["code"])
+    _need(set(result) == {"ok", "value"}, "native_child_ipc_refused")
+    return result["value"]
+
+
+def _child_result(stdout, stderr, exit_code):
+    _need(type(stdout) is bytes and len(stdout) <= MAX_CONTROL + 1 and type(stderr) is bytes
+          and len(stderr) <= 4096 and type(exit_code) is int, "native_child_ipc_refused")
+    # Exact SOURCE-ONLY reproduction signature. Never relabel earlier generic
+    # receipts as having measured this exit code or this stderr.
+    if exit_code == 71 and stdout == b"" and stderr == b"sandbox-exec: sandbox_apply: Operation not permitted\n":
+        raise MassiveReadbackError("native_sandbox_launch_refused")
+    _need(exit_code in {0, 2} and not stderr, "native_child_process_refused")
+    _need(stdout.endswith(b"\n"), "native_child_ipc_refused")
+    try:
+        result = _decode(stdout[:-1])
+    except Exception:
+        raise MassiveReadbackError("native_child_ipc_refused") from None
+    _need(exit_code == 0 or result.get("ok") is False, "native_child_process_refused")
+    _result_value(result)  # Validate even refused worker messages before return.
+    return result
+
+
+def _cleanup(process, poll, *, failed):
+    """Bounded reap/close-all; even an exited leader may have pipe holders."""
+    clean = True
+    if process is not None:
+        try:
+            if failed or process.poll() is None:
+                os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        except Exception:
+            clean = False
+        try:
+            process.wait(timeout=CLEANUP_SECONDS)
+        except Exception:
+            clean = False
+        for stream in (process.stdout, process.stderr):
+            if stream is not None:
+                try:
+                    stream.close()
+                except Exception:
+                    clean = False
+    if poll is not None:
+        try:
+            poll.close()
+        except Exception:
+            clean = False
+    return clean
+
+
+def _launch(command):
+    """Bounded protected IPC, without a fallback launcher or weaker fence."""
+    process = poll = None
+    accepted = False
+    try:
+        process = subprocess.Popen(command, cwd=LANE_ROOT, stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
+        poll = selectors.DefaultSelector()
+        output, errors = bytearray(), bytearray()
+        for stream, sink in ((process.stdout, output), (process.stderr, errors)):
+            os.set_blocking(stream.fileno(), False)
+            poll.register(stream, selectors.EVENT_READ, sink)
+        deadline = time.monotonic() + WORKER_SECONDS
+        while poll.get_map():
+            remaining = deadline - time.monotonic()
+            _need(remaining > 0, "native_child_deadline")
+            for key, _ in poll.select(min(0.2, remaining)):
+                cap = 4096 if key.data is errors else MAX_CONTROL + 1
+                chunk = os.read(key.fileobj.fileno(), min(65536, cap + 1 - len(key.data)))
+                if chunk:
+                    key.data.extend(chunk)
+                    _need(len(key.data) <= cap, "native_child_ipc_refused")
+                else:
+                    poll.unregister(key.fileobj)
+        code = process.wait(timeout=max(0.001, deadline - time.monotonic()))
+        result = _child_result(bytes(output), bytes(errors), code)
+        accepted = True
+        return result
+    except MassiveReadbackError:
+        raise
+    except subprocess.TimeoutExpired:
+        raise MassiveReadbackError("native_child_deadline") from None
+    except Exception:
+        raise MassiveReadbackError("native_child_process_refused") from None
+    finally:
+        primary = sys.exc_info()[0] is not None
+        cleaned = _cleanup(process, poll, failed=not accepted)
+        _need(cleaned or primary, "native_child_process_refused")
+
+
+def preflight_actual(*, expected_head):
+    """SOURCE ONLY: run BEFORE a caller claims any new diagnostic namespace.
+
+    Health proves launch/isolation/current-code/IPC mechanics, not permission
+    to repeat a consumed scope or to read any retained input. The trusted
+    source-only orchestrator must let the fixed child install its full fence;
+    a nested sandbox rejection is preserved, never bypassed.
+    """
+    try:
+        identity = _identity(expected_head)
+        value = _result_value(_launch(_command(identity, role="health")))
+        _same(value, _health(identity))
+        _same(_identity(expected_head), identity)
+        return value
+    except MassiveReadbackError:
+        raise
+    except Exception:
+        raise MassiveReadbackError("native_refused") from None
 
 
 def verify_actual(*, expected_head):
     """Trusted parent verifies old Git images; actual private identity stays IPC."""
     try:
         identity = _identity(expected_head)
-        result = native.batch.campaign._run_child(_command(identity), timeout=WORKER_SECONDS)
-        _need(type(result) is dict and set(result) == {"ok", "value"} and result["ok"] is True, "native_refused")
-        value = result["value"]
+        value = _result_value(_launch(_command(identity)))
         _need(type(value) is dict and set(value) == {"producer_identity", "receipt"}, "native_refused")
         old = value["producer_identity"]
         prior._validate_identity(old, PRODUCER_HEAD, LANE_ROOT)

@@ -262,7 +262,7 @@ def test_actual_command_is_fixed_isolated_and_native_readonly_without_credential
     for rule in ("(deny network*)", "(deny process-fork)", "(deny file-write*)", '(deny process-exec (literal "/usr/bin/security"))'):
         assert rule in policy
     assert all(flag in command for flag in ("-I", "-S", "-B", "-X", "pycache_prefix=" + m.EMPTY_CACHE_PREFIX))
-    assert "m._worker(identity)" in command[-1]
+    assert "m._worker(identity,role=\'readback\')" in command[-1]
     assert TOKEN not in repr(command)
 
 
@@ -274,7 +274,7 @@ def test_final_git_and_public_receipt_validation_is_not_an_identity_self_asserti
     identity = {"current": True}
     monkeypatch.setattr(m, "_identity", lambda _: deepcopy(identity))
     receipt = m._receipt(old, m.COMPLETE_SHA256, False, m.OBSERVED_TOTAL_BYTES)
-    monkeypatch.setattr(m.native.batch.campaign, "_run_child", lambda *args, **kw: {"ok": True, "value": {"producer_identity": old, "receipt": receipt}})
+    monkeypatch.setattr(m, "_launch", lambda *args, **kw: {"ok": True, "value": {"producer_identity": old, "receipt": receipt}})
     monkeypatch.setattr(m.custody, "_git", lambda *_: b"foreign Git bytes")
     with pytest.raises(m.MassiveReadbackError, match="producer_identity_refused"):
         m.verify_actual(expected_head=HEAD)
@@ -328,7 +328,7 @@ def _fake_parent(monkeypatch):
     monkeypatch.setattr(m, "_identity", lambda _: deepcopy(current))
     receipt = m._receipt(old, m.COMPLETE_SHA256, False, m.OBSERVED_TOTAL_BYTES)
     result = {"ok": True, "value": {"producer_identity": old, "receipt": receipt}}
-    monkeypatch.setattr(m.native.batch.campaign, "_run_child", lambda *args, **kw: deepcopy(result))
+    monkeypatch.setattr(m, "_launch", lambda *args, **kw: deepcopy(result))
     calls = []
     def git(root, command, image):
         assert root == m.LANE_ROOT and command == "show" and image.startswith(m.PRODUCER_HEAD + ":source")
@@ -467,3 +467,167 @@ def test_scope_mismatch_refuses_before_any_success_body(tmp_path, monkeypatch):
     monkeypatch.setattr(m.publication, "_leaf", no_body)
     with pytest.raises(m.MassiveReadbackError, match="controls_refused"):
         _read(tmp_path, pin)
+
+
+def test_runtime_health_worker_never_opens_inputs_and_keeps_guard_through_stdout(monkeypatch):
+    events, output = [], bytearray()
+    identity = {"head": HEAD, "source_inventory_sha256": "c" * 64, "source_sha256": {"invented.py": "d" * 64}}
+    class Guard:
+        def __init__(self): events.append("guard")
+        def check(self): events.append("sample")
+        def close(self): events.append("closed")
+    class Buffer:
+        def write(self, raw): events.append("write"); output.extend(raw)
+        def flush(self): events.append("flush")
+    class Stdout:
+        buffer = Buffer()
+    def forbidden(*args, **kwargs): pytest.fail("runtime health must not open retained inputs")
+    monkeypatch.setattr(m.native, "_isolated", lambda: events.append("flags"))
+    monkeypatch.setattr(m.native.batch.campaign.base, "_prove_isolation", lambda: events.append("proof"))
+    monkeypatch.setattr(m.native, "_WorkerMemoryGuard", Guard)
+    monkeypatch.setattr(m, "_current", lambda _: events.append("current"))
+    monkeypatch.setattr(m, "_readback", forbidden)
+    monkeypatch.setattr(m, "_Held", forbidden)
+    monkeypatch.setattr(m.sys, "stdout", Stdout())
+    m._worker(identity, role="health")
+    value = json.loads(output)
+    assert value == {"ok": True, "value": m._health(identity)}
+    assert events[:4] == ["flags", "proof", "guard", "current"]
+    assert events[-3:] == ["flush", "sample", "closed"]
+    assert value["value"]["retained_inputs_opened"] is False
+    assert value["value"]["new_requests"] == value["value"]["credential_reads"] == 0
+
+
+def test_preflight_runs_fixed_health_only_before_any_namespace_or_retained_input(tmp_path, monkeypatch):
+    _, _, identity, _ = _fake_parent(monkeypatch)
+    calls = []
+    def launch(command):
+        calls.append(command)
+        assert "role='health'" in command[-1]
+        return {"ok": True, "value": m._health(identity)}
+    monkeypatch.setattr(m, "_launch", launch)
+    monkeypatch.setattr(m, "_readback", lambda *args, **kwargs: pytest.fail("preflight opened input"))
+    receipt = m.preflight_actual(expected_head=HEAD)
+    assert receipt == m._health(identity) and len(calls) == 1
+    assert list(tmp_path.iterdir()) == []
+    assert receipt["retained_inputs_opened"] is False
+
+
+@pytest.mark.parametrize("entry", ["preflight_actual", "verify_actual"])
+@pytest.mark.parametrize("code", ["current_source_refused", "projection_refused", "native_sandbox_launch_refused"])
+def test_validated_worker_refusals_keep_their_finite_code(entry, code, monkeypatch):
+    _fake_parent(monkeypatch)
+    monkeypatch.setattr(m, "_launch", lambda *_: {"ok": False, "code": code})
+    with pytest.raises(m.MassiveReadbackError, match="^" + code + "$"):
+        getattr(m, entry)(expected_head=HEAD)
+
+
+@pytest.mark.parametrize("exit_code", [0, 2])
+def test_child_finite_refusal_message_is_preserved(exit_code):
+    wire = m._raw({"ok": False, "code": "current_source_refused"}) + b"\n"
+    with pytest.raises(m.MassiveReadbackError, match="^current_source_refused$"):
+        m._child_result(wire, b"", exit_code)
+
+
+def test_exact_source_only_nested_sandbox_signature_has_a_distinct_finite_refusal():
+    with pytest.raises(m.MassiveReadbackError, match="^native_sandbox_launch_refused$"):
+        m._child_result(b"", b"sandbox-exec: sandbox_apply: Operation not permitted\n", 71)
+
+
+@pytest.mark.parametrize("stdout,stderr,code", [(b"", b"sandbox_apply: Operation not permitted\n", 71),
+    (b"marker", b"sandbox-exec: sandbox_apply: Operation not permitted\n", 71),
+    (b"", b"sandbox-exec: sandbox_apply: Operation not permitted\n", 70),
+    (b"", b"untrusted provider detail", 2),
+    (b'{"ok":true,"value":{}}\n', b"", 2),
+    (b'{"ok":false,"code":"untrusted arbitrary detail"}\n', b"", 0),
+    (b'{"ok":false,"code":"native_refused","extra":1}\n', b"", 0),
+    (b'{"ok":1,"value":{}}\n', b"", 0),
+    (b'{"ok":true,"ok":true,"value":{}}\n', b"", 0),
+    (b'{"ok":true,"value":{}}', b"", 0),
+    (b'{"ok":true,"value":{}}\n{}\n', b"", 0),
+    (b"x" * (m.MAX_CONTROL + 2), b"", 0), (b"", b"x" * 4097, 71)])
+def test_process_and_ipc_refusals_never_echo_untrusted_details(stdout, stderr, code):
+    with pytest.raises(m.MassiveReadbackError) as captured:
+        m._child_result(stdout, stderr, code)
+    assert str(captured.value) in m._CODES
+    assert str(captured.value) != "native_sandbox_launch_refused"
+    assert "detail" not in str(captured.value)
+
+
+def test_health_payload_cannot_promote_inputs_or_authority(monkeypatch):
+    _, _, identity, _ = _fake_parent(monkeypatch)
+    value = m._health(identity)
+    value["retained_inputs_opened"] = True
+    monkeypatch.setattr(m, "_launch", lambda *_: {"ok": True, "value": value})
+    with pytest.raises(m.MassiveReadbackError, match="controls_refused"):
+        m.preflight_actual(expected_head=HEAD)
+
+
+@pytest.mark.parametrize("close_failure,wait_failure", [(False, False), (True, False), (False, True)])
+def test_cleanup_kills_group_for_exited_leader_reaps_bounded_and_closes_every_handle(monkeypatch, close_failure, wait_failure):
+    events = []
+    class Stream:
+        def __init__(self, name): self.name = name
+        def close(self):
+            events.append(self.name)
+            if close_failure and self.name == "stdout": raise OSError("invented close failure")
+    class Process:
+        pid = 987654
+        stdout, stderr = Stream("stdout"), Stream("stderr")
+        def poll(self): return 0
+        def wait(self, *, timeout):
+            events.append(("wait", timeout))
+            if wait_failure: raise m.subprocess.TimeoutExpired("invented", timeout)
+    class Poll:
+        def close(self): events.append("poll")
+    monkeypatch.setattr(m.os, "killpg", lambda pid, sig: events.append(("killpg", pid, sig)))
+    clean = m._cleanup(Process(), Poll(), failed=True)
+    assert events[0] == ("killpg", Process.pid, m.signal.SIGKILL)
+    assert events[1] == ("wait", m.CLEANUP_SECONDS)
+    assert events[-3:] == ["stdout", "stderr", "poll"]
+    assert clean is (not close_failure and not wait_failure)
+
+
+def test_launcher_preserves_primary_refusal_when_cleanup_also_fails(monkeypatch):
+    monkeypatch.setattr(m.subprocess, "Popen", lambda *args, **kwargs: (_ for _ in ()).throw(OSError("untrusted launch detail")))
+    monkeypatch.setattr(m, "_cleanup", lambda *args, **kwargs: False)
+    with pytest.raises(m.MassiveReadbackError, match="^native_child_process_refused$"):
+        m._launch(("invented",))
+
+
+@pytest.mark.skipif(m.sys.platform != "darwin" or os.environ.get("INSIDER_MASSIVE_NESTED_HEALTH_PROBE") != "1",
+    reason="explicit source-only nested-sandbox diagnostic requires the documented matching parent fence")
+def test_native_nested_launch_is_refused_before_python_without_opening_inputs():
+    """Opt-in matched-profile diagnostic, not a universal Darwin invariant.
+
+    Run separately with parent fork allowed; all artifact reads stay denied.
+
+    The child command is the genuine fixed HEALTH role, which cannot open
+    retained inputs. Its invented identity is never used: native nesting is
+    refused before Python starts. This supplies no actual readback result.
+    """
+    with pytest.raises(m.MassiveReadbackError, match="^native_sandbox_launch_refused$"):
+        m._launch(m._command({"head": HEAD}, role="health"))
+
+
+@pytest.mark.parametrize("result", [{"ok": False, "code": "untrusted arbitrary detail"},
+    {"ok": False, "code": "native_refused", "extra": 1}, {"ok": 1, "value": {}},
+    {"ok": True, "value": {}, "extra": 1}])
+def test_canonical_worker_messages_still_require_exact_finite_protocol(result):
+    with pytest.raises(m.MassiveReadbackError, match="^native_child_ipc_refused$"):
+        m._child_result(m._raw(result) + b"\n", b"", 0)
+
+
+def test_canonical_successful_child_ipc_round_trip():
+    result = {"ok": True, "value": {"invented": True}}
+    assert m._child_result(m._raw(result) + b"\n", b"", 0) == result
+
+
+def test_health_command_kernel_denies_all_lane_artifacts_and_actual_owner_keychains():
+    health = m._command({"head": HEAD}, role="health")
+    policy = health[health.index("-p") + 1]
+    for private in (m.LANE_ROOT / "artifacts", Path(m.pwd.getpwuid(os.geteuid()).pw_dir) / "Library" / "Keychains"):
+        assert "(deny file-read* (subpath " + json.dumps(str(private)) + "))" in policy
+    assert "role='health'" in health[-1]
+    readback = m._command({"head": HEAD}, role="readback")
+    assert "deny file-read*" not in readback[readback.index("-p") + 1]

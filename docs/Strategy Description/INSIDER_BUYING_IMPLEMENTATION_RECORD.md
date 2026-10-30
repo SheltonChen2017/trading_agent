@@ -1,19 +1,17 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 351 COUNTER-REVIEWS BOTH CLAUDE COMMITS AFTER `1635900d`:
-`0f70bbe0` AND `d786e82e`, ACCEPTED AFTER THE BOUNDED CORRECTIONS RECORDED
-BELOW. SEVENTEEN PRODUCTION-PINNED TEST IMAGES ARE RESTORED EXACTLY; THE
-EXPLICIT LANE TEST COLLECTION POLICY PRESERVES THEM AND THE OTHER 25 NEW
-PLATFORM GUARDS. THE REVIEWER-ONLY SHARED MANIFEST ADDITION IS VETOED AND
-RESTORED TO THE COMMON BASELINE; `IBSH-CR02` REMAINS OPEN. THIRTEEN P2s
-REMAIN OPEN INCLUDING THE PRECISE DEFAULT-WINDOWS COLLECTION LIMITATION;
-NO OPEN P0/P1. SECTION353 QUALIFIES THE NEW OFFLINE MASSIVE V2 READBACK AND PREREGISTERS
-ONE RETAINED-INPUT OBSERVATION; ACTUAL EXECUTION IS STILL UNATTEMPTED AT
-THIS COMMIT. THIS IS NOT NEW ACQUISITION OR QC. MASSIVE NOW REPORTS
-LATEST-CORRECTED RECORDS ONLY; NO HISTORICAL ARCHIVE SAMPLE WAS SUPPLIED.
-SHARADAR'S ACCOUNT QUESTION AND ALL VENDOR REPLIES STAY HELD, THE MONITOR
-STAYS PAUSED, AND THE LANE IS NOT BACKTEST-READY. NO QC/SAFARI, PURCHASE,
-UPGRADE, OUTCOME, BACKTEST, CAPITAL, PAPER/LIVE OR REAL-ORDER AUTHORITY.**
+Status: **351 ACCEPTS BOTH INCOMING CLAUDE COMMITS AFTER CORRECTION;
+`b4846efe` PRESERVES THE17 FROZEN TEST IMAGES AND COMMON MANIFEST BASELINE.
+353'S QUALIFIED CANDIDATE/PREREGISTRATION WAS COMMITTED IN `eb55aa7b`;
+354'S ONE ACTUAL READBACK REFUSED `native_refused` AFTER2.642968s AND IS
+PRESERVED, NOT SUCCESSFUL OR BACKTEST-READY. NO SEMANTIC RETRY/RENAMED
+NAMESPACE IS STARTED. SOURCE-ONLY DIAGNOSIS REPRODUCES MACOS NESTED
+SANDBOX LAUNCH REFUSAL; HEALTH/OBSERVABILITY CORRECTION IS BEING QUALIFIED
+WITHOUT REAL INPUTS. `IBMASSIVE2-OBS34101` STAYS OPEN. THIRTEEN P2s REMAIN
+OPEN; NO OPEN P0/P1. MASSIVE REPORTS LATEST-CORRECTED RECORDS ONLY, NO
+HISTORICAL ARCHIVE SAMPLE; SHARADAR'S ACCOUNT QUESTION/REPLY HOLD REMAIN.
+ARCHIVE/PIT/POPULATION/RIGHTS GATES ARE FALSE. MONITOR PAUSED; NO QC/SAFARI,
+VENDOR REPLY, PURCHASE, UPGRADE, OUTCOME, BACKTEST OR TRADING ACTION.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -41127,3 +41125,189 @@ preregistration: **125 passed,7.08s**, native network/security/private-input
 read/repo-write denial, with no operator fixture. This includes the new-test
 platform convention and exact package guard. It is distinct from the165
 new/producer regression selection and is not a complete lane/repository suite.
+
+
+## 354. Preserved failed actual Massive readback and source-only launch diagnosis (2026-10-30)
+
+### 354.1 Exact execution, failure and custody
+
+The one prospective353 operation used already-existing clean committed
+**`eb55aa7bab7f874c2d6835cb336ab9b97a9e2ea3`** on the designated lane.
+Neither code nor HEAD changed during execution. The exact3,967B bootstrap
+`aab75be741b8f0ed804f6e232cf638e51c6ad8429effc1b4f04021a314c1c376`
+was checked against its executed bytes. It claimed the fresh preregistered
+metadata namespace, published reservation/start and invoked `verify_actual`
+exactly ONCE. That operation **REFUSED `native_refused` in2.642968s**.
+The parent process exited0 because it successfully serialized a failure
+receipt; that is NOT successful verifier execution. Parent stdout298B,
+stderr0B; `readback`/`witness` is NULL. Completion time
+`2026-10-30T08:39:20.364852Z`. No semantic retry, namespace alias, reset,
+resume or original producer/source rewrite followed.
+
+| New private parent metadata | Bytes | SHA-256 |
+| --- | --- | --- |
+| `scope-reservation.json` |15646| `68d1037f05519ee5d69214e3e7ebcb4bbda2ca17702db47c34cfeccf31c64400` |
+| `observation-started.json` |264| `87f820929db003247347815e8a860ffb99d00abda96ffff475ab3f43f2bc99f2` |
+| `readback.json` |611| `b36643435294da5baa095db33efe26384016a6a7609c4b41cc0647027a805b1c` |
+| `complete.json` |571| `ac99130938696ccc66c044b24e10a1da23f65d6df6609abe8dd9fed7c8e33cd0` |
+
+A separate native-denied check read ONLY these four owned metadata leaves,
+verified0700/0600 ownership/single-link custody and all final/start/reservation
+crosslinks. Original retained-source bodies were denied for that check.
+The trusted-parent reservation binds121 current source images/inventory
+`99bf7b0f24fc39ee7d4e6bae847207a9ced50e62b141d6d9b09088beefe05550`;
+this is the reservation's current code identity, not an accepted child witness
+or the historical50-image producer identity. **No accepted real17-leaf readback
+or historical50-Git-image result exists from this operation.** The prospective
+2,355 retained bytes remain an expected input, not a measured successful
+replay count. `IBMASSIVE2-OBS34101` stays OPEN.
+
+### 354.2 Reproduced launch defect, with original-measurement limits
+
+The surrounding trusted-parent fence was stricter than the production child
+launcher expected: it was itself already under `sandbox-exec`, then the
+qualified verifier attempted its own nested `sandbox-exec`. Main reproduced
+the exact parent/child native launch-policy prefix with ONLY a source-marker
+Python program, no module/retained input: child exit71, empty stdout, exact
+stderr `sandbox-exec: sandbox_apply: Operation not permitted` plus newline.
+Python never printed the source-only marker. This identifies an incompatible
+native launch topology; the earlier independent tests of the two policies
+and memory helper separately did not exercise their nesting.
+
+The ORIGINAL generic child helper discarded its child launch status/stderr
+when raising the sanitized refusal. Thus71/the exact OS line are SOURCE-ONLY
+diagnostic observations, not retrospectively measured original child metrics.
+Do not invent an original private-read counter or retroactively call the
+failed operation a success. The reproducible launch refusal supports the
+cause; the immutable original receipt remains generic `native_refused`.
+No source body, credential, provider API, QC/Safari or outcome is used to
+establish this diagnosis.
+
+### 354.3 Correction scope and preserved blocker
+
+**IBNATIVE-CCR35401, P3 tooling, correction in qualification:** add an explicit
+source-only health role exercising the complete native child command,
+flags/denials, live memory guard, current identity and bounded IPC BEFORE a
+caller claims a one-shot data namespace. Never call the retained reader in
+that role. Preserve finite own worker failures and recognize ONLY the exact
+observed empty-stdout/exit71/OS-line launch signature; do not expose arbitrary
+stderr or broadly match foreign text. Timeouts, oversized IPC and cleanup
+must fail closed without leaking or leaving worker groups running.
+
+This correction is available-input engineering of the verified defect; it
+does not weaken the real input child's native fence or reauthorize the spent
+353 observation. No fallback to inherited weaker permissions, mocked native
+proof, unsandboxed data worker or automatic real-input retry is allowed.
+Qualify and commit corrected code plus source-only controls; any later health
+result is health ONLY. The actual readback P3 remains OPEN and352's missing
+historical availability, complete originals/PIT/context/rights/population
+facts continue to block the claimed last step before QC/backtesting.
+
+
+## 355. Corrected source-only native health and bounded failure IPC; no data retry (2026-10-30)
+
+### 355.1 Engineering correction and precise limits
+
+Correct the354 tooling failure before any future one-shot caller claims a
+namespace. `preflight_actual(expected_head=...)` qualifies clean current
+source/Git identity and launches the explicit HEALTH role. It exercises the
+full native command, effective connection/fork/all-write/security denials,
+current source closure, live baseline-relative VM/sampled-RSS monitoring,
+protected bounded IPC and final source recheck. It NEVER calls `_readback`,
+constructs `_Held` or opens a retained namespace. In addition to the unchanged
+native denials, health's kernel profile denies ALL lane artifacts and the
+effective UID's Keychain directory (resolved through pwd, not an environment
+HOME). Even an accidental health-to-reader branch would be denied inputs.
+The actual readback role's fence remains unchanged; there is no weaker
+fallback, inherited-permission substitution or automatic real-input retry.
+
+The native launcher now bounds stdout/stderr/deadline, validates canonical
+worker envelopes and propagates only its finite own refusal codes. Exactly
+exit71 + empty stdout + the known OS line/newline becomes
+`native_sandbox_launch_refused`; other foreign stderr is not exposed or
+matched by substring. This does NOT rewrite354's original generic receipt or
+retroactively claim that original child exit/stderr was captured. Failed
+process groups are killed even if their leader exited, reaped with a bounded
+2s cleanup wait, and all streams/selectors are closed independently. Preserve
+the primary finite refusal; cleanup failure cannot turn failure into success.
+
+**IBNATIVE-CCR35401, P3 tooling, CLOSED at pre-claim-health/observability scope**
+after the controls below. It does not close the separate
+**`IBMASSIVE2-OBS34101`, P3, OPEN** actual retained-readback requirement. No
+accepted real17-leaf/old50-image verification has been manufactured. The
+source-only launch reproduction supports the compatibility diagnosis; it is
+not an original child trace or a new semantic observation of old source data.
+
+### 355.2 Final source qualification and exclusions
+
+| Qualified image | SHA-256 |
+| --- | --- |
+|450-line corrected source | `e633a68b10866585aa4057f3e1ecb07eb2f88ca2bbc83a15e3f4e8c96ee40647` |
+|633-line corrected tests | `d852e1786dd9a84944f2b165f96f11a943bcad2db6069c7b23c370cef381f9f7` |
+
+Final pure focused selection **200 passed,1.78s**, one explicitly split live
+runtime node deselected:103 new pure cases +96 producer regressions +EXACT
+package guard. The separate opt-in matched-parent SOURCE-ONLY nested launch
+node is **1 passed,0.51s**, with parent fork allowed and all other native
+network/security/private-input/repo-write denials retained. The live node is
+opt-in and Darwin-specific; it does not assert every Mac must have this
+host's nested-sandbox behavior. Portable exact codec tests cover the known
+signature without encoding it as universal platform behavior.
+
+Seven whole-function/command reversals produce **16 expected red results**,
+with12 unrelated passing results; restored final200 are green. These are
+mutant-run outcomes, not additional unique tests:
+
+| Reversal | Expected red results |
+| --- | --- |
+| `_worker`: make health always call the retained reader |1|
+| `_result_value`: discard specific finite worker failure into a generic code |6|
+| `_cleanup`: skip failed-group kill when the leader already exited |3|
+| `_cleanup`: remove the bounded wait timeout |3|
+| `_child_result`: broaden exact stderr equality into substring matching |1, with12 unrelated green|
+| `preflight_actual`: remove exact health-payload validation |1|
+| `_command`: remove health's native private-input read denials |1|
+
+IPC size and execution-deadline guards have green regressions but were NOT
+reversed. Independent43 pure/mock parent/health/IPC controls are a SUBSET, not43
+additional unique tests. Source-only cleanup probes cover both running and
+exited leaders and preserving finite primary errors. Two source images compile
+in memory and whitespace checks pass. These are focused tests, not a complete
+lane/repository suite or proof of real data completion.
+
+All pure tests use native process-tree network/fork/security denial, artifact/
+Keychain read denial and fresh-temp-only writes; no conftest/operator root,
+autoload plugins or caches. The nested signature node necessarily allows
+its SOURCE-ONLY parent to fork; its fixed health child retains the stricter
+fence. No actual retained observation, source/credential/provider request,
+new namespace, vendor reply, QC/Safari, registered look or backtest occurred
+while correcting/qualifying this code. No frozen producer/custody byte changed.
+
+### 355.3 Prospective source-only flat health, not a data operation
+
+Commit corrected code/tests and this record BEFORE one source-only runtime
+qualification on that then-existing clean HEAD. Invoke ONLY `preflight_actual`.
+The trusted source/Git launcher sits above a single native health-worker
+fence; nesting another sandbox is what the matched-parent diagnostic refuses.
+The launcher handles committed source/Git and curated health IPC only. The
+health worker has all financial artifact/Keychain access natively denied,
+no stdin secret and no capability/route to source parsing in that role.
+Do not call `verify_actual`, resume353's spent namespace or create an alias.
+No permission in353's actual retained-input scope is relaxed by this SOURCE-
+ONLY health control. Any future real retained observation still needs its
+own genuine qualified execution topology and prospective scope; this round
+will not substitute it for the failed operation.
+
+Record measured health timing/current HEAD/source inventory and hash only
+if that control passes. It proves software/runtime health, not the old
+producer's historical images or rows, historical known-by, coverage, PIT,
+rights, canonical readiness, QC access or backtesting readiness. Passing it
+cannot close the open actual readback P3 or any of the13 current P2s. Finish
+with a separate durable handoff and the owner's ONE final matching-lane push;
+the concrete missing archive/PIT/population inputs and reply hold remain the
+reason the last step before QC cannot honestly be reached in this round.
+
+After354-355 and the final code correction, main's record/active-document/
+import-boundary/EXACT-package/platform-convention selection is **125 passed,
+7.06s**, under native network/security/private-input/repo-write denial.
+No complete suite or actual data retry is included.

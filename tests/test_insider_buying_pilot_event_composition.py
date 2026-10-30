@@ -15,6 +15,8 @@ import zipfile
 import pytest
 
 from data.hashing import hash_bytes, hash_payload
+
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 from research import insider_buying_pilot_event_composition as m
 from test_insider_buying_pilot_production_composition import (
     ingredients as original_ingredients, _registration_inputs, _source,
@@ -23,6 +25,7 @@ from test_insider_buying_pilot_sec_roster import corpus as roster_corpus, _manif
 from test_insider_buying_backtest_source_stream import _record
 from test_insider_buying_backtest_evidence_pipeline import make_pipeline_fixture
 from test_insider_buying_backtest_event_clock import listing_evidence
+from test_insider_buying_pilot_2021_2025 import _entry
 
 
 @pytest.fixture(scope="module")
@@ -83,11 +86,16 @@ def registered(ingredients):
     return m.pilot.bind_pilot_production_registration(**_registration_inputs(ingredients))
 
 
-def _pair(ingredients, registered, *, entry="2023-01-13", stamps=None, shares=None, transaction_days=None, reference_edit=None):
+def _pair(ingredients, registered, *, entry="2023-01-13", stamps=None, shares=None, transaction_days=None,
+          reference_edit=None, metadata_prior_listing=None):
     stamps = stamps or {}
     shares = shares or {}
     transaction_days = transaction_days or {}
     initial = _source(ingredients, entry=entry)
+    if metadata_prior_listing is not None:
+        context_raw = m._raw(_entry(ingredients[0]["pilot_plan"], entry=entry,
+                                   prior_listing=metadata_prior_listing))
+        initial.update(entry_context_raw=context_raw, expected_entry_context_sha256=hash_bytes(context_raw))
     coverages = initial["window_coverages"]
     periods = tuple(coverage.to_payload()["period"] for coverage in coverages)
     declarations, records = [], []
@@ -184,6 +192,8 @@ def test_real_causal_lot_threshold_snapshot_is_composed(ingredients, registered)
         assert Decimal(event["score"]) == m.base.formula._event_formula(Decimal(75000), 0)[2]
     assert summary["asof_future_parent_count"] == summary["canonical_future_parent_count"] == 2
     assert summary["backtesting_ready"] is summary["old_full_study_manifest_seal_created"] is False
+    assert summary["event_clock_basis"] == "SEC_ACCEPTANCE_MODEL"
+    assert summary["historical_public_known_by_verified_here"] is False
     assert summary["research_looks_consumed"] == summary["qc_jobs"] == summary["backtests"] == 0
 
 
@@ -273,6 +283,92 @@ def test_later_filing_of_consumed_lot_is_not_reset_or_retraded(ingredients, regi
     assert body["canonical_counts"]["late_members_not_reset_or_retraded"] == 1
 
 
+def test_pre_source_facts_outside_target_preserve_complete_source_and_ordered_accounting(ingredients, registered):
+    arguments = _pair(ingredients, registered, entry="2023-01-19",
+                      stamps={3:"20230113091500",4:"20230113090000"},
+                      transaction_days={3:"2022-09-30", 4:"2022-09-30"})
+    result = m.compose_pilot_entry_events(**arguments)
+    body = result.to_payload()
+    assert body["disposition"] == "SOURCE_EVENTS_MOO_COMPATIBLE"
+    assert body["canonical_event_count"] == body["provisional_event_count"] == 0
+    assert body["source_submission_count"] == 15 and body["relevant_original_count"] == 7
+    assert body["all_six_form_source_counts"] == {"3":2,"3/A":2,"4":5,"4/A":2,"5":2,"5/A":2}
+    assert body["pre_source_target_relevance_policy"] == "literal-first-open-interval-no-historical-carryin-v1"
+    assert body["historical_pre_source_lot_replay_or_carryin_used"] is False
+    for prefix, source in (("provisional", arguments["entry_source"].source_evidence()),
+                           ("canonical", arguments["first_open_source"])):
+        rows = [row for row in source.transaction_rows()
+                if row["issuer_cik"] == "0000000003" and row["transaction_date"] == "2022-09-30"]
+        assert len(rows) == 2
+        # The source census is ordinal ordered, whereas this projection is
+        # acceptance ordered; the reversed timestamps make that observable.
+        assert rows[0]["accepted_at_utc"] > rows[1]["accepted_at_utc"]
+        descriptors = [{name:row[name] for name in
+                       ("event_id", "transaction_sha256", "accepted_at_utc", "transaction_date")}
+                       for row in sorted(rows, key=lambda row:row["accepted_at_utc"])]
+        expected = hash_bytes(b"".join(m._raw(row) + b"\n" for row in descriptors))
+        assert expected != hash_bytes(b"".join(m._raw(row) + b"\n" for row in reversed(descriptors)))
+        assert body[prefix + "_counts"]["pre_source_facts_outside_target_first_open"] == 2
+        assert body[prefix + "_pre_source_outside_target_rows_sha256"] == expected
+        assert source.to_payload()["source_submission_count"] == body["source_submission_count"]
+        assert len(source.quarter_receipts()) == 2
+    assert body["canonical_amendment_eligibility_not_evaluated_count"] == 2
+    assert body["canonical_exclusion_reason_counts"]["known_amendment_identity_retained_eligibility_not_evaluated"] == 2
+
+
+@pytest.mark.parametrize("shares", [{3:1}, {3:500}, {3:1,4:1,5:1}])
+def test_target_relevant_pre_source_lot_needs_history_even_below_or_above_threshold(ingredients, registered, shares):
+    # Unknown earlier members might have consumed this lot, or might combine
+    # with a tiny current member to make its first crossing. Neither a zero
+    # assumption nor the visible amount proves the historical state.
+    arguments = _pair(ingredients, registered, shares=shares, transaction_days={3:"2022-09-30"})
+    with pytest.raises(m.PilotEventCompositionError, match="^economic_lot_precedes_complete_source_scope$"):
+        m.compose_pilot_entry_events(**arguments)
+
+
+def test_earlier_pre_source_member_does_not_clear_target_relevant_same_lot(ingredients, registered):
+    arguments = _pair(ingredients, registered, entry="2023-01-19",
+                      transaction_days={3:"2022-09-30",6:"2022-09-30"})
+    with pytest.raises(m.PilotEventCompositionError, match="^economic_lot_precedes_complete_source_scope$"):
+        m.compose_pilot_entry_events(**arguments)
+
+
+@pytest.mark.parametrize("stamp,refused", [("20230113092959",False), ("20230113093000",True)])
+def test_pre_source_target_interval_includes_exact_previous_open(ingredients, registered, stamp, refused):
+    arguments = _pair(ingredients, registered, entry="2023-01-16", stamps={3:stamp},
+                      transaction_days={3:"2022-09-30"})
+    if refused:
+        with pytest.raises(m.PilotEventCompositionError, match="^economic_lot_precedes_complete_source_scope$"):
+            m.compose_pilot_entry_events(**arguments)
+    else:
+        body = m.compose_pilot_entry_events(**arguments).to_payload()
+        assert body["disposition"] == "SOURCE_EVENTS_MOO_COMPATIBLE"
+        assert body["canonical_counts"]["pre_source_facts_outside_target_first_open"] == 1
+
+
+def test_pre_source_fact_at_exact_target_open_cannot_rewrite_finalized_event(ingredients, registered):
+    arguments = _pair(ingredients, registered, stamps={5:"20230113093000"},
+                      transaction_days={5:"2022-09-30"})
+    result = m.compose_pilot_entry_events(**arguments)
+    body = result.to_payload()
+    assert body["disposition"] == "SOURCE_EVENTS_MOO_COMPATIBLE"
+    assert result.event_lineage()[0]["payload"]["lots"][0]["purchase_value_usd"] == "50000"
+    assert body["provisional_counts"]["pre_source_facts_outside_target_first_open"] == 0
+    assert body["canonical_counts"]["pre_source_facts_outside_target_first_open"] == 1
+    assert body["provisional_pre_source_outside_target_rows_sha256"] == hash_bytes(b"")
+
+
+def test_post_moo_pre_source_member_remains_whole_window_history_refusal(ingredients, registered):
+    arguments = _pair(ingredients, registered, stamps={5:"20230113092900"},
+                      transaction_days={5:"2022-09-30"})
+    assert not any(row["transaction_date"] == "2022-09-30" and row["issuer_cik"] == "0000000003"
+                   for row in arguments["entry_source"].source_evidence().transaction_rows())
+    assert any(row["transaction_date"] == "2022-09-30" and row["issuer_cik"] == "0000000003"
+               for row in arguments["first_open_source"].transaction_rows())
+    with pytest.raises(m.PilotEventCompositionError, match="^economic_lot_precedes_complete_source_scope$"):
+        m.compose_pilot_entry_events(**arguments)
+
+
 def test_reference_known_at0929_refuses_whole_population_not_backdated(ingredients, registered):
     result = m.compose_pilot_entry_events(**_pair(ingredients, registered,
         reference_edit=lambda row:row.update(knowledge_at_utc="2023-01-13T14:29:00Z")))
@@ -305,6 +401,75 @@ def test_frozen_pilot_embargo_is_preserved_separately_from_source_compatibility(
     assert body["whole_window_refusal_reasons"] == []
     assert "embargo_first60_phase_sessions" in body["pilot_schedule_exclusion_reasons"]
     assert body["source_submission_count"] == 12
+    with pytest.raises(m.PilotEventCompositionError, match="whole_window"):
+        result.compatible_events()
+
+
+@pytest.mark.parametrize("prior", [0, 1, 60, 252, 253])
+def test_single_security_context_cannot_select_the_whole_window(ingredients, registered, prior):
+    baseline = m.compose_pilot_entry_events(**_pair(ingredients, registered))
+    arguments = _pair(ingredients, registered, metadata_prior_listing=prior)
+    selected_context = arguments["entry_source"].to_payload()["entry_context_assessment"]
+    assert selected_context["declared_prior_listing_sessions"] == prior
+    assert selected_context["metadata_disposition"] == (
+        "EXCLUDED_METADATA" if prior < 253 else "CONTEXT_METADATA_COMPLETE")
+    if prior < 253:
+        assert "primary_factor_calibration_listing_seasoning_below_253_sessions" in selected_context["exclusion_reasons"]
+    result = m.compose_pilot_entry_events(**arguments)
+    body = result.to_payload()
+    assert body["disposition"] == baseline.to_payload()["disposition"] == "SOURCE_EVENTS_MOO_COMPATIBLE"
+    assert body["pilot_schedule_exclusion_reasons"] == []
+    assert result.compatible_events() == baseline.compatible_events()
+    assert body["canonical_event_inventory_sha256"] == baseline.to_payload()["canonical_event_inventory_sha256"]
+    assert body["source_submission_count"] == baseline.to_payload()["source_submission_count"] == 15
+
+
+@pytest.mark.parametrize("prior", [60, 252, 253])
+def test_actual_event_security_still_requires253_prior_listing_sessions(ingredients, registered, prior):
+    def change(reference):
+        plan = ingredients[0]["pilot_plan"].to_payload()
+        rows = plan["calendar_sessions"]
+        index = next(i for i, row in enumerate(rows) if row["session"] == reference["entry_session"])
+        subject = reference["stock_context"]["rows"][0]
+        evidence = listing_evidence(subject["qc_symbol_id"], rows[index-prior]["session"],
+            published=rows[index-prior]["open_utc"], knowledge=rows[index-prior]["open_utc"])
+        subject.update(first_listing_evidence=evidence, first_listing_evidence_sha256=hash_payload(evidence))
+        reference["stock_context_sha256"] = hash_payload(reference["stock_context"])
+        if prior < 253:
+            reference["eligible_control_security_ids"].remove(subject["qc_symbol_id"])
+    result = m.compose_pilot_entry_events(**_pair(ingredients, registered, reference_edit=change,
+                                               metadata_prior_listing=0))
+    body = result.to_payload()
+    assert body["disposition"] == "SOURCE_EVENTS_MOO_COMPATIBLE"
+    assert body["pilot_schedule_exclusion_reasons"] == []
+    assert body["canonical_event_count"] == (0 if prior < 253 else 1)
+    assert body["canonical_exclusion_reason_counts"].get(m.causal.PRIMARY_SEASONING_EXCLUSION, 0) == (1 if prior < 253 else 0)
+    assert len(result.compatible_events()) == body["canonical_event_count"]
+    assert body["source_submission_count"] == 15 and body["relevant_original_count"] == 7
+
+
+@pytest.mark.parametrize("entry,reason", [("2023-12-15", "purged_label_crosses_next_phase"),
+                                         ("2024-01-02", "embargo_first60_phase_sessions")])
+def test_plan_schedule_exclusion_does_not_report_selected_security_seasoning(ingredients, registered, entry, reason):
+    arguments = _pair(ingredients, registered, entry=entry, metadata_prior_listing=0)
+    assert "primary_factor_calibration_listing_seasoning_below_253_sessions" in arguments[
+        "entry_source"].to_payload()["entry_context_assessment"]["exclusion_reasons"]
+    result = m.compose_pilot_entry_events(**arguments)
+    assert result.to_payload()["disposition"] == "PILOT_SCHEDULE_EXCLUDED"
+    assert result.to_payload()["pilot_schedule_exclusion_reasons"] == [reason]
+    assert result.to_payload()["whole_window_refusal_reasons"] == []
+    with pytest.raises(m.PilotEventCompositionError, match="whole_window"):
+        result.compatible_events()
+
+
+def test_young_selected_context_cannot_mask_whole_window_temporal_refusal(ingredients, registered):
+    result = m.compose_pilot_entry_events(**_pair(ingredients, registered, metadata_prior_listing=0,
+        reference_edit=lambda row:row.update(knowledge_at_utc="2023-01-13T14:29:00Z")))
+    body = result.to_payload()
+    assert body["disposition"] == "REFUSED_TEMPORAL_INCOMPATIBILITY"
+    assert body["whole_window_refusal_reasons"] == ["required_prerequisite_after_moo_cutoff"]
+    assert body["pilot_schedule_exclusion_reasons"] == []
+    assert body["canonical_event_count"] == 1
     with pytest.raises(m.PilotEventCompositionError, match="whole_window"):
         result.compatible_events()
 

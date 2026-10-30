@@ -412,3 +412,37 @@ def test_genuine_nested_native_launcher_refuses_before_old_or_new_artifacts(monk
     monkeypatch.setattr(m,"Controller",lambda *a,**k:pytest.fail("no new root before healthy launcher"))
     with pytest.raises(m.NativeWorkerRefused) as error:m.prepare_actual_batch("a"*40)
     assert error.value.phase=="launcher_health"
+
+
+# Claude review section 342 (IBREQ21-CR34202): the required21 capture consumed
+# eight accessions this planner does not chain, so planning must stop while
+# such a later capture namespace exists, before any planner scope or child.
+def test_later_capture_namespace_blocks_planning(tmp_path):
+    root=tmp_path.resolve()
+    assert m._no_unchained_later_capture(root) is None
+    root.joinpath(*m.UNCHAINED_LATER_CAPTURE_PARTS[0]).mkdir(parents=True)
+    with pytest.raises(m.CampaignError,match="^campaign_unchained_later_capture_consumption$"):
+        m._no_unchained_later_capture(root)
+
+
+def test_actual_planning_checks_later_captures_before_any_planner_scope(monkeypatch):
+    # A lane directory present in every checkout stands in for the private
+    # capture namespace, so the test does not depend on retained artifacts.
+    monkeypatch.setattr(m,"UNCHAINED_LATER_CAPTURE_PARTS",(("tests",),))
+    identity={"invented_source_identity":True}
+    monkeypatch.setattr(m,"_identity",lambda _:identity)
+    monkeypatch.setattr(m,"_launcher_health",lambda value:None)
+    monkeypatch.setattr(m,"_stopped_launch_lineage",lambda value:m._launch_lineage())
+    monkeypatch.setattr(m,"Controller",lambda *a,**k:pytest.fail("planner scope created"))
+    monkeypatch.setattr(m,"_run_child",lambda *a,**k:pytest.fail("planner child launched"))
+    with pytest.raises(m.CampaignError,match="^campaign_unchained_later_capture_consumption$"):
+        m.prepare_actual_batch("a"*40)
+
+
+def test_planner_worker_checks_later_captures_before_any_input(monkeypatch):
+    monkeypatch.setattr(m,"UNCHAINED_LATER_CAPTURE_PARTS",(("tests",),))
+    monkeypatch.setattr(m,"_isolated",lambda:None)
+    monkeypatch.setattr(m,"_current",lambda identity:None)
+    monkeypatch.setattr(m,"_FailedLaunchHold",lambda *a:pytest.fail("old input reached"))
+    with pytest.raises(m.CampaignError,match="^campaign_unchained_later_capture_consumption$"):
+        m._plan_worker({},1)

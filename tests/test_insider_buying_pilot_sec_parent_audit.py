@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 from research import insider_buying_pilot_sec_parent_audit as m
 from research import insider_buying_pilot_sec_roster as roster
 from research.insider_buying.sec_quarter_master_index import parse_sec_quarter_master_index

@@ -5,6 +5,7 @@ import copy
 
 import pytest
 
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 from research import insider_buying_pilot_sec_parent_readback as m
 
 

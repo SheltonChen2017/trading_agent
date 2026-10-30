@@ -7,6 +7,7 @@ A durable Main receipt/SourceAUTH bridge is deliberately unavailable here.
 import argparse
 import base64
 from contextlib import contextmanager
+import ctypes
 import errno
 import json
 import math
@@ -30,16 +31,18 @@ worker, native = old.worker, old.native
 ROOT, PARENT = old.ROOT, old.PARENT
 MODULE = "scripts.prove_short_interest_native_supervision"
 DRIVER = "scripts/prove_short_interest_native_supervision.py"
-BOOTSTRAP = "si-native-supervision-v2-v3-bootstrap"
-DOMAIN = "si-native-supervision-v2-v3-domain"
-LABEL = "com.openai.codex.short-interest-native-supervision-v2-v3"
-POLICY_SHA256 = "6e6be3f2329c8131e9ee674b056a742cb8262defb336bed58f27845e24ec351a"
+BOOTSTRAP = "si-native-supervision-v2-v4-bootstrap"
+DOMAIN = "si-native-supervision-v2-v4-domain"
+LABEL = "com.openai.codex.short-interest-native-supervision-v2-v4"
+POLICY_SHA256 = "848ceb48bc42aa02a4974d95da2ba113c172a26aed31d5d0827a4a8fa62c3a94"
 CODE_FILES = (*old.CODE_FILES, startup.DRIVER, DRIVER)
 MAXIMUM_SECONDS, COMMAND_SECONDS, VIRTUAL_BYTES = 300, 120, 8 * 1024 ** 3
 MAXIMUM_NATIVE_BYTES, MAXIMUM_CONTROL_BYTES, MAX_CONFIG, MAX_WIRE = 4194304, 4096, 4096, 1024
 RAW_ROLES = ("native.before.plist", "native.create.plist", "native.attach.plist", "native.initial.plist", "native.terminal.plist")
-PRIVATE_ROLES = ("child.failure.buffers.private.json", "child.remaining.pipe.private.bin", "child.partial.stdout.private.bin", "child.negative.closed.json")
+PRIVATE_ROLES = ("child.failure.buffers.private.json", "child.remaining.pipe.private.bin", "child.partial.stdout.private.bin", "child.negative.closed.json", "child.returned.stdout.private.json")
 NEGATIVE_SECONDS, MAXIMUM_PRIVATE_BYTES, MAXIMUM_TRACE_FRAMES = 5, 65536, 128
+SYSTEM_INITIAL_SECONDS, SYSTEM_INITIAL_SAMPLES, SYSTEM_INITIAL_INTERVAL, SYSTEM_INITIAL_QUIET = 8, 33, 0.25, 1
+UF_IMMUTABLE = 2  # Fixed Darwin policy value; platform APIs are checked only at call time.
 INVENTORY_ROLE, MARKER_ROLE = "metadata.inventory.private.json", "run.completed.provisional.json"
 CONTROL_ROLES = ("run.started.json", "stdout.jsonl", "child.exit.provisional.json", MARKER_ROLE, "run.refused.json")
 ROLES = RAW_ROLES + CONTROL_ROLES + (INVENTORY_ROLE,) + PRIVATE_ROLES
@@ -50,7 +53,7 @@ _USED = False
 _STAGE, _COMPONENT = "registration", "operation"
 _STAGES = frozenset("registration startup_import bootstrap current_code native_creation output_creation child_launch child_observation terminal_code terminal_native inventory_publication original_audit cleanup named_audit root_load root_observation root_verification root_cleanup".split())
 _COMPONENTS = old._COMPONENTS | frozenset(("operation", "main_directory", "root_receipt"))
-_CODES = old._CODES | startup._CODES | frozenset("supervision_unregistered supervision_arguments supervision_code supervision_factory supervision_changed supervision_wait supervision_kernel supervision_negative supervision_original supervision_unknown supervision_marker supervision_source_refused".split())
+_CODES = old._CODES | startup._CODES | frozenset("supervision_unregistered supervision_arguments supervision_code supervision_factory supervision_changed supervision_wait supervision_kernel supervision_negative supervision_original supervision_unknown supervision_marker supervision_source_refused system_initialization_refused system_initial_identity_changed immutable_platform_refused immutable_creator_refused immutable_freeze_refused immutable_file_changed".split())
 _ERRNOS = {**old._ERRNOS, **startup._ERRNOS}
 _PRODUCERS, _CLOSED, _PREPARED, _HELD, _FAILURES, _ADVISORIES, _KERNEL_ORIGINS = {}, {}, {}, [], {}, {}, {}
 _COMPARISONS, _PRESERVATIONS, _NEGATIVE_CLOSURES, _NEGATIVE_WAITS = {}, {}, {}, {}
@@ -64,6 +67,8 @@ _COMPARISON_ROLES = _STAMP_COMPARISON_ROLES | _SYSTEM_COMPARISONS | frozenset(_S
 _CREATION_STATES, _CREATION_FAILURES, _CREATION_MANIFESTS, _SYSTEM_FAILURES, _PRODUCTION_SCOPES = {}, {}, {}, {}, {}
 _NATIVE_PLANS, _NATIVE_INVOCATIONS = {}, {}
 _SYSTEM_BASELINES = {}
+_SYSTEM_INITIALIZATIONS, _FILE_CREATORS, _COLLECT_RETURNS, _STDOUT_FREEZES, _ACTIVE_FREEZES = {}, {}, {}, {}, {}
+_RO_ORIGINS, _RO_HANDOFFS = {}, {}
 CREATION_NATIVE_ROLES = tuple("creation.native." + role + ".private.plist" for role in ("before", "create", "attach", "initial", "terminal"))
 CREATION_SYSTEM_ROLE = "creation.system.private.json"
 CREATION_FAILURE_ROLE = "creation.failure.private.json"
@@ -140,7 +145,7 @@ def authority():
 
 
 def policy():
-    return {"schema": "si-native-supervision-v2-policy-v3", "root": str(ROOT), "bootstrap": BOOTSTRAP,
+    return {"schema": "si-native-supervision-v2-policy-v4", "root": str(ROOT), "bootstrap": BOOTSTRAP,
         "domain": DOMAIN, "label": LABEL, "code_files": list(CODE_FILES), "roles": list(ROLES),
         "virtual_bytes": VIRTUAL_BYTES, "maximum_seconds": MAXIMUM_SECONDS, "native_command_seconds": COMMAND_SECONDS,
         "config_bytes": MAX_CONFIG, "control_bytes": MAXIMUM_CONTROL_BYTES, "native_bytes": MAXIMUM_NATIVE_BYTES, "inventory_bytes": MAXIMUM_NATIVE_BYTES,
@@ -151,6 +156,16 @@ def policy():
             "wait": "original_handle_EOF_then_known_original_or_separate_negative_wait_receipt_never_mint_positive_wait_or_recover_success",
             "closure": "all_consumed_bytes_retained_before_bounds_and_durably_preserved_original_seals_readback_fsync_cleanup_or_hold_all_contexts"},
         "private_observer_overflow": "retain_exact_original_FD_raw_and_newly_consumed_block_before_refusal_never_slice_or_continue_consuming_after_failure",
+        "system_initialization": {"seconds": SYSTEM_INITIAL_SECONDS, "samples": SYSTEM_INITIAL_SAMPLES,
+            "interval": SYSTEM_INITIAL_INTERVAL, "quiet_seconds": SYSTEM_INITIAL_QUIET,
+            "contract": "fresh_only_required_presence_same_five_predicates_first_valid_devino_pin_only_unsealed_nlink_candidate_may_restart_quiet_one_original_six_field_baseline_no_reinitialize"},
+        "immutable_evidence": {"required_kernel_flag": UF_IMMUTABLE,
+            "SDK": "fixed_lazy_usr_lib_libSystem_B_dylib_fchflags_int_fd_uint32_flags_int_return_errno_no_fallback",
+            "contract": "new_original_OEXCL0600_singlelink_creator_FD_only_one_attempt_before_first_seal_no_flag_clear_rebaseline_adoption_old_seal_repair",
+            "handle_handoff": "creation_time_independent_original_RO_OFD_one_atomic_dup2_replaces_owned_RW_numeric_slot_before_UF_and_FIRST9_two_RO_survivors_preflush_post_RO_fsync_exact_identity_bytes_no_retry",
+            "handle_limit": "closed_code_no_other_owned_data_writer_alias_export_inheritance_or_writable_mmap_dup2_suppresses_target_close_errors_no_observed_last_close0_or_global_revocation_claim",
+            "reader": "actual_kernel_flag_plus_all_original_nine_fields_bytes_and_owned_parent_each_audit",
+            "stdout": "only_genuine_final_collect_validate_EOF_empty_pending_stages_original_wait0_before_first_local_seal_or_genuine_failed_unsealed_partial_before_first_negative_snapshot"},
         "creation_failure": {"roles": list(CREATION_ROLES), "native_each_bytes": MAXIMUM_NATIVE_BYTES,
             "native_total_bytes": len(CREATION_NATIVE_ROLES) * MAXIMUM_NATIVE_BYTES, "private_JSON_each_bytes": MAXIMUM_PRIVATE_BYTES,
             "routing": "original_APFS_mount_domain_anchors_seeded_after_owner_mode_before_first_system_no_proof_directory_or_host_status_adoption",
@@ -176,6 +191,7 @@ def registered():
     require(type(POLICY_SHA256) is str and re.fullmatch(r"[0-9a-f]{64}", POLICY_SHA256)
         and hash_payload(policy()) == POLICY_SHA256 and _COLLECT is worker._collect and _COLLECT_CODE is worker._collect.__code__, "supervision_unregistered")
     require(CODE_FILES == (*old.CODE_FILES, startup.DRIVER, DRIVER), "supervision_code")
+    _require_immutable_platform()
 
 
 def failure_summary(error):
@@ -214,12 +230,323 @@ def _native_statfs(fd): return native._native_statfs(fd)
 def _device_node(device, mount_dev): return native._node_pin(device, mount_dev)
 def _native_command(arguments, timeout):
     return subprocess.run(arguments, cwd=ROOT, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-        check=False, timeout=timeout, env={"PATH": "/usr/bin:/bin", "LC_ALL": "C"})
+        check=False, close_fds=True, timeout=timeout, env={"PATH": "/usr/bin:/bin", "LC_ALL": "C"})
 def _launch_worker(head, remote):
     return subprocess.Popen([worker.PYTHON, "-B", "-m", worker.MODULE, "proof-worker", "--head", head, "--remote", remote],
         cwd=ROOT, env=worker._environment(), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
         shell=False, close_fds=True, start_new_session=True)
 def _new_domain(clock): return _DomainVolume(clock)
+
+
+def _require_immutable_platform():
+    require(sys.platform == "darwin" and os.name == "posix" and ctypes.sizeof(ctypes.c_int) == 4
+        and ctypes.sizeof(ctypes.c_uint32) == 4 and ctypes.sizeof(ctypes.c_void_p) == 8
+        and getattr(stat, "UF_IMMUTABLE", None) == UF_IMMUTABLE
+        and hasattr(os.stat_result, "st_flags"), "immutable_platform_refused")
+
+
+def _file_flags(info):
+    flags = getattr(info, "st_flags", None)
+    require(type(flags) is int and 0 <= flags < 2 ** 32, "immutable_platform_refused")
+    return flags
+
+
+def _set_file_flags(fd, flags):
+    _require_immutable_platform()
+    require(type(fd) is int and 0 <= fd < 2 ** 31 and type(flags) is int and 0 <= flags < 2 ** 32
+        and flags & UF_IMMUTABLE, "immutable_creator_refused")
+    active = _ACTIVE_FREEZES.get(fd); caller = sys._getframe(1)
+    require(type(active) is tuple and len(active) == 3, "immutable_creator_refused")
+    row = _creator(active[0])
+    require(caller.f_code is _freeze_new_file.__code__ and caller.f_globals is globals()
+        and caller.f_locals.get("row") is row and caller.f_locals.get("cap") is active[0]
+        and flags == active[1] == row["target_flags"] and row["attempted"] and not row["verified"]
+        and not row.get("syscall_attempted") and "failure" not in row, "immutable_creator_refused")
+    _readonly_handoff(row)
+    a, b = _creator_current(row)
+    require(_file_flags(a) == _file_flags(b) == flags & ~UF_IMMUTABLE
+        and a.st_size == b.st_size == len(row["before_raw"]), "immutable_freeze_refused")
+    row["syscall_attempted"] = True
+    _sdk_fchflags(fd, flags)
+
+
+def _sdk_fchflags(fd, flags):
+    _require_immutable_platform()
+    require(type(fd) is int and 0 <= fd < 2 ** 31 and type(flags) is int and 0 <= flags < 2 ** 32, "immutable_creator_refused")
+    try: operation = ctypes.CDLL("/usr/lib/libSystem.B.dylib", use_errno=True).fchflags
+    except (AttributeError, OSError): raise SupervisionRefusal("REFUSED: immutable_platform_refused") from None
+    operation.argtypes, operation.restype = (ctypes.c_int, ctypes.c_uint32), ctypes.c_int
+    caller = sys._getframe(1); active = _ACTIVE_FREEZES.get(fd)
+    require(caller.f_code is _set_file_flags.__code__ and caller.f_globals is globals()
+        and type(active) is tuple and active[1] == flags, "immutable_creator_refused")
+    row = _creator(active[0])
+    require(caller.f_locals.get("row") is row and row.get("syscall_attempted") is True
+        and not row.get("sdk_invoked") and "failure" not in row, "immutable_creator_refused")
+    _readonly_handoff(row)
+    a, b = _creator_current(row)
+    require(_file_flags(a) == _file_flags(b) == flags & ~UF_IMMUTABLE
+        and a.st_size == b.st_size == len(row["before_raw"]), "immutable_freeze_refused")
+    row["sdk_invoked"] = True
+    ctypes.set_errno(0); result = operation(fd, flags); number = ctypes.get_errno()
+    if type(result) is not int or result != 0:
+        raise OSError(number if type(number) is int and number > 0 else errno.EIO, "immutable_flag_sdk_refused")
+
+
+def _require_file_immutable(info):
+    require(_file_flags(info) & UF_IMMUTABLE, "immutable_file_changed")
+
+
+class _FileCreator:
+    def __init__(self): raise SupervisionRefusal("REFUSED: immutable_creator_refused")
+
+
+def _descriptor_access(fd):
+    require(os.name == "posix" and type(fd) is int and fd >= 0, "immutable_platform_refused")
+    try: import fcntl
+    except ImportError: raise SupervisionRefusal("REFUSED: immutable_platform_refused") from None
+    flags = fcntl.fcntl(fd, fcntl.F_GETFL)
+    require(type(flags) is int, "immutable_platform_refused")
+    return flags & os.O_ACCMODE
+
+
+def _owner_data_fds(owner):
+    if type(owner) is _Files: return owner.fds
+    if type(owner) is _CreationCarrier: return owner.file_fds
+    require(type(owner) is _NegativeReporter, "immutable_creator_refused")
+    return owner.private_fds
+
+
+def _owned_handle_profile(row):
+    """The supported closed code owns exactly two handles for this inode."""
+    fds = tuple(_owner_data_fds(row["owner"])); expected = row["fd"], row["original_ro_fd"]
+    require(fds.count(expected[0]) == fds.count(expected[1]) == 1, "immutable_creator_refused")
+    for fd in fds:
+        info = os.fstat(fd)
+        if (info.st_dev, info.st_ino) == row["identity"][:2]:
+            require(fd in expected, "immutable_creator_refused")
+
+
+def _issue_file_creator(owner, name, fd, parent):
+    frame = sys._getframe(1)
+    require(any(frame.f_code is code and type(owner) is kind for code, kind in _CREATOR_SITES)
+        and frame.f_globals is globals() and frame.f_locals.get("self") is owner
+        and frame.f_locals.get("name") == name and frame.f_locals.get("fd") == fd
+        and name not in owner.creators, "immutable_creator_refused")
+    info = os.fstat(fd); named = os.stat(name, dir_fd=parent, follow_symlinks=False)
+    identity = _negative_file(info, MAXIMUM_NATIVE_BYTES, empty=True)[:6]
+    require(_stamp(named)[:6] == identity and _file_flags(info) == _file_flags(named)
+        and not _file_flags(info) & UF_IMMUTABLE, "immutable_creator_refused")
+    value = object.__new__(_FileCreator)
+    row = {"cap": value, "owner": owner, "name": name, "fd": fd, "parent": parent, "path": owner.path,
+        "parent_pin": _dir(os.fstat(parent), True), "identity": identity, "initial_flags": _file_flags(info),
+        "attempted": False, "verified": False, "frozen9": None, "issuer_frame": frame, "issuer": object(),
+        "writer_fd": fd, "original_ro_fd": None, "handoff_attempted": False, "handoff_verified": False}
+    value._anchor = row; _FILE_CREATORS[value] = row; owner.creators[name] = value
+    try:
+        require(_descriptor_access(fd) == os.O_RDWR and os.get_inheritable(fd) is False, "immutable_creator_refused")
+        # Independent creation-time RO OFD, before writing or closing the writer.
+        ro = os.open(name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=parent)
+        row["original_ro_fd"] = ro; _owner_data_fds(owner).append(ro)
+        readonly = os.fstat(ro)
+        require(ro != fd and _descriptor_access(ro) == os.O_RDONLY and os.get_inheritable(ro) is False
+            and _negative_file(readonly, MAXIMUM_NATIVE_BYTES, empty=True)[:6] == identity
+            and _file_flags(readonly) == row["initial_flags"], "immutable_creator_refused")
+        _same(_stamp(readonly), _stamp(os.fstat(fd)))
+        _same(_stamp(os.stat(name, dir_fd=parent, follow_symlinks=False)), _stamp(readonly))
+        _RO_ORIGINS[value] = value, row, fd, ro, parent, identity, row["initial_flags"], frame, object()
+    except BaseException as error:
+        row["failure"], row["trace"] = error, BaseException.__traceback__.__get__(error, BaseException)
+        raise
+    return value
+
+
+def _creator(cap):
+    require(type(cap) is _FileCreator, "immutable_creator_refused")
+    row = _FILE_CREATORS.get(cap)
+    require(type(row) is dict and row.get("cap") is cap and cap._anchor is row
+        and row["owner"].creators.get(row["name"]) is cap, "immutable_creator_refused")
+    frame = row["issuer_frame"]
+    require(frame.f_globals is globals() and any(frame.f_code is code and type(row["owner"]) is kind for code, kind in _CREATOR_SITES)
+        and frame.f_locals.get("self") is row["owner"] and frame.f_locals.get("name") == row["name"]
+        and frame.f_locals.get("fd") == row["fd"], "immutable_creator_refused")
+    origin = _RO_ORIGINS.get(cap)
+    require(type(origin) is tuple and len(origin) == 9 and origin[0] is cap and origin[1] is row
+        and origin[2:7] == (row["fd"], row["original_ro_fd"], row["parent"], row["identity"], row["initial_flags"])
+        and origin[7] is frame and row["writer_fd"] == row["fd"], "immutable_creator_refused")
+    return row
+
+
+def _creator_current(row):
+    require(row["path"].resolve() == row["path"] and _dir(os.fstat(row["parent"]), True)
+        == _dir(row["path"].lstat(), True) == row["parent_pin"], "immutable_creator_refused")
+    a, b = os.fstat(row["fd"]), os.stat(row["name"], dir_fd=row["parent"], follow_symlinks=False)
+    require(_negative_file(a, MAXIMUM_NATIVE_BYTES, empty=True)[:6] == _stamp(b)[:6] == row["identity"], "immutable_creator_refused")
+    return a, b
+
+
+def _handoff_readonly(cap, size, raw):
+    """One pre-seal OFD transition; dup2 does not attest target-close success."""
+    row = _creator(cap); caller = sys._getframe(1)
+    require(caller.f_code is _freeze_new_file.__code__ and caller.f_globals is globals()
+        and caller.f_locals.get("row") is row and caller.f_locals.get("cap") is cap
+        and row["attempted"] and not row["verified"] and not row["handoff_attempted"]
+        and type(raw) is bytes and len(raw) == size and row.get("before_raw") is raw, "immutable_creator_refused")
+    row["handoff_attempted"] = True
+    try:
+        fd, ro = row["fd"], row["original_ro_fd"]
+        _owned_handle_profile(row)
+        require(_descriptor_access(fd) == os.O_RDWR and _descriptor_access(ro) == os.O_RDONLY
+            and os.get_inheritable(fd) is os.get_inheritable(ro) is False, "immutable_creator_refused")
+        a, b = _creator_current(row); r = os.fstat(ro)
+        require(_negative_file(r, MAXIMUM_NATIVE_BYTES, empty=True)[:6] == row["identity"]
+            and a.st_size == b.st_size == r.st_size == size
+            and _file_flags(a) == _file_flags(b) == _file_flags(r) == row["initial_flags"], "immutable_freeze_refused")
+        os.fsync(fd); os.fsync(row["parent"])
+        os.lseek(ro, 0, os.SEEK_SET); before = os.read(ro, size + 1); row["handoff_before_raw"] = before
+        require(before == raw, "immutable_freeze_refused")
+        a, b = _creator_current(row); r = os.fstat(ro)
+        require(_stamp(a) == _stamp(b) == _stamp(r) and a.st_size == size
+            and _file_flags(a) == _file_flags(b) == _file_flags(r) == row["initial_flags"]
+            and _descriptor_access(fd) == os.O_RDWR and _descriptor_access(ro) == os.O_RDONLY, "immutable_freeze_refused")
+        row["dup2_attempted"] = True
+        replaced = os.dup2(ro, fd, inheritable=False); row["dup2_returned"] = replaced
+        require(type(replaced) is int and replaced == fd, "immutable_freeze_refused")
+        require(_descriptor_access(fd) == _descriptor_access(ro) == os.O_RDONLY
+            and os.get_inheritable(fd) is os.get_inheritable(ro) is False, "immutable_freeze_refused")
+        a, b = _creator_current(row); r = os.fstat(ro)
+        require(_stamp(a) == _stamp(b) == _stamp(r) and a.st_size == size
+            and _file_flags(a) == _file_flags(b) == _file_flags(r) == row["initial_flags"], "immutable_freeze_refused")
+        os.fsync(fd); os.fsync(ro); os.fsync(row["parent"])
+        os.lseek(ro, 0, os.SEEK_SET); after = os.read(ro, size + 1); row["handoff_after_raw"] = after
+        require(after == raw, "immutable_freeze_refused")
+        a, b = _creator_current(row); r = os.fstat(ro)
+        require(_stamp(a) == _stamp(b) == _stamp(r) and a.st_size == size
+            and _file_flags(a) == _file_flags(b) == _file_flags(r) == row["initial_flags"]
+            and _descriptor_access(fd) == _descriptor_access(ro) == os.O_RDONLY, "immutable_freeze_refused")
+        frame = sys._getframe()
+        receipt = cap, row, _RO_ORIGINS[cap], frame, fd, ro, size, raw, object()
+        _RO_HANDOFFS[cap] = receipt; row["handoff_receipt"], row["handoff_verified"] = receipt, True
+        return receipt
+    except BaseException as error:
+        row["handoff_error"], row["handoff_trace"] = error, BaseException.__traceback__.__get__(error, BaseException)
+        raise
+
+
+def _readonly_handoff(row, *, live=True):
+    cap = row["cap"]; receipt = _RO_HANDOFFS.get(cap)
+    require(type(receipt) is tuple and len(receipt) == 9 and receipt[0] is cap and receipt[1] is row
+        and receipt[2] is _RO_ORIGINS.get(cap) and row.get("handoff_receipt") is receipt
+        and row["handoff_attempted"] is row["handoff_verified"] is True
+        and receipt[4:7] == (row["fd"], row["original_ro_fd"], len(row["before_raw"]))
+        and receipt[7] is row["before_raw"], "immutable_creator_refused")
+    frame = receipt[3]
+    require(frame.f_code is _handoff_readonly.__code__ and frame.f_globals is globals()
+        and frame.f_locals.get("row") is row and frame.f_locals.get("cap") is cap
+        and frame.f_locals.get("replaced") == row["fd"]
+        and frame.f_locals.get("raw") is receipt[7], "immutable_creator_refused")
+    if live:
+        _owned_handle_profile(row)
+        require(_descriptor_access(row["fd"]) == _descriptor_access(row["original_ro_fd"]) == os.O_RDONLY
+            and os.get_inheritable(row["fd"]) is os.get_inheritable(row["original_ro_fd"]) is False, "immutable_file_changed")
+        a, b = _creator_current(row); r = os.fstat(row["original_ro_fd"])
+        require(_negative_file(r, MAXIMUM_NATIVE_BYTES, empty=True)[:6] == row["identity"]
+            and _stamp(a) == _stamp(b) == _stamp(r) and _file_flags(a) == _file_flags(b) == _file_flags(r), "immutable_file_changed")
+        if row["verified"]:
+            for observed in (a, b, r):
+                require(_file_flags(observed) == row["frozen_flags"] and _file_flags(observed) & UF_IMMUTABLE, "immutable_file_changed")
+                _same(_stamp(observed), row["frozen9"])
+    return receipt
+
+
+def _freeze_new_file(cap, size, expected_raw=None):
+    row = _creator(cap)
+    require(not row["attempted"], "immutable_freeze_refused"); row["attempted"] = True
+    try:
+        require(type(size) is int and 0 <= size <= MAXIMUM_NATIVE_BYTES
+            and (expected_raw is None or type(expected_raw) is bytes and len(expected_raw) == size), "immutable_freeze_refused")
+        owner = row["owner"]; original = owner.originals.get(row["name"])
+        require(original is None or type(owner) is _Files and original[2] is None, "immutable_freeze_refused")
+        if type(owner) is _Files and row["name"] == "stdout.jsonl":
+            require(_stdout_freeze_origin(cap), "immutable_freeze_refused")
+        a, b = _creator_current(row)
+        require(a.st_size == b.st_size == size and _file_flags(a) == _file_flags(b) == row["initial_flags"], "immutable_freeze_refused")
+        os.fsync(row["fd"]); os.fsync(row["parent"])
+        os.lseek(row["fd"], 0, os.SEEK_SET); before = os.read(row["fd"], size + 1); row["before_raw"] = before
+        require(type(before) is bytes and len(before) == size and (expected_raw is None or before == expected_raw), "immutable_freeze_refused")
+        a, b = _creator_current(row)
+        require(a.st_size == b.st_size == size and _file_flags(a) == _file_flags(b) == row["initial_flags"], "immutable_freeze_refused")
+        _handoff_readonly(cap, size, before)
+        target = row["initial_flags"] | UF_IMMUTABLE; row["target_flags"] = target
+        _ACTIVE_FREEZES[row["fd"]] = cap, target, object()
+        _set_file_flags(row["fd"], target); row["set_returned"] = True
+        a, b = _creator_current(row)
+        require(_file_flags(a) == _file_flags(b) == target and a.st_size == b.st_size == size, "immutable_freeze_refused")
+        candidate = _stamp(a); row["post_flag9"] = candidate; _same(_stamp(b), candidate)
+        os.lseek(row["fd"], 0, os.SEEK_SET); after = os.read(row["fd"], size + 1); row["after_raw"] = after
+        require(after == before, "immutable_freeze_refused")
+        os.fsync(row["fd"]); os.fsync(row["parent"])
+        a, b = _creator_current(row); _same(_stamp(a), candidate); _same(_stamp(b), candidate)
+        require(_file_flags(a) == _file_flags(b) == target, "immutable_file_changed")
+        row["frozen9"], row["frozen_flags"], row["verified"] = candidate, target, True
+        return candidate
+    except BaseException as error:
+        row["failure"], row["trace"] = error, BaseException.__traceback__.__get__(error, BaseException)
+        raise
+
+
+def _check_frozen(cap, info):
+    row = _creator(cap)
+    _readonly_handoff(row, live=not row["owner"].closed)
+    require(row["verified"] is True and row["attempted"] is True and row["frozen9"] is not None, "immutable_freeze_refused")
+    require(_file_flags(info) == row["frozen_flags"] and _file_flags(info) & UF_IMMUTABLE, "immutable_file_changed")
+    _same(_stamp(info), row["frozen9"])
+    return row["frozen9"]
+
+
+def _freeze_stdout_final(outputs, fd, size, cap):
+    row = _creator(cap)
+    if row["verified"]: return
+    frame = sys._getframe(2)
+    if frame.f_code is not _COLLECT_CODE or frame.f_globals is not worker.__dict__: return
+    local = frame.f_locals; process = local.get("process"); origin = worker._CHILDREN.get(process)
+    wait = worker._WAITS.get(process)
+    final = (local.get("ns") is outputs and local.get("log_fd") == fd and local.get("eof") is True
+        and local.get("pending") == b"" and local.get("stages") == [] and local.get("status") == 0
+        and type(wait) is tuple and len(wait) == 3 and wait[0] is origin and type(wait[1]) is int and wait[1] == 0
+        and type(origin) is tuple and origin[0] is process and type(local.get("output")) is bytes
+        and len(local["output"]) == size)
+    if not final: return
+    require("seal" not in local and process not in _COLLECT_RETURNS, "immutable_freeze_refused")
+    require(0 <= worker._now() - local["began"] <= worker.MAXIMUM_SECONDS, "supervision_wait")
+    _STDOUT_FREEZES[cap] = cap, "collector_final", frame, process, outputs, fd, origin, wait, local["output"], object()
+    _freeze_new_file(cap, size, local["output"])
+    require(0 <= worker._now() - local["began"] <= worker.MAXIMUM_SECONDS, "supervision_wait")
+    row["collector_final"] = frame, process, outputs, fd, origin, wait, object()
+
+
+def _stdout_freeze_origin(cap):
+    receipt = _STDOUT_FREEZES.get(cap)
+    if type(receipt) is not tuple or receipt[0] is not cap: return False
+    if receipt[1] == "collector_final":
+        if len(receipt) != 10: return False
+        frame, process, outputs, fd, origin, wait, raw = receipt[2:9]
+        local = frame.f_locals
+        return (frame.f_code is _COLLECT_CODE and frame.f_globals is worker.__dict__ and local.get("process") is process
+            and local.get("ns") is outputs and local.get("log_fd") == fd and local.get("output") is raw
+            and local.get("eof") is True and local.get("pending") == b"" and local.get("stages") == []
+            and worker._CHILDREN.get(process) is origin and worker._WAITS.get(process) is wait and wait[0] is origin and wait[1] == 0)
+    if receipt[1] == "negative_partial":
+        if len(receipt) != 5: return False
+        state, caller = receipt[2:4]
+        return (caller.f_code is _preserve_collection_failure.__code__ and caller.f_globals is globals()
+            and caller.f_locals.get("state") is state and _preservation_state(state)
+            and "seal" not in state["frame"].f_locals and state["process"] not in _COLLECT_RETURNS
+            and state["eof"] and state["wait"] is not None and state["outputs"].creators.get("stdout.jsonl") is cap)
+    return False
+
+
+def _initialization_now(): return time.monotonic()
+def _initialization_sleep(seconds): time.sleep(seconds)
 
 
 @contextmanager
@@ -275,7 +602,7 @@ class _Directory:
 class _Files:
     def __init__(self, fd, parent, path, check, roles):
         self.fd, self.parent, self.path, self.callback, self.roles = fd, parent, path, check, frozenset(roles)
-        self.originals, self.fds, self.closed = {}, [], False
+        self.originals, self.fds, self.closed, self.creators = {}, [], False, {}
     def check(self):
         self.callback()
         require(not self.closed and set(os.listdir(self.fd)) <= self.roles, "native_proof_membership")
@@ -284,27 +611,36 @@ class _Files:
         fd = os.open(name, os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=self.fd)
         self.fds.append(fd); os.fchmod(fd, 0o600)
         info = os.fstat(fd); self.originals[name] = [fd, _stamp(info)[:6], None, None]
+        _issue_file_creator(self, name, fd, self.fd)
         self.validate(fd, name, 0); return fd
     def validate(self, fd, name, size):
         self.check(); row = self.originals.get(name)
         require(row is not None and row[0] == fd, "native_proof_protection")
+        cap = self.creators.get(name)
+        if name == "stdout.jsonl": _freeze_stdout_final(self, fd, size, cap)
         a, b = os.fstat(fd), os.stat(name, dir_fd=self.fd, follow_symlinks=False)
         require(stat.S_ISREG(a.st_mode) and _stamp(a)[:6] == row[1]
             and a.st_uid == os.getuid() and stat.S_IMODE(a.st_mode) == 0o600 and a.st_nlink == 1
             and a.st_size == size, "native_proof_protection")
         if name == "stdout.jsonl": _compared_stamp(_stamp(a), _stamp(b), "stdout_fd_named_pair")
         else: _same(_stamp(a), _stamp(b))
+        creator = _creator(cap)
+        if creator["attempted"]:
+            _check_frozen(cap, a); _check_frozen(cap, b)
+        else: require(row[2] is None, "immutable_freeze_refused")
     def seal(self, name, fd, stamp, raw):
+        cap = self.creators.get(name); require(_check_frozen(cap, os.fstat(fd)) == stamp, "immutable_freeze_refused")
         self.validate(fd, name, len(raw)); _same(_stamp(os.fstat(fd)), stamp)
         os.lseek(fd, 0, os.SEEK_SET)
         require(os.read(fd, len(raw) + 1) == raw, "native_proof_stamp")
-        _same(_stamp(os.fstat(fd)), stamp)
+        _check_frozen(cap, os.fstat(fd)); _same(_stamp(os.fstat(fd)), stamp)
         require(self.originals[name][2] is None, "native_proof_stamp")
         self.originals[name][2:] = stamp, raw
     def write(self, name, raw):
         limit = MAXIMUM_NATIVE_BYTES if name in RAW_ROLES or name == INVENTORY_ROLE else 65536 if name in PRIVATE_ROLES else MAXIMUM_CONTROL_BYTES
         require(type(raw) is bytes and 0 < len(raw) <= limit, "native_proof_write")
         fd = self.create(name); _write(fd, raw); self.validate(fd, name, len(raw))
+        _freeze_new_file(self.creators[name], len(raw), raw)
         os.fsync(fd); os.fsync(self.fd); os.fsync(self.parent)
         self.seal(name, fd, _stamp(os.fstat(fd)), raw)
     def audit(self):
@@ -313,11 +649,13 @@ class _Files:
             require(stamp is not None and type(raw) is bytes, "native_proof_stamp")
             self.validate(fd, name, len(raw)); _same(_stamp(os.fstat(fd)), stamp)
             os.lseek(fd, 0, os.SEEK_SET); require(os.read(fd, len(raw) + 1) == raw, "native_proof_stamp")
-            _same(_stamp(os.fstat(fd)), stamp)
+            _check_frozen(self.creators.get(name), os.fstat(fd)); _same(_stamp(os.fstat(fd)), stamp)
+            _check_frozen(self.creators.get(name), os.stat(name, dir_fd=self.fd, follow_symlinks=False))
     def named(self):
         require(self.path.resolve() == self.path and set(os.listdir(self.path)) == set(self.originals), "native_proof_membership")
         for name, (unused, unused_pin, stamp, unused_raw) in self.originals.items():
-            require(stamp is not None, "native_proof_stamp"); _same(_stamp((self.path / name).lstat()), stamp)
+            require(stamp is not None, "native_proof_stamp"); info = (self.path / name).lstat()
+            _check_frozen(self.creators.get(name), info); _same(_stamp(info), stamp)
     def inventory(self):
         self.audit()
         require(INVENTORY_ROLE not in self.originals and "run.completed.provisional.json" not in self.originals,
@@ -526,7 +864,7 @@ class _CreationCarrier:
     def __init__(self, volume, state):
         self.state, self.volume = state, volume; state["carrier"] = self
         self.path, self.domain = volume.mount, volume.path
-        self.fds, self.file_fds, self.originals, self.attempted = [], [], {}, set()
+        self.fds, self.file_fds, self.originals, self.attempted, self.creators = [], [], {}, set(), {}
         self.closed = self.started = False
         self.pins = (_dir(os.fstat(volume.mount_fd), True), _dir(os.fstat(volume.directory.fd), True))
         for fd in (volume.mount_fd, volume.directory.fd): self.fds.append(os.dup(fd))
@@ -543,13 +881,15 @@ class _CreationCarrier:
         limit = MAXIMUM_NATIVE_BYTES if name in CREATION_NATIVE_ROLES else MAXIMUM_PRIVATE_BYTES
         require(type(raw) is bytes and len(raw) <= limit, "supervision_negative"); self.check()
         fd = os.open(name, os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=self.fds[0]); self.file_fds.append(fd)
-        os.fchmod(fd, 0o600); _write(fd, raw); os.fsync(fd)
+        os.fchmod(fd, 0o600); _issue_file_creator(self, name, fd, self.fds[0]); _write(fd, raw); os.fsync(fd)
+        _freeze_new_file(self.creators[name], len(raw), raw)
         for parent in self.fds: os.fsync(parent)
         seal = _negative_file(os.fstat(fd), limit, empty=name in CREATION_NATIVE_ROLES)
         require(seal[6] == len(raw), "supervision_negative")
         _same(_stamp(os.stat(name, dir_fd=self.fds[0], follow_symlinks=False)), seal)
         os.lseek(fd, 0, os.SEEK_SET); require(os.read(fd, len(raw) + 1) == raw, "supervision_negative")
-        _same(_stamp(os.fstat(fd)), seal); self.originals[name] = fd, seal, raw; self.check()
+        _check_frozen(self.creators[name], os.fstat(fd)); _same(_stamp(os.fstat(fd)), seal)
+        self.originals[name] = fd, seal, raw; self.check()
     def audit(self, *, named=False):
         require(set(self.originals) == self.attempted, "supervision_negative")
         if not named: self.check()
@@ -557,10 +897,12 @@ class _CreationCarrier:
             for path, pin in zip((self.path, self.domain), self.pins):
                 require(path.resolve() == path and _dir(path.lstat(), True) == pin, "supervision_original")
         for name, (fd, seal, raw) in self.originals.items():
-            _same(_stamp((self.path / name).lstat()), seal)
+            info = (self.path / name).lstat(); _check_frozen(self.creators.get(name), info); _same(_stamp(info), seal)
             if not named:
-                _same(_stamp(os.fstat(fd)), seal); os.lseek(fd, 0, os.SEEK_SET)
-                require(os.read(fd, len(raw) + 1) == raw, "supervision_negative"); _same(_stamp(os.fstat(fd)), seal)
+                _check_frozen(self.creators.get(name), os.fstat(fd)); _same(_stamp(os.fstat(fd)), seal); os.lseek(fd, 0, os.SEEK_SET)
+                require(os.read(fd, len(raw) + 1) == raw, "supervision_negative")
+                _check_frozen(self.creators.get(name), os.fstat(fd)); _same(_stamp(os.fstat(fd)), seal)
+                _check_frozen(self.creators.get(name), (self.path / name).lstat())
     def preserve(self, error):
         require(not self.started, "supervision_negative"); self.started = True
         state = self.state; row = _CREATION_FAILURES.get(id(error))
@@ -582,11 +924,14 @@ class _CreationCarrier:
             if not command["known_terminal"] or command["stderr"] not in (None, b""): complete = False
         system = {"schema": "si-native-creation-system-v1", "original_baseline": state["system_baseline"],
             "baseline_established": self.volume in _SYSTEM_BASELINES,
+            "initialization": state.get("system_initialization"),
             "present_observations": state["system_observations"], "authority": authority()}
         self.publish(CREATION_SYSTEM_ROLE, canonical_json(system).encode()); deadline()
         sites, trace = [], state["trace"]
         methods = {method.__code__: name for name, method in (("creation", _DomainVolume.__init__), ("native_command", _DomainVolume.command),
-            ("system", _DomainVolume._system), ("native_check", _DomainVolume.check), ("output_creation", _DomainVolume.outputs), ("named_check", _DomainVolume.named))}
+            ("system", _DomainVolume._system), ("system_initialization", _DomainVolume._initialize_system),
+            ("initialization_guard", _DomainVolume._initialization_guards), ("native_check", _DomainVolume.check),
+            ("output_creation", _DomainVolume.outputs), ("named_check", _DomainVolume.named))}
         for unused in range(MAXIMUM_TRACE_FRAMES):
             if trace is None: break
             frame = trace.tb_frame
@@ -734,10 +1079,7 @@ class _DomainVolume:
             _CreationCarrier(self, state)
             _component("native_system", 15)
             self.system = None
-            require(set(os.listdir(self.mount_fd)) <= {".fseventsd"}, "native_proof_membership")
-            if ".fseventsd" in os.listdir(self.mount_fd):
-                self.system = self._system(); state["system_baseline"] = self.system
-            _SYSTEM_BASELINES[self] = self, self.system, object()
+            self._initialize_system()
             _component("main_directory")
             os.mkdir("main", 0o700, dir_fd=self.mount_fd)
             self.main_fd = os.open("main", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=self.mount_fd); self.fds.append(self.main_fd)
@@ -751,7 +1093,7 @@ class _DomainVolume:
             # On a pre-anchor/unknown failure it retains this original state.
             raise
     def arguments(self, verb):
-        if verb == "create": return [native.HDIUTIL, "create", "-type", "SPARSE", "-size", "8g", "-fs", "APFS", "-uid", str(os.getuid()), "-gid", str(os.getgid()), "-mode", "0700", "-volname", "SI_NATIVE_SUPERVISION_V2_V3", "-nospotlight", "-plist", str(self.image)]
+        if verb == "create": return [native.HDIUTIL, "create", "-type", "SPARSE", "-size", "8g", "-fs", "APFS", "-uid", str(os.getuid()), "-gid", str(os.getgid()), "-mode", "0700", "-volname", "SI_NATIVE_SUPERVISION_V2_V4", "-nospotlight", "-plist", str(self.image)]
         if verb == "attach": return [native.HDIUTIL, "attach", "-mountpoint", str(self.mount), "-mount", "required", "-nobrowse", "-owners", "on", "-noautoopen", "-noautoopenro", "-noautoopenrw", "-plist", str(self.image)]
         require(verb == "info", "native_proof_command"); return [native.HDIUTIL, "info", "-plist"]
     def command(self, role, verb):
@@ -834,6 +1176,50 @@ class _DomainVolume:
             and not current["flags"] & (native.MNT_RDONLY | native.MNT_IGNORE_OWNERSHIP)
             and current["mounted_on"] == str(self.mount) and current["mounted_from"] == self.device
             and native._mount_identity(current) == self.mount_native, "native_proof_mount")
+    def _initialization_guards(self):
+        self.clock.check(); self.directory.check()
+        require(set(os.listdir(self.directory.fd)) == {"backing.sparseimage", "mount"}, "native_proof_membership")
+        require(native._backing(os.fstat(self.backing_fd)) == native._backing(self.image.lstat()) == self.backing_pin, "native_proof_backing")
+        require(_dir(os.fstat(self.under_fd), True) == self.under_pin and self.mount.resolve() == self.mount
+            and _dir(os.fstat(self.mount_fd), True) == _dir(self.mount.lstat(), True) == self.mount_pin, "native_proof_mount")
+        self._native(_native_statfs(self.mount_fd))
+        require(_device_node(self.device, os.fstat(self.mount_fd).st_dev) == self.node, "native_proof_mount")
+        require(set(os.listdir(self.mount_fd)) <= {".fseventsd"}, "native_proof_membership")
+    def _initialize_system(self):
+        state = _CREATION_STATES[self]
+        require(self not in _SYSTEM_INITIALIZATIONS and self not in _SYSTEM_BASELINES, "system_initialization_refused")
+        init = {"samples": [], "first_identity": None, "candidate": None, "quiet_begin": None, "sealed": False}
+        _SYSTEM_INITIALIZATIONS[self] = self, init, object(); state["system_initialization"] = init
+        begin = last = _initialization_now()
+        require(type(begin) in (int, float) and math.isfinite(begin) and begin >= 0, "native_proof_clock")
+        for number in range(SYSTEM_INITIAL_SAMPLES):
+            now = _initialization_now()
+            require(type(now) in (int, float) and math.isfinite(now) and begin <= last <= now
+                and now - begin <= SYSTEM_INITIAL_SECONDS, "system_initialization_refused"); last = now
+            self._initialization_guards()
+            present = ".fseventsd" in os.listdir(self.mount_fd)
+            sample = {"number": number + 1, "at": now, "present": present}; init["samples"].append(sample)
+            if not present:
+                require(init["first_identity"] is None, "system_initial_identity_changed")
+            else:
+                actual = self._system(); sample["metadata"] = actual
+            end = _initialization_now(); self.clock.check()
+            require(type(end) in (int, float) and math.isfinite(end) and now <= end
+                and end - begin <= SYSTEM_INITIAL_SECONDS, "system_initialization_refused")
+            last = end; sample["observed_at"] = end
+            if present:
+                if init["first_identity"] is None: init["first_identity"] = actual[:2]
+                require(actual[:2] == init["first_identity"], "system_initial_identity_changed")
+                if init["candidate"] is None: init["candidate"], init["quiet_begin"] = actual, end
+                else:
+                    require(actual[:5] == init["candidate"][:5], "system_initial_identity_changed")
+                    if actual != init["candidate"]: init["candidate"], init["quiet_begin"] = actual, end
+                if end - init["quiet_begin"] >= SYSTEM_INITIAL_QUIET:
+                    self.system = actual; state["system_baseline"] = actual
+                    _SYSTEM_BASELINES[self] = self, actual, object(); init["sealed"] = True; return
+            if number + 1 >= SYSTEM_INITIAL_SAMPLES or SYSTEM_INITIAL_SECONDS - (end - begin) < SYSTEM_INITIAL_INTERVAL: break
+            _initialization_sleep(SYSTEM_INITIAL_INTERVAL)
+        raise SupervisionRefusal("REFUSED: system_initialization_refused")
     def _system(self):
         _component("native_system", 15)
         info = os.stat(".fseventsd", dir_fd=self.mount_fd, follow_symlinks=False)
@@ -982,15 +1368,18 @@ def _audit_local(outputs):
     for name, (fd, pin, stamp, raw) in outputs.originals.items():
         require(type(raw) is bytes and stamp is not None and _stamp(os.fstat(fd))[:6] == pin, "native_proof_stamp")
         _same(_stamp(os.fstat(fd)), stamp); _same(_stamp(os.stat(name, dir_fd=outputs.fd, follow_symlinks=False)), stamp)
+        _check_frozen(outputs.creators.get(name), os.fstat(fd))
+        _check_frozen(outputs.creators.get(name), os.stat(name, dir_fd=outputs.fd, follow_symlinks=False))
         os.lseek(fd, 0, os.SEEK_SET); require(os.read(fd, len(raw) + 1) == raw, "native_proof_stamp")
-        _same(_stamp(os.fstat(fd)), stamp)
+        _check_frozen(outputs.creators.get(name), os.fstat(fd)); _same(_stamp(os.fstat(fd)), stamp)
+        _check_frozen(outputs.creators.get(name), os.stat(name, dir_fd=outputs.fd, follow_symlinks=False))
 
 
 class _NegativeReporter:
     def __init__(self, outputs, volume):
         self.path, self.mount, self.domain = outputs.path, volume.mount, volume.path
         self.pins = (_dir(os.fstat(outputs.fd), True), _dir(os.fstat(volume.mount_fd), True), _dir(os.fstat(volume.directory.fd), True))
-        self.fds = []; self.private_fds = []; self.originals = {}; self.attempted = set(); self.used = False
+        self.fds = []; self.private_fds = []; self.originals = {}; self.attempted = set(); self.used = False; self.closed = False; self.creators = {}
         try:
             for fd in (outputs.fd, volume.mount_fd, volume.directory.fd): self.fds.append(os.dup(fd))
             self.check()
@@ -1015,13 +1404,14 @@ class _NegativeReporter:
         self.check()
         fd = os.open(name, os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=self.fds[0])
         self.private_fds.append(fd)
-        os.fchmod(fd, 0o600); _write(fd, raw); os.fsync(fd)
+        os.fchmod(fd, 0o600); _issue_file_creator(self, name, fd, self.fds[0]); _write(fd, raw); os.fsync(fd)
+        _freeze_new_file(self.creators[name], len(raw), raw)
         for parent in self.fds: os.fsync(parent)
         seal = _negative_file(os.fstat(fd), limit, empty=name in ("child.remaining.pipe.private.bin", "child.partial.stdout.private.bin"))
         require(seal[6] == len(raw), "supervision_negative")
         _same(_stamp(os.stat(name, dir_fd=self.fds[0], follow_symlinks=False)), seal)
         os.lseek(fd, 0, os.SEEK_SET); require(os.read(fd, len(raw) + 1) == raw, "supervision_negative")
-        _same(_stamp(os.fstat(fd)), seal); self.check()
+        _check_frozen(self.creators[name], os.fstat(fd)); _same(_stamp(os.fstat(fd)), seal); self.check()
         self.originals[name] = fd, seal, raw
     def audit_preserved(self, *, named=False):
         require(set(self.originals) == self.attempted, "supervision_negative")
@@ -1030,10 +1420,12 @@ class _NegativeReporter:
             for path, pin in zip((self.path, self.mount, self.domain), self.pins):
                 require(path.resolve() == path and _dir(path.lstat(), True) == pin, "supervision_original")
         for name, (fd, seal, raw) in self.originals.items():
-            _same(_stamp((self.path / name).lstat()), seal)
+            info = (self.path / name).lstat(); _check_frozen(self.creators.get(name), info); _same(_stamp(info), seal)
             if not named:
-                _same(_stamp(os.fstat(fd)), seal); os.lseek(fd, 0, os.SEEK_SET)
-                require(os.read(fd, len(raw) + 1) == raw, "supervision_negative"); _same(_stamp(os.fstat(fd)), seal)
+                _check_frozen(self.creators.get(name), os.fstat(fd)); _same(_stamp(os.fstat(fd)), seal); os.lseek(fd, 0, os.SEEK_SET)
+                require(os.read(fd, len(raw) + 1) == raw, "supervision_negative")
+                _check_frozen(self.creators.get(name), os.fstat(fd)); _same(_stamp(os.fstat(fd)), seal)
+                _check_frozen(self.creators.get(name), (self.path / name).lstat())
     def close(self):
         first = None
         try: _drain(self.private_fds)
@@ -1042,6 +1434,7 @@ class _NegativeReporter:
         except BaseException as error:
             if first is None: first = error
         if first is not None: raise first
+        self.closed = True
 
 
 def _negative_file(info, maximum, *, empty=False):
@@ -1099,6 +1492,8 @@ def _capture_collection_failure(error, process, origin, outputs, log_fd, reporte
         # about where the original collector failed.
         for name in ("output", "pending", "line", "block"):
             if name in local: state["buffers"][name] = local[name]
+        state["collector_seal_present"] = "seal" in local
+        if "seal" in local: state["collector_seal"] = local["seal"]
         require({"output", "pending"} <= set(state["buffers"])
             and all(type(raw) is bytes for raw in state["buffers"].values()), "supervision_original")
         state["stdout"] = process.stdout; state["pipe_fd"] = process.stdout.fileno()
@@ -1121,7 +1516,58 @@ def _preservation_state(state):
         and local.get("log_fd") == state["log_fd"] and worker._CHILDREN.get(state["process"]) is state["origin"]
         and state["process"].stdout is state["stdout"] and state["stdout"].fileno() == state["pipe_fd"]
         and all(name in local and local[name] is raw and type(raw) is bytes for name, raw in state["buffers"].items())
-        and set(state["buffers"]) == {name for name in ("output", "pending", "line", "block") if name in local})
+        and set(state["buffers"]) == {name for name in ("output", "pending", "line", "block") if name in local}
+        and state.get("collector_seal_present") is ("seal" in local)
+        and ("seal" not in local or state.get("collector_seal") is local["seal"]))
+
+
+def _collector_return(process):
+    row = _COLLECT_RETURNS.get(process)
+    if type(row) is not tuple or len(row) != 9 or row[0] is not process: return None
+    frame = row[8]; local = frame.f_locals
+    if (frame.f_code is not _produce.__code__ or frame.f_globals is not globals()
+            or local.get("process") is not process or local.get("outputs") is not row[1]
+            or local.get("log_fd") != row[2] or local.get("origin") is not row[3]
+            or local.get("status") != row[4] or local.get("stdout_sha") != row[5] or local.get("seal") is not row[6]
+            or worker._CHILDREN.get(process) is not row[3]): return None
+    wait = worker._WAITS.get(process)
+    require(type(wait) is tuple and wait[0] is row[3] and type(wait[1]) is int and wait[1] == row[4] == 0, "supervision_wait")
+    return row
+
+
+def _audit_returned_stdout(receipt, *, named=False):
+    process, outputs, fd, origin, status, digest, seal = receipt[:7]
+    require(_collector_return(process) is receipt and type(seal) is tuple and len(seal) == 9, "supervision_original")
+    cap = outputs.creators.get("stdout.jsonl")
+    info = (outputs.path / "stdout.jsonl").lstat(); _check_frozen(cap, info); _same(_stamp(info), seal)
+    if named: return None
+    _check_frozen(cap, os.fstat(fd)); _same(_stamp(os.fstat(fd)), seal)
+    os.lseek(fd, 0, os.SEEK_SET); raw = os.read(fd, worker.MAXIMUM_LOG_BYTES + 1)
+    _creator(cap)["returned_negative_raw"] = raw
+    require(len(raw) == seal[6] and hash_bytes(raw) == digest, "supervision_original")
+    _check_frozen(cap, os.fstat(fd)); _same(_stamp(os.fstat(fd)), seal); return raw
+
+
+def _negative_stdout_stamp(state):
+    outputs, fd, process = state["outputs"], state["log_fd"], state["process"]
+    row = outputs.originals.get("stdout.jsonl"); cap = outputs.creators.get("stdout.jsonl"); creator = _creator(cap)
+    require(row is not None and row[0] == fd, "supervision_original")
+    old = state.get("collector_seal") if state["collector_seal_present"] else None
+    returned = _collector_return(process)
+    if returned is not None:
+        require(old is None or old == returned[6], "supervision_original"); old = returned[6]
+    if row[2] is not None:
+        require(old is None or old == row[2], "supervision_original"); old = row[2]
+    if old is not None:
+        require(type(old) is tuple and len(old) == 9, "supervision_original")
+        _check_frozen(cap, os.fstat(fd)); _same(_stamp(os.fstat(fd)), old); return old
+    require(_preservation_state(state) and "seal" not in state["frame"].f_locals and returned is None
+        and row[2] is None and state["eof"] and state["wait"] is not None, "immutable_freeze_refused")
+    if not creator["attempted"]:
+        _STDOUT_FREEZES[cap] = cap, "negative_partial", state, sys._getframe(1), object()
+        info = _negative_file(os.fstat(fd), worker.MAXIMUM_LOG_BYTES, empty=True)
+        _freeze_new_file(cap, info[6])
+    return _check_frozen(cap, os.fstat(fd))
 
 
 def _preserve_collection_failure(state):
@@ -1133,7 +1579,8 @@ def _preserve_collection_failure(state):
         process, outputs, reporter = state["process"], state["outputs"], state["reporter"]
         require(sum(map(len, state["buffers"].values())) <= MAXIMUM_PRIVATE_BYTES, "supervision_negative")
         raw = canonical_json({"schema": "si-native-collection-buffers-v2", "present": sorted(state["buffers"]),
-            "private_bytes_hex": {name: value.hex() for name, value in state["buffers"].items()}, "authority": authority()}).encode()
+            "private_bytes_hex": {name: value.hex() for name, value in state["buffers"].items()},
+            "collector_seal_present": state["collector_seal_present"], "original_collector_seal": state.get("collector_seal"), "authority": authority()}).encode()
         state["buffers_raw"] = raw
         reporter.preserve("child.failure.buffers.private.json", raw)
         begin = last = state["negative_begin"]
@@ -1168,7 +1615,7 @@ def _preserve_collection_failure(state):
         row = outputs.originals.get("stdout.jsonl")
         require(row is not None and row[0] == state["log_fd"], "supervision_original")
         reporter.check()
-        before = _negative_file(os.fstat(state["log_fd"]), worker.MAXIMUM_LOG_BYTES, empty=True)
+        before = _negative_stdout_stamp(state)
         require(before[:6] == row[1], "supervision_original")
         _same(_stamp(os.stat("stdout.jsonl", dir_fd=reporter.fds[0], follow_symlinks=False)), before)
         os.fsync(state["log_fd"]); os.lseek(state["log_fd"], 0, os.SEEK_SET)
@@ -1208,11 +1655,33 @@ def _negative_closed(token, state):
 def _negative_snapshot_audit(state, *, named=False):
     """Compare the original partial-log seal; never seal/rebaseline it positive."""
     partial, seal = state["partial_log"], state["partial_stamp"]
+    _check_frozen(state["outputs"].creators.get("stdout.jsonl"), (state["reporter"].path / "stdout.jsonl").lstat())
     _same(_stamp((state["reporter"].path / "stdout.jsonl").lstat()), seal)
     if not named:
-        fd = state["log_fd"]; _same(_stamp(os.fstat(fd)), seal); os.lseek(fd, 0, os.SEEK_SET)
+        fd = state["log_fd"]; _check_frozen(state["outputs"].creators.get("stdout.jsonl"), os.fstat(fd))
+        _same(_stamp(os.fstat(fd)), seal); os.lseek(fd, 0, os.SEEK_SET)
         require(os.read(fd, len(partial) + 1) == partial, "supervision_negative")
-        _same(_stamp(os.fstat(fd)), seal)
+        _check_frozen(state["outputs"].creators.get("stdout.jsonl"), os.fstat(fd)); _same(_stamp(os.fstat(fd)), seal)
+
+
+def _preserve_returned_stdout(receipt, reporter, state):
+    process, outputs, fd = receipt[:3]; cap = outputs.creators.get("stdout.jsonl")
+    require(_collector_return(process) is receipt and _stdout_freeze_origin(cap), "supervision_original")
+    final = _STDOUT_FREEZES[cap]
+    require(final[1] == "collector_final", "supervision_original")
+    frame = final[2]; local = frame.f_locals
+    buffers = {name: local[name] for name in ("output", "pending", "line", "block") if name in local}
+    state["returned_receipt"], state["returned_frame"], state["returned_buffers"] = receipt, frame, buffers
+    require({"output", "pending"} <= set(buffers) and all(type(value) is bytes for value in buffers.values())
+        and local.get("seal") is receipt[6] and not buffers["pending"] and local.get("stages") == [], "supervision_original")
+    raw = _audit_returned_stdout(receipt); state["returned_raw"] = raw
+    require(raw == buffers["output"], "supervision_original")
+    payload = canonical_json({"schema": "si-native-returned-stdout-negative-v1", "collector_returned": True,
+        "actual_child_exit": receipt[4], "original_stdout_sha256": receipt[5], "original_stdout_seal": list(receipt[6]),
+        "present_buffers": sorted(buffers), "private_bytes_hex": {name: value.hex() for name, value in buffers.items()},
+        "authority": authority()}).encode()
+    state["returned_payload_raw"] = payload
+    reporter.preserve("child.returned.stdout.private.json", payload)
 
 
 def _hold(state):
@@ -1238,7 +1707,22 @@ def _produce(head, remote, digest, observer):
     scope = object(); _PRODUCTION_SCOPES[scope] = scope, sys._getframe(), clock, head, remote, digest, observer, object()
     clock.production_scope = scope
     error = None; held = False; entered = returned = False; origin = wait = marker = log_fd = None
-    failure_state = negative_token = creation_state = None
+    failure_state = negative_token = creation_state = return_receipt = None
+    def retain_cleanup(failure):
+        nonlocal failure_state
+        if failure_state is None:
+            failure_state = {"failure": failure, "trace": BaseException.__traceback__.__get__(failure, BaseException),
+                "process": process, "origin": origin, "code": code, "directory": directory, "config": config,
+                "volume": volume, "outputs": outputs, "reporter": reporter, "returned_receipt": return_receipt}
+        return failure_state
+    def retain_report_failure(first, secondary):
+        nonlocal held
+        state = retain_cleanup(first)
+        state["reporter_error"], state["reporter_trace"] = secondary, BaseException.__traceback__.__get__(secondary, BaseException)
+        held = True
+        try: _hold(state)
+        except BaseException: raise first
+        raise first  # A returning observer cannot authorize releasing partial originals.
     try:
         _phase("current_code"); _guard(head, remote); code = _Code7(head, remote, clock)
         _phase("bootstrap"); directory, config = _read_config(head, remote, digest, observer, code.manifest)
@@ -1254,7 +1738,10 @@ def _produce(head, remote, digest, observer):
         require(type(process.pid) is int and process.pid > 0 and process.stdout is not None, "supervision_wait")
         origin = (process, digest, code.manifest, object()); worker._CHILDREN[process] = origin
         _phase("child_observation"); entered = True
-        status, stdout_sha, seal = _COLLECT(process, outputs, log_fd, began); returned = True
+        status, stdout_sha, seal = _COLLECT(process, outputs, log_fd, began)
+        return_receipt = process, outputs, log_fd, origin, status, stdout_sha, seal, object(), sys._getframe()
+        _COLLECT_RETURNS[process] = return_receipt; returned = True
+        require(0 <= worker._now() - began <= worker.MAXIMUM_SECONDS, "supervision_wait")
         wait = worker._WAITS.get(process)
         require(type(wait) is tuple and len(wait) == 3 and wait[0] is origin and worker._CHILDREN.get(process) is origin and wait[1] == status == 0, "supervision_wait")
         os.lseek(log_fd, 0, os.SEEK_SET); raw = os.read(log_fd, worker.MAXIMUM_LOG_BYTES + 1)
@@ -1296,8 +1783,14 @@ def _produce(head, remote, digest, observer):
         if reporter is not None:
             try: reporter.refuse(failure)
             except BaseException as secondary:
-                failure_state["reporter_error"] = secondary
-                failure_state["reporter_trace"] = BaseException.__traceback__.__get__(secondary, BaseException)
+                retain_report_failure(failure, secondary)
+        if returned:
+            try: _preserve_returned_stdout(return_receipt, reporter, failure_state)
+            except BaseException as secondary:
+                held = True; failure_state["return_preservation_error"] = secondary
+                failure_state["return_preservation_trace"] = BaseException.__traceback__.__get__(secondary, BaseException)
+                try: _hold(failure_state)
+                except BaseException: raise failure
         if creation_state is not None:
             try:
                 carrier = creation_state["carrier"]
@@ -1332,15 +1825,16 @@ def _produce(head, remote, digest, observer):
             for close in actions:
                 try: close()
                 except BaseException as failure:
-                    if first is None: first = failure; failure_summary(failure)
-                    if negative_token is not None or creation_state is not None:
+                    retain_cleanup(failure)
+                    if first is None: first = failure; error = failure; failure_summary(failure)
+                    if negative_token is not None or creation_state is not None or return_receipt is not None:
                         held = True; failure_state["cleanup_error"] = failure
                         failure_state["cleanup_trace"] = BaseException.__traceback__.__get__(failure, BaseException)
                         try: _hold(failure_state)
                         except BaseException: raise error
             if first is not None and reporter is not None and not reporter.used:
                 try: reporter.refuse(first)
-                except BaseException: pass
+                except BaseException as secondary: retain_report_failure(first, secondary)
             if error is None and first is not None: error = first
     if held: raise SupervisionRefusal("REFUSED: supervision_unknown")
     terminal_error = error
@@ -1352,16 +1846,22 @@ def _produce(head, remote, digest, observer):
             terminal_error = failure; failure_summary(failure)
             if reporter is not None:
                 try: reporter.refuse(failure)
-                except BaseException: pass
+                except BaseException as secondary: retain_report_failure(failure, secondary)
     if reporter is not None:
         try:
             if negative_token is not None:
                 reporter.audit_preserved(); _negative_snapshot_audit(failure_state, named=True)
+            if error is not None and return_receipt is not None:
+                reporter.audit_preserved(); _audit_returned_stdout(return_receipt, named=True)
             reporter.close()
             if negative_token is not None:
                 reporter.audit_preserved(named=True); _negative_snapshot_audit(failure_state, named=True)
+            if error is not None and return_receipt is not None:
+                reporter.audit_preserved(named=True); _audit_returned_stdout(return_receipt, named=True)
         except BaseException as failure:
-            if negative_token is not None or creation_state is not None:
+            if negative_token is not None or creation_state is not None or return_receipt is not None:
+                retain_cleanup(failure)
+                if error is None: error = failure
                 failure_state["cleanup_error"] = failure
                 failure_state["cleanup_trace"] = BaseException.__traceback__.__get__(failure, BaseException)
                 try: _hold(failure_state)
@@ -1595,6 +2095,8 @@ class _OriginalRead:
             native_keys = {"domain_original_identity", "main_original_seal", "proof_original_identity", "backing_original_identity", "mount_original_identity",
                 "native_original_identity", "device_node_original_identity", "fresh_root_creation_identity", "system_original_metadata", "attach_original_entities", "original_command_output_sha256s"}
             require(type(n) is dict and set(n) == native_keys, "supervision_original")
+            require(type(n["system_original_metadata"]) is list and len(n["system_original_metadata"]) == 6
+                and all(type(value) is int and value >= 0 for value in n["system_original_metadata"]), "supervision_original")
             require(n["original_command_output_sha256s"] == {role: hash_bytes(self.raw_controls["native." + role + ".plist"]) for role in ("before", "create", "attach", "initial", "terminal")}, "supervision_original")
             require(_dir(os.fstat(self.directory.fd), True) == _tuples(n["domain_original_identity"])
                 and _dir(os.fstat(self.mount_fd), True) == _tuples(n["mount_original_identity"])
@@ -1615,10 +2117,11 @@ class _OriginalRead:
         require(name in POSITIVE_ROLES and type(seal) is list and len(seal) == 9 and all(type(v) is int and v >= 0 for v in seal)
             and type(digest) is str and re.fullmatch(r"[0-9a-f]{64}", digest), "supervision_original")
         seal = tuple(seal); info = os.stat(name, dir_fd=self.proof_fd, follow_symlinks=False)
-        _same(_protected(info, maximum), seal)
+        _require_file_immutable(info); _same(_protected(info, maximum), seal)
         fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=self.proof_fd); self.fds.append(fd)
-        _same(_stamp(os.fstat(fd)), seal); raw = os.read(fd, maximum + 1)
+        _require_file_immutable(os.fstat(fd)); _same(_stamp(os.fstat(fd)), seal); raw = os.read(fd, maximum + 1)
         require(len(raw) == seal[6] and hash_bytes(raw) == digest, "supervision_original")
+        _require_file_immutable(os.fstat(fd)); _require_file_immutable(os.stat(name, dir_fd=self.proof_fd, follow_symlinks=False))
         _same(_stamp(os.fstat(fd)), seal); _same(_stamp(os.stat(name, dir_fd=self.proof_fd, follow_symlinks=False)), seal)
         self.files.append((name, fd, seal, raw)); return raw
     def native_audit(self):
@@ -1657,8 +2160,11 @@ class _OriginalRead:
         for path, fd, pin in self.anchors: require(path.resolve() == path and _dir(os.fstat(fd), True) == _dir(path.lstat(), True) == pin, "supervision_original")
         require(set(os.listdir(self.proof_fd)) == POSITIVE_ROLES, "supervision_negative")
         for name, fd, seal, raw in self.files:
+            _require_file_immutable(os.fstat(fd)); _require_file_immutable((self.proof_path / name).lstat())
             _same(_stamp(os.fstat(fd)), seal); _same(_stamp((self.proof_path / name).lstat()), seal)
-            os.lseek(fd, 0, os.SEEK_SET); require(os.read(fd, len(raw) + 1) == raw, "supervision_original"); _same(_stamp(os.fstat(fd)), seal)
+            os.lseek(fd, 0, os.SEEK_SET); require(os.read(fd, len(raw) + 1) == raw, "supervision_original")
+            _require_file_immutable(os.fstat(fd)); _same(_stamp(os.fstat(fd)), seal)
+            _require_file_immutable((self.proof_path / name).lstat()); _same(_stamp((self.proof_path / name).lstat()), seal)
     def _named_originals(self):
         self.directory.named()
         for path, unused, pin in self.anchors: require(path.resolve() == path and _dir(path.lstat(), True) == pin, "supervision_original")
@@ -1673,7 +2179,8 @@ class _OriginalRead:
                 and info.st_gid == self.mount.lstat().st_gid and info.st_dev == self.mount.lstat().st_dev
                 and _stamp(info)[:6] == _tuples(n["system_original_metadata"]), "supervision_original")
         require(set(os.listdir(self.proof_path)) == POSITIVE_ROLES, "supervision_negative")
-        for name, unused, seal, unused_raw in self.files: _same(_stamp((self.proof_path / name).lstat()), seal)
+        for name, unused, seal, unused_raw in self.files:
+            info = (self.proof_path / name).lstat(); _require_file_immutable(info); _same(_stamp(info), seal)
         _same(_stamp((self.mount / "main").lstat()), _tuples(n["main_original_seal"]))
         require(not os.listdir(self.mount / "main"), "supervision_original")
     def named(self):
@@ -1959,6 +2466,10 @@ def main(argv=None):
             except BaseException: pass
         elif args.command != "run-proof": print(canonical_json({"status": "refused", "failure": failure_summary(error), "producer_diagnostic": advisory_summary(error), "authority": authority()}))
         return 2
+
+
+_CREATOR_SITES = ((_Files.create.__code__, _Files), (_CreationCarrier.publish.__code__, _CreationCarrier),
+    (_NegativeReporter.preserve.__code__, _NegativeReporter))
 
 
 if __name__ == "__main__": raise SystemExit(main())

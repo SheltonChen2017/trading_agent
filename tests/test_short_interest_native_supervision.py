@@ -2,13 +2,18 @@
 
 Ordinary temporary directories are NOT APFS evidence. The fake worker uses a
 pipe and the unchanged original collector/wait registries; it runs no process,
-source operation, launchd command, image command or native syscall.
+source operation, launchd command, image command or device operation. One
+explicit Darwin test exercises real kernel immutable flags on its own new
+temporary inode, with identity-checked test-only cleanup. All other kernel
+flag behavior uses the named fabricated boundary below.
 """
 import json
+from contextlib import contextmanager
 import os
 import plistlib
 import stat
 import subprocess
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -24,7 +29,48 @@ pytestmark = pytest.mark.skipif(os.name != "posix" or not all(hasattr(os, n) for
 
 
 @pytest.fixture(autouse=True)
-def owned_external_boundaries(monkeypatch):
+def fabricated_kernel_file_flags(monkeypatch, request):
+    """NAMED fabricated kernel boundary for existing adversarial I/O cases.
+
+    It deliberately permits ordinary temporary-file mutations so all previous
+    nine-field/byte/protection regressions remain causal. It is not evidence
+    that a real kernel or privileged metadata writer respects immutable flags.
+    The separately named real-kernel test never enters this boundary.
+    """
+    if request.node.name.startswith("test_real_kernel_immutable_"):
+        yield None
+        return
+    actual_fstat, actual_stat, actual_lstat = os.fstat, os.stat, os.lstat
+    actual_set_flags = proof._set_file_flags
+    flags, ctime_offsets, events = {}, {}, []
+    immutable = getattr(stat, "UF_IMMUTABLE", 2)  # Fabricated BSD flag value only.
+    def overlay(info):
+        key = info.st_dev, info.st_ino
+        if key not in flags and hasattr(info, "st_flags"): return info
+        value = {name: getattr(info, name) for name in dir(info) if name.startswith("st_")}
+        value["st_flags"] = flags.get(key, getattr(info, "st_flags", 0))
+        value["st_ctime_ns"] += ctime_offsets.get(key, 0)
+        return SimpleNamespace(**value)
+    def set_flags(fd, value):
+        info = actual_fstat(fd); key = info.st_dev, info.st_ino
+        previous = flags.get(key, getattr(info, "st_flags", 0))
+        assert type(value) is int and value == previous | immutable
+        events.append((fd, value, key))
+        flags[key] = value
+        ctime_offsets[key] = ctime_offsets.get(key, 0) + 1
+    monkeypatch.setattr(proof, "_set_file_flags", set_flags)
+    monkeypatch.setattr(os, "fstat", lambda fd: overlay(actual_fstat(fd)))
+    monkeypatch.setattr(os, "stat", lambda path, *a, **kw: overlay(actual_stat(path, *a, **kw)))
+    monkeypatch.setattr(os, "lstat", lambda path, *a, **kw: overlay(actual_lstat(path, *a, **kw)))
+    def drop_flag(fd):
+        info = actual_fstat(fd); key = info.st_dev, info.st_ino
+        flags[key] = flags.get(key, getattr(info, "st_flags", 0)) & ~immutable
+    yield SimpleNamespace(events=events, flags=flags, ctime_offsets=ctime_offsets,
+        drop_flag=drop_flag, immutable=immutable, actual_fstat=actual_fstat, real_set_file_flags=actual_set_flags)
+
+
+@pytest.fixture(autouse=True)
+def owned_external_boundaries(monkeypatch, fabricated_kernel_file_flags, request):
     def denied(*args, **kwargs):
         raise AssertionError("actual native, launchd or worker operation forbidden")
     for name in ("_native_command", "_launch_worker", "_launch_service", "_platform",
@@ -37,8 +83,25 @@ def owned_external_boundaries(monkeypatch):
                         ("_CAPTURED", []), ("_PRIVATE_FAILURES", {}),
                         ("_CREATION_STATES", {}), ("_CREATION_FAILURES", {}),
                         ("_CREATION_MANIFESTS", {}), ("_SYSTEM_FAILURES", {}), ("_PRODUCTION_SCOPES", {}),
-                        ("_NATIVE_PLANS", {}), ("_NATIVE_INVOCATIONS", {}), ("_SYSTEM_BASELINES", {})):
+                        ("_NATIVE_PLANS", {}), ("_NATIVE_INVOCATIONS", {}), ("_SYSTEM_BASELINES", {}),
+                        ("_SYSTEM_INITIALIZATIONS", {}), ("_FILE_CREATORS", {}),
+                        ("_COLLECT_RETURNS", {}), ("_STDOUT_FREEZES", {}), ("_ACTIVE_FREEZES", {}),
+                        ("_RO_ORIGINS", {}), ("_RO_HANDOFFS", {})):
         monkeypatch.setattr(proof, name, value)
+    if request.node.name != "test_real_kernel_immutable_owned_readonly_handoff_denies_owned_and_named_writes":
+        monkeypatch.setattr(sys.modules[__name__], "_OWNED_KERNEL_UNIT_ORIGINAL", None)
+        monkeypatch.setattr(sys.modules[__name__], "_OWNED_KERNEL_UNIT_PUBLICATIONS", [])
+    unexpected_holds = []; original_hold = proof._hold
+    class UnexpectedFabricatedHold(BaseException): pass
+    def unexpected_hold(state):
+        # Never let a software regression enter the real indefinite custodian.
+        # Expected-hold cases replace this with their explicit retained witness.
+        unexpected_holds.append(state); proof._HELD.append(state)
+        raise UnexpectedFabricatedHold()
+    monkeypatch.setattr(proof, "_hold", unexpected_hold)
+    yield SimpleNamespace(original_hold=original_hold)
+    if unexpected_holds:
+        pytest.fail("unexpected production hold in fabricated test; original state retained", pytrace=False)
 
 
 @pytest.fixture
@@ -158,6 +221,13 @@ def genuine_domain(fabricated, monkeypatch):
     h.native_calls, h.system_changes, h.system_reads = [], {}, 0
     h.root_changes = {}
     h.native_callback = h.native_transform = h.before_outputs = h.before_system = None
+    h.initial_time, h.initial_sleeps, h.initial_callback = 0.0, [], None
+    monkeypatch.setattr(proof, "_initialization_now", lambda: h.initial_time)
+    def initialization_sleep(seconds):
+        assert seconds == 0.25
+        h.initial_sleeps.append(seconds); h.initial_time += seconds
+        if h.initial_callback is not None: h.initial_callback()
+    monkeypatch.setattr(proof, "_initialization_sleep", initialization_sleep)
     h.attached = False
     h.include_system = True
     h.domain_path = h.root / proof.PARENT / proof.DOMAIN
@@ -165,6 +235,7 @@ def genuine_domain(fabricated, monkeypatch):
     h.image_path = h.domain_path / "backing.sparseimage"
     actual_open, actual_dup, actual_fstat = os.open, os.dup, os.fstat
     actual_stat, actual_lstat = os.stat, os.lstat
+    h.actual_lstat = actual_lstat
     fd_paths = {}
     fake_device = actual_stat(h.root).st_dev + 987654321
     def full_path(path, dir_fd=None):
@@ -381,6 +452,607 @@ def test_policy_is_new_scope_with_zero_source_authority():
         ("provider_HTTP", "credential_reads", "source_STARTs", "source_bytes", "new_source_claims", "qc_attempts"))
 
 
+@pytest.mark.skipif(sys.platform != "darwin", reason="Explicit Darwin owned-inode kernel boundary")
+def test_real_kernel_immutable_external_alias_is_outside_owned_handle_contract(tmp_path):
+    """Escaped writers are NOT revoked by the controlled two-handle contract.
+
+    The historical UF-only experiment was RED: a pre-freeze RW duplicate wrote
+    successfully, and original nine-field/byte audits refused the mutation.
+    Its old temporary receipt later became unavailable. This ongoing boundary
+    regression permits OS denial OR requires the original audit to refuse an
+    allowed write; neither branch proves global writer revocation.
+    """
+    import ctypes
+    import errno
+    import fcntl
+    with _new_owned_bucket(tmp_path) as files:
+        fd = files.create("run.started.json"); cap = files.creators["run.started.json"]
+        raw = b"FIXED EXTERNAL-ALIAS BOUNDARY BYTES"; proof._write(fd, raw)
+        escaped = os.dup(fd)  # Deliberate test-only alias, never created/exported by production.
+        identity = proof._stamp(os.fstat(fd))[:6]
+        try:
+            seal = proof._freeze_new_file(cap, len(raw), raw); files.seal("run.started.json", fd, seal, raw)
+            assert fcntl.fcntl(fd, fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDONLY
+            assert fcntl.fcntl(escaped, fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDWR
+            assert proof._file_flags(os.fstat(escaped)) & proof.UF_IMMUTABLE
+            try: written = os.write(escaped, b"EXTERNAL_ALIAS_MUTATION")
+            except OSError as error:
+                assert error.errno in (errno.EPERM, errno.EACCES)
+                assert proof._stamp(os.fstat(escaped)) == seal
+                assert (files.path / "run.started.json").read_bytes() == raw
+                files.audit()
+            else:
+                assert written > 0 and proof._stamp(os.fstat(escaped)) != seal
+                assert (files.path / "run.started.json").read_bytes() != raw
+                with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal)): files.audit()
+                assert files.originals["run.started.json"][2] is seal
+            assert proof._PRODUCERS == proof._CLOSED == {}
+        finally:
+            # Test-only cleanup of this exact newly created inode. No old file,
+            # image, source claim or production clear-flags path is involved.
+            info = os.fstat(escaped); named = (files.path / "run.started.json").lstat()
+            assert proof._stamp(info)[:6] == proof._stamp(named)[:6] == identity
+            assert info.st_uid == os.getuid() and stat.S_IMODE(info.st_mode) == 0o600 and info.st_nlink == 1
+            assert files.path.resolve() == files.path and not (files.path / "run.started.json").is_symlink()
+            if info.st_flags & proof.UF_IMMUTABLE:
+                library = ctypes.CDLL("/usr/lib/libSystem.B.dylib", use_errno=True)
+                operation = library.fchflags; operation.argtypes = (ctypes.c_int, ctypes.c_uint32); operation.restype = ctypes.c_int
+                ctypes.set_errno(0); result = operation(escaped, info.st_flags & ~proof.UF_IMMUTABLE)
+                if result != 0: raise OSError(ctypes.get_errno(), "test-only original temporary inode cleanup failed")
+            os.close(escaped)
+
+
+_OWNED_KERNEL_UNIT_ORIGINAL = None
+_OWNED_KERNEL_UNIT_PUBLICATIONS = []
+_OWNED_KERNEL_UNIT_LANE = Path("/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest")
+_OWNED_KERNEL_UNIT_DIRECTORY = "native-supervision-v4-ro-owned-20261030-v2"
+_OWNED_KERNEL_UNIT_JOURNAL_NAME = "unit.observation.private.json"
+
+
+def _owned_kernel_unit_configuration(environment, source_sha):
+    mode = environment.get("SI_NATIVE_SUPERVISION_KERNEL_UNIT")
+    expected = environment.get("SI_NATIVE_SUPERVISION_KERNEL_SOURCE_SHA256")
+    if mode is None:
+        assert expected is None, "source pin without an explicit named kernel unit configuration"
+        return None  # Ordinary pytest has no lane writes or fixed-receipt collision.
+    assert mode == "owned-ro-v2", "only the fixed named v2 configuration is allowed"
+    assert type(expected) is str and proof.re.fullmatch(r"[0-9a-f]{64}", expected) and expected == source_sha
+    return "owned-ro-v2"
+
+
+def _open_owned_kernel_unit_journal():
+    lane = _OWNED_KERNEL_UNIT_LANE
+    assert Path(__file__).resolve().parents[1] == lane and Path.cwd().resolve() == lane
+    ancestry = []
+    try:
+        ancestry.append(os.open(lane, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW))
+        for part in ("artifacts", "short_interest", "private", "kernel_unit"):
+            fd = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=ancestry[-1]); ancestry.append(fd)
+        parent = ancestry[-1]; info = os.fstat(parent)
+        assert info.st_uid == os.getuid() and stat.S_IMODE(info.st_mode) == 0o700
+        # Existing/partial namespaces are never adopted, cleared or retried.
+        os.mkdir(_OWNED_KERNEL_UNIT_DIRECTORY, 0o700, dir_fd=parent); os.fsync(parent)
+        fd = os.open(_OWNED_KERNEL_UNIT_DIRECTORY, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
+        ancestry.append(fd); path = lane / "artifacts/short_interest/private/kernel_unit" / _OWNED_KERNEL_UNIT_DIRECTORY
+        anchors = [(descriptor, proof._dir(os.fstat(descriptor), True)) for descriptor in (parent, fd)]
+        def check():
+            assert path.resolve() == path and proof._dir(path.lstat(), True) == anchors[-1][1]
+            for descriptor, original in anchors: assert proof._dir(os.fstat(descriptor), True) == original
+        check()
+        return proof._Files(fd, parent, path, check, {_OWNED_KERNEL_UNIT_JOURNAL_NAME}), ancestry
+    except BaseException:
+        for fd in reversed(ancestry): os.close(fd)
+        raise
+
+
+def _publish_owned_kernel_unit_observation(journal, ancestry, observation, primary=None):
+    """Register strong originals BEFORE I/O; partial/unknown publication holds.
+
+    The outer same-process pytest wrapper can retain this state before exit.
+    There is no retry, namespace adoption, journal unflagging or success token
+    from provisional bytes, a close failure or a post-close seal discrepancy.
+    """
+    global _OWNED_KERNEL_UNIT_ORIGINAL
+    state = {"journal": journal, "ancestry": ancestry, "original_ancestry": tuple(ancestry),
+        "observation": observation, "encoded": None, "original": None, "failure": None, "trace": None,
+        "primary": primary, "primary_trace": None if primary is None else primary.__traceback__,
+        "stage": "encoding", "closed_ancestry": [], "final_read_fd": None, "final_read_closed": False}
+    _OWNED_KERNEL_UNIT_PUBLICATIONS.append(state)
+    try:
+        encoded = canonical_json(observation).encode() + b"\n"; state["encoded"] = encoded
+        assert 0 < len(encoded) <= 16384
+        name = _OWNED_KERNEL_UNIT_JOURNAL_NAME
+        state["stage"] = "publication"
+        journal.write(name, encoded); journal.audit()
+        original = journal.originals[name][2]; state["original"] = original
+        assert journal.originals[name][3] == encoded
+        state["original_data_fds"] = tuple(journal.fds)
+        state["stage"] = "journal_close"; journal.close(); journal.named()
+        state["stage"] = "ancestry_close"
+        for fd in reversed(ancestry):
+            os.close(fd); state["closed_ancestry"].append(fd)
+        ancestry.clear()
+        state["stage"] = "final_original_audit"
+        # Independent RO read compares to FIRST9 and original bytes; it never
+        # substitutes its new snapshot for a failed original seal.
+        cap = journal.creators[name]
+        fd = os.open(journal.path / name, os.O_RDONLY | os.O_NOFOLLOW); state["final_read_fd"] = fd
+        proof._check_frozen(cap, os.fstat(fd)); proof._same(proof._stamp(os.fstat(fd)), original)
+        assert os.read(fd, 16385) == encoded
+        proof._check_frozen(cap, os.fstat(fd)); proof._same(proof._stamp(os.fstat(fd)), original)
+        os.close(fd); state["final_read_closed"] = True
+        journal.named(); proof._same(proof._stamp((journal.path / name).lstat()), original)
+        result = {"path": str(journal.path / name), "raw": encoded, "stamp": original,
+            "raw_sha256": hash_bytes(encoded), "stamp_sha256": hash_bytes(canonical_json(list(original)).encode())}
+        state["stage"], state["result"] = "closed_original_journal", result
+        _OWNED_KERNEL_UNIT_ORIGINAL = result  # All required close/audit calls already succeeded.
+        return result
+    except BaseException as error:
+        state["failure"], state["trace"] = error, error.__traceback__
+        _OWNED_KERNEL_UNIT_ORIGINAL = None
+        raise  # Retain every still-open original handle and complete encoded bytes.
+
+
+def test_kernel_unit_lane_capture_is_explicit_fixed_and_source_pinned():
+    sha = "a" * 64
+    assert _owned_kernel_unit_configuration({}, sha) is None
+    environment = {"SI_NATIVE_SUPERVISION_KERNEL_UNIT": "owned-ro-v2", "SI_NATIVE_SUPERVISION_KERNEL_SOURCE_SHA256": sha}
+    assert _owned_kernel_unit_configuration(environment, sha) == "owned-ro-v2"
+    assert _OWNED_KERNEL_UNIT_DIRECTORY == "native-supervision-v4-ro-owned-20261030-v2"
+    assert _OWNED_KERNEL_UNIT_JOURNAL_NAME == "unit.observation.private.json"
+
+
+@pytest.mark.parametrize("mode,expected", [(None, "a" * 64), ("/arbitrary/path", "a" * 64),
+    ("owned-ro-v1", "a" * 64), ("owned-ro-v2", None), ("owned-ro-v2", "A" * 64),
+    ("owned-ro-v2", "b" * 64), ("owned-ro-v2", "a" * 63)])
+def test_kernel_unit_capture_rejects_unregistered_modes_or_bad_source_pin(mode, expected):
+    environment = {}
+    if mode is not None: environment["SI_NATIVE_SUPERVISION_KERNEL_UNIT"] = mode
+    if expected is not None: environment["SI_NATIVE_SUPERVISION_KERNEL_SOURCE_SHA256"] = expected
+    with pytest.raises(AssertionError): _owned_kernel_unit_configuration(environment, "a" * 64)
+
+
+@pytest.mark.parametrize("fault", ["write", "immutable_flag", "readback", "named", "ancestry_close", "final_named"])
+def test_kernel_journal_failure_retains_original_state_without_closed_token(tmp_path, monkeypatch, fault):
+    path = tmp_path / "fresh-unit-journal"; path.mkdir(mode=0o700)
+    parent = os.open(tmp_path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    directory = os.open(path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    ancestry = [parent, directory]
+    journal = proof._Files(directory, parent, path, lambda: None, {_OWNED_KERNEL_UNIT_JOURNAL_NAME})
+    observation = {"schema": "EXPLICIT FABRICATED UNIT OBSERVATION", "status": "negative_only_no_authority"}
+    primary = ValueError("FIXED FABRICATED ORIGINAL UNIT FAILURE")
+    injected = OSError(5, "FIXED FABRICATED PRIVATE JOURNAL FAILURE")
+    original_write, original_read, original_named, original_close = proof._write, os.read, journal.named, os.close
+    original_flags = proof._set_file_flags; named_calls = []
+    def write(fd, raw):
+        if fault == "write" and fd in journal.fds: raise injected
+        return original_write(fd, raw)
+    def flags(fd, value):
+        if fault == "immutable_flag" and fd in journal.fds: raise injected
+        return original_flags(fd, value)
+    def read(fd, maximum):
+        raw = original_read(fd, maximum)
+        if fault == "readback" and fd in journal.fds: return raw + b"FIXED READBACK DIFFERENCE"
+        return raw
+    def named():
+        named_calls.append(True)
+        if fault == "named" or fault == "final_named" and len(named_calls) == 2: raise injected
+        return original_named()
+    def close(fd):
+        if fault == "ancestry_close" and fd == directory: raise injected
+        return original_close(fd)
+    monkeypatch.setattr(proof, "_write", write); monkeypatch.setattr(proof, "_set_file_flags", flags)
+    monkeypatch.setattr(os, "read", read); monkeypatch.setattr(journal, "named", named); monkeypatch.setattr(os, "close", close)
+    try:
+        with pytest.raises((OSError, proof.SupervisionRefusal, proof.old.NativeProofRefusal)) as caught:
+            _publish_owned_kernel_unit_observation(journal, ancestry, observation, primary)
+        assert _OWNED_KERNEL_UNIT_ORIGINAL is None and len(_OWNED_KERNEL_UNIT_PUBLICATIONS) == 1
+        state = _OWNED_KERNEL_UNIT_PUBLICATIONS[0]
+        assert state["failure"] is caught.value and state["trace"] is not None
+        assert state["primary"] is primary and state["observation"] is observation and state["journal"] is journal
+        assert state["encoded"] == canonical_json(observation).encode() + b"\n"
+        assert state["original_ancestry"] == (parent, directory)
+        if fault in ("write", "immutable_flag", "readback"):
+            assert journal.fds and not journal.closed and all(os.fstat(fd).st_ino > 0 for fd in journal.fds)
+            assert ancestry == [parent, directory] and all(os.fstat(fd).st_ino > 0 for fd in ancestry)
+        if fault == "ancestry_close":
+            assert state["closed_ancestry"] == [] and ancestry == [parent, directory]
+            assert os.fstat(directory).st_ino > 0
+        if fault == "final_named":
+            assert ancestry == [] and state["final_read_closed"] is True and state["original"] is not None
+    finally:
+        # Test-only cleanup of this fabricated scope; production unit failures
+        # deliberately return with their original still-open state retained.
+        monkeypatch.setattr(os, "close", original_close)
+        try: journal.close()
+        except OSError: pass
+        for fd in (directory, parent):
+            try: original_close(fd)
+            except OSError: pass
+
+
+def test_kernel_journal_token_is_issued_only_after_all_close_and_final_original_audits(tmp_path):
+    path = tmp_path / "fresh-unit-journal"; path.mkdir(mode=0o700)
+    parent = os.open(tmp_path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    directory = os.open(path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    ancestry = [parent, directory]
+    journal = proof._Files(directory, parent, path, lambda: None, {_OWNED_KERNEL_UNIT_JOURNAL_NAME})
+    result = _publish_owned_kernel_unit_observation(journal, ancestry, {"schema": "EXPLICIT FABRICATED UNIT OBSERVATION"})
+    state = _OWNED_KERNEL_UNIT_PUBLICATIONS[0]
+    assert _OWNED_KERNEL_UNIT_ORIGINAL is result and state["result"] is result
+    assert ancestry == [] and journal.closed and state["final_read_closed"] is True
+    assert set(state["closed_ancestry"]) == {parent, directory} and state["failure"] is None
+    assert state["stage"] == "closed_original_journal"
+    assert proof._stamp((path / _OWNED_KERNEL_UNIT_JOURNAL_NAME).lstat()) == result["stamp"]
+    assert (path / _OWNED_KERNEL_UNIT_JOURNAL_NAME).read_bytes() == result["raw"]
+
+
+@pytest.mark.skipif(sys.platform != "darwin", reason="Explicit Darwin owned-inode kernel contract")
+def test_real_kernel_immutable_owned_readonly_handoff_denies_owned_and_named_writes(tmp_path):
+    """One owned-temp kernel unit, never a native proof or APFS/source admission.
+
+    Default execution writes only a new temp inode. The explicit fixed v2
+    configuration alone writes an immutable journal outside pytest retention.
+    No RW descriptor escapes
+    the two-handle factory: the sole extra dup is created AFTER handoff and is
+    itself O_RDONLY. Test-only unflagging applies only to this exact new inode.
+    """
+    import ctypes
+    import errno
+    import fcntl
+    global _OWNED_KERNEL_UNIT_ORIGINAL
+    source = Path(proof.__file__).resolve(); source_sha = hash_bytes(source.read_bytes())
+    configuration = _owned_kernel_unit_configuration(os.environ, source_sha)
+    journal = None; ancestry = []
+    if configuration is not None:
+        journal, ancestry = _open_owned_kernel_unit_journal()
+    observation = {"schema": "si-native-supervision-owned-ro-kernel-unit-v1", "status": "failed",
+        "driver_source_sha256": source_sha, "stage": "new_owned_file", "operations": [],
+        "authority": proof.authority(), "source_requests": 0, "claims": 0, "native_proof_invocations": 0,
+        "first_seal": None, "final_seal_before_test_cleanup": None, "cleanup": "not_entered"}
+    access = lambda fd: fcntl.fcntl(fd, fcntl.F_GETFL) & os.O_ACCMODE
+    failure = cleanup_failure = None
+    try:
+        with _new_owned_bucket(tmp_path) as files:
+            original_fd = files.create("run.started.json"); cap = files.creators["run.started.json"]
+            row = proof._creator(cap); ro = row["original_ro_fd"]; duplicate_ro = None
+            original_identity = proof._stamp(os.fstat(original_fd))[:6]
+            raw = b"FIXED SOURCE-FREE OWNED READONLY HANDOFF KERNEL UNIT\n"
+            observation["creation_access"] = [access(original_fd), access(ro)]
+            observation["creation_original_identity"] = list(original_identity)
+            try:
+                assert observation["creation_access"] == [os.O_RDWR, os.O_RDONLY] and original_fd != ro
+                proof._write(original_fd, raw); observation["stage"] = "readonly_handoff_and_freeze"
+                seal = proof._freeze_new_file(cap, len(raw), raw)
+                observation["first_seal"] = list(seal)
+                assert row["handoff_verified"] is row["verified"] is True
+                assert row["handoff_receipt"] is proof._RO_HANDOFFS[cap]
+                assert row["dup2_returned"] == original_fd and row["handoff_attempted"] is True
+                assert proof._file_flags(os.fstat(original_fd)) & proof.UF_IMMUTABLE
+                duplicate_ro = os.dup(ro)  # The only extra alias is created after the RO handoff.
+                handles = (original_fd, ro, duplicate_ro)
+                observation["posthandoff_access"] = [access(fd) for fd in handles]
+                assert observation["posthandoff_access"] == [os.O_RDONLY] * 3
+                observation["stage"] = "owned_readonly_denials"
+                for ordinal, fd in enumerate(handles, 1):
+                    os.fsync(fd)  # Actual RO fsync compatibility, including the unchanged collector's slot.
+                    for operation in ("write", "truncate"):
+                        try:
+                            if operation == "write": os.write(fd, b"MUTATION_MUST_NOT_SUCCEED")
+                            else: os.ftruncate(fd, len(raw) - 1)
+                        except OSError as error:
+                            observation["operations"].append({"role": "owned_ro_" + str(ordinal),
+                                "operation": operation, "errno": error.errno, "denied": True})
+                            # Darwin truncate(2) also documents EINVAL for an
+                            # fd not open for writing; writes still require EBADF.
+                            assert error.errno in ((errno.EBADF,) if operation == "write" else (errno.EBADF, errno.EINVAL))
+                        else:
+                            observation["operations"].append({"role": "owned_ro_" + str(ordinal),
+                                "operation": operation, "errno": None, "denied": False})
+                            pytest.fail("owned O_RDONLY kernel handle unexpectedly allowed data mutation")
+                        assert proof._stamp(os.fstat(fd)) == seal
+                observation["stage"] = "named_writable_denials"
+                for operation, flags in (("open_readwrite", os.O_RDWR), ("open_truncate", os.O_WRONLY | os.O_TRUNC)):
+                    try: writable = os.open("run.started.json", flags | os.O_NOFOLLOW, dir_fd=files.fd)
+                    except OSError as error:
+                        observation["operations"].append({"role": "named", "operation": operation,
+                            "errno": error.errno, "denied": True})
+                        assert error.errno in (errno.EPERM, errno.EACCES)
+                    else:
+                        os.close(writable)
+                        observation["operations"].append({"role": "named", "operation": operation,
+                            "errno": None, "denied": False})
+                        pytest.fail("named immutable inode unexpectedly allowed a writable open")
+                    assert proof._stamp(os.fstat(original_fd)) == seal
+                observation["stage"] = "original_final_audit"
+                files.seal("run.started.json", original_fd, seal, raw); files.audit()
+                assert (files.path / "run.started.json").read_bytes() == raw
+                assert proof._stamp(os.fstat(original_fd)) == proof._stamp((files.path / "run.started.json").lstat()) == seal
+                assert proof._file_flags(os.fstat(original_fd)) & proof.UF_IMMUTABLE
+                observation["final_seal_before_test_cleanup"] = list(seal)
+                observation["raw_sha256"], observation["raw_bytes"] = hash_bytes(raw), len(raw)
+                observation["status"] = "owned_readonly_kernel_unit_passed_no_proof_authority"
+            finally:
+                observation["cleanup"] = "entered_exact_owned_inode_only"
+                try:
+                    cleanup_fd = ro if duplicate_ro is None else duplicate_ro
+                    info = os.fstat(cleanup_fd); named = (files.path / "run.started.json").lstat()
+                    assert proof._stamp(info)[:6] == proof._stamp(named)[:6] == original_identity
+                    assert info.st_uid == os.getuid() and stat.S_IMODE(info.st_mode) == 0o600 and info.st_nlink == 1
+                    assert files.path.resolve() == files.path and (files.path / "run.started.json").is_symlink() is False
+                    if info.st_flags & proof.UF_IMMUTABLE:
+                        library = ctypes.CDLL("/usr/lib/libSystem.B.dylib", use_errno=True)
+                        operation = library.fchflags; operation.argtypes = (ctypes.c_int, ctypes.c_uint32); operation.restype = ctypes.c_int
+                        ctypes.set_errno(0); returned = operation(cleanup_fd, info.st_flags & ~proof.UF_IMMUTABLE)
+                        number = ctypes.get_errno()
+                        if returned != 0: raise OSError(number, "test-only exact owned inode cleanup refused")
+                    observation["cleanup"] = "only_exact_new_owned_inode_unflagged"
+                except BaseException as error:
+                    cleanup_failure = error; observation["cleanup"] = "failed_original_evidence_retained"
+                finally:
+                    if duplicate_ro is not None: os.close(duplicate_ro)
+        assert hash_bytes(source.read_bytes()) == source_sha
+        if cleanup_failure is not None: raise cleanup_failure
+    except BaseException as error:
+        failure = error
+        observation["status"] = "kernel_unit_failed_no_proof_authority"
+        observation["fixed_failure"] = proof.failure_summary(error)
+    finally:
+        if journal is not None:
+            try: _publish_owned_kernel_unit_observation(journal, ancestry, observation, failure)
+            except BaseException:
+                if failure is not None: raise failure
+                raise
+    if failure is not None: raise failure
+
+
+@contextmanager
+def _new_owned_bucket(tmp_path, roles=("run.started.json",)):
+    path = tmp_path / "new-owned-test-bucket"; path.mkdir(mode=0o700)
+    fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    parent = os.open(tmp_path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    files = proof._Files(fd, parent, path, lambda: None, roles)
+    try: yield files
+    finally: files.close(); os.close(fd); os.close(parent)
+
+
+def test_new_creator_hands_off_exactly_once_to_both_original_readonly_handles_before_freeze(tmp_path, monkeypatch, fabricated_kernel_file_flags):
+    """Descriptor access modes are real; native and UF facts remain fabricated."""
+    import fcntl
+    boundary = fabricated_kernel_file_flags
+    with _new_owned_bucket(tmp_path) as files:
+        fd = files.create("run.started.json"); cap = files.creators["run.started.json"]
+        row = proof._creator(cap); ro = row["original_ro_fd"]; origin = proof._RO_ORIGINS[cap]
+        access = lambda target: fcntl.fcntl(target, fcntl.F_GETFL) & os.O_ACCMODE
+        assert ro != fd and row["writer_fd"] == fd and access(fd) == os.O_RDWR and access(ro) == os.O_RDONLY
+        assert files.fds.count(fd) == files.fds.count(ro) == 1 and row["handoff_attempted"] is False
+        assert proof._stamp(os.fstat(fd)) == proof._stamp(os.fstat(ro)) and os.fstat(fd).st_size == 0
+        raw = b"FIXED CREATION-TIME READONLY HANDOFF BYTES"; proof._write(fd, raw)
+        calls, flag_checks = [], []
+        original_dup2, original_flags = os.dup2, proof._set_file_flags
+        def dup2(source, target, inheritable=True):
+            if (source, target) != (ro, fd): return original_dup2(source, target, inheritable=inheritable)
+            assert inheritable is False
+            assert access(source) == os.O_RDONLY and access(target) == os.O_RDWR
+            assert files.originals["run.started.json"][2] is None and boundary.events == []
+            calls.append((source, target)); return original_dup2(source, target, inheritable=inheritable)
+        def flags(target, value):
+            assert calls == [(ro, fd)] and target == fd
+            assert access(fd) == access(ro) == os.O_RDONLY
+            assert row["handoff_verified"] is True and files.originals["run.started.json"][2] is None
+            assert os.get_inheritable(fd) is os.get_inheritable(ro) is False
+            flag_checks.append(target); return original_flags(target, value)
+        monkeypatch.setattr(os, "dup2", dup2); monkeypatch.setattr(proof, "_set_file_flags", flags)
+        seal = proof._freeze_new_file(cap, len(raw), raw)
+        receipt = proof._RO_HANDOFFS[cap]
+        assert row["handoff_receipt"] is receipt and receipt[0] is cap and receipt[1] is row and receipt[2] is origin
+        assert receipt[4:7] == (fd, ro, len(raw)) and receipt[7] is row["before_raw"]
+        assert proof._readonly_handoff(row) is receipt and flag_checks == [fd]
+        assert row["frozen9"] is seal and row["handoff_verified"] and row["verified"]
+        files.seal("run.started.json", fd, seal, raw); files.audit()
+        assert len(calls) == 1 and access(fd) == access(ro) == os.O_RDONLY
+        for target in (fd, ro):
+            with pytest.raises(OSError) as caught: os.write(target, b"X")
+            assert caught.value.errno == 9  # Genuine O_RDONLY descriptor, not fake UF enforcement.
+            with pytest.raises(OSError): os.ftruncate(target, len(raw) - 1)
+        assert (files.path / "run.started.json").read_bytes() == raw
+        files.audit()  # Denied writes did not change any original nine-field seal.
+
+
+@pytest.mark.parametrize("fault", ["dup2_failure", "dup2_no_effect", "wrong_ro_access"])
+def test_readonly_handoff_failure_keeps_originals_without_flag_or_first_seal(tmp_path, monkeypatch, fabricated_kernel_file_flags, fault):
+    import fcntl
+    boundary = fabricated_kernel_file_flags
+    with _new_owned_bucket(tmp_path) as files:
+        fd = files.create("run.started.json"); cap = files.creators["run.started.json"]; row = proof._creator(cap)
+        ro = row["original_ro_fd"]; raw = b"FIXED HANDOFF REFUSAL BYTES"; proof._write(fd, raw)
+        original_dup2 = os.dup2; calls = []
+        if fault == "wrong_ro_access": original_dup2(fd, ro, inheritable=False)
+        def dup2(source, target, inheritable=True):
+            if (source, target) != (ro, fd): return original_dup2(source, target, inheritable=inheritable)
+            assert inheritable is False
+            calls.append((source, target))
+            if fault == "dup2_failure": raise OSError(5, "FIXED FABRICATED HANDOFF SYSCALL FAILURE")
+            if fault == "dup2_no_effect": return target  # Explicit syscall-result fabrication.
+            return original_dup2(source, target, inheritable=inheritable)
+        monkeypatch.setattr(os, "dup2", dup2)
+        with pytest.raises((proof.SupervisionRefusal, OSError)): proof._freeze_new_file(cap, len(raw), raw)
+        assert row["handoff_attempted"] is True and row["handoff_verified"] is False
+        assert row["handoff_error"] is not None and row["handoff_trace"] is not None
+        assert not row["verified"] and row["frozen9"] is None and cap not in proof._RO_HANDOFFS
+        assert files.originals["run.started.json"][2] is None and boundary.events == []
+        assert len(calls) == (0 if fault == "wrong_ro_access" else 1)
+        assert fcntl.fcntl(fd, fcntl.F_GETFL) & os.O_ACCMODE == os.O_RDWR
+        assert os.fstat(ro).st_ino == os.fstat(fd).st_ino and (files.path / "run.started.json").read_bytes() == raw
+        before = tuple(calls)
+        with pytest.raises(proof.SupervisionRefusal): proof._freeze_new_file(cap, len(raw), raw)
+        assert tuple(calls) == before and boundary.events == []
+
+
+@pytest.mark.parametrize("slot", ["writer_fd", "original_ro_fd"])
+def test_frozen_owned_handle_replaced_by_escaped_rw_alias_refuses_without_data_mutation(tmp_path, slot):
+    """Adversarial test alias is outside the production two-handle creator."""
+    with _new_owned_bucket(tmp_path) as files:
+        fd = files.create("run.started.json"); raw = b"FIXED OWNED HANDLE ACCESS AUDIT BYTES"; proof._write(fd, raw)
+        cap = files.creators["run.started.json"]; row = proof._creator(cap)
+        escaped_rw = os.dup(fd)  # Test-only unregistered pre-handoff writer, never a claimed revoked handle.
+        try:
+            seal = proof._freeze_new_file(cap, len(raw), raw); files.seal("run.started.json", fd, seal, raw)
+            os.dup2(escaped_rw, row[slot], inheritable=False)
+            assert proof._stamp(os.fstat(row[slot])) == proof._stamp((files.path / "run.started.json").lstat()) == seal
+            assert (files.path / "run.started.json").read_bytes() == raw
+            with pytest.raises(proof.SupervisionRefusal, match="immutable_file_changed"): files.named()
+            assert files.originals["run.started.json"][2] is seal and proof._PRODUCERS == proof._CLOSED == {}
+        finally: os.close(escaped_rw)
+
+
+@pytest.mark.parametrize("drift", ["ctime_ns", "non_immutable_flags"])
+def test_named_audit_rejects_fresh_metadata_drift_after_outer_snapshot(tmp_path, monkeypatch, fabricated_kernel_file_flags, drift):
+    """Fresh helper reads must match the original seal, not only one another."""
+    boundary = fabricated_kernel_file_flags
+    with _new_owned_bucket(tmp_path) as files:
+        raw = b"FIXED STALE OUTER SNAPSHOT REGRESSION BYTES"; files.write("run.started.json", raw)
+        cap = files.creators["run.started.json"]; row = proof._creator(cap)
+        seal = files.originals["run.started.json"][2]; frozen = row["frozen9"]
+        assert frozen == seal
+        original = proof._readonly_handoff; changed = []
+        info = boundary.actual_fstat(row["fd"]); key = info.st_dev, info.st_ino
+        def handoff(current, *, live=True):
+            if current is row and live and not changed:
+                # Named fabricated privileged metadata mutation only; all
+                # current fstat/named/RO observations agree after this boundary.
+                assert current["verified"] and proof._stamp(os.fstat(current["fd"])) == seal
+                if drift == "ctime_ns": boundary.ctime_offsets[key] += 1
+                else: boundary.flags[key] |= 1  # Keep UF set; producer pins ALL original flag bits.
+                changed.append(drift)
+            return original(current, live=live)
+        monkeypatch.setattr(proof, "_readonly_handoff", handoff)
+        with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal)): files.named()
+        assert changed == [drift] and row["frozen9"] is frozen and files.originals["run.started.json"][2] is seal
+        assert (files.path / "run.started.json").read_bytes() == raw
+        assert proof._file_flags(os.fstat(row["fd"])) & proof.UF_IMMUTABLE
+        assert proof._PRODUCERS == proof._CLOSED == {}
+
+
+def test_direct_handoff_or_copied_receipt_cannot_replace_original_factory_operation(tmp_path, fabricated_kernel_file_flags):
+    with _new_owned_bucket(tmp_path) as files:
+        fd = files.create("run.started.json"); raw = b"FIXED ORIGINAL HANDOFF RECEIPT BYTES"; proof._write(fd, raw)
+        cap = files.creators["run.started.json"]; row = proof._creator(cap)
+        with pytest.raises(proof.SupervisionRefusal): proof._handoff_readonly(cap, len(raw), raw)
+        assert row["handoff_attempted"] is False and fabricated_kernel_file_flags.events == []
+        seal = proof._freeze_new_file(cap, len(raw), raw); files.seal("run.started.json", fd, seal, raw)
+        original = row["handoff_receipt"]; row["handoff_receipt"] = tuple(list(original))
+        assert row["handoff_receipt"] == original and row["handoff_receipt"] is not original
+        with pytest.raises(proof.SupervisionRefusal): files.audit()
+        assert proof._RO_HANDOFFS[cap] is original and files.originals["run.started.json"][2] is seal
+
+
+def test_frozen_creator_requires_original_factory_identity_and_unsealed_new_inode(tmp_path, fabricated_kernel_file_flags):
+    boundary = fabricated_kernel_file_flags
+    with pytest.raises(proof.SupervisionRefusal): proof._FileCreator()
+    with _new_owned_bucket(tmp_path) as files:
+        fd = files.create("run.started.json"); raw = b"FIXED NEW OWNED BYTES"; proof._write(fd, raw)
+        cap = files.creators["run.started.json"]; row = proof._creator(cap)
+        forged = object.__new__(proof._FileCreator); forged._anchor = dict(row)
+        with pytest.raises(proof.SupervisionRefusal): proof._freeze_new_file(forged, len(raw), raw)
+        assert boundary.events == [] and row["attempted"] is False
+        original_seal = proof._stamp(os.fstat(fd))
+        files.originals["run.started.json"][2:] = original_seal, raw
+        with pytest.raises(proof.SupervisionRefusal): proof._freeze_new_file(cap, len(raw), raw)
+        assert boundary.events == [] and files.originals["run.started.json"][2] is original_seal
+        assert row["verified"] is False and row["frozen9"] is None
+
+
+def test_existing_named_file_cannot_gain_a_creator_or_kernel_flag(tmp_path, fabricated_kernel_file_flags):
+    with _new_owned_bucket(tmp_path) as files:
+        path = files.path / "run.started.json"; path.write_bytes(b"PREEXISTING OWNED TEST BYTES"); path.chmod(0o600)
+        before = proof._stamp(path.lstat())
+        with pytest.raises(FileExistsError): files.create("run.started.json")
+        assert files.creators == {} and proof._stamp(path.lstat()) == before
+        assert path.read_bytes() == b"PREEXISTING OWNED TEST BYTES"
+        assert fabricated_kernel_file_flags.events == []
+
+
+def test_flags_added_immediately_before_sdk_call_are_preserved_and_refused(tmp_path, monkeypatch, fabricated_kernel_file_flags):
+    boundary = fabricated_kernel_file_flags
+    with _new_owned_bucket(tmp_path) as files:
+        fd = files.create("run.started.json"); raw = b"FIXED NEW OWNED BYTES"; proof._write(fd, raw)
+        cap = files.creators["run.started.json"]; info = boundary.actual_fstat(fd); key = info.st_dev, info.st_ino
+        added_flag = 1  # Explicit fabricated non-immutable BSD bit, not an actual flag mutation.
+        calls = []
+        def before_sdk():
+            boundary.flags[key] = added_flag
+            boundary.ctime_offsets[key] = 1
+        def sdk(fd, flags):
+            calls.append((fd, flags)); boundary.flags[key] = flags
+        monkeypatch.setattr(proof, "_require_immutable_platform", before_sdk)
+        monkeypatch.setattr(proof, "_set_file_flags", boundary.real_set_file_flags)
+        monkeypatch.setattr(proof, "_sdk_fchflags", sdk)  # Named fabricated SDK; no kernel call.
+        with pytest.raises(proof.SupervisionRefusal): proof._freeze_new_file(cap, len(raw), raw)
+        assert calls == [] and boundary.flags[key] == added_flag
+        row = proof._creator(cap)
+        assert row["attempted"] is True and row["verified"] is False and row["frozen9"] is None
+        assert files.originals["run.started.json"][2] is None
+        assert (files.path / "run.started.json").read_bytes() == raw
+
+
+@pytest.mark.parametrize("fault", ["denied", "readback", "postflag_stamp"])
+def test_freeze_failure_latches_without_retry_or_first_seal(tmp_path, monkeypatch, fabricated_kernel_file_flags, fault):
+    boundary = fabricated_kernel_file_flags
+    with _new_owned_bucket(tmp_path) as files:
+        fd = files.create("run.started.json"); raw = b"FIXED NEW OWNED BYTES"; proof._write(fd, raw)
+        cap = files.creators["run.started.json"]; original_read, original_fsync = os.read, os.fsync
+        if fault == "denied":
+            def refused(fd, flags): raise PermissionError(1, "fabricated kernel freeze denial")
+            monkeypatch.setattr(proof, "_set_file_flags", refused)
+        elif fault == "readback":
+            def read(target, maximum):
+                value = original_read(target, maximum)
+                return b"X" + value[1:] if target == fd and boundary.events and value else value
+            monkeypatch.setattr(os, "read", read)
+        else:
+            def fsync(target):
+                if target == fd and boundary.events: os.fchmod(fd, 0o600)
+                return original_fsync(target)
+            monkeypatch.setattr(os, "fsync", fsync)
+        with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal, PermissionError)):
+            proof._freeze_new_file(cap, len(raw), raw)
+        row = proof._creator(cap); events = tuple(boundary.events)
+        assert row["attempted"] is True and row["verified"] is False and row["frozen9"] is None
+        assert row["failure"] is not None and row["trace"] is not None
+        assert files.originals["run.started.json"][2] is None
+        with pytest.raises(proof.SupervisionRefusal): proof._freeze_new_file(cap, len(raw), raw)
+        assert tuple(boundary.events) == events
+
+
+def test_missing_immutable_bit_refuses_even_when_original_nine_fields_and_bytes_match(tmp_path, fabricated_kernel_file_flags):
+    boundary = fabricated_kernel_file_flags
+    with _new_owned_bucket(tmp_path) as files:
+        raw = b"FIXED NEW OWNED BYTES"; files.write("run.started.json", raw)
+        fd, unused, seal, original = files.originals["run.started.json"]
+        assert original == raw and proof._stamp(os.fstat(fd)) == seal
+        boundary.drop_flag(fd)  # Fabricated privileged change; no real flag is cleared.
+        assert proof._stamp(os.fstat(fd)) == seal and (files.path / "run.started.json").read_bytes() == raw
+        before = tuple(boundary.events)
+        with pytest.raises(proof.SupervisionRefusal): files.audit()
+        assert tuple(boundary.events) == before and files.originals["run.started.json"][2] is seal
+
+
+@pytest.mark.parametrize("route", ["direct_freeze", "direct_write"])
+def test_direct_stdout_write_or_freeze_cannot_substitute_for_original_final_collector(tmp_path, fabricated_kernel_file_flags, route):
+    with _new_owned_bucket(tmp_path, ("stdout.jsonl",)) as files:
+        raw = b"FIXED OUTSIDE-COLLECTOR BYTES"
+        with pytest.raises(proof.SupervisionRefusal):
+            if route == "direct_write": files.write("stdout.jsonl", raw)
+            else:
+                fd = files.create("stdout.jsonl"); proof._write(fd, raw)
+                proof._freeze_new_file(files.creators["stdout.jsonl"], len(raw), raw)
+        cap = files.creators["stdout.jsonl"]; row = proof._creator(cap)
+        assert row["verified"] is False and row["frozen9"] is None
+        assert files.originals["stdout.jsonl"][2] is None
+        assert fabricated_kernel_file_flags.events == [] and cap not in proof._STDOUT_FREEZES
+
+
 def test_genuine_domain_constructor_and_outputs_keep_all_original_checks(genuine_domain):
     h = genuine_domain; early = []
     def before_system():
@@ -400,6 +1072,100 @@ def test_genuine_domain_constructor_and_outputs_keep_all_original_checks(genuine
     files = volume.outputs()
     assert type(files) is proof._Files and files.path == h.mount_path / "proof"
     assert proof._PRODUCERS == proof._CLOSED == {} and h.processes == []
+
+
+def test_late_fresh_system_arrival_settles_before_first_positive_evidence_freeze(genuine_domain, monkeypatch):
+    h = genuine_domain; h.include_system = False
+    arrived, freezes = [], []
+    def advance():
+        assert not proof._FILE_CREATORS and not h.processes
+        if h.initial_time == 1.0:
+            (h.mount_path / ".fseventsd").mkdir(mode=0o700); arrived.append(h.initial_time)
+    h.initial_callback = advance
+    original_flags = proof._set_file_flags
+    def flags(fd, value):
+        # Observe the named fabricated kernel boundary, leaving the original
+        # creator/freeze/handoff issuer code and its genuine frames unchanged.
+        rows = [row for row in proof._FILE_CREATORS.values() if row["fd"] == fd]
+        assert len(rows) == 1
+        if rows[0]["path"] == h.mount_path / "proof":
+            state = proof._CREATION_STATES[h.volumes[0]]
+            assert state["system_initialization"]["sealed"] and state["system_baseline"] is not None
+            freezes.append(h.initial_time)
+        return original_flags(fd, value)
+    monkeypatch.setattr(proof, "_set_file_flags", flags)
+    result = h.produce(h.prepare())
+    volume = h.volumes[0]; init = proof._SYSTEM_INITIALIZATIONS[volume][1]
+    assert arrived == [1.0] and freezes and min(freezes) >= 2.0
+    assert any(not sample["present"] for sample in init["samples"])
+    assert init["sealed"] and init["first_identity"] == volume.system[:2]
+    assert len(init["samples"]) <= 33 and h.initial_time <= 8.0
+    assert type(result) is proof.ProducerObservation and proof._CLOSED == {}
+
+
+def test_fresh_valid_link_count_candidate_may_settle_once_but_never_change_after_baseline(genuine_domain):
+    h = genuine_domain; changed = []
+    def advance():
+        if h.initial_time == 0.5:
+            original = h.actual_lstat(h.mount_path / ".fseventsd").st_nlink
+            h.system_changes["st_nlink"] = original + 1; changed.append(original + 1)
+    h.initial_callback = advance
+    volume = h.create_domain(); init = proof._SYSTEM_INITIALIZATIONS[volume][1]
+    assert changed == [volume.system[5]] and h.initial_time >= 1.5
+    assert init["quiet_begin"] == 0.5 and init["sealed"]
+    original = volume.system; samples = tuple(init["samples"])
+    h.system_changes["st_nlink"] += 1
+    with pytest.raises(proof.SupervisionRefusal): volume.check()
+    with pytest.raises(proof.SupervisionRefusal): volume._initialize_system()
+    assert volume.system is proof._SYSTEM_BASELINES[volume][1] is original
+    assert tuple(init["samples"]) == samples
+
+
+@pytest.mark.parametrize("field,index", [("st_ino", 1), ("st_dev", 0)])
+def test_fresh_initialization_never_adopts_replaced_first_identity(genuine_domain, monkeypatch, field, index):
+    h = genuine_domain; held = _bounded_test_hold(monkeypatch)
+    def advance():
+        if h.initial_time == 0.5:
+            init = proof._SYSTEM_INITIALIZATIONS[h.volumes[0]][1]
+            h.system_changes[field] = init["samples"][0]["metadata"][index] + 1
+    h.initial_callback = advance
+    with pytest.raises(proof.SupervisionRefusal) as caught: h.produce(h.prepare())
+    volume = h.volumes[0]; state = proof._CREATION_STATES[volume]; init = state["system_initialization"]
+    assert held == [] and state["failure"] is caught.value
+    assert init["first_identity"] == init["samples"][0]["metadata"][:2]
+    assert not init["sealed"] and volume not in proof._SYSTEM_BASELINES
+    assert state["system_baseline"] is None and h.processes == []
+    assert not (volume.mount / "proof").exists()
+    assert proof._PRODUCERS == proof._CLOSED == {}
+
+
+def test_disappearance_after_first_valid_fresh_sample_never_becomes_known_absence(genuine_domain, monkeypatch):
+    h = genuine_domain; held = _bounded_test_hold(monkeypatch)
+    def advance():
+        if h.initial_time == 0.25: (h.mount_path / ".fseventsd").rmdir()  # Empty owned fixture directory only.
+    h.initial_callback = advance
+    with pytest.raises(proof.SupervisionRefusal) as caught: h.produce(h.prepare())
+    volume = h.volumes[0]; state = proof._CREATION_STATES[volume]
+    assert held == [] and state["failure"] is caught.value
+    assert state["system_initialization"]["first_identity"] is not None
+    assert state["system_initialization"]["sealed"] is False and state["system_baseline"] is None
+    assert volume not in proof._SYSTEM_BASELINES and h.processes == []
+
+
+@pytest.mark.parametrize("clock", ["backward", "stalled"])
+def test_fresh_initialization_clock_or_sample_cap_refuses_without_any_baseline(genuine_domain, monkeypatch, clock):
+    h = genuine_domain; h.include_system = False
+    held = _bounded_test_hold(monkeypatch)
+    if clock == "backward": h.initial_callback = lambda: setattr(h, "initial_time", -0.25)
+    else: monkeypatch.setattr(proof, "_initialization_sleep", lambda seconds: h.initial_sleeps.append(seconds))
+    with pytest.raises(proof.SupervisionRefusal) as caught: h.produce(h.prepare())
+    volume = h.volumes[0]; state = proof._CREATION_STATES[volume]; init = state["system_initialization"]
+    assert held == [] and state["failure"] is caught.value and state["system_baseline"] is None
+    assert not init["sealed"] and volume not in proof._SYSTEM_BASELINES and h.processes == []
+    assert len(init["samples"]) == (1 if clock == "backward" else 33)
+    assert len(h.initial_sleeps) == (1 if clock == "backward" else 32)
+    assert all(not sample["present"] for sample in init["samples"])
+    assert proof.failure_summary(caught.value)["creation_manifest_sha256"] == hash_bytes(state["manifest_raw"])
 
 
 def test_genuine_domain_producer_closes_empty_carrier_but_remains_provisional(genuine_domain):
@@ -695,22 +1461,27 @@ def test_terminal_native_failure_after_worker_wait0_preserves_original_new_nativ
     assert (h.mount_path / "proof" / "stdout.jsonl").read_bytes() == _two_original_lines()
 
 
-def test_known_absent_system_baseline_is_distinct_from_failed_before_baseline(genuine_domain, monkeypatch):
+def test_system_absence_deadline_cannot_establish_baseline_or_be_retried_after_late_arrival(genuine_domain, monkeypatch):
+    # V4 deliberately strengthens V3's known-absence behavior: absence is now
+    # a failed fresh initialization, never an admitted baseline.
     h = genuine_domain; h.include_system = False
     held = _bounded_test_hold(monkeypatch)
-    def transform(result):
-        if len(h.native_calls) == 5:
-            result.returncode, result.stdout = 2, b"FIXED_LOCAL_TERMINAL_REFUSAL"
-        return result
-    h.native_transform = transform
     with pytest.raises(proof.SupervisionRefusal) as caught: h.produce(h.prepare())
-    assert held == [] and len(h.processes) == 1
+    assert held == [] and h.processes == [] and len(h.native_calls) == 4
     volume = h.volumes[0]; state = proof._CREATION_STATES[volume]
-    assert proof._SYSTEM_BASELINES[volume][1] is None and state["system_baseline"] is None
+    init = state["system_initialization"]
+    assert volume not in proof._SYSTEM_BASELINES and state["system_baseline"] is None
+    assert len(init["samples"]) == 33 and len(h.initial_sleeps) == 32 and h.initial_time == 8.0
+    assert not init["sealed"] and all(not sample["present"] for sample in init["samples"])
     system = json.loads((volume.mount / proof.CREATION_SYSTEM_ROLE).read_bytes())
-    assert system["original_baseline"] is None and system["baseline_established"] is True
+    assert system["original_baseline"] is None and system["baseline_established"] is False
     assert system["present_observations"] == []
     assert proof.failure_summary(caught.value)["creation_manifest_sha256"] == hash_bytes(state["manifest_raw"])
+    original_samples = tuple(init["samples"])
+    (volume.mount / ".fseventsd").mkdir(mode=0o700)  # Late fixture timeline only, after the spent negative.
+    with pytest.raises(proof.SupervisionRefusal): volume._initialize_system()
+    assert tuple(init["samples"]) == original_samples and volume not in proof._SYSTEM_BASELINES
+    assert not (volume.mount / "proof").exists() and not (volume.mount / "main").exists()
     assert proof._PRODUCERS == proof._CLOSED == {}
 
 
@@ -956,24 +1727,92 @@ def test_original_terminal_native_failure_dominates_worker_wait0(fabricated):
     assert (h.volumes[0].output.path / "run.refused.json").is_file()
 
 
-def test_close_failure_dominates_provisional_marker(fabricated):
-    h = fabricated
+def test_close_failure_dominates_provisional_marker(fabricated, monkeypatch):
+    h = fabricated; held = _bounded_test_hold(monkeypatch)
     def refused(volume): raise proof.SupervisionRefusal("REFUSED: supervision_original")
     h.close_callback = refused
     with pytest.raises(proof.SupervisionRefusal, match="supervision_original"): h.produce(h.prepare())
     path = h.volumes[0].output.path
-    assert (path / proof.MARKER_ROLE).is_file() and (path / "run.refused.json").is_file()
-    assert proof._PRODUCERS == {} and proof._CLOSED == {}
+    assert (path / proof.MARKER_ROLE).is_file()
+    assert len(held) == 1 and held[0]["cleanup_error"] is held[0]["failure"]
+    assert held[0]["returned_receipt"] is proof._COLLECT_RETURNS[h.processes[0]]
+    assert held[0]["reporter"].fds and proof._PRODUCERS == proof._CLOSED == {}
 
 
-def test_named_negative_after_context_close_vetoes_producer(fabricated):
-    h = fabricated
+def test_named_negative_after_context_close_vetoes_producer(fabricated, monkeypatch):
+    h = fabricated; held = _bounded_test_hold(monkeypatch)
     def negative(volume):
         path = volume.output.path / "run.refused.json"
         if not path.exists(): path.write_bytes(b"negative")
     h.named_callback = negative
     with pytest.raises(proof.SupervisionRefusal): h.produce(h.prepare())
+    assert len(held) == 1 and held[0]["reporter"].fds
     assert proof._PRODUCERS == {} and proof._CLOSED == {}
+
+
+@pytest.mark.parametrize("secondary_fault", ["publication", "readback", "immutable_flag"])
+def test_late_named_failure_and_refusal_persistence_failure_retain_originals(fabricated, monkeypatch, secondary_fault):
+    """A late failure plus broken negative storage can never discard its state.
+
+    Native facts and kernel flags are explicitly fabricated here. The genuine
+    producer, original collector, late named route and negative writer execute;
+    this is not an actual proof or a claim about real immutable-file behavior.
+    """
+    h = fabricated; held = _bounded_test_hold(monkeypatch)
+    first = proof.SupervisionRefusal("REFUSED: supervision_original")
+    injected = OSError(28, "FIXED FABRICATED PRIVATE REFUSAL STORAGE FAILURE")
+    reporters, refusals, secondary_errors = [], [], []
+    original_refuse = proof._NegativeReporter.refuse
+    original_preserve = proof._NegativeReporter.preserve
+    original_read, original_flags = os.read, proof._set_file_flags
+    def named(volume):
+        assert volume.output.closed and not volume.fds
+        assert proof.worker._WAITS[h.processes[0]][1] == 0
+        assert h.processes[0] in proof._COLLECT_RETURNS
+        raise first
+    h.named_callback = named
+    def refuse(reporter, error):
+        reporters.append(reporter); refusals.append(error)
+        return original_refuse(reporter, error)
+    def preserve(reporter, name, raw):
+        try:
+            if name == "run.refused.json" and secondary_fault == "publication": raise injected
+            return original_preserve(reporter, name, raw)
+        except BaseException as error:
+            secondary_errors.append(error)
+            raise
+    def is_negative_fd(fd):
+        return bool(reporters and fd in reporters[-1].private_fds)
+    def read(fd, maximum):
+        raw = original_read(fd, maximum)
+        if secondary_fault == "readback" and is_negative_fd(fd):
+            return raw + b"FIXED FABRICATED READBACK DIFFERENCE"
+        return raw
+    def flags(fd, value):
+        if secondary_fault == "immutable_flag" and is_negative_fd(fd): raise injected
+        return original_flags(fd, value)
+    monkeypatch.setattr(proof._NegativeReporter, "refuse", refuse)
+    monkeypatch.setattr(proof._NegativeReporter, "preserve", preserve)
+    monkeypatch.setattr(os, "read", read); monkeypatch.setattr(proof, "_set_file_flags", flags)
+    with pytest.raises(proof.SupervisionRefusal) as caught: h.produce(h.prepare())
+    assert caught.value is first and refusals == [first]
+    assert len(secondary_errors) == len(reporters) == len(held) == len(proof._HELD) == 1
+    state = held[0]; reporter = reporters[0]; secondary = secondary_errors[0]
+    assert state["failure"] is first and state["trace"] is not None
+    assert state["reporter"] is reporter and state["process"] is h.processes[0]
+    assert state["returned_receipt"] is proof._COLLECT_RETURNS[h.processes[0]]
+    assert state["reporter_error"] is secondary and state["reporter_trace"] is not None
+    assert reporter.used and len(reporter.fds) == 3
+    assert all(os.fstat(fd).st_ino > 0 for fd in reporter.fds + reporter.private_fds)
+    assert h.processes[0].waits and len(h.processes[0].waits) == 1
+    assert proof._PRODUCERS == proof._CLOSED == {}
+    assert (h.volumes[0].output.path / proof.MARKER_ROLE).is_file()
+    if secondary_fault == "publication":
+        assert secondary is injected and reporter.private_fds == []
+        assert not (reporter.path / "run.refused.json").exists()
+    else:
+        assert "run.refused.json" in reporter.attempted and "run.refused.json" not in reporter.originals
+        assert reporter.private_fds and (reporter.path / "run.refused.json").is_file()
 
 
 @pytest.mark.parametrize("case", ["unknown_wait", "nonzero", "partial_tail", "extra_line"])
@@ -1053,7 +1892,8 @@ def _collection_fault(h, monkeypatch, case):
             info = original_stat(path, *args, **kwargs)
             if (path == "stdout.jsonl" and h.volumes and not h.injected
                     and kwargs.get("dir_fd") == h.volumes[-1].output.fd
-                    and info.st_size > 0 and (case == "stdout_relation" or h.processes[0].waits)):
+                    and info.st_size > 0 and (case == "stdout_relation" or (h.processes[0].waits
+                        and proof._creator(h.volumes[-1].output.creators["stdout.jsonl"])["verified"]))):
                 h.injected = True
                 return _only_ctime_changed(info)
             return info
@@ -1068,23 +1908,76 @@ def _collection_fault(h, monkeypatch, case):
     h.output_callback = forbid_positive_callback_after_capture
 
 
+@pytest.mark.parametrize("after_seal_drift", [False, True])
+def test_failed_collector_with_original_local_seal_never_uses_fresh_partial_freeze(fabricated, monkeypatch, fabricated_kernel_file_flags, after_seal_drift):
+    h = fabricated; held = _bounded_test_hold(monkeypatch); injected = []
+    original_read = os.read
+    def read(fd, maximum):
+        raw = original_read(fd, maximum); frame = sys._getframe(1)
+        if (not injected and frame.f_code is proof._COLLECT_CODE and frame.f_globals is proof.worker.__dict__
+                and frame.f_locals.get("log_fd") == fd and "seal" in frame.f_locals):
+            original_seal = frame.f_locals["seal"]; injected.append(original_seal)
+            assert h.processes[0] not in proof._COLLECT_RETURNS
+            assert h.volumes[0].output.originals["stdout.jsonl"][2] is None
+            if after_seal_drift:
+                # Named fabricated privileged mutation: real native flags are
+                # NOT set in this test. Original all-nine checks must refuse it.
+                path = h.volumes[0].output.path / "stdout.jsonl"
+                path.write_bytes(b"X" + raw[1:])
+            return raw + b"FIXED ORIGINAL COLLECTOR READBACK REFUSAL"
+        return raw
+    monkeypatch.setattr(os, "read", read)
+    with pytest.raises(proof.worker.ProcessSupervisorRefusal) as caught: h.produce(h.prepare())
+    state = proof._CAPTURED[0]; outputs = h.volumes[0].output
+    cap = outputs.creators["stdout.jsonl"]; creator = proof._creator(cap)
+    assert len(injected) == 1 and state["failure"] is caught.value
+    assert state["collector_seal_present"] is True and state["collector_seal"] is injected[0]
+    assert state["frame"].f_locals["seal"] is injected[0] and outputs.originals["stdout.jsonl"][2] is None
+    assert h.processes[0] not in proof._COLLECT_RETURNS and len(h.processes[0].waits) == 1
+    assert proof._STDOUT_FREEZES[cap][1] == "collector_final"  # Never negative_partial or a reissued freeze.
+    own_key = creator["identity"][:2]
+    assert len([event for event in fabricated_kernel_file_flags.events if event[2] == own_key]) == 1
+    assert creator["frozen9"] == injected[0] and creator["handoff_verified"] is True
+    if after_seal_drift:
+        assert held == [state] and state["preservation_error"] is not None
+        assert proof._NEGATIVE_CLOSURES == {} and not outputs.closed
+        assert proof._stamp((outputs.path / "stdout.jsonl").lstat()) != injected[0]
+    else:
+        assert held == [] and len(proof._NEGATIVE_CLOSURES) == 1 and outputs.closed
+        assert state["partial_stamp"] is injected[0]
+        assert proof._stamp((outputs.path / "stdout.jsonl").lstat()) == injected[0]
+        assert (outputs.path / "child.negative.closed.json").is_file()
+    assert proof._PRODUCERS == proof._CLOSED == {}
+
+
+def test_copied_returned_collector_receipt_never_issues_negative_preservation(fabricated):
+    h = fabricated; result = h.produce(h.prepare()); child = h.processes[0]
+    receipt = proof._COLLECT_RETURNS[child]; copied = tuple(list(receipt))
+    assert copied == receipt and copied is not receipt and proof._collector_return(child) is receipt
+    before = set(os.listdir(h.volumes[0].output.path)); state = {}
+    with pytest.raises(proof.SupervisionRefusal): proof._preserve_returned_stdout(copied, None, state)
+    assert set(os.listdir(h.volumes[0].output.path)) == before == proof.POSITIVE_ROLES
+    assert state == {} and proof._CLOSED == {} and type(result) is proof.ProducerObservation
+
+
 @pytest.mark.parametrize("case", ["stdout_relation", "postwait_relation", "prewrite", "postwrite", "third_line", "partial_tail", "nonzero"])
 def test_genuine_collection_failure_preserves_every_present_buffer_and_closes_only_negative(fabricated, monkeypatch, case):
     h = fabricated; _collection_fault(h, monkeypatch, case)
     held = _bounded_test_hold(monkeypatch)
-    original = proof._preserve_collection_failure
+    original_closed = proof._negative_closed
     tokens = []
-    def preserve(state):
+    def closed(token, state):
+        # Do not replace the original preservation issuer: its exact frame is
+        # part of the new negative-only stdout freeze provenance contract.
         assert proof._CAPTURED[-1] is state
         assert proof._PRESERVATIONS[id(state["failure"])][1] is state
-        token = original(state)
-        if token is not None:
-            assert proof._negative_closed(token, state) is True
-            assert proof._negative_closed(object(), state) is False
-            assert proof._negative_closed(token, dict(state)) is False
+        answer = original_closed(token, state)
+        if answer:
+            assert original_closed(object(), state) is False
+            assert original_closed(token, dict(state)) is False
             tokens.append(token)
-        return token
-    monkeypatch.setattr(proof, "_preserve_collection_failure", preserve)
+        return answer
+    monkeypatch.setattr(proof, "_negative_closed", closed)
     with pytest.raises((proof.old.NativeProofRefusal, proof.worker.ProcessSupervisorRefusal, OSError)) as caught:
         h.produce(h.prepare())
     assert held == [] and len(tokens) == len(proof._NEGATIVE_CLOSURES) == 1
@@ -1118,7 +2011,8 @@ def test_genuine_collection_failure_preserves_every_present_buffer_and_closes_on
     if case == "postwait_relation": assert state["tail"] == b"" and state["partial_log"] == h.raw
     if case == "prewrite": assert state["partial_log"] == b"" and state["buffers"]["line"]
     if case == "postwrite": assert state["partial_log"] == state["buffers"]["line"] + b"\n" and state["buffers"]["output"] == b""
-    for name in proof.PRIVATE_ROLES:
+    assert not (path / "child.returned.stdout.private.json").exists()
+    for name in set(proof.PRIVATE_ROLES) - {"child.returned.stdout.private.json"}:
         info = (path / name).lstat()
         assert info.st_mode & 0o777 == 0o600 and info.st_nlink == 1
 
@@ -1285,7 +2179,7 @@ def test_final_partial_log_original_seal_drift_holds_after_negative_copies_exist
     assert proof._PRODUCERS == proof._CLOSED == {}
 
 
-def test_root_private_overflow_retains_the_exact_consumed_block_and_latches_reads(monkeypatch):
+def test_root_private_overflow_retains_the_exact_consumed_block_and_latches_reads(monkeypatch, owned_external_boundaries):
     read_fd, write_fd = os.pipe()
     previous = b"P" * (65536 + 4096)
     consumed = b"SOURCE_FREE_DIAGNOSTIC_BLOCK"
@@ -1305,7 +2199,7 @@ def test_root_private_overflow_retains_the_exact_consumed_block_and_latches_read
         class StopTestHold(BaseException): pass
         monkeypatch.setattr(proof.time, "sleep", lambda seconds: (_ for _ in ()).throw(StopTestHold()))
         state = {"master": read_fd, "raw": row[4], "private_failure": row, "private_error": caught.value}
-        with pytest.raises(StopTestHold): proof._hold(state)
+        with pytest.raises(StopTestHold): owned_external_boundaries.original_hold(state)
         assert calls == [] and os.read(read_fd, 4096) == b"MUST_REMAIN_UNREAD"
     finally:
         os.close(read_fd); os.close(write_fd)
@@ -1446,6 +2340,22 @@ def test_root_reader_failure_and_postclose_drift_never_issue_closed_result(coord
     assert proof._CLOSED == {} and h.kernel_calls.count("start") == 1
 
 
+def test_root_requires_immutable_bit_even_with_exact_original_nine_fields_and_bytes(coordinator, fabricated_kernel_file_flags):
+    h = coordinator; changed = []
+    def change(stage, reader):
+        if stage != "entry" or changed: return
+        name, fd, seal, raw = reader.files[0]
+        fabricated_kernel_file_flags.drop_flag(fd)  # Named fabricated privileged metadata boundary only.
+        assert proof._stamp(os.fstat(fd)) == proof._stamp((reader.proof_path / name).lstat()) == seal
+        assert (reader.proof_path / name).read_bytes() == raw
+        changed.append(name)
+    h.reader_event = change
+    with pytest.raises(proof.SupervisionRefusal, match="immutable_file_changed"):
+        proof.coordinate_registered(HEAD, REMOTE)
+    assert len(changed) == 1 and h.reader_count == 1 and h.kernel_calls.count("start") == 1
+    assert proof._CLOSED == {}  # Root has no newly invented all-flags baseline.
+
+
 def test_root_result_anchor_copy_and_public_payload_cannot_grant_source(coordinator):
     result = proof.coordinate_registered(HEAD, REMOTE)
     public = result.public_summary(); public["authority"]["source_admitted"] = True
@@ -1548,9 +2458,7 @@ def test_fixed_failure_summary_never_formats_arbitrary_error_text():
 
 
 def _only_ctime_changed(info):
-    fields = ("st_dev", "st_ino", "st_uid", "st_gid", "st_mode", "st_nlink",
-              "st_size", "st_mtime_ns", "st_ctime_ns")
-    value = {name: getattr(info, name) for name in fields}
+    value = {name: getattr(info, name) for name in dir(info) if name.startswith("st_")}
     value["st_ctime_ns"] += 1
     return SimpleNamespace(**value)
 

@@ -29302,3 +29302,395 @@ looks0/0/exploratory0/alpha0, permanentlookIDsnone, QC/Safari/purchases/pushes0.
 Post-record Main active-record/import-boundary checks:38passed/1.27s;
 original58D record prefix, final source/test hashes and staged whitespace
 checks passed. No actual V2-v3 invocation preceded this registration.
+
+### 133.7 Actual V2-v3 negative bytes preserved; initialization and post-seal drift
+
+Main committed673517752d5252baa2525680f6ffcec8c71c090c, verified clean exact lane/
+HEAD and matching tracking/actual4BE, fresh V2-v3 names absent and exact service
+absent113, then invoked ONE registered source-free coordinate-proof exec52834.
+All authors/tests were frozen. Actual Root exit2 and native kernel runs1/
+inactive/no PID/exit2 establish terminal negative closure; target39874 is absent.
+No worker launched, no source claim/credential/HTTP/START was made, and no
+process was signalled, retried or left held.
+
+The correlated producer failure is output_creation / native_system /
+native_proof_membership. Its original private creation-failure manifest SHA is
+117871eda2018e3b68e041a6a21cf8ad06ed4130725a0cc4ead00c2e5c3a1dc4.
+The verified original-own trace identifies check line867 (root membership)
+and producer line1251 (guard/code/config/volume checks after initial controls).
+The proof directory contains four native controls, run.started and
+run.refused, but no stdout/worker output. This differs from the earlier
+V2-v2 footprint; its earlier absent-proof observations remain unchanged.
+
+The hash-bound private system packet records baseline_established=True with
+original_baseline=None and zero present-system observations. After termination,
+.fseventsd is present. Thus an originally accepted absence baseline did not
+remain true through the same fresh-volume lifetime. The exact failed directory
+entry set was not captured, so no actor or complete failed membership set is
+invented. This observed absence-to-presence transition supports a stricter
+prospective initialization barrier, not replacement of the old issued None.
+
+All six referenced private control BYTES still match the original manifest
+hashes, but every original file seal mismatches ctime_ns. The first independent
+full-seal check therefore REFUSED before accepting the controls. A bounded
+read-only projection verified the original byte hashes and reported only
+mismatching field names. Using the EXACT producer interpreter and original
+_stamp helper independently confirmed those same six ctime_ns mismatches.
+These are byte-authenticated NEGATIVE diagnostics, NOT intact original
+metadata custody or a qualified proof. No fresh seal was adopted.
+
+| Negative control | Bytes | Original byte SHA |
+| --- | --- | --- |
+| creation.failure.private.json | 1589 | 704aacb97cb5bb6686d30c36a6010ed1a00ce3eaddb3cd31ade6365995b05575 |
+| creation.native.attach.private.plist | 1938 | 9bf7eff62cb5472302606c794ca954808238f3ffbb5c5e1d4026b09e25dabd01 |
+| creation.native.before.private.plist | 2262 | 7d60e67a90460efaa491d324720547ad6e7c55b62d5e38c43bdf5662a14f1b25 |
+| creation.native.create.private.plist | 366 | b04ded85d2f64d25086202816eba102c542ae07439dc85b2917de52dad75f36b |
+| creation.native.initial.private.plist | 4156 | 37c2b4eb21237cda58cb36bba44b6b6f34750ea49a7b1ab86b349108ac9c283d |
+| creation.system.private.json | 481 | 67e6c5858317bf33d592a9497b09f0371ef7902f915ac5612dbb3ae6b1888aeb |
+
+Read-only attribute-name queries found com.apple.macl and com.apple.provenance
+on the seven private diagnostic files; the named runtime had provenance.
+No original attribute-name snapshot exists, so timing and actor remain UNKNOWN.
+No attribute value was read or exposed, and no attribute, executable, privacy
+setting, daemon or filesystem policy was removed or changed. Main initially
+used an unavailable macOS os.listxattr API, then corrected this read-only
+diagnostic to the native xattr names-only command; no production code changed.
+
+SI-BUILD-20261030-013 (P2, open) tracks early acceptance of a system-directory
+absence baseline. SI-BUILD-20261030-014 (P2, open) tracks actual post-seal
+metadata drift despite matching diagnostic bytes. These observations are not
+source usability conclusions or a claim that historical count022 has a known
+cause. V2-v3, V2-v2 and9FA remain negative; no old image is adopted or repaired.
+
+SI-DEC-20261030-05 authorizes another bounded OFFLINE software slice under the
+owner's standing instruction, before any further actual invocation:
+a NEW creator-only system initialization barrier and kernel immutability for
+ONLY newly created evidence files BEFORE their FIRST seal. This adds controls;
+it does not remove a predicate, ignore ctime, alter an original seal, modify
+an existing artifact or change a source budget.
+
+The prospective barrier is fixed8seconds/33samples/0.25second spacing/1second
+quiet, before the first baseline/main/proof/worker. Absence is pending, never
+authority. Require the unchanged five protections; pin the first valid device/
+inode, refuse replacement, retain valid unsealed link-count candidates and
+issue ONE baseline after settlement within the same finite window. Every
+post-seal six-field comparison remains exact; there is no reinitialization
+or extension of the window on failure.
+
+The prospective file profile uses original creator FD/role/parent/inode
+capabilities, one-way flag-attempt/verification/first-seal state and actual
+UF_IMMUTABLE checks PLUS every existing nine-field/byte check. It excludes
+existing files, backing images, directories, OS system metadata, code and
+host configuration. No production flag-clear, attribute stripping, retry,
+retroactive flagging of an issued seal or caller flag/copy admission is allowed.
+Stdout may freeze only at the genuine original collector's final validation,
+after EOF/complete lines/original wait0 and BEFORE its first seal; a local or
+returned original seal already counts even before the owning row is filled.
+Unsealed negative partials require proof that no original seal was issued.
+
+Kernel immutability is an additional invariant, not a guarantee that privileged
+OS metadata cannot change. [Apple documents owner-settable immutable flags](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fchflags.2.html);
+[XNU also contains privileged authorization exceptions](https://github.com/apple-oss-distributions/xnu/blob/main/bsd/vfs/vfs_subr.c).
+Denied required flagging/reads or any later drift must still refuse/hold.
+No errno alone identifies TCC or another actor. Real owned-temporary-file
+kernel tests, explicit fabricated flag boundaries for existing mutation
+regressions, causal tests and a frozen policy must precede any actual run.
+This is not authority to keep creating namespaces until one passes.
+
+No new source budget, private licensed row, outcome/look, alpha allocation,
+permanent look ID, QC/Safari access, purchase, external message or push occurred.
+Count84005/4GiB, separate existing DAILY residual limits and permanent
+8START/16MiB remain unchanged. SourceAUTH and all actual-input gates stay closed.
+### 133.8 Real owned-file counterexample: immutable flags do not revoke an open writer
+
+The prospective UF-only candidate has NOT been registered or invoked as an
+actual proof. Its policy literal remains PENDING. The real Darwin test first
+found two API issues before setting any flag: the test used an unavailable
+os.setxattr API, and production assumed this Python exposed os.fchflags.
+The former is a fixture correction; the latter is verified prospective adapter
+finding SI-BUILD-20261030-016 (P2). The fixed lazy libSystem fchflags ABI preserves
+the original creator/FD checks and has no error fallback or retry. Neither issue
+identifies a historical custody actor or cause.
+
+A subsequent real owned-temporary-file test used the genuine creator capability,
+set and read back UF_IMMUTABLE, verified its first exact seal, and then attempted
+a non-idempotent write through a duplicate RW descriptor opened BEFORE freezing.
+That write SUCCEEDED while the immutable bit remained set. Size, mtime_ns and
+ctime_ns changed. The genuine original Files.audit correctly REFUSED the changed
+file. Thus the existing nine-field check worked; the proposed assumption that
+UF alone revokes an existing writer is false on this actual host.
+
+The required-profile test remained RED: 1 failed / 183 deselected / 0.75s.
+This is a real, source-free kernel counterexample, not a fabricated fixture
+result, provider transport failure, actual capture, source qualification or
+readiness. The original owned-test observation is 658 bytes, SHA256
+7e63710debf45573efb800f990f12babbc9d082d0430d814f374b15b3d3a410b;
+its independent current-owner/0600/single-link/original-nine-field read was
+stable. Cleanup cleared the flag ONLY on that exact newly owned test inode
+after identity checks, and closed its handles. No old file, source artifact,
+image, namespace or claim was changed. Other mutation classes were not yet
+classified when that first real write assertion failed.
+
+SI-BUILD-20261030-018 (P2, open) records this limitation. Do not convert the failed
+UF-only policy into an admitted one by changing its write-denial assertion.
+A prospective stricter contract must instead close every OWNED writer before
+freezing, preserve a distinct original RO handle opened at creation, prove the
+surviving owned handles are read-only and keep all original bytes/protection/
+nine-field checks. A numeric descriptor handoff would explicitly replace its
+open-file description; it must never be described as retaining the original
+writer OFD, repairing an issued seal or globally revoking arbitrary external
+dup/fork/mmap aliases. No such contract has yet passed actual proof.
+
+The owner authorizes continued bounded OFFLINE implementation. This negative
+is retained while the minimal creator-only handoff is assessed. There is no
+new source permission, claim, START, HTTP, credential read, outcome/look, alpha,
+QC/Safari access, purchase or push. SourceAUTH stays unconditionally closed.
+
+Erratum appended after further focused test runs: Main attempted to reopen that
+exact temporary receipt independently and received FileNotFoundError. The test
+author has no retained original raw copy; no original stamp values will be
+reconstructed. The SHA/length and earlier authenticated read remain historical
+reported evidence, while current independent reauthentication is unavailable.
+The actual RED terminal test and observed original-audit refusal are not changed
+into a passed profile. No deletion actor is inferred. Future essential kernel
+receipts must be preserved outside transient pytest retention before more runs.
+This does not affect any provider source artifact, spent claim or source budget.
+
+### 133.9 Partial real owned-RO unit; original receipt stamp refused
+
+After the UF-only counterexample, Main authorized ONE distinct owned-handle
+unit scenario, not an actual native proof or source operation. The frozen
+driver was f7a8201552b931a17e2206f0408f7510d3d928ba0c5ad68728b34d0de5efc4dd,
+with policy PENDING. Its new creator opened an independent original RO handle
+before writes. A one-time dup2 replaced the original numeric writer slot with
+that RO OFD before UF and the first seal. The test observed RO fsync, real UF,
+the first exact nine-field seal and read-only access for the two production
+handles plus a test-only RO duplicate.
+
+The first owned write was denied EBADF. Truncation was also denied, but Darwin
+returned EINVAL and the fixture incorrectly required EBADF for that operation.
+The terminal result was 1 failed / 196 deselected / 0.80s. The test stopped
+there; the remaining handles, named opens and final audit are UNOBSERVED.
+This is partial finite kernel evidence, not a complete passed contract.
+Apple documents EINVAL for truncating a descriptor not open for writing:
+[truncate(2)](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/truncate.2.html).
+The prospective fixture correction allows that documented denial only for
+truncation and still requires exact no-mutation checks.
+
+The fixed lane-private NONCLAIM receipt was published exclusively, 0600,
+single-link, fsynced and original-nine-field/readback checked. Its original
+1309 bytes have SHA9403d58c2b7acdc7c1007c212361f5573a6a379f5a6f85cd0c72d4bc8e0bc21d.
+The original compact-nine-field stamp hash is
+a05dcef5c486c0e636bc46858e5ff3e5186d1ee5d84300e567544f690a3b061e.
+Main independently verified the exact bytes and stable current read, but the
+current stamp hash was
+0067f1ec939e117162c4f6a5d1ddc9c0d0423eb143f4202e64115c33bebff001.
+Comparison to the author's retained ORIGINAL stamp found mismatching FIELD
+NAMES [mtime_ns, ctime_ns]. The original raw/stamp remain retained privately.
+No new baseline was accepted: original receipt metadata custody REFUSES.
+Actor and timing remain UNKNOWN. This byte-authenticated partial unit diagnostic
+cannot serve as a qualified native proof or source-admission witness.
+
+The exact newly owned temporary data inode was cleaned up with identity-checked
+test-only unflagging, and all unit descriptors closed. No actual proof ran, no
+source process was signalled and no source artifact, spent claim or budget was
+changed. SourceAUTH and all actual-input/QC gates remain closed. No new real
+scenario is inferred from this result; verified software corrections and a new
+finite registration must precede any further actual proof.
+
+### 133.10 Strict creator-only RO handoff, verified corrections and validation
+
+SI-DEC-20261030-05 remains an OFFLINE source-free software decision. Only the
+owned driver, its focused tests and this record change. All six antecedent
+runtime files remain byte-identical to673517752d5252baa2525680f6ffcec8c71c090c.
+Shared documents and Session Handoff stay frozen. SourceAUTH is still
+unconditionally blocked; neither a fixture nor this kernel unit admits source
+requests, counts, denominators, actual inputs or readiness.
+
+The first system-directory baseline now requires presence and bounded observed
+settlement: 8 seconds / 33 samples / 0.25-second spacing / 1 second quiet.
+Absence is pending. The original five protection predicates and their order
+remain. First valid device/inode stays pinned; only valid unsealed link-count
+candidates restart quiet within the same window. Replacement, disappearance,
+protection drift, clock reversal and exhaustion refuse. There is one baseline
+and no reinitialization/post-seal exception. The negative-only carrier can still
+preserve an initialization failure without issuing a baseline or main/proof.
+
+For each new exclusive regular evidence inode, the creator opens a DISTINCT
+original RO OFD before writes. The narrow actual program owns exactly two file
+handles. A one-time dup2 atomically replaces the numeric writer slot with the
+creation-time RO OFD BEFORE UF and FIRST9. This replaces an OFD; it does not
+preserve the old writer OFD or attest an implicit target-close error as close0.
+Strict preflush, post-handoff RO fsync, original inode/protection/bytes/flags,
+noninheritability and both current access modes are checked. Unknown transition
+or extra registered same-inode handles refuse; no retry, reopen or reseal.
+The code exports no other data writer, writable mmap or inherited writer.
+This is OWNED-handle closure, not global revocation of arbitrary external
+aliases. The original escaped-writer counterexample remains a documented
+boundary: if such a write is allowed, the original audit must refuse its result.
+
+The fixed lazy libSystem fchflags ABI adds UF before the FIRST seal. Attempt,
+handoff and native-call latches precede side effects. Immediately before the
+call, live flags/identity must still match; observed bits are never cleared.
+Every producer reader retains exact original frozen_flags, nine fields and
+bytes. Root independently checks actual UF plus producer-issued nine fields/
+bytes at every read/audit; it does not claim an unbound all-flags equality or
+adopt a fresh Root baseline. Privileged metadata immunity is not claimed.
+Directories, backing images, code, old files and source artifacts are excluded;
+no production clear, attribute stripping or host-policy change is added.
+
+The unchanged original collector may freeze stdout only in its genuine final
+validation after EOF, empty pending/stages and original wait0, BEFORE its first
+local seal. Local and returned seals count even before an owning row is filled.
+Generic writes/copies/caller flags cannot authorize freezing. Failed unsealed
+partials require genuine failed-frame lineage; returned receipts and buffers
+are retained separately. An issued seal is compared, never retroactively fixed.
+Publication uncertainty retains original state instead of admitting success.
+
+| Finding | Disposition in this software slice |
+| --- | --- |
+| SI-BUILD-20261030-013, P2 | Premature known-absence baseline corrected prospectively; actual native proof still pending. |
+| SI-BUILD-20261030-014, P2 | Historical/actual post-seal drift remains OPEN; no old evidence repaired. |
+| SI-BUILD-20261030-015, P2 | Last live-flags check prevents clearing an observed new bit; corrected with causal regression. |
+| SI-BUILD-20261030-016, P2 | Actual Python lacks os.fchflags; fixed lazy Darwin SDK adapter, not a historical-cause claim. |
+| SI-BUILD-20261030-017, P2 | Late named-audit refusal-publication failure now retains original first/secondary errors, bytes, handles and traces, then holds. |
+| SI-BUILD-20261030-018, P2 | UF-only revocation assumption rejected; new owned-RO contract adds conditions. External/global revocation is not claimed. |
+| SI-BUILD-20261030-019, P2 | Fresh a/b/r metadata observed inside the live getter now compares to ORIGINAL frozen9/flags, rather than only agreeing with itself. |
+
+The reusable kernel test defaults to its own temporary inode, with no lane
+writes. Only explicit owned-ro-v2 configuration plus exact driver SHA enables
+the fixed fresh private directory and sole journal. Unknown config/source,
+existing/partial namespace or oversize body refuses. Journal publication uses
+the same genuine RO handoff/UF/FIRST9; it never clears the journal flag.
+Strong originals are registered BEFORE encoding/I/O. Failure retains bytes,
+traces and surviving handles; the closed row is issued only after all cleanup,
+independent original readback/UF checks and final named audit. Two verified
+pre-release harness gaps (late failure-state registration and pre-cleanup token
+issuance) were corrected with causal fabricated regressions before real v2.
+
+Validation is focused, not a full lane/repository suite. Main ran five related
+startup/exposure/stamps/active-document/import-boundary files:268 passed/3.72s;
+then final supervision+resolution software selection:270 passed,2 real cases
+deselected/7.54s. All OS network access was denied. Main also verified registered
+policy, seven-path mapping, compilation and exact old-six bytes. Author final
+software214 passed/7.11s and peer270 passed,2 real cases deselected/7.39s are
+separately attributed, not Main reruns or Claude review. Earlier peer255/7.65s predates the final test-only harness corrections; the
+final peer270/7.39s includes frozen608443e4 and its closure corrections.
+
+Causal memory reversals preserved disk bytes:015 baseline1/.73s, omitted final
+check1 expected failure/.44s, restored1/.91s;017 old swallow3 expected
+failures/.59s, restored4/.99s;019 old fresh-drift escape2 expected failures/.81s,
+restored2/.51s. Late publication-state registration and premature journal token
+each caused1 expected failure/.66s, restored seven-case journal selection/.98s.
+An earlier ordinary fabricated pytest session54007 unexpectedly entered a hold;
+its exact self-started PID/argv were checked and that TEST ONLY was cancelled
+SIGTERM/exit143. A named fixture now retains unexpected test hold state and
+fails instead of hanging. No pinned proof/source process was signalled.
+
+Peer accepted preliteral driver89b7b8cfe74abaabbc691609f18081b13613dbfe29254db9904ee6b016123c0b.
+Main changed ONLY PENDING to the computed policy literal, then validated:
+
+| Frozen item | SHA256 |
+| --- | --- |
+| Policy | 848ceb48bc42aa02a4974d95da2ba113c172a26aed31d5d0827a4a8fa62c3a94 |
+| Driver | e477f8921c71410c36aa8c4b23e9c76f46aa68286b62bf2991882832b7a73237 |
+| Exact seven-path list | 991cff6fb8e13a748068abbba0e38dae7aa0b072b0c78c19fd4385c3245c5f03 |
+| Current seven-byte mapping | ccd69b81f2f69037a3b5ed18bb76bf50e68e9bd7639cec3836cb859571c9247c |
+| Supervision tests | 608443e45b4e0384a0a101f9500a1d148e3c62e6a46b777ab7f5663ecb8497ff |
+| Unchanged resolution tests | a8dd2984daa1d63ab9784809ad21de3bab42de6e7724475f63c83aff5dd5026e |
+
+### 133.11 Actual owned-RO unit v2 passed; independent custody veto dominates
+
+At exact673/4BE, Main reverified physical/Git roots, branch, authorized status,
+actual matching remote, exact frozen source/test bytes and absent fixed v2
+namespace. Main invoked the configured owned-RO UNIT ONCE, exec40383. It is not
+a native proof, source capture or spent source claim. The same-process wrapper
+retained the original journal bytes/stamp before process exit; it did not
+recapture a fresh baseline. Actual terminal exit0:1 passed/0.99s.
+
+All eight observed denial cases completed: write/truncate on both surviving
+owned RO handles plus a post-handoff RO duplicate, and named RW/truncate opens.
+Writes returned EBADF, RO truncation EINVAL, named writable opens EPERM. RO
+fsync, exact original bytes/nine fields and the original final audit passed.
+Test-only cleanup unflagged ONLY its exact temporary DATA inode before journal
+publication. The lane journal was written via genuine creator/RO/UF/FIRST9,
+then its contexts closed, an independent original readback ran and the final
+named audit passed before the original closed-journal row was issued.
+
+The fixed private journal is1681 bytes, original byte SHA
+64f275a4e8b8c712a2a944a6416ac915c49fb412d9ed3dcbf4a9eb673cc695bc;
+its original compact-nine-field stamp SHA is
+5fe8a8c9afeae56f41905d13605bdca710d7592102f533cd881bd588ae8313e3.
+Main's separate fresh-process original-seal comparison REFUSED. Read-only
+projection found exact original bytes, stable current FD/named snapshots, but
+FIELD NAMES [mtime_ns, ctime_ns] differ from the original; actual UF is ABSENT.
+Current stamp SHA is
+56ce154ef583ccbf26d1166825c69ff6ae10ca2eaa4873baa03fae2b3ce02913.
+Native stat independently reported current flags64 (immutable bit2 absent).
+Peer independently reproduced exact byte SHA/current stamp/UF absence.
+
+No reachable JOURNAL clear was found in driver, selected test or teardown.
+The only selected test clear targets its separately identity-checked temporary
+inode BEFORE the journal exists. Actor and exact timing between the last
+original audit and the later independent read remain UNKNOWN. No filesystem,
+cloud service, privacy framework, tool, user or other agent is blamed.
+Exit0 and matching bytes DO NOT override the failed original seal/flag.
+Original raw/stamp are retained privately; current metadata is not adopted.
+No reflagging, attribute removal, longer window, new probe or namespace retry
+is authorized by this result. Actual V2-v4 native proof was NEVER INVOKED.
+
+### 133.12 Terminal safe-publication blocker and final handoff
+
+SI-BUILD-20261030-020 (P2, OPEN): the exact local evidence destination did not
+preserve the new original immutable journal metadata through independent
+verification, despite the completed owned-RO unit and matching bytes. Required
+original seal/UF checks veto admission. This is a concrete custody-preservation
+blocker before actual native proof, source release and pre-QC readiness.
+Further source retrieval cannot safely proceed under the current invariant.
+A factual owner/external environment change that preserves the required
+original file protection/metadata is needed, followed by a newly frozen proof;
+no particular actor or unverified workaround is prescribed.
+
+Read-only follow-on audit also identified durable-authority work still needed:
+ClosedNativeSupervision and Run13448Resolution are in-memory registry types.
+The owner-confirmed reboot does not preserve those objects; Git/JSON cannot be
+cast into them, and an absent/remounted old epoch is not an original resolver.
+If no genuine durable negative-resolution witness survives, a separately frozen
+conservative readmission must retain UNKNOWN old actuals, zero coverage and the
+permanent8START/16MiB. Do not silently re-resolve, revive or refund the spent run.
+Native full9 includes gid and omits flags; checkpoint full9 includes flags and
+omits gid. A future versioned durable receipt must retain explicit original
+representations/flags, not cast tuples or synthesize original flags from now.
+The coordinator still requires genuine nine-part exposure/ledger binding before
+SourceLease or claims; pure plans/exposure confer no dispatch authority.
+
+No new provider request, credential read, source claim, START, charge, outcome
+join, S1/rank/order/evaluation/backtest, look, alpha, permanent look ID, QC/Safari
+access, purchase, email or other-chat message occurred. Canonical looks0/0,
+exploratory0, alpha0, permanent IDsnone, QCattempts0 remain. Count authority is
+84005 cumulative START/4GiB; DAILY retains its separate existing residual
+36837 attempts/3327988047 bytes/71468572 rows. Permanent8START/16MiB remains
+charged. Initial conservative count upper accounting14000START/40229897bytes
+and residual70005START/4254737399bytes are not reset or expanded here.
+
+Claude commits ccea2fb4e4e31ffb0b68656445fd6d1736fea70b and
+4be7c1ea043baa86f1030b5b0a20e9e0e1faeade remain accepted as recorded in133.1,
+with its appended wording qualification. Both complete historical132 blocks
+remain preserved. The owner's review waiver remains in effect; Claude has NOT
+independently reviewed the accumulated local implementation snapshots.
+This round retains the prior14 exact local hashes documented in133.1 and adds
+572ed522742f037a0a83a3c55bb6832138fefcc9,
+58d00461ac33a68adc0f2eeb895dff3c0ef08134,
+673517752d5252baa2525680f6ffcec8c71c090c, and this record-bearing final commit.
+The final full commit ID is resolved from Git HEAD after commit, not embedded
+self-referentially. No interim push occurred. The authorized ONE matching-lane
+nonforce publication may now report the honest blocked state after final
+record/status/concurrency checks and verification that no pinned operation is
+active. Keep all original source data, claims, images and negative evidence.
+Next action is owner/external custody-environment resolution, then bounded
+source-free proof/readmission work; this is NOT pre-QC or backtest readiness.
+
+Main post-record active-document/import-boundary checks:78 passed/1.47s.
+All authors/test sessions are terminated or frozen; guarded read-only process
+inspection found zero known pinned-role Python processes. No V2-v4 native proof
+was invoked. These final checks do not cure the independent journal veto.

@@ -3,15 +3,16 @@
 An absent-fcntl simulation proves the documented unsupported-host treatment.
 The child is still required to inherit the test runner's OS network denial.
 
-Section 350 (Claude review, 2026-10-29): the guard rule is enforced for every
-lane test module whose module-level load reaches `fcntl` directly, through a
-lane module's import closure, or through a sibling test module, and the probes
-also cover the 42 files that had been added after the section-161 declaration
-without the guard.
+Section 350 counter-review: 25 new guards remain, while 17 production-pinned
+test images keep their exact pre-review bytes. The explicit lane pytest plugin
+handles their unsupported-host collection; shared/default pytest is unchanged.
+Neither collection policy establishes a Windows custody port.
 """
 from __future__ import annotations
 
 import ast
+import hashlib
+import importlib.util
 import json
 import os
 import re
@@ -21,8 +22,14 @@ import sys
 
 import pytest
 
-
 ROOT = Path(__file__).resolve().parents[1]
+_platform_spec = importlib.util.spec_from_file_location(
+    "insider_buying_pytest_platform", ROOT / "tests" / "insider_buying_pytest_platform.py",
+)
+assert _platform_spec is not None and _platform_spec.loader is not None
+platform_policy = importlib.util.module_from_spec(_platform_spec)
+sys.modules[_platform_spec.name] = platform_policy
+_platform_spec.loader.exec_module(platform_policy)
 PRE_GUARD_COMMIT = "85c7755deb75b5d0c61cc4a63a385d4b87b55110"
 GUARDED_FILES = (
     "test_insider_buying_sec_all_form4_parent_ambiguous_diagnostic.py",
@@ -45,7 +52,7 @@ GUARDED_FILES = (
 # Section 350: lane tests added after the section-161 declaration that loaded a
 # POSIX-only module before any guard, so Windows collection errored on them.
 PRE_GUARD_COMMIT_350 = "1635900df1385ebeb4d791948b7816e2a875435e"
-GUARDED_FILES_350 = (
+_REVIEW_FILES_350 = (
     "test_insider_buying_affected_quarter_selector_launcher_v3.py",
     "test_insider_buying_affected_quarter_selector_runner.py",
     "test_insider_buying_affected_quarter_selector_verification_v2.py",
@@ -89,6 +96,10 @@ GUARDED_FILES_350 = (
     "test_insider_buying_sec_feed_prefix_shape_v1.py",
     "test_insider_buying_sec_feed_prefix_shape_v1_review.py",
 )
+# Frozen test bytes are production custody inputs. Keep their exact images and
+# apply unsupported-host collection policy through the explicit lane plugin.
+FROZEN_FILES_350 = tuple(Path(name).name for name in platform_policy.FROZEN_POSIX_TEST_SHA256)
+GUARDED_FILES_350 = tuple(name for name in _REVIEW_FILES_350 if name not in FROZEN_FILES_350)
 PROBES = tuple((PRE_GUARD_COMMIT, name) for name in GUARDED_FILES) + tuple(
     (PRE_GUARD_COMMIT_350, name) for name in GUARDED_FILES_350
 )
@@ -200,10 +211,25 @@ def _is_guard(statement: ast.stmt) -> bool:
             if (function.attr == "importorskip" and statement.value.args
                     and isinstance(statement.value.args[0], ast.Constant) and statement.value.args[0].value == "fcntl"):
                 return True
-            if function.attr == "skip" and any(keyword.arg == "allow_module_level" for keyword in statement.value.keywords):
+            if function.attr == "skip" and any(
+                keyword.arg == "allow_module_level" and isinstance(keyword.value, ast.Constant)
+                and keyword.value.value is True for keyword in statement.value.keywords
+            ):
                 return True
     if isinstance(statement, ast.If):
-        return any(_is_guard(inner) for inner in statement.body)
+        condition = statement.test
+        # Existing lane tests also explicitly defer all non-POSIX hosts. Only
+        # this literal platform predicate is accepted, not an arbitrary branch.
+        if (isinstance(condition, ast.Compare) and len(condition.ops) == 1
+                and isinstance(condition.ops[0], ast.NotEq)
+                and isinstance(condition.left, ast.Attribute)
+                and isinstance(condition.left.value, ast.Name)
+                and condition.left.value.id == "os" and condition.left.attr == "name"
+                and len(condition.comparators) == 1
+                and isinstance(condition.comparators[0], ast.Constant)
+                and condition.comparators[0].value == "posix"):
+            return any(_is_guard(inner) for inner in statement.body)
+    # An arbitrary condition (including if False) does not establish a guard.
     return False
 
 
@@ -333,19 +359,27 @@ def test_every_lane_test_reaching_fcntl_guards_before_its_first_posix_load():
     # Section 350: the rule, not a list. Any new lane test that loads a module
     # whose import closure includes fcntl (directly, through research modules,
     # or through a sibling test) must guard at module level before that load.
-    unguarded, guarded = [], []
+    unguarded, guarded, frozen = [], [], []
     for path in sorted((ROOT / "tests").glob("test_insider_buying*.py")):
         before, statement = _first_posix_load(path)
         if statement is None:
             continue
-        (guarded if before else unguarded).append(f"{path.name}:{statement.lineno}")
+        if not before and path.name in FROZEN_FILES_350:
+            relative = path.relative_to(ROOT).as_posix()
+            assert hashlib.sha256(path.read_bytes()).hexdigest() == platform_policy.FROZEN_POSIX_TEST_SHA256[relative]
+            frozen.append(path.name)
+        else:
+            (guarded if before else unguarded).append(f"{path.name}:{statement.lineno}")
     assert not unguarded, f"unguarded POSIX-only loads: {unguarded}"
     # Non-vacuous: the rule must see the files it was written for.
     assert set(GUARDED_FILES) | set(GUARDED_FILES_350) <= {entry.split(":")[0] for entry in guarded}
+    assert set(frozen) == set(FROZEN_FILES_350)
 
 
-def test_scan_sees_direct_fcntl_imports_and_sibling_loads(tmp_path):
-    (tmp_path / "test_insider_buying_invented_sibling.py").write_text(
+def test_scan_sees_direct_fcntl_imports_and_sibling_loads(tmp_path, monkeypatch):
+    monkeypatch.setattr(sys.modules[__name__], "ROOT", tmp_path)
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "test_insider_buying_invented_sibling.py").write_text(
         "import fcntl\n", encoding="utf-8",
     )
     direct = tmp_path / "test_insider_buying_invented_direct.py"
@@ -361,6 +395,113 @@ def test_scan_sees_direct_fcntl_imports_and_sibling_loads(tmp_path):
     clean = tmp_path / "test_insider_buying_invented_clean.py"
     clean.write_text("import json\n", encoding="utf-8")
     assert _first_posix_load(clean) == (None, None)
+    sibling = tmp_path / "tests" / "test_insider_buying_invented_caller.py"
+    sibling.write_text("import test_insider_buying_invented_sibling\n", encoding="utf-8")
+    assert _first_posix_load(sibling)[0] is False
+    sibling.write_text('import pytest\npytest.importorskip("fcntl")\n'
+                       'import test_insider_buying_invented_sibling\n', encoding="utf-8")
+    assert _first_posix_load(sibling)[0] is True
+
+
+@pytest.mark.parametrize("guard", [
+    'if False:\n    pytest.importorskip("fcntl")',
+    'pytest.skip("ineffective", allow_module_level=False)',
+])
+def test_scan_rejects_ineffective_guard_statements(tmp_path, guard):
+    path = tmp_path / "test_insider_buying_invented_ineffective.py"
+    path.write_text("import pytest\n" + guard + "\nimport fcntl\n", encoding="utf-8")
+    assert _first_posix_load(path)[0] is False
+
+
+def test_frozen_platform_policy_keeps_native_selection_and_exact_scope(tmp_path):
+    platform_policy._validate_frozen_images()
+    assert len(platform_policy.FROZEN_POSIX_TEST_SHA256) == 17
+    for relative in platform_policy.FROZEN_POSIX_TEST_SHA256:
+        path = ROOT / relative
+        assert platform_policy._skip_frozen_path(path, missing_fcntl=False) is None
+        assert platform_policy._skip_frozen_path(path, missing_fcntl=True) is True
+        assert platform_policy._skip_frozen_path(tmp_path / path.name, missing_fcntl=True) is None
+    assert platform_policy._skip_frozen_path(ROOT / "tests" / GUARDED_FILES_350[0], missing_fcntl=True) is None
+    with pytest.raises(pytest.UsageError, match="exact boolean"):
+        platform_policy._skip_frozen_path(ROOT, missing_fcntl=1)
+
+
+@pytest.mark.parametrize("mutation", ["scope", "digest", "bytes", "symlink"])
+def test_frozen_platform_policy_refuses_changed_contract_or_image(tmp_path, mutation):
+    pins = dict(platform_policy.FROZEN_POSIX_TEST_SHA256)
+    for relative in pins:
+        path = tmp_path / relative
+        path.parent.mkdir(exist_ok=True)
+        path.write_bytes((ROOT / relative).read_bytes())
+    first = next(iter(pins))
+    if mutation == "scope":
+        pins["tests/test_insider_buying_invented.py"] = pins.pop(first)
+    elif mutation == "digest":
+        pins[first] = "not-a-digest"
+    elif mutation == "bytes":
+        (tmp_path / first).write_bytes((tmp_path / first).read_bytes() + b"\n")
+    else:
+        original = tmp_path / first
+        target = tmp_path / "same-bytes.py"
+        target.write_bytes(original.read_bytes())
+        original.unlink()
+        original.symlink_to(target)
+    with pytest.raises(pytest.UsageError):
+        platform_policy._validate_frozen_images(tmp_path, pins)
+
+
+def test_frozen_platform_policy_stops_explicit_file_collection_before_import():
+    child = r'''
+import importlib.abc, json, os, sys
+request=json.load(sys.stdin)
+sys.path.insert(0,request["root"])
+for entry in request["site_packages"]:
+    if entry not in sys.path:sys.path.append(entry)
+import pytest
+sys.path.insert(0,os.path.join(request["root"],"tests"))
+import insider_buying_pytest_platform as policy
+sys.modules.pop("fcntl",None)
+class Finder(importlib.abc.MetaPathFinder):
+    def find_spec(self,fullname,path=None,target=None):
+        if fullname=="fcntl":raise ModuleNotFoundError("invented unsupported host",name="fcntl")
+        if fullname=="research" or fullname.startswith("research."):
+            raise AssertionError("frozen custody import reached")
+sys.meta_path.insert(0,Finder())
+class Reports:
+    skipped=0
+    failed=0
+    def pytest_collectreport(self,report):
+        self.skipped+=report.skipped
+        self.failed+=report.failed
+reports=Reports()
+result=pytest.main(["--noconftest","--collect-only","-q","-p","no:cacheprovider",
+                    *policy.FROZEN_POSIX_TEST_SHA256],plugins=[policy,reports])
+print(json.dumps({"exit":int(result),"skipped":reports.skipped,"failed":reports.failed}))
+'''
+    environment = {name: os.environ[name] for name in ("PATH", "TMPDIR", "TEMP", "TMP") if name in os.environ}
+    environment["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
+    result = subprocess.run([sys.executable, "-I", "-B", "-c", child], cwd=ROOT,
+                            env=environment, capture_output=True, text=True, timeout=30,
+                            input=json.dumps({"root": str(ROOT), "site_packages": [
+                                entry for entry in sys.path if "site-packages" in entry]}))
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout.splitlines()[-1]) == {"exit": 5, "skipped": 17, "failed": 0}
+
+
+def test_frozen_production_pin_maps_still_match_current_test_bytes():
+    pytest.importorskip("fcntl", reason="This source-only pin control needs POSIX imports")
+    from research import insider_buying_sec_feed_nc_source_binding_observe_v1 as observer
+    from research import insider_buying_sec_feed_compact_capture_v1 as compact_capture
+    modules = [observer, observer.inherited, observer.binder,
+               compact_capture, compact_capture.previous]
+    checked = set()
+    for module in modules:
+        for attribute in ("FROZEN", "CODE_PINS"):
+            for relative, digest in getattr(module, attribute, {}).items():
+                if relative.startswith("tests/"):
+                    assert hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() == digest
+                    checked.add(relative)
+    assert set(platform_policy.FROZEN_POSIX_TEST_SHA256) <= checked
 
 
 def test_qc_checkout_controls_remain_available_without_custody_platform_guard():

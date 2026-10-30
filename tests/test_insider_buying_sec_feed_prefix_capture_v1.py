@@ -10,7 +10,6 @@ import zlib
 
 import pytest
 
-pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 from research import insider_buying_sec_feed_prefix_capture_v1 as m
 
 CONTACT="invented@unit.test"

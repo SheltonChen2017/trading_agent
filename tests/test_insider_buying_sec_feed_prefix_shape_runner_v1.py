@@ -1,9 +1,5 @@
 """Invented old-prefix custody + offline runner fixtures; no real artifacts."""
 import copy
-
-import pytest
-
-pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 import fcntl
 import hashlib
 import json
@@ -12,6 +8,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import zlib
 
+import pytest
 
 from research import insider_buying_sec_feed_prefix_shape_runner_v1 as m
 

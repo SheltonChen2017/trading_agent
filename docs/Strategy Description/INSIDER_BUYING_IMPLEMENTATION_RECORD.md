@@ -1,19 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 350 (CLAUDE, WINDOWS SESSION) REVIEWS `d1990c49..1635900d`
-(SECTIONS 343-349, RECORD-ONLY); ALL FOUR COMMITS ARE ACCEPTED. UNDER THE
-OWNER'S 2026-10-29 FIX-NOT-LOG DIRECTION TWO FINDINGS ARE CORRECTED IN
-`0f70bbe0`: `IBWIN-CR02` (42 LANE TESTS ADDED AFTER SECTION 161
-REACHED `fcntl` UNGUARDED, SO WINDOWS COLLECTION ERRORED ON 42 OF 200 FILES)
-IS FIXED BY GUARDS PLUS A CONVENTION TEST THAT ENFORCES THE RULE FOR EVERY LANE
-TEST, AND `IBSH-CR02` IS FIXED BY DECLARING `IPython`, `QuantConnect` AND `clr`
-AS HOSTED PLATFORM IMPORTS IN THE SHARED SEP-2 MANIFEST (FLAGGED SHARED EDIT;
-BOTH PROJECT-SEPARATION TESTS NOW PASS). `IBQC-SHARED-META01` STAYS OPEN WITH
-ITS PROPOSED PATCH AND BLOCKER. TEN P2 FINDINGS REMAIN OPEN; NO OPEN P0/P1.
-THE LANE IS NOT BACKTEST-READY; ARCHIVE REPLIES ARE STILL PENDING AND THE
-MONITOR STAYS PAUSED. NO VENDOR REPLY, PURCHASE, UPGRADE, QC JOB, OUTCOME LOOK,
-BACKTEST OR TRADING IN THIS ROUND; LOOKS 0/0/0. CODEX COUNTER-REVIEW OF THIS
-ROUND IS NEXT. NO FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY.**
+Status: **SECTION 351 COUNTER-REVIEWS BOTH CLAUDE COMMITS AFTER `1635900d`:
+`0f70bbe0` AND `d786e82e`, ACCEPTED AFTER THE BOUNDED CORRECTIONS RECORDED
+BELOW. SEVENTEEN PRODUCTION-PINNED TEST IMAGES ARE RESTORED EXACTLY; THE
+EXPLICIT LANE TEST COLLECTION POLICY PRESERVES THEM AND THE OTHER 25 NEW
+PLATFORM GUARDS. THE REVIEWER-ONLY SHARED MANIFEST ADDITION IS VETOED AND
+RESTORED TO THE COMMON BASELINE; `IBSH-CR02` REMAINS OPEN. THIRTEEN P2s
+REMAIN OPEN INCLUDING THE PRECISE DEFAULT-WINDOWS COLLECTION LIMITATION;
+NO OPEN P0/P1. THE NEXT OFFLINE ENGINEERING STEP IS THE NAMED MASSIVE V2
+RETAINED-RESULT READBACK, NOT NEW ACQUISITION OR QC. MASSIVE NOW REPORTS
+LATEST-CORRECTED RECORDS ONLY; NO HISTORICAL ARCHIVE SAMPLE WAS SUPPLIED.
+SHARADAR'S ACCOUNT QUESTION AND ALL VENDOR REPLIES STAY HELD, THE MONITOR
+STAYS PAUSED, AND THE LANE IS NOT BACKTEST-READY. NO QC/SAFARI, PURCHASE,
+UPGRADE, OUTCOME, BACKTEST, CAPITAL, PAPER/LIVE OR REAL-ORDER AUTHORITY.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -40781,3 +40780,195 @@ the guard convention. The lane's substantive blockers are unchanged from
 344 and 348: a qualified historical archive sample and the identity/PIT
 inputs. `IBQC-SHARED-META01` waits for one captured real orders response
 under a permitted QC round. Nothing is started by inference.
+
+
+## 351. Codex counter-review of Claude section 350: frozen test images, platform scope and shared-file veto (2026-10-30)
+
+### 351.1 Exact incoming range and serialized scope
+
+The designated lane was clean at
+`1635900df1385ebeb4d791948b7816e2a875435e`. Matching-lane-only fetch showed
+exactly two ordered descendants through
+`d786e82ee9b186b8f8e56ef1bb937643b78a7d0b`; the same branch/worktree was
+fast-forwarded without reset, merge, cherry-pick, alternate checkout or
+worktree. This counter-review covers BOTH commits separately. Section350's
+four reviewed Codex record commits are not newly pending or silently omitted.
+The owner explicitly asks for counter-review followed by continued build to
+the pre-QC boundary. That permits available-input engineering after correction;
+it does not release the later NO-QC/Safari, no-purchase/upgrade or no-vendor-
+reply holds. The archive reply monitor remains PAUSED by explicit owner choice.
+Shared/project-wide records, Action Plan and SESSION_HANDOFF stay frozen.
+
+| Incoming commit | Codex disposition | Independently checked scope and correction |
+| --- | --- | --- |
+| `0f70bbe024d495239faa21993ef8bba19780e271` | **Accepted after correction, with the shared addition vetoed.** | All42 inserted guard changes, the custody-platform convention/probes and the three manifest additions were inspected. Seventeen changed test images are binding production custody inputs: restore exact pre-review bytes, retain25 unpinned guards, and use an explicit lane test helper for unsupported-host collection. Restore the shared manifest byte-exact to `1635900d`; do not create a new shared coordination amendment. |
+| `d786e82ee9b186b8f8e56ef1bb937643b78a7d0b` | **Accepted after append-only qualification.** | Section350's four earlier record-commit dispositions are supported. Its Windows/fixture runs stay reviewer-attributed. Correct the new frozen-pin regression, narrowed Windows collection support, vetoed shared closure and P2 arithmetic here without rewriting historical review evidence. |
+
+### 351.2 Verified findings and bounded corrections
+
+**IBFROZEN-CCR35001, P2, lane-owned, CLOSED by this correction.** The new
+`importorskip` lines changed17 test images pinned by existing source bindings,
+shape/observer/format/compact custody fronts. Source-only rederivation found
+17 distinct mismatching images before correction, including two `CODE_PINS`,
+16 observer,10 shape-runner and one format inventory entry (overlapping sets,
+not29 different files). These are fail-closed current-byte inputs even on
+macOS, not disposable test text. No private replay or acquisition was needed
+to establish the mismatch. Restore the exact17 images from `1635900d`, without
+refreshing ANY consumed pin or frozen production file. The regression checks
+all22 distinct test paths found in the existing production pin dictionaries;
+all current bytes must match. The explicit platform policy also checks the17
+exact baseline hashes before skipping anything. This fixes engineering byte
+identity only; it admits no original, archive, PIT fact or campaign completion.
+
+**IBWIN-CR02, P2, OPEN / partially corrected at explicit invocation scope.**
+Keep25 safe new in-file guards and the improved sibling/direct/spec-import
+scanner. The17 pinned tests are handled by the lane-owned helper
+`tests/insider_buying_pytest_platform.py`: from this lane root run
+`python tests/insider_buying_pytest_platform.py <focused pytest arguments>`
+with the separately required native isolation. On a host with `fcntl` none
+of those17 is excluded. Without it, only those17 exact frozen paths are
+excluded; explicit file arguments are also stopped before module import.
+Changed bytes, a symlink or a changed scope refuses instead of hiding a test.
+The convention rejects arbitrary conditional guards (`if False`) and
+`allow_module_level=False`. The helper lives under tests rather than adding
+an undeclared `scripts/` launch surface; shared pytest/conftest and the shared
+script manifest are unchanged. A plain, unadapted default Windows invocation
+has not been made fully supported; no actual native Windows run or Windows
+custody port is claimed. The supported macOS/POSIX custody stack and separately
+protected QC checkout behavior remain the chosen lane scope from161.
+
+**IBSH-CR02, P2, shared, OPEN.** The three proposed hosted-import declarations
+are technically consistent with the two QC metadata modules. Source-only
+execution of the exact two SEP-2 guards fails on the baseline and passes
+with the additions. Nevertheless,350's general fix-not-log direction and
+absence of merge conflicts are not the explicit common-baseline coordination
+required by the binding parallel workflow. Codex exercises the reviewer's
+stated veto and restores `architecture/entry_points.json` byte-exact to
+`1635900d`. No shared behavior, guard or coordination record is changed.
+The two pre-existing manifest guards remain known failures pending actual
+shared coordination; they are not relabelled as passing or ignored debt.
+
+**IBREC-CCR35001, P3, CLOSED documentation correction.** Before the veto,
+350's twelve minus one shared closure would be ELEVEN, not ten; its phrase
+"other nine" lists ten IDs, plus the separate shared metadata finding.
+After the veto the original12 remain OPEN, and `IBWIN-CR02`'s exact remaining
+scope makes13. No topical factual gate closes through collection tests.
+**IBREC-349-OBS01** remains a reviewer-unverified attribution note, not a new
+authorization violation:349 already documents the explicitly Analyst-only,
+read-only metadata reconciliation. This round makes NO QC reconciliation
+request and does not broaden that finished exception.
+
+### 351.3 Current P0-P3 ledger and evidence attribution
+
+No open P0/P1. The exact13 OPEN P2s are:
+`IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`, `IBSRC-CCR01`,
+shared `IBSH-CR02`, shared `IBQC-SHARED-META01`, `IBARCHIVE-OBS-01`,
+`IBARCHIVE-OBS-02`, `IBPARENT-PLAN-OBS01`, `IBPUBLIC-KNOWNBY-01`,
+`IBQC-ACK-33001`, `IBPILOT-COMP-33001` (partly corrected in its exact scope),
+and `IBWIN-CR02` (partly corrected above).
+`IBPILOT-COMP-33002` and `IBNC-OBS33004` stay CLOSED only in their recorded
+scopes; all other resolved findings and carried P3s retain their history.
+The named P3 `IBMASSIVE2-OBS34101` is still OPEN pending a qualified strict
+readback; it is the next actual engineering deliverable, not already closed.
+`IBSH-CR01` stays shared/open. Overall incoming implementation quality is
+6/10 before correction: useful platform probes, but a material byte-pin
+regression and an uncoordinated shared closure. Corrected acceptance is
+bounded by the explicit invocation and shared-debt qualifications above.
+
+All350.6 Windows counts, POSIX stand-in results and previous full-suite
+statements stay attributed to Claude. They are not observed macOS Codex
+runs, and a fake `fcntl` does not prove a custody port. Codex's source-only
+pin and isolated focused results are recorded separately below. A failed
+first strict test setup could not write the unrelated shared dispatch-lock
+root; the rerun uses `--noconftest` for these source tests instead of granting
+operator writes. This is a harness/setup exclusion, not an acquisition test
+or evidence that production source operations are safe to run online.
+
+### 351.4 Next authorized available-input work
+
+Finish the counter-review validation and commit it before any next source
+implementation. Then implement the existing named Massive v2 retained-result
+readback as a NEW offline module: preserve the consumed producer bytes and
+namespace; validate all private held leaves, canonical crosslinks, strict
+schema-derived metadata, exact externally pinned completion and the captured
+50-image producer Git provenance separately from the current verifier.
+Never invent a credential to re-run its original privacy screening. A new
+strict schema check must say it did not re-read Keychain or re-screen the
+original credential. Qualify/commit its code and prospective read-only scope
+before any actual retained-body observation; apply native process-tree
+network/fork/write/security denial and the required live memory guard.
+No new SEC/provider request, capture retry or original-parent admission is
+part of that readback. Historical availability, processing rights and the
+other pre-QC facts remain real input gates, not policy choices Codex can make.
+
+
+### 351.5 Observed Codex validation of the corrected counter-review
+
+| Focused check | Observed result and scope |
+| --- | --- |
+| Final native lane-helper invocation of custody-platform tests | **94 passed,13.32s.** All selected native POSIX tests retained; not a full lane suite. The earlier13.61s direct run and0.42s preceding-location one-test CLI check are separate preliminary checks, not extra final tests. |
+| Actual production test-pin dictionaries | **22 distinct test paths, zero mismatches**, versus17 distinct mismatches before restoration. Frozen files/pins were not refreshed. |
+| Meaningful in-memory reversals | **Seven detected**, each restored green: false conditional guard, false module-skip permission, removed byte check, foreign skip, missing protected selection, native-host skip and missing explicit-file collector. The last produces17 failed collections/zero skips/exit2 when reversed, then zero failures/17 skips/exit5 (no tests collected) when restored. |
+| Independent source-compiled exact architecture guards | **14 passed**, including exhaustive scripts ownership, launch surface, dynamic-import controls, product boundaries, composition, licensed/authority imports. No operational module or private input was loaded for these source-only checks. |
+| Two exact shared manifest/certificate guards | **Two expected known failures** after the veto, precisely `IPython`, `QuantConnect`, `clr` undeclared; both pass against the reviewer's proposed in-memory addition. They remain shared debt, not a green full-separation claim. |
+| Main focused record/active-document/lane-import-boundary selection and EXACT `tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports` | **124 passed,3.05s** under native process-tree network/security denial, private-artifact/Keychain-read denial and fresh-temp-only writes. |
+| Final record/active-document check after351-352 append | **72 passed,0.37s**, same native restrictions and no private inputs. |
+| Native isolation controls | Network connections are denied with `PermissionError` in both parent and descendant; `/usr/bin/security` exec is denied. An initial preflight incorrectly assumed socket construction itself must fail; it stopped BEFORE tests. A second setup hit pytest's forbidden artifacts-directory metadata traversal; explicit `--ignore` preserves the read denial and prevents traversal. Neither setup is an executed source observation or test-case result. |
+| Compilation / preservation | **48 source images compile in memory**, no caches; all four frozen v3 production sources equal exact historical `aa0d635d00b64825bf8003289e0a60279bd52e73`; shared manifest equals baseline blob `df3dcea7cf45de83bc445b119524039dae06748b`; `git diff --check` clean. |
+
+No complete lane/repository suite, retained-root replay, current credential,
+provider/SEC data request, QC/Safari/SDK action or outcome was used to fix the
+counter-review. The initial shared dispatch fixture and pytest directory
+setup exclusions did not relax network, private-body, Keychain or repo-write
+denial. This corrected counter-review is accepted before the next new
+implementation stage; the next stage will be separately qualified and is not
+claimed independently Claude-reviewed.
+
+## 352. Existing support-answer qualification: Massive corrected records, Sharadar still held (2026-10-30)
+
+The existing two authorized support threads were read without sending any
+reply, follow-up, new inquiry or account detail. The substantive Massive
+response is dated2026-10-29, subject
+"Historical SEC ownership availability archive sample — existing subscription only". Its displayed sender
+is the existing provider support conversation. It reports that its service
+supplies the most updated records after corrections. It supplied NO archive
+sample or attachment and no original-body/version/public-delivery log. This
+is **provider-reported latest-corrected-record behavior**, not a qualified
+historical archive and not a universal claim that every possible bespoke
+vendor archive has been refused. Public documentation was also inspected;
+a documentation link/index does not supply the missing retained evidence.
+No authenticated provider API or new licensed-row operation was invoked.
+
+The requested distinct pilot/warm-up archive remains
+**2020-10-01 through2025-12-31**. This response establishes none of the exact
+accession/body/version linkage, authenticated public-available-by upper
+bounds before09:28/09:30 US Eastern, explicit clock/timezone semantics,
+correction/deletion/backfill lineage, full-window coverage/refusals or
+applicable archive retention/processing rights. Exact first-public seconds
+are not required; a trustworthy historical upper bound for the exact version
+would suffice. A latest corrected table or SEC acceptance timestamp alone
+is still insufficient. The captured reference/index/Form4 capability rows
+from336 remain capability evidence, not a historical snapshot or full corpus.
+
+Sharadar's existing account-verification question is unchanged: no archive
+answer, sample, entitlement or refusal has been supplied. The owner-directed
+reply hold remains in force; no subscriber identity is guessed or disclosed.
+The reply monitor stays PAUSED, and neither silence nor this account question
+is called a negative archive answer. Mail/message/account identifiers and
+private bodies remain out of Git. No EODHD/FMP outreach, purchases, upgrades,
+trials or paid exports occurred.
+
+**Decision / next action:** use delegated routine judgment to complete the
+already-named offline Massive readback rather than retrying consumed source
+requests or pretending the supplier answer closes availability. Thereafter,
+actual pre-QC population assembly still needs a genuine archive sample and
+coverage/rights proof, full required21 original admission, genuine older
+target-affecting lots, historical issuer/share-class/listing/PIT identities,
+real price/volume/factor contexts, both prescribed earnings diagnostics and
+permanent population/look/engine-parity bindings. The old planner's consumed-
+index stop remains intact. Missing historical facts cannot be supplied by
+an engineering approval, a convenient lag, an exclusion or a zero-event proxy.
+The concrete external next input is a verifiable historical archive sample
+with the above semantics under existing rights; Sharadar's account inquiry
+cannot progress under the current no-reply hold. This records the blocker
+without starting QC or requiring another Claude checkpoint.

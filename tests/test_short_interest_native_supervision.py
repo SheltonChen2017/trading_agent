@@ -31,7 +31,9 @@ def owned_external_boundaries(monkeypatch):
         if hasattr(proof, name): monkeypatch.setattr(proof, name, denied)
     for name, value in (("_USED", False), ("_PRODUCERS", {}), ("_CLOSED", {}), ("_PREPARED", {}),
                         ("_HELD", []), ("_FAILURES", {}), ("_KERNEL_ORIGINS", {}), ("_ROOT_RECEIPTS", {}),
-                        ("_ADVISORIES", {})):
+                        ("_ADVISORIES", {}), ("_COMPARISONS", {}), ("_PRESERVATIONS", {}),
+                        ("_NEGATIVE_CLOSURES", {}), ("_NEGATIVE_WAITS", {}),
+                        ("_CAPTURED", []), ("_PRIVATE_FAILURES", {})):
         monkeypatch.setattr(proof, name, value)
 
 
@@ -52,7 +54,7 @@ def fabricated(tmp_path, monkeypatch):
         "slave_path": os.ttyname(slave)}
     monkeypatch.setattr(proof, "_observer_fd", lambda: slave)
     def guard(head, remote):
-        assert head == HEAD and remote in (REMOTE, proof.startup.REMOTE)
+        assert (head, remote) == (HEAD, REMOTE)
         if h.guard_callback is not None: h.guard_callback()
     def git(arguments):
         assert type(arguments) is list and len(arguments) == 2 and arguments[0] == "show"
@@ -404,6 +406,14 @@ def test_named_negative_after_context_close_vetoes_producer(fabricated):
 @pytest.mark.parametrize("case", ["unknown_wait", "nonzero", "partial_tail", "extra_line"])
 def test_unverified_or_unpreserved_worker_keeps_all_original_contexts(fabricated, monkeypatch, case):
     h = fabricated; retained = []
+    # A known terminal child may now close NEGATIVELY after complete private
+    # preservation. This case deliberately makes that preservation unavailable;
+    # the historical hold assertion remains required in that failure direction.
+    original_preserve = proof._NegativeReporter.preserve
+    def fail_private(reporter, name, raw):
+        if name == "child.failure.buffers.private.json": raise OSError(28, "fabricated disk full")
+        return original_preserve(reporter, name, raw)
+    monkeypatch.setattr(proof._NegativeReporter, "preserve", fail_private)
     class StopTestHold(BaseException): pass
     def hold(state):
         retained.append(state); proof._HELD.append(state)
@@ -435,6 +445,300 @@ def test_unverified_or_unpreserved_worker_keeps_all_original_contexts(fabricated
             for frame in frames if type(frame.get("pending", b"")) is bytes and type(frame.get("block", b"")) is bytes)
 
 
+def _bounded_test_hold(monkeypatch):
+    retained = []
+    class StopTestHold(BaseException): pass
+    def hold(state):
+        retained.append(state); proof._HELD.append(state)
+        raise StopTestHold()
+    monkeypatch.setattr(proof, "_hold", hold)
+    return retained
+
+
+def _two_original_lines():
+    return b"".join(canonical_json(proof.worker._worker_line(stage, 4321, os.getpid())).encode() + b"\n"
+        for stage in ("entered", "completed"))
+
+
+def _collection_fault(h, monkeypatch, case):
+    h.raw = _two_original_lines()
+    h.injected = False
+    if case == "third_line": h.raw += b"UNVERIFIED_THIRD_LINE\n"
+    elif case == "partial_tail": h.raw += b"UNVERIFIED_PARTIAL_TAIL"
+    elif case == "nonzero": h.status = 2
+    elif case == "unknown_wait": h.wait_error = TimeoutError()
+    elif case in ("postwrite", "prewrite"):
+        original_write = proof.worker._write
+        def fail_write(fd, raw):
+            if case == "postwrite": original_write(fd, raw)
+            h.injected = True
+            raise OSError(28, "fabricated original collector write refusal")
+        monkeypatch.setattr(proof.worker, "_write", fail_write)
+    elif case in ("stdout_relation", "postwait_relation"):
+        original_stat = os.stat
+        def fail_named(path, *args, **kwargs):
+            info = original_stat(path, *args, **kwargs)
+            if (path == "stdout.jsonl" and h.volumes and not h.injected
+                    and kwargs.get("dir_fd") == h.volumes[-1].output.fd
+                    and info.st_size > 0 and (case == "stdout_relation" or h.processes[0].waits)):
+                h.injected = True
+                return _only_ctime_changed(info)
+            return info
+        monkeypatch.setattr(os, "stat", fail_named)
+    else: raise AssertionError("unknown explicit fabricated fault")
+    def forbid_positive_callback_after_capture(files):
+        original = files.callback
+        def check():
+            assert not proof._CAPTURED, "negative preservation called a failed positive source/native guard"
+            return original()
+        files.callback = check
+    h.output_callback = forbid_positive_callback_after_capture
+
+
+@pytest.mark.parametrize("case", ["stdout_relation", "postwait_relation", "prewrite", "postwrite", "third_line", "partial_tail", "nonzero"])
+def test_genuine_collection_failure_preserves_every_present_buffer_and_closes_only_negative(fabricated, monkeypatch, case):
+    h = fabricated; _collection_fault(h, monkeypatch, case)
+    held = _bounded_test_hold(monkeypatch)
+    original = proof._preserve_collection_failure
+    tokens = []
+    def preserve(state):
+        assert proof._CAPTURED[-1] is state
+        assert proof._PRESERVATIONS[id(state["failure"])][1] is state
+        token = original(state)
+        if token is not None:
+            assert proof._negative_closed(token, state) is True
+            assert proof._negative_closed(object(), state) is False
+            assert proof._negative_closed(token, dict(state)) is False
+            tokens.append(token)
+        return token
+    monkeypatch.setattr(proof, "_preserve_collection_failure", preserve)
+    with pytest.raises((proof.old.NativeProofRefusal, proof.worker.ProcessSupervisorRefusal, OSError)) as caught:
+        h.produce(h.prepare())
+    assert held == [] and len(tokens) == len(proof._NEGATIVE_CLOSURES) == 1
+    state = proof._CAPTURED[0]; child = h.processes[0]
+    assert state["failure"] is caught.value and state["capture_error"] is state["preservation_error"] is None
+    assert state["frame"].f_code is proof._COLLECT_CODE and state["frame"].f_globals is proof.worker.__dict__
+    local = state["frame"].f_locals
+    assert set(state["buffers"]) == {name for name in ("output", "pending", "line", "block") if name in local}
+    assert all(local[name] is raw for name, raw in state["buffers"].items())
+    path = h.volumes[0].output.path
+    encoded = json.loads((path / "child.failure.buffers.private.json").read_bytes())
+    assert encoded["present"] == sorted(state["buffers"])
+    assert encoded["private_bytes_hex"] == {name: raw.hex() for name, raw in state["buffers"].items()}
+    assert state["tail"] == b"".join(state["blocks"])
+    assert (path / "child.remaining.pipe.private.bin").read_bytes() == state["tail"]
+    assert (path / "child.partial.stdout.private.bin").read_bytes() == state["partial_log"] == (path / "stdout.jsonl").read_bytes()
+    closed = json.loads((path / "child.negative.closed.json").read_bytes())
+    assert closed["status"] == "all_original_collection_bytes_preserved_negative_only"
+    assert closed["actual_child_exit"] == h.status and closed["collector_returned"] is False and closed["pipe_EOF"] is True
+    assert (path / "run.refused.json").is_file()
+    assert not any((path / name).exists() for name in (proof.MARKER_ROLE, proof.INVENTORY_ROLE, "child.exit.provisional.json"))
+    assert proof._PRODUCERS == proof._CLOSED == {} and child.stdout.closed
+    assert len(child.waits) == 1
+    if case in ("stdout_relation", "prewrite", "postwrite", "third_line"):
+        assert child not in proof.worker._WAITS
+        assert proof._NEGATIVE_WAITS[child][0] is state["origin"]
+    else: assert child in proof.worker._WAITS and child not in proof._NEGATIVE_WAITS
+    if case in ("stdout_relation", "postwait_relation"):
+        assert closed["original_failure"]["comparison_relation"] == "stdout_fd_named_pair"
+        assert closed["original_failure"]["mismatching_fields"] == ["ctime_ns"]
+    if case == "postwait_relation": assert state["tail"] == b"" and state["partial_log"] == h.raw
+    if case == "prewrite": assert state["partial_log"] == b"" and state["buffers"]["line"]
+    if case == "postwrite": assert state["partial_log"] == state["buffers"]["line"] + b"\n" and state["buffers"]["output"] == b""
+    for name in proof.PRIVATE_ROLES:
+        info = (path / name).lstat()
+        assert info.st_mode & 0o777 == 0o600 and info.st_nlink == 1
+
+
+def test_unknown_negative_wait_retains_every_original_context_and_never_marks_closed(fabricated, monkeypatch):
+    h = fabricated; _collection_fault(h, monkeypatch, "unknown_wait")
+    held = _bounded_test_hold(monkeypatch)
+    with pytest.raises(TimeoutError) as caught: h.produce(h.prepare())
+    assert len(held) == 1 and held[0] is proof._CAPTURED[0]
+    state = held[0]
+    assert state["failure"] is caught.value and isinstance(state["preservation_error"], TimeoutError)
+    assert state["frame"] is not None and state["buffers"] and state["eof"] is True
+    assert state["process"].stdout.closed is False
+    assert state["reporter"].fds and not state["outputs"].closed and not state["directory"].closed
+    assert not (state["outputs"].path / "child.negative.closed.json").exists()
+    assert proof._NEGATIVE_CLOSURES == proof._PRODUCERS == proof._CLOSED == {}
+
+
+@pytest.mark.parametrize("fault", ["fileno", "missing_buffer", "partial_write", "readback", "fsync", "cleanup"])
+def test_negative_preservation_faults_hold_original_buffers_and_surviving_anchors(fabricated, monkeypatch, fault):
+    h = fabricated; _collection_fault(h, monkeypatch, "postwrite")
+    held = _bounded_test_hold(monkeypatch)
+    if fault in ("fileno", "missing_buffer"):
+        original_capture = proof._capture_collection_failure
+        def capture(*args):
+            state = original_capture(*args)
+            if fault == "fileno":
+                def refused(): raise OSError(9, "fabricated live descriptor callback")
+                monkeypatch.setattr(state["stdout"], "fileno", refused)
+            else: state["buffers"].pop("pending")
+            return state
+        monkeypatch.setattr(proof, "_capture_collection_failure", capture)
+    elif fault == "cleanup":
+        def refused(volume): raise OSError(5, "fabricated negative context cleanup")
+        h.close_callback = refused
+    else:
+        armed = []
+        original_preserve = proof._NegativeReporter.preserve
+        def preserve(reporter, name, raw):
+            if name == "child.failure.buffers.private.json": armed.append(reporter)
+            return original_preserve(reporter, name, raw)
+        monkeypatch.setattr(proof._NegativeReporter, "preserve", preserve)
+        if fault == "partial_write":
+            original_write = proof._write
+            def write(fd, raw):
+                if armed and fd in armed[-1].private_fds:
+                    original_write(fd, raw[:1])
+                    raise OSError(28, "fabricated private partial write")
+                return original_write(fd, raw)
+            monkeypatch.setattr(proof, "_write", write)
+        elif fault == "readback":
+            original_read = os.read
+            def read(fd, maximum):
+                raw = original_read(fd, maximum)
+                return b"X" + raw[1:] if armed and fd in armed[-1].private_fds and raw else raw
+            monkeypatch.setattr(os, "read", read)
+        else:
+            original_fsync = os.fsync
+            def fsync(fd):
+                if armed and fd in armed[-1].private_fds: raise OSError(5, "fabricated private fsync")
+                return original_fsync(fd)
+            monkeypatch.setattr(os, "fsync", fsync)
+    with pytest.raises(OSError) as caught: h.produce(h.prepare())
+    assert len(held) == 1 and held[0] is proof._CAPTURED[0]
+    state = held[0]
+    assert state["failure"] is caught.value and state["trace"] is not None
+    assert state["frame"].f_locals["line"] + b"\n" == (state["outputs"].path / "stdout.jsonl").read_bytes()
+    assert state["frame"].f_locals["pending"] is not None
+    assert state["reporter"].fds and all(os.fstat(fd).st_ino > 0 for fd in state["reporter"].fds)
+    assert proof._PRODUCERS == proof._CLOSED == {}
+    if fault != "cleanup":
+        assert state["process"].stdout.closed is False and not state["outputs"].closed
+        assert state["preservation_error"] is not None
+        assert proof._NEGATIVE_CLOSURES == {}
+        assert not (state["outputs"].path / "child.negative.closed.json").exists()
+    else:
+        assert state["cleanup_error"] is not None
+        assert (state["outputs"].path / "child.negative.closed.json").is_file()
+
+
+def test_tail_overflow_retains_the_newly_consumed_block_before_holding(fabricated, monkeypatch):
+    h = fabricated; _collection_fault(h, monkeypatch, "postwrite")
+    h.raw += b"UNVERIFIED_REMAINING_PIPE" * 120
+    original_read = os.read
+    def small_original_reads(fd, maximum):
+        # Keep the genuine original collector/frame, but make its first failed
+        # line arrive in bounded small pipe reads so the buffer report itself
+        # fits the explicit smaller fabricated preservation cap.
+        if h.processes and fd == h.processes[0].stdout.fileno() and not proof._CAPTURED:
+            maximum = min(maximum, 32)
+        return original_read(fd, maximum)
+    monkeypatch.setattr(os, "read", small_original_reads)
+    monkeypatch.setattr(proof, "MAXIMUM_PRIVATE_BYTES", 2048)
+    monkeypatch.setattr(proof, "POLICY_SHA256", hash_payload(proof.policy()))
+    held = _bounded_test_hold(monkeypatch)
+    with pytest.raises(OSError): h.produce(h.prepare())
+    assert len(held) == 1
+    state = held[0]
+    assert len(state["tail"]) > proof.MAXIMUM_PRIVATE_BYTES
+    assert state["tail"] == b"".join(state["blocks"]) and state["blocks"][-1]
+    assert isinstance(state["preservation_error"], proof.SupervisionRefusal)
+    assert state["process"].stdout.closed is False and state["reporter"].fds
+    assert proof._NEGATIVE_CLOSURES == proof._PRODUCERS == proof._CLOSED == {}
+
+
+def test_missing_genuine_collector_frame_or_copied_state_cannot_preserve_anything(monkeypatch):
+    class HostileError(ValueError):
+        def __str__(self): raise AssertionError("do not format a private error")
+    error = HostileError("PRIVATE_UNFORMATTED_DETAIL")
+    state = proof._capture_collection_failure(error, None, None, None, None, None)
+    assert proof._CAPTURED == [state] and state["failure"] is error
+    assert state["capture_error"] is not None and state["frame"] is None
+    assert proof._preserve_collection_failure(dict(state)) is None
+    assert proof._preserve_collection_failure(state) is None
+    assert proof._NEGATIVE_CLOSURES == proof._NEGATIVE_WAITS == {}
+
+
+@pytest.mark.parametrize("when", ["context_close", "reporter_close"])
+def test_final_partial_log_original_seal_drift_holds_after_negative_copies_exist(fabricated, monkeypatch, when):
+    h = fabricated; _collection_fault(h, monkeypatch, "postwrite")
+    held = _bounded_test_hold(monkeypatch)
+    changed = []
+    def mutate():
+        path = h.volumes[0].output.path / "stdout.jsonl"
+        raw = path.read_bytes()
+        path.write_bytes(bytes([raw[0] ^ 1]) + raw[1:])
+        changed.append(path)
+    if when == "context_close": h.close_callback = lambda volume: mutate()
+    else:
+        original = proof._NegativeReporter.close
+        def close(reporter):
+            original(reporter)
+            if proof._CAPTURED: mutate()
+        monkeypatch.setattr(proof._NegativeReporter, "close", close)
+    with pytest.raises(OSError): h.produce(h.prepare())
+    assert len(held) == len(changed) == 1
+    state = held[0]
+    assert state is proof._CAPTURED[0] and isinstance(state["cleanup_error"], proof.old.NativeProofRefusal)
+    assert (state["reporter"].path / "child.negative.closed.json").is_file()
+    assert (state["reporter"].path / "child.partial.stdout.private.bin").read_bytes() == state["partial_log"]
+    assert changed[0].read_bytes() != state["partial_log"]
+    assert proof._PRODUCERS == proof._CLOSED == {}
+
+
+def test_root_private_overflow_retains_the_exact_consumed_block_and_latches_reads(monkeypatch):
+    read_fd, write_fd = os.pipe()
+    previous = b"P" * (65536 + 4096)
+    consumed = b"SOURCE_FREE_DIAGNOSTIC_BLOCK"
+    try:
+        os.write(write_fd, consumed)
+        with pytest.raises(proof.SupervisionRefusal) as caught:
+            proof._read_private(read_fd, previous)
+        row = proof._private_failure(caught.value, read_fd)
+        assert row is proof._PRIVATE_FAILURES[id(caught.value)]
+        assert row[2] is previous and row[3] == consumed and row[4] == previous + consumed
+        assert proof._private_failure(caught.value, write_fd) is None
+        os.write(write_fd, b"MUST_REMAIN_UNREAD")
+        calls = []
+        original = proof._read_private
+        def read(*args): calls.append(args); return original(*args)
+        monkeypatch.setattr(proof, "_read_private", read)
+        class StopTestHold(BaseException): pass
+        monkeypatch.setattr(proof.time, "sleep", lambda seconds: (_ for _ in ()).throw(StopTestHold()))
+        state = {"master": read_fd, "raw": row[4], "private_failure": row, "private_error": caught.value}
+        with pytest.raises(StopTestHold): proof._hold(state)
+        assert calls == [] and os.read(read_fd, 4096) == b"MUST_REMAIN_UNREAD"
+    finally:
+        os.close(read_fd); os.close(write_fd)
+
+
+def test_unexpected_prestart_private_bytes_are_held_and_never_reset(coordinator, monkeypatch):
+    h = coordinator; original = proof._launch_service
+    unexpected = b"UNEXPECTED_PRIVATE_PRESTART_BYTES"
+    def launch(role):
+        result = original(role)
+        if role == "load":
+            spec = json.loads((h.root / proof.PARENT / proof.BOOTSTRAP / "launch.spec.json").read_bytes())
+            fd = os.open(spec["observer"]["slave_path"], os.O_RDWR | os.O_NOFOLLOW | getattr(os, "O_NOCTTY", 0))
+            try: os.write(fd, unexpected)
+            finally: os.close(fd)
+        return result
+    monkeypatch.setattr(proof, "_launch_service", launch)
+    held = _bounded_test_hold(monkeypatch)
+    with pytest.raises(proof.SupervisionRefusal): proof.coordinate_registered(HEAD, REMOTE)
+    assert len(held) == 1
+    state = held[0]
+    assert state["raw"] == unexpected and state["private_failure"][4] == unexpected
+    assert h.kernel_calls.count("start") == 0 and h.processes == []
+    assert proof._PRODUCERS == proof._CLOSED == {}
+    os.close(state["master"]); os.close(state["slave"])
+    state["master"] = state["slave"] = None
+
+
 def test_observer_emits_only_genuine_factory_result_as_pending_pty_observation(fabricated):
     h = fabricated; digest = h.prepare(); result = h.produce(digest)
     channel = proof._Observer(h.observer, digest); channel.emit(result=result)
@@ -454,6 +758,33 @@ def test_observer_cannot_accept_caller_summary(fabricated):
     assert channel.attempted is True
 
 
+def test_largest_allowlisted_failure_fits_original_wire_and_roundtrips_exact_correlation(fabricated, monkeypatch):
+    h = fabricated
+    detail = {"stage": max(proof._STAGES, key=len), "component": max(proof._COMPONENTS, key=len),
+        "contract_code": max(proof._CODES, key=len),
+        "upstream_contract_code": max(proof.old._CODES | proof.worker._CODES | proof.native._CODES, key=len),
+        "errno_name": max(set(proof._ERRNOS.values()) | set(proof.native._ERRNOS.values())
+            | set(proof.worker._ERRNOS.values()), key=len),
+        "mismatching_fields": list(proof.old._STAMP_NAMES),
+        "comparison_relation": max(proof._COMPARISON_ROLES, key=len)}
+    monkeypatch.setattr(proof, "failure_summary", lambda error: dict(detail))  # Explicit maximal fixed-diagnostic seam.
+    digest = "d" * 64
+    proof._Observer(h.observer, digest).emit(error=ValueError("never formatted"))
+    raw = os.read(h.master, proof.MAX_WIRE + 1).replace(b"\r\n", b"\n")
+    assert 0 < len(raw) <= proof.MAX_WIRE == 1024
+    checked = proof._validated_observation(raw, h.observer, digest, os.getpid())
+    assert checked["failure"] == detail and checked["nonce"] == h.observer["nonce"]
+    assert checked["status"] == "refused" and checked["marker"] is None
+    assert checked["authority_sha256"] == hash_payload(proof.authority())
+
+
+@pytest.mark.parametrize("value", ["unknown_relation", 1, True, [], {}])
+def test_failure_wire_rejects_unregistered_or_nonliteral_comparison_relation(value):
+    detail = {"stage": "child_observation", "component": "operation", "contract_code": None,
+        "upstream_contract_code": None, "errno_name": None, "mismatching_fields": [], "comparison_relation": value}
+    with pytest.raises(proof.SupervisionRefusal): proof._checked_failure(detail)
+
+
 def test_root_accepts_only_kernel0_plus_genuine_inner_wait_and_independent_reader(coordinator):
     h = coordinator; result = proof.coordinate_registered(HEAD, REMOTE)
     assert type(result) is proof.ClosedNativeSupervision
@@ -467,6 +798,18 @@ def test_root_accepts_only_kernel0_plus_genuine_inner_wait_and_independent_reade
     assert proof.worker._WAITS[child][0] is proof.worker._CHILDREN[child]
     assert proof.worker._WAITS[child][1] == 0 and len(child.waits) == 1
     assert len(proof._PRODUCERS) == len(proof._CLOSED) == 1
+
+
+def test_query_uses_explicit_current_remote_after_prior_startup_epoch(coordinator, monkeypatch):
+    h = coordinator
+    assert REMOTE != proof.startup.REMOTE
+    guarded = []
+    def guard(head, remote):
+        guarded.append((head, remote))
+        assert (head, remote) == (HEAD, REMOTE)
+    monkeypatch.setattr(proof, "_guard", guard)
+    assert proof._query_service(HEAD, REMOTE) is None
+    assert guarded == [(HEAD, REMOTE)] and h.kernel_calls == ["query"]
 
 
 def test_root_kernel_nonzero_vetoes_positive_marker_and_pty(coordinator):
@@ -595,6 +938,62 @@ def test_fixed_failure_summary_never_formats_arbitrary_error_text():
     public = proof.failure_summary(HostileError("PRIVATE_SECRET_PATH"))
     assert "PRIVATE_SECRET_PATH" not in canonical_json(public)
     assert public["contract_code"] is None
+
+
+def _only_ctime_changed(info):
+    fields = ("st_dev", "st_ino", "st_uid", "st_gid", "st_mode", "st_nlink",
+              "st_size", "st_mtime_ns", "st_ctime_ns")
+    value = {name: getattr(info, name) for name in fields}
+    value["st_ctime_ns"] += 1
+    return SimpleNamespace(**value)
+
+
+@pytest.mark.parametrize("relation", ["main_fd_original_seal", "main_named_original_seal"])
+def test_exact_original_main_comparison_names_only_the_failed_relation(fabricated, monkeypatch, relation):
+    # Native APFS/device facts remain an explicitly fabricated boundary. The
+    # actual new DomainVolume.check and unchanged old._same execute against
+    # real temporary directory/backing/main originals.
+    h = fabricated
+    local = proof._new_domain(proof._Clock())
+    volume = object.__new__(proof._DomainVolume)
+    volume.__dict__.update(clock=local.clock, directory=local.directory, path=local.path,
+        mount=local.mount, image=local.image, backing_pin=local.backing_pin,
+        under_fd=local.mount_fd, under_pin=proof._dir(os.fstat(local.mount_fd), True),
+        mount_fd=local.mount_fd, mount_pin=proof._dir(os.fstat(local.mount_fd), True),
+        main_fd=local.main_fd, main_seal=local.main_pin, system=None,
+        device="explicitly_fabricated_device", node=("explicitly_fabricated_node",))
+    volume.backing_fd = os.open(volume.image, os.O_RDONLY | os.O_NOFOLLOW)
+    volume._native = lambda current: None
+    monkeypatch.setattr(proof, "_native_statfs", lambda fd: {"explicitly_fabricated_native": True})
+    monkeypatch.setattr(proof, "_device_node", lambda *a: volume.node)
+    if relation == "main_fd_original_seal":
+        volume.main_seal = (*volume.main_seal[:-1], volume.main_seal[-1] - 1)
+    else:
+        actual = Path.lstat
+        main = volume.mount / "main"
+        monkeypatch.setattr(Path, "lstat", lambda path: _only_ctime_changed(actual(path))
+            if path == main else actual(path))
+    try:
+        with pytest.raises(proof.old.NativeProofRefusal, match="native_proof_stamp") as caught:
+            volume.check()
+        public = proof.failure_summary(caught.value)
+        assert public["comparison_relation"] == relation
+        assert public["mismatching_fields"] == ["ctime_ns"]
+        assert str(volume.mount) not in canonical_json(public)
+        assert proof._PRODUCERS == proof._CLOSED == {}
+    finally:
+        os.close(volume.backing_fd)
+        local.close()
+
+
+@pytest.mark.parametrize("relation", ["main_fd_original_seal", "main_named_original_seal", "stdout_fd_named_pair"])
+def test_outside_helper_call_cannot_claim_a_production_comparison_relation(relation):
+    original = tuple(range(9))
+    with pytest.raises(proof.old.NativeProofRefusal) as caught:
+        proof._compared_stamp((*original[:-1], 999), original, relation)
+    public = proof.failure_summary(caught.value)
+    assert public["comparison_relation"] is None
+    assert proof._comparison(caught.value) is None
 
 
 @pytest.mark.parametrize("mutation", ["extra", "wrong_nonce", "wrong_pid", "bool_pid", "wrong_authority", "bad_marker", "negative", "trailing", "duplicate"])

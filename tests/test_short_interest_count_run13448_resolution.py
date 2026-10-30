@@ -17,6 +17,11 @@ from types import SimpleNamespace
 
 import pytest
 
+# The registered resolver reaches POSIX capture helpers during import; guard
+# collection before loading that immutable runtime on unsupported hosts.
+pytest.importorskip("fcntl", reason="the registered resolver imports POSIX descriptor custody")
+pytest.importorskip("resource", reason="the registered resolver imports POSIX capture limits")
+
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import resolve_short_interest_count_run13448 as resolution
 

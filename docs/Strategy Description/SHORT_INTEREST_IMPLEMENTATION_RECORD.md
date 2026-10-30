@@ -28997,3 +28997,129 @@ All30 changed Python files compiled in memory; native-seven bytes equal9FA;
 both complete concurrent record blocks and local post-F27 append match their
 original committed bytes. Staged whitespace/conflict checks passed. No full
 suite or actual proof invocation ran.
+
+### 133.4 Offline failure-path repair and separately frozen source-free proof
+
+SI-DEC-20261030-01 is now implemented in the lane-owned new driver and its
+tests. Only scripts/prove_short_interest_native_supervision.py,
+tests/test_short_interest_native_supervision.py, the test-only collection
+guard in tests/test_short_interest_count_run13448_resolution.py and this
+record changed after merge572ed522742f037a0a83a3c55bb6832138fefcc9.
+The original native-five, startup-v7 and original worker collector bytes
+remain unchanged. Every positive full9/bytes/identity/native/context/cleanup
+check still applies; no positive result can contain negative-only files.
+
+The new collector-failure path captures a strong original exception,
+traceback, unique genuine collector frame/code/globals, process/origin,
+namespace/log FD and every PRESENT output/pending/line/block byte value
+BEFORE diagnostic writes or further consumed reads. Missing variables are
+not invented as empty. Each additional pipe block is retained before bounds
+or I/O. A bounded five-second NEGATIVE-only drain precedes the original
+handle wait, avoiding a full-pipe wait deadlock. An independently recorded
+late wait never writes the original positive _WAITS registry and never
+turns a failed collector into success.
+
+Original duplicate reporter FD anchors publish four fixed private roles:
+child.failure.buffers.private.json, child.remaining.pipe.private.bin,
+child.partial.stdout.private.bin and child.negative.closed.json. Fresh
+O_EXCL0600/single-link/full9/readback/fsync controls remain strict. Only
+observed empty negative binary files allow size0; original positive/config
+protection is unchanged. Every attempted filename is spent after its first
+attempt; no partial file is retried, adopted or replaced. Negative routing
+does not call the failed positive volume/main guard. Complete original
+buffer/tail/partial-log preservation plus EOF and genuine known wait may
+issue an exact private NEGATIVE cleanup token. Unknown wait, missing frame,
+overflow, write/readback/fsync/cleanup or postclose original-seal failure
+keeps the original contexts/buffers held. The negative control explicitly
+states contexts are still retained until cleanup; it grants no admission.
+
+Precise comparison_relation is emitted only from genuine new-driver caller
+code/frame/receiver/operands plus the unchanged original failed comparison:
+main_fd_original_seal, main_named_original_seal or stdout_fd_named_pair.
+Only the fixed role and mismatching FIELD NAMES are projected, never paths,
+stamps, arbitrary exception text or a guessed actor. This does not identify
+the historical9FA relation or cause. Root now retains consumed PTY overflow
+blocks before refusal, latches further reads after failure, and refuses/
+retains unexpected prestart bytes instead of resetting them to empty.
+
+| Finding | Priority | Final software disposition and verification |
+| --- | --- | --- |
+| SI-BUILD-20261030-001 | P2 | Collector preservation/negative cleanup software corrected; operational proof remains pending. Historical9FA failure and its unavailable RAM are not repaired or relabelled successful. |
+| SI-BUILD-20261030-002 | P2 | Corrected: Root PTY slicing and prestart reset could discard consumed diagnostic bytes. Exact original FD/raw/block state now precedes refusal, with latched reads. Old read behavior reversal caused1 expected failure/104deselected/.58s. |
+| SI-BUILD-20261030-003 | P2 | Corrected before release: live fileno precondition could throw outside preservation's protected path and unwind original contexts. It now records the secondary exception/trace and holds. Outside-catch reversal caused1 expected failure/104deselected/.58s. |
+| SI-BUILD-20261030-004 | P3 | Corrected before release: an outside helper call could falsely claim a production comparison role. Genuine caller/frame/receiver/operand attribution is required; omission caused3 expected failures/102deselected/.48s. |
+| SI-BUILD-20261030-005 | P2 | Corrected before release: ordinary EOF can produce an empty negative tail or physical partial log, but positive protection rejected size0 and unnecessarily held forever. A separate strict negative-only protector admits actual empty binary evidence. Old positive-size check caused2 expected failures/103deselected/.48s. |
+| SI-BUILD-20261030-006 | P2 | Corrected: new query guard used immutable startup.REMOTE=F27 after actual origin advanced to4BE; a permissive fixture masked it. New query/root callers pass the explicit current remote, fixture accepts exactly HEAD/REMOTE, and the old-remote reversal caused1 expected failure/104deselected/.48s. Historical startup bytes/constants remain unchanged. |
+| SI-BUILD-20261030-007 | P3 | Corrected: the new resolver test reached genuine fcntl/resource imports before a Windows collection guard. Test-only importorskip now precedes that immutable runtime import; no Mac test is suppressed and no runtime registration changes. |
+
+Final partial-log seal omission produced2 expected failures/103deselected/
+.47s after context/reporter close mutation; restored checks passed2/.43s.
+All causal reversals were memory-only and restored. The initially suggested
+resource guard on the source-free seven-file chain was removed after peer
+verification showed it unnecessary; that draft never shipped. An initial
+small-cap fixture had not recomputed its explicit fabricated policy and was
+corrected test-only. These are not operational failures or market evidence.
+
+Main inspected the complete production/test diffs and ran seven relevant
+files:490passed/5.42s before final policy literal; after changing ONLY PENDING
+to its computed hash, the two directly changed test files passed161/1.92s.
+Author105/1.74s, production author independently105/1.59s and read-only peer
+161/1.88s are separately attributed. All used sanitized environments,
+OS-network-denied execution and no bytecode/cache; no complete lane/repository
+suite ran. Tests execute genuine original collector/wait paths, temporary
+files and private PTYs; APFS/device/native coordinator facts remain explicitly
+FABRICATED. They do not establish actual APFS closure or source readiness.
+
+Main registered policy, exact AST transitive closure7 including the package
+initializer, old-six committed-byte equality, nine source/test in-memory
+compiles, fixed-wrapper/body compile, literal stage/component/contract
+catalogues and whitespace checks passed. Actual-root canonical job3317bytes
+fits4096, inline wrapper1771bytes. Main's first ad-hoc AST checker omitted
+the package initializer and its first builder-size check assumed bytes
+instead of serializing the returned dictionary; both validation harnesses
+were corrected without changing production. Current local available storage
+measured71.93GiB; no cleanup was performed.
+
+SI-DEC-20261030-02 freezes ONE prospective source-free coordinate-proof after
+clean commit, exact matching tracking/actual origin4BE and verified absence
+of its fresh names/service. All authors and test sessions must be frozen
+during actual execution. Fixed NEW names:
+si-native-supervision-v2-v2-bootstrap,
+si-native-supervision-v2-v2-domain and
+com.openai.codex.short-interest-native-supervision-v2-v2.
+This is a separately versioned failure-path policy, not a restart or
+adoption of V2-v1 or any spent source claim.
+
+Policy38d4aa59c569e1de8cc77c456145f350cfa9c28b5db45365196b967ba98bb415;
+exact current seven-byte mapping
+b1f1d88f1d0985741b1646d6c3463d4718af05bab3f4869bd7730d4316b404fc.
+Final driver0e38d5caba183aa73d0fcc170f9c4b4d6b7b29447baedb8bf7e51cde82a3875c;
+test3eec71789df7713d831d9cbc57e4e0a8d8dc7d34d1357d92de58ecba8ccf90a6;
+resolver testa8dd2984daa1d63ab9784809ad21de3bab42de6e7724475f63c83aff5dd5026e.
+Peer reviewed pre-literal source4c9c19160c2af2b543bb31a0f000474106c335b850d4d7f08e2d096472e0e80e.
+The matching tracking ref was then advanced normally to the already-reviewed
+actual4BE through a lane-only fetch; no other ref or branch was synchronized.
+
+Unchanged bounds:300s whole positive proof,120s native command, original
+2s/two-line/5s collector, fresh5s negative-only preservation,128trace frames,
+65536bytes per private buffer file,4096control bytes and1024wire bytes.
+The8GiB virtual sparse APFS domain is proof storage capacity, NOT a source
+budget allocation. Old images, claims, all negatives and permanent exposure
+8START/16MiB stay untouched. No stop/signal/reset/retry/remount/detach/adoption
+of an old operation is authorized. Any unknown terminal or incomplete
+preservation remains a hold and cannot be published as success.
+
+Actual proof is PENDING. Require genuine original parent kernel0, inner
+wait0, original APFS/metadata/code/cleanup/postclose conjunction and no
+negative before any source-free closed type. A terminal2 is a negative
+diagnostic result only; preserving collector buffers does not prove all
+possible native-command diagnostics or arbitrary exception/RAM state were
+persisted. Durable Main receipt WRITING/READMISSION remains unavailable,
+SourceAUTH/capture stay blocked even if the proof succeeds, and no provider
+claim or backtest readiness follows. Count84005/4GiB and separate existing
+DAILY residual budget are unchanged. No actual outcomes/looks, alpha,
+permanent look IDs, QC/Safari, purchases or push occurred. Continue only
+from trustworthy actual closure and append its real result.
+
+Post-record Main active-record/import-boundary checks:38passed/.84s;
+final staged whitespace and append-only historical-prefix checks passed.

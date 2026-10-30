@@ -29,19 +29,20 @@ worker, native = old.worker, old.native
 ROOT, PARENT = old.ROOT, old.PARENT
 MODULE = "scripts.prove_short_interest_native_supervision"
 DRIVER = "scripts/prove_short_interest_native_supervision.py"
-BOOTSTRAP = "si-native-supervision-v2-v1-bootstrap"
-DOMAIN = "si-native-supervision-v2-v1-domain"
-LABEL = "com.openai.codex.short-interest-native-supervision-v2-v1"
-POLICY_SHA256 = "8e3ba4e2e3efb8d9724bc89485ab6017f830d22a0053455dd331b705698e0eb5"
+BOOTSTRAP = "si-native-supervision-v2-v2-bootstrap"
+DOMAIN = "si-native-supervision-v2-v2-domain"
+LABEL = "com.openai.codex.short-interest-native-supervision-v2-v2"
+POLICY_SHA256 = "38d4aa59c569e1de8cc77c456145f350cfa9c28b5db45365196b967ba98bb415"
 CODE_FILES = (*old.CODE_FILES, startup.DRIVER, DRIVER)
 MAXIMUM_SECONDS, COMMAND_SECONDS, VIRTUAL_BYTES = 300, 120, 8 * 1024 ** 3
 MAXIMUM_NATIVE_BYTES, MAXIMUM_CONTROL_BYTES, MAX_CONFIG, MAX_WIRE = 4194304, 4096, 4096, 1024
 RAW_ROLES = ("native.before.plist", "native.create.plist", "native.attach.plist", "native.initial.plist", "native.terminal.plist")
-PRIVATE_ROLES = ()
+PRIVATE_ROLES = ("child.failure.buffers.private.json", "child.remaining.pipe.private.bin", "child.partial.stdout.private.bin", "child.negative.closed.json")
+NEGATIVE_SECONDS, MAXIMUM_PRIVATE_BYTES, MAXIMUM_TRACE_FRAMES = 5, 65536, 128
 INVENTORY_ROLE, MARKER_ROLE = "metadata.inventory.private.json", "run.completed.provisional.json"
 CONTROL_ROLES = ("run.started.json", "stdout.jsonl", "child.exit.provisional.json", MARKER_ROLE, "run.refused.json")
-ROLES = RAW_ROLES + CONTROL_ROLES + (INVENTORY_ROLE,)
-POSITIVE_ROLES = set(ROLES) - {"run.refused.json"}
+ROLES = RAW_ROLES + CONTROL_ROLES + (INVENTORY_ROLE,) + PRIVATE_ROLES
+POSITIVE_ROLES = set(ROLES) - {"run.refused.json", *PRIVATE_ROLES}
 LAUNCHCTL = "/bin/launchctl"
 _COLLECT, _COLLECT_CODE = worker._collect, worker._collect.__code__
 _USED = False
@@ -51,6 +52,10 @@ _COMPONENTS = old._COMPONENTS | frozenset(("operation", "main_directory", "root_
 _CODES = old._CODES | startup._CODES | frozenset("supervision_unregistered supervision_arguments supervision_code supervision_factory supervision_changed supervision_wait supervision_kernel supervision_negative supervision_original supervision_unknown supervision_marker supervision_source_refused".split())
 _ERRNOS = {**old._ERRNOS, **startup._ERRNOS}
 _PRODUCERS, _CLOSED, _PREPARED, _HELD, _FAILURES, _ADVISORIES, _KERNEL_ORIGINS = {}, {}, {}, [], {}, {}, {}
+_COMPARISONS, _PRESERVATIONS, _NEGATIVE_CLOSURES, _NEGATIVE_WAITS = {}, {}, {}, {}
+_CAPTURED = []
+_PRIVATE_FAILURES = {}
+_COMPARISON_ROLES = frozenset(("main_fd_original_seal", "main_named_original_seal", "stdout_fd_named_pair"))
 _stamp, _same, _dir, _drain, _write, _close = old._stamp, old._same, old._dir, old._drain, old._write, old._close
 
 
@@ -71,6 +76,49 @@ def _component(value, ordinal=0):
     require(value in _COMPONENTS and type(ordinal) is int and 0 <= ordinal <= 32, "supervision_arguments"); _COMPONENT = value
 
 
+def _compared_stamp(actual, original, relation):
+    """Keep the original comparison; attribute only this exact failed call."""
+    require(relation in _COMPARISON_ROLES, "supervision_arguments")
+    try: _same(actual, original)
+    except BaseException as error:
+        trace = BaseException.__traceback__.__get__(error, BaseException); frame = None; genuine = False
+        for unused in range(MAXIMUM_TRACE_FRAMES):
+            if trace is None: break
+            if trace.tb_frame.f_code is _compared_stamp.__code__ and trace.tb_frame.f_globals is globals(): frame = trace.tb_frame
+            if trace.tb_frame.f_code is old._same.__code__ and trace.tb_frame.f_globals is old.__dict__: genuine = True
+            trace = trace.tb_next
+        caller = frame.f_back if frame is not None else None
+        if genuine and frame is not None and _comparison_site(caller, relation, actual, original):
+            fields = tuple(name for name, a, b in zip(old._STAMP_NAMES, actual, original) if a != b)
+            _COMPARISONS[id(error)] = error, relation, fields, frame, actual, original, caller
+        raise
+
+
+def _comparison_site(frame, relation, actual, original):
+    if (frame is None or frame.f_globals is not globals() or type(actual) is not tuple
+            or type(original) is not tuple or len(actual) != 9 or len(original) != 9): return False
+    local = frame.f_locals; instance = local.get("self")
+    if relation == "stdout_fd_named_pair":
+        return (frame.f_code is _Files.validate.__code__ and type(instance) is _Files
+            and local.get("name") == "stdout.jsonl" and local.get("row") is instance.originals.get("stdout.jsonl")
+            and local.get("row") is not None and local["row"][0] == local.get("fd")
+            and actual == _stamp(local["a"]) and original == _stamp(local["b"]))
+    return (type(instance) is _DomainVolume and original is instance.main_seal
+        and (relation == "main_fd_original_seal" and frame.f_code is _DomainVolume.check.__code__
+             or relation == "main_named_original_seal" and frame.f_code in (_DomainVolume.check.__code__, _DomainVolume.named.__code__)))
+
+
+def _comparison(error):
+    row = _COMPARISONS.get(id(error))
+    if type(row) is not tuple or len(row) != 7 or row[0] is not error: return None
+    frame = row[3]
+    if (frame.f_code is not _compared_stamp.__code__ or frame.f_globals is not globals()
+            or frame.f_locals.get("actual") is not row[4] or frame.f_locals.get("original") is not row[5]
+            or frame.f_locals.get("relation") != row[1] or row[1] not in _COMPARISON_ROLES
+            or not _comparison_site(row[6], row[1], row[4], row[5])): return None
+    return row
+
+
 def authority():
     return {"source_free_native_supervision_only": True, "source_admitted": False, "source_dispatch_authority": False,
         "budget_release_authority": False, "old_V1_admitted": False, "durable_Main_receipt": False,
@@ -79,11 +127,17 @@ def authority():
 
 
 def policy():
-    return {"schema": "si-native-supervision-v2-policy-v1", "root": str(ROOT), "bootstrap": BOOTSTRAP,
+    return {"schema": "si-native-supervision-v2-policy-v2", "root": str(ROOT), "bootstrap": BOOTSTRAP,
         "domain": DOMAIN, "label": LABEL, "code_files": list(CODE_FILES), "roles": list(ROLES),
         "virtual_bytes": VIRTUAL_BYTES, "maximum_seconds": MAXIMUM_SECONDS, "native_command_seconds": COMMAND_SECONDS,
         "config_bytes": MAX_CONFIG, "control_bytes": MAXIMUM_CONTROL_BYTES, "native_bytes": MAXIMUM_NATIVE_BYTES, "inventory_bytes": MAXIMUM_NATIVE_BYTES,
-        "worker_log_bytes": worker.MAXIMUM_LOG_BYTES, "private_buffer_bytes": 65536, "private_buffer_files": [], "wire_bytes": MAX_WIRE,
+        "worker_log_bytes": worker.MAXIMUM_LOG_BYTES, "private_buffer_bytes": MAXIMUM_PRIVATE_BYTES, "private_buffer_files": list(PRIVATE_ROLES), "wire_bytes": MAX_WIRE,
+        "negative_preservation": {"seconds": NEGATIVE_SECONDS, "trace_frames": MAXIMUM_TRACE_FRAMES,
+            "relation_roles": sorted(_COMPARISON_ROLES), "frame": "exact_original_collector_code_globals_process_namespace_logFD_all_present_output_pending_line_block",
+            "routing": "original_duplicate_reporter_FDs_only_no_positive_native_callback_no_rebaseline_no_retry_partial_names_immutable",
+            "wait": "original_handle_EOF_then_known_original_or_separate_negative_wait_receipt_never_mint_positive_wait_or_recover_success",
+            "closure": "all_consumed_bytes_retained_before_bounds_and_durably_preserved_original_seals_readback_fsync_cleanup_or_hold_all_contexts"},
+        "private_observer_overflow": "retain_exact_original_FD_raw_and_newly_consumed_block_before_refusal_never_slice_or_continue_consuming_after_failure",
         "volume": "fresh_original_creator_APFS_local_nobrowse_owner_writable_global_unique_no_shadow_no_retry_detach_remount_adoption",
         "evidence": "original_OEXCL0600_singlelink_full9_and_readback_all_contexts_and_postclose_named_audits_no_negative",
         "worker": "unchanged_genuine_two_second_two_line_proof_worker_collect_original_wait0_within5seconds",
@@ -115,9 +169,12 @@ def failure_summary(error):
     upstream = old.failure_summary(error)
     number = OSError.errno.__get__(error, OSError) if isinstance(error, OSError) else None
     number = number if type(number) is int else None
+    comparison = _comparison(error)
     detail = {"stage": _STAGE, "component": _COMPONENT, "contract_code": code,
         "upstream_contract_code": upstream["contract_code"] or upstream["upstream_contract_code"],
-        "errno_name": _ERRNOS.get(number) or upstream["errno_name"], "mismatching_fields": upstream["mismatching_fields"]}
+        "errno_name": _ERRNOS.get(number) or upstream["errno_name"],
+        "comparison_relation": comparison[1] if comparison is not None else None,
+        "mismatching_fields": list(comparison[2]) if comparison is not None else upstream["mismatching_fields"]}
     _FAILURES[id(error)] = error, canonical_json(detail); return detail
 
 
@@ -212,7 +269,9 @@ class _Files:
         a, b = os.fstat(fd), os.stat(name, dir_fd=self.fd, follow_symlinks=False)
         require(stat.S_ISREG(a.st_mode) and _stamp(a)[:6] == row[1]
             and a.st_uid == os.getuid() and stat.S_IMODE(a.st_mode) == 0o600 and a.st_nlink == 1
-            and a.st_size == size, "native_proof_protection"); _same(_stamp(a), _stamp(b))
+            and a.st_size == size, "native_proof_protection")
+        if name == "stdout.jsonl": _compared_stamp(_stamp(a), _stamp(b), "stdout_fd_named_pair")
+        else: _same(_stamp(a), _stamp(b))
     def seal(self, name, fd, stamp, raw):
         self.validate(fd, name, len(raw)); _same(_stamp(os.fstat(fd)), stamp)
         os.lseek(fd, 0, os.SEEK_SET)
@@ -516,7 +575,8 @@ class _DomainVolume:
         expected = ({".fseventsd"} if self.system is not None else set()) | {"main"} | ({"proof"} if hasattr(self, "proof_pin") else set())
         require(set(os.listdir(self.mount_fd)) == expected, "native_proof_membership")
         if self.system is not None: require(self._system() == self.system, "native_proof_protection")
-        _same(_stamp(os.fstat(self.main_fd)), self.main_seal); _same(_stamp((self.mount / "main").lstat()), self.main_seal)
+        _compared_stamp(_stamp(os.fstat(self.main_fd)), self.main_seal, "main_fd_original_seal")
+        _compared_stamp(_stamp((self.mount / "main").lstat()), self.main_seal, "main_named_original_seal")
         require(not os.listdir(self.main_fd), "native_proof_membership")
         if hasattr(self, "proof_pin"): require(_dir((self.mount / "proof").lstat(), True) == self.proof_pin, "native_proof_path")
     def outputs(self):
@@ -541,7 +601,8 @@ class _DomainVolume:
         require(set(os.listdir(self.mount)) == ({".fseventsd"} if self.system is not None else set()) | {"proof", "main"}
             and _dir((self.mount / "proof").lstat(), True) == self.proof_pin, "native_proof_membership")
         if self.system is not None: require(_stamp((self.mount / ".fseventsd").lstat())[:6] == self.system, "native_proof_protection")
-        _same(_stamp((self.mount / "main").lstat()), self.main_seal); require(not os.listdir(self.mount / "main"), "native_proof_membership")
+        _compared_stamp(_stamp((self.mount / "main").lstat()), self.main_seal, "main_named_original_seal")
+        require(not os.listdir(self.mount / "main"), "native_proof_membership")
     def close(self):
         first = None
         try: _drain(self.fds)
@@ -637,7 +698,7 @@ class _NegativeReporter:
     def __init__(self, outputs, volume):
         self.path, self.mount, self.domain = outputs.path, volume.mount, volume.path
         self.pins = (_dir(os.fstat(outputs.fd), True), _dir(os.fstat(volume.mount_fd), True), _dir(os.fstat(volume.directory.fd), True))
-        self.fds = []; self.used = False
+        self.fds = []; self.private_fds = []; self.originals = {}; self.attempted = set(); self.used = False
         try:
             for fd in (outputs.fd, volume.mount_fd, volume.directory.fd): self.fds.append(os.dup(fd))
             self.check()
@@ -650,17 +711,52 @@ class _NegativeReporter:
         for fd, path, pin in zip(self.fds, (self.path, self.mount, self.domain), self.pins):
             require(path.resolve() == path and _dir(os.fstat(fd), True) == _dir(path.lstat(), True) == pin, "supervision_original")
     def refuse(self, error):
-        require(not self.used, "supervision_negative"); self.used = True; self.check()
-        raw = canonical_json({"schema": "si-native-supervision-refusal-v1", "failure": failure_summary(error), "authority": authority()}).encode()
-        fd = os.open("run.refused.json", os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=self.fds[0]); primary = None
-        try:
-            os.fchmod(fd, 0o600); _write(fd, raw); os.fsync(fd); os.fsync(self.fds[0]); os.fsync(self.fds[1])
-            before = _protected(os.fstat(fd)); _same(_stamp(os.stat("run.refused.json", dir_fd=self.fds[0], follow_symlinks=False)), before)
-            os.lseek(fd, 0, os.SEEK_SET); require(os.read(fd, len(raw) + 1) == raw, "supervision_negative"); _same(_stamp(os.fstat(fd)), before)
-        except BaseException as error: primary = error; raise
-        finally: _close(fd, primary)
-        self.check(); _same(_stamp((self.path / "run.refused.json").lstat()), before)
-    def close(self): _drain(self.fds)
+        require(not self.used, "supervision_negative"); self.used = True
+        raw = canonical_json({"schema": "si-native-supervision-refusal-v2", "failure": failure_summary(error), "authority": authority()}).encode()
+        self.preserve("run.refused.json", raw)
+    def preserve(self, name, raw):
+        """Negative-only publication through surviving ORIGINAL duplicate anchors."""
+        require(name in (*PRIVATE_ROLES, "run.refused.json") and name not in self.attempted, "supervision_negative")
+        self.attempted.add(name)
+        limit = MAXIMUM_CONTROL_BYTES if name in ("run.refused.json", "child.negative.closed.json") else MAXIMUM_PRIVATE_BYTES
+        require(type(raw) is bytes and len(raw) <= limit, "supervision_negative")
+        self.check()
+        fd = os.open(name, os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=self.fds[0])
+        self.private_fds.append(fd)
+        os.fchmod(fd, 0o600); _write(fd, raw); os.fsync(fd)
+        for parent in self.fds: os.fsync(parent)
+        seal = _negative_file(os.fstat(fd), limit, empty=name in ("child.remaining.pipe.private.bin", "child.partial.stdout.private.bin"))
+        require(seal[6] == len(raw), "supervision_negative")
+        _same(_stamp(os.stat(name, dir_fd=self.fds[0], follow_symlinks=False)), seal)
+        os.lseek(fd, 0, os.SEEK_SET); require(os.read(fd, len(raw) + 1) == raw, "supervision_negative")
+        _same(_stamp(os.fstat(fd)), seal); self.check()
+        self.originals[name] = fd, seal, raw
+    def audit_preserved(self, *, named=False):
+        require(set(self.originals) == self.attempted, "supervision_negative")
+        if not named: self.check()
+        else:
+            for path, pin in zip((self.path, self.mount, self.domain), self.pins):
+                require(path.resolve() == path and _dir(path.lstat(), True) == pin, "supervision_original")
+        for name, (fd, seal, raw) in self.originals.items():
+            _same(_stamp((self.path / name).lstat()), seal)
+            if not named:
+                _same(_stamp(os.fstat(fd)), seal); os.lseek(fd, 0, os.SEEK_SET)
+                require(os.read(fd, len(raw) + 1) == raw, "supervision_negative"); _same(_stamp(os.fstat(fd)), seal)
+    def close(self):
+        first = None
+        try: _drain(self.private_fds)
+        except BaseException as error: first = error
+        try: _drain(self.fds)
+        except BaseException as error:
+            if first is None: first = error
+        if first is not None: raise first
+
+
+def _negative_file(info, maximum, *, empty=False):
+    """An observed empty negative binary is evidence, never a config default."""
+    require(stat.S_ISREG(info.st_mode) and info.st_uid == os.getuid() and stat.S_IMODE(info.st_mode) == 0o600
+        and info.st_nlink == 1 and (0 if empty else 1) <= info.st_size <= maximum, "supervision_negative")
+    return _stamp(info)
 
 
 class ProducerObservation:
@@ -684,12 +780,158 @@ class ClosedNativeSupervision:
         return json.loads(row[1])
 
 
+def _capture_collection_failure(error, process, origin, outputs, log_fd, reporter):
+    """Strong issuance precedes every diagnostic write or further consumed read."""
+    state = {"failure": error, "trace": BaseException.__traceback__.__get__(error, BaseException),
+        "process": process, "origin": origin, "outputs": outputs, "log_fd": log_fd, "reporter": reporter,
+        "frame": None, "buffers": {}, "tail": b"", "blocks": (), "partial_log": None,
+        "started": False, "capture_error": None, "preservation_error": None, "wait": None, "eof": False}
+    _CAPTURED.append(state)
+    try:
+        require(id(error) not in _PRESERVATIONS, "supervision_negative")
+        _PRESERVATIONS[id(error)] = error, state, object()
+        state["negative_begin"] = time.monotonic()
+        require(process is not None and type(origin) is tuple and origin[0] is process
+            and worker._CHILDREN.get(process) is origin and type(outputs) is _Files
+            and type(reporter) is _NegativeReporter, "supervision_original")
+        trace = state["trace"]; frames = []
+        for unused in range(MAXIMUM_TRACE_FRAMES):
+            if trace is None: break
+            if trace.tb_frame.f_code is _COLLECT_CODE and trace.tb_frame.f_globals is worker.__dict__: frames.append(trace.tb_frame)
+            trace = trace.tb_next
+        require(trace is None and len(frames) == 1, "supervision_original")
+        frame = frames[0]; state["frame"] = frame; local = frame.f_locals
+        require(local.get("process") is process and local.get("ns") is outputs and local.get("log_fd") == log_fd,
+            "supervision_original")
+        # Absent variables stay absent; an empty default would destroy evidence
+        # about where the original collector failed.
+        for name in ("output", "pending", "line", "block"):
+            if name in local: state["buffers"][name] = local[name]
+        require({"output", "pending"} <= set(state["buffers"])
+            and all(type(raw) is bytes for raw in state["buffers"].values()), "supervision_original")
+        state["stdout"] = process.stdout; state["pipe_fd"] = process.stdout.fileno()
+        state["wait_method"] = process.wait
+    except BaseException as secondary:
+        state["capture_error"] = secondary
+        state["capture_trace"] = BaseException.__traceback__.__get__(secondary, BaseException)
+    return state
+
+
+def _preservation_state(state):
+    if type(state) is not dict: return False
+    error = state.get("failure"); row = _PRESERVATIONS.get(id(error))
+    if type(row) is not tuple or row[0] is not error or row[1] is not state: return False
+    frame = state.get("frame")
+    if (state.get("capture_error") is not None or frame is None or frame.f_code is not _COLLECT_CODE
+            or frame.f_globals is not worker.__dict__): return False
+    local = frame.f_locals
+    return (local.get("process") is state["process"] and local.get("ns") is state["outputs"]
+        and local.get("log_fd") == state["log_fd"] and worker._CHILDREN.get(state["process"]) is state["origin"]
+        and state["process"].stdout is state["stdout"] and state["stdout"].fileno() == state["pipe_fd"]
+        and all(name in local and local[name] is raw and type(raw) is bytes for name, raw in state["buffers"].items())
+        and set(state["buffers"]) == {name for name in ("output", "pending", "line", "block") if name in local})
+
+
+def _preserve_collection_failure(state):
+    """An exact terminal negative can release contexts; uncertainty keeps them."""
+    if type(state) is not dict: return None
+    try:
+        require(not state.get("started"), "supervision_negative"); state["started"] = True
+        require(_preservation_state(state), "supervision_original")
+        process, outputs, reporter = state["process"], state["outputs"], state["reporter"]
+        require(sum(map(len, state["buffers"].values())) <= MAXIMUM_PRIVATE_BYTES, "supervision_negative")
+        raw = canonical_json({"schema": "si-native-collection-buffers-v2", "present": sorted(state["buffers"]),
+            "private_bytes_hex": {name: value.hex() for name, value in state["buffers"].items()}, "authority": authority()}).encode()
+        state["buffers_raw"] = raw
+        reporter.preserve("child.failure.buffers.private.json", raw)
+        begin = last = state["negative_begin"]
+        def remaining():
+            nonlocal last
+            now = time.monotonic()
+            require(type(now) in (int, float) and math.isfinite(now) and 0 <= begin <= last <= now
+                and now - begin < NEGATIVE_SECONDS, "supervision_unknown")
+            last = now; return NEGATIVE_SECONDS - (now - begin)
+        selector = worker.selectors.DefaultSelector(); state["selector"] = selector
+        os.set_blocking(state["pipe_fd"], False); selector.register(state["stdout"], worker.selectors.EVENT_READ)
+        while not state["eof"]:
+            require(_preservation_state(state), "supervision_original")
+            for key, unused in selector.select(min(0.1, remaining())):
+                require(key.fd == state["pipe_fd"], "supervision_original")
+                block = os.read(key.fd, 1024)
+                # Keep consumed bytes BEFORE bounds, encoding or publication.
+                state["blocks"] = (*state["blocks"], block); state["tail"] += block
+                require(type(block) is bytes and len(state["tail"]) <= MAXIMUM_PRIVATE_BYTES, "supervision_negative")
+                if not block: state["eof"] = True; break
+            remaining()
+        selector.close(); state["selector_closed"] = True
+        reporter.preserve("child.remaining.pipe.private.bin", state["tail"])
+        wait = worker._WAITS.get(process)
+        if not (type(wait) is tuple and len(wait) == 3 and wait[0] is state["origin"] and type(wait[1]) is int):
+            require(worker._CHILDREN.get(process) is state["origin"], "supervision_original")
+            status = state["wait_method"](timeout=remaining())
+            require(type(status) is int and worker._CHILDREN.get(process) is state["origin"], "supervision_wait")
+            wait = state["origin"], status, object()
+            _NEGATIVE_WAITS[process] = wait
+        state["wait"] = wait
+        row = outputs.originals.get("stdout.jsonl")
+        require(row is not None and row[0] == state["log_fd"], "supervision_original")
+        reporter.check()
+        before = _negative_file(os.fstat(state["log_fd"]), worker.MAXIMUM_LOG_BYTES, empty=True)
+        require(before[:6] == row[1], "supervision_original")
+        _same(_stamp(os.stat("stdout.jsonl", dir_fd=reporter.fds[0], follow_symlinks=False)), before)
+        os.fsync(state["log_fd"]); os.lseek(state["log_fd"], 0, os.SEEK_SET)
+        partial = os.read(state["log_fd"], worker.MAXIMUM_LOG_BYTES + 1); state["partial_log"] = partial
+        require(type(partial) is bytes and len(partial) == before[6], "supervision_original")
+        _same(_stamp(os.fstat(state["log_fd"])), before)
+        state["partial_stamp"] = before
+        reporter.preserve("child.partial.stdout.private.bin", partial)
+        require(_preservation_state(state) and state["eof"] and state["selector_closed"], "supervision_original")
+        evidence = [{"name": name, "bytes": len(row[2]), "sha256": hash_bytes(row[2]), "original_stamp": list(row[1])}
+            for name, row in sorted(reporter.originals.items())]
+        raw = canonical_json({"schema": "si-native-collection-negative-v2", "status": "all_original_collection_bytes_preserved_negative_only",
+            "actual_child_exit": wait[1], "collector_returned": False, "pipe_EOF": True, "present_buffers": sorted(state["buffers"]),
+            "context_closure": "original_contexts_still_retained_until_cleanup",
+            "controls": evidence, "original_failure": failure_summary(state["failure"]), "authority": authority()}).encode()
+        state["closure_raw"] = raw; reporter.preserve("child.negative.closed.json", raw)
+        remaining(); reporter.audit_preserved()
+        token = object(); _NEGATIVE_CLOSURES[token] = state, wait, reporter, tuple(sorted(reporter.originals)), object()
+        return token
+    except BaseException as secondary:
+        state["preservation_error"] = secondary
+        state["preservation_trace"] = BaseException.__traceback__.__get__(secondary, BaseException)
+        return None
+
+
+def _negative_closed(token, state):
+    row = _NEGATIVE_CLOSURES.get(token)
+    if (type(row) is not tuple or len(row) != 5 or row[0] is not state or not _preservation_state(state)
+            or row[1] is not state.get("wait") or row[2] is not state["reporter"]
+            or row[3] != tuple(sorted(state["reporter"].originals)) or not state.get("eof")): return False
+    wait = row[1]; process = state["process"]
+    require((worker._WAITS.get(process) is wait or _NEGATIVE_WAITS.get(process) is wait)
+        and wait[0] is state["origin"] and type(wait[1]) is int, "supervision_wait")
+    state["reporter"].audit_preserved(); _negative_snapshot_audit(state); return True
+
+
+def _negative_snapshot_audit(state, *, named=False):
+    """Compare the original partial-log seal; never seal/rebaseline it positive."""
+    partial, seal = state["partial_log"], state["partial_stamp"]
+    _same(_stamp((state["reporter"].path / "stdout.jsonl").lstat()), seal)
+    if not named:
+        fd = state["log_fd"]; _same(_stamp(os.fstat(fd)), seal); os.lseek(fd, 0, os.SEEK_SET)
+        require(os.read(fd, len(partial) + 1) == partial, "supervision_negative")
+        _same(_stamp(os.fstat(fd)), seal)
+
+
 def _hold(state):
     _HELD.append(state)
     while True:
-        if state.get("master") is not None:
+        if state.get("master") is not None and state.get("private_failure") is None and "private_error" not in state:
             try: state["raw"], unused = _read_private(state["master"], state["raw"])
-            except BaseException: pass
+            except BaseException as error:
+                state["private_failure"] = _private_failure(error, state["master"])
+                state["private_error"] = error
+                state["private_trace"] = BaseException.__traceback__.__get__(error, BaseException)
         time.sleep(0.1 if state.get("master") is not None else 30)
 
 
@@ -701,7 +943,8 @@ def run_registered(head, remote, digest, observer):
 
 def _produce(head, remote, digest, observer):
     clock = _Clock(); code = directory = config = volume = outputs = reporter = process = None
-    error = None; held = False; entered = returned = False; origin = wait = marker = None
+    error = None; held = False; entered = returned = False; origin = wait = marker = log_fd = None
+    failure_state = negative_token = None
     try:
         _phase("current_code"); _guard(head, remote); code = _Code7(head, remote, clock)
         _phase("bootstrap"); directory, config = _read_config(head, remote, digest, observer, code.manifest)
@@ -741,17 +984,33 @@ def _produce(head, remote, digest, observer):
         code.audit(); _guard(head, remote); volume.check(); config.audit(); code.close(); code.named()
         _phase("original_audit"); _audit_local(outputs); clock.check()
     except BaseException as failure:
-        error = failure; failure_summary(failure)
+        error = failure
+        if entered and not returned:
+            failure_state = _capture_collection_failure(failure, process, origin, outputs, log_fd, reporter)
+        else:
+            failure_state = {"process": process, "origin": origin, "failure": failure,
+                "trace": BaseException.__traceback__.__get__(failure, BaseException)}
+        failure_state.update({"code": code, "directory": directory, "config": config, "volume": volume,
+            "outputs": outputs, "reporter": reporter})
+        failure_summary(failure)
         if reporter is not None:
             try: reporter.refuse(failure)
-            except BaseException: pass
+            except BaseException as secondary:
+                failure_state["reporter_error"] = secondary
+                failure_state["reporter_trace"] = BaseException.__traceback__.__get__(secondary, BaseException)
         actual_wait = worker._WAITS.get(process) if process is not None else None
         unknown = process is not None and not (type(actual_wait) is tuple and len(actual_wait) == 3 and actual_wait[0] is origin and type(actual_wait[1]) is int)
-        if unknown or entered and not returned:
+        preserved = False
+        if entered and not returned:
+            negative_token = _preserve_collection_failure(failure_state)
+            if negative_token is not None:
+                try: preserved = _negative_closed(negative_token, failure_state)
+                except BaseException as secondary:
+                    failure_state["closure_error"] = secondary
+                    failure_state["closure_trace"] = BaseException.__traceback__.__get__(secondary, BaseException)
+        if (unknown or entered and not returned) and not preserved:
             held = True
-            state = {"process": process, "code": code, "directory": directory, "config": config, "volume": volume,
-                "outputs": outputs, "reporter": reporter, "origin": origin, "failure": failure, "trace": BaseException.__traceback__.__get__(failure, BaseException)}
-            try: _hold(state)
+            try: _hold(failure_state)
             except BaseException: raise failure
         # Known-negative paths continue through original reporter cleanup.
     finally:
@@ -764,7 +1023,12 @@ def _produce(head, remote, digest, observer):
                 try: close()
                 except BaseException as failure:
                     if first is None: first = failure; failure_summary(failure)
-            if first is not None and reporter is not None:
+                    if negative_token is not None:
+                        held = True; failure_state["cleanup_error"] = failure
+                        failure_state["cleanup_trace"] = BaseException.__traceback__.__get__(failure, BaseException)
+                        try: _hold(failure_state)
+                        except BaseException: raise error
+            if first is not None and reporter is not None and not reporter.used:
                 try: reporter.refuse(first)
                 except BaseException: pass
             if error is None and first is not None: error = first
@@ -780,8 +1044,18 @@ def _produce(head, remote, digest, observer):
                 try: reporter.refuse(failure)
                 except BaseException: pass
     if reporter is not None:
-        try: reporter.close()
+        try:
+            if negative_token is not None:
+                reporter.audit_preserved(); _negative_snapshot_audit(failure_state, named=True)
+            reporter.close()
+            if negative_token is not None:
+                reporter.audit_preserved(named=True); _negative_snapshot_audit(failure_state, named=True)
         except BaseException as failure:
+            if negative_token is not None:
+                failure_state["cleanup_error"] = failure
+                failure_state["cleanup_trace"] = BaseException.__traceback__.__get__(failure, BaseException)
+                try: _hold(failure_state)
+                except BaseException: raise error
             if terminal_error is None: terminal_error = failure; failure_summary(failure)
     if terminal_error is not None: raise terminal_error
     # Last original named seals follow reporter cleanup; no reopen/rebaseline.
@@ -815,12 +1089,13 @@ class _Observer:
 
 
 def _checked_failure(detail):
-    require(type(detail) is dict and set(detail) == {"stage", "component", "contract_code", "upstream_contract_code", "errno_name", "mismatching_fields"}
+    require(type(detail) is dict and set(detail) == {"stage", "component", "contract_code", "upstream_contract_code", "errno_name", "mismatching_fields", "comparison_relation"}
         and type(detail["stage"]) is str and detail["stage"] in _STAGES
         and type(detail["component"]) is str and detail["component"] in _COMPONENTS
         and (detail["contract_code"] is None or type(detail["contract_code"]) is str and detail["contract_code"] in _CODES)
         and (detail["upstream_contract_code"] is None or type(detail["upstream_contract_code"]) is str and detail["upstream_contract_code"] in old._CODES | worker._CODES | native._CODES)
         and (detail["errno_name"] is None or type(detail["errno_name"]) is str and detail["errno_name"] in set(_ERRNOS.values()) | set(native._ERRNOS.values()) | set(worker._ERRNOS.values()))
+        and (detail["comparison_relation"] is None or type(detail["comparison_relation"]) is str and detail["comparison_relation"] in _COMPARISON_ROLES)
         and type(detail["mismatching_fields"]) is list and len(detail["mismatching_fields"]) <= 9
         and all(type(value) is str and value in old._STAMP_NAMES for value in detail["mismatching_fields"]), "supervision_original")
     return json.loads(canonical_json(detail))
@@ -1160,8 +1435,8 @@ def _kernel_metadata(raw):
     return result
 
 
-def _query_service(head):
-    _guard(head, startup.REMOTE)
+def _query_service(head, remote):
+    _guard(head, remote)
     result = _launch_service("query")
     require(type(result) is subprocess.CompletedProcess and type(result.returncode) is int
         and type(result.args) is list and all(type(v) is str for v in result.args) and result.args == _service_arguments("query")
@@ -1197,18 +1472,47 @@ def _read_private(fd, raw):
     try: block = os.read(fd, 4096)
     except BlockingIOError: return raw, False
     if not block: return raw, True
-    return (raw + block)[:65536 + 4096], False
+    combined = raw + block
+    if len(combined) > 65536 + 4096:
+        error = SupervisionRefusal("REFUSED: supervision_unknown")
+        # The actual newly consumed block is strongly retained before raising.
+        _PRIVATE_FAILURES[id(error)] = error, fd, raw, block, combined, object()
+        raise error
+    return combined, False
+
+
+def _private_failure(error, fd):
+    row = _PRIVATE_FAILURES.get(id(error))
+    if type(row) is not tuple or len(row) != 6 or row[0] is not error or row[1] != fd: return None
+    trace = BaseException.__traceback__.__get__(error, BaseException)
+    for unused in range(MAXIMUM_TRACE_FRAMES):
+        if trace is None: break
+        frame = trace.tb_frame
+        if frame.f_code is _read_private.__code__ and frame.f_globals is globals():
+            local = frame.f_locals
+            if local.get("fd") == fd and local.get("raw") is row[2] and local.get("block") is row[3] and local.get("combined") is row[4]: return row
+        if frame.f_code is _drain_private.__code__ and frame.f_globals is globals():
+            local = frame.f_locals
+            if local.get("fd") == fd and local.get("original") is row[2] and local.get("raw") is row[4] and row[2] + row[3] == row[4]: return row
+        if frame.f_code is _coordinate.__code__ and frame.f_globals is globals():
+            local = frame.f_locals
+            if local.get("master") == fd and local.get("raw") is row[4] and row[2] == b"" and row[3] is row[4]: return row
+        trace = trace.tb_next
+    return None
 
 
 def _drain_private(fd, raw):
-    for unused in range(32):
-        raw, done = _read_private(fd, raw)
-        if done: return raw
-        try: block = os.read(fd, 4096)
-        except BlockingIOError: return raw
-        if not block: return raw
-        raw = (raw + block)[:65536 + 4096]
-    raise SupervisionRefusal("REFUSED: supervision_unknown")
+    original = raw
+    try:
+        for unused in range(64):
+            previous = raw; raw, done = _read_private(fd, raw)
+            if done: return raw
+            if raw is previous: return raw
+        raise SupervisionRefusal("REFUSED: supervision_unknown")
+    except BaseException as error:
+        if id(error) not in _PRIVATE_FAILURES:
+            _PRIVATE_FAILURES[id(error)] = error, fd, original, raw[len(original):], raw, object()
+        raise
 
 
 def coordinate_registered(head, remote):
@@ -1222,28 +1526,33 @@ def _coordinate(head, remote):
     scope = object(); receipt = None; public = None
     try:
         _phase("current_code"); _guard(head, remote); code = _Code7(head, remote, clock)
-        require(_query_service(head) is None, "supervision_kernel")
+        require(_query_service(head, remote) is None, "supervision_kernel")
         master, slave = os.openpty(); os.set_blocking(master, False)
         settings = startup.termios.tcgetattr(slave); settings[1] &= ~startup.termios.ONLCR; settings[3] &= ~startup.termios.ECHO
         startup.termios.tcsetattr(slave, startup.termios.TCSANOW, settings)
         observer = {"nonce": secrets.token_hex(16), "terminal": list(startup._tty_pin(slave)), "slave_path": os.ttyname(slave)}
         startup._tty_check(slave, observer)
         digest = prepare_bootstrap(head, remote, observer)["spec_sha256"]
-        _guard(head, remote); require(_query_service(head) is None, "supervision_kernel")
+        _guard(head, remote); require(_query_service(head, remote) is None, "supervision_kernel")
         _phase("root_load"); transaction = _LoadTransaction(head, remote, digest, observer)
         startup._tty_check(slave, observer); require(_launch_service("load").returncode == 0, "supervision_kernel"); loaded = True
         transaction.audit(); startup._tty_check(slave, observer); transaction.close(); load_witness = transaction; transaction = None
-        kernel = _query_service(head); _never_started(kernel)
-        raw = _drain_private(master, raw); _guard(head, remote)
+        kernel = _query_service(head, remote); _never_started(kernel)
+        raw = _drain_private(master, raw)
+        if raw:
+            error = SupervisionRefusal("REFUSED: supervision_unknown")
+            _PRIVATE_FAILURES[id(error)] = error, master, b"", raw, raw, object()
+            raise error
+        _guard(head, remote)
         config_directory, config = _read_config(head, remote, digest, observer, code.manifest)
-        kernel = _query_service(head); _never_started(kernel); raw = b""; startup._tty_check(slave, observer)
+        kernel = _query_service(head, remote); _never_started(kernel); startup._tty_check(slave, observer)
         start_attempt = True; kernel = None
         result = _launch_service("start"); require(result.returncode == 0 and re.fullmatch(rb"[1-9][0-9]{0,9}\n?", result.stdout), "supervision_kernel")
         producer_pid = int(result.stdout); require(producer_pid < 2 ** 31, "supervision_kernel"); started = True
         _phase("root_observation")
         for unused in range(300):
             raw, unused_eof = _read_private(master, raw)
-            kernel = None; kernel = _query_service(head)
+            kernel = None; kernel = _query_service(head, remote)
             require(kernel is not None and (kernel["pid"] is None or kernel["pid"] == producer_pid), "supervision_kernel")
             if _terminal(kernel): break
             clock.check(); time.sleep(1)
@@ -1267,9 +1576,11 @@ def _coordinate(head, remote):
             "marker_sha256": original_marker["sha256"], "durable_Main_receipt": False, "sourceAUTH_blocked": True, "authority": authority()}
     except BaseException as error:
         failure = error; failure_summary(error)
-        if start_attempt and not _terminal(kernel) or loaded and kernel is None:
+        private_failure = _private_failure(error, master)
+        if private_failure is not None or start_attempt and not _terminal(kernel) or loaded and kernel is None:
             state = {"master": master, "slave": slave, "code": code, "config_directory": config_directory, "config": config,
                 "transaction": transaction, "load_witness": load_witness, "root_read": root_read, "raw": raw, "failure": error,
+                "private_failure": private_failure,
                 "start_attempted": start_attempt, "start_PID_validated": started, "kernel": kernel, "scope": scope}
             master = slave = None; code = config_directory = config = transaction = root_read = None
             try: _hold(state)

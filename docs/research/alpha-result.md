@@ -7057,6 +7057,227 @@ separate look. No accepted comparison cell is added. Analyst322.13–322.14 own
 the exact evidence, limitations and handoff. This owner-authorized append changes
 no historical entry or other lane; immutable/PIT/master/paper/live flags stay false.
 
+### R-298 A12 actual runtime failure — 2026-10-25 UTC
+
+At clean `e3afe7efab1b3960b0fd883d1ce185bb30d35470`, new owner-authorized A12
+launched one exact plain-source job in existing project38364439, then observed
+Runtime Error after8 application dispatches. Parent19:04:31.087193Z..
+19:05:50.531763Z, actualexit2/stderr0/no bound; stdout2,361bytes SHA256
+`efa245a692a265a7db56d918be629d87500916ad3335fcef7e75caab2c9b5570`.
+Native output-only validator exited0 and authenticated FAILURE; outer retained2.
+Report2,232bytes SHA256
+`a56e8faed5bfa43e945c789e999b241523d7f9302cf43258affabecacd26c8e4`.
+Backtest `e5c358608fa75d62b3a26a1be26d301f`, exact name
+`ARV2 R298 NEWRULE SIX OFF 2021 OCT2026 R323 A12 9dde3978`.
+No aggregate reader or accepted result cell followed. Subsequent authenticated
+Safari error UI reports2021-02-22 09:31 execution_price_not_current_minute;
+exact missing/stale/fill-forward predicate and security remain unknown.
+Incidental partial failed-run UI statistics are not accepted performance.
+
+Book A12 exactly once: **326 ->327 shared /251 ->252 Analyst development /
+50 infrastructure unchanged /699 booked cells unchanged**. A11 is not rebooked.
+The owner directs continued verified diagnosis/fixes/Mia and waives Claude
+review until further notice. A12 remains spent; no unchanged retry or live
+clearance follows. Analyst323.6 owns the exact evidence and current diagnosis.
+This append leaves all historical entries and other lanes unchanged.
+
+### R-298 A13 access-stage refusal before write/compile/job — 2026-10-25 UTC
+
+At clean `433831fc50c16eb57d1c867a3a7df058b28ae144`, sole quote-diagnostic
+parent ran19:54:02.800469Z..19:54:13.746378Z, actualexit2/stderr0/no bound.
+Stdout637bytes SHA256
+`4c0f7b212706cd8903e5582908b38a285ac550e436aaacc081a51f97c0074f9a`.
+Native supplied-output validator exited0; outer retained the authenticated
+failure/actualexit2. Stageprepare,2application dispatch intents, codeunknown_exception,
+compile/launch/terminalnull. No mutation, lock, compile, capacity or new backtest
+followed. This does not prove which API/access predicate failed or two wire
+successes. A13 is spent; A12 remains the last actual failed strategy job.
+
+Book the A13 claim once: **327 ->328 shared /252 ->253 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No accepted result cell.
+This is attempt accounting, not an asserted runtime failure. A separately
+frozen read-only current-access diagnosis adds no new strategy look. Analyst
+323.10 owns the exact limitations and prospective boundary. No historical or
+other-lane entry is changed; all formal/PIT/paper/live flags remain false.
+
+### R-298 A14 finite quote diagnostic runtime refusal — 2026-10-25 UTC
+
+At clean `9eec227695f360a90e875340f70e6683a5b313f8`, sole diagnostic parent
+20:38:25.027866Z..20:39:57.548705Z exited2/stderr0/no bound. Stdout3,385bytes
+SHA256 `2b9ff847e2541ef71e90c82fe18a2ffafb1790da5aa6b2d643b4ce5a58ca140f`.
+Native supplied-output validator exited0 and authenticated FAILURE; outer2.
+Report3,256bytes SHA256
+`c8d14b163bc214f78ed912271035deac88bbb9e6bd1cd7583d7d502151ffd5fe`.
+Backtest `45ffd36c48e59adfbb212cfd3324dfeb`, exact name
+`ARV2 R298 QUOTE DIAGNOSTIC R323 A14`,33application dispatches. Runtime context:
+generic cached TradeBar not current, current TradeBar missing, current QuoteBar
+fresh/non-fill-forward; trade-price equality unknown. This is diagnostic
+context, not engine causality, historical cause or accepted performance.
+
+Book A14 once: **328 ->329 shared /253 ->254 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No completed result cell,
+repeat claim or old operational reader. The separate current-access metadata
+observation adds no strategy look. Analyst323.15 owns exact evidence and the
+prospective quote-aware correction boundary. All history/other lanes and all
+formal/PIT/paper/live false flags remain unchanged.
+
+### R-298 A15 pre-mutation idleness refusal — 2026-10-25 UTC
+
+At clean `5817aa42fdae6815d36c45e7723bdd1a1b764e53`, sole quote-aware A15 parent
+21:02:19.955187Z..21:02:32.195106Z exited2/stderr0/no bound. Stdout729bytes
+SHA256 `690b239757c3665c388088719c2d212f1c1ffa9dc158194972b421c433a02cab`.
+Native supplied-output validator exited0 and authenticated FAILURE; outer2.
+Exactaccess_idle, stageprepare,2application intents/2responses; compile/launch/
+terminalnull. No lock, file readback/update, compile, capacity or job occurred.
+This is NOT a runtime failure or evidence against the unexercised quote-aware
+candidate. A later scoped UI action stopped only R298's lingering code
+environment; new API clearance remains prospective. No other lane was changed.
+
+Book A15 claim once: **329 ->330 shared /254 ->255 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No accepted result cell.
+Analyst323.20 owns exact evidence, UI qualification and fresh-use boundary.
+A15 remains spent; all historical entries and false formal/PIT/paper/live
+flags are preserved. Continuing owner direction authorizes verified recovery,
+not an unchanged automatic retry or fabricated idle state.
+
+### R-298 A16 RAW-reference runtime failure and detail-bound refusal — 2026-10-25 UTC
+
+At clean `af789ea0284b4c18b3fa4bd629a53014363d569e`, A16 passed fresh source/
+access/input checks, updated the exact two files and launched quote-aware
+job `65a1d6698d182b11f2f4b60b7e31267b` in project38364439. Parent21:12:50.203259Z..
+21:16:22.909650Z, actualexit2/stderr0; stdout3,275bytes SHA256
+`f1611fb828bc0904a1551c056a80e48eba3d6a51f342c412bc01badf3092349d`.
+Native supplied-output validator exited0 and authenticated FAILURE; outer2.
+Runtime Error retained after35application dispatches. The one detail read
+refused the complete decoded body's canonical1MiB limit, not a measured wire
+size; no aggregate/result cell/report success pin was returned. Later exact
+Safari error UI identified2022-10-24 09:20 incomplete required RAW-close census.
+Missing security and cause remain unknown. Static Mia advice supplied no proven
+fix and changed no source; incidental failed performance is not accepted.
+
+Book A16 claim once: **330 ->331 shared /255 ->256 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No extra look for static
+Mia/UI or native output validation. A16/F remain spent; no old read/retry is
+revived. Analyst323.22 owns exact evidence and the prospective failure-only
+diagnostic boundary. Historical/other-lane entries and all false formal/PIT/
+paper/live flags are preserved.
+
+### R-298 A17 general-collaborator refusal before mutation/job — 2026-10-25 UTC
+
+At clean `52eb8956c5bbfe7b2f8e6f81402977b975b0c289`, sole A17 parent
+21:59:23.790868Z..21:59:36.075705Z exited2/stderr0/no bound. Stdout755bytes
+SHA256 `fbcb3c200ee9acac2bd4549e714ab60b5c181f0750c0495a65231cb66ea7710c`.
+Native supplied-output validator exited0 and authenticated FAILURE; outer2.
+Exactaccess_general_collaborators, stageprepare,2application intents/2responses;
+compile/launch/terminalnull. No lock, source readback/update, compile, capacity,
+job, failure-detail read or RAW diagnostic probe followed. A17/G remain spent.
+This is NOT a strategy runtime result. Later R298-only UI showed owner+A5+Mia,
+refused removal ofMia with Collaboration not found, restored owner's edit
+control and closed the editor; no source edit or strategy job was requested.
+Implicit editor build/save UI effects are qualified in Analyst323.25.
+
+Book A17 claim once: **331 ->332 shared /256 ->257 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No extra look for scoped
+UI or later read-only current access census. No accepted result cell or
+historical cause is fabricated. This owner-authorized R298 append preserves
+all earlier/other-lane entries and false formal/PIT/paper/live flags.
+
+### R-298 A18 held-stock RAW-reference diagnostic refusal — 2026-10-25 UTC
+
+At clean `ff7de3dd20ba7e20b94614d74e4780baf7634e84`, sole A18 parent
+22:25:44.425719Z..22:30:17.678830Z exited2/stderr0/no bound. Stdout3,981bytes
+SHA256 `b4e9403c4f6af53a8621a09fecb1e7d3306ea7c3ddd1290ea3db652e9051ac75`.
+Native supplied-output validator exited0 and authenticated FAILURE; outer2.
+Report3,852bytes SHA256
+`071515e58fd03478bf0b6ec21695c6767ba6e3bc09f7f91fa840981eb08552d2`.
+Fresh exact-view access/source/input/compile/capacity passed; one job
+`78ba7a236450cdeffea5efe07d087637`/ARV2 R298 RAW REFERENCE DIAGNOSTIC R323 A18
+ran in project38364439. Runtime Error after36application dispatches; the
+corrected selected reader retained requested48/returned47/missing1heldstock.
+One bounded probe returned4earlier-session bars and no exact-reference bar;
+no probe prices were used. Actual reference/decision dates and identity were
+not retained, so neither is fabricated from A16. No aggregate/performance cell.
+
+Book A18 once: **332 ->333 shared /257 ->258 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No extra look for probe,
+native validation or H's metadata observation. A18/I remain spent/frozen.
+Analyst323.30 owns exact evidence, limitations and private-identity diagnostic
+next action. Historical/other-lane entries and all false formal/PIT/paper/live
+flags remain unchanged; no new job, provider price query or fallback followed.
+
+### R-298 A19 Runtime Error; postterminal access refusal — 2026-10-25 UTC
+
+At clean `01def20b111b45e4d752257d87383ea99669d609`, sole A19 parent
+23:00:32.870978Z..23:04:03.368437Z exited2/stderr0/no bound. Stdout3,359bytes
+SHA256 `cd5c9cefc38841096e3c5aef0fd35a8c372d020b414ea4b0d29c66340d8b0236`.
+Native supplied-output validator exited0 and authenticated FAILURE; outer2.
+Fresh source/input/access/compile/capacity passed; one job
+`b850c8193949015bc59c41d0e1434229`/ARV2 R298 REFERENCE IDENTITY DIAGNOSTIC R323 A19
+ran in project38364439. QC list reported Runtime Error. Current access_idle
+then blocked the selected detail read BEFORE backtests/read;31application
+intents/31responses, lastprojects/collaboration/read. No witness/catalog join,
+known cause, accepted report/performance cell or new source-price fact.
+
+Book A19 once: **333 ->334 shared /258 ->259 Analyst development /
+50 infrastructure unchanged /699 cells unchanged**. No extra look for native
+validation or a later bounded read-only exact-job reconciliation. A19/J remain
+spent/frozen, never renewed. Analyst323.33 owns evidence and limitations.
+Historical/other-lane entries and all false formal/PIT/paper/live flags remain.
+
+### R-298 N no-order exact-identity feed-presence diagnostic — 2026-10-26 UTC
+
+At clean `86ba71fc5345a075534fa24676404dcabc649bc8`, sole N parent
+00:50:53.309564Z..00:52:07.725940Z exited0/stderr0/no bound. Stdout10,574bytes
+SHA256 `0e124b1712206dbc35a16d95769b21eb8971bab65039a65337307f4fc2a3ff2f`.
+Native supplied-output validator exited0/accepted bounded diagnostic only;
+report10,444bytes SHA256
+`7ae988dac8ac89195d2a7dc636df817e89374e54cd3574859bc571144650d1ac`.
+One no-order job `80f506bd3526e4d31a47b7eef5e1b3dc`, ARV2 R298 RAW FEED
+PRESENCE R323 N, compilee519bbfb97bd35211f963ea0bd2b5eb3-61ba015c3a74d972878ec774971a4144,
+project38364439, reached exact Completed.;47application dispatches and all
+source/access/input/postchecks passed. Both exact Oct21 typed RAW Daily and
+regular Minute queries returned0batches/0items for N's freshly resolved exact
+logical identity. No price/volume/cache field, order or strategy return was
+used/selected. Actual0 is diagnostic observation, NOT a performance cell.
+
+Book N ONCE: **334 ->335 shared /259 Analyst development unchanged /
+50 ->51 infrastructure /699 cells unchanged**. No extra look for M's offline
+original-row authentication, native workers/validator or public source audit.
+N is spent/frozen; other five comparison projects uncreated/unlaunched.
+Analyst323.45 records native-SID continuity/metadata/coverage qualifications;
+zero returned rows do not prove market absence, halt or historical cause.
+Owner R298-only append preserves all historical/other-lane entries and false
+formal/PIT/master/paper/live flags; no strategy-price fallback or efficacy claim.
+
+### R-298 R/P no-order native series/phase diagnostic — 2026-10-26 UTC
+
+At clean `f701a602885384130d4607756e17eaf8ef2be175`, sole R parent
+03:12:55.944302Z..03:14:10.871893Z exited0/stderr0/no bound. Stdout15,239bytes
+SHA256 `c31aaf6b7783b96278530a2a2bab7f64edcacaa470585bd33a4601592ba292a4`.
+Sole native supplied-output validator03:14:10.872488Z..03:14:14.507394Z
+exited0/accepted bounded diagnostic only. Report15,109bytes SHA256
+`54c6c1c5d872864e86e3d3ce8855f64b95e15e91d478ae82de66f7f6da5ee14c`.
+One job `fe0603a704d33cfce3d072947bcc56e0`, ARV2 R298 REFERENCE SERIES PHASE
+R323 P, compiled527e950e2a673b9c56c96b45a91ac91-f769ff859a5e3b6108b95e45bff62bf0,
+project38364439, reached exact Completed.;47application dispatches, physical
+request count unmeasured. All fresh original owner/A5-only source/access/input/
+postchecks passed. R is attempt2 of the same P scientific experiment: P's
+first attempt stopped pre-job, Q was metadata-only. No duplicate P look.
+
+Daily census returned valid October17,18,19,20,24 sessions but no October21.
+Exact October21 Minute enumeration was empty during Init and after a genuine
+market-clock bar. Native identity fingerprints matched within this job;
+historical master/PIT continuity and physical cause remain unproven. No price,
+order, ordinary outcome or strategy result cell was read/selected.
+
+Book R ONCE: **335 ->336 shared /259 Analyst development unchanged /
+51 ->52 infrastructure /699 cells unchanged**. No extra look for P/Q, three
+in-job History calls, native workers/validator or source audit. R/P/Q are spent;
+other five comparison projects remain uncreated/unlaunched. Analyst323.60
+owns exact evidence/qualifications; new S source eligibility is local-only
+and has not run. Owner-authorized R298 append preserves all historical/
+other-lane entries and false formal/PIT/master/paper/live flags.
+
 ## R-298 R323-named launches — seven unbooked backtests after the pushed tip (RETROACTIVELY RECONCILED FROM A QC CENSUS AT THE OWNER'S DIRECTION; NOT ADMISSIBLE) — 2026-10-26
 
 Written by the Claude review of section 323 on the Windows host, at the
@@ -7095,3 +7316,78 @@ that round's own entries book any of these seven identities again, the
 later push must reconcile against this entry by identity rather than add
 them a second time. No formal alpha, efficacy, paper/live, broker, funded or
 real-order claim follows.
+
+### R-298 same-lane merge reconciliation — 2026-10-26 (NO NEW LOOK)
+
+The owner explicitly approved a normal non-rewriting merge of the Mac recovery
+history and e57d785f review history. The preceding retrospective seven-job entry
+is retained as a historical census/accounting view, NOT seven additional looks.
+Its exact job identities are already each booked in A12/A14/A16/A18/A19/N/R
+above. Identity-set intersection is seven; union is seven, not fourteen. No
+historical entry or other lane is removed, rewritten or rebooked.
+
+The three additional Mac consumed claims A13(access-stage refusal), A15(idleness
+refusal) and A17(general-collaborator refusal) preceded write/compile/job. They
+are not missing launches or compile failures and remain counted once under the
+existing consumed-attempt convention. The combined ten consumed looks are eight
+development claims A12–A19 plus two infrastructure jobs N and R/P. Therefore
+**336 shared /259 Analyst development /52 infrastructure /699 cells unchanged**
+is the merged floor. Remote333/256/52/699 is its seven-launched-job subset,
+not a rollback of the three pre-job claims and not an additive new balance.
+
+Append-only wording qualification for the retained retrospective paragraph:
+its five development jobs were CONFIGURED for the2020-11-01..2026-10-13window,
+but stopped early in2021or2022. They did not complete that candidate period.
+The two completed one-day probes are not strategy performance cells. Mac323
+contains original per-run freezes/finite result evidence/waiver context;
+this merge neither rereads private receipts nor infers authority from names.
+No new QC/provider/result access, accepted cell, efficacy or formal/PIT/master/
+paper/live clearance follows. Analyst325 owns the counter-review and merge.
+
+## R-298 / Analyst326 AJ native-five source availability — 2026-10-27 (INFRASTRUCTURE ONLY)
+
+Owner-authorized parser/price recovery under the current review waiver used
+new owned project38522505, ARV2 R326 FIVE SOURCE RAW 20261027, to check the
+five predeclared original identity/RAW source assignments and retain their
+book inside QC. The no-order exception was frozen before execution. At
+4fd0d422, one normal Safari Backtest Project gesture produced short IDE build
+b0a1d7-58fd1d and actual backtestd366867e9ca3a657baea9beb9b660b41,
+Retrospective Fluorescent Pink kitten. UI engine2.5.0.0.18207 reported
+completion on the2026-10-14one-day algorithm window. The requested native
+source window is2020-12-31..2026-10-13, not a strategy evaluation period.
+All eight cloud code files177315bytes matched the frozen65cebf60 projection
+through controlled code-only downloads/one native readback before launch.
+
+Full selected custom metadata is still pending bounded authentication;
+completion/cache-prefix/flat engine metrics are not identity or price coverage,
+formal admission, a comparison result cell or an efficacy claim. No raw QC
+prices/book, order/return artifact or full result export was requested. One
+actual new source job is booked ONCE: **336->337 shared /259 Analyst development
+unchanged /52->53 infrastructure /699 cells unchanged**. Preparations, IDE
+automatic builds and result authentication are not additional looks. No
+historical/other-lane entry is changed or rebooked; no funded/broker/real-order/
+paper/live authority or formal/PIT/master readiness follows. Analyst326.26–28
+own the exact one-use protocol, current UI/source/rights qualifications and
+remaining source/coverage gates.
+
+## R-298 N as-is rerun — one unbooked one-day launch (RETROACTIVELY RECONCILED FROM A QC CENSUS; NOT ADMISSIBLE) — 2026-10-29
+
+Written by the Windows-host Claude review snapshot R333. A 2026-10-29
+administrative census (zero looks: `backtests/list` and one status-only
+`backtests/read` projection of name, status, progress, error text, creation
+time and engine window; no statistic, chart, order, log or return) of private
+project `ARV2 R298 NEWRULE SIX OFF 2021 OCT2026` (`38364439`) finds nine
+backtests. Eight are booked above (the owner's manual sample, A12, A14, A16,
+A18, A19, N and R/P). The ninth, `5633b9955d98a08fb503f3bd78cb7de5`, named
+`R298-N-asis-rerun-20221024-20261026`, reached `Completed.` with no error,
+was created 2026-10-26 18:10:44 UTC and ran the one-day engine window
+2022-10-25. It is in neither the lane record nor this ledger. Its name
+describes an as-is rerun of the N feed-presence probe, but no record section
+claims it, so who launched it and from what source is unknown; the lane read
+no result from it on this host. It is counted conservatively as one
+input-presence infrastructure look: **337 -> 338 shared looks / 259 Analyst
+development evaluations unchanged / 53 -> 54 infrastructure looks / 699
+authenticated cells unchanged**. If a later push books this identity again,
+it must reconcile against this entry by identity rather than add it a second
+time. No formal alpha, efficacy, paper/live, broker, funded or real-order
+claim follows.

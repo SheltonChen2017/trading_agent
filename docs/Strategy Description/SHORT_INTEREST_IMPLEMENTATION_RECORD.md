@@ -29123,3 +29123,182 @@ from trustworthy actual closure and append its real result.
 
 Post-record Main active-record/import-boundary checks:38passed/.84s;
 final staged whitespace and append-only historical-prefix checks passed.
+
+### 133.5 Actual V2-v2 early native-system refusal; creation telemetry gap
+
+After commit58d00461ac33a68adc0f2eeb895dff3c0ef08134, Main verified clean exact
+physical/Git roots/branch/HEAD, matching tracking/actual4BE, both fresh fixed
+names absent, exact new service absent113 and no old/new proof process active.
+All authors/tests were frozen. ONE registered coordinate-proof ran, exec74487.
+Actual Root exit2 and independently observed native kernel runs1/inactive/
+active0/no PID/exit2 establish a terminal NEGATIVE, not qualification. Target
+PID27689 is absent. No process was stopped, signalled or left in a hold.
+
+The genuine correlated producer failure is output_creation / native_system /
+own native_proof_protection, comparison_relation null, mismatching_fields[].
+The fixed domain contains its backing/mount; the APFS root contains .fseventsd
+and main, and proof is ABSENT. Therefore the failure occurred in the FIRST
+volume.outputs().check, before proof-directory creation, reporter creation,
+run.started, collector or worker launch. No positive marker, inventory,
+private creation-failure receipt or child-buffer closure exists. This is NOT
+evidence that the newly implemented collector-negative preservation failed:
+that path was never reached. It is also not a ctime_ns observation.
+
+Main protected stable read/close checks found original bootstrap spec1538bytes
+SHA4857739bfe908bb19859512f29ddee3ab3787e224c8c54b619178878798e5eb4
+and job3317bytes
+SHA6850617f22c736356e141d6936c68add3d84a80c8bc94a443576891e0f4ca0b9.
+These are bootstrap diagnostics, never proof of source or native closure.
+The failed image and every old namespace remain untouched; no remount,
+detach, reset, retry, adoption or new source claim occurred.
+
+Current read-only .fseventsd observations pass all five normative predicates:
+directory type, exact0700, root owner, group matching the mount and same
+device. That present state cannot reconstruct the failed instant. Code
+contains two possible refusal sites under the same component/contract:
+_system's ordered normative conjunction, or the exact returned first-six
+(dev,ino,uid,gid,mode,nlink) comparison with the ORIGINAL self.system tuple.
+The original tuple and failed observation were not durably captured before
+unwinding. Historical predicate, mismatching field and actor remain UNKNOWN.
+Do not attribute this to link count, permissions, a daemon, cloud software,
+the filesystem, Keychain or another agent by inference.
+
+SI-BUILD-20261030-008 (P2, open) is the verified creation-stage telemetry gap:
+the normal negative reporter is created AFTER outputs(), and constructor/
+early output failures can unwind before their original metadata and generated
+native command diagnostics have durable negative evidence. Current terminal
+status does not certify complete retention of those unexported diagnostics.
+No market rows, source credentials, HTTP, START, claim or outcome were accessed.
+
+SI-DEC-20261030-03 authorizes a bounded OFFLINE software correction under the
+standing owner instruction, not a new capture or filesystem-policy change.
+Seed a distinct negative-only carrier from original fresh APFS mount/domain
+anchors before the first system check. Strongly retain original creation
+instance/state, exact failed frames, original baseline/present observation
+and generated native command bytes BEFORE diagnostic I/O or cleanup.
+Only on failure, publish fixed exclusive private negative roles through those
+original anchors; no host status file, old image, adopted proof directory or
+positive result may supply them. Failed publication/seal/readback/fsync/
+deadline/cleanup holds every original byte/context, including no-child paths.
+
+Split diagnostics at the genuine predicate and original-six comparison while
+preserving every condition, order, short circuit, original operand and exact
+equality. Public projection is fixed relation/field names plus a nullable
+original private-failure-manifest SHA; raw metadata/paths/exception text stay
+private. The hash may be issued only by the exact original negative writer
+after its durability and original-context/postclose audits, and remains
+nonadmitting. No nlink exception, gid/permission relaxation, rebaseline or
+filesystem settings change is authorized by this implementation decision.
+
+Public Apple documentation was consulted about volume event logging, but no
+configuration was applied and no archived advice is assumed effective on
+current APFS. Implementation, genuine-path fabricated regressions, causal
+reversals and a separately frozen finite policy must precede any later actual
+invocation. Do not create another namespace merely to try again. The actual
+underlying custody repair, source release and pre-QC readiness remain unproven.
+The count84005/4GiB and separate existing DAILY residual envelopes, permanent
+8START/16MiB exposure and all original data/spent budgets remain unchanged.
+QC/Safari/purchases/pushes0 and actual looks0/0/exploratory0/alpha0 remain.
+
+### 133.6 Original creation-failure carrier and frozen V2-v3 diagnostic policy
+
+SI-DEC-20261030-03 is implemented in ONLY the existing lane-owned proof driver
+and its test. This repairs the verified evidence gap, not the unexplained
+historical filesystem event. Old native-six source bytes, old images and all
+source/custody predicates remain unchanged. No filesystem setting, daemon,
+ownership, permission or logging configuration was changed.
+
+An original creation state now exists before platform/directory side effects.
+It retains the exact volume instance, original producer operation/frame,
+native command plans/results/exception bytes, original system baseline and
+genuine observations before cleanup. After fresh APFS identity/owner/mode
+checks and BEFORE the first system check, an independent negative-only
+carrier duplicates the ORIGINAL mount/domain FDs. It creates NO file on a
+successful path; every positive membership/native/protection check remains.
+
+On failure only, fixed APFS-root roles preserve generated native outputs:
+creation.native.before/create/attach/initial/terminal.private.plist,
+plus creation.system.private.json, creation.failure.private.json and
+creation.failure.manifest.private.json. Native outputs are capped4MiB each,
+20MiB aggregate; each private JSON is capped65536bytes. These are LOCAL
+source-free diagnostics, not a provider-byte allocation. Missing or
+never-invoked outputs are not fabricated as empty. Exclusive0600 single-link
+creation, exact readback, original full9 seals, file/containing-directory
+fsync and final original named checks remain required. Failed/partial
+publication, unknown command result, timeout, over-cap byte buffer or cleanup
+retains all original state/bytes/FDs, including before a worker exists.
+
+Public error projection distinguishes the original five ordered system
+predicates and unchanged exact first-six comparison. Both existing mount
+fstat calls and short-circuit order are retained. Privately captured file_mode
+keeps directory-type evidence; public output contains only fixed relation/
+field names and a nullable SHA of the NEW original failure manifest.
+Original instance/error/frame/caller provenance is required; caller JSON,
+a copied error or a seven-file code-mapping hash cannot supply that witness.
+
+The manifest SHA is issued only after all original producer contexts and the
+carrier have closed successfully and original postclose seals pass. Its
+getter is PURE: no late filesystem callback can silently null a failed
+preservation check. Original cause fields remain cached at the failed stage;
+only a valid later original manifest witness augments the diagnostic.
+The fixed preimport wrapper and strict correlated observer schema include
+the nullable field and still fit the unchanged1024byte wire.
+
+| Finding | Priority | Software disposition and causal evidence |
+| --- | --- | --- |
+| SI-BUILD-20261030-008 | P2 | Corrected creation evidence gap: original state precedes effects; original APFS carrier precedes first system check; incomplete preservation holds. Seed omission caused3 expected failures/164deselected/.94s; restored3/.64s. Final named carrier-audit omission caused1 expected failure/166deselected/.99s. |
+| SI-BUILD-20261030-009 | P2 | Corrected before release: limiting creation preservation to process=None discarded newly generated terminal-native bytes after a genuine worker wait0. Every genuine volume failure now preserves those bytes or holds; old routing caused2 expected failures/165deselected/1.03s. |
+| SI-BUILD-20261030-010 | P2 | Corrected before release: registering a command before its precheck made never-invoked stdout look unknown. Exact original command/frame plans and independent immediately-before-dispatch receipts now distinguish NOT_INVOKED from missing/timeout output; no caller False flag can invent that fact. Treating NOT_INVOKED as unknown caused1 expected failure/166deselected/.99s. |
+| SI-BUILD-20261030-011 | P2 | Corrected before release: mutable instance/state fields could replace an original system baseline with current metadata. A separate original issuer tuple now prevents replacement/adoption and distinguishes known-absence None from failure before any baseline. Guard omission caused4 expected failures,2passes/161deselected/.99s. |
+| SI-BUILD-20261030-012 | P2 | Corrected before release: a trace catalogue containing only volume methods rejected genuine collector errors despite an original producer/volume operation binding. Exact original producer frame/error/volume/private operation provenance now permits BOTH negative preservations; omitted producer site caused3 expected failures/164deselected/1.12s. |
+
+All causal reversals were memory-only and restored; no original file was
+reverted or rewritten. An initial test guessed a trace literal as producer
+rather than the actual fixed original_producer; its three assertions were
+corrected after the behavior itself passed. Native/device/root-ownership
+facts in tests remain explicitly FABRICATED. The new fixture executes real
+DomainVolume constructor/check/output methods and temporary file/FD/PTY
+operations, instead of substituting the whole volume; this is still not an
+actual APFS proof.
+
+Main read production/test changes and ran seven relevant files:
+552passed/7.29s before the final policy literal. After changing ONLY PENDING
+to its computed hash, the two direct files passed223/3.81s. Test author
+167/3.37s, production author independently167/3.62s and independent peer
+223/3.94s are separately attributed. Sanitized environment, OS network
+denied, no bytecode/cache; no full lane/repository suite or new Claude review.
+Original-six byte equality, exact AST closure7 including package initializer,
+source/test/fixed-wrapper compile and literal contract/stage/component checks
+passed. Actual-root canonical job3349bytes<=4096; inline wrapper1803bytes.
+
+SI-DEC-20261030-04 freezes ONE prospective V2-v3 source-free coordinate-proof
+after clean commit and exact lane/tracking/actual4BE/name/service guards.
+It is a new version after a verified diagnostic correction, not a retry of
+V2-v2 or any spent source claim. Fixed fresh names:
+si-native-supervision-v2-v3-bootstrap,
+si-native-supervision-v2-v3-domain and
+com.openai.codex.short-interest-native-supervision-v2-v3.
+All authors/tests must remain frozen throughout actual execution.
+
+Policy6e6be3f2329c8131e9ee674b056a742cb8262defb336bed58f27845e24ec351a;
+exact current seven-byte mapping
+e81cd8ec613208715c1f8a07aec64183d20c2c43b9a892c3955e22993bfaa2f0;
+path-list SHA991cff6fb8e13a748068abbba0e38dae7aa0b072b0c78c19fd4385c3245c5f03.
+Final driver2cf7486087fd5273da797f26945333e62c551b0234f5639de839c9c78258b95d;
+testf1b6a4969da92a3ecf749561980453ba46116b7de241165fb92a2ca8411ea6fa.
+Peer reviewed pre-literal sourcedf6a3012036a56c841ac1be9cc127873dc637c0f17e83ea6a549fcf57ff28314.
+
+Actual V2-v3 is PENDING; V2-v2 and9FA negatives remain negative with their
+historical exact cause UNKNOWN. No inode/nlink exception, rebaseline,
+ownership/mode relaxation, old-namespace reuse, detach/remount/restart or
+source release follows. Require actual parent kernel0/worker0 and the full
+unchanged original conjunction for any source-free positive type; negative
+manifest preservation is never qualification. Durable Main receipt and
+SourceAUTH/capture remain unavailable even after such a proof. Count84005/
+4GiB, separate existing DAILY residual budget, permanent8START/16MiB and every
+old file/claim/debit remain intact. Source START/HTTP/key/newclaims0, actual
+looks0/0/exploratory0/alpha0, permanentlookIDsnone, QC/Safari/purchases/pushes0.
+
+Post-record Main active-record/import-boundary checks:38passed/1.27s;
+original58D record prefix, final source/test hashes and staged whitespace
+checks passed. No actual V2-v3 invocation preceded this registration.

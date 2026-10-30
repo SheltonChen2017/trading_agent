@@ -18,6 +18,7 @@ import secrets
 import socket
 import stat
 import subprocess
+import sys
 import time
 import zlib
 
@@ -29,10 +30,10 @@ worker, native = old.worker, old.native
 ROOT, PARENT = old.ROOT, old.PARENT
 MODULE = "scripts.prove_short_interest_native_supervision"
 DRIVER = "scripts/prove_short_interest_native_supervision.py"
-BOOTSTRAP = "si-native-supervision-v2-v2-bootstrap"
-DOMAIN = "si-native-supervision-v2-v2-domain"
-LABEL = "com.openai.codex.short-interest-native-supervision-v2-v2"
-POLICY_SHA256 = "38d4aa59c569e1de8cc77c456145f350cfa9c28b5db45365196b967ba98bb415"
+BOOTSTRAP = "si-native-supervision-v2-v3-bootstrap"
+DOMAIN = "si-native-supervision-v2-v3-domain"
+LABEL = "com.openai.codex.short-interest-native-supervision-v2-v3"
+POLICY_SHA256 = "6e6be3f2329c8131e9ee674b056a742cb8262defb336bed58f27845e24ec351a"
 CODE_FILES = (*old.CODE_FILES, startup.DRIVER, DRIVER)
 MAXIMUM_SECONDS, COMMAND_SECONDS, VIRTUAL_BYTES = 300, 120, 8 * 1024 ** 3
 MAXIMUM_NATIVE_BYTES, MAXIMUM_CONTROL_BYTES, MAX_CONFIG, MAX_WIRE = 4194304, 4096, 4096, 1024
@@ -55,7 +56,19 @@ _PRODUCERS, _CLOSED, _PREPARED, _HELD, _FAILURES, _ADVISORIES, _KERNEL_ORIGINS =
 _COMPARISONS, _PRESERVATIONS, _NEGATIVE_CLOSURES, _NEGATIVE_WAITS = {}, {}, {}, {}
 _CAPTURED = []
 _PRIVATE_FAILURES = {}
-_COMPARISON_ROLES = frozenset(("main_fd_original_seal", "main_named_original_seal", "stdout_fd_named_pair"))
+_STAMP_COMPARISON_ROLES = frozenset(("main_fd_original_seal", "main_named_original_seal", "stdout_fd_named_pair"))
+_SYSTEM_PREDICATES = {"system_directory_type": "mode", "system_directory_mode": "mode", "system_directory_uid": "uid",
+    "system_directory_gid": "gid", "system_directory_dev": "dev"}
+_SYSTEM_COMPARISONS = frozenset(("system_original_metadata", "system_named_original_metadata"))
+_COMPARISON_ROLES = _STAMP_COMPARISON_ROLES | _SYSTEM_COMPARISONS | frozenset(_SYSTEM_PREDICATES)
+_CREATION_STATES, _CREATION_FAILURES, _CREATION_MANIFESTS, _SYSTEM_FAILURES, _PRODUCTION_SCOPES = {}, {}, {}, {}, {}
+_NATIVE_PLANS, _NATIVE_INVOCATIONS = {}, {}
+_SYSTEM_BASELINES = {}
+CREATION_NATIVE_ROLES = tuple("creation.native." + role + ".private.plist" for role in ("before", "create", "attach", "initial", "terminal"))
+CREATION_SYSTEM_ROLE = "creation.system.private.json"
+CREATION_FAILURE_ROLE = "creation.failure.private.json"
+CREATION_MANIFEST_ROLE = "creation.failure.manifest.private.json"
+CREATION_ROLES = CREATION_NATIVE_ROLES + (CREATION_SYSTEM_ROLE, CREATION_FAILURE_ROLE, CREATION_MANIFEST_ROLE)
 _stamp, _same, _dir, _drain, _write, _close = old._stamp, old._same, old._dir, old._drain, old._write, old._close
 
 
@@ -78,7 +91,7 @@ def _component(value, ordinal=0):
 
 def _compared_stamp(actual, original, relation):
     """Keep the original comparison; attribute only this exact failed call."""
-    require(relation in _COMPARISON_ROLES, "supervision_arguments")
+    require(relation in _STAMP_COMPARISON_ROLES, "supervision_arguments")
     try: _same(actual, original)
     except BaseException as error:
         trace = BaseException.__traceback__.__get__(error, BaseException); frame = None; genuine = False
@@ -127,7 +140,7 @@ def authority():
 
 
 def policy():
-    return {"schema": "si-native-supervision-v2-policy-v2", "root": str(ROOT), "bootstrap": BOOTSTRAP,
+    return {"schema": "si-native-supervision-v2-policy-v3", "root": str(ROOT), "bootstrap": BOOTSTRAP,
         "domain": DOMAIN, "label": LABEL, "code_files": list(CODE_FILES), "roles": list(ROLES),
         "virtual_bytes": VIRTUAL_BYTES, "maximum_seconds": MAXIMUM_SECONDS, "native_command_seconds": COMMAND_SECONDS,
         "config_bytes": MAX_CONFIG, "control_bytes": MAXIMUM_CONTROL_BYTES, "native_bytes": MAXIMUM_NATIVE_BYTES, "inventory_bytes": MAXIMUM_NATIVE_BYTES,
@@ -138,6 +151,13 @@ def policy():
             "wait": "original_handle_EOF_then_known_original_or_separate_negative_wait_receipt_never_mint_positive_wait_or_recover_success",
             "closure": "all_consumed_bytes_retained_before_bounds_and_durably_preserved_original_seals_readback_fsync_cleanup_or_hold_all_contexts"},
         "private_observer_overflow": "retain_exact_original_FD_raw_and_newly_consumed_block_before_refusal_never_slice_or_continue_consuming_after_failure",
+        "creation_failure": {"roles": list(CREATION_ROLES), "native_each_bytes": MAXIMUM_NATIVE_BYTES,
+            "native_total_bytes": len(CREATION_NATIVE_ROLES) * MAXIMUM_NATIVE_BYTES, "private_JSON_each_bytes": MAXIMUM_PRIVATE_BYTES,
+            "routing": "original_APFS_mount_domain_anchors_seeded_after_owner_mode_before_first_system_no_proof_directory_or_host_status_adoption",
+            "failure": "capture_original_instance_error_trace_native_results_and_system_baseline_observations_before_cleanup_then_exclusive_private_full9_readback_fsync_or_hold_all",
+            "wire": "nullable_original_manifest_SHA_only_after_all_negative_context_cleanup_and_original_postclose_seals_no_baseline_values",
+            "native_invocation": "original_command_frame_plan_and_independent_before_dispatch_issuer_distinguish_recorded_not_invoked_from_unknown_stdout_no_empty_default",
+            "positive": "unchanged_root_membership_system_protection_six_field_original_equality_any_negative_root_role_permanently_vetoes"},
         "volume": "fresh_original_creator_APFS_local_nobrowse_owner_writable_global_unique_no_shadow_no_retry_detach_remount_adoption",
         "evidence": "original_OEXCL0600_singlelink_full9_and_readback_all_contexts_and_postclose_named_audits_no_negative",
         "worker": "unchanged_genuine_two_second_two_line_proof_worker_collect_original_wait0_within5seconds",
@@ -160,7 +180,8 @@ def registered():
 
 def failure_summary(error):
     previous = _FAILURES.get(id(error))
-    if previous is not None and previous[0] is error: return json.loads(previous[1])
+    if previous is not None and previous[0] is error:
+        detail = json.loads(previous[1]); detail["creation_manifest_sha256"] = _creation_manifest(error); return detail
     code = None
     if type(error) is SupervisionRefusal:
         args = BaseException.args.__get__(error, BaseException)
@@ -169,12 +190,13 @@ def failure_summary(error):
     upstream = old.failure_summary(error)
     number = OSError.errno.__get__(error, OSError) if isinstance(error, OSError) else None
     number = number if type(number) is int else None
-    comparison = _comparison(error)
+    comparison = _comparison(error); system = _system_failure(error)
     detail = {"stage": _STAGE, "component": _COMPONENT, "contract_code": code,
         "upstream_contract_code": upstream["contract_code"] or upstream["upstream_contract_code"],
         "errno_name": _ERRNOS.get(number) or upstream["errno_name"],
-        "comparison_relation": comparison[1] if comparison is not None else None,
-        "mismatching_fields": list(comparison[2]) if comparison is not None else upstream["mismatching_fields"]}
+        "comparison_relation": system[1] if system is not None else comparison[1] if comparison is not None else None,
+        "mismatching_fields": list(system[2]) if system is not None else list(comparison[2]) if comparison is not None else upstream["mismatching_fields"],
+        "creation_manifest_sha256": _creation_manifest(error)}
     _FAILURES[id(error)] = error, canonical_json(detail); return detail
 
 
@@ -420,16 +442,256 @@ def _config_write(directory, name, raw):
     return pin
 
 
+def _production_origin(clock):
+    scope = getattr(clock, "production_scope", None); row = _PRODUCTION_SCOPES.get(scope)
+    if type(row) is not tuple or len(row) != 8 or row[0] is not scope or row[2] is not clock: return None
+    frame = row[1]; local = frame.f_locals
+    if (frame.f_code is not _produce.__code__ or frame.f_globals is not globals() or local.get("scope") is not scope
+            or local.get("clock") is not clock or tuple(local.get(name) for name in ("head", "remote", "digest")) != row[3:6]
+            or local.get("observer") is not row[6]): return None
+    return row
+
+
+def _capture_creation_failure(volume, error):
+    state = _CREATION_STATES.get(volume)
+    if type(state) is not dict or state.get("volume") is not volume: return None
+    caller = sys._getframe(1); local = caller.f_locals
+    genuine = caller.f_globals is globals() and (
+        caller.f_code is _DomainVolume.__init__.__code__ and local.get("self") is volume and local.get("error") is error
+        or caller.f_code is _produce.__code__ and local.get("volume") is volume and local.get("failure") is error
+            and _production_origin(state["clock"]) is state["operation"] and state["operation"] is not None)
+    if not genuine: return None
+    if state["failure"] is None:
+        # Keep the exact first exception and traceback BEFORE cleanup/report I/O.
+        state["failure"], state["trace"] = error, BaseException.__traceback__.__get__(error, BaseException)
+        _CREATION_FAILURES[id(error)] = error, state, object()
+    return state if state["failure"] is error else None
+
+
+def _system_require(instance, condition, relation, observation):
+    try: require(condition, "native_proof_protection")
+    except BaseException as error:
+        frame = sys._getframe(1); state = _CREATION_STATES.get(instance)
+        if (relation in _SYSTEM_PREDICATES and frame.f_code is _DomainVolume._system.__code__
+                and frame.f_globals is globals() and frame.f_locals.get("self") is instance
+                and type(state) is dict and state["volume"] is instance
+                and any(item is observation for item in state["system_observations"]) and frame.f_locals.get("observation") is observation):
+            _SYSTEM_FAILURES[id(error)] = error, relation, (_SYSTEM_PREDICATES[relation],), instance, frame, observation, object()
+        raise
+
+
+def _compared_system(instance, actual, original, relation):
+    require(original is _system_baseline(instance), "supervision_original")
+    try: require(actual == original, "native_proof_protection")
+    except BaseException as error:
+        frame = sys._getframe(1); state = _CREATION_STATES.get(instance)
+        expected_code = _DomainVolume.check.__code__ if relation == "system_original_metadata" else _DomainVolume.named.__code__
+        if (relation in _SYSTEM_COMPARISONS and frame.f_code is expected_code and frame.f_globals is globals()
+                and frame.f_locals.get("self") is instance and type(state) is dict and state["volume"] is instance
+                and original is instance.system is state["system_baseline"]
+                and type(actual) is tuple and type(original) is tuple and len(actual) == len(original) == 6):
+            fields = tuple(name for name, a, b in zip(old._STAMP_NAMES[:6], actual, original) if a != b)
+            observation = {"relation": relation, "actual": actual, "original": original}
+            state["system_observations"].append(observation)
+            _SYSTEM_FAILURES[id(error)] = error, relation, fields, instance, frame, observation, object()
+        raise
+
+
+def _system_failure(error):
+    row = _SYSTEM_FAILURES.get(id(error))
+    if type(row) is not tuple or len(row) != 7 or row[0] is not error: return None
+    relation, instance, frame, observation = row[1], row[3], row[4], row[5]
+    state = _CREATION_STATES.get(instance)
+    if (type(instance) is not _DomainVolume or type(state) is not dict or state["volume"] is not instance
+            or frame.f_globals is not globals() or frame.f_locals.get("self") is not instance
+            or not any(item is observation for item in state["system_observations"])): return None
+    if relation in _SYSTEM_PREDICATES:
+        if frame.f_code is not _DomainVolume._system.__code__ or frame.f_locals.get("observation") is not observation: return None
+    elif relation in _SYSTEM_COMPARISONS:
+        code = _DomainVolume.check.__code__ if relation == "system_original_metadata" else _DomainVolume.named.__code__
+        if frame.f_code is not code or observation["original"] is not state["system_baseline"]: return None
+    else: return None
+    return row
+
+
+def _system_baseline(instance):
+    row = _SYSTEM_BASELINES.get(instance); state = _CREATION_STATES.get(instance)
+    require(type(row) is tuple and len(row) == 3 and row[0] is instance and type(state) is dict
+        and state["volume"] is instance and instance.system is row[1] and state["system_baseline"] is row[1], "supervision_original")
+    return row[1]
+
+
+class _CreationCarrier:
+    """Failure-only records on this invocation's original APFS root anchors."""
+    def __init__(self, volume, state):
+        self.state, self.volume = state, volume; state["carrier"] = self
+        self.path, self.domain = volume.mount, volume.path
+        self.fds, self.file_fds, self.originals, self.attempted = [], [], {}, set()
+        self.closed = self.started = False
+        self.pins = (_dir(os.fstat(volume.mount_fd), True), _dir(os.fstat(volume.directory.fd), True))
+        for fd in (volume.mount_fd, volume.directory.fd): self.fds.append(os.dup(fd))
+        self.check()
+    def check(self):
+        require(not self.closed and len(self.fds) == 2 and _CREATION_STATES.get(self.volume) is self.state
+            and self.state["carrier"] is self, "supervision_original")
+        for fd, path, pin in zip(self.fds, (self.path, self.domain), self.pins):
+            require(path.resolve() == path and _dir(os.fstat(fd), True) == _dir(path.lstat(), True) == pin, "supervision_original")
+        require(set(os.listdir(self.fds[0])) <= {".fseventsd", "main", "proof", *CREATION_ROLES}, "supervision_negative")
+    def publish(self, name, raw):
+        require(name in CREATION_ROLES and name not in self.attempted, "supervision_negative")
+        self.attempted.add(name)
+        limit = MAXIMUM_NATIVE_BYTES if name in CREATION_NATIVE_ROLES else MAXIMUM_PRIVATE_BYTES
+        require(type(raw) is bytes and len(raw) <= limit, "supervision_negative"); self.check()
+        fd = os.open(name, os.O_RDWR | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=self.fds[0]); self.file_fds.append(fd)
+        os.fchmod(fd, 0o600); _write(fd, raw); os.fsync(fd)
+        for parent in self.fds: os.fsync(parent)
+        seal = _negative_file(os.fstat(fd), limit, empty=name in CREATION_NATIVE_ROLES)
+        require(seal[6] == len(raw), "supervision_negative")
+        _same(_stamp(os.stat(name, dir_fd=self.fds[0], follow_symlinks=False)), seal)
+        os.lseek(fd, 0, os.SEEK_SET); require(os.read(fd, len(raw) + 1) == raw, "supervision_negative")
+        _same(_stamp(os.fstat(fd)), seal); self.originals[name] = fd, seal, raw; self.check()
+    def audit(self, *, named=False):
+        require(set(self.originals) == self.attempted, "supervision_negative")
+        if not named: self.check()
+        else:
+            for path, pin in zip((self.path, self.domain), self.pins):
+                require(path.resolve() == path and _dir(path.lstat(), True) == pin, "supervision_original")
+        for name, (fd, seal, raw) in self.originals.items():
+            _same(_stamp((self.path / name).lstat()), seal)
+            if not named:
+                _same(_stamp(os.fstat(fd)), seal); os.lseek(fd, 0, os.SEEK_SET)
+                require(os.read(fd, len(raw) + 1) == raw, "supervision_negative"); _same(_stamp(os.fstat(fd)), seal)
+    def preserve(self, error):
+        require(not self.started, "supervision_negative"); self.started = True
+        state = self.state; row = _CREATION_FAILURES.get(id(error))
+        require(type(row) is tuple and row[0] is error and row[1] is state and state["failure"] is error, "supervision_original")
+        begin = time.monotonic(); state["preserve_begin"] = begin
+        def deadline():
+            now = time.monotonic()
+            require(type(now) in (int, float) and math.isfinite(now) and 0 <= begin <= now
+                and now - begin <= NEGATIVE_SECONDS, "supervision_unknown")
+        total = 0; complete = True; invocations = []
+        for role, command in state["commands"].items():
+            attempted = _native_invocation(self.volume, role, command)
+            invocations.append({"role": role, "invocation_attempted": attempted})
+            if not attempted: continue
+            raw = command["stdout"]
+            if type(raw) is not bytes: complete = False; continue
+            total += len(raw); require(total <= len(CREATION_NATIVE_ROLES) * MAXIMUM_NATIVE_BYTES, "supervision_negative")
+            self.publish("creation.native." + role + ".private.plist", raw); deadline()
+            if not command["known_terminal"] or command["stderr"] not in (None, b""): complete = False
+        system = {"schema": "si-native-creation-system-v1", "original_baseline": state["system_baseline"],
+            "baseline_established": self.volume in _SYSTEM_BASELINES,
+            "present_observations": state["system_observations"], "authority": authority()}
+        self.publish(CREATION_SYSTEM_ROLE, canonical_json(system).encode()); deadline()
+        sites, trace = [], state["trace"]
+        methods = {method.__code__: name for name, method in (("creation", _DomainVolume.__init__), ("native_command", _DomainVolume.command),
+            ("system", _DomainVolume._system), ("native_check", _DomainVolume.check), ("output_creation", _DomainVolume.outputs), ("named_check", _DomainVolume.named))}
+        for unused in range(MAXIMUM_TRACE_FRAMES):
+            if trace is None: break
+            frame = trace.tb_frame
+            if frame.f_globals is globals() and frame.f_code in methods and frame.f_locals.get("self") is self.volume:
+                sites.append({"site": methods[frame.f_code], "code_bytes_sha256": hash_bytes(frame.f_code.co_code), "line": trace.tb_lineno})
+            elif (frame.f_globals is globals() and frame.f_code is _produce.__code__ and frame.f_locals.get("volume") is self.volume
+                    and frame.f_locals.get("failure") is error and state["operation"] is not None
+                    and frame.f_locals.get("scope") is state["operation"][0]
+                    and _production_origin(state["clock"]) is state["operation"]):
+                sites.append({"site": "original_producer", "code_bytes_sha256": hash_bytes(frame.f_code.co_code), "line": trace.tb_lineno})
+            trace = trace.tb_next
+        operation = state["operation"]
+        require(operation is None or _production_origin(state["clock"]) is operation, "supervision_original")
+        binding = None if operation is None else {"runtime_head": operation[3], "actual_remote": operation[4], "spec_sha256": operation[5],
+            "nonce": operation[6]["nonce"], "producer_pid": os.getpid(), "policy_sha256": POLICY_SHA256}
+        failure = {"schema": "si-native-creation-failure-v1", "failure": failure_summary(error), "original_own_trace_sites": sites,
+            "native_roles_present": list(state["commands"]), "operation_origin_bound": state["operation"] is not None,
+            "native_invocations": invocations,
+            "original_operation": binding,
+            "authority": authority()}
+        self.publish(CREATION_FAILURE_ROLE, canonical_json(failure).encode()); deadline()
+        require(complete and trace is None and bool(sites) and set(state["commands"]) <= {"before", "create", "attach", "initial", "terminal"}, "supervision_unknown")
+        controls = [{"name": name, "bytes": len(row[2]), "sha256": hash_bytes(row[2]), "original_stamp": list(row[1])}
+            for name, row in sorted(self.originals.items())]
+        manifest = {"schema": "si-native-creation-failure-manifest-v1", "status": "negative_creation_bytes_preserved_contexts_still_open",
+            "original_operation": binding, "controls": controls, "authority": authority()}
+        raw = canonical_json(manifest).encode(); state["manifest_raw"] = raw
+        self.publish(CREATION_MANIFEST_ROLE, raw); self.audit(); deadline()
+        state["preserved"] = self, error, raw, tuple(sorted(self.originals)), object()
+    def close(self):
+        first = None
+        try: _drain(self.file_fds)
+        except BaseException as error: first = error
+        try: _drain(self.fds)
+        except BaseException as error:
+            if first is None: first = error
+        self.closed = True
+        if first is not None: raise first
+
+
+def _creation_manifest(error):
+    row = _CREATION_MANIFESTS.get(id(error))
+    if type(row) is not tuple or len(row) != 8 or row[0] is not error: return None
+    state, carrier, raw, sha, original_controls, operation, cleanup = row[1:]
+    try:
+        if (_CREATION_STATES.get(state["volume"]) is not state or state["failure"] is not error
+                or state["carrier"] is not carrier or not carrier.closed or hash_bytes(raw) != sha
+                or state.get("manifest_raw") is not raw or _production_origin(state["clock"]) is not operation
+                or operation is None or tuple(sorted(carrier.originals.items())) != original_controls
+                or state.get("cleanup_witness") is not cleanup or cleanup[0] is not state
+                or _creation_cleanup_snapshot(cleanup[1]) != cleanup[2]): return None
+        # Pure issued projection: every filesystem audit already finished in
+        # the protected cleanup path. No new callback can silently null a
+        # known witness after contexts have been released.
+        return sha
+    except BaseException: return None
+
+
+def _creation_cleanup_snapshot(contexts):
+    code, config, directory, volume, outputs, reporter, carrier = contexts
+    require(code is not None and not code.fds and type(config) is _Inputs and set(config.rows) == set(config.ROLES)
+        and directory is not None and directory.closed and type(volume) is _DomainVolume and not volume.fds
+        and volume.directory.closed and (outputs is None or outputs.closed)
+        and (reporter is None or not reporter.fds and not reporter.private_fds)
+        and carrier.closed and not carrier.fds and not carrier.file_fds, "supervision_original")
+    return tuple(id(obj) for obj in contexts), tuple(sorted(carrier.originals.items())), tuple(sorted(config.rows.items()))
+
+
+def _native_invocation(volume, role, command):
+    plan = _NATIVE_PLANS.get((volume, role))
+    require(type(plan) is tuple and len(plan) == 6 and plan[0] is volume and plan[1] == role and plan[2] is command,
+        "supervision_original")
+    frame = plan[3]; local = frame.f_locals
+    require(frame.f_code is _DomainVolume.command.__code__ and frame.f_globals is globals()
+        and local.get("self") is volume and local.get("role") == role and local.get("command") is command
+        and _CREATION_STATES[volume]["commands"].get(role) is command and tuple(command["arguments"]) == plan[4], "supervision_original")
+    invocation = _NATIVE_INVOCATIONS.get((volume, role))
+    if invocation is None:
+        require(command["invocation_attempted"] is False and command["stdout"] is None and command["result"] is None
+            and command["failure"] is None and "result" not in local, "supervision_original")
+        return False
+    require(type(invocation) is tuple and invocation[0] is plan and command["invocation_attempted"] is True, "supervision_original")
+    result = command["result"]
+    if type(result) is subprocess.CompletedProcess:
+        require(local.get("result") is result and command["stdout"] is result.stdout and command["stderr"] is result.stderr
+            and command["known_terminal"] is (type(result.returncode) is int), "supervision_original")
+    else:
+        error = command["failure"]
+        require(result is None and error is not None and command["known_terminal"] is False, "supervision_original")
+        if type(error) is subprocess.TimeoutExpired:
+            require(command["stdout"] is error.output and command["stderr"] is error.stderr, "supervision_original")
+    return True
+
+
 class _DomainVolume:
     def __init__(self, clock):
-        _component("native_platform", 1)
-        _platform()
-        clock.check()
-        _component("native_parent", 2)
-        self.clock, self.directory, self.fds, self.origins = clock, _Directory(DOMAIN, create=True), [], {}
-        self.path = self.directory.path; self.image = self.path / "backing.sparseimage"; self.mount = self.path / "mount"
-        self.mount_fd = None
+        self.clock, self.directory, self.fds, self.origins, self.mount_fd = clock, None, [], {}, None
+        state = {"volume": self, "clock": clock, "operation": _production_origin(clock), "carrier": None,
+            "commands": {}, "origins": self.origins, "system_baseline": None, "system_observations": [],
+            "failure": None, "trace": None, "preserved": None}
+        _CREATION_STATES[self] = state
         try:
+            _component("native_platform", 1); _platform(); clock.check()
+            _component("native_parent", 2); self.directory = _Directory(DOMAIN, create=True)
+            self.path = self.directory.path; self.image = self.path / "backing.sparseimage"; self.mount = self.path / "mount"
             _component("native_host", 3)
             host = _native_statfs(self.directory.fd)
             require(host["flags"] & native.MNT_LOCAL and not host["flags"] & native.MNT_IGNORE_OWNERSHIP
@@ -469,10 +731,13 @@ class _DomainVolume:
             _component("native_root_mode", 14)
             os.fchmod(self.mount_fd, 0o700); os.fsync(self.mount_fd); self.mount_pin = _dir(os.fstat(self.mount_fd), True)
             require(native._fresh_root_identity(os.fstat(self.mount_fd)) == self.creation, "native_proof_mount")
+            _CreationCarrier(self, state)
             _component("native_system", 15)
             self.system = None
             require(set(os.listdir(self.mount_fd)) <= {".fseventsd"}, "native_proof_membership")
-            if ".fseventsd" in os.listdir(self.mount_fd): self.system = self._system()
+            if ".fseventsd" in os.listdir(self.mount_fd):
+                self.system = self._system(); state["system_baseline"] = self.system
+            _SYSTEM_BASELINES[self] = self, self.system, object()
             _component("main_directory")
             os.mkdir("main", 0o700, dir_fd=self.mount_fd)
             self.main_fd = os.open("main", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=self.mount_fd); self.fds.append(self.main_fd)
@@ -481,20 +746,38 @@ class _DomainVolume:
             _component("native_first_check", 16)
             self.check()
         except BaseException as error:
-            failure_summary(error)
-            try: self.close()
-            except BaseException: pass
+            _capture_creation_failure(self, error)
+            # The caller owns cleanup only after negative bytes are preserved.
+            # On a pre-anchor/unknown failure it retains this original state.
             raise
     def arguments(self, verb):
-        if verb == "create": return [native.HDIUTIL, "create", "-type", "SPARSE", "-size", "8g", "-fs", "APFS", "-uid", str(os.getuid()), "-gid", str(os.getgid()), "-mode", "0700", "-volname", "SI_NATIVE_SUPERVISION_V2_V1", "-nospotlight", "-plist", str(self.image)]
+        if verb == "create": return [native.HDIUTIL, "create", "-type", "SPARSE", "-size", "8g", "-fs", "APFS", "-uid", str(os.getuid()), "-gid", str(os.getgid()), "-mode", "0700", "-volname", "SI_NATIVE_SUPERVISION_V2_V3", "-nospotlight", "-plist", str(self.image)]
         if verb == "attach": return [native.HDIUTIL, "attach", "-mountpoint", str(self.mount), "-mount", "required", "-nobrowse", "-owners", "on", "-noautoopen", "-noautoopenro", "-noautoopenrw", "-plist", str(self.image)]
         require(verb == "info", "native_proof_command"); return [native.HDIUTIL, "info", "-plist"]
     def command(self, role, verb):
         require(role not in self.origins and {"before": "info", "create": "create", "attach": "attach", "initial": "info", "terminal": "info"}.get(role) == verb,
             "native_proof_command")
+        state = _CREATION_STATES[self]
+        require(role not in state["commands"], "native_proof_command")
+        command = {"arguments": tuple(self.arguments(verb)), "stdout": None, "stderr": None, "result": None,
+            "failure": None, "known_terminal": False, "invocation_attempted": False}
+        state["commands"][role] = command
+        plan = self, role, command, sys._getframe(), command["arguments"], object()
+        _NATIVE_PLANS[self, role] = plan
         remaining = self.clock.check(); require(remaining > 0, "native_proof_deadline")
         self._pre_command(role)
-        result = _native_command(self.arguments(verb), min(COMMAND_SECONDS, remaining))
+        command["invocation_attempted"] = True
+        _NATIVE_INVOCATIONS[self, role] = plan, object()
+        try: result = _native_command(list(command["arguments"]), min(COMMAND_SECONDS, remaining))
+        except BaseException as error:
+            command["failure"] = error; command["trace"] = BaseException.__traceback__.__get__(error, BaseException)
+            if type(error) is subprocess.TimeoutExpired:
+                command["stdout"], command["stderr"] = error.output, error.stderr
+            raise
+        command["result"] = result
+        if type(result) is subprocess.CompletedProcess:
+            command["stdout"], command["stderr"] = result.stdout, result.stderr
+            command["known_terminal"] = type(result.returncode) is int
         self.clock.check()
         require(type(result.returncode) is int and result.returncode == 0 and type(result.stdout) is bytes
             and 0 < len(result.stdout) <= MAXIMUM_NATIVE_BYTES, "native_proof_command")
@@ -554,9 +837,16 @@ class _DomainVolume:
     def _system(self):
         _component("native_system", 15)
         info = os.stat(".fseventsd", dir_fd=self.mount_fd, follow_symlinks=False)
-        require(stat.S_ISDIR(info.st_mode) and stat.S_IMODE(info.st_mode) == 0o700 and info.st_uid == 0
-            and info.st_gid == os.fstat(self.mount_fd).st_gid and info.st_dev == os.fstat(self.mount_fd).st_dev,
-            "native_proof_protection")
+        state = _CREATION_STATES.get(self)
+        observation = {"stat": _stamp(info), "file_mode": info.st_mode}
+        if state is not None: state["system_observations"].append(observation)
+        _system_require(self, stat.S_ISDIR(info.st_mode), "system_directory_type", observation)
+        _system_require(self, stat.S_IMODE(info.st_mode) == 0o700, "system_directory_mode", observation)
+        _system_require(self, info.st_uid == 0, "system_directory_uid", observation)
+        observation["mount_gid"] = os.fstat(self.mount_fd).st_gid
+        _system_require(self, info.st_gid == observation["mount_gid"], "system_directory_gid", observation)
+        observation["mount_dev"] = os.fstat(self.mount_fd).st_dev
+        _system_require(self, info.st_dev == observation["mount_dev"], "system_directory_dev", observation)
         return _stamp(info)[:6]
     def check(self):
         _component("native_parent", 2)
@@ -572,9 +862,10 @@ class _DomainVolume:
         _component("native_mount_open", 11)
         require(_device_node(self.device, os.fstat(self.mount_fd).st_dev) == self.node, "native_proof_mount")
         _component("native_system", 15)
+        if self in _CREATION_STATES: _system_baseline(self)
         expected = ({".fseventsd"} if self.system is not None else set()) | {"main"} | ({"proof"} if hasattr(self, "proof_pin") else set())
         require(set(os.listdir(self.mount_fd)) == expected, "native_proof_membership")
-        if self.system is not None: require(self._system() == self.system, "native_proof_protection")
+        if self.system is not None: _compared_system(self, self._system(), self.system, "system_original_metadata")
         _compared_stamp(_stamp(os.fstat(self.main_fd)), self.main_seal, "main_fd_original_seal")
         _compared_stamp(_stamp((self.mount / "main").lstat()), self.main_seal, "main_named_original_seal")
         require(not os.listdir(self.main_fd), "native_proof_membership")
@@ -595,12 +886,13 @@ class _DomainVolume:
             "original_command_output_sha256s": {name: hash_bytes(raw) for name, raw in sorted(self.origins.items())}}
     def named(self):
         self.directory.named()
+        if self in _CREATION_STATES: _system_baseline(self)
         require(set(os.listdir(self.path)) == {"backing.sparseimage", "mount"}
             and native._backing(self.image.lstat()) == self.backing_pin and _dir(self.mount.lstat(), True) == self.mount_pin,
             "native_proof_path")
         require(set(os.listdir(self.mount)) == ({".fseventsd"} if self.system is not None else set()) | {"proof", "main"}
             and _dir((self.mount / "proof").lstat(), True) == self.proof_pin, "native_proof_membership")
-        if self.system is not None: require(_stamp((self.mount / ".fseventsd").lstat())[:6] == self.system, "native_proof_protection")
+        if self.system is not None: _compared_system(self, _stamp((self.mount / ".fseventsd").lstat())[:6], self.system, "system_named_original_metadata")
         _compared_stamp(_stamp((self.mount / "main").lstat()), self.main_seal, "main_named_original_seal")
         require(not os.listdir(self.mount / "main"), "native_proof_membership")
     def close(self):
@@ -625,7 +917,7 @@ def _wrapper_body():
     body = body.replace("si-startup-PTY-observation-v7", "si-native-supervision-observation-v1")
     body = body.replace(hash_payload(startup.authority()), hash_payload(authority()))
     start = body.index("  F={"); end = body.index("\n  R={", start)
-    body = body[:start] + "  F={'stage':'startup_import','component':'operation','contract_code':'startup_import_failed','upstream_contract_code':None,'errno_name':n,'mismatching_fields':[]}" + body[end:]
+    body = body[:start] + "  F={'stage':'startup_import','component':'operation','contract_code':'startup_import_failed','upstream_contract_code':None,'errno_name':n,'mismatching_fields':[],'comparison_relation':None,'creation_manifest_sha256':None}" + body[end:]
     return body.replace("'failure':F,'authority_sha256'", "'failure':F,'marker':None,'authority_sha256'")
 
 
@@ -943,8 +1235,10 @@ def run_registered(head, remote, digest, observer):
 
 def _produce(head, remote, digest, observer):
     clock = _Clock(); code = directory = config = volume = outputs = reporter = process = None
+    scope = object(); _PRODUCTION_SCOPES[scope] = scope, sys._getframe(), clock, head, remote, digest, observer, object()
+    clock.production_scope = scope
     error = None; held = False; entered = returned = False; origin = wait = marker = log_fd = None
-    failure_state = negative_token = None
+    failure_state = negative_token = creation_state = None
     try:
         _phase("current_code"); _guard(head, remote); code = _Code7(head, remote, clock)
         _phase("bootstrap"); directory, config = _read_config(head, remote, digest, observer, code.manifest)
@@ -985,19 +1279,35 @@ def _produce(head, remote, digest, observer):
         _phase("original_audit"); _audit_local(outputs); clock.check()
     except BaseException as failure:
         error = failure
+        creation = _CREATION_FAILURES.get(id(failure))
+        if type(creation) is tuple and creation[0] is failure and creation[1]["operation"] is _PRODUCTION_SCOPES[scope]:
+            creation_state = creation[1]; volume = creation_state["volume"]
+        elif volume is not None: creation_state = _capture_creation_failure(volume, failure)
         if entered and not returned:
             failure_state = _capture_collection_failure(failure, process, origin, outputs, log_fd, reporter)
+        elif creation_state is not None: failure_state = creation_state
         else:
             failure_state = {"process": process, "origin": origin, "failure": failure,
                 "trace": BaseException.__traceback__.__get__(failure, BaseException)}
         failure_state.update({"code": code, "directory": directory, "config": config, "volume": volume,
             "outputs": outputs, "reporter": reporter})
+        if creation_state is not None: failure_state["creation_state"] = creation_state
         failure_summary(failure)
         if reporter is not None:
             try: reporter.refuse(failure)
             except BaseException as secondary:
                 failure_state["reporter_error"] = secondary
                 failure_state["reporter_trace"] = BaseException.__traceback__.__get__(secondary, BaseException)
+        if creation_state is not None:
+            try:
+                carrier = creation_state["carrier"]
+                require(type(carrier) is _CreationCarrier, "supervision_unknown")
+                carrier.preserve(failure)
+            except BaseException as secondary:
+                held = True; creation_state["preservation_error"] = secondary
+                creation_state["preservation_trace"] = BaseException.__traceback__.__get__(secondary, BaseException)
+                try: _hold(failure_state)
+                except BaseException: raise failure
         actual_wait = worker._WAITS.get(process) if process is not None else None
         unknown = process is not None and not (type(actual_wait) is tuple and len(actual_wait) == 3 and actual_wait[0] is origin and type(actual_wait[1]) is int)
         preserved = False
@@ -1023,7 +1333,7 @@ def _produce(head, remote, digest, observer):
                 try: close()
                 except BaseException as failure:
                     if first is None: first = failure; failure_summary(failure)
-                    if negative_token is not None:
+                    if negative_token is not None or creation_state is not None:
                         held = True; failure_state["cleanup_error"] = failure
                         failure_state["cleanup_trace"] = BaseException.__traceback__.__get__(failure, BaseException)
                         try: _hold(failure_state)
@@ -1051,12 +1361,32 @@ def _produce(head, remote, digest, observer):
             if negative_token is not None:
                 reporter.audit_preserved(named=True); _negative_snapshot_audit(failure_state, named=True)
         except BaseException as failure:
-            if negative_token is not None:
+            if negative_token is not None or creation_state is not None:
                 failure_state["cleanup_error"] = failure
                 failure_state["cleanup_trace"] = BaseException.__traceback__.__get__(failure, BaseException)
                 try: _hold(failure_state)
                 except BaseException: raise error
             if terminal_error is None: terminal_error = failure; failure_summary(failure)
+    native_state = _CREATION_STATES.get(volume)
+    carrier = native_state["carrier"] if native_state is not None else None
+    if carrier is not None:
+        try:
+            carrier.audit(); carrier.close(); carrier.audit(named=True)
+            if creation_state is not None:
+                require(creation_state["preserved"] is not None and creation_state["operation"] is _PRODUCTION_SCOPES[scope], "supervision_original")
+                raw = carrier.originals[CREATION_MANIFEST_ROLE][2]
+                contexts = code, config, directory, volume, outputs, reporter, carrier
+                cleanup = creation_state, contexts, _creation_cleanup_snapshot(contexts), object()
+                creation_state["cleanup_witness"] = cleanup
+                _CREATION_MANIFESTS[id(error)] = (error, creation_state, carrier, raw, hash_bytes(raw),
+                    tuple(sorted(carrier.originals.items())), creation_state["operation"], cleanup)
+        except BaseException as secondary:
+            state = failure_state if failure_state is not None else native_state
+            state["cleanup_error"] = secondary; state["cleanup_trace"] = BaseException.__traceback__.__get__(secondary, BaseException)
+            try: _hold(state)
+            except BaseException:
+                if terminal_error is not None: raise terminal_error
+                raise secondary
     if terminal_error is not None: raise terminal_error
     # Last original named seals follow reporter cleanup; no reopen/rebaseline.
     volume.named(); code.named(); config.audit(named=True); outputs.named(); clock.check()
@@ -1089,13 +1419,14 @@ class _Observer:
 
 
 def _checked_failure(detail):
-    require(type(detail) is dict and set(detail) == {"stage", "component", "contract_code", "upstream_contract_code", "errno_name", "mismatching_fields", "comparison_relation"}
+    require(type(detail) is dict and set(detail) == {"stage", "component", "contract_code", "upstream_contract_code", "errno_name", "mismatching_fields", "comparison_relation", "creation_manifest_sha256"}
         and type(detail["stage"]) is str and detail["stage"] in _STAGES
         and type(detail["component"]) is str and detail["component"] in _COMPONENTS
         and (detail["contract_code"] is None or type(detail["contract_code"]) is str and detail["contract_code"] in _CODES)
         and (detail["upstream_contract_code"] is None or type(detail["upstream_contract_code"]) is str and detail["upstream_contract_code"] in old._CODES | worker._CODES | native._CODES)
         and (detail["errno_name"] is None or type(detail["errno_name"]) is str and detail["errno_name"] in set(_ERRNOS.values()) | set(native._ERRNOS.values()) | set(worker._ERRNOS.values()))
         and (detail["comparison_relation"] is None or type(detail["comparison_relation"]) is str and detail["comparison_relation"] in _COMPARISON_ROLES)
+        and (detail["creation_manifest_sha256"] is None or type(detail["creation_manifest_sha256"]) is str and re.fullmatch(r"[0-9a-f]{64}", detail["creation_manifest_sha256"]))
         and type(detail["mismatching_fields"]) is list and len(detail["mismatching_fields"]) <= 9
         and all(type(value) is str and value in old._STAMP_NAMES for value in detail["mismatching_fields"]), "supervision_original")
     return json.loads(canonical_json(detail))

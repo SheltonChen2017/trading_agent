@@ -7,6 +7,7 @@ source operation, launchd command, image command or native syscall.
 import json
 import os
 import plistlib
+import stat
 import subprocess
 from pathlib import Path
 from types import SimpleNamespace
@@ -33,7 +34,10 @@ def owned_external_boundaries(monkeypatch):
                         ("_HELD", []), ("_FAILURES", {}), ("_KERNEL_ORIGINS", {}), ("_ROOT_RECEIPTS", {}),
                         ("_ADVISORIES", {}), ("_COMPARISONS", {}), ("_PRESERVATIONS", {}),
                         ("_NEGATIVE_CLOSURES", {}), ("_NEGATIVE_WAITS", {}),
-                        ("_CAPTURED", []), ("_PRIVATE_FAILURES", {})):
+                        ("_CAPTURED", []), ("_PRIVATE_FAILURES", {}),
+                        ("_CREATION_STATES", {}), ("_CREATION_FAILURES", {}),
+                        ("_CREATION_MANIFESTS", {}), ("_SYSTEM_FAILURES", {}), ("_PRODUCTION_SCOPES", {}),
+                        ("_NATIVE_PLANS", {}), ("_NATIVE_INVOCATIONS", {}), ("_SYSTEM_BASELINES", {})):
         monkeypatch.setattr(proof, name, value)
 
 
@@ -139,6 +143,127 @@ def fabricated(tmp_path, monkeypatch):
             if not child.stdout.closed: child.stdout.close()
             proof.worker._CHILDREN.pop(child, None); proof.worker._WAITS.pop(child, None)
         os.close(master); os.close(slave)
+
+
+@pytest.fixture
+def genuine_domain(fabricated, monkeypatch):
+    """Original DomainVolume lifecycle with explicitly FABRICATED native facts.
+
+    There is no image command, APFS mount, root-owned directory or device node.
+    Temporary files, descriptors, exclusive creation and original Python
+    constructor/check/output methods are real. Only mounted-device/native/root
+    metadata is projected at the syscall/native boundary.
+    """
+    h = fabricated
+    h.native_calls, h.system_changes, h.system_reads = [], {}, 0
+    h.root_changes = {}
+    h.native_callback = h.native_transform = h.before_outputs = h.before_system = None
+    h.attached = False
+    h.include_system = True
+    h.domain_path = h.root / proof.PARENT / proof.DOMAIN
+    h.mount_path = h.domain_path / "mount"
+    h.image_path = h.domain_path / "backing.sparseimage"
+    actual_open, actual_dup, actual_fstat = os.open, os.dup, os.fstat
+    actual_stat, actual_lstat = os.stat, os.lstat
+    fd_paths = {}
+    fake_device = actual_stat(h.root).st_dev + 987654321
+    def full_path(path, dir_fd=None):
+        if isinstance(path, int): return fd_paths.get(path, (None, False))[0]
+        value = Path(path)
+        if value.is_absolute(): return value
+        parent = fd_paths.get(dir_fd, (h.root, False))[0] if dir_fd is not None else Path.cwd()
+        return parent / value
+    def mounted(path):
+        return path is not None and (path == h.mount_path or h.mount_path in path.parents)
+    def projected(info, path, is_mounted):
+        values = {name: getattr(info, name) for name in dir(info) if name.startswith("st_")}
+        if is_mounted: values["st_dev"] = fake_device
+        if path == h.mount_path and is_mounted: values.update(h.root_changes)
+        if path == h.mount_path / ".fseventsd" and is_mounted:
+            h.system_reads += 1
+            if h.before_system is not None: h.before_system()
+            values["st_uid"] = 0  # Explicit fabricated root-ownership/native fact.
+            values.update(h.system_changes)
+        return SimpleNamespace(**values)
+    def open_file(path, flags, mode=0o777, *, dir_fd=None):
+        fd = actual_open(path, flags, mode, dir_fd=dir_fd)
+        resolved = full_path(path, dir_fd)
+        fd_paths[fd] = (resolved, h.attached and mounted(resolved))
+        return fd
+    def duplicate(fd):
+        result = actual_dup(fd)
+        if fd in fd_paths: fd_paths[result] = fd_paths[fd]
+        return result
+    def fstat(fd):
+        path, on_mount = fd_paths.get(fd, (None, False))
+        return projected(actual_fstat(fd), path, on_mount)
+    def stat_path(path, *, dir_fd=None, follow_symlinks=True):
+        resolved = full_path(path, dir_fd)
+        return projected(actual_stat(path, dir_fd=dir_fd, follow_symlinks=follow_symlinks), resolved,
+            h.attached and mounted(resolved))
+    def lstat_path(path, *, dir_fd=None):
+        resolved = full_path(path, dir_fd)
+        return projected(actual_lstat(path, dir_fd=dir_fd), resolved, h.attached and mounted(resolved))
+    monkeypatch.setattr(os, "open", open_file); monkeypatch.setattr(os, "dup", duplicate)
+    monkeypatch.setattr(os, "fstat", fstat); monkeypatch.setattr(os, "stat", stat_path)
+    monkeypatch.setattr(os, "lstat", lstat_path)
+    monkeypatch.setattr(proof, "_platform", lambda: None)
+    def statfs(fd):
+        on_mount = fd_paths.get(fd, (None, False))[1]
+        return {"bsize": 4096, "blocks": 2 ** 21, "bavail": 2 ** 21 if on_mount else 2 ** 24,
+            "fsid": (123, 456), "owner": os.getuid(), "flags": proof.native.MNT_LOCAL | proof.native.MNT_DONTBROWSE,
+            "flags_ext": 0, "type": 26, "subtype": 0, "fstype": "apfs" if on_mount else "explicit_fake_host",
+            "mounted_on": str(h.mount_path) if on_mount else str(h.root),
+            "mounted_from": "/dev/disk987s1" if on_mount else "/dev/explicit_fake_host"}
+    monkeypatch.setattr(proof, "_native_statfs", statfs)
+    monkeypatch.setattr(proof, "_device_node", lambda device, dev: ("explicit_fake_node", device, dev))
+    def command(arguments, timeout):
+        h.native_calls.append(tuple(arguments))
+        assert arguments[0] == proof.native.HDIUTIL and 0 < timeout <= proof.COMMAND_SECONDS
+        if h.native_callback is not None: h.native_callback(arguments, timeout)
+        verb = arguments[1]
+        entities = [{"dev-entry": "/dev/disk987s1", "content-hint": "Apple_APFS", "volume-kind": "apfs", "mount-point": str(h.mount_path)}]
+        if verb == "create":
+            assert not h.attached and arguments[-1] == str(h.image_path)
+            h.image_path.write_bytes(b"EXPLICIT FABRICATED BACKING CONTENTS")
+            raw = plistlib.dumps([str(h.image_path)])
+        elif verb == "attach":
+            assert not h.attached
+            if h.include_system: (h.mount_path / ".fseventsd").mkdir(mode=0o700)
+            h.attached = True
+            raw = plistlib.dumps({"system-entities": entities})
+        else:
+            assert verb == "info"
+            raw = plistlib.dumps({"images": [{"image-path": str(h.image_path), "system-entities": entities}] if h.attached else []})
+        result = subprocess.CompletedProcess(arguments, 0, raw, b"")
+        return h.native_transform(result) if h.native_transform is not None else result
+    monkeypatch.setattr(proof, "_native_command", command)
+    def create(clock):
+        # Test retention is not production preservation: tests separately
+        # require the driver's exact issued creation state and original FDs.
+        volume = object.__new__(proof._DomainVolume); h.volumes.append(volume)
+        proof._DomainVolume.__init__(volume, clock)
+        original = volume.outputs
+        def outputs():
+            if h.before_outputs is not None: h.before_outputs(volume)
+            result = original(); volume.output = result
+            if h.output_callback is not None: h.output_callback(result)
+            return result
+        volume.outputs = outputs
+        return volume
+    monkeypatch.setattr(proof, "_new_domain", create)
+    h.create_domain = lambda: create(proof._Clock())
+    try: yield h
+    finally:
+        for volume in h.volumes:
+            # Test-only closure of this fixture's original, possibly held
+            # carrier descriptors; never a production recovery/disposal path.
+            state = proof._CREATION_STATES.get(volume)
+            if state is not None and state["carrier"] is not None:
+                try: state["carrier"].close()
+                except BaseException: pass
+            try: volume.close()
+            except BaseException: pass
 
 
 @pytest.fixture
@@ -254,6 +379,454 @@ def test_policy_is_new_scope_with_zero_source_authority():
         "old_V1_admitted", "durable_Main_receipt", "ready_for_backtest", "QC_or_Safari"))
     assert all(type(a[key]) is int and a[key] == 0 for key in
         ("provider_HTTP", "credential_reads", "source_STARTs", "source_bytes", "new_source_claims", "qc_attempts"))
+
+
+def test_genuine_domain_constructor_and_outputs_keep_all_original_checks(genuine_domain):
+    h = genuine_domain; early = []
+    def before_system():
+        state = proof._CREATION_STATES[h.volumes[0]]
+        if not early:
+            assert state["system_baseline"] is None and state["carrier"] is not None
+            assert state["carrier"].fds and all(os.fstat(fd).st_ino > 0 for fd in state["carrier"].fds)
+        early.append(state)
+    h.before_system = before_system
+    volume = h.create_domain()
+    assert type(volume) is proof._DomainVolume
+    assert [row[1] for row in h.native_calls] == ["info", "create", "attach", "info"]
+    assert volume.system == proof._stamp(os.stat(".fseventsd", dir_fd=volume.mount_fd, follow_symlinks=False))[:6]
+    assert h.system_reads >= 2 and volume.system[2] == 0
+    assert early and all(state is proof._CREATION_STATES[volume] for state in early)
+    volume.check()
+    files = volume.outputs()
+    assert type(files) is proof._Files and files.path == h.mount_path / "proof"
+    assert proof._PRODUCERS == proof._CLOSED == {} and h.processes == []
+
+
+def test_genuine_domain_producer_closes_empty_carrier_but_remains_provisional(genuine_domain):
+    h = genuine_domain; result = h.produce(h.prepare())
+    assert type(result) is proof.ProducerObservation
+    volume = h.volumes[0]; state = proof._CREATION_STATES[volume]
+    assert state["failure"] is None and state["carrier"].closed and state["carrier"].originals == {}
+    assert state["carrier"].attempted == set() and proof._CREATION_MANIFESTS == {}
+    assert result.public_summary()["actual_child_exit"] == 0
+    assert result.public_summary()["authority"] == proof.authority()
+    assert result.public_summary()["kernel_exit_attested"] is False
+    assert len(proof._PRODUCERS) == 1 and proof._CLOSED == {}
+
+
+@pytest.mark.parametrize("field,value,relation,projected_field", [("st_mode", stat.S_IFREG | 0o700, "system_directory_type", "mode"),
+    ("st_mode", stat.S_IFLNK | 0o700, "system_directory_type", "mode"),
+    ("st_mode", stat.S_IFDIR | 0o600, "system_directory_mode", "mode"),
+    ("st_mode", stat.S_IFDIR | 0o750, "system_directory_mode", "mode"),
+    ("st_uid", 12345, "system_directory_uid", "uid"), ("st_gid", -1, "system_directory_gid", "gid"),
+    ("st_dev", -1, "system_directory_dev", "dev")])
+def test_original_system_current_protection_predicates_remain_mandatory(genuine_domain, field, value, relation, projected_field):
+    h = genuine_domain; volume = h.create_domain(); original = volume.system
+    h.system_changes[field] = value
+    with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal)) as caught:
+        volume._system()
+    public = proof.failure_summary(caught.value)
+    assert public["comparison_relation"] == relation and public["mismatching_fields"] == [projected_field]
+    assert public["creation_manifest_sha256"] is None
+    assert volume.system is original
+    assert proof._PRODUCERS == proof._CLOSED == {} and h.processes == []
+
+
+@pytest.mark.parametrize("field,value,reads", [("st_mode", stat.S_IFREG | 0o700, 0),
+    ("st_mode", stat.S_IFDIR | 0o750, 0), ("st_uid", 12345, 0), ("st_gid", -1, 1), ("st_dev", -1, 2)])
+def test_system_telemetry_preserves_original_short_circuit_reference_order(genuine_domain, monkeypatch, field, value, reads):
+    h = genuine_domain; volume = h.create_domain()
+    h.system_changes[field] = value
+    original = os.fstat; references = []
+    def fstat(fd):
+        if fd == volume.mount_fd: references.append(fd)
+        return original(fd)
+    monkeypatch.setattr(os, "fstat", fstat)
+    with pytest.raises(proof.SupervisionRefusal): volume._system()
+    assert len(references) == reads
+
+
+@pytest.mark.parametrize("field,index", [("st_ino", 1), ("st_nlink", 5)])
+@pytest.mark.parametrize("entry", ["check", "named"])
+def test_original_system_identity_and_link_count_never_rebaseline_or_gain_exceptions(genuine_domain, field, index, entry):
+    h = genuine_domain; volume = h.create_domain(); original = volume.system
+    volume.outputs()  # named() also requires the original proof directory.
+    h.system_changes[field] = original[index] + 1
+    assert volume._system()[index] != original[index]  # Current protection still passes.
+    with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal)) as caught:
+        getattr(volume, entry)()
+    public = proof.failure_summary(caught.value)
+    assert public["comparison_relation"] == ("system_original_metadata" if entry == "check" else "system_named_original_metadata")
+    assert public["mismatching_fields"] == [proof.old._STAMP_NAMES[index]]
+    assert public["creation_manifest_sha256"] is None
+    assert volume.system is original
+    assert proof._PRODUCERS == proof._CLOSED == {} and h.processes == []
+
+
+@pytest.mark.parametrize("field", ["st_size", "st_mtime_ns", "st_ctime_ns"])
+def test_system_original_identity_keeps_the_existing_six_field_contract(genuine_domain, field):
+    h = genuine_domain; volume = h.create_domain(); original = volume.system
+    current = os.stat(".fseventsd", dir_fd=volume.mount_fd, follow_symlinks=False)
+    h.system_changes[field] = getattr(current, field) + 1
+    assert volume._system() == original
+    volume.check()
+    assert volume.system is original
+
+
+@pytest.mark.parametrize("entry", ["check", "named"])
+@pytest.mark.parametrize("replace", ["instance", "state", "both"])
+def test_original_system_baseline_cannot_be_replaced_to_adopt_current_link_drift(genuine_domain, entry, replace):
+    h = genuine_domain; volume = h.create_domain(); volume.outputs()
+    state = proof._CREATION_STATES[volume]
+    original = volume.system
+    h.system_changes["st_nlink"] = original[5] + 1
+    changed = volume._system()
+    if replace in ("instance", "both"): volume.system = changed
+    if replace in ("state", "both"): state["system_baseline"] = changed
+    with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal)):
+        getattr(volume, entry)()
+    assert proof._SYSTEM_BASELINES[volume][1] is original
+    assert proof._PRODUCERS == proof._CLOSED == {}
+
+
+@pytest.mark.parametrize("field", ["st_mode", "st_uid", "st_gid", "st_dev", "st_ino"])
+def test_genuine_domain_root_protection_and_original_identity_still_precede_system_checks(genuine_domain, field):
+    h = genuine_domain; volume = h.create_domain()
+    current = os.fstat(volume.mount_fd)
+    h.root_changes[field] = (stat.S_IFDIR | 0o755) if field == "st_mode" else getattr(current, field) + 1
+    before_system = h.system_reads
+    with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal, proof.native.IsolatedVolumeRefusal)):
+        volume.check()
+    assert h.system_reads == before_system
+    assert proof._PRODUCERS == proof._CLOSED == {} and h.processes == []
+
+
+def test_system_relation_requires_original_created_instance_and_original_error(genuine_domain):
+    h = genuine_domain; volume = h.create_domain()
+    h.system_changes["st_uid"] = 12345
+    with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal)) as genuine:
+        volume._system()
+    assert proof.failure_summary(genuine.value)["comparison_relation"] == "system_directory_uid"
+    clone = type(genuine.value)(*BaseException.args.__get__(genuine.value, BaseException))
+    copied = proof.failure_summary(clone)
+    assert copied["comparison_relation"] is copied["creation_manifest_sha256"] is None
+    assert copied["mismatching_fields"] == []
+    unissued = object.__new__(proof._DomainVolume)
+    unissued.mount_fd = volume.mount_fd
+    with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal)) as forged:
+        unissued._system()
+    public = proof.failure_summary(forged.value)
+    assert public["comparison_relation"] is public["creation_manifest_sha256"] is None
+    assert public["mismatching_fields"] == []
+
+
+@pytest.mark.parametrize("kind", ["predicate", "original_comparison"])
+def test_outside_system_helper_call_cannot_claim_original_system_relation(genuine_domain, kind):
+    h = genuine_domain; volume = h.create_domain()
+    with pytest.raises(proof.SupervisionRefusal) as caught:
+        if kind == "predicate": proof._system_require(volume, False, "system_directory_uid", {})
+        else: proof._compared_system(volume, (1,) * 6, (2,) * 6, "system_original_metadata")
+    public = proof.failure_summary(caught.value)
+    assert public["comparison_relation"] is public["creation_manifest_sha256"] is None
+    assert public["mismatching_fields"] == []
+
+
+@pytest.mark.parametrize("case,relation,field", [("first_system", "system_directory_uid", "uid"),
+    ("outputs_predicate", "system_directory_mode", "mode"),
+    ("outputs_original", "system_original_metadata", "nlink")])
+def test_original_preoutput_failure_preserves_private_native_and_system_origins_before_any_worker(genuine_domain, monkeypatch, case, relation, field):
+    h = genuine_domain
+    held = _bounded_test_hold(monkeypatch)
+    expected_baseline = []
+    if case == "first_system": h.system_changes["st_uid"] = 12345
+    else:
+        def before_outputs(volume):
+            expected_baseline.append(volume.system)
+            if case == "outputs_predicate": h.system_changes["st_mode"] = stat.S_IFDIR | 0o750
+            else: h.system_changes["st_nlink"] = volume.system[5] + 1
+        h.before_outputs = before_outputs
+    original_publish = proof._CreationCarrier.publish
+    observed = []
+    def publish(carrier, name, raw):
+        state = carrier.state
+        assert proof._CREATION_STATES[state["volume"]] is state
+        assert proof._CREATION_FAILURES[id(state["failure"])][1] is state
+        assert state["trace"] is not None
+        assert h.processes == [] and proof._PRODUCERS == proof._CLOSED == {}
+        observed.append(name)
+        return original_publish(carrier, name, raw)
+    monkeypatch.setattr(proof._CreationCarrier, "publish", publish)
+    with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal)) as caught:
+        h.produce(h.prepare())
+    assert held == [] and observed
+    volume = h.volumes[0]; state = proof._CREATION_STATES[volume]; carrier = state["carrier"]
+    assert state["failure"] is caught.value and state["trace"] is not None
+    assert list(state["commands"]) == ["before", "create", "attach", "initial"]
+    assert carrier.closed and carrier.originals
+    assert h.processes == [] and proof._PRODUCERS == proof._CLOSED == {}
+    assert not (h.mount_path / "proof").exists()
+    assert not (h.mount_path / "run.started.json").exists()
+    system = json.loads((carrier.path / proof.CREATION_SYSTEM_ROLE).read_bytes())
+    if case == "first_system":
+        assert state["system_baseline"] is None and system["original_baseline"] is None
+        assert system["baseline_established"] is False
+    else:
+        assert state["system_baseline"] is expected_baseline[0]
+        assert system["original_baseline"] == list(expected_baseline[0])
+        assert system["baseline_established"] is True
+    assert system["present_observations"] and state["system_observations"]
+    for role, command in state["commands"].items():
+        name = "creation.native." + role + ".private.plist"
+        assert (carrier.path / name).read_bytes() == command["stdout"]
+    for name, (unused, seal, raw) in carrier.originals.items():
+        assert (carrier.path / name).read_bytes() == raw
+        assert proof._stamp((carrier.path / name).lstat()) == seal
+        assert seal[4:6] == (0o600, 1)
+    public = proof.failure_summary(caught.value)
+    assert public["comparison_relation"] == relation and public["mismatching_fields"] == [field]
+    receipt = proof._CREATION_MANIFESTS[id(caught.value)]
+    assert receipt[0] is caught.value and receipt[1] is state and receipt[2] is carrier
+    assert receipt[3] is state["manifest_raw"]
+    assert public["creation_manifest_sha256"] == hash_bytes(receipt[3]) == receipt[4]
+    assert public["creation_manifest_sha256"] != hash_payload(json.loads((h.root / proof.PARENT / proof.BOOTSTRAP / "launch.spec.json").read_bytes())["code_manifest"])
+    assert str(h.root) not in canonical_json(public)
+
+
+def test_direct_constructor_failure_retains_original_state_but_cannot_issue_producer_manifest(genuine_domain, monkeypatch):
+    h = genuine_domain; h.system_changes["st_uid"] = 12345
+    _bounded_test_hold(monkeypatch)
+    with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal)) as caught:
+        h.create_domain()
+    volume = h.volumes[0]; state = proof._CREATION_STATES[volume]
+    assert proof._CREATION_FAILURES[id(caught.value)][1] is state
+    assert state["failure"] is caught.value and state["system_baseline"] is None
+    assert state["commands"] and state["system_observations"]
+    assert state["operation"] is None
+    assert proof.failure_summary(caught.value)["creation_manifest_sha256"] is None
+    assert proof._CREATION_MANIFESTS == proof._PRODUCERS == proof._CLOSED == {}
+
+
+def test_creation_state_exists_before_platform_or_any_directory_effect(genuine_domain, monkeypatch):
+    h = genuine_domain; held = _bounded_test_hold(monkeypatch); observed = []
+    def refused():
+        assert len(proof._CREATION_STATES) == len(h.volumes) == 1
+        state = proof._CREATION_STATES[h.volumes[0]]
+        assert state["commands"] == {} and state["system_observations"] == []
+        assert state["system_baseline"] is state["carrier"] is None
+        assert state["volume"].directory is None and not h.domain_path.exists()
+        observed.append(state)
+        raise OSError(38, "fabricated pre-effect platform refusal")
+    monkeypatch.setattr(proof, "_platform", refused)
+    with pytest.raises(OSError) as caught: h.produce(h.prepare())
+    assert len(observed) == len(held) == 1
+    state = observed[0]
+    assert state["failure"] is caught.value and state["trace"] is not None
+    assert proof._CREATION_FAILURES[id(caught.value)][1] is state
+    assert proof.failure_summary(caught.value)["creation_manifest_sha256"] is None
+    assert h.native_calls == h.processes == [] and not h.domain_path.exists()
+    assert proof._CREATION_MANIFESTS == proof._PRODUCERS == proof._CLOSED == {}
+
+
+def test_native_timeout_output_is_retained_without_inventing_terminal_or_system_baseline(genuine_domain, monkeypatch):
+    h = genuine_domain; held = _bounded_test_hold(monkeypatch)
+    original_output = b"EXACT_GENERATED_LOCAL_TIMEOUT_BYTES"
+    timeout = []
+    def fail(arguments, seconds):
+        if arguments[1] == "create":
+            error = subprocess.TimeoutExpired(arguments, seconds, output=original_output)
+            timeout.append(error)
+            raise error
+    h.native_callback = fail
+    with pytest.raises(subprocess.TimeoutExpired) as caught: h.produce(h.prepare())
+    assert caught.value is timeout[0] and len(held) == 1
+    volume = h.volumes[0]; state = proof._CREATION_STATES[volume]
+    assert state["failure"] is caught.value and state["trace"] is not None
+    assert state["system_baseline"] is None and state["system_observations"] == []
+    assert state["commands"]["create"]["stdout"] is original_output
+    assert state["commands"]["create"]["known_terminal"] is False
+    assert state["carrier"] is None
+    assert os.fstat(volume.directory.fd).st_ino > 0
+    assert h.processes == [] and proof._CREATION_MANIFESTS == proof._PRODUCERS == proof._CLOSED == {}
+
+
+def test_native_output_is_strongly_retained_before_its_acceptance_size_guard(genuine_domain, monkeypatch):
+    h = genuine_domain; held = _bounded_test_hold(monkeypatch)
+    oversized = b"F" * (proof.MAXIMUM_NATIVE_BYTES + 1)
+    def transform(result):
+        result.stdout = oversized
+        return result
+    h.native_transform = transform
+    with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal)) as caught:
+        h.produce(h.prepare())
+    assert len(held) == 1
+    state = proof._CREATION_STATES[h.volumes[0]]
+    assert state["failure"] is caught.value and state["commands"]["before"]["stdout"] is oversized
+    assert state["commands"]["before"]["known_terminal"] is True
+    assert state["carrier"] is state["system_baseline"] is None
+    assert state["system_observations"] == []
+    assert os.fstat(h.volumes[0].directory.fd).st_ino > 0
+    assert proof.failure_summary(caught.value)["creation_manifest_sha256"] is None
+    assert h.processes == [] and proof._CREATION_MANIFESTS == proof._PRODUCERS == proof._CLOSED == {}
+
+
+@pytest.mark.parametrize("fault", ["nonzero", "bad_plist"])
+def test_terminal_native_failure_after_worker_wait0_preserves_original_new_native_bytes(genuine_domain, monkeypatch, fault):
+    h = genuine_domain; held = _bounded_test_hold(monkeypatch)
+    terminal_raw = b"EXACT_PRIVATE_GENERATED_TERMINAL_NATIVE_BYTES"
+    def transform(result):
+        if len(h.native_calls) == 5:
+            assert result.args[1] == "info"
+            result.returncode = 2 if fault == "nonzero" else 0
+            result.stdout, result.stderr = terminal_raw, None
+        return result
+    h.native_transform = transform
+    with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal, plistlib.InvalidFileException)) as caught:
+        h.produce(h.prepare())
+    assert held == [] and len(h.processes) == 1 and len(h.native_calls) == 5
+    child = h.processes[0]
+    assert proof.worker._WAITS[child][1] == 0 and child.stdout.closed
+    state = proof._CREATION_STATES[h.volumes[0]]; carrier = state["carrier"]
+    assert state["failure"] is caught.value and state["commands"]["terminal"]["stdout"] is terminal_raw
+    assert state["commands"]["terminal"]["known_terminal"] is True
+    assert (carrier.path / "creation.native.terminal.private.plist").read_bytes() == terminal_raw
+    assert proof.failure_summary(caught.value)["creation_manifest_sha256"] == hash_bytes(state["manifest_raw"])
+    assert proof._PRODUCERS == proof._CLOSED == {}
+    assert not (h.mount_path / "proof" / proof.MARKER_ROLE).exists()
+    assert (h.mount_path / "proof" / "stdout.jsonl").read_bytes() == _two_original_lines()
+
+
+def test_known_absent_system_baseline_is_distinct_from_failed_before_baseline(genuine_domain, monkeypatch):
+    h = genuine_domain; h.include_system = False
+    held = _bounded_test_hold(monkeypatch)
+    def transform(result):
+        if len(h.native_calls) == 5:
+            result.returncode, result.stdout = 2, b"FIXED_LOCAL_TERMINAL_REFUSAL"
+        return result
+    h.native_transform = transform
+    with pytest.raises(proof.SupervisionRefusal) as caught: h.produce(h.prepare())
+    assert held == [] and len(h.processes) == 1
+    volume = h.volumes[0]; state = proof._CREATION_STATES[volume]
+    assert proof._SYSTEM_BASELINES[volume][1] is None and state["system_baseline"] is None
+    system = json.loads((volume.mount / proof.CREATION_SYSTEM_ROLE).read_bytes())
+    assert system["original_baseline"] is None and system["baseline_established"] is True
+    assert system["present_observations"] == []
+    assert proof.failure_summary(caught.value)["creation_manifest_sha256"] == hash_bytes(state["manifest_raw"])
+    assert proof._PRODUCERS == proof._CLOSED == {}
+
+
+def test_unknown_terminal_native_timeout_keeps_original_worker_and_all_creation_contexts(genuine_domain, monkeypatch):
+    h = genuine_domain; held = _bounded_test_hold(monkeypatch)
+    terminal_raw = b"EXACT_PARTIAL_TERMINAL_NATIVE_TIMEOUT_BYTES"
+    def timeout(arguments, seconds):
+        if len(h.native_calls) == 5: raise subprocess.TimeoutExpired(arguments, seconds, output=terminal_raw)
+    h.native_callback = timeout
+    with pytest.raises(subprocess.TimeoutExpired) as caught: h.produce(h.prepare())
+    assert len(held) == 1 and len(h.processes) == 1 and len(h.native_calls) == 5
+    child = h.processes[0]; state = proof._CREATION_STATES[h.volumes[0]]
+    assert state["failure"] is caught.value and state["commands"]["terminal"]["stdout"] is terminal_raw
+    assert state["commands"]["terminal"]["known_terminal"] is False
+    assert proof.worker._WAITS[child][1] == 0 and child.stdout.closed is False
+    assert state["carrier"].fds and os.fstat(h.volumes[0].mount_fd).st_ino > 0
+    assert proof.failure_summary(caught.value)["creation_manifest_sha256"] is None
+    assert proof._CREATION_MANIFESTS == proof._PRODUCERS == proof._CLOSED == {}
+
+
+def test_terminal_precondition_failure_preserves_exact_not_invoked_fact_without_empty_native_output(genuine_domain, monkeypatch):
+    h = genuine_domain; held = _bounded_test_hold(monkeypatch); changed = []
+    def guard():
+        if proof._STAGE == "terminal_code" and not changed:
+            volume = h.volumes[0]
+            h.system_changes["st_nlink"] = volume.system[5] + 1
+            changed.append(volume)
+    h.guard_callback = guard
+    with pytest.raises(proof.SupervisionRefusal) as caught: h.produce(h.prepare())
+    assert held == [] and len(changed) == len(h.processes) == 1 and len(h.native_calls) == 4
+    child = h.processes[0]; volume = h.volumes[0]; state = proof._CREATION_STATES[volume]
+    assert proof.worker._WAITS[child][1] == 0 and child.stdout.closed
+    terminal = state["commands"]["terminal"]
+    assert terminal["invocation_attempted"] is False and terminal["stdout"] is terminal["result"] is terminal["failure"] is None
+    assert (volume, "terminal") in proof._NATIVE_PLANS and (volume, "terminal") not in proof._NATIVE_INVOCATIONS
+    assert not (volume.mount / "creation.native.terminal.private.plist").exists()
+    failure = json.loads((volume.mount / proof.CREATION_FAILURE_ROLE).read_bytes())
+    assert failure["native_invocations"] == [{"role": role, "invocation_attempted": role != "terminal"}
+        for role in ("before", "create", "attach", "initial", "terminal")]
+    public = proof.failure_summary(caught.value)
+    assert public["comparison_relation"] == "system_original_metadata" and public["mismatching_fields"] == ["nlink"]
+    assert public["creation_manifest_sha256"] == hash_bytes(state["manifest_raw"])
+    assert proof._PRODUCERS == proof._CLOSED == {}
+
+
+def test_caller_false_invocation_flag_cannot_hide_original_entered_native_timeout(genuine_domain, monkeypatch):
+    h = genuine_domain; held = _bounded_test_hold(monkeypatch)
+    raw = b"EXACT_ENTERED_TERMINAL_TIMEOUT_BYTES"
+    def timeout(arguments, seconds):
+        if len(h.native_calls) == 5:
+            state = proof._CREATION_STATES[h.volumes[0]]
+            state["commands"]["terminal"]["invocation_attempted"] = False
+            raise subprocess.TimeoutExpired(arguments, seconds, output=raw)
+    h.native_callback = timeout
+    with pytest.raises(subprocess.TimeoutExpired) as caught: h.produce(h.prepare())
+    volume = h.volumes[0]; state = proof._CREATION_STATES[volume]
+    assert len(held) == 1 and len(h.native_calls) == 5
+    assert (volume, "terminal") in proof._NATIVE_INVOCATIONS
+    assert state["commands"]["terminal"]["stdout"] is raw and state["failure"] is caught.value
+    assert h.processes[0].stdout.closed is False and state["carrier"].fds
+    assert proof.failure_summary(caught.value)["creation_manifest_sha256"] is None
+    assert proof._CREATION_MANIFESTS == proof._PRODUCERS == proof._CLOSED == {}
+
+
+@pytest.mark.parametrize("fault", ["partial_write", "readback", "fsync", "cleanup", "postclose_stamp"])
+def test_early_creation_preservation_failure_holds_all_original_state_without_manifest_authority(genuine_domain, monkeypatch, fault):
+    h = genuine_domain; h.system_changes["st_uid"] = 12345
+    held = _bounded_test_hold(monkeypatch)
+    original_write, original_read, original_fsync = proof._write, os.read, os.fsync
+    original_volume_close, original_carrier_close = proof._DomainVolume.close, proof._CreationCarrier.close
+    def carrier():
+        return proof._CREATION_STATES.get(h.volumes[0], {}).get("carrier") if h.volumes else None
+    with monkeypatch.context() as patch:
+        if fault == "partial_write":
+            def write(fd, raw):
+                current = carrier()
+                if current is not None and fd in current.file_fds:
+                    original_write(fd, raw[:1]); raise OSError(28, "fabricated early private partial write")
+                return original_write(fd, raw)
+            patch.setattr(proof, "_write", write)
+        elif fault == "readback":
+            def read(fd, maximum):
+                raw = original_read(fd, maximum); current = carrier()
+                return b"X" + raw[1:] if current is not None and fd in current.file_fds and raw else raw
+            patch.setattr(os, "read", read)
+        elif fault == "fsync":
+            def fsync(fd):
+                current = carrier()
+                if current is not None and fd in current.file_fds: raise OSError(5, "fabricated early private fsync")
+                return original_fsync(fd)
+            patch.setattr(os, "fsync", fsync)
+        elif fault == "cleanup":
+            def close(volume):
+                state = proof._CREATION_STATES.get(volume)
+                if state is not None and state["failure"] is not None: raise OSError(5, "fabricated early original cleanup")
+                return original_volume_close(volume)
+            patch.setattr(proof._DomainVolume, "close", close)
+        else:
+            def close(current):
+                original_carrier_close(current)
+                if current.originals:
+                    name = next(iter(current.originals))
+                    (current.path / name).chmod(0o600)  # Same bytes/mode; changed ORIGINAL ctime still refuses.
+            patch.setattr(proof._CreationCarrier, "close", close)
+        with pytest.raises((proof.SupervisionRefusal, proof.old.NativeProofRefusal)) as caught:
+            h.produce(h.prepare())
+        assert len(held) == 1
+        state = proof._CREATION_STATES[h.volumes[0]]
+        assert state["failure"] is caught.value and state["trace"] is not None
+        assert state["system_baseline"] is None and state["system_observations"]
+        assert list(state["commands"]) == ["before", "create", "attach", "initial"]
+        assert state["carrier"] is carrier()
+        if fault != "postclose_stamp":
+            assert carrier().fds and all(os.fstat(fd).st_ino > 0 for fd in carrier().fds)
+        assert proof.failure_summary(caught.value)["creation_manifest_sha256"] is None
+        assert proof._CREATION_MANIFESTS == proof._PRODUCERS == proof._CLOSED == {} and h.processes == []
 
 
 def test_pending_registration_refuses_before_owned_io(monkeypatch):
@@ -550,6 +1123,28 @@ def test_genuine_collection_failure_preserves_every_present_buffer_and_closes_on
         assert info.st_mode & 0o777 == 0o600 and info.st_nlink == 1
 
 
+@pytest.mark.parametrize("case", ["third_line", "nonzero", "postwrite"])
+def test_genuine_domain_collector_failure_finishes_both_private_negative_preservations(genuine_domain, monkeypatch, case):
+    h = genuine_domain; _collection_fault(h, monkeypatch, case)
+    held = _bounded_test_hold(monkeypatch)
+    with pytest.raises((proof.worker.ProcessSupervisorRefusal, OSError)) as caught:
+        h.produce(h.prepare())
+    assert held == []
+    volume = h.volumes[0]; creation = proof._CREATION_STATES[volume]
+    collection = proof._CAPTURED[0]
+    assert creation["failure"] is collection["failure"] is caught.value
+    assert collection["preservation_error"] is None and collection["eof"] is True
+    assert creation["carrier"].closed and creation["carrier"].originals
+    assert (volume.mount / "proof" / "child.negative.closed.json").is_file()
+    assert (volume.mount / "proof" / "child.failure.buffers.private.json").is_file()
+    assert (volume.mount / proof.CREATION_MANIFEST_ROLE).is_file()
+    assert proof.failure_summary(caught.value)["creation_manifest_sha256"] == hash_bytes(creation["manifest_raw"])
+    failure = json.loads((volume.mount / proof.CREATION_FAILURE_ROLE).read_bytes())
+    assert any(row["site"] == "original_producer" for row in failure["original_own_trace_sites"])
+    assert h.processes[0].stdout.closed and proof._PRODUCERS == proof._CLOSED == {}
+    assert not (volume.mount / "proof" / proof.MARKER_ROLE).exists()
+
+
 def test_unknown_negative_wait_retains_every_original_context_and_never_marks_closed(fabricated, monkeypatch):
     h = fabricated; _collection_fault(h, monkeypatch, "unknown_wait")
     held = _bounded_test_hold(monkeypatch)
@@ -766,7 +1361,7 @@ def test_largest_allowlisted_failure_fits_original_wire_and_roundtrips_exact_cor
         "errno_name": max(set(proof._ERRNOS.values()) | set(proof.native._ERRNOS.values())
             | set(proof.worker._ERRNOS.values()), key=len),
         "mismatching_fields": list(proof.old._STAMP_NAMES),
-        "comparison_relation": max(proof._COMPARISON_ROLES, key=len)}
+        "comparison_relation": max(proof._COMPARISON_ROLES, key=len), "creation_manifest_sha256": "f" * 64}
     monkeypatch.setattr(proof, "failure_summary", lambda error: dict(detail))  # Explicit maximal fixed-diagnostic seam.
     digest = "d" * 64
     proof._Observer(h.observer, digest).emit(error=ValueError("never formatted"))
@@ -776,12 +1371,24 @@ def test_largest_allowlisted_failure_fits_original_wire_and_roundtrips_exact_cor
     assert checked["failure"] == detail and checked["nonce"] == h.observer["nonce"]
     assert checked["status"] == "refused" and checked["marker"] is None
     assert checked["authority_sha256"] == hash_payload(proof.authority())
+    worst_pid = dict(checked); worst_pid["pid"] = 2 ** 31 - 1
+    # Serialization upper bound only, not another observed process/PTY result.
+    assert len(canonical_json(worst_pid).encode() + b"\n") <= proof.MAX_WIRE
 
 
 @pytest.mark.parametrize("value", ["unknown_relation", 1, True, [], {}])
 def test_failure_wire_rejects_unregistered_or_nonliteral_comparison_relation(value):
     detail = {"stage": "child_observation", "component": "operation", "contract_code": None,
-        "upstream_contract_code": None, "errno_name": None, "mismatching_fields": [], "comparison_relation": value}
+        "upstream_contract_code": None, "errno_name": None, "mismatching_fields": [], "comparison_relation": value,
+        "creation_manifest_sha256": None}
+    with pytest.raises(proof.SupervisionRefusal): proof._checked_failure(detail)
+
+
+@pytest.mark.parametrize("value", [True, 123, "", "a" * 63, "A" * 64, {"sha256": "a" * 64}])
+def test_failure_wire_rejects_malformed_creation_manifest_identity(value):
+    detail = {"stage": "output_creation", "component": "native_system", "contract_code": None,
+        "upstream_contract_code": None, "errno_name": None, "mismatching_fields": [], "comparison_relation": None,
+        "creation_manifest_sha256": value}
     with pytest.raises(proof.SupervisionRefusal): proof._checked_failure(detail)
 
 
@@ -949,23 +1556,11 @@ def _only_ctime_changed(info):
 
 
 @pytest.mark.parametrize("relation", ["main_fd_original_seal", "main_named_original_seal"])
-def test_exact_original_main_comparison_names_only_the_failed_relation(fabricated, monkeypatch, relation):
+def test_exact_original_main_comparison_names_only_the_failed_relation(genuine_domain, monkeypatch, relation):
     # Native APFS/device facts remain an explicitly fabricated boundary. The
     # actual new DomainVolume.check and unchanged old._same execute against
     # real temporary directory/backing/main originals.
-    h = fabricated
-    local = proof._new_domain(proof._Clock())
-    volume = object.__new__(proof._DomainVolume)
-    volume.__dict__.update(clock=local.clock, directory=local.directory, path=local.path,
-        mount=local.mount, image=local.image, backing_pin=local.backing_pin,
-        under_fd=local.mount_fd, under_pin=proof._dir(os.fstat(local.mount_fd), True),
-        mount_fd=local.mount_fd, mount_pin=proof._dir(os.fstat(local.mount_fd), True),
-        main_fd=local.main_fd, main_seal=local.main_pin, system=None,
-        device="explicitly_fabricated_device", node=("explicitly_fabricated_node",))
-    volume.backing_fd = os.open(volume.image, os.O_RDONLY | os.O_NOFOLLOW)
-    volume._native = lambda current: None
-    monkeypatch.setattr(proof, "_native_statfs", lambda fd: {"explicitly_fabricated_native": True})
-    monkeypatch.setattr(proof, "_device_node", lambda *a: volume.node)
+    h = genuine_domain; volume = h.create_domain()
     if relation == "main_fd_original_seal":
         volume.main_seal = (*volume.main_seal[:-1], volume.main_seal[-1] - 1)
     else:
@@ -973,17 +1568,13 @@ def test_exact_original_main_comparison_names_only_the_failed_relation(fabricate
         main = volume.mount / "main"
         monkeypatch.setattr(Path, "lstat", lambda path: _only_ctime_changed(actual(path))
             if path == main else actual(path))
-    try:
-        with pytest.raises(proof.old.NativeProofRefusal, match="native_proof_stamp") as caught:
-            volume.check()
-        public = proof.failure_summary(caught.value)
-        assert public["comparison_relation"] == relation
-        assert public["mismatching_fields"] == ["ctime_ns"]
-        assert str(volume.mount) not in canonical_json(public)
-        assert proof._PRODUCERS == proof._CLOSED == {}
-    finally:
-        os.close(volume.backing_fd)
-        local.close()
+    with pytest.raises(proof.old.NativeProofRefusal, match="native_proof_stamp") as caught:
+        volume.check()
+    public = proof.failure_summary(caught.value)
+    assert public["comparison_relation"] == relation
+    assert public["mismatching_fields"] == ["ctime_ns"]
+    assert str(volume.mount) not in canonical_json(public)
+    assert proof._PRODUCERS == proof._CLOSED == {}
 
 
 @pytest.mark.parametrize("relation", ["main_fd_original_seal", "main_named_original_seal", "stdout_fd_named_pair"])

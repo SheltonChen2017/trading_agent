@@ -29694,3 +29694,157 @@ Main post-record active-document/import-boundary checks:78 passed/1.47s.
 All authors/test sessions are terminated or frozen; guarded read-only process
 inspection found zero known pinned-role Python processes. No V2-v4 native proof
 was invoked. These final checks do not cure the independent journal veto.
+
+
+## 134. Owner-directed journal actor attribution and custody continuation (2026-10-30)
+
+### 134.1 Scope and preserved base
+
+The owner reopened the concrete custody blocker: find what changes journal
+flags/timestamps, fix without weaker checks or lost data, retain existing source
+budgets, build to the last step before QC/Safari, and publish once at the end.
+No QC/Safari or purchases are authorized. Starting physical/Git root is the
+same Short Interest worktree, branch codex/strategy-short-interest, clean exact
+HEAD/tracking/actual origin b556bee695694a5ef79cd285be9631f288f5e679. No fetch,
+branch/worktree switch, reset/rebase/history rewrite or interim push occurs.
+SourceAUTH remains unconditionally blocked while custody is investigated.
+
+Count84005 cumulative START/4294967296 bytes, separate existing DAILY residual
+36837 attempts/3327988047 bytes/71468572 rows and permanent8START/16777216 bytes
+remain unchanged. There are no new provider/key/claim/START/charged-byte/outcome/
+look/QC actions. Shared docs and Session Handoff remain frozen; this record is
+the lane handoff. The owner's prior independent-review waiver remains in force.
+
+### 134.2 Read-only facts and one finite failed timing diagnostic
+
+Independent exact-interpreter, original-stamp, native-stat and persistent Node
+reads agree on the old v2 journal:1681 original bytes/SHA64f275a4e8b8c712a2a944a6416ac915c49fb412d9ed3dcbf4a9eb673cc695bc,
+current9 SHA56ce154ef583ccbf26d1166825c69ff6ae10ca2eaa4873baa03fae2b3ce02913,
+mtime_ns/ctime_ns differ and UF2 is absent. Flags64 means UF_TRACKED(document ID),
+not an immutable variant and not attribution to any service. Journal and lane
+root share the same writable local APFS/ownership-enforced mount. This rules out
+a simple CURRENT Python serialization/view mismatch, not every producer-time
+view or actor. No old metadata was changed or adopted.
+
+A new finite source-free attribution policy was prepared under fixed private
+custody_attribution/journal-20261030-v1, with two reserved roles node/subject.json
+and exec/subject.json; policy SHA4a859ae75f7e739fcd5ace21ea9d347bf5fb3b0796010fa92a4d4f16fa8424a4.
+Maximum180s, producer stdin wait15s, observer120s/20samples, fixed literal data,
+HTTP/key/claims/START0 and no admission. This was an owner-authorized diagnostic,
+not an old capture/probe restart or source qualification.
+
+The independent Node-launched producer issued a first UF2 seal, literal-byte
+SHA5481ceac52b870e340c7a613b41553fc4f45b40677330d106efd3245959f4052,
+then terminated exit1 when its controller did not send EXIT before15s. The
+observer used TextIO.readline followed by select on the raw descriptor: a
+coalesced initial packet/label could remain in the user-space buffer while
+select waited for another OS byte. Its producer_alive label was therefore
+sampled AFTER producer timeout. It MUST NOT establish an alive-stage or exact
+mutation time. Later same-held-inode/named samples showed flags64 and failed
+original9; observer exited0 normally. No process was signalled/restarted and
+no new observation baseline was adopted. Existing evidence remains unchanged.
+The second exec/subject.json role and trace.private.json remain absent/reserved.
+This diagnostic cannot identify the actor or prove an exec-command-only cause.
+
+### 134.3 Prospective bounded privileged metadata trace
+
+SI-DEC-20261030-06 registers only a source-free attribution helper and fabricated
+regressions before any actual administrator trace. Native fs_usage refuses
+UID501; a noninteractive sudo capability check returned password-required.
+No privileged trace ran and no password was accessed. eslogger is installed,
+and its supported list includes setflags/setattrlist/utimes. The owner must
+perform the exact separately reviewable administrator action after preparation;
+standing repository instructions do not grant OS privilege.
+
+The helper is stdlib-only, target-scoped and non-admitting: exact reserved
+exec/subject.json initially absent, first observed device/inode pinned, fixed
+new private O_EXCL output, no privileged directory creation, no source/credential
+entry, settings/daemon/security changes or old-artifact mutations. Only three
+metadata notification types are subscribed. Unrelated rows are discarded before
+persistence; actor projection excludes args, environment and account fields.
+Unknown schema/truncation/gaps/incomplete lifecycle cannot claim complete trace.
+SETATTRLIST attribute masks are not invented requested values; attribution must
+be correlated with the independent original-stamp/flags observer.
+
+Installed Apple man states eslogger suppresses its own PROCESS GROUP. The new
+tracer must use a dedicated session/PGID and remain separate from the subject
+producer/possible actor. Only its original Popen handle may receive bounded
+shutdown, never a PID search or killpg. This affects trace completeness, not
+any source/capture budget. The prospective policy waits up to90s for initial
+UF2 target calibration, then observes30s with hard120s maximum plus bounded
+child shutdown. READY requires a valid ES record; it is not source admission.
+No timing/window of an old proof is extended or reused.
+
+The privileged command must hash-check the exact O_NOFOLLOW-held helper bytes
+BEFORE compiling/executing them as root. An in-script guard alone runs too late
+to protect a root caller from a changed top-level. Root code has no repository
+imports. Original directory protection pins and safe projected target events
+must survive later guard/publication failure; existing output is never replaced.
+Fabricated tests and independent review precede the actual owner command.
+
+### 134.4 Reviewable trace helper prepared; administrator action remains pending
+
+Only scripts/trace_short_interest_journal_actor.py, its focused test file and
+this record are added/changed. The source/capture/native-proof implementations
+and all old artifacts remain untouched. Helper SHA256
+08bc6bd68b6d24ab2e0df0632f669818ff152187a6acb383dc79324aae4e413c;
+test SHA2560028931e97397f63a1b3c6da9dde1b0a457895228b496c9fa841fb36dce87353.
+The pure print-plan produces a copyable exact-root command. Its fixed isolated
+root bootstrap reads O_NOFOLLOW-held bytes, checks original identity/protection,
+bound size and the owner-reviewed SHA BEFORE compile/exec. Root mode imports
+stdlib only and requires clean exact committed helper bytes/HEAD/lane.
+The root result UID/GID derives from the validated lane, never environment.
+
+The helper launches only /usr/bin/eslogger --format json setflags setattrlist
+utimes in a new session, ensuring its own suppressed process group is separate.
+Native enum IDs26/28/59 were independently derived from the installed Apple
+ESTypes.h SHA b25c5f75474afd1dba841e7cbb8510a64077806175a29187395e81023c55f51a.
+The strict versioned JSON adapter rejects unknown shapes, numeric/semantic
+discordance, malformed/nonfinite data, duplicate keys and truncation. Global
+sequence is observed BEFORE target filtering. Only exact target events retain
+safe actor process/version/executable/signing and metadata fields; unrelated
+rows, args/environment/account fields and native stderr are not persisted.
+Three notifications are not every possible mutation; a closed trace alone
+is not causal attribution or source authority.
+
+Verified pre-release corrections, retained here for review:
+
+| ID | Priority | Correction/validation |
+| --- | --- | --- |
+| SI-ATTR-20261030-001 | P2 | Positional json would be an event; exact --format json argv pinned. |
+| SI-ATTR-20261030-002 | P2 | Same-PGID suppression would hide producer events; dedicated tracer session/expectedPGID pinned. |
+| SI-ATTR-20261030-003 | P2 | Direct sudo-script executes before its guard; fixed held-byte root bootstrap verifies before execution. |
+| SI-ATTR-20261030-004 | P2 | Post-observation guard/publication/close failure could discard matches; bounded projected report survives negative cleanup and graceful interruption. |
+| SI-ATTR-20261030-005 | P2 | Nonfinite or pre-read timestamps could defeat/shorten bounds; finite monotonic checks resample after parsing, enforce initial expiry and start30s at observed calibration. |
+| SI-ATTR-20261030-006 | P3 | Terminal default cwd could refuse exact binding; plan includes cd to exact lane. |
+
+First-match UF2 calibration is required; missed initialization/gaps/unknown
+schema/early native termination cannot claim complete observation. Initial
+90s plus post-calibration30s has a hard120s observation cap and at most4s
+shutdown wait. Only the original Popen child can receive terminate/kill, never
+PID lookup or killpg. No source/capture process is stopped. The supervisor
+preserves filtered observations if safe new-output publication fails, reports
+original encoded bytes/SHA on success and never overwrites existing results.
+Graceful cancellation is incomplete; no lossless guarantee is made for SIGKILL
+or power loss. Required FDA and actual ES JSON remain unverified until the
+owner's administrator action. No security setting is changed automatically.
+
+Main final focused trace/import-boundary/active-document checks:132 passed/1.19s,
+OS network denied. Earlier draft130/1.30s is superseded for the final helper.
+Author54/.57s and independent peer54/.34s are separately attributed fabricated
+checks, not Main reruns or actual macOS actor evidence. Python3.9 AST/in-memory
+compilation and whitespace pass. The system Python lacks pytest; that initial
+attempt ran zero tests, then the existing approved py313 environment was used.
+No dependency was installed. Peer accepted after the above corrections.
+
+The exact future subject exec/subject.json and trace.private.json are still
+absent. There is no active diagnostic producer/observer or native trace.
+After the local registration commit, the owner must run the exact prepared
+administrator command and reply Running when tracer_stream_ready appears.
+Only then may Main publish the ONE reserved literal source-free subject through
+the same local tool path and inspect its original metadata beside the trace.
+Do not retry a spent trace/output namespace, guess the actor, reflag old files,
+adopt current stamps, disable controls, release SourceAUTH or spend source
+budgets from this preparation. No push has occurred in this new owner round;
+its ONE publication remains deferred until work is done or a genuine
+owner-required terminal blocker is resolved/reported.

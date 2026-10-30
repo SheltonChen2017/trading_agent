@@ -7,8 +7,9 @@ EXPLICIT LANE TEST COLLECTION POLICY PRESERVES THEM AND THE OTHER 25 NEW
 PLATFORM GUARDS. THE REVIEWER-ONLY SHARED MANIFEST ADDITION IS VETOED AND
 RESTORED TO THE COMMON BASELINE; `IBSH-CR02` REMAINS OPEN. THIRTEEN P2s
 REMAIN OPEN INCLUDING THE PRECISE DEFAULT-WINDOWS COLLECTION LIMITATION;
-NO OPEN P0/P1. THE NEXT OFFLINE ENGINEERING STEP IS THE NAMED MASSIVE V2
-RETAINED-RESULT READBACK, NOT NEW ACQUISITION OR QC. MASSIVE NOW REPORTS
+NO OPEN P0/P1. SECTION353 QUALIFIES THE NEW OFFLINE MASSIVE V2 READBACK AND PREREGISTERS
+ONE RETAINED-INPUT OBSERVATION; ACTUAL EXECUTION IS STILL UNATTEMPTED AT
+THIS COMMIT. THIS IS NOT NEW ACQUISITION OR QC. MASSIVE NOW REPORTS
 LATEST-CORRECTED RECORDS ONLY; NO HISTORICAL ARCHIVE SAMPLE WAS SUPPLIED.
 SHARADAR'S ACCOUNT QUESTION AND ALL VENDOR REPLIES STAY HELD, THE MONITOR
 STAYS PAUSED, AND THE LANE IS NOT BACKTEST-READY. NO QC/SAFARI, PURCHASE,
@@ -40972,3 +40973,157 @@ The concrete external next input is a verifiable historical archive sample
 with the above semantics under existing rights; Sharadar's account inquiry
 cannot progress under the current no-reply hold. This records the blocker
 without starting QC or requiring another Claude checkpoint.
+
+
+## 353. Qualified offline Massive v2 readback and prospective one-shot observation (2026-10-30)
+
+### 353.1 Defined deliverable and authority
+
+The counter-review was accepted-after-correction and committed separately in
+**`b4846efe8949f48b15f3d68dc6b6234d2cd3917d`** before this implementation
+started. This is the named outstanding engineering deliverable
+`IBMASSIVE2-OBS34101`: strict custody/schema readback of the existing three-
+profile v2 success, not a new source request, parent acquisition, signal run,
+archive sample, backtest or arbitrary substitute milestone. The owner directs
+continued build to the last step before QC/Safari; no routine engineering or
+Claude checkpoint is needed. Missing historical facts, existing reply hold
+and all NO-QC/purchase/upgrade restrictions still bind. This candidate has
+Codex qualification, not a new independent Claude review.
+
+Technical milestone: add
+`research/insider_buying_pilot_massive_evidence_readback_v1.py` and its focused
+test only. Hold and revalidate the exact original private scope reservation
+plus16 child leaves; require the external final pin before bodies; rebuild
+canonical reservation/key-read/start/completed/final crosslinks and current
+strict schema-derived metadata. Numeric financial lexemes stay opaque. A
+reference/index/Form4 sample is capability evidence only; independent index
+and Form4 accessions are not silently joined into an original-parent proof.
+
+Plain language: the new verifier checks that the small evidence already kept
+is intact and that its claimed result follows from those bytes. It contacts
+no service and cannot supply the missing historical archive or make the lane
+ready for backtesting. The old producer, claims and evidence stay intact.
+
+### 353.2 Fixed original evidence and separate current code identity
+
+The original operation used already-existing committed producer
+`78a048e3eaf3f93f1888f3d35c46b02e85c8eae2`,50 source images/inventory
+`150a108bb20abb9360146bae09144dcc5619d127a4c3440a7d216be438330299`.
+The externally bound15,025B `complete.json` SHA-256 remains
+`1a6d8e8ea61cd0cd2e9af752c0ba8ff405bf8c937a8f0554c3e8ce343e083b06`;
+three successful bodies total2,355B. The exact retained namespace is
+`artifacts/insider_buying/pilot_massive_evidence_v2/ib-pilot-massive-evidence-20261027-once-v2`
+plus its parent's `scope-reservation.json`. No current credential, new API
+response, source link or page is substituted. The old journal records one
+credential read/three transport invocations; this new observation permits
+ZERO credential reads or provider requests.
+
+The new actual parent verifies every captured50-image digest against that
+old Git commit, separately from its current committed loaded/static source
+closure plus the new source/test. Current pure schema helpers are used;
+this is NOT execution of historical modules, reconstruction of a historical
+environment, or re-execution of the original key privacy screen. No invented
+credential is used to make the old projector callable. The public receipt
+explicitly keeps both original-key/current-key rescreen flags FALSE and
+excludes the private producer identity map/row fields. That map travels only
+through the protected worker pipe to the trusted parent for Git verification.
+
+No-follow held ancestry and owner-only0700 directories/0600 single-link leaves
+are required. Exact directory names are checked before and after full leaf
+rehashes. The reused version tuple binds device/inode/mode/link count/owner/
+size/mtime; **ctime-only changes are intentionally ignored**, as documented
+for Darwin UF_TRACKED. Hashes and final rechecks remain binding; this is not a
+claim of perfectly atomic observation against arbitrary noncooperative writers.
+
+### 353.3 Source qualification and corrected draft finding
+
+| Qualified image | SHA-256 |
+| --- | --- |
+| New312-line readback source | `1c713a1ad6eb3161cf7fc3997075a4f0f3f429fa0342904360d1b6ef9989dcfe` |
+| New469-line focused test | `ea3e650cd5f17cdc9da6719d5f2f521788f39adaad0e410995806c19771adcd8` |
+
+**IBMASSIVE2-CCR35301, P2, CLOSED before activation.** Independent Codex draft
+inspection found two inventory timing gaps: the constructor could adopt an
+extra leaf as a second observed baseline, and the last leaf rehash could
+introduce an extra leaf after the earlier inventory check. Store ONLY the
+fixed expected sets and repeat exact inventory checks after all leaf rehashes.
+Both old paths are red under independent source-only fake-FD probes, and both
+corrected paths refuse; real invented-root timing regressions cover them too.
+This is a new draft defect corrected before real inputs, not a Claude defect
+or a changed disposition of the old producer. No factual P2 is closed by it.
+
+Final focused validation: **165 passed,1.68s** =68 new readback tests,96
+producer regressions and EXACT
+`tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`.
+Five whole-function/in-memory reversals produce seven expected red cases:
+constructor inventory adoption, late inventory gap, final leaf version/hash,
+external completion pin and three unchecked filing-schema cases. Restored
+final165 are green. Independent14 parent/source controls are a SUBSET of that
+focused selection, not14 additional unique tests; they cover all50 Git image
+checks, sanitized receipt/authority/current-identity drift and fixed native
+command. A separate source-only worker-order proof keeps the live memory
+monitor through source/private reads, serialization, stdout write/flush and
+final sample. Two new images compile with no caches; whitespace checks pass.
+All tests deny native process-tree network/fork/security exec, private artifact/
+Keychain reads and repo writes, permitting only fresh-temp test writes; no
+conftest/operator fixture, autoloaded plugins or complete suite is used. A
+first harness selected a Python without pytest and stopped before any test;
+the qualified run uses the existing Python3.13.15 virtual environment.
+
+Three independently run invented-root publication controls pass (held ancestry
+survives mkdir/publication, hash/version agreement and duplicate-name refusal).
+Main's exact permission-policy fixture allows required ancestor directoryFD
+opens plus only the old selected scope/new metadata namespace, and refuses
+unrelated artifact bodies/old-scope writes. A separate REAL native runtime
+preflight passes effective connection/fork/all-write/security denial and the
+live baseline-relative VM/sampled-RSS guard with NO retained inputs opened.
+
+### 353.4 Prospective actual observation, still UNATTEMPTED at this commit
+
+Commit the above source/test and this preregistration on a clean exact lane
+HEAD BEFORE activation. Run exactly ONE `verify_actual(expected_head=...)` on
+that then-existing commit; do not relabel a later commit as already existing
+at execution. New private parent metadata namespace:
+`artifacts/insider_buying/pilot_massive_evidence_readback_v1`.
+An atomic exclusive mkdir claims it once. Publish `scope-reservation.json`
+and `observation-started.json` BEFORE invoking the verifier; then immutable
+`readback.json` and `complete.json` record success or finite refusal. Preserve
+any partial/ambiguous namespace; no cleanup, reset, resumed claim, renamed
+retry, original-root write or source acquisition is authorized by this scope.
+
+The separate trusted-parent invocation/bootstrap is3,967 UTF-8 bytes, SHA-256
+**`aab75be741b8f0ed804f6e232cf638e51c6ad8429effc1b4f04021a314c1c376`**.
+It orchestrates qualified code/publication only; it is explicitly inventoried
+invocation glue, NOT silently included in the verifier's source-image digest
+or represented as a historical source. It checks its exact executed bytes,
+root, clean code identity, single fresh namespace and full own metadata
+inventory/hash/versions before and after each publication. It serializes only
+the verifier's already-curated public result, counts, hashes, source lineage,
+measured elapsed time and finite own refusal. Its bootstrap identity is kept
+separate in the reservation/result; no account/body/row identity is exported.
+
+Parent: cleared environment, fixed lane cwd, `-I -S -B`, exact cache prefix
+`/var/empty/insider-pilot-sec-parent-audit-no-bytecode`, native network/security
+exec denial, all writes denied except its new metadata namespace and all other
+artifact/Keychain bodies denied. Allow only necessary ancestor directoryFD
+opens and the exact existing Massive scope/new metadata directory. The raw-
+input child additionally denies fork and ALL file writes, proves native
+isolation BEFORE inputs and enforces a90-second wall bound. The real reviewed
+memory guard installs/readbacks baseline-relative4GiB maximum new VM growth
+(subject to existing stricter limits), samples peakRSS against4GiB at requested
+50ms intervals and remains live through stdout flush/final sample. This is
+not an instantaneous/hard-RSS guarantee; sample overshoot remains possible.
+No test-only patch or mock is relied on for actual input isolation.
+
+If the actual readback passes, close ONLY `IBMASSIVE2-OBS34101` at retained-
+result custody/schema scope and record measured output hashes/timing/current
+code identity. If it refuses, preserve all evidence and keep that P3 OPEN;
+passing contracts do not substitute a real accepted observation. Either way,
+352's historical-availability/PIT/population/rights facts remain unresolved;
+no QC, Safari, source retry, vendor reply or readiness promotion follows.
+
+Pre-commit final focused source-boundary/record qualification after this
+preregistration: **125 passed,7.08s**, native network/security/private-input
+read/repo-write denial, with no operator fixture. This includes the new-test
+platform convention and exact package guard. It is distinct from the165
+new/producer regression selection and is not a complete lane/repository suite.

@@ -1225,7 +1225,8 @@ def _assert_section93_current_facts(text: str) -> None:
     """Positive, bounded current facts; never scan old sections for stale dates."""
     normalized = " ".join(text.split()).lower()
     _assert_section106_current_scope(text)
-    for required in (*SECTION93_CURRENT_FACTS, SECTION106_NEXT_ROLE, SECTION109_NEXT_ROLE,
+    _assert_section110_current_facts(text)
+    for required in (*SECTION93_CURRENT_FACTS, SECTION106_NEXT_ROLE, SECTION110_NEXT_ROLE,
                      "last completed counter-review", "skip 1, proceed to 2 and 3 directly"):
         assert required.lower() in normalized, required
     assert SECTION92_NEXT_ROLE.lower() not in normalized, "section92-only routing is superseded for this round"
@@ -1300,7 +1301,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         "Codex has independently counter-reviewed the exact incoming Claude range"
         in normalized_current
     )
-    assert SECTION109_NEXT_ROLE in normalized_current
+    assert SECTION110_NEXT_ROLE in normalized_current
+    assert SECTION109_NEXT_ROLE not in normalized_current
     assert SECTION108_NEXT_ROLE not in normalized_current
     assert (
         "the non-authorizing tpr-tr0-i implementation candidate is checkpointed but remains incomplete"
@@ -1410,7 +1412,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
         ) == [SECTION109_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert SECTION109_NEXT_ROLE.lower() in normalized_summary_lower
+        assert SECTION110_NEXT_ROLE.lower() in normalized_summary_lower
+        assert SECTION109_NEXT_ROLE.lower() not in normalized_summary_lower
         assert SECTION108_NEXT_ROLE.lower() not in normalized_summary_lower
         _assert_section93_current_facts(summary_pointer)
         assert SECTION91_NEXT_ROLE.lower() not in normalized_summary_lower
@@ -4681,10 +4684,10 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "current_reviewed105_role", "preamble_reviewed105_role",
     "current_reviewed108_role", "preamble_reviewed108_role",
 ))
-def test_section_109_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+def test_section110_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
     """Retain old routing mutants; reject routing only to the skipped checkpoint."""
     test_exact_next_step_names_the_current_artifacts()
-    current_next = SECTION109_NEXT_ROLE
+    current_next = SECTION110_NEXT_ROLE
     stale_next = SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], "")
     if fault.startswith("current_"):
         original_section = _record_section
@@ -5804,6 +5807,52 @@ SECTION109_NEXT_ROLE = (
     "Codex next monitors the existing QC backtest under fresh bounded scopes; after it is terminal and CR33-008 is verified closed, "
     "Codex runs the remaining frozen arms, consulting genuine Mia for runtime errors."
 )
+SECTION110_NEXT_ROLE = (
+    "The next bounded action is restoring genuine Mia control and verifying an economics-preserving source/input correction "
+    "under fresh bounded scopes; keep the heartbeat PAUSED during this blocked handoff, then run OFF and the remaining "
+    "frozen arms serially only after verified source recovery."
+)
+
+
+def _assert_section110_current_facts(text: str) -> None:
+    """Bound the current handoff facts; never inspect historical section bodies."""
+    folded = " ".join(text.replace("*", "").replace(chr(96), "").split()).casefold()
+    assert SECTION110_NEXT_ROLE.casefold() in folded
+    assert SECTION109_NEXT_ROLE.casefold() not in folded, "obsolete running-job role"
+    for pattern, meaning in (
+        (r"\bruntime error[,;]\s*completedtrue\b", "actual terminal failure"),
+        (r"\bheartbeat(?: is| remains| stays)? paused\b", "paused heartbeat"),
+        (r"\bcr33-008 is closed\b", "verified frozen-financial route closure"),
+    ):
+        assert re.search(pattern, folded), meaning
+    for required in (
+        "project38609836", "21d48f35420052b3c20d2bf628b5a0ae",
+        "0/5 accepted full-window results", "all financial metrics null",
+        "0 verified messages sent", "0 mia responses", "0 mia runs",
+        "genuine mia consultation could not be submitted",
+        "compiled-job-source attestation and economic acceptance remain false",
+    ):
+        assert required in folded, required
+    for stale in (
+        "one qc backtest running", "one qc backtest is running",
+        "current job is still in progress", "tpr100 is still running",
+        "cr33-008 remains open", "cr33-008 is open",
+        "all five full-window results are accepted",
+        "current terminal status is completed",
+        "genuine mia consultation completed", "one verified message sent",
+        "completed proves accepted source/economics/accounting",
+    ):
+        assert stale not in folded, "contradictory current handoff: " + stale
+    for pattern in (
+        r"\bheartbeat(?: is| remains| stays)? active\b",
+        r"\b[1-9][0-9]*/5 accepted full-window results\b",
+        r"\b[1-9][0-9]* verified messages? sent\b",
+        r"\b[1-9][0-9]* mia responses?\b",
+        r"\b[1-9][0-9]* mia runs?\b",
+    ):
+        assert re.search(pattern, folded) is None, "contradictory current handoff count/status"
+
+
 SECTION106_COMMITS = ("1ebb720852820056ec6f30af8afd4fdbdc9eae8f", SECTION106_HEAD)
 SECTION106_OWNER_SHA256 = "abdd8bc5542b89ff0815b9d433a216279b1271f71755ddd7fc0bf779cdabd907"
 SECTION106_HEADING = "## 106. Owner-directed genuine Mia recovery and five-arm continuation"
@@ -6732,16 +6781,16 @@ def test_section109_history_guard_refuses_retrospective_rewrite(monkeypatch) -> 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
 @pytest.mark.parametrize("before,after", (
-    ("after it is terminal and CR33-008 is verified closed", "before it is terminal or CR33-008 is verified closed"),
     ("under fresh bounded scopes", "without a fresh bounded scope"),
-    ("consulting genuine Mia for runtime errors", "relaunching unchanged failures without diagnosis"),
-    ("remaining frozen arms", "new unfrozen variants"),
+    ("keep the heartbeat PAUSED", "keep the heartbeat ACTIVE"),
+    ("only after verified source recovery", "before verified source recovery"),
+    ("remaining frozen arms serially", "new unfrozen variants concurrently"),
 ))
-def test_section109_monitoring_role_refuses_unsafe_serialization_or_scope_drift(monkeypatch, surface, before, after):
+def test_section110_handoff_role_refuses_unsafe_serialization_or_scope_drift(monkeypatch, surface, before, after):
     test_exact_next_step_names_the_current_artifacts()
-    changed_role = SECTION109_NEXT_ROLE.replace(before, after)
-    assert changed_role != SECTION109_NEXT_ROLE
-    pattern = r"\s+".join(re.escape(word) for word in SECTION109_NEXT_ROLE.split())
+    changed_role = SECTION110_NEXT_ROLE.replace(before, after)
+    assert changed_role != SECTION110_NEXT_ROLE
+    pattern = r"\s+".join(re.escape(word) for word in SECTION110_NEXT_ROLE.split())
     if surface == "current":
         original_section = _record_section
         section = original_section("## 8. Exact next step")
@@ -6763,3 +6812,65 @@ def test_section109_current_portability_qualification_is_limited_to_named_paths(
     assert "Section 108 adds lane attributes" in row
     assert "Outside section108's named paths, no attribute or working-byte repair was performed" in row
     assert "no production port or fresh Mac-native validation is claimed by that review" in row
+
+def _mutate_section110_current_surface(monkeypatch, surface, mutate):
+    if surface == "current":
+        original_section = _record_section
+        section = original_section("## 8. Exact next step")
+        current = _current_qualification(section)
+        changed = mutate(current)
+        assert changed != current
+        monkeypatch.setitem(globals(), "_record_section",
+            lambda heading: section.replace(current, changed, 1)
+            if heading.startswith("## 8.") else original_section(heading))
+    else:
+        preamble = _record_preamble()
+        changed = mutate(preamble)
+        assert changed != preamble
+        monkeypatch.setitem(globals(), "_record_preamble", lambda: changed)
+
+
+@pytest.mark.parametrize("surface", ("current", "preamble"))
+def test_section110_current_terminal_handoff_facts_are_explicit(surface):
+    text = _current_qualification(_record_section("## 8. Exact next step")) if surface == "current" else _record_preamble()
+    _assert_section110_current_facts(text)
+
+
+@pytest.mark.parametrize("surface", ("current", "preamble"))
+@pytest.mark.parametrize("pattern,replacement", (
+    (r"Runtime Error,\s*completedTRUE", "In Progress..., completedFALSE"),
+    (r"CR33-008 is closed", "CR33-008 remains open"),
+    (r"0/5 accepted full-window results", "5/5 accepted full-window results"),
+    (r"0 verified\s+messages\s+sent", "1 verified message sent"),
+    (r"0 Mia responses", "1 Mia response"),
+    (r"0 Mia runs", "1 Mia run"),
+))
+def test_section110_current_fact_guard_refuses_replacements(monkeypatch, surface, pattern, replacement):
+    test_exact_next_step_names_the_current_artifacts()
+    def mutate(text):
+        changed, count = re.subn(pattern, lambda _: replacement, text, count=1, flags=re.I)
+        assert count == 1
+        return changed
+    _mutate_section110_current_surface(monkeypatch, surface, mutate)
+    with pytest.raises(AssertionError):
+        test_exact_next_step_names_the_current_artifacts()
+
+
+@pytest.mark.parametrize("surface", ("current", "preamble"))
+@pytest.mark.parametrize("contradiction", (
+    "Current job is still in progress.",
+    "CR33-008 remains open.",
+    "The heartbeat is ACTIVE.",
+    "5/5 accepted full-window results.",
+    "1 verified message sent.",
+    "1 Mia response.",
+    "1 Mia run.",
+    "The current terminal status is Completed.",
+    SECTION109_NEXT_ROLE,
+))
+def test_section110_current_fact_guard_refuses_appended_contradictions(monkeypatch, surface, contradiction):
+    test_exact_next_step_names_the_current_artifacts()
+    _mutate_section110_current_surface(monkeypatch, surface,
+        lambda text: text + "\n" + contradiction + "\n")
+    with pytest.raises(AssertionError):
+        test_exact_next_step_names_the_current_artifacts()

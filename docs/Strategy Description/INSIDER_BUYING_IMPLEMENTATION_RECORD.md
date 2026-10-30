@@ -1,6 +1,13 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **356 HANDS OFF THIS COMPLETED COUNTER-REVIEW/AVAILABLE-INPUT
+Status: **357 CONTINUES AVAILABLE-INPUT PRE-QC ENGINEERING FROM CLEAN/SYNCED
+`e7e65b9f`, WITH NO INCOMING REVIEW. ADDITIVE REQUIRED21 CONSUMPTION-CHAIN
+QUALIFICATION IS IN PROGRESS; OLD PLANNER STOP AND ALL CONSUMED SCOPES STAY
+INTACT. NO PURCHASES, QC/SAFARI OR VENDOR REPLIES. PRE-QC READINESS REMAINS
+FALSE; HISTORICAL ARCHIVE/PIT/POPULATION FACTS ARE STILL MISSING. MONITOR
+STAYS DISARMED. ONE FINAL MATCHING-LANE PUSH FOR THIS NEW ROUND.**
+
+Previous completed round: **356 HANDS OFF THIS COMPLETED COUNTER-REVIEW/AVAILABLE-INPUT
 ENGINEERING ROUND, BLOCKED BEFORE PRE-QC/BACKTEST READINESS. BOTH CLAUDE
 COMMITS `0f70bbe0`/`d786e82e` ARE ACCEPTED AFTER351'S CORRECTIONS IN
 `b4846efe`;17 PINNED TEST IMAGES/COMMON MANIFEST BASELINE ARE PRESERVED.
@@ -41487,3 +41494,217 @@ four frozen v3 images equal the exact historical commit, and the shared
 manifest remains byte-exact common baseline. `git diff --check` is clean;
 only this expected handoff is dirty before its separate commit. These
 checks do not repeat the actual refused readback or claim readiness.
+
+
+## 357. Continued pre-QC build: additive required21 consumption chain (2026-10-30)
+
+### 357.1 Exact starting state, authority and selected deliverable
+
+The owner now directs: "Keep building toward pre-QC readiness with existing
+subscriptions. No purchases or QC/Safari. Document everything and push once
+when done." Starting local HEAD and matching origin are exact
+`e7e65b9f597fb1ac0ce32312e374259fe055eec6`, clean/synced. A matching-branch-only
+fetch contains NO incoming commits. This is continued Codex implementation,
+not another counter-review of the already accepted Claude range. No new
+independent Claude review is asserted or awaited. Every repository operation
+stays in the designated Insider worktree on `codex/strategy-insider-buying`.
+Shared records, Action Plan and root Session Handoff remain frozen.
+
+**IBDEC-357-01, available-input priority:** complete the explicitly unfinished
+consumption-chain prerequisite in342.2/343.3/339-340 rather than repeat the
+spent Massive readback, ordinary provider probes or build an archive parser
+without any archive. The old batch planner knows the earlier20,044-accession
+index and deliberately refuses while the later required21 namespace exists.
+Do not remove that stop. Add a separate sealed metadata chain and explicit
+required21 selection adapter that authenticates the later20,052 index and
+retains every earlier consumed/claimed/ambiguous accession. All25 source
+quarters still provide conflict/context accounting; future selection remains
+limited to2020Q4-2025Q4. No collector, planner dispatch or original admission
+is activated by this engineering.
+
+The two existing authorized support threads were read only: neither contains
+a new archive sample or new answer beyond352. Massive's latest-corrected
+record response remains insufficient historical version evidence; Sharadar's
+subscriber-verification question remains unchanged and held. No follow-up,
+identity disclosure, vendor reply, new inquiry or other external message is
+sent. The no-reply hold and disarmed monitor persist. No account/secret/mail
+identifier or private body goes into Git. Existing subscription reuse does
+not infer a purchased archive, entitlement or applicable rights.
+
+### 357.2 Prospective bounded metadata question and evidence limits
+
+New files are limited to
+`research/insider_buying_pilot_sec_consumption_chain_v1.py` and its focused
+test. Original producers, observers, exposure roots, frozen test images and
+the old planner/collector remain unchanged. The new contract must authenticate
+five fixed selected controls: the prior batch's consumed index, and required21
+reservation/plan/index/completion. Require independent external pins before
+parsing, strict canonical JSON, exact producer/schema/fixture/authority
+bindings, exact predecessor hash/list agreement and monotonic set conservation
+from20,044 to20,052 by the eight recorded starts. Unknown archive memberships
+stay UNKNOWN; consumption is exclusion evidence, not successful transport,
+retained-body integrity, source authenticity, PIT or canonical admission.
+
+Section339 supplies the required21 pins: reservation23,055B
+`501f33d8497ea3d33ac7d6e88690beb821ab3642dd7645e9883f4462f8984f7d`,
+plan516,504B
+`79ee10366391b2a0a735f2d5127d583c17bf5d4c12f93871e110de9a1fe0fdf4`,
+index461,511B
+`fc60ac0f83c6e1509cc45e2acf277f7d587906799187b99ca02493cbab66ed59`,
+completion24,680B
+`9a0fdbb8c4154d6199c50f8d9625671cef4ac6a8138b10f42c0e9b28b74b0a1c`.
+Prior batch index pin is
+`d501e30d5ce1e9b90cd8738251036fa5f0dbf0a16bba65d6c5d66fa83af4f664`.
+Original required21 producing HEAD is
+`5f4988f4294eb23f603ea94d0f4eaca962ba03c1`. These are external byte anchors,
+not execution of historical code or a full historical-environment replay.
+
+The chain's public summary contains counts/hashes/explicit false readiness
+and zero-operation flags only. Private consumed identifiers remain in a
+sealed object behind an explicit consumer method, never in stdout/Git. A
+fixture factory remains fixture-only and cannot mint actual evidence. The
+adapter must prevent fixture/actual source mixing and retain genuine complete
+source factory checks. Test the dangerous directions and guard reversals;
+passing contracts do not prove a genuine actual chain observation.
+
+After source qualification and committing this prospective scope on an exact
+clean HEAD, permit ONE new metadata-only chain observation under operation
+`ib-pilot-required21-consumption-chain-20261030-once-v1`. It asks a different
+question of different controls than353 and is NOT a renamed retry of that
+spent Massive namespace. Read only the five pinned JSON controls and each
+selected root's `scope.lock`, with no-follow held ancestry, owner-only custody,
+single-link leaves, cooperative SH locks and final rehash/version rechecks.
+This selected-control check does NOT inventory or replay all old claims,
+results, original bodies, census files or any archive. No raw filing, profile,
+credential, provider request or new parent selection occurs.
+
+The source-only qualified trusted launcher must sit above a SINGLE native
+worker fence, never a nested `sandbox-exec`. The child denies process-tree
+network/fork/all writes/security exec, all Keychain reads and all artifact
+reads except the exact selected controls/locks and necessary ancestor
+DIRECTORIES. Prove those controls before actual inputs, with real existing
+baseline-relative VM/sampled-RSS monitoring through serialization/stdout flush
+and final sample. It is not instantaneous/hard RSS enforcement. Verify current
+committed source/Git closure separately from the pinned old metadata. First
+qualify the complete flat topology and read allowlist using source-only and
+invented controls. No weaker fallback, implicit retry, actual input probe or
+old namespace write may follow a failed preflight.
+
+Prospective new private OWN metadata root is
+`artifacts/insider_buying/pilot_sec_consumption_chain_v1`. Claim it by exclusive
+mkdir only after successful source-only qualification and exact clean committed
+code identity; publish reservation/start before exactly one actual reader
+call. Preserve finite success/refusal and immutable result/completion. Never
+resume/reset/rename it. Neither this observation nor a green adapter lifts
+the old planner stop or the missing historical availability/PIT/rights gates.
+Finish with observed limits and exact hashes in a separate final handoff,
+then ONE final matching-lane push. No complete suite, source acquisition,
+vendor reply, purchase/upgrade or QC/Safari operation is authorized here.
+
+### 357.3 Qualified candidate and native invocation
+
+Technical scope: the new immutable sealed chain authenticates the fixed prior
+index and later required21 controls, verifies exact prior-list agreement and
+the monotonic union of recorded started descriptors, and exposes an explicit
+private-consumer API plus a full25/restricted21 selection adapter. Refused or
+ambiguous starts remain consumed; an unattempted suffix is not silently added.
+Canonical JSON types, genuine seals and fixture/actual scope separation are
+binding. Selected roots/leaves have no-follow custody, SH locks, owner-only
+modes/single links and final versions/hashes. Shared absolute ancestors bind
+identity/mode/owner without requiring unrelated sibling-directory link counts
+to stay fixed. Selected final roots still bind their full version. Darwin
+ctime-only tracking changes are excluded, with final byte hashes binding;
+this is not an atomic snapshot against arbitrary noncooperative writers.
+
+Plain language: a future selector can reuse the complete list of filings that
+have already been attempted and exclude them from another request. The check
+reads five small metadata documents and two locks, not the filings themselves.
+It does not make those filings usable signals or supply the missing archive.
+The old planner still stops; no collection or backtest starts automatically.
+
+| Qualified new source image | SHA-256 |
+| --- | --- |
+|390-line chain source | `dede28b8efb8bdc3ca2d238c993fb4609402e6cdb73571811b05a52b826b40a4` |
+|394-line focused test | `1d5492a4f05ed078afd8d81513eddeae0354f35893d3450256f385edb2741ca8` |
+
+Main observed **126 passed,13.39s**, no skips/warnings: new chain66, unchanged
+required21 selection59 and EXACT
+`tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`.
+Native process-tree network/fork/security denial was proved before pytest;
+all writes except freshTMP were denied, artifact/Keychain DATA reads denied,
+with cleared environment, isolated Python3.13.15, disabled plugins/logging/
+cache/bytecode, `--noconftest` and explicit artifact-discovery ignore. Metadata
+stats remain allowed for existing fixture-root checks; no retained body read.
+An initial main harness stopped BEFORE tests because pytest logging tried
+opening denied `/dev/null`; disabling that plugin corrected only the harness.
+This is a focused selection, not a full lane/repository suite.
+
+Attributed internal author qualification: same126 selection passed13.50s.
+Six faithful in-memory reversals produced seven expected reds: prior-list
+agreement1, exact monotonic union1, canonical prior-authority types2, adapter
+fixture-scope1, final root version after rehash1 and external completion pin
+before later reads1. Source files were never physically mutated. Restored
+126 passed. An independent internal QA19-case dangerous-direction SUBSET
+passed2.47s with real memory monitoring through pytest/stdout, no drift or
+unresolved material finding. These are Codex subtask checks, not a new Claude
+review; overlapping counts are not summed as unique tests. Author harness
+setup exclusions are22passes/34fixture setup errors under an overstrict
+artifact-metadata fence, then two test-expectation setup failures corrected
+before final qualification; no actual operation resulted. One mutant anchor
+assertion stopped before the fourth reversal; the remaining three ran in the
+corrected harness. No old source, test or pin was weakened to pass.
+
+Main independently qualified the read-allowlist predicate in a SINGLE native
+source-only child using invented temporary leaves: one selected leaf read
+succeeded, two neighboring reads returned native EPERM/EACCES. Real effective
+connection/fork/all-write/security-exec denial and live VM/RSS guard passed
+through stdout flush/final sample. ALL actual artifacts and Keychains were
+natively denied during that control. No actual namespace or retained input
+was opened. This verifies the predicate/topology, not real metadata contents.
+
+The explicit trusted-parent invocation glue is8,737 UTF-8 bytes, SHA-256
+**`86d5c18f6d6838ff718384c874fe00be46ae7589a79c60f90198486a95bbb317`**.
+It is separately inventoried invocation glue, not silently part of the module
+source inventory or an historical source image. A verified exact-byte loader
+supplies that hash to the script. The parent handles committed source/Git,
+curated bounded IPC and its own fresh immutable metadata only; it is NOT
+claimed to be the fork-denied raw-input worker. It calls the already-qualified
+Massive reader's bounded IPC helper ONLY as a generic process/codec helper,
+never its actual readback or spent namespace. The new selected-control worker
+has the fixed direct read fence, native denials and guard; no weaker inherited
+fence or nested launcher is substituted. Parent rechecks exact clean committed
+source identity after the worker and validates an exact finite public schema.
+Worker exceptions become finite own refusals, never private exception text.
+
+Health mode denies ALL actual artifacts in addition to Keychains, calls no
+metadata reader and creates no namespace. After committing the qualified
+source/test and this preregistration, run that complete flat SOURCE-ONLY mode
+on the then-existing clean HEAD; only a successful control permits claiming
+357.2's fresh metadata scope for ONE actual selected-control call. Record the
+measured worker/code/inventory identity, timing and immutable results after
+they actually exist. No later commit is relabelled as existing at execution.
+If qualification or the actual call refuses, preserve the finite result and
+stop; there is no implicit semantic retry, renamed namespace or readiness
+promotion. A public summary is a selected-metadata result, not a full original
+replay, independently verified historical producer execution or publication
+archive. No factual P2 closes by this code or its tests.
+
+Final pre-activation checks: main **129 passed,6.81s**, no skips/warnings,
+covering record/active-document/lane-import boundaries, EXACT package guard,
+new-test POSIX convention, all22 current production test-pin paths and the
+THREE existing old-planner later-capture refusal controls. This selection
+permits boundary subprocesses while inheriting native network/security and
+artifact/Keychain-data/repository-write denial; only freshTMP and `/dev/null`
+may receive test writes. An earlier overstrict `/dev/null` fence yielded
+125passes/3skips, then126passes/3skips after adding the pin-map node because
+Git's mainline-ref probes could not succeed; the corrected129 exercises those
+checks instead of claiming the skips as evidence. A separate diagnostic
+command quoting error stopped at Python syntax before any operation. Shared
+behavior and valid tests were not changed. Main's source-only native strong
+compile hashes23 MANUAL source/test images: two new files,17 frozen test
+images and four v3 sources equal the exact historical commit. Memory/native
+controls remain live through output; no actual inputs are opened. Four
+invented own-metadata publications and duplicate-name refusal also pass using
+the exact qualified bootstrap publisher functions, without actual namespace
+or source access. All source hashes above remain unchanged; diff whitespace
+checks pass. No complete suite or factual gate closure is claimed.

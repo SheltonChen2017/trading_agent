@@ -1,9 +1,13 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **USB FirstRate structural audit recorded in section 58, 2026-11-03.
+Status: **USB coverage and quality audit recorded in section 59, 2026-11-03.
+The owner reports these FirstRate files were purchased under their licence.
+Date-gated quality checks found daily data conflicts and action-field gaps;
+the sampled minute bars pass scalar/OHLCV checks, not whole-dataset acceptance.
+No QC access, purchase, strategy evaluation or source-data repair occurred.
+USB FirstRate structural audit recorded in section 58, 2026-11-03.
 Long-history raw stock/SPY OHLCV and action files are present as candidate inputs;
 historical NBBO and issuer-guidance coverage are still not established.
-No market-value/outcome rows, QC access, backtest or archive ingestion occurred.
 Coverage/licensing follow-up recorded in section 57, 2026-10-28.
 Known subscriptions still do not establish usable guidance and stock/SPY NBBO.
 Current-vintage exploratory reconstruction is permitted by the plan in principle;
@@ -86,7 +90,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 58. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 59. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -8212,3 +8216,239 @@ skips; changed boundary test compiles in memory; all pinned SHA shapes and
 production source SHA is unchanged, and prior sections 1 through 57 are
 byte-exact. No full suite, bulk integrity pass or empirical/native run is
 claimed or needed for this metadata-only assessment.
+
+## 59. USB unadjusted bar and corporate-action quality audit, 2026-11-03
+
+### 59.1 Scope, owner provenance and date controls
+
+Owner direction: "Proceed with the coverage and quality audit of the USB's
+unadjusted stock/SPY bars and corporate-action files. Don't access QC or buy
+anything, and tell me exactly what still blocks backtesting." This extends
+58's metadata-only inspection to bounded local market/action scalar and
+coverage checks. It does not authorize a strategy evaluation, return/outcome
+join, parameter selection, provider acquisition, source-data repair, native
+launch or protected-outcome inspection. Start at clean local
+`918f405b91d675cac2c405051bb04866bcb77596`, retaining the two known local
+notes commits ahead of live matching
+`7d63314472b4462e153dde82b0bf71c848a253fa`. Mandatory worktree/branch/origin
+remain unchanged; no new push is requested.
+
+In response to the specific provenance question, the owner answered
+"Purchased under my licence". Retain this as owner-reported licensed purchase,
+not an independently inspected invoice. Together with the applicable public
+FirstRate licence described in 58.3, this resolves the copy-provenance
+question for this audit. Do not keep a blanket missing-licence blocker for
+these USB files, require an invented additional approval, or transfer these
+rights to guidance/NBBO from other vendors. Retain purchase/applicable-terms
+provenance with a later dataset freeze. Earlier immutable audit receipts keep
+their original conservative rights booleans; they are not rewritten into
+permissions. No new contract is signed or account changed.
+
+Numerical checks cover `2013-01-01 <= date < 2026-09-01`. Each row's date is
+gated before financial-value decoding. Ascending bar members stop at their
+first protected date; their later chronology and CRC are untested. Descending
+action files require scanning date prefixes to EOF while excluding protected
+financial lexemes. ZIP buffering/checksums can consume excluded raw bytes;
+no protected financial field is parsed, emitted or used in an analysis.
+Quality scripts compute scalar validity/coverage counts only, no returns,
+profitability, candidate selection, trades or research-look receipt.
+
+Scripts and aggregate/date-only receipts are retained locally under ignored
+`artifacts/guidance_revision_drift/usb-quality-audit-20261103/`. They are audit
+utilities, not additions to the accepted candidate/native source. No USB
+writes, extraction, executable disk-code/pickle loading, API-access file,
+credentials, private download links, provider calls, QC page/API/docs/quota/
+Mia, purchases or account/resource changes. No raw dataset is committed.
+
+### 59.2 Measured coverage and healthy sampled behaviour
+
+| Audit | Actual scope | Evidence limit |
+|---|---|---|
+| Stock raw daily census | 32 containers: 26 active and six delisted, 517,458,054 compressed bytes. 16,477 member occurrences / 16,180 filename symbols; 23,659,724 eligible row occurrences. 15,641 members contain eligible rows; 836 contain none. Observed eligible endpoints January 2, 2013–August 31, 2026. | Complete selected inventory and eligible prefixes, not every later row, permanent security identity or an official-session completeness certificate. Empty eligible history may legitimately predate/postdate the window. |
+| Detailed minute sample | SPY plus predeclared AAPL, AMZN, F, GE, JNJ, JPM, META, MSFT and XOM: 19,307,318 eligible minute rows. All ten show 3,436 observed dates, with matching paired raw daily dates. | The cohort was fixed before price checks, not selected from returns. It is not all stock/ETF minute archives or an eligibility-approved universe. |
+| Actions | All four stock/ETF split/dividend ZIPs: 11,900 data members plus two README members. 396,030 date-prefix rows; 293,067 valid eligible actions plus two invalid zero-ratio rows. 96,840 earlier and 6,121 protected rows excluded before numeric decoding. | Date/value validity and within-file keys, not complete permanent-ID, announcement, payment or terminal-action evidence. |
+
+The ten sampled minute files have no detected nonfinite/malformed numbers,
+nonpositive OHLC, invalid OHLC bounds, negative/zero/fractional volume,
+duplicate timestamps, ordering faults, malformed clocks, non-minute seconds
+or weekend rows. The 19,307,318 timestamps were independently rescanned
+without decoding any OHLCV by the timestamp supplement. All SPY and eight
+stock observed dates contain every 10:00–10:05 slot; AMZN lacks three slots:
+November 20, 2013 at 10:02; May 19, 2015 at 10:00; July 2, 2015 at 10:01.
+This says nothing about whether a signal/order opportunity existed then.
+Dependent completed-minute volume cannot be fabricated or forward-filled.
+
+The paired raw daily checks also cover all 3,436 SPY dates. Those checks
+find 20 fractional-volume rows in SPY, requiring volume-unit/source-contract
+reconciliation; no other scalar/OHLCV/date fault is detected in the ten paired
+daily files. This limited paired-file result does not supersede the full
+stock-daily conflict census below or establish daily/minute price agreement.
+
+There are 150 sample timestamps outside the diagnostic 04:00–20:00 range:
+three at 03:59, 141 at 20:00 and six later. SPY has 38 dates with fewer than
+390 observed minutes in the wall-clock 09:30–16:00 window; AMZN has 1,044.
+These are reconciliation observations, not 38/1,044 proven missing sessions
+or vendor errors. Early closes, halts, trade eligibility and source gaps need
+their own evidence; extended-hours bars can occupy the afternoon after an
+early close. No exact 210-minute shape safely identifies that calendar here.
+
+`requirements.txt` pins `pandas_market_calendars==5.4.0`, but neither that
+package nor `exchange_calendars` is available in the checked existing runtime
+locations. No package is installed. Do not substitute weekdays, federal
+holidays or the invented fixture calendar for a verified NYSE schedule.
+Eastern start-of-bar documentation and available ZoneInfo support a later
+declared conversion, not independent proof of the feed's timezone/availability.
+
+### 59.3 Confirmed quality findings and reconciliation ledger
+
+Counts below are input row/member occurrences; categories overlap. They are
+not independent issuer/date defects, research samples, or a reason to remove
+future losing securities. Resolve or quarantine affected observations under
+frozen pre-outcome rules, not by averaging prices, choosing an arbitrary ZIP
+copy, shifting dates or dropping inconvenient history.
+
+| Finding | Count / disposition |
+|---|---|
+| Within-member daily duplicate timestamps | 6,914 rows. Of 1,464 differing raw representations, 735 are numeric OHLCV conflicts and 729 formatting-only. Numeric conflicts need canonical source/version resolution. |
+| Cross-container daily duplicate timestamps | 434,575 occurrences, with 52,186 differing raw representations: **50,040 numeric conflicts**, 2,146 formatting-only. Do not equate a CRC or text difference with a numeric difference. |
+| Nonpositive daily OHLC | 1,207 rows, all involving zero prices; no negative prices found. Active archives account for 1,034, delisted for 173. Fail dependent positive-price eligibility/valuation; do not silently substitute old prices. |
+| Daily OHLC bounds | 721 violations, all in delisted archives. These require resolution or explicit refusal. |
+| Daily volume | 6,593 fractional raw volumes (6,305 active), 370 zero-volume rows. Fractional values need source/normalization reconciliation with the integer-volume contract; zero daily volume is diagnostic, not automatically invalid. The README's omitted-zero claim is about intraday data. |
+| Daily chronology / blank rows | Six order events; 44 date-prefix refusals were blank lines, not malformed calendar dates. No weekend, nonfinite, negative-volume, malformed-number, field-count or daily timestamp-format fault found. Post-protected-boundary chronology remains untested. |
+| Splits | Two nonpositive ratios in `CTM.txt`, dated January 31, 2013 and May 14, 2015. Quarantine affected split records rather than guess an adjustment. Eligibility/type mapping determines which studies can encounter them. |
+| Action dates / ordering | A HON split dated June 28, 2026 and MFICL dividend dated March 1, 2025 fall on weekends; effective-date/security-type reconciliation is needed, not automatic shifting. Seventeen ETF dividend files have mixed date order. Twenty-five zero cash amounts are flagged, not automatically invalid. |
+| Action key validity | No malformed/nonfinite/negative-cash or duplicate/conflicting date keys within individual action files after separating README metadata. This is not cross-ticker/permanent-ID reconciliation. |
+
+All within-member daily duplicate/order faults and all bounds violations occur
+in delisted archives. Filtering only to surviving clean names would conceal
+these risks. The broad daily audit includes instruments not yet demonstrated
+to satisfy baseline common-share eligibility; it does not require repairing
+every irrelevant warrant before a properly frozen study.
+
+Central metadata also finds 384 active/delisted base-symbol overlaps after
+stripping `-DELISTED`. Stock action filename joins leave 15 split and 224
+dividend names unmatched, and 160/83 ambiguous active/delisted bases.
+Punctuation variants, ETF members and minute-only symbols explain some cases;
+they are not automatically missing actions. Active minute-only symbols are
+ALCE, CRKN, DCOMG, IMPH, QH, VHUB and WHLM; MESA is daily-only. The ticker
+list lacks permanent issuer/security IDs, instrument eligibility, currency,
+dated exchange/sector/status and source publication/receipt clocks.
+
+SPY has 54 eligible dividend records, March 15, 2013–June 18, 2026: four per
+year through 2025 and two before the 2026 cutoff. There is no SPY split member;
+absence is consistent with the file convention, not independent proof of a
+complete split history. Two-column action files lack payment dates, currency,
+permanent IDs, action/version IDs and availability clocks. An ex-date cannot
+be treated as spendable dividend cash. Merger/spinoff/delisting consideration
+and residual settlement economics remain unavailable/unverified.
+
+### 59.4 Auditor controls, integrity and retained receipts
+
+Author QA caught and corrected an audit-counter defect before final reporting:
+daily v1's global-overlap counter included some repetitions within the first
+container. An invented ZIP control fails that version; archive-aware v2 passes
+and the full daily audit was rerun. V1 scripts/receipts are retained and
+superseded, not erased. Raw text conflicts were then compared as exact Decimal
+values to separate formatting-only differences. The semantic pass covers 749
+target member occurrences / 1,062,685 eligible rows. All 44 apparent invalid
+date rows were confirmed blank; two action README files were separated from
+data rather than labelled malformed events.
+
+One initial format probe emitted short prefixes containing a few price
+lexemes from two eligible, unprotected rows (September 24, 2014 and April 7,
+2025). This was disclosed and output was corrected; no protected financial
+value or return was emitted. Do not claim zero raw price-lexeme exposure for
+this round. Retained results contain aggregate diagnostics and dates only.
+
+Minute parser controls pass six invented methods plus its original control
+matrix (gates, duplicate semantics, finiteness, bounds, volume, clock/order).
+Action controls pass five retained invented gate/scalar checks. The timestamp
+supplement proves financial-payload changes do not change its output. Daily
+invented ZIP controls cover gates, numeric/OHLCV validity, duplicates/source
+overlap, order, ZIP-magic dispatch and CRC scope. These are author/subagent QA,
+not independent Claude acceptance or a full lane/repository suite.
+
+For integrity, 9,423 daily members reach EOF with ZIP CRC verification;
+7,054 stop before protected values and do not receive a full CRC claim.
+All ten sampled minute members are similarly prefix-only. All four small
+action archives match manifest size/MD5, compressed SHA and complete-member
+CRC; their excluded financial fields are never decoded. Source archive
+sizes/mtimes and the USB manifest SHA remain unchanged. There is no full
+324-GB checksum or all-minute-ticker quality certificate.
+
+All following receipts are ignored/local under
+`artifacts/guidance_revision_drift/usb-quality-audit-20261103/`:
+
+| Retained receipt or script | SHA256 |
+|---|---|
+| `daily/daily-report-v2.json` | `794e330c2a742fa654b0ef10ac6ac4e8b4ebdbcccd8683196cef6916ee0aa36d` |
+| `daily/audit_v2.py` | `465aeca966b5df1359858e47ca03e5e20e55fa55ad1b5e2b17c9d13f5c40c0d5` |
+| `daily/duplicate-diagnosis-v2.json` | `128140cc1819b27ede8432d6e9b03660f4696dd2c90e154834268cfb23840b73` |
+| `daily/control-report.json` | `8b80b439e33acf7fb6675408febfdf40b647b02e649f40cf3edd1c3b11b10784` |
+| `minute/minute-report.json` | `48d6838f04414ff1eab1376cac006c16b7811ad3be2c65a6694787cd19ecc9ff` |
+| `minute/audit.py` | `b903440323cf2019fe6cfc7e27400428d251493eb382324d291124aac4748bd5` |
+| `minute/test_controls.py` | `a73297331f04019db70acee63d252bde70b380a60c4c83dc78d7916156e9cf2e` |
+| `minute/timestamp-supplement.json` | `5e4d5bc476dcfbc0e081ea36839eb394c995b284fcb16131c96a3f4855f2fd0f` |
+| `minute/timestamp_supplement.py` | `d986699d92cf67bd1c3488eb5213c1fbad28445f381f8932f3e665fa082a2d60` |
+| `actions/action_audit_v2.json` | `9fa40d0bd431d1b31fd41a8e7ad49ff8e4d4be039d8d651b3899bb6710a44237` |
+| `actions/audit_actions_v2.py` | `387a982b2cd8d3ecd019a6908a8ddc34f0de8c9d26fb7b4154b2837bf88d4753` |
+| `actions/action_exception_details.json` | `c910016d607d75bc2d684a4d6169bb3cee60195169ea39071f962ef4129ab0aa` |
+
+The daily v2 audit took 84.660 s and semantic pass 6.284 s; minute numeric
+audit 75.194 s and independent timestamp pass 40.220 s. These timings are not
+independent sample sizes. No performance-bearing evaluation/look or native
+attempt is created. Local receipts remain machine-bound; the lane record
+contains the resumable findings and exact anchors without raw licensed data.
+
+### 59.5 Exact remaining backtesting blockers and handoff
+
+1. Resolve/quarantine conflicting daily histories, zero-price/bounds faults
+   and invalid splits with documented source/version precedence and a frozen
+   eligibility/refusal policy. Never silently select one copy or remove an
+   affected historical issuer based on later outcomes. Audit all minute files
+   actually selected by that dated universe; the nine-stock sample cannot
+   certify the entire minute collection.
+2. Supply management FY guidance/current-comparable predecessor content and
+   declared publication/correction/withdrawal/reconstruction semantics. The
+   USB earnings calendar remains analyst estimates/reported EPS, not guidance.
+   PIT/confirmation proof is stronger than the exploratory reconstruction
+   allowed in 57.4; do not turn it into an unconditional exploration veto.
+3. Supply historical consolidated stock/SPY NBBO with usable common dates and
+   actual quote conditions/sizes/clocks. Bars do not establish spreads, limit
+   executability or historical quotes. No bar-only strategy substitution.
+4. Bind dated permanent identities, eligible type/sector/exchange/status,
+   authentic sessions/early closes/halts, action payment/availability and
+   terminal/settlement/fee economics. Common usable history is more than the
+   presence of long files; missing minutes remain named refusals.
+5. Implement/validate an accurately labelled FirstRate raw-bar/action adapter
+   and its combination with a licensed quote source. Existing
+   `historical_market` requires a Massive-shaped source plus real NBBO and
+   receipt/reference metadata; do not relabel FirstRate, fabricate missing
+   fields or assert completeness. The current runner remains invented-only;
+   new exact source still needs its applicable independent review/native
+   validation and frozen research/economic/date/look scope. Current owner
+   direction continues to prohibit QC, so no native run occurs now.
+
+The owner's licensed-purchase report and published FirstRate terms improve
+the USB rights position; missing original invoice inspection is not used as
+an invented prohibition on this completed audit. Dataset/terms provenance
+should be retained at freeze, and rights for any additional guidance/quote
+source remain separate. No purchase is made or recommended merely to replace
+existing bar coverage. No cleansing/adapter milestone starts automatically.
+
+Only the lane record and active-status pins change in tracked Git. Ignored
+audit utilities/aggregate receipts are local; production full-source SHA stays
+`aeefa0b379e3049a85954084cee5f2a1dc5f14a0f9265460c7f8e8c243666096`.
+Sections 1 through 58 are preserved below the header. Root/shared documents,
+original plan/PDF/draft, accepted fixture/carrier, the original closed 3/3
+cycle and separate recovery zero attempts/intents remain unchanged. Monitor
+stays PAUSED. Preserve both existing local notes commits; this audit is
+local-only and no new push is requested or performed.
+
+Final focused verification: the one active-record method passes in 0.011 s
+with zero failures/errors/skips; the changed boundary test compiles in memory.
+All twelve section-59 receipt/script anchors match their retained bytes.
+Production source SHA is unchanged, sections 1 through 58 are byte-exact below
+the header, and `git diff --check` passes. Read-only author/subagent document
+QA found no material discrepancy; this is not independent Claude acceptance.
+No full lane/repository suite or empirical/native test was run.

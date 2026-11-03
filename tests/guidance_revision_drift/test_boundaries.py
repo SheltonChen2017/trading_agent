@@ -191,9 +191,13 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         # Review-state phrase: rotate it in the same commit as each new review
         # or counter-review section so the status block cannot go stale.
         header = record.split("## 1.", 1)[0]
+        self.assertIn("USB coverage and quality audit recorded in section 59", header)
+        self.assertIn("The owner reports these FirstRate files were purchased under their licence", header)
+        self.assertIn("Date-gated quality checks found daily data conflicts and action-field gaps", header)
+        self.assertIn("No QC access, purchase, strategy evaluation or source-data repair occurred", header)
         self.assertIn("USB FirstRate structural audit recorded in section 58", header)
         self.assertIn("historical NBBO and issuer-guidance coverage are still not established", header)
-        self.assertIn("No market-value/outcome rows, QC access, backtest or archive ingestion occurred", header)
+        self.assertNotIn("No market-value/outcome rows, QC access, backtest or archive ingestion occurred", header)
         self.assertIn("Coverage/licensing follow-up recorded in section 57", header)
         self.assertIn("original receipt/version proof is required for PIT/confirmation claims", header)
         self.assertIn("The section-55/56 round was published once as `7d633144`", header)
@@ -250,6 +254,7 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertGreater(record.index("\n## 56."), record.index("\n## 55."))
         self.assertGreater(record.index("\n## 57."), record.index("\n## 56."))
         self.assertGreater(record.index("\n## 58."), record.index("\n## 57."))
+        self.assertGreater(record.index("\n## 59."), record.index("\n## 58."))
         self.assertIn("research/__init__.py`, remains unobserved", header)
         self.assertIn("paused pending platform preflight", header)
         self.assertIn("GDR-RP33 is accepted in section 34", header)

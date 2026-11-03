@@ -1,6 +1,10 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Coverage/licensing follow-up recorded in section 57, 2026-10-28.
+Status: **USB FirstRate structural audit recorded in section 58, 2026-11-03.
+Long-history raw stock/SPY OHLCV and action files are present as candidate inputs;
+historical NBBO and issuer-guidance coverage are still not established.
+No market-value/outcome rows, QC access, backtest or archive ingestion occurred.
+Coverage/licensing follow-up recorded in section 57, 2026-10-28.
 Known subscriptions still do not establish usable guidance and stock/SPY NBBO.
 Current-vintage exploratory reconstruction is permitted by the plan in principle;
 original receipt/version proof is required for PIT/confirmation claims.
@@ -82,7 +86,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 57. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 58. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -8083,3 +8087,128 @@ zero failures/errors/skips); the changed test file compiles in memory,
 `git diff --check` passes, production source SHA is unchanged and sections
 1 through 56 are byte-exact to `7d633144`. No full lane/repository suite or
 repeated engine evaluation is needed or claimed for this documentation audit.
+
+## 58. Connected USB FirstRate Data structural assessment, 2026-11-03
+
+### 58.1 Owner scope, physical inventory and integrity limit
+
+Owner: "i just connected a usb disk to the computer. examin whether the data
+would be of any use here". This authorizes a local read-only usefulness and
+structure inspection, not an empirical evaluation, unrestricted import,
+source/policy change, QC access, purchase or publication. Start at clean
+local `f95b84e5d26f20f429a1bd1f3d4d500f93f4b2ff`, one known local notes
+commit ahead of live matching remote
+`7d63314472b4462e153dde82b0bf71c848a253fa`; mandatory worktree, branch and
+origin unchanged. Preserve the unpushed section-57 notes.
+
+One external physical SANDISK disk is mounted at `/Volumes/SANDISK` with
+`firstrate/market`, `firstrate/fundamentals` and `firstrate/manifest.json`.
+The manifest contains 769 entries totalling 324,283,728,284 bytes (324.284
+decimal GB, 302.013 GiB); there are 770 regular files including the manifest,
+and no symlinks under `firstrate`. All 769 entries resolve to files on the
+disk with matching declared sizes. Every manifest `ok` value is true, which
+is retained downloader metadata, not a new checksum certification. The
+manifest's naive `fetched` strings span October 17, 2026, 17:05:02–20:13:39;
+no timezone, original data availability or subscriber identity is inferred.
+Source hostnames in the manifest are `firstratedata.com`.
+
+Stock and ETF directories contain 388 and 316 files, respectively. Other
+directories cover indices, futures, FX, crypto and fundamentals; those are
+inventoried only as context and do not add hypotheses to this lane. Only
+documentation, ticker metadata, bounded ZIP central directories and CSV
+headers are inspected. No data-value, earnings-result or price/action row is
+opened or emitted. No extraction, execution of disk files, unverified
+deserialization, provider API, backtest, outcome join or QC access occurs.
+No agent command writes to the USB. The two `API_Access` files are not opened;
+manifest download URLs are neither emitted nor visited. No credentials or
+private access links enter the repository.
+
+Manifest SHA256:
+`c681af584244d38e3f9dea2ff765cc2c991cb383107a3e542115a4338ee4cdf8`.
+The two small market README files also match their manifest MD5s. No full
+checksum/CRC pass is claimed for the 324 GB collection or compressed payloads.
+
+### 58.2 Materially useful inputs and remaining data gaps
+
+| Inspected local material | Structural evidence | Use and limit |
+|---|---|---|
+| Stock and ETF bars | Six columns: DateTime, Open, High, Low, Close, Volume. Unadjusted 1-minute/daily, split-only and split/dividend-adjusted variants are present. | Candidate raw execution-price, minute-volume and daily valuation inputs; not bid/ask/NBBO. Prefer raw bars plus separately verified action accounting; never double-count cash dividends with dividend-adjusted prices. |
+| SPY | Ticker metadata lists January 3, 2000–October 16, 2026. ZIP inventory contains `SPY_full_1min_UNADJUSTED.txt` (249,648,453 uncompressed bytes) and `SPY_divs.txt`. | Long comparator bar/volume history is physically present. Metadata/member existence does not prove all sessions, conditions or synchronization. It does not fill the historical quote gap. |
+| Stock/ETF coverage lists | Stock list: 16,306 rows, 16,136 distinct symbols; 169 duplicated symbols. Stock metadata endpoints January 3, 2000–October 16, 2026. ETF list: 5,100 symbols, February 26, 1999–October 16, 2026. | Far more than five years of nominal bar history, but not proof of six usable common years across guidance, quotes and the eligible universe. Ticker/name/first/last dates lack permanent identity, type, sector and exchange history. |
+| Splits and dividends | Stock/ETF action ZIPs and relevant member names present. | Candidate action inputs only; no action amounts, entitled shares, completeness or original availability were validated. Merger, spinoff and terminal settlement coverage remains absent/unverified. |
+| Earnings Calendar/Estimates/Surprises | 7,992 per-ticker CSV members; headers `date,eps_estimate,eps_reported,release_time`. README identifies analyst consensus and reported EPS; release-time classification is coarse. | Earnings context, not management FY revenue/EPS guidance, comparable predecessor ranges, withdrawal/correction history or receipt/version evidence. |
+| Annual/quarterly financials | 16,230/15,779 CSV members, identical 74-column schemas in two bounded ticker crosschecks. Includes filing/fiscal dates and actual revenue/EPS fields. | Descriptive filed fundamentals; neither management outlooks nor a new baseline filter. A filing-date column does not establish original availability/PIT. |
+| Valuation metrics | 5,945 CSV members, ten-column schema including forward ratios. | Context only. Forward valuation ratios are not issuer guidance disclosures. |
+
+No management-guidance product/category or corresponding guidance/version/
+withdrawal/receipt-named member was found in the four inspected full
+fundamental archives. This is a bounded inventory/schema result, not a claim
+to have read every file's contents. No stock/ETF format inspected supplies
+historical best bid/ask. Thus this disk can supply important existing bar,
+volume, SPY and action candidates without another bar-data purchase, but
+does not close either of the lane's two core signal/quote gaps.
+
+Bundled market documentation specifies US Eastern EST/EDT, period-start
+timestamps, share volume and omitted zero-trade minutes. A future adapter
+must represent completed bars correctly, handle daylight saving, missing
+minutes and regular sessions explicitly, and not fabricate prices or same-bar
+fills. Unadjusted trade-volume inputs should not be silently replaced by
+retroactively adjusted volume. The docs describe filtered, periodic ticker
+additions; "Complete" is a product label, not an unbiased universe guarantee.
+
+The provider's [FAQ](https://firstratedata.com/about/FAQ) separately confirms
+incomplete delisted coverage, histories stored under recent tickers, distinct
+daily/intraday construction, and split/dividend-only actions. Dated identity,
+inactive-security coverage and terminal economics still need audit. No
+current-ticker join is accepted as point-in-time mapping.
+
+### 58.3 Rights, evidence custody and next step
+
+FirstRate's current public [licence](https://firstratedata.com/about/license)
+supports perpetual downloaded-data use, research/model derivatives, and
+service-provider access/copying/hosting on the subscriber's behalf. Raw
+redistribution remains restricted and published research has an attribution
+provision. This is substantially more positive retention/private-processing
+evidence than section 57 established for some other providers. Bind these
+downloads to the actual subscriber/purchase and applicable terms; possession
+of a disk or an MD5 manifest alone is not that proof. Do not invent a separate
+vendor sign-off requirement when the applicable licence already permits the
+use. Nor does the licence grant this lane QC/run or trading authority.
+
+Small inspected metadata SHA256 anchors:
+
+| File, relative to `/Volumes/SANDISK/firstrate` | SHA256 |
+|---|---|
+| `market/Stocks_Complete_10_000+_Tickers/Read_Me_Documentation.txt` | `65488a86ad567ab432be31f86935445888cc41c1aaf8afb8f9d2dd49191fa5a1` |
+| `market/ETF-Complete_5000+_Tickers/Read_Me_Documentation.txt` | `eb09be54bf112b0395e255407056285e455f80f34e845f6f9ba2f1fb60653ef4` |
+| `market/Stocks_Complete_10_000+_Tickers/Ticker_Listing.txt` | `584718095d81d576af0f83d6f31d5cda565e59ea2c6677e5b164e0db39e93464` |
+| `market/ETF-Complete_5000+_Tickers/Ticker_Listing.txt` | `4532194e351a00a51b0e379b4df86f20bd92aa9a98f8110f81ff9d90c112f559` |
+| `fundamentals/Earnings_Calendar_Estimates_Surprises/Read_Me_Documentation.txt` | `7121cf97c68c94e35ac806f433810e13ef68fc8a16e13fd1008eddf1bf53c08b` |
+| `fundamentals/Company_Financials_Income_Statement_Balance_Sheet_Cash_Flow/Read_Me_Documentation.txt` | `402c3cbd54015bba8c0e0c607d7dcf0de1c503992c6b6af0265f1babaa28356b` |
+| `fundamentals/Valuation_Metrics_P_E_P_B_EV_EBITDA_etc./Read_Me_Documentation.txt` | `dc85b67cbde91573af69e390d133396bc2d48363bd69ac21c70e118a647923ac` |
+
+Recommended next bounded step: retain this collection in place, verify its
+purchase/terms provenance, then design a date-quarantined structural coverage
+and identity/normalization audit of the raw stock/SPY bars and action files.
+Keep data dated September 1, 2026 onward quarantined; its existence in
+metadata does not authorize inspecting protected outcomes. Do not run a study,
+load whole archives, change to a bar-based execution model or add fundamental
+filters under this inspection request. Guidance/predecessor/timing coverage,
+historical stock/SPY NBBO, dated reference/terminal/settlement evidence, native
+adapter validation, independent review and exact research/evaluation scope
+remain unresolved. The exploratory-versus-PIT distinction in 57.4 still holds.
+
+Only the lane record and active-status pins change; no production/source,
+draft/fixture, coverage snapshot or native carrier changes. Source SHA remains
+`aeefa0b379e3049a85954084cee5f2a1dc5f14a0f9265460c7f8e8c243666096`.
+Sections 1 through 57 remain byte-exact below the header. Root/shared documents
+stay frozen. Original closed 3/3 and separate recovery zero attempts/intents
+are unchanged; monitor stays PAUSED. Preserve local `f95b84e5`; no push is
+requested for this USB audit and none occurs.
+
+Focused verification passes: one active-record method, zero failures/errors/
+skips; changed boundary test compiles in memory; all pinned SHA shapes and
+`git diff --check` pass. The USB manifest SHA is unchanged after inspection,
+production source SHA is unchanged, and prior sections 1 through 57 are
+byte-exact. No full suite, bulk integrity pass or empirical/native run is
+claimed or needed for this metadata-only assessment.

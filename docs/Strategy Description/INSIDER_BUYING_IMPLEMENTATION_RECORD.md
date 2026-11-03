@@ -1,14 +1,15 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **361 HANDS OFF THE COMPLETED USB SOURCE-QUALITY ROUND AT A
-CONCRETE PRE-QC FACTUAL STOP. CORRECTED QUALIFICATION ON EXISTING51177f3e
-SUCCEEDED230.497046375s:68 DATA FILES PLUS MANIFEST,21,638 DAILY MEMBERS,
-47,802,869 DAILY ROWS; PRIVATE COVERAGE IS RETAINED/HASH-BOUND. FIRST
-FAILED ATTEMPT IS PRESERVED; NOTHING IS CANONICALLY ADMITTED OR BACKTEST
-READY. THIRTEEN P2s REMAIN OPEN. HISTORICAL SEC PUBLIC-AVAILABILITY,
-ORIGINAL/PIT/IDENTITY/POPULATION FACTS STILL BLOCK THE FINAL HANDOFF.
-NO QC/SAFARI, VENDOR REPLY, PURCHASE, UPGRADE OR OUTCOME LOOK; MONITOR
-DISARMED. ONE FINAL MATCHING-LANE PUSH FOR THIS ROUND.**
+Status: **362–363 RECORD THE OWNER-REQUESTED READ-ONLY SUBSCRIPTION AUDIT.
+QC RESEARCHER AND SHARADAR5-YEAR BUNDLE/EOD HISTORICAL+CALENDAR/FMP STARTER
+ARE CURRENTLY AVAILABLE; CANCELLED RENEWAL IS NOT EXPIRED ACCESS. FMP'S
+STARTER MATRIX LISTS ALL6 INSIDER AND ALL12 SEC-FILINGS ENDPOINTS AVAILABLE;
+NO DATA QUERY/COVERAGE/PIT CLAIM FOLLOWS. QC ETF CONSTITUENTS HAVE FREE CLOUD
+USE, SEPARATE DOWNLOAD LICENSING. USB QUALIFICATION360–361 REMAINS COMPLETE.
+THIRTEEN P2s REMAIN OPEN; HISTORICAL SEC AVAILABILITY/VERSION AND ORIGINAL/
+PIT/IDENTITY/POPULATION FACTS STILL BLOCK READINESS. QC ACCESS THIS ROUND IS
+ACCOUNT/LICENSE METADATA ONLY: NO HISTORY/SDK/UPLOAD/JOB/LOOK/BACKTEST.
+NO VENDOR REPLY, PURCHASE, UPGRADE OR MONITOR REARM.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -319,6 +320,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-29 | Claude review (Windows session) and corrections | `1635900d` -> `0f70bbe0` (42 collection guards, custody-platform convention test, SEP-2 manifest declaration) -> this review record | Review of `d1990c49..1635900d` (four record-only Codex commits: sections 343-349, zero merges); every earlier commit since `86700b1c` carries a disposition from the macOS Claude session in sections 159-342. Owner direction for this round: fix, do not just log. | All four commits accepted after verifying hashes, counts, time conversions, append-only status edits, and the absence of contact or credential shapes. Corrections: `IBWIN-CR02` (42 lane tests added after section 161 reached `fcntl` unguarded, so Windows collection errored on 42 of 200 lane files) fixed by guards plus a convention test that enforces the rule for every lane test; `IBSH-CR02` fixed by declaring `IPython`, `QuantConnect`, `clr` as hosted platform imports in the shared SEP-2 manifest (flagged shared edit); `IBQC-SHARED-META01` left open with the exact proposed patch and blocker. Full detail in section 350, including the required 1-10 rating. | All runs under proven process-level network denial. Windows lane-set collection 6,770 tests, 0 errors (was 42); custody-platform file 61 passed, 58 skipped; 44 guarded files 44 skipped; project-separation files 35 passed (was 2 failed); boundary/package/document selection 1 failed, 156 passed (the one failure is the section-155 harness artifact: the denial harness preloads `socket`; the test passes without the harness); record/active-document gates **72 passed** (measured on the tree carrying this section; the re-run after this value was written reported the same count); compileall tests+research exit 0; `git diff --check` clean. No full lane gate or complete repository suite on this host. No SEC/EDGAR, provider, Gmail, QC, credential, journal, custody, broker, or trading access; **0 research looks**. | `01138636`, `9a35d71e`, `2f9ee6e8`, `1635900d` accepted (the last with a cross-lane QC-read note). Open P2s: ten remain (twelve minus `IBSH-CR02`, plus none new; `IBWIN-CR02` opened and fixed in the same round). | Codex counter-reviews this round, including the shared manifest edit; `IBQC-SHARED-META01` waits for one captured real orders response under a permitted QC round; substantive blockers unchanged from 344/348. |
 | 2026-10-30 | Codex continued pre-QC implementation | `e7e65b9f` -> `8586239117f09c3b59802e14c1c6791f5e502848` -> this separate final handoff | Additive required21 selected-control consumption chain | Sections357-359 authenticate exact20,044+8=20,052 exclusions and add a genuine full25/restricted21 selector adapter; old planner stop remains; zero new requests/body reads/credential/QC access or historical archive promotion. | Main126 focused13.39s;129 boundary/document/pin/stop checks6.81s;23 manual source images compile; one source-only health1.926698709s and one actual selected-metadata observation1.992836416s on existing clean85862391,168 current code images; no looks/jobs/backtests. | No P0/P1;13 carried P2s remain OPEN, actual Massive readback P3 remains OPEN; prior scoped closures preserved. | Genuine historical availability/version archive and remaining original/PIT/context/rights/population inputs; release held subscriber-verification reply only by explicit owner direction. No purchase/QC/Safari/vendor reply, automatic monitor rearm or interim push. |
 | 2026-11-03 | Codex owner-authorized pre-QC USB build | Clean32caf7a5521ef4fae21b504feac816c8e7f692ef -> implementation5493b95f48105510b77396ef7310161bae25086d -> correction51177f3e9dbad613de61b341e632b228d747fe71 -> this separate361 handoff | Qualify supplied FirstRate daily/action/earnings bytes without purchases or QC | Failed attempt1 preserved; ZIP-only underscore correction proved RED/GREEN; same-epoch attempt2 succeeded230.497046375s,68 data files+manifest/21,638 daily members/47,802,869 daily rows, private catalog37,210,827B hash-bound; no canonical/source/PIT/actual-release/rights/backtest promotion. | Main136 focused/EXACT1.52s,129 boundary6.67s and final checks below; author65 focused/compile; native no-USB health plus bounded metadata diagnosis and actual read-only scan; independent nine-leaf integrity/hash reconstruction, zero requests/credentials/looks/QC/backtests. | No P0/P1;13 carried P2s OPEN; IBUSB-FORMAT-36001 resolved narrowly, old-helper IBIPC-36001 P3 retained/open; prior closures/failed roots preserved. | Concrete missing historical SEC availability/version, original/PIT/identity/whole-population facts; no vendor reply, purchase/upgrade, QC/Safari, optional EOD comparison, monitor rearm or interim push. |
+| 2026-11-03 | Codex owner-requested subscription audit | Clean317ca265778f8df430fade5c212647b07f08b78a -> this documentation-only363 handoff; incoming EMPTY | Inspect QC/Sharadar/EODHD/FMP active plans and available dataset families | Current plans verified; renewal cancellation distinguished from active paid access. FMP Starter matrix6/6 insider and12/12 SEC endpoints available; QC Researcher/core-cloud license versus download distinction. No source request/row capture or job. | Public primary docs plus signed-in account/license metadata; focused record/active-document/EXACT checks below; zero source replays/provider queries/looks/backtests. |13 carried P2s unchanged; IBUI-SECRET-36201 P3 token-display/owner-rotation scope OPEN, no key in Git or further use. | Qualify existing-plan FMP/identifier sources under a new bounded source scope before purchase; historical archive/PIT/population facts remain missing; no QC research, vendor reply or monitor rearm. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -42592,3 +42594,178 @@ Diff whitespace is clean; no full lane/repository suite was run. Source/test
 images remain the observed51177f3e images. Final commit/push guards must still
 verify exact root/branch/HEAD/expected status and unchanged matching origin;
 remote completion is reported only after independent exact-tip readback.
+
+## 362. Owner-requested active-subscription and dataset audit (2026-11-03)
+
+### 362.1 Authority, actual checks and status meaning
+
+Start clean local/origin `317ca265778f8df430fade5c212647b07f08b78a`;
+matching-only fetch and ordered incoming range EMPTY. Owner requests
+`check my qc/sharadar/eodhd/fmp subscriptions for available data`, then
+explicitly confirms cancelled plans remain active. **IBDEC-362-01:** inspect
+only signed-in account/subscription, organization-resource and dataset-license
+metadata. This later explicit request releases the earlier QC/Safari hold
+ONLY for those read-only checks, not Research history/SDK, data downloads,
+uploads/jobs/strategy launches, outcome looks or backtests. Owner subsequently
+confirms Safari is available. No plan/payment/security setting, project,
+dataset subscription or source namespace is created/changed.
+
+Safari's initial QC session was expired. Its cached generic FREE label was
+NOT evidence of a free current organization. Existing Google sign-in restored
+the established QC account; no new account, agreement, permission expansion,
+credential entry/reset or project operation. One stalled/no-frame login was
+refreshed; current organization/billing then visibly states Researcher.
+Initial concurrent Safari navigation was respected and refreshed, not
+attributed to another agent. No vendor correspondence or subscriber identity
+disclosure. No provider data endpoint, credential helper, direct QC API/SDK/
+history data call, retained-source replay or private dataset body is invoked.
+Website account-page background requests are not mislabelled as zero network
+access.
+
+Current authenticated panels show Sharadar5-Year Bundle, EOD All World plus
+Calendar and FMP Starter have usable paid access with renewal cancelled.
+**IBDEC-362-02:** CANCELLED RENEWAL IS NOT EXPIRED ACCESS. Exact access-end
+dates were read and reported privately to the owner; do not label these
+subscriptions unavailable. No renewal/resume/upgrade/purchase is performed.
+Private subscriber/account IDs, contact addresses, payment/invoice/card
+values, API material and private browser/mail URLs are excluded from Git.
+
+### 362.2 Available families versus proven source coverage
+
+| Service | Observed plan / account evidence | Data available or advertised within that scope | Exact evidence limits |
+|---|---|---|---|
+| QC | Current organization Researcher; organization resources and billing products read. Listed products are platform/compute/support; no paid dataset add-on was shown in that inspected product list. | Public core-cloud offerings include US Equity Security Master, US equities, Morningstar US Fundamental Data, US ETF Constituents and EODHD Upcoming Earnings. Authenticated ETF dataset Licenses explicitly permits FREE organization-scoped cloud use. | Current account metadata and a catalogue/license are NOT a successful History/SDK read, complete coverage or local-export license. ETF on-premise downloads are separately charged/licensed. No all-organization paid-license absence claim. |
+| Sharadar | Authenticated Personal-use Bundle,5-Year history, active paid term; cancellation applies to renewal. This agrees with the earlier owner-confirmed tier. | Bundle tables include fundamentals/daily fundamentals, stocks/funds/metrics, tickers, actions/events, SP500, insiders and institutional holdings. | Current5-year tier is not full history or automatic2020 warm-up coverage. Previously retained SF1 remains retained; do not buy it again. A current ticker/permaticker record is not by itself a historically observed identity interval. |
+| EODHD | Authenticated EOD All World and EOD Calendar, active paid terms; renewal cancelled. | EOD price/dividend/split families and Calendar earnings. Official ID Mapping is documented under ALL plans, including EOD Historical; can cross-reference symbol/CIK/ISIN/CUSIP/FIGI/LEI. | No new authenticated mapping/data request or date/population qualification. Current crosswalk output has no documented as-of validity interval. Fundamentals/All-In-One/Form4 entitlement is not established by Historical+Calendar ownership. |
+| FMP | Authenticated subscription banner says Starter, active paid term, renewal cancelled. Pricing card/default matrix also shows generic Free markers; this is not silently treated as a confirmed downgrade. Starter was selected ONLY as the Market Data comparison filter. | The displayed Starter matrix lists ALL6 insider-trading endpoints and ALL12 SEC-filings endpoints available/full;9 of9 earnings/dividend/split endpoints (3 full,6 limited);3 of9 ETF/fund endpoints;10 of11 directory endpoints. Standard Starter families include up-to5-year US prices, annual fundamentals/ratios, profiles/reference/news. | This is account-plan plus displayed comparison-matrix evidence, not endpoint HTTP/row retention/coverage/PIT validation. Do not infer every ETF holding or unlimited historical earnings feature. No new FMP data request, rights assertion or paperwork question. |
+
+FMP insider category names are Latest Insider Trading, Search Insider Trades,
+Search Insider Trades by Reporting Name, All Insider Transaction Types,
+Insider Trade Statistics and Acquisition Ownership. SEC category covers
+filings by form/symbol/CIK/name, company searches/full profile and industry
+classification. These are real existing-plan candidates worth qualifying;
+the old blanket inference that Starter cannot include insider/SEC search
+would be wrong. Conversely, an endpoint marked full in a comparison matrix
+does not prove its retained original body, historical availability/version,
+dead/reused-ticker coverage or exact source-window depth.
+
+Authoritative public sources checked alongside the signed-in pages:
+
+- https://sharadar.com/subscribe — exact Bundle/history-tier/table scope.
+- https://sharadar.com/docs/insiders — normalized Forms3/4/5, filing-date
+  fields and current daily delivery; its advertised whole-product start is
+  not an account5-year entitlement.
+- https://sharadar.com/docs/tickers and https://sharadar.com/docs/holdings —
+  active/delisted reference and institutional13F holdings; do not call those
+  holdings historical ETF constituents.
+- https://eodhd.com/pricing and
+  https://eodhd.com/financial-apis/id-mapping-api-cusip-isin-figi-lei-cik-%E2%86%94-symbol
+  — plan families and current identifier crosswalk.
+- https://eodhd.com/financial-apis/calendar-upcoming-earnings-ipos-and-splits
+  — Calendar semantics; do not convert upcoming schedules to verified actual
+  published-results evidence.
+- https://site.financialmodelingprep.com/pricing-plans — Starter history/
+  families and endpoint comparison. The authenticated selected Starter
+  matrix supplies the exact endpoint counts above.
+- https://www.quantconnect.com/docs/v2/cloud-platform/datasets/licensing —
+  distinct cloud/download licenses.
+- https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/quantconnect/us-equity-security-master
+  and https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/quantconnect/us-etf-constituents
+  — mapping/corporate actions and historical ETF constituent families.
+- https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/algoseek/us-equities
+  and https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/morningstar/us-fundamental-data
+  — market/fundamental/reference families.
+- https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/eod-historical-data/upcoming-earnings
+  — UPCOMING schedule, not the actual-release archive.
+- https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/quiver-quantitative/insider-trading
+  — legacy fields before2021-05-14 are specifically limited; do not silently
+  substitute it for complete2020 warm-up/all-six-form originals.
+- https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/securities-and-exchange-commission/us-sec-filings
+  — documented8K/10K/10Q family is not a documented Form4 public-version archive.
+
+QC US Equity Security Master/US equity feed cover the pilot era in principle;
+US ETF Constituents advertises June2009 onward and daily since2015. Those
+published histories are not measured per-issuer/per-ETF completeness. Current
+delivery schedule or a historical filing-date field is not a historical
+version-linked public-known-by upper bound. Morningstar reference/CIK and
+the CIK+trading-date Symbol lookup are useful candidate identity bridges,
+not all-CIK/class coverage proof. Core cloud availability does not release
+the owner hold on actual QC research/data execution.
+
+### 362.3 Useful next work and unchanged factual blockers
+
+**IBDEC-362-03:** use the currently active subscriptions before recommending
+another purchase. The best newly confirmed lead is a separately bounded,
+prospectively registered FMP insider/SEC/reference qualification against
+already-retained originals and the required2020Q4–2025Q4 source cohort.
+Include exact historical coverage, accession/body links, actual timestamp
+meaning, correction/backfill behavior, dead/reused labels, refusals and
+permitted use. EODHD ID Mapping plus existing Sharadar TICKERS/ACTIONS can
+support a candidate crosswalk; they cannot assert PIT identity from today's
+labels. QC's security-master/CIK/ETF reference interfaces can be considered
+only under a separately explicit in-cloud source-operation scope and its
+custody/consumption controls, without retrying claimed old SDK namespaces.
+
+This audit authorizes NONE of those source operations automatically and
+executes NONE. It finds no reason to buy an extra dataset yet; it does not
+establish that the remaining archive can be obtained free or that no other
+source will ever be required. Historical SEC body/version public-available-by
+evidence, full original-parent admission, PIT identity/whole-population/
+context/diagnostic/rights bindings remain as360.8. No arbitrary lag,
+present-day table regeneration, today’s delivery time, EPS presence or green
+fixture closes those facts. Both prescribed earnings diagnostics remain
+required; present-version local retrospective earnings policy remains
+accepted, without a new universal forecast/version archive requirement.
+
+**IBUI-SECRET-36201, P3, OPEN owner-action scope:** one EODHD API-token field
+appeared in a UI accessibility capture because the initial general redactor
+did not match that vendor's token format. It was not copied into Git, used
+in any request, printed again, hashed or put in a command/file. The capture
+filter was corrected and the owner notified to rotate/update the configured
+credential. Rotation is NOT observed or claimed. No external disclosure/
+misuse is inferred from this capture, and no credential is changed by Codex.
+Private UI state/bodies are not retained as repository artifacts. This is
+distinct from both historical nonretroactive SEC authorization incidents.
+
+No new production defect or P0/P1. The13 carried P2s and all prior scoped
+closures remain unchanged, including the old helper P3, preserved failed
+Massive readback and the failed/corrected USB attempts. No vendor reply,
+purchase/upgrade/trial, provider data request, original body request, QC
+history/SDK/upload/job/backtest/strategy outcome, namespace reset, monitor
+rearm, broker/operator DB/scheduler/deployment/capital/paper/live/order action.
+
+## 363. Separate durable handoff — active plans audited, sources not promoted (2026-11-03)
+
+This documentation-only audit starts at exact clean local/origin
+`317ca265778f8df430fade5c212647b07f08b78a`; incoming range EMPTY. Sections362.1–3
+separate actual account observations, published dataset scope and untested
+source/coverage claims. No implementation/review commits or source-image
+change occurs in this audit; the previous source-quality implementation
+remains exact5493b95f/51177f3e with preserved evidence360–361. This record
+is the sole changed repository file and replaces the root handoff under the
+lane exception. No new Claude acceptance is claimed. Record/active-document/
+EXACT guard, diff/status and matching-origin checks follow before the one
+standing owner-authorized final push; no complete lane/repository suite.
+
+Plain language: the existing subscriptions are active and useful now even
+though three renewals were cancelled. In particular, FMP Starter advertises
+more insider/SEC search access than earlier unconfirmed-plan notes could
+establish; QC already offers relevant core data in cloud, while local data
+licenses are separate. We should test these existing sources' actual
+historical fields/coverage before buying anything else. The plan names do
+not supply the missing historical facts or make the lane backtest-ready.
+The owner’s QC permission here is account/data-license inspection only;
+actual QC data/research/jobs remain held. Vendor reply/purchase holds and
+disarmed monitors stay in force. Exact access-end dates are reported to the
+owner, not private billing/account values in Git. EOD token rotation remains
+an explicit unverified owner action; no key is included here.
+
+Validation on the appended audit/handoff content before this validation
+paragraph:73 focused record/active-document/EXACT package-guard checks PASS
+in0.73s, no skips/warnings. Native process-tree network/security-exec denial,
+real memory guard and all USB/artifact-data/Keychain denial remain active in
+the test subprocesses; only fresh test-TMP and required /dev/null writes are
+allowed. These are tests of documents/boundaries, not provider entitlements
+or source coverage. No code changed; no full lane/repository suite. Final
+root/branch/exact HEAD/expected status and matching-only fetch/diff checks
+precede commit and the single push; remote exact-tip readback follows.

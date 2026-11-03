@@ -1,10 +1,11 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **364 RECORDS A FAILED PRE-INPUT RESERVATION ATTEMPT ON650cd9ba.
-NO INPUT STAGE, CREDENTIAL READ OR PROVIDER REQUEST BEGAN. ORIGINAL FAILURE
-CAUSE REMAINS UNESTABLISHED; ONE EXPLICIT PRE-INPUT CONTINUATION IS REGISTERED
-AGAINST THE PRESERVED EMPTY/PINNED ROOT, NOT A REPEATED PROVIDER REQUEST.
-CONTINUATION CODE MUST BE QUALIFIED AND COMMITTED BEFORE REAL ACTIVATION.
+Status: **364 PRESERVES TWO FAILED PRE-INPUT CLAIMS ON650cd9ba/743aea5a;
+NO INPUT STAGE, CREDENTIAL READ OR PROVIDER REQUEST BEGAN. A SYNTHETIC
+ACTUAL-FOLDER CTIME DRIFT IS REPRODUCED; NEW SEALING CORRECTION IS QUALIFIED
+BY288 FOCUSED/129 BOUNDARY CHECKS AND FOUR DELAYED ACTUAL-FOLDER PASSES.
+ONE EXPLICIT CORRECTED CLAIM IS REGISTERED AGAINST BOTH PINNED EMPTY
+PREDECESSORS; COMMITTED CLEAN CODE IS REQUIRED BEFORE ITS REAL ACTIVATION.
 SUBSCRIPTIONS REMAIN ACTIVE; CANCELLED RENEWAL IS NOT EXPIRED ACCESS.
 CURRENT MAPPINGS/NAIVE ACCEPTANCE ARE NOT HISTORICAL IDENTITY/PUBLIC-KNOWN-BY.
 FOURTEEN P2s AND THE HISTORICAL SOURCE/PIT/POPULATION FACTUAL GATES REMAIN
@@ -43075,3 +43076,189 @@ root bypass, HTTP retry, fixture promotion or third-attempt route. Actual
 continuation has NOT occurred at this commit point; no provider qualification
 is yet claimed. Native network denial, private-input isolation and real
 memory guards remain active for focused tests/diagnostics; no full suite.
+
+
+### 364.6 Second actual pre-input stop and a verified publication manifestation
+
+On already-existing clean
+`743aea5a6555a1a4c062f16e485751b7f6a7b6b1`, native source-only health PASS
+exit0 in8.711660667s, stderr0,158 source images/inventory
+`075913eaf2a7ddb67a733966f922bdf887acb720c029642c36a2029bc4402e17`.
+Exactly ONE explicit pre-input continuation then exited2 in6.506152167s,
+stdout29B/stderr0, finite `output_changed`. Its21,397B latch SHA
+`778467039348084e28bc9495c56af7c23da861890494b7e4ce34e70d9f11fefe`
+and EMPTY continuation audit are preserved alongside original650cd9ba latch
+and EMPTY original audit. No metadata/body/credential/request stage began;
+aggregate source stages/credential reads/provider transports remain ZERO.
+This is a second FAILED local operation, not successful source qualification.
+New exact-code telemetry identifies custody output change; it does not recover
+the first attempt's erased reason or identify an outside actor.
+
+A further main native diagnostic used ONLY synthetic20,994B X-byte files
+in a fresh exclusive directory under the actual artifact parent, then removed
+that diagnostic directory. It read NONE of the real source/credential/output
+bodies, invoked no provider, and never entered/reclaimed a qualification
+namespace. Native process-tree network/fork/security denial, actual-input/
+USB/Keychain denial and real VM/RSS guard held; only its fresh synthetic
+directory was writable. Four of four publications reproduced `output_changed`:
+immediate full versions equalled the writer's pin, while after0.25s only
+version index6 (ctime) differed. No other version field changed. This is real
+local publication evidence, unlike the earlier TMP fixtures that all passed.
+The actor/underlying OS cause of that ctime change is NOT established.
+
+**IBFMPEOD-PUB36402, P2, verified new-route publication defect:** the creator
+pins ctime before close, but valid newly created artifacts exhibit later
+ctime-only metadata evolution. The current strict post-publication check
+correctly refuses that drift. Correct publication by sealing AFTER a bounded
+pre-seal quiet interval, never by ignoring ctime or weakening post-seal guards.
+The four-RED probe establishes this manifestation, not the original attempt's
+specific cause. IBFMPEOD-OBS36401 remains OPEN at its exact original scope.
+
+### 364.7 Verified publication correction and one explicit corrected claim
+
+New additive sealing helper: actual publication reopens only the file it
+just exclusively created; validates exact own raw bytes/hash, held/named
+identity, owner/mode/link count/size/mtime; permits only ctime evolution
+BEFORE sealing, resetting a500ms quiet clock within a hard2-second deadline,
+50ms polls. Caller also requires the sealed dev/inode/mode/link/size/mtime
+six-field prefix to equal the original creator fstat, closing the identical-
+content replacement gap before reopen. Final content/full-version checks
+precede the returned pin. Every subsequent custody check retains the full
+ctime comparison. Persistent churn, byte/identity/mtime/mode/owner/link drift,
+clock anomalies or deadline/cleanup failure REFUSE. No chmod/chown, timestamp
+rewrite, delayed-error suppression, raw data substitution or frozen edit.
+The production clock is fixed; invented test seams cannot dispatch acquisition.
+
+**IBDEC-364-07, explicit successor to364.5's two-control-claim ceiling:** newly
+verified actual-folder reproduction justifies one separately qualified,
+committed, publication-corrected control claim under the owner's delegated
+engineering authority. This is NOT a retroactive assertion that either
+previous operation succeeded or that the first cause is known. Both earlier
+claims stopped before ANY input/credential/request journal. Require their
+EXACT pinned latches (650cd9ba/faef6d68 and743aea5a/77846703) and BOTH EMPTY
+held directories before writing; any prior processing/request evidence or
+extra leaf refuses. Preserve all four predecessor entries permanently, create
+ONLY `scope-publication-corrected-3.json` plus fixed audit suffix
+`-publication-corrected-3`, then require exact SIX root entries and recheck
+both old pins/empty directories at every publication/dispatch boundary.
+A fourth claim is forbidden. Default/original and continuation2 entry points
+remain consumed and refuse; no reset, resume, overwrite or request alias.
+
+The total provider budget is STILL at most36 deduplicated requests, one
+attempt per request and one credential read attempt per provider across the
+whole round; prior attempts dispatched ZERO. This explicit exception concerns
+only locally failed pre-input control publication, not a completed/claimed/
+ambiguous HTTP request or old SEC/source/SDK namespace. Qualified tests,
+actual-folder synthetic RED/GREEN and an existing clean commit are prerequisites
+before the corrected CLI. No new acquisition type/window/vendor/rights policy,
+purchase/QC/Safari permission or independent-review claim follows.
+
+
+Pre-seal policy refinement BEFORE any corrected source operation: the first
+uncommitted500ms/2s helper candidate gave3 of4 synthetic actual-folder passes
+but one post-seal ctime change after1 second. It is INSUFFICIENT and was NOT
+accepted or activated against real inputs/providers. A further three-file
+synthetic5-second timeline observed ctime-only events at approximately
+[0.219,0.648,3.286], [0.215,0.911,2.949], [0.215,0.969,2.958] seconds;
+full content hashes and mode0600 remained unchanged. No actor is inferred.
+Earlier immediate TMP checks did not wait for these events and therefore
+never contradicted this delayed reproduction. All actual-folder probes used
+only self-generated X bytes/fresh exclusive directories, removed afterward,
+with no source/credential/provider/QC access and native network/fork/private
+input denial plus real guard; they are not dataset qualification/retries.
+
+Strengthen the candidate policy to FOUR seconds of full-version quiet inside
+a TEN-second maximum,50ms polls and a256-poll clock fuse. Replay all observed
+event schedules in invented tests and prove actual-folder synthetic acceptance
+plus unchanged strict post-seal checks before any corrected claim. Local
+artifact ctime/stability supplies NO historical SEC public-known-by evidence.
+IBFMPEOD-PUB36402 stays OPEN until that revised candidate is qualified; the
+original unknown-cause IBFMPEOD-OBS36401 remains separately OPEN. No fourth
+qualification claim or provider retry is authorized by these synthetic probes.
+
+
+### 364.8 Revised sealing evidence, before corrected activation
+
+The final main synthetic actual-folder probe produced FOUR of FOUR passes:
+sealed full versions matched immediately AND one second later after creating
+a sibling audit directory, exact hashes unchanged. All strict ctime checks
+remained enabled. Executed UNCOMMITTED candidate source hashes were main
+`9c2d3aec812e613297b2dac609bfba7e5cedc1aa5b538891fb4fccfe4dc81ae7`
+and helper
+`4af952520e60ff6df127f209ecedf15c43619246f30ba7b0c3ae2a85d6e9bbb9`,
+checked before/after; no later commit is represented as already existing.
+The earlier0.5-second3/4 result and original4/4 RED result remain preserved.
+Native controls/own-synthetic-only scope are unchanged; no real qualification
+namespace, retained original, credential or provider operation was used.
+
+Helper author35 focused checks PASS5.33s (34 new+EXACT), source/test compilation
+and unchanged-byte proof PASS. Tests replay the three observed delayed event
+profiles, reject persistent churn/content/non-ctime/owner/mode/link/identity
+changes, enforce clock/deadline/final-probe conditions and normal/exceptional
+cleanup. A source-QA cleanup defect (checking sys.exc_info only inside the
+close-error handler) was corrected to snapshot primary status BEFORE close;
+normal close failure now refuses and a primary refusal is preserved. Public
+sealing clock is fixed; private invented seams have no transport authority.
+Test image SHA
+`ec452507c261901fdcf4ce6dca1b0404389e314db1e63fb7226f8ab0b8040037`.
+
+Capture third-claim author129 focused checks PASS0.84s on earlier source820d5254
+and test0c5445ec, with six faithful in-memory reversals producing13 intended
+REDs: second-old emptiness beforewrite5, ongoing emptiness1, second-pin hash1,
+prewrite root ceiling2, exact bool3, predecessor lineage1. A duplicated textual
+mutation selector interrupted an initial harness before its third mutation;
+the corrected complete six-mutant group alone supplies these13, without
+counting initial partial failures twice. Later added creator-prefix/error
+integration tests and final main validation follow before activation. No
+full suite. All actual earlier namespace claims remain FAILED, with ZERO
+source stages/credential reads/provider invocations. Four-second quiet and
+ten-second deadline are sampled between bounded local filesystem calls;
+no OS syscall preemption or universal future metadata-stability guarantee is
+claimed. The guard continues to refuse any later drift. No source/PIT/rights/
+canonical/full-population/backtest authority follows from local seal success.
+
+
+### 364.9 Final corrected-code qualification before activation
+
+Main independently observed288 focused checks PASS9.03s across all FOUR new
+test files plus EXACT package guard, and129 boundary/record/active-document/
+import/platform/frozen-pin/old-stop checks PASS6.95s. All EIGHT final Python
+images compile; all four current frozen v3 custody files independently equal
+the exact aa0d635d historical Git blobs. This comparison is not historical
+root replay. No full lane/repository suite or QC operation.
+
+Final capture source48,050B SHA
+`9c2d3aec812e613297b2dac609bfba7e5cedc1aa5b538891fb4fccfe4dc81ae7`;
+test51,796B SHA
+`c754392845dda317725ba70fd35e8f535cbeb3218b6963025eb836da28cb1b6d`.
+Sealing helper7,986B SHA
+`4af952520e60ff6df127f209ecedf15c43619246f30ba7b0c3ae2a85d6e9bbb9`;
+test11,000B SHA
+`ec452507c261901fdcf4ce6dca1b0404389e314db1e63fb7226f8ab0b8040037`.
+Other four controls/projection images remain364.3. Exact current source/test
+pins are inventoried into the next actual committed execution identity.
+
+Agent final145 capture checks PASS0.81s (144+EXACT) and four additional faithful
+reversals produced16 intended REDs: creator six-field binding6, unchanged
+post-seal ctime1, all five helper finite-cause translations5, exact settle
+boolean4. Helper's six faithful reversals produced17 intended REDs (plus one
+unaffected primary-error PASS): old500ms policy3, content/SHA1, non-ctime/owner
+anchor8, deadline after final hash1, swallowed close failure1, privacy before
+content3. Actual on-disk source/test hashes unchanged in every mutation child.
+Revised helper35/5.33s green supersedes the earlier35-test run with34 PASS and
+one obsolete test expectation: its1.1-second synthetic probes no longer
+exceeded the revised10-second budget; test-only delay was changed to5.1s,
+with no source change to make the test pass. Native network/process-tree/
+private-input/USB/security denial and real memory guards held for agents;
+main permits Git subprocesses but denies networking throughout their tree.
+
+IBFMPEOD-PUB36402 is **RESOLVED narrowly for the new4s/10s sealing route** by
+observed actual-folder synthetic RED/GREEN, focused tests and guard reversals.
+All post-seal byte/identity/mode/owner/link/size/mtime/ctime checks remain
+binding, and future drift still refuses. IBFMPEOD-OBS36401 remains OPEN:
+neither old execution is relabelled successful and the erased original
+reason remains unestablished. Fourteen P2s remain OPEN (13 carried plus that
+operational observation). No real input/credential/provider stage has yet
+occurred in this round at this prospective corrected commit point. Actual
+corrected-run health/results and final handoff follow only after this code
+and scope exist together in a clean committed HEAD.

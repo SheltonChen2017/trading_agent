@@ -28,6 +28,7 @@ from urllib import error, parse, request
 from research import insider_buying_pilot_firstrate_qualification_v1 as ipc
 from research import insider_buying_pilot_provider_controls_v1 as controls
 from research import insider_buying_pilot_fmp_eod_projection_v1 as projection
+from research import insider_buying_pilot_publication_seal_v1 as seal
 from research.insider_buying_keychain_credentials import KeychainCredential, read_keychain_credential
 from research.insider_buying_sharadar_reference_qualification import _screen_credential
 
@@ -39,13 +40,17 @@ OWN_PATHS = (SELF_PATH, TEST_PATH,
     "research/insider_buying_pilot_provider_controls_v1.py",
     "tests/test_insider_buying_pilot_provider_controls_v1.py",
     "research/insider_buying_pilot_fmp_eod_projection_v1.py",
-    "tests/test_insider_buying_pilot_fmp_eod_projection_v1.py")
+    "tests/test_insider_buying_pilot_fmp_eod_projection_v1.py",
+    "research/insider_buying_pilot_publication_seal_v1.py",
+    "tests/test_insider_buying_pilot_publication_seal_v1.py")
 SCHEMA = "insider-pilot-fmp-eod-retained-control-qualification-v1"
 OUTPUT_PARTS = ("artifacts", "insider_buying", "pilot_fmp_eod_qualification_v1")
 AUDIT_ID = "ib-fmp-eod-retained-control-qualification-20261103-once-v1"
 PREINPUT_HEAD = "650cd9ba4569f6ef059246944a62fcd107d0de29"
 PREINPUT_PIN = {"bytes": 20994, "sha256": "faef6d685ed93f9d225abe94c9377df93bd3c0031547d46335c05ddfeef7b299", "head": PREINPUT_HEAD}
 CONTINUATION_SUFFIX = "-preinput-continuation-2"
+SECOND_PREINPUT_PIN = {"bytes": 21397, "sha256": "778467039348084e28bc9495c56af7c23da861890494b7e4ce34e70d9f11fefe", "head": "743aea5a6555a1a4c062f16e485751b7f6a7b6b1"}
+CORRECTED_SUFFIX = "-publication-corrected-3"
 RECENT_ROOT = LANE_ROOT.parent / "insider_buying_sec_complete_16_9ab2ed0"
 MAX_BODY = 128 * 1024
 MAX_CONTROL = 2 * 1024 * 1024
@@ -60,7 +65,8 @@ _CODES = frozenset({"arguments_refused", "identity_refused", "namespace_consumed
     "output_changed", "publication_refused", "controls_refused", "worker_refused", "credential_refused",
     "request_refused", "started_journal_required", "deadline_unavailable", "transport_timeout",
     "transport_error", "http_refused", "redirect_refused", "framing_refused", "oversized_response",
-    "partial_response", "credential_or_metadata_refused", "projection_refused", "provider_scope_refused", "qualification_stopped"})
+    "partial_response", "credential_or_metadata_refused", "projection_refused", "provider_scope_refused", "qualification_stopped",
+    "publication_seal_refused", "publication_seal_changed", "publication_seal_timeout", "publication_seal_clock_refused", "publication_seal_cleanup_refused"})
 
 
 class ProviderQualificationError(ValueError):
@@ -109,6 +115,9 @@ def registration():
         "one_explicit_preinput_continuation_only": True,
         "continuation_requires_pinned_failed_reservation_and_empty_original_audit": True,
         "provider_attempt_budget_shared_across_original_and_continuation": 1,
+        "one_publication_corrected_claim_after_two_pinned_preinput_stops": True,
+        "preseal_ctime_quiet_seconds": 4.0, "preseal_deadline_seconds": 10,
+        "ctime_not_ignored_after_publication": True,
         "paid_era_controls_before_warmup_within_provider": True,
         "http_402_403_stop_family_not_prove_providerwide_failure": True,
         "raw_or_normalized_provider_rows_retained": False,
@@ -381,18 +390,23 @@ def _child(role, identity, supplied=None, *, paths=()):
 
 
 class _Context:
-    def __init__(self, root, identity, *, fixture=False, checker=None, continuation=False, predecessor_pin=None):
+    def __init__(self, root, identity, *, fixture=False, checker=None, continuation=False, predecessor_pin=None,
+                 publication_corrected=False, second_predecessor_pin=None):
         _need(type(root) is Path or isinstance(root, Path), "arguments_refused")
         _need((fixture and not root.resolve().is_relative_to(LANE_ROOT) and callable(checker))
             or (not fixture and root == LANE_ROOT and checker is None), "arguments_refused")
-        _need(type(continuation) is bool and (predecessor_pin is None or fixture and continuation), "arguments_refused")
+        _need(type(continuation) is bool and type(publication_corrected) is bool
+            and (not publication_corrected or continuation)
+            and (predecessor_pin is None or fixture and continuation)
+            and (second_predecessor_pin is None or fixture and publication_corrected), "arguments_refused")
         self.root, self.identity, self.fixture = root, identity, fixture
         self.continuation = continuation
-        self.latch_name = "scope-continuation-2.json" if continuation else "scope-reservation.json"
-        self.audit_name = AUDIT_ID + CONTINUATION_SUFFIX if continuation else AUDIT_ID
+        self.publication_corrected = publication_corrected
+        self.latch_name = "scope-publication-corrected-3.json" if publication_corrected else "scope-continuation-2.json" if continuation else "scope-reservation.json"
+        self.audit_name = AUDIT_ID + CORRECTED_SUFFIX if publication_corrected else AUDIT_ID + CONTINUATION_SUFFIX if continuation else AUDIT_ID
         self.checker = checker if fixture else lambda: _parent_current(identity)
-        self.parent = self.directory = self.old_directory = None
-        self.predecessor = None
+        self.parent = self.directory = self.old_directory = self.old_directory2 = None
+        self.predecessor = self.predecessor2 = None
         self.pins, self.versions, self.latch, self.active = {}, {}, None, None
         self.dispatched = set()
         self.token = None if fixture else _ACTUAL
@@ -404,7 +418,9 @@ class _Context:
                     and type(pin["bytes"]) is int and 0 < pin["bytes"] <= MAX_CONTROL
                     and type(pin["sha256"]) is str and _SHA.fullmatch(pin["sha256"])
                     and type(pin["head"]) is str and _HEAD.fullmatch(pin["head"]), "arguments_refused")
-                _need(set(os.listdir(self.parent.fd)) == {"scope-reservation.json", AUDIT_ID}, "namespace_consumed")
+                expected = {"scope-reservation.json", AUDIT_ID}
+                if publication_corrected: expected.update({"scope-continuation-2.json", AUDIT_ID+CONTINUATION_SUFFIX})
+                _need(set(os.listdir(self.parent.fd)) == expected, "namespace_consumed")
                 raw = custody._read_leaf(self.parent.fd, "scope-reservation.json", limit=MAX_CONTROL)
                 _need(len(raw) == pin["bytes"] and _sha(raw) == pin["sha256"], "custody_refused")
                 old = json.loads(raw)
@@ -414,27 +430,51 @@ class _Context:
                 _need(not os.listdir(self.old_directory.fd), "namespace_consumed")
                 self.predecessor = {**pin, "version": custody._version(os.stat("scope-reservation.json", dir_fd=self.parent.fd, follow_symlinks=False))}
                 self._verify(self.parent.fd, "scope-reservation.json", self.predecessor)
+                if publication_corrected:
+                    pin2 = second_predecessor_pin if fixture else SECOND_PREINPUT_PIN
+                    _need(type(pin2) is dict and set(pin2) == {"bytes", "sha256", "head"}
+                        and type(pin2["bytes"]) is int and 0 < pin2["bytes"] <= MAX_CONTROL
+                        and type(pin2["sha256"]) is str and _SHA.fullmatch(pin2["sha256"])
+                        and type(pin2["head"]) is str and _HEAD.fullmatch(pin2["head"]), "arguments_refused")
+                    raw2 = custody._read_leaf(self.parent.fd, "scope-continuation-2.json", limit=MAX_CONTROL)
+                    _need(len(raw2) == pin2["bytes"] and _sha(raw2) == pin2["sha256"], "custody_refused")
+                    old2 = json.loads(raw2)
+                    _need(_raw(old2) == raw2 and old2["fixture_only"] is fixture
+                        and old2["execution_identity"]["head"] == pin2["head"]
+                        and old2["preinput_predecessor"] == pin, "custody_refused")
+                    self.old_directory2 = custody._Chain(root, (*OUTPUT_PARTS, AUDIT_ID+CONTINUATION_SUFFIX))
+                    _need(not os.listdir(self.old_directory2.fd), "namespace_consumed")
+                    self.predecessor2 = {**pin2, "version": custody._version(os.stat("scope-continuation-2.json", dir_fd=self.parent.fd, follow_symlinks=False))}
+                    self._verify(self.parent.fd, "scope-continuation-2.json", self.predecessor2)
             else:
                 _need(not os.listdir(self.parent.fd), "namespace_consumed")
             self.latch = self._write(self.parent.fd, self.latch_name, _raw({
                 "registration": registration(), "execution_identity": identity, "fixture_only": fixture,
                 **({"preinput_predecessor": {k: self.predecessor[k] for k in ("bytes", "sha256", "head")},
-                    "original_failure_cause_established": False} if continuation else {})}))
+                    "original_failure_cause_established": False} if continuation else {}),
+                **({"publication_predecessor": {k: self.predecessor2[k] for k in ("bytes", "sha256", "head")}} if publication_corrected else {})}), settle=not fixture)
             self.directory = custody._Chain(root, (*OUTPUT_PARTS, self.audit_name), create=True, exclusive_last=True)
             self.check()
         except BaseException:
             self.close(); raise
 
     @staticmethod
-    def _write(fd, name, raw):
+    def _write(fd, name, raw, *, settle=False):
         _need(type(raw) is bytes and 0 < len(raw) <= MAX_CONTROL
-            and type(name) is str and re.fullmatch(r"[a-z0-9][a-z0-9.-]{0,99}", name), "publication_refused")
+            and type(name) is str and re.fullmatch(r"[a-z0-9][a-z0-9.-]{0,99}", name)
+            and type(settle) is bool, "publication_refused")
         leaf = os.open(name, os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW|os.O_NONBLOCK, 0o600, dir_fd=fd)
         with os.fdopen(leaf, "wb") as stream:
             _need(stream.write(raw) == len(raw), "publication_refused")
             stream.flush(); os.fsync(stream.fileno())
             version = custody._version(os.fstat(stream.fileno()))
         os.fsync(fd)
+        if settle:
+            try: pin = seal.seal_written(fd, name, raw)
+            except seal.PublicationSealError as exc:
+                raise ProviderQualificationError(seal.safe_failure(exc)) from None
+            _need(pin["version"][:6] == version[:6], "output_changed")
+            return pin
         return {"bytes": len(raw), "sha256": _sha(raw), "version": version}
 
     @staticmethod
@@ -456,6 +496,11 @@ class _Context:
             self.old_directory.recheck()
             _need(not os.listdir(self.old_directory.fd), "output_changed")
             self._verify(self.parent.fd, "scope-reservation.json", self.predecessor)
+        if self.publication_corrected:
+            expected.update({"scope-continuation-2.json", AUDIT_ID+CONTINUATION_SUFFIX})
+            self.old_directory2.recheck()
+            _need(not os.listdir(self.old_directory2.fd), "output_changed")
+            self._verify(self.parent.fd, "scope-continuation-2.json", self.predecessor2)
         _need(set(os.listdir(self.parent.fd)) == expected
             and set(os.listdir(self.directory.fd)) == set(self.pins), "output_changed")
         for folder in (self.parent, self.directory):
@@ -467,7 +512,7 @@ class _Context:
 
     def publish(self, name, value):
         self.check()
-        self.pins[name] = self._write(self.directory.fd, name, _raw(value))
+        self.pins[name] = self._write(self.directory.fd, name, _raw(value), settle=not self.fixture)
         self.check()
         return self.pins[name]["sha256"]
 
@@ -478,7 +523,7 @@ class _Context:
 
     def close(self):
         failed, primary = False, sys.exc_info()[0] is not None
-        for name in ("directory", "old_directory", "parent"):
+        for name in ("directory", "old_directory2", "old_directory", "parent"):
             held = getattr(self, name, None); setattr(self, name, None)
             if held is not None:
                 try: held.close()
@@ -691,10 +736,10 @@ def preflight_actual(expected_head):
         "source_inventory_sha256": identity["source_inventory_sha256"], **value}
 
 
-def run_actual(expected_head, *, continuation=False):
+def run_actual(expected_head, *, continuation=False, publication_corrected=False):
     identity = _identity(expected_head); context = None; stage = "reservation"
     try:
-        context = _Context(LANE_ROOT, identity, continuation=continuation)
+        context = _Context(LANE_ROOT, identity, continuation=continuation, publication_corrected=publication_corrected)
         stage = "controls_metadata"
         context.publish("controls-metadata-started.json", {"worker_invocations": 1})
         metadata = _child("metadata", identity, paths=controls.metadata_paths())
@@ -709,6 +754,7 @@ def run_actual(expected_head, *, continuation=False):
         result = _drive(context, cases, identity)
         result.update(scope_reservation_sha256=context.latch["sha256"],
             preinput_continuation=continuation,
+            publication_corrected=publication_corrected,
             preserved_failed_reservation_sha256=PREINPUT_PIN["sha256"] if continuation else None,
             control_evidence_sha256=context.pins["controls.json"]["sha256"],
             request_plan_sha256=context.pins["request-plan.json"]["sha256"],
@@ -739,10 +785,13 @@ def main(argv=None):
     cli.add_argument("--expected-head", required=True)
     cli.add_argument("--health", action="store_true")
     cli.add_argument("--continue-pre-input", action="store_true")
+    cli.add_argument("--publication-corrected", action="store_true")
     args = cli.parse_args(argv)
     try:
-        _need(not (args.health and args.continue_pre_input), "arguments_refused")
-        value = preflight_actual(args.expected_head) if args.health else run_actual(args.expected_head, continuation=args.continue_pre_input)
+        _need(not (args.health and (args.continue_pre_input or args.publication_corrected))
+            and (not args.publication_corrected or args.continue_pre_input), "arguments_refused")
+        value = preflight_actual(args.expected_head) if args.health else run_actual(args.expected_head,
+            continuation=args.continue_pre_input, publication_corrected=args.publication_corrected)
     except Exception as exc:
         print(_raw({"refused": safe_failure(exc)}).decode()); return 2
     print(_raw(value).decode())

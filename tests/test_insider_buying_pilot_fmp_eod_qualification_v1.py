@@ -625,13 +625,13 @@ def test_no_numeric_third_or_implicit_continuation_namespace(tmp_path, monkeypat
             predecessor_pin={"bytes": 1, "sha256": "a" * 64, "head": "1" * 40})
 
 
-@pytest.mark.parametrize("continuation", (False, True))
-def test_run_entry_preserves_finite_cause_and_continuation_selection_without_actual_access(monkeypatch, continuation):
+@pytest.mark.parametrize("continuation,publication_corrected", ((False,False), (True,False), (True,True)))
+def test_run_entry_preserves_finite_cause_and_continuation_selection_without_actual_access(monkeypatch, continuation, publication_corrected):
     events = []; identity = {"head": "2" * 40}
     monkeypatch.setattr(m, "_identity", lambda head: identity)
     class Context:
         def __init__(self, root, supplied, **kwargs):
-            assert root == m.LANE_ROOT and supplied is identity and kwargs == {"continuation": continuation}
+            assert root == m.LANE_ROOT and supplied is identity and kwargs == {"continuation": continuation,"publication_corrected":publication_corrected}
         def publish(self, name, value):
             if name == "controls-metadata-started.json": raise m.ProviderQualificationError("output_changed")
             assert name == "failure.json"
@@ -639,7 +639,7 @@ def test_run_entry_preserves_finite_cause_and_continuation_selection_without_act
         def close(self): events.append("closed")
     monkeypatch.setattr(m, "_Context", Context)
     with pytest.raises(m.ProviderQualificationError, match="^output_changed$"):
-        m.run_actual(identity["head"], continuation=continuation)
+        m.run_actual(identity["head"], continuation=continuation,publication_corrected=publication_corrected)
     assert events[0]["stage"] == "controls_metadata" and events[0]["code"] == "output_changed"
     assert events[-1] == "closed"
     assert events[0]["authority"]["backtesting_ready"] is False
@@ -647,14 +647,14 @@ def test_run_entry_preserves_finite_cause_and_continuation_selection_without_act
 
 def test_continuation_cli_routes_only_explicit_flag_and_health_is_mutually_exclusive(monkeypatch, capsys):
     calls = []
-    def run(head, *, continuation=False):
-        calls.append((head, continuation))
+    def run(head, *, continuation=False,publication_corrected=False):
+        calls.append((head, continuation,publication_corrected))
         return {"clean_scoped_responses": 0, "planned_requests": 1}
     monkeypatch.setattr(m, "run_actual", run)
     monkeypatch.setattr(m, "preflight_actual", lambda *a: pytest.fail("health launched with continuation"))
     assert m.main(["--expected-head", "2" * 40]) == 2
     assert m.main(["--expected-head", "2" * 40, "--continue-pre-input"]) == 2
-    assert calls == [("2" * 40, False), ("2" * 40, True)]
+    assert calls == [("2" * 40, False,False), ("2" * 40, True,False)]
     assert m.main(["--expected-head", "2" * 40, "--continue-pre-input", "--health"]) == 2
     assert len(calls) == 2 and "arguments_refused" in capsys.readouterr().out
 
@@ -665,3 +665,245 @@ def test_continuation_budget_never_increases_provider_attempts():
     assert policy["continuation_requires_pinned_failed_reservation_and_empty_original_audit"] is True
     assert policy["provider_attempt_budget_shared_across_original_and_continuation"] == 1
     assert policy["maximum_attempts_per_request"] == 1 and policy["maximum_unique_requests"] == 36
+
+
+def _seed_two_preinput_predecessors(tmp_path):
+    root,parent,first_pin,first_raw=_seed_preinput_predecessor(tmp_path)
+    context=_continuation(root,first_pin)
+    try:
+        second_pin={k:context.latch[k] for k in ("bytes","sha256")}
+        second_pin["head"]="2"*40
+        second_raw=(parent/context.latch_name).read_bytes()
+        assert not list((parent/context.audit_name).iterdir())
+    finally:context.close()
+    assert set(p.name for p in parent.iterdir())=={"scope-reservation.json",m.AUDIT_ID,
+        "scope-continuation-2.json",m.AUDIT_ID+m.CONTINUATION_SUFFIX}
+    return root,parent,first_pin,second_pin,first_raw,second_raw
+
+
+def _publication_corrected(root,first_pin,second_pin):
+    return m._Context(root,{"head":"3"*40},fixture=True,checker=lambda:None,continuation=True,
+        publication_corrected=True,predecessor_pin=first_pin,second_predecessor_pin=second_pin)
+
+
+def test_publication_corrected_third_claim_preserves_both_empty_failed_scopes_and_exact_six_root(tmp_path):
+    root,parent,pin1,pin2,raw1,raw2=_seed_two_preinput_predecessors(tmp_path)
+    context=_publication_corrected(root,pin1,pin2)
+    try:
+        assert context.latch_name=="scope-publication-corrected-3.json"
+        assert context.audit_name==m.AUDIT_ID+"-publication-corrected-3"
+        assert set(p.name for p in parent.iterdir())=={"scope-reservation.json",m.AUDIT_ID,
+            "scope-continuation-2.json",m.AUDIT_ID+m.CONTINUATION_SUFFIX,context.latch_name,context.audit_name}
+        new=json.loads((parent/context.latch_name).read_bytes())
+        assert new["preinput_predecessor"]==pin1
+        assert new["publication_predecessor"]==pin2
+        assert new["execution_identity"]["head"]=="3"*40
+        assert new["original_failure_cause_established"] is False
+        assert context.predecessor["sha256"]==pin1["sha256"] and context.predecessor2["sha256"]==pin2["sha256"]
+        context.publish("invented-stage.json",{"fixture_only":True})
+        assert context.read("invented-stage.json")=={"fixture_only":True}
+        with pytest.raises(FileExistsError):context.publish("invented-stage.json",{"overwrite":True})
+        assert (parent/"scope-reservation.json").read_bytes()==raw1
+        assert (parent/"scope-continuation-2.json").read_bytes()==raw2
+        assert not list((parent/m.AUDIT_ID).iterdir())
+        assert not list((parent/(m.AUDIT_ID+m.CONTINUATION_SUFFIX)).iterdir())
+    finally:context.close()
+    snapshot={p.name:p.read_bytes() for p in parent.iterdir() if p.is_file()}
+    for factory in (lambda:_publication_corrected(root,pin1,pin2),lambda:_continuation(root,pin1),
+        lambda:m._Context(root,{"head":"4"*40},fixture=True,checker=lambda:None)):
+        with pytest.raises(m.ProviderQualificationError,match="namespace_consumed"):factory()
+    assert {p.name:p.read_bytes() for p in parent.iterdir() if p.is_file()}==snapshot
+    assert set(p.name for p in parent.iterdir())==set(snapshot)|{m.AUDIT_ID,
+        m.AUDIT_ID+m.CONTINUATION_SUFFIX,m.AUDIT_ID+"-publication-corrected-3"}
+
+
+@pytest.mark.parametrize("older",("first","second"))
+@pytest.mark.parametrize("leaf",("controls-metadata-started.json","controls.json","fmp-credential-started.json",
+    "request-000-started.json","foreign.json"))
+def test_publication_corrected_requires_both_old_audits_empty_before_any_new_write(tmp_path,older,leaf):
+    root,parent,pin1,pin2,raw1,raw2=_seed_two_preinput_predecessors(tmp_path)
+    directory=parent/(m.AUDIT_ID if older=="first" else m.AUDIT_ID+m.CONTINUATION_SUFFIX)
+    path=directory/leaf;path.write_bytes(b"{}");path.chmod(0o600)
+    expected=set(p.name for p in parent.iterdir())
+    with pytest.raises(m.ProviderQualificationError,match="namespace_consumed"):_publication_corrected(root,pin1,pin2)
+    assert set(p.name for p in parent.iterdir())==expected
+    assert (parent/"scope-reservation.json").read_bytes()==raw1 and (parent/"scope-continuation-2.json").read_bytes()==raw2
+
+
+@pytest.mark.parametrize("older",("first","second"))
+@pytest.mark.parametrize("fault",("bytes","sha256","head","mode","noncanonical"))
+def test_publication_corrected_each_external_predecessor_pin_is_binding_before_write(tmp_path,older,fault):
+    root,parent,pin1,pin2,raw1,raw2=_seed_two_preinput_predecessors(tmp_path)
+    pin=pin1 if older=="first" else pin2
+    path=parent/("scope-reservation.json" if older=="first" else "scope-continuation-2.json")
+    if fault=="bytes":pin["bytes"]+=1
+    if fault=="sha256":pin["sha256"]="0"*64
+    if fault=="head":pin["head"]="4"*40
+    if fault=="mode":path.chmod(0o644)
+    if fault=="noncanonical":
+        raw=json.dumps(json.loads(path.read_bytes()),indent=2).encode();path.write_bytes(raw)
+        pin.update(bytes=len(raw),sha256=m._sha(raw))
+    expected=set(p.name for p in parent.iterdir())
+    with pytest.raises((m.ProviderQualificationError,ValueError)):_publication_corrected(root,pin1,pin2)
+    assert set(p.name for p in parent.iterdir())==expected
+    assert not (parent/"scope-publication-corrected-3.json").exists()
+
+
+def test_publication_corrected_second_predecessor_must_link_exact_first_pin_before_write(tmp_path):
+    root,parent,pin1,pin2,_,raw2=_seed_two_preinput_predecessors(tmp_path)
+    old=json.loads(raw2);old["preinput_predecessor"]["sha256"]="b"*64
+    altered=m._raw(old);(parent/"scope-continuation-2.json").write_bytes(altered)
+    pin2.update(bytes=len(altered),sha256=m._sha(altered))
+    before=set(p.name for p in parent.iterdir())
+    with pytest.raises(m.ProviderQualificationError,match="custody_refused"):_publication_corrected(root,pin1,pin2)
+    assert set(p.name for p in parent.iterdir())==before
+
+
+@pytest.mark.parametrize("older",("first","second"))
+@pytest.mark.parametrize("fault",("body_hash","old_audit_leaf","old_audit_mode"))
+def test_publication_corrected_rechecks_each_prior_pin_and_empty_audit_every_time(tmp_path,older,fault):
+    root,parent,pin1,pin2,_,_=_seed_two_preinput_predecessors(tmp_path)
+    context=_publication_corrected(root,pin1,pin2)
+    try:
+        path=parent/("scope-reservation.json" if older=="first" else "scope-continuation-2.json")
+        directory=parent/(m.AUDIT_ID if older=="first" else m.AUDIT_ID+m.CONTINUATION_SUFFIX)
+        if fault=="body_hash":
+            info=path.stat();raw=path.read_bytes();marker=("1" if older=="first" else "2")*40
+            changed=raw.replace(marker.encode(),b"4"*40,1)
+            assert changed!=raw and len(changed)==len(raw)
+            path.write_bytes(changed);os.utime(path,ns=(info.st_atime_ns,info.st_mtime_ns))
+            # Isolate content hashing from the ctime-only/version tripwire.
+            pin=context.predecessor if older=="first" else context.predecessor2
+            pin["version"]=m.custody._version(path.stat())
+        if fault=="old_audit_leaf":(directory/"request-000-started.json").write_bytes(b"{}")
+        if fault=="old_audit_mode":directory.chmod(0o750)
+        with pytest.raises((m.ProviderQualificationError,ValueError)):context.check()
+    finally:context.close()
+
+
+@pytest.mark.parametrize("fault",("extra_root","missing_second_audit","preexisting_third_latch","preexisting_third_audit"))
+def test_publication_corrected_exact_four_root_before_write_and_no_fourth_namespace(tmp_path,fault):
+    root,parent,pin1,pin2,_,_=_seed_two_preinput_predecessors(tmp_path)
+    if fault=="extra_root":(parent/"fourth-scope.json").write_bytes(b"{}")
+    if fault=="missing_second_audit":(parent/(m.AUDIT_ID+m.CONTINUATION_SUFFIX)).rmdir()
+    if fault=="preexisting_third_latch":(parent/"scope-publication-corrected-3.json").write_bytes(b"{}")
+    if fault=="preexisting_third_audit":(parent/(m.AUDIT_ID+"-publication-corrected-3")).mkdir(mode=0o700)
+    before=set(p.name for p in parent.iterdir())
+    with pytest.raises((m.ProviderQualificationError,OSError)):_publication_corrected(root,pin1,pin2)
+    assert set(p.name for p in parent.iterdir())==before
+
+
+@pytest.mark.parametrize("publication_corrected",(None,1,2,"yes"))
+def test_publication_corrected_requires_exact_bool_before_namespace_open(tmp_path,monkeypatch,publication_corrected):
+    monkeypatch.setattr(m.custody,"_Chain",lambda *a,**k:pytest.fail("numeric fourth claim opened namespace"))
+    with pytest.raises(m.ProviderQualificationError,match="arguments_refused"):
+        m._Context(tmp_path,{"head":"3"*40},fixture=True,checker=lambda:None,continuation=True,
+            publication_corrected=publication_corrected,predecessor_pin={"bytes":1,"sha256":"a"*64,"head":"1"*40},
+            second_predecessor_pin={"bytes":1,"sha256":"b"*64,"head":"2"*40})
+
+
+def test_publication_corrected_requires_explicit_continuation_and_forbids_actual_pin_overrides(tmp_path,monkeypatch):
+    monkeypatch.setattr(m.custody,"_Chain",lambda *a,**k:pytest.fail("invalid selector opened namespace"))
+    with pytest.raises(m.ProviderQualificationError,match="arguments_refused"):
+        m._Context(tmp_path,{"head":"3"*40},fixture=True,checker=lambda:None,publication_corrected=True)
+    with pytest.raises(m.ProviderQualificationError,match="arguments_refused"):
+        m._Context(m.LANE_ROOT,{"head":"3"*40},continuation=True,publication_corrected=True,
+            second_predecessor_pin=dict(m.SECOND_PREINPUT_PIN))
+
+
+def test_publication_corrected_fixture_requires_both_explicit_predecessor_pins(tmp_path):
+    root,parent,pin1,pin2,_,_=_seed_two_preinput_predecessors(tmp_path)
+    before=set(p.name for p in parent.iterdir())
+    with pytest.raises(m.ProviderQualificationError,match="arguments_refused"):
+        m._Context(root,{"head":"3"*40},fixture=True,checker=lambda:None,continuation=True,
+            publication_corrected=True,predecessor_pin=pin1)
+    assert set(p.name for p in parent.iterdir())==before
+
+
+def test_publication_corrected_actual_predecessor_constants_are_exact_and_request_budget_is_shared():
+    assert m.PREINPUT_PIN=={"bytes":20994,"sha256":"faef6d685ed93f9d225abe94c9377df93bd3c0031547d46335c05ddfeef7b299",
+        "head":"650cd9ba4569f6ef059246944a62fcd107d0de29"}
+    assert m.SECOND_PREINPUT_PIN=={"bytes":21397,"sha256":"778467039348084e28bc9495c56af7c23da861890494b7e4ce34e70d9f11fefe",
+        "head":"743aea5a6555a1a4c062f16e485751b7f6a7b6b1"}
+    policy=m.registration()
+    assert policy["maximum_attempts_per_request"]==1 and policy["maximum_unique_requests"]==36
+    assert policy["provider_attempt_budget_shared_across_original_and_continuation"]==1
+
+
+def test_publication_corrected_cli_is_explicit_requires_continuation_and_cannot_enter_health(monkeypatch,capsys):
+    calls=[]
+    def run(head,*,continuation=False,publication_corrected=False):
+        calls.append((head,continuation,publication_corrected))
+        return {"clean_scoped_responses":0,"planned_requests":1}
+    monkeypatch.setattr(m,"run_actual",run)
+    monkeypatch.setattr(m,"preflight_actual",lambda *a:pytest.fail("corrected claim entered health"))
+    head="3"*40
+    assert m.main(["--expected-head",head,"--continue-pre-input","--publication-corrected"])==2
+    assert calls==[(head,True,True)]
+    assert m.main(["--expected-head",head,"--publication-corrected"])==2
+    assert m.main(["--expected-head",head,"--continue-pre-input","--publication-corrected","--health"])==2
+    assert len(calls)==1 and "arguments_refused" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("index",range(6))
+def test_settled_publication_must_bind_every_creator_nonctime_version_field(tmp_path,monkeypatch,index):
+    directory=tmp_path/"creator";directory.mkdir(mode=0o700)
+    fd=os.open(directory,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+    raw=b'{"invented":true}'
+    def seal(directory_fd,name,body):
+        assert directory_fd==fd and name=="sample.json" and body==raw
+        version=list(m.custody._version(os.stat(name,dir_fd=fd,follow_symlinks=False)))
+        version[index]+=1
+        return {"bytes":len(body),"sha256":m._sha(body),"version":tuple(version)}
+    monkeypatch.setattr(m.seal,"seal_written",seal)
+    try:
+        with pytest.raises(m.ProviderQualificationError,match="output_changed"):
+            m._Context._write(fd,"sample.json",raw,settle=True)
+    finally:os.close(fd)
+
+
+def test_preseal_ctime_migration_does_not_weaken_full_postseal_version_check(tmp_path,monkeypatch):
+    directory=tmp_path/"creator";directory.mkdir(mode=0o700)
+    fd=os.open(directory,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+    raw=b'{"invented":true}'
+    def seal(directory_fd,name,body):
+        version=list(m.custody._version(os.stat(name,dir_fd=fd,follow_symlinks=False)))
+        # Model a permitted ctime migration during the pre-seal window.
+        version[6]+=1
+        return {"bytes":len(body),"sha256":m._sha(body),"version":tuple(version)}
+    monkeypatch.setattr(m.seal,"seal_written",seal)
+    try:
+        pin=m._Context._write(fd,"sample.json",raw,settle=True)
+        now=m.custody._version(os.stat("sample.json",dir_fd=fd,follow_symlinks=False))
+        assert pin["version"][:6]==now[:6] and pin["version"][6]!=now[6]
+        # Only ctime differs between the full sealed pin and current file.
+        # The caller's unchanged strict post-seal check must still refuse.
+        with pytest.raises(m.ProviderQualificationError,match="output_changed"):
+            m._Context._verify(fd,"sample.json",pin)
+    finally:os.close(fd)
+
+
+@pytest.mark.parametrize("code",("publication_seal_refused","publication_seal_changed","publication_seal_timeout",
+    "publication_seal_clock_refused","publication_seal_cleanup_refused"))
+def test_publication_seal_finite_refusals_propagate_without_foreign_values(tmp_path,monkeypatch,code):
+    directory=tmp_path/"creator";directory.mkdir(mode=0o700)
+    fd=os.open(directory,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+    def seal(*args):raise m.seal.PublicationSealError(code)
+    monkeypatch.setattr(m.seal,"seal_written",seal)
+    try:
+        with pytest.raises(m.ProviderQualificationError,match="^"+code+"$") as error:
+            m._Context._write(fd,"sample.json",b"{}",settle=True)
+        assert m.safe_failure(error.value)==code
+    finally:os.close(fd)
+
+
+@pytest.mark.parametrize("settle",(None,1,2,"yes"))
+def test_publication_settle_selector_is_exact_bool_before_exclusive_creation(tmp_path,monkeypatch,settle):
+    directory=tmp_path/"creator";directory.mkdir(mode=0o700)
+    fd=os.open(directory,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+    monkeypatch.setattr(m.seal,"seal_written",lambda *a:pytest.fail("nonbool selector invoked seal"))
+    try:
+        with pytest.raises(m.ProviderQualificationError,match="publication_refused"):
+            m._Context._write(fd,"sample.json",b"{}",settle=settle)
+        assert not (directory/"sample.json").exists()
+    finally:os.close(fd)

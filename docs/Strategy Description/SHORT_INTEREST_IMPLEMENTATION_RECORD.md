@@ -30258,3 +30258,192 @@ source-cap enlargement is authorized by this prepared trace correction.
 Main post-record active-document checks:69 passed/.85s, OS network denied;
 final guarded check retained empty v1 output and absent v2 output/subject,
 matching published2A6D remote, no known active trace and exact reviewed hashes.
+
+
+## 137. Observed FileProvider flag writer and prospective local metadata isolation (2026-11-03)
+
+### 137.1 Original trace, creator and independent observer
+
+At clean local95c72ca85d7b3e082901a5ad3f6f0f0a6ccff07d with matching
+tracking/actual origin2a6d34c063da17dadeb98874344b628dcd6594a7, the owner
+operated the NEW command-only v2 file and supplied genuine tracer_stream_ready
+for original native child PID/PGID56373. Main then invoked the ONE reserved
+exec/subject.json producer through its owned exec handle5577/PID56593 and
+started an independent persistent-Node RO observer/PID56578. No old invocation
+or subject was restarted. Both Main-owned processes actually terminated0;
+their raw original packets are retained without JavaScript-number conversion.
+
+The producer used the UNCHANGED genuine native publisher/creator/RO handoff
+and immutable-flag path in scripts/prove_short_interest_native_supervision.py,
+SHAe477f8921c71410c36aa8c4b23e9c76f46aa68286b62bf2991882832b7a73237.
+Its fixed41-byte source-free literal has SHA256
+5481ceac52b870e340c7a613b41553fc4f45b40677330d106efd3245959f4052.
+Original device/inode16777234/48643016, UF2, full native9 and exact bytes were
+observed at sealing and producer-context closure. Native9 stores permission
+mode384; the independent observer's explicit raw stat schema stores full
+mode33152. Those schemas are not blindly cast or compared as identical tuples.
+
+The observer held the ORIGINAL RO inode and observed flags2->66->64->64 with
+unchanged41 bytes, SHA, device/inode and mtime, but changed ctime. FD and named
+observations agreed. It had no stderr, overflow or signal. The complete raw
+producer/observer packets are retained in the clearly labelled private lineage
+retention file,3309 bytes/SHA256
+1135931590c4b054bde75646f4bf9c7520a79ab9e9a9bb085e1e0552fd6cbe30.
+Its owner-final-CLI-authentication field is explicitly PENDING, not a repaired
+or invented original root receipt.
+
+Main independently read the original trace-v2.private.json with original
+FD/name full-stamp/protection/size/hash checks:3873 bytes/SHA256
+4a3c83432f14b43be6bbf6ec8872a58a6c73ebe74d0f792c3180855eebd58d54.
+It reports schema si-journal-actor-trace-v2, bounded_observation_closed,
+168 records/global sequence0..167,348507 input bytes, no issue, terminal or
+cleanup failure, stderr0 and original native-child exit-15 after its bounded
+original-handle shutdown. A read-only wide process inventory subsequently
+found no UID0 Python process or original native child. These observations
+establish current termination; the owner's final CLI line containing
+original_report_sha256 is STILL required to authenticate the root helper's
+final return path after report publication. It has been requested; do not
+rerun the administrator command or claim that report presence alone proves
+that final return path. Advisory peer independently matched the original
+report hash/schema/head/events; that is not Claude review.
+
+### 137.2 Verified attribution and limits
+
+All five retained target notifications name that SAME device/inode. Global
+sequence140 records genuine producer56593 setting flags2. Sequences141/142
+record signed Apple com.apple.fileproviderd/PID761 setting66;148/149 record
+the same actor setting64. The first FileProvider notification follows the
+producer notification by11952120ns; the first removal of immutable2 follows
+by504831518ns. Original observer ctime changes follow the corresponding
+FileProvider notifications by27166ns and43541ns. Raw nanosecond integers are
+parsed exactly in Python and are never round-tripped through JavaScript Number.
+
+This identifies FileProvider as the direct writer of the REPRODUCED immutable
+flag loss and associated ctime transitions. It does NOT identify the older
+journal's changed mtime, the later additional ctime-only transition, a specific
+cloud vendor/account, every historical custody failure or every possible
+metadata writer. Those attribution limits remain explicit. No old flag,
+timestamp, datum, claim, budget or uncertainty is restored, adopted or refunded.
+In particular, permanent8START/16777216-byte exposure stays charged.
+
+### 137.3 Bounded prospective isolation; no source release
+
+SI-DEC-20261103-03, under continuing SI-AUTH-20261103-02, selects a causal
+prospective location change for NEW source-free custody metadata only. The
+old image design still placed its backing/bootstrap/host controls under
+Documents; moving only inner files would leave that host chain exposed.
+The next fixed profile keeps ROOT/cwd/Git/branch/code checks in the designated
+lane but places ALL its new data/control artifacts under the separately
+private local Library/Application Support/CodexShortInterestCustody/
+local-metadata-20261103-v1. No new checkout, image, mount, provider/domain
+configuration, security-setting or daemon change is involved. No old data,
+image, failed probe, claim or control is moved, copied, reflagged or deleted.
+The new base remains ABSENT; no actual profile has been invoked.
+
+This intermediate profile is narrower than a full native-supervision proof.
+One producer and one independently controlled RO observer use the unchanged
+genuine publisher, original O_EXCL0600/single-link creation, original RO
+handoff, UF2, full native9, flags and exact fixed literal. Original nofollow
+ancestry/private modes and local writable ownership-enabled APFS are required.
+Only exact known owned additions derive directory nlink; replacement, extra
+membership, remount/host drift or any original file/flag/stamp drift refuses.
+No delayed rebaseline, weaker seal, retry, namespace reset or old-file adoption
+is permitted. New code is restricted to one driver and its fabricated tests;
+the old publisher/source/capture/native-proof implementations stay unchanged.
+
+The entire successful operation is bounded300s; the original observer must
+remain held through the producer's independently owned exit0 plus40s tail,
+sampled at.25s. Every raw wire/control is at most4096 bytes; aggregate controls
+at most65536 bytes. Raw-FD pending-buffer framing plus final EOF rejects extra
+or partial packets without the earlier TextIO/select buffering defect. The
+controller must relay original JSON lines without lossy integer conversion,
+correlate BOTH actual owned waits and perform a fresh read of the ORIGINAL
+seal before any fixed post-exit control publication. Child exit claims cannot
+mint actual OS waits or durable Main/source authority. Unknown/nonzero exits,
+negative packets, cleanup or post-close failures override all provisional
+positives. Original data/control/protection/host checks continue after all
+code, file and directory context closes.
+
+Even a successful actual profile would establish only this finite source-free
+metadata observation. It would NOT admit production storage, native supervision,
+durable Main/readmission, source/denominator/actual inputs or a backtest. Full
+native storage isolation, the genuine nine-part accounting/ledger/lease/
+checkpoint bridge, USB/source qualification, exact native/date/class/CIK/USD,
+availability/revision, same-date own-class denominator, rights, coverage, daily
+union, market eligibility/corporate actions/factual cash and actual-input gates
+remain. SourceAUTH remains unconditionally blocked. No QC/Safari until further
+notice, purchases, new provider/key/claim/START/bytes/outcomes or source-budget
+enlargement occurs. Count84005/4GiB and the separate DAILY residual budget in
+136.1 stay unchanged; looks0/0, exploratory0, alpha0, IDsnone and QCattempts0.
+
+### 137.4 Frozen software and pre-release corrections
+
+New scripts/prove_short_interest_local_metadata.py is38266 bytes/SHA256
+7ee90a8462f538cd7e8ddc40c5a701de9d84f45c9dca2d370664de7a2c82d75a;
+new tests/test_short_interest_local_metadata.py is36242 bytes/SHA256
+db061dd9d9d0e30e4be76ce0c03f3f63f3202b51b94bd3cd093e3647912275f7.
+Frozen policy SHA256 is
+43088ee5abc1327c21a78013f3371ddf9b9cae3084f8ffedfc7afd6ed51c2a87.
+Its code holder is the unchanged original seven-file holder plus this ONE
+committed driver, exact eight-file mapping. The initial original seven-file
+constructor already audits those files; the new wrapper reuses that genuine
+issued mapping rather than immediately duplicating its complete Git sweep.
+Every later full original audit, named/stamp comparison and eighth-file
+committed-Git/byte check remains. No deadline is enlarged to conceal slow guards.
+
+| ID | Priority | Corrected before actual release; evidence and reason |
+| --- | --- | --- |
+| SI-LOCAL-20261103-001 | P2 | Partial creation could lose ownership of the data directory FD while opening control. It remains in the original cleanup set; fabricated failed control creation verifies every opened FD closes. |
+| SI-LOCAL-20261103-002 | P2 | Terminal named audits originally omitted the original host contract after directory handles closed. Fresh RO reads now compare original directory identity/protections and the ORIGINAL host tuple, then recheck the name; no fresh baseline is admitted. The in-memory omission reversal fails its causal regression. |
+| SI-LOCAL-20261103-003 | P2 | Python equality accepted Boolean/integer aliases in nested authority and lineage packets, and final_read omitted producer PID validation. Recursive exact-type equality plus positive exact-int PID/full9/flags/length validation now rejects those aliases. Peer in-memory old-equality reversal yields four expected failures. Fixed false/zero authority projections never became source authority. |
+| SI-LOCAL-20261103-004 | P2 | Final read lacked the same explicit source/network-denial context. It now uses the unchanged original denial context; context-exit failure vetoes closure even after an emitted provisional terminal packet. |
+| SI-LOCAL-20261103-005 | P2 | Final-packet parsing must consume EOF, not merely accept a valid prefix. Bounded raw-FD buffering and final EOF refuse coalesced, partial or later extra bytes. Memory-only EOF reversal has three expected failures; no TextIO/raw-select combination is used. |
+
+Main final new-driver/import-boundary/active-document selection188 passed/4.71s,
+using the existing py313 environment, empty inherited environment, bytecode/
+pytest cache disabled and OS network denied. A TEST-NET connection probe refused
+EPERM before collection. The attempted system-Python pytest import earlier
+failed with ModuleNotFoundError and ran ZERO tests; no package was installed.
+Author110/4.22s and advisory peer110/4.17s are separate executions, not Main
+reruns or independent Claude review. Author EOF memory reversal:3 expected
+failures/1 pass/106 deselected/.40s, restored4/.06s; final-host omission:
+1 expected failure/109 deselected/.53s, restored1/.26s. Peer exact-type reversal:
+4 expected failures/106 deselected/.42s, restored4/.04s. These are fabricated
+causal tests and do not prove the actual local directory, flags or process
+waits. Original publisher/native-proof/source/capture files are unchanged.
+No full lane/repository suite is run.
+
+### 137.5 Current handoff and next authorized action
+
+Local95c72ca85d7b3e082901a5ad3f6f0f0a6ccff07d is the previously committed
+trace correction; actual/tracking origin remains the earlier published
+2a6d34c063da17dadeb98874344b628dcd6594a7. The following prepared-profile commit
+will resolve its full ID from Git; this record does not invent a self hash.
+This continuation has made NO successful push. Main reviewed both new files;
+the author and advisory peer are completed/frozen. Only the new driver/test
+and this lane record change. Every older row and shared document stays intact.
+
+The owner-final root CLI authentication requested in137.1 remains pending.
+Do not repeat the administrator command. When its genuine final line matches
+the retained original report bytes/SHA/status and no negative final return is
+reported, bind the prospective profile to its new clean committed HEAD, exact
+eight working/committed code bytes and unchanged actual lane remote. Then one
+fresh registered producer/observer observation may run, with independently
+owned waits, original seal/flags/bytes and post-close authentication as above.
+No edit/test/commit/push overlaps any active proof. No further namespace,
+retry, longer window, relaxed flag/stamp check or source hold release follows
+an unexplained refusal. Record any actual negative honestly and preserve it.
+
+The last step before QC/Safari has NOT been reached. The remaining native,
+durable accounting, source and actual-input gates are explicit in137.3. Continue
+safe lane work when the required original root return is authenticated; the
+ONE final matching-lane push remains reserved for the completed round or a
+concrete terminal owner-required gate, after all operations terminate and final
+physical/Git root, branch, exact HEAD/status and matching actual remote checks.
+No conditional sibling-lane monitor releases QC/Safari or changes this scope.
+Main post-record active-document checks69 passed/.85s. Exact eight-path working
+byte mapping SHA256 is
+ca4394423f4a31c0c8f994e4d9ad78fef8f929ca6d45365b8b0ca25ea538c248.
+Main independently verified both frozen new-file hashes, unchanged SDK/literal,
+policy equality, Python3.9 AST/in-memory compile and fixed own stage/contract
+literal catalogues. Whitespace passed; actual local base remained absent.

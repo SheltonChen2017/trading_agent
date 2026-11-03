@@ -1,10 +1,17 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **FirstRate raw adapter and conservative USB reconciliation recorded in section 60,
+Status: **Provider-field follow-up recorded in section 61, 2026-11-03.
+EODHD website sign-in is verified; the token-free bounded SPY API request returns Unauthenticated.
+Paid-account data access remains unverified, rather than disproved by that authentication result.
+Public-demo AAPL payment dates and four exact raw-cash USB matches are format/sample evidence only.
+Owned news/press-release routes may support exploratory guidance reconstruction; history is unverified.
+Historical stock/SPY NBBO remains unestablished. No new purchase is recommended.
+This follow-up is local-only; section 60 was published once as `3e144031`.
+FirstRate raw adapter and conservative USB reconciliation recorded in section 60,
 2026-11-03. The adapter and final virtual source reconciliation are complete as offline software.
 No QC navigation, query or launch; no purchases or strategy evaluation.
 Existing Massive/EODHD/FMP/Sharadar plan metadata refreshed. Guidance and historical NBBO remain unestablished.
-Targeted action-field coverage remains unverified; native provider-control failures are recorded below.
+Paid-account stock/SPY action-field coverage remains unverified; native provider-control failures are recorded below.
 Virtual reconciliation accepts 23,585,624 structural keys and quarantines 58,586 keys.
 USB coverage and quality audit recorded in section 59, 2026-11-03.
 The owner reports these FirstRate files were purchased under their licence.
@@ -18,7 +25,7 @@ Coverage/licensing follow-up recorded in section 57, 2026-10-28.
 Known subscriptions still do not establish usable guidance and stock/SPY NBBO.
 Current-vintage exploratory reconstruction is permitted by the plan in principle;
 original receipt/version proof is required for PIT/confirmation claims.
-Owner authorized one final matching-lane non-force push; monitor stays PAUSED.
+Owner-authorized section-60 final matching-lane non-force push is finished; monitor stays PAUSED.
 The section-55/56 round was published once as `7d633144`.
 Codex counter-review of sections 53 and 54 completed in section 55,
 2026-10-28; all four Claude commits are accepted after the recorded corrections.
@@ -97,7 +104,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 60. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 61. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -8878,3 +8885,176 @@ disclosed tool-output incident. Read-only author document QA corrected the
 HistoricalMinute projection wording and scoped section 59's old no-QC claim;
 it is not independent review acceptance. Exact final Git/publication identity
 is retained after the guarded single push in the paused monitor checkpoint.
+
+## 61. Guidance, bid/ask and payment-date follow-up, 2026-11-03
+
+### 61.1 Scope, publication custody and access
+
+Owner: "Proceed with the remaining guidance-history, stock/SPY bid/ask and
+dividend payment-date checks using my existing subscriptions. Don't access QC
+or buy anything." This is a bounded provider-field/rights audit, not a strategy
+evaluation, new data purchase or waiver of protected dates. All requests must
+retain the section-60 date fence, with ticker/date checks before financial
+number conversion. No signal, return, order or research look is computed.
+
+Start and resumed checks verify clean local and live matching remote
+`3e14403190504f0dfc33e7b542965a935e2fc496`, mandatory worktree/branch/origin
+unchanged. The previous section-60 round was published in exactly one
+successful non-force push of
+`7d63314472b4462e153dde82b0bf71c848a253fa..3e14403190504f0dfc33e7b542965a935e2fc496`,
+including accumulated `f95b84e5`, `918f405b`, `e7a785c0` and `3e144031`.
+That publication is finished, not authorization for another push. This new
+follow-up accumulates locally; no new Claude review is consumed. Monitor
+remains PAUSED. No native Safari attachment, QC page/docs/API/quota/source/
+log/outcome, provider purchase, account change or message to a provider occurs.
+
+Provider-plugin discovery found no usable EODHD connector; no plugin is
+installed or reconfigured. A narrowly scoped connected-mail metadata search
+found no new guidance/NBBO/licensing confirmation. Unrelated lane messages
+were not opened and no mail was sent. Official public documentation and an
+isolated in-app browser avoid the shared native Safari control failures in
+60.5. This is an access method choice, not copied Safari authentication.
+
+The owner answered **"Signed in to EODHD"**. The isolated tab visibly reached
+`https://eodhd.com/cp/dashboard`; website authentication is verified. One
+official token-free API navigation requested only SPY dividends for
+January 1--December 31, 2025 and returned visible **Unauthenticated**. HTTP
+status headers were not directly measured. The official dividend docs say
+missing `api_token` returns 401. Do not turn this result into an entitlement
+refusal, an empty history result or a missing-subscription claim. No owner
+API token is extracted, copied to code/artifacts or reused from the prior
+Sharadar exposure. The already bounded provider tab is retained for the owner
+to authenticate directly; the token must not be sent in chat. Other paid-
+account probes remain unexecuted until a reliable authorized request route
+exists. No generic new vendor sign-off is invented for local analysis.
+
+### 61.2 What the owned products can supply, and what remains unverified
+
+| Input | Current official documentation | Measured evidence / remaining limit |
+| --- | --- | --- |
+| EODHD All World financial news | [News API](https://eodhd.com/financial-apis/stock-market-financial-news-api) supplies article content, original link, publication time and symbols; [Calendar and News](https://eodhd.com/lp/calendar-and-news-api) describes inclusion in All World. | Potential owned route to original issuer/syndicated releases for current-vintage exploratory reconstruction. Actual account grant, usable years, comparable management FY pairs, corrections/withdrawals and inactive coverage remain unverified. News commentary or keyword hits are not guidance ranges. |
+| FMP Starter financial news / press releases | [Financial Market News](https://site.financialmodelingprep.com/datasets/market-news) and [Search Press Releases](https://site.financialmodelingprep.com/developer/docs/stable/search-press-releases) describe publication, publisher, full text and original URL. | Starter marketing is not an exact endpoint/history grant. No authenticated Try request is submitted. Generic stock-news history must not be transferred into a press-release completeness guarantee. |
+| Sharadar Bundle 5Y material events | [Material Events](https://sharadar.com/docs/events) gives dated ticker/8-K-event context. | It does not supply management revenue/adjusted-EPS ranges or original exhibit text. No new account request is made. |
+| FMP SEC metadata | [Search by symbol](https://site.financialmodelingprep.com/developer/docs/stable/search-by-symbol) supports bounded filing metadata and document links. | Starter access is unverified; a filing link is not captured original guidance. EODHD SEC Filings is a separate All-In-One product, not inferred owned or queried through a default latest-data route. |
+| EODHD dividend JSON | [Splits and Dividends](https://eodhd.com/financial-apis/api-splits-dividends) includes optional payment/declaration/record dates, currency and `unadjustedValue`; `value` is split-adjusted. CSV omits extended date fields. | Public AAPL format/sample checks below pass. Paid-account SPY/AAPL and common-history population remain unverified. Optional fields must be checked on actual rows. |
+| Massive Stocks Starter dividends | [Dividends](https://massive.com/docs/rest/stocks/corporate-actions/dividends) documents history since January 15, 2000, optional pay date/currency/action ID and separate raw/adjusted cash fields. | Useful existing-plan route before another actions purchase. No authenticated bounded request or cross-provider SPY comparison is completed. |
+| FMP dividend calendar | [Calendar](https://site.financialmodelingprep.com/developer/docs/stable/dividends-calendar) supports bounded dates, at most 90 days per request and 4,000 records. | Generic tier is Premium; Starter/grandfathered grant is unverified. The isolated viewer is prepared for March 2025 but Try is not clicked. The per-symbol dividends endpoint does not document a date filter, so no guessed `from/to` request is sent. |
+| Historical stock and SPY NBBO | [Massive Quotes](https://www.massive.com/docs/rest/stocks/trades-quotes/quotes) documents Advanced access, archive from September 10, 2003, sizes/conditions and SIP/participant clocks. | Displayed Starter excludes historical quotes; no Advanced grant or actual account denial is established here. Existing Sharadar daily data, FirstRate OHLCV, EODHD live EDGX and FMP live/aftermarket quotes do not establish historical consolidated NBBO. |
+
+EODHD's documented `direction=1` news paging orders database arrivals, requires
+a window no longer than 31 days and bounds `offset+limit` at 10,000. Those
+controls help retrieval completeness; they do not establish original delivery,
+immutable historical versions or PIT. January/April 2025 JNJ probes remain
+prepared rather than executed. The source plan permits non-PIT historical
+reconstruction in principle; neither a vendor timestamp nor an original URL
+automatically supplies the immediate comparable predecessor. An unconditional
+Corporate Guidance purchase is not justified before testing these owned routes.
+
+[EODHD Terms](https://eodhd.com/financial-apis/terms-conditions) expressly
+permit nonprofessional private storage, manipulation and analysis. Ordinary
+local personal analysis does not require an invented additional vendor approval.
+Redistribution/account sharing are restricted; third-party cloud processing/
+upload and post-cancellation retention remain unresolved for the intended use.
+[Massive Market Data Terms](https://massive.com/legal/market-data-terms-of-service)
+default to display-only absent another agreement and address non-display/
+derived use plus cease-use/deletion after termination/restriction/suspension. The actual
+applicable grant must be checked before strategy processing. A product upgrade
+alone would not settle those rights. No agreement is accepted or changed here.
+
+### 61.3 Actual public-evaluation AAPL sample and USB crosscheck
+
+One explicitly documented EODHD **public demo**, not owner-token, request reads
+AAPL dividends only for calendar 2025: HTTP 200, 721 bytes, captured
+`2026-11-03T22:10:15.356780+00:00`. All four ex-date rows pass the allowed-window
+gate before financial numerical interpretation. Ex-dates are February 10,
+May 12, August 11 and November 10, 2025. All four contain valid nonnull payment,
+declaration and record dates, currency and raw/adjusted cash fields. No sampled
+declaration-after-ex, payment-before-ex or record-before-ex flag appears.
+No amount is emitted. This proves only public-demo format/population for these
+four AAPL records, not paid-account access, SPY coverage, six common years,
+original availability or an issuer-wide action certificate.
+
+Read only the already inventoried USB `Stock_Dividends.zip` and named
+`AAPL_divs.txt`, with its retained archive hash verified. Date prefixes are
+examined while other out-of-window financial fields remain undecoded. Four
+2025 ex-dates and all four unadjusted cash amounts match the public sample
+exactly through the new FirstRate Decimal parser. This is a vendor-label/date
+crosscheck without permanent-ID or PIT proof. No USB write, full re-audit,
+source repair, return join, portfolio evaluation or cash posting occurs.
+
+An ignored private inspector preserves numeric JSON lexemes as strings,
+refuses duplicate/nonfinite JSON and performs complete ticker/date gating
+before Decimal conversion, financial-text keyword checks or content hashing.
+It distinguishes authentication, policy/entitlement, empty and partial results.
+Thirteen invented controls pass, including precision, duplicate keys, invalid
+dates/tickers, absent raw cash/pay dates, ignored filters and 401/403. Captured
+request context remains an external claim, not a provider grant or PIT receipt.
+Only the explicitly named public AAPL sample is inspected. No private data,
+token or raw article/amount is committed. A helper's official-document search
+incidentally returned a current financial-summary snippet; values are not
+repeated, used or joined. Do not claim zero incidental protected-context display.
+
+Retained ignored evidence under
+`artifacts/guidance_revision_drift/provider-field-audit-20261103/`:
+
+| File | SHA-256 |
+| --- | --- |
+| `request-plan-v1.json` | `fbbab409dccbb844be31d82f800858a99d3dcd6c7192e493ca6aa1898e7b7760` |
+| `request-plan-v2.json` | `d331fb7e03671c3ff151d3ea733d8a02ad2b09e0b2c01bb9ae61447df73e66a1` |
+| `eodhd-cookie-only-spy-observation-v1.json` | `1695459ca6dd264f7475c66ab8f430bf952ed1daad5f8b809f069d69c571b1e8` |
+| `public-evaluation-plan.json` | `50be32e6a8281b4f8b012581c6faa15545c26f14442b294e4ce29e86bf569805` |
+| `eodhd-public-evaluation-aapl-2025.json` | `cd5ef751dafd09b62576c634d58bf15f2bff3498291346a1f85d9f33f7e143e3` |
+| `eodhd-public-evaluation-receipt.json` | `1f2b8f3bb0bbeb56e8278db6fd8e295c002e4509f419a6623cd95fa527c67421` |
+| `eodhd-public-evaluation-context.json` | `75ee4d15a1832a15147b60260cbe2de453d7e2e187bd9f9a078b433d62918e60` |
+| `eodhd-public-evaluation-inspection-v1.json` | `267db1e2b799ad391853669ed7e59240f3358db1d3951b1227bf0b945c4b8a65` |
+| `aapl-public-evaluation-firstrate-action-crosscheck.json` | `27a5d91e44e81f93d1ad5fe3dd4ecae7a193a717c6e76199aaf2ba8279540142` |
+| `inspect_response.py` | `d78835d12d503727ecf2087f483439ec7a688ae16108aa2357e49fcc0fc33e64` |
+| `invented-controls-v2.json` | `8dcf52dbdc91fcd80454e1a40837627f81656dd3d8d81fc3fa64c50c3062f31a` |
+
+Plan v2 is not a launch/access receipt. It explicitly binds expected ticker
+filters and the documented news paging option. The ignored v1 inspector
+does not yet accept `direction`; update/validate it before using a changed
+context. No request in v2 is represented as executed with an owner token.
+
+### 61.4 Remaining blockers and next bounded action
+
+1. Authenticate the already date-bounded EODHD request through the provider;
+   do not extract credentials, reuse the exposed Sharadar key or replace the
+   request with an unbounded current-data query. Verify SPY payment dates/raw
+   cash first, then actual owned news disclosure/predecessor coverage. This is
+   an access-route blocker, not a recommendation to buy another product.
+2. Verify the existing Massive/FMP endpoint grants with bounded requests and
+   the actual applicable processing/retention agreement. No denial is inferred
+   from missing authentication or public plan marketing. Historical stock and
+   SPY NBBO remains the principal documented product gap; usable common dates,
+   size units, conditions, action/reference history and six-year depth still
+   need actual evidence before choosing a purchase.
+3. Sections 60.5's canonical identity/minute audit, terminal actions, authentic
+   service calendar/fees/settlement, real-input runner integration, exact-source
+   review/native parity and frozen research/economic/date/look scope remain.
+   No original GDR milestone or empirical readiness gate is declared passed.
+
+Production source remains
+`f570bb044504ec12439d74d49e27408337705286a7ca5d1ac46bb91526e1b11b`
+(60 members); FirstRate source remains
+`7889276ed58bd8f24c25c3fb6db4d81c2a3c463ae14b13d5bfb2c38ddc34631e`;
+native audit remains
+`fa562a43d49f59e5e3305c3d99cb2d3537bf0045a494504c3f5e5711fd8ae3e6`.
+Original candidate/fixture/economic/null/false permissions are unchanged.
+Original cycle stays CLOSED FAILED 3/3; separate Mia recovery remains zero
+attempts/intents with maximum three unsuccessful attempts. No QC access or
+native attempt is consumed by these provider checks. Only this lane record
+and its existing active-status pins change in tracked Git; prior sections
+remain byte-exact below the active header. This is partial coverage evidence,
+not a complete paid-account audit or another publication round.
+
+Focused verification: one existing active-document method passes (0.014 s,
+zero failures/errors/skips), 11 retained artifact hashes match, both changed/
+private-inspector Python files compile in memory and production manifest
+SHA/member count remain exact. Sections 1 through 60 below the header are
+byte-exact to `3e144031`. `git diff --check` passes; no full lane/repository
+suite is run. Read-only author document QA clarified paid-account versus
+public-sample action coverage and the Massive suspension clause. It is not
+independent Claude review or empirical/native acceptance. Final header/diff/
+status checks precede the local-only commit; no additional push is authorized
+or performed in this follow-up.

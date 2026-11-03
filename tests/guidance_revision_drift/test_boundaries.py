@@ -192,6 +192,10 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         # Review-state phrase: rotate it in the same commit as each new review
         # or counter-review section so the status block cannot go stale.
         header = record.split("## 1.", 1)[0]
+        self.assertIn("Provider-field follow-up recorded in section 61", header)
+        self.assertIn("Paid-account data access remains unverified", header)
+        self.assertIn("Public-demo AAPL payment dates and four exact raw-cash USB matches", header)
+        self.assertIn("This follow-up is local-only; section 60 was published once as `3e144031`", header)
         self.assertIn("FirstRate raw adapter and conservative USB reconciliation recorded in section 60", header)
         self.assertIn("No QC navigation, query or launch; no purchases or strategy evaluation", header)
         self.assertIn("USB coverage and quality audit recorded in section 59", header)
@@ -204,7 +208,7 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertIn("Coverage/licensing follow-up recorded in section 57", header)
         self.assertIn("original receipt/version proof is required for PIT/confirmation claims", header)
         self.assertIn("The section-55/56 round was published once as `7d633144`", header)
-        self.assertIn("Owner authorized one final matching-lane non-force push; monitor stays PAUSED", header)
+        self.assertIn("Owner-authorized section-60 final matching-lane non-force push is finished; monitor stays PAUSED", header)
         self.assertIn("Claude follow-up corrections recorded in section 54", header)
         self.assertIn("Codex counter-review of sections 53 and 54 completed in section 55", header)
         self.assertNotIn("Codex counter-review of sections 53 and 54 pending", header)
@@ -259,6 +263,7 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertGreater(record.index("\n## 58."), record.index("\n## 57."))
         self.assertGreater(record.index("\n## 59."), record.index("\n## 58."))
         self.assertGreater(record.index("\n## 60."), record.index("\n## 59."))
+        self.assertGreater(record.index("\n## 61."), record.index("\n## 60."))
         self.assertIn("research/__init__.py`, remains unobserved", header)
         self.assertIn("paused pending platform preflight", header)
         self.assertIn("GDR-RP33 is accepted in section 34", header)

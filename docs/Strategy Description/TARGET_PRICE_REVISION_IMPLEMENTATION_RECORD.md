@@ -1,29 +1,29 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current counter-review and concrete-blocked handoff, section110 (2026-10-30):**
-The exact incoming Claude range `a7f83bb4..e2dac576` (one commit) is accepted
-after the section109 current-record correction. CR33-007 is retrospectively
-verified; CR33-008 is closed for the verified frozen-financial actions
-successor. The committed status reader genuinely observed TPR100
-project38609836/job21d48f35420052b3c20d2bf628b5a0ae **Runtime Error,
-completedTRUE** at13:01UTC. The heartbeat is **PAUSED**. This terminal failure
-is distinct from the earlier oversized-response parser failures.
+**Current owner-directed offline build, section112 (2026-11-03):**
+QC access is deferred because another lane is using it. This round permits
+local preparation with no QC access: **0 QC requests, 0 native compiles,
+0 backtests**. Skip Claude review and make exactly one final lane push.
+The independent USB assessment is complete in111. The data is useful for
+price/action diagnostics; it is not an admitted replacement for the frozen
+TPR signal, membership, SID, PIT or native RAW input.
 
-The diagnosed runtime guard is persistent subscription bound4096 exhaustion;
-its native resource/custody correction remains unverified. All17 cloud files
-are retained and unchanged through terminal/UI reconciliation. The four-file
-Mia diff's stale/future-mark exceptions and identity heuristics remain rejected;
-compiled-job-source attestation and economic acceptance remain FALSE.
-Genuine Mia consultation could not be submitted: Safari input control failed,
-and the supported browser is unauthenticated. Mia attempt:0 verified messages
-sent,0 Mia responses,0 Mia runs. An accidental unpersisted editor
-insertion was cleared; fresh native reads prove no cloud source change. No
-new compile or financial job was requested. **0/5 accepted full-window results;
-all financial metrics NULL.** Section110 owns the final snapshot, distinct job
-provenance, limits and next technical action. Sections107–109 retain their
-historical evidence.
+The local build adds a supplied-byte FirstRate adapter, conservative
+already-final subscription bookkeeping candidate, pinned five-arm source
+preflight and claimed local exporter. Private source exports follow only
+after the implementation source is committed. The4096limit and all historical
+financial functions/economics remain unchanged; native activation/capacity
+and full-window completion are unproved. **0/5 accepted full-window results;
+all financial metrics NULL; financial acceptance remains FALSE.**
 
-The next bounded action is restoring genuine Mia control and verifying an economics-preserving source/input correction under fresh bounded scopes; keep the heartbeat PAUSED during this blocked handoff, then run OFF and the remaining frozen arms serially only after verified source recovery.
+The last accepted Claude counter-review remains `a7f83bb4..e2dac576`;
+CR33-008 remains closed for its old frozen-financial route. The new candidate
+is a separate source epoch and cannot bypass that route. The retained
+October30 TPR100 RuntimeError and paused heartbeat are historical observations;
+QC was not freshly inspected in this round. Earlier failures and every
+Completed diagnostic/source/attempt/look record remain retained.
+
+The next bounded action is deferred QC verification and backtesting once QC is available again; the local build stops before any QC access, skips Claude review, and makes exactly one final lane push.
 
 **Retained published result, section107 (2026-10-29):** five separate lane-owned QC
 projects are created and source-verified; cleanup is complete with two older
@@ -32,10 +32,10 @@ completed, including a matching map/config trace with zero target bars in the
 tested session. Genuine Mia006/007 supplied no verified financial correction.
 All five financial backtests remain incomplete; full-window metrics are NULL.
 The concrete blocker is the lack of an admissible same-session native mark
-for the exact held OFF SID on2021-02-10. Section107.7 records its then-current role/counts; section110 owns the
-current next action. Section106 retains the accepted Claude counter-review.
+for the exact held OFF SID on2021-02-10. Section107.7 records its then-current role/counts; section112 owns the
+current offline next action. Section106 retains the accepted Claude counter-review.
 
-**Current owner continuation (section107):** create FIVE separate private QC
+**Standing earlier owner continuation (section107, subject to112):** create FIVE separate private QC
 projects, one per frozen arm, preserve old project37650980 and its source-drift
 evidence, use genuine Mia for verified fixes, exercise documented bestjudgment,
 skip routineClaude review, and push exactlyone time at the completed or
@@ -76,10 +76,9 @@ owner-answer checkpoint is added by this factual blocked handoff.
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **SECTION110 CONCRETE-BLOCKED HANDOFF: TPR100 RUNTIME ERROR;
-HEARTBEAT PAUSED; ZERO ACCEPTED FULL-WINDOW RESULTS. SOURCE UNCHANGED;
-PERSISTENT4096 SUBSCRIPTION GUARD, OFF RAW/INPUT AND MIA CONTROL
-CORRECTIONS UNVERIFIED. FROZEN ECONOMICS UNCHANGED; NO TRADING ACCEPTANCE.** The exact per-commit counter-review 2cce8dfc..cf5157d8
+Status: **SECTION112 OFFLINE BUILD; QC ACCESS DEFERRED; SKIP CLAUDE REVIEW;
+ONE FINAL PUSH. ZERO QC REQUESTS/NATIVE COMPILES/BACKTESTS;
+0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
 in106 remains accepted after its document/current-routing correction.
 Historicalsection105 review/disposition/fullrange remains intact in105.
 
@@ -473,48 +472,46 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, counter-review and concrete-blocked handoff (section110):**
-Section110 owns current routing. TPR100 project38609836/job
-21d48f35420052b3c20d2bf628b5a0ae was natively observed Runtime Error,
-completedTRUE at13:01UTC. The heartbeat is PAUSED. All17 cloud files are
-retained and unchanged; fresh native reads prove no cloud source change.
-The persistent4096 subscription guard and OFF native RAW/SID/input
-corrections remain unverified. **0/5 accepted full-window results; all financial
-metrics NULL.** Compiled-job-source attestation and economic acceptance remain
-FALSE. Genuine Mia consultation could not be submitted: Safari input control
-failed and the supported browser is unauthenticated. Mia attempt:0 verified
-messages sent,0 Mia responses,0 Mia runs. No new financial compile or job
-was requested.
+**Current qualification, owner-directed local build and deferred backtesting (section112):**
+QC access is deferred while another lane uses it. This round has no QC access:
+**0 QC requests, 0 native compiles, 0 backtests**. Skip Claude review and make
+exactly one final lane push. The USB assessment in111 found useful independent
+OHLCV/action/cap/fundamental data, missing TPR/universe/SID/PIT inputs and a
+323row REMX pre-inception lineage anomaly. It is not an admitted price fallback.
 
 Codex has independently counter-reviewed the exact incoming Claude range
 `a7f83bb4f711cbb187a3bdde4de476f137eb243f..e2dac57607cf4ae068051a85dd2f0fa5f2f35a57`:
-one correction/review commit carrying section108, accepted after current-record
-correction. Compile/launch readbacks, fixed project targets, map-probe privacy
-and portable guards are accepted as software; reported Windows figures are
-not locally reproduced Windows custody evidence. The retrospective cleanup
-receipt chain is verified; the legacy cleanup client is retired for future
-deletes. CR33-008 is closed for the independently verified frozen-financial
-actions successor; direct legacy financial mutations are retired. This route
-does not admit the unreviewed Mia source epoch or prove backend atomicity,
-compiled source/native accounting or financial acceptance.
+one correction/review commit, accepted after the section109 current-record
+correction. CR33-007 is verified and future legacy cleanup retired.
+CR33-008 is closed for the preserved frozen-financial route; the new resource
+candidate has a separately pinned source epoch and is ineligible for that
+old route. No override flag or unreviewed Mia correction is admitted.
 
-The next bounded action is restoring genuine Mia control and verifying an economics-preserving source/input correction under fresh bounded scopes; keep the heartbeat PAUSED during this blocked handoff, then run OFF and the remaining frozen arms serially only after verified source recovery.
+The local build stops at source/config/software verification and local
+artifact preparation. Original financial function ASTs,4096limit, frozen
+dates/calendar/economics/inputs and six STOCK sleeves remain unchanged.
+No ordinary unheld/out-of-universe subscription pruning, stale/future marks,
+identity guess, missing-as-zero or financial acceptance is introduced.
+**0/5 accepted full-window results; all financial metrics NULL;
+financial acceptance remains FALSE.**
 
-Historical pre-owner/Mia financial evidence remains8financialjobs/8RuntimeErrors/
-0acceptedfullwindowresults: OFF1failedunsupportedAPI and seven later jobs
-were mark-related. The separately classified8owner/Miajobs have7RuntimeErrors
-and1shortCompleted verification, with no accepted financial outcome. They are
-not silently added to financial/outcome counts. Only the exactOFFFeb10 native
-paths were independently probed; rootcause prevalence and other-arm sameSID/
-dataabsence are not proved. The exact16:00Tickboundary is included; no
-auction-completeness inference.
+The next bounded action is deferred QC verification and backtesting once QC is available again; the local build stops before any QC access, skips Claude review, and makes exactly one final lane push.
 
-The latest owner authorizes genuineMia recovery/bestjudgment without another
-routineClaude checkpoint or owner-answer stop. Frozen economics/custody/
-rights/per-effect fresh claims remain. The standing authorized sequence after
-control/source recovery remains: Codex uses genuine QC Mia under fresh bounded scopes to diagnose and verify a native source/routing correction, then continues all five frozen arms; no routine Claude checkpoint or owner-answer gate is required by the latest continuation.
+The last native TPR100 RuntimeError/4096observation,8distinct owner/Miajobs
+and paused heartbeat remain attributed toOctober30/section110. No current
+cloud state or availability is inferred. NativeSDK behavior, actual resource
+capacity/relief, exact native RAW/SID/input correction, compiled-job source
+and complete accounting remain unverified. Supplied-source/fixture results
+do not grant PIT/rights/canonical/Windows ACL/signer or trading authority.
+Historical8deliberatefinancialjobs/8RuntimeErrors and all earlier looks remain
+separate from the8owner/Miajobs and this round's0financialruns.
 
-Historical workflow context: the last completed counter-review before this round was section106. Section 94 reviewed the owner-skipped continuation of section 93. The direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY; sections106/107 retain that history; section110 governs the current handoff.
+The latest owner permits bestjudgment/local work and waives routineClaude
+review; private custody, source rights and fresh per-effect claims remain.
+The standing earlier recovery sequence, subject now to the explicit noQC
+deferral, is: Codex uses genuine QC Mia under fresh bounded scopes to diagnose and verify a native source/routing correction, then continues all five frozen arms; no routine Claude checkpoint or owner-answer gate is required by the latest continuation.
+
+Historical workflow context: the last completed counter-review before this round was section106. Section 94 reviewed the owner-skipped continuation of section 93. The direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY; sections106/107 retain that history; section112 governs the current offline build.
 
 Historical source/attempt observations below remain attributed to their
 original rounds; they are not new currentIDE/operator/source inspections.
@@ -31237,3 +31234,259 @@ advance. Exactlyone nonforce push targets only the matching lane, then actual
 local/remote equality and clean status are checked. No extra cleanup, native
 job, project/source modification, account action or acceptance is implied.
 The actual final HEAD/push verification is reported with this handoff.
+
+Fresh USB utility claim USB-20261103-INVENTORY-001; HEAD1b4aea22f7d9709d47762505b10aa53394e0c446; readonly filesystem only; {"depth": 1, "hidden": "excluded", "max_entries": 200, "max_file_content_bytes": 0, "symlinks": "not-followed", "volume": "/Volumes/SANDISK"}; fsynced manifest 1515B/SHA9d7d3c8c7172c180dd37a0b29ce7a336060db4df85cfbefcdeda8035fe3ef552 BEFORE effect. New owner authority is bounded USB inspection only; no provider/QC/Mia/compile/job/outcome authority, frozen economics or prior claims/counters changed.
+
+USB top-level metadata inventory completed; 1 visible entries, no file bodies read. Private result 150B/SHAc2c65c4945313381cffbd6259927e54140c3a292a66631602c35cc0c820de71d.
+
+Fresh USB utility claim USB-20261103-DATASET-LAYOUT-001; HEAD1b4aea22f7d9709d47762505b10aa53394e0c446; readonly filesystem only; {"max_depth": 3, "max_entries": 1200, "max_file_content_bytes": 0, "per_directory_entries": 250, "root": "/Volumes/SANDISK/firstrate", "symlinks": "not-followed"}; fsynced manifest 1546B/SHA87e28ce8c2fddaba347393d151b23e0733d093db4b14a78d4706afa9b47e13a1 BEFORE effect. New owner authority is bounded USB inspection only; no provider/QC/Mia/compile/job/outcome authority, frozen economics or prior claims/counters changed.
+
+Fresh readonly USB dataset-layout metadata completed; 582 bounded entries, truncation["market/ETF-Complete_5000+_Tickers", "market/Stocks_Complete_10_000+_Tickers"]; no file content. Private result 74925B/SHAba5f5f46406284d0aedfbc5e010f8978a62eea7a35db99989be8d4da195ab0ed.
+
+Fresh USB utility claim USB-20261103-DOCS-001; HEAD1b4aea22f7d9709d47762505b10aa53394e0c446; readonly filesystem only; {"files": ["manifest.json", "market/Stocks_Complete_10_000+_Tickers/Read_Me_Documentation.txt", "market/ETF-Complete_5000+_Tickers/Read_Me_Documentation.txt", "fundamentals/Valuation_Metrics_P_E_P_B_EV_EBITDA_etc./Read_Me_Documentation.txt", "fundamentals/Company_Financials_Income_Statement_Balance_Sheet_Cash_Flow/Read_Me_Documentation.txt"], "max_content_bytes": 424000, "root": "/Volumes/SANDISK/firstrate", "scope": "documentation and JSON key/type shape; no URL/credential values or financial rows"}; fsynced manifest 1869B/SHAc5def528d3b924ec06f6457c1aff415a6b0a8a91a3e11bb87e111afae1537323 BEFORE effect. New owner authority is bounded USB inspection only; no provider/QC/Mia/compile/job/outcome authority, frozen economics or prior claims/counters changed.
+
+USB-DOCS-001 local decoder refused a Windows-1252 byte; spent read retained as failed, no result/body export/native request/financial attempt. Fresh002 uses explicit UTF8-or-CP1252 documentation decoding; old scope not reused.
+
+Fresh USB utility claim USB-20261103-DOCS-002; HEAD1b4aea22f7d9709d47762505b10aa53394e0c446; readonly filesystem only; {"encoding": "UTF8 or CP1252", "files": ["manifest.json", "market/Stocks_Complete_10_000+_Tickers/Read_Me_Documentation.txt", "market/ETF-Complete_5000+_Tickers/Read_Me_Documentation.txt", "fundamentals/Valuation_Metrics_P_E_P_B_EV_EBITDA_etc./Read_Me_Documentation.txt", "fundamentals/Company_Financials_Income_Statement_Balance_Sheet_Cash_Flow/Read_Me_Documentation.txt"], "max_content_bytes": 424000, "root": "/Volumes/SANDISK/firstrate", "scope": "documentation and JSON key/type shape only; no URL/credential values or financial rows"}; fsynced manifest 1902B/SHA01d882b66c51ee8dc1d624da61a5cae99d76b9c71e9b5e7c7bac61d31c8d3856 BEFORE effect. New owner authority is bounded USB inspection only; no provider/QC/Mia/compile/job/outcome authority, frozen economics or prior claims/counters changed.
+
+USB documentation+manifest structure read completed; only four explicit dataset readmes/12131B and manifest/327907B processed. No API_Access file, URL/key values or market-price bodies exposed. Private result 16501B/SHAad5e22484cde8767fb294844641bac79382bde8bc46dd4636ef4aaddca2ff822.
+
+Fresh USB utility claim USB-20261103-COMPLETE-INVENTORY-001; HEAD1b4aea22f7d9709d47762505b10aa53394e0c446; readonly filesystem only; {"file_bodies": ["manifest.json"], "manifest_expected_sha256": "c681af584244d38e3f9dea2ff765cc2c991cb383107a3e542115a4338ee4cdf8", "max_content_bytes": 327907, "max_directories": 80, "max_files": 2500, "root": "/Volumes/SANDISK/firstrate", "scope": "file sizes/types/product categories; selected manifest status/date metadata only; no URLs or API_Access"}; fsynced manifest 1745B/SHAb92e68b0c65029975e70d367afa9e7dff91417ca892bc95aa36d99f0886161c0 BEFORE effect. New owner authority is bounded USB inspection only; no provider/QC/Mia/compile/job/outcome authority, frozen economics or prior claims/counters changed.
+
+USB-COMPLETE-INVENTORY-001 claim spent on local phase syntax refusal BEFORE any USB effect. Fresh002 fixes only the parenthesis and precompiles before claiming; no old scope reused.
+
+Fresh USB utility claim USB-20261103-COMPLETE-INVENTORY-002; HEAD1b4aea22f7d9709d47762505b10aa53394e0c446; readonly filesystem only; {"file_bodies": ["manifest.json"], "manifest_expected_sha256": "c681af584244d38e3f9dea2ff765cc2c991cb383107a3e542115a4338ee4cdf8", "max_content_bytes": 327907, "max_directories": 80, "max_files": 2500, "root": "/Volumes/SANDISK/firstrate", "scope": "file sizes/types/product categories; selected manifest status/date metadata only; no URLs or API_Access"}; fsynced manifest 1745B/SHA93c996150c97ab287344b4dd23499f6c6d741deed9633074a58a6a2ce862304c BEFORE effect. New owner authority is bounded USB inspection only; no provider/QC/Mia/compile/job/outcome authority, frozen economics or prior claims/counters changed.
+
+Complete bounded metadata census: 770 files/324284056191B; manifest769entries; signal/membership/identity filename matches0. No URL/API/credential files or raw market rows read. Private result 115168B/SHA4495b48efbc70a3ea423d77246b84644866ebb5408fcced90d012ec50380dbb7.
+
+Fresh USB utility claim USB-20261103-SCHEMA-COVERAGE-001; HEAD1b4aea22f7d9709d47762505b10aa53394e0c446; readonly filesystem only; {"archives": 11, "daily_symbols": ["IWM", "KIE", "REMX", "SPY", "XLE", "XLF", "AAPL", "LMB"], "fundamental_actions_header_bytes_per_member": 4096, "max_compressed_bytes_read": 25165824, "max_daily_members": 8, "max_full_daily_member_bytes": 2097152, "max_members_per_archive": 5000, "root": "/Volumes/SANDISK/firstrate", "scope": "archive membership, header structure, date-column coverage only; no price/return calculations, extraction, upload, or archive execution", "ticker_listing_prefix_bytes_each": 2048}; fsynced manifest 1881B/SHAa6ff9ef82212cceed42dc9b026a145f0a6f7bf6f3dae13c5637f259d668a4692 BEFORE effect. New owner authority is bounded USB inspection only; no provider/QC/Mia/compile/job/outcome authority, frozen economics or prior claims/counters changed.
+
+USB-SCHEMA-COVERAGE-001 consumed a bounded first daily-member read but refused an unsupported codec spelling before result/financial processing. Fresh002 corrects UTF-8-SIG alias and validates codec before effect; no old scope reused.
+
+Fresh USB utility claim USB-20261103-SCHEMA-COVERAGE-002; HEAD1b4aea22f7d9709d47762505b10aa53394e0c446; readonly filesystem only; {"archives": 11, "daily_symbols": ["IWM", "KIE", "REMX", "SPY", "XLE", "XLF", "AAPL", "LMB"], "fundamental_actions_header_bytes_per_member": 4096, "max_compressed_bytes_read": 25165824, "max_daily_members": 8, "max_full_daily_member_bytes": 2097152, "max_members_per_archive": 5000, "root": "/Volumes/SANDISK/firstrate", "scope": "archive membership, header structure, date-column coverage only; no price/return calculations, extraction, upload, or archive execution", "ticker_listing_prefix_bytes_each": 2048}; fsynced manifest 1881B/SHAa51ab2d7d8a774e63b715886143ef71df17a57be184678a7545fcd92c71ba68b BEFORE effect. New owner authority is bounded USB inspection only; no provider/QC/Mia/compile/job/outcome authority, frozen economics or prior claims/counters changed.
+
+Fresh USB utility claim USB-20261103-SCHEMA-COVERAGE-003; HEAD1b4aea22f7d9709d47762505b10aa53394e0c446; readonly filesystem only; {"ambiguous_symbols": "report filenames; never choose a lineage", "archives": 11, "daily_symbols": ["IWM", "KIE", "REMX", "SPY", "XLE", "XLF", "AAPL", "LMB"], "fundamental_actions_header_bytes_per_member": 4096, "max_compressed_bytes_read": 25165824, "max_daily_members": 8, "max_full_daily_member_bytes": 2097152, "max_members_per_archive": 5000, "root": "/Volumes/SANDISK/firstrate", "scope": "archive membership/header/date coverage only; no price/return interpretation, extraction, upload or archive execution", "ticker_listing_prefix_bytes_each": 2048}; fsynced manifest 1926B/SHA23ab60c120468e1edd6cbcaf8dc7ea2e1874666bd803894d9f1949382fc340ae BEFORE effect. New owner authority is bounded USB inspection only; no provider/QC/Mia/compile/job/outcome authority, frozen economics or prior claims/counters changed.
+
+Correction to the002 failure attribution: traceback line20 was the5000 archive-member count guard in fundamentals, not a stock ticker ambiguity. Scope003 repeated that same bound and is retained failed; no actual ticker ambiguity was proved. Fresh004 explicitly declares50000 bounded archive metadata entries while keeping the same4MiB-per-read/24MiB-total compressed byte caps; no production or frozen financial limits change. Date/header-only processing continues, no financial results.
+
+Fresh USB utility claim USB-20261103-SCHEMA-COVERAGE-004; HEAD1b4aea22f7d9709d47762505b10aa53394e0c446; readonly filesystem only; {"archives": 11, "daily_symbols": ["IWM", "KIE", "REMX", "SPY", "XLE", "XLF", "AAPL", "LMB"], "fundamental_actions_header_bytes_per_member": 4096, "max_compressed_bytes_read": 25165824, "max_daily_members": 8, "max_full_daily_member_bytes": 2097152, "max_members_per_archive": 50000, "max_single_compressed_read": 4194304, "root": "/Volumes/SANDISK/firstrate", "scope": "archive membership/header/date coverage including Feb10 availability only; no price/return interpretation, extraction, upload or archive execution", "ticker_listing_prefix_bytes_each": 2048}; fsynced manifest 1930B/SHAb8ea28c0fe4d8d99d1c24a01087e12282b92796cad1e747c9827c65fb346e9ec BEFORE effect. New owner authority is bounded USB inspection only; no provider/QC/Mia/compile/job/outcome authority, frozen economics or prior claims/counters changed.
+
+USB bounded archive/schema/date coverage inspection completed; 13 reports; archive compressed metadata/body bytesread4853968. Date/header structure only; no price values/returns interpreted or QC source changed. Private result 7005B/SHAec43d2154bf6c17340a6c43fa0a978e8ca747b4ebcab9927ca3b7f1bc54a3714.
+
+Fresh USB utility claim USB-20261103-PUBLIC-DOCS-DELEGATE-001; HEAD1b4aea22f7d9709d47762505b10aa53394e0c446; readonly filesystem only; {"executor": "usb_data_requirements", "max_public_web_opens": 2, "scope": "inception-date and license documentation only; no data/API/account endpoints", "urls": ["https://www.vaneck.com/us/en/investments/rare-earth-strategic-metals-etf-remx/overview/", "https://firstratedata.com/about/license"]}; fsynced manifest 1696B/SHA92c4374c9d632ea2a1531c506cc12348b4725f13165b15673bfb6007c26b3e4a BEFORE effect. New owner authority is bounded USB inspection only; no provider/QC/Mia/compile/job/outcome authority, frozen economics or prior claims/counters changed.
+
+Fresh USB utility claim USB-20261103-QUALITY-CLOSURE-001; HEAD1b4aea22f7d9709d47762505b10aa53394e0c446; readonly filesystem only; {"LMB_minute_stop": "date greater than2021-02-10 or bound", "LMB_minute_uncompressed_max_bytes": 67108864, "REMX_daily_max_bytes": 2097152, "manifest_bytes": 327907, "root": "/Volumes/SANDISK/firstrate", "scope": "sizes/identifiers/date coverage only, no numericalfinancialfields; officialREMXinception2010-10-27 suppliedbypublicdocscope; no QC or network effects", "ticker_listing_total_bytes_max": 1500000}; fsynced manifest 1792B/SHA1f1e397682449479aaa984bb0d33fe41bb2114b7b23ca7992794f08372119741 BEFORE effect. New owner authority is bounded USB inspection only; no provider/QC/Mia/compile/job/outcome authority, frozen economics or prior claims/counters changed.
+
+USB quality closure completed: physical-size checks, listing/schema counts, REMX inception/date check and a bounded LMB minute availability scan only. No price/volume values, returns, provider/QC/Mia access, upload or backtest. Private result 1384B/SHA6d5c250a7d2a27d260d09bde4e23197693e7cde2f439c96f2f2e7913a777013c.
+
+
+## 111. USB data utility assessment —2026-11-03
+
+Owner requested read-only inspection of the newly connected disk. Physical
+external volume is /Volumes/SANDISK; only its firstrate tree was read.
+Fresh bounded/fsynced claims above precede each phase; no disk write,
+extraction, credential/API_Access read, upload, broker/realDB/stopflag or
+financial backtest was performed. Failed local decoder/planning/member-count
+inspections remain recorded with corrected diagnoses; they are not native
+attempts or accepted financial looks. No oldD0/provider capture or280MB
+signal packet was reopened.
+
+The completed metadata census found770files/324284056191B (about324.3GB).
+All769 manifest-listed downloaded files are present with matching sizes;
+manifest ok=True/fetched2026-10-17 is source-supplied metadata, not independently
+verified origin or a full-archive checksum. Stock/ETF listings contain16306/
+5100 tickers and onlyTicker,Name,FirstDate,LastDate, with no permanent SID.
+The archive has unadjusted minute/daily prices and separately adjusted
+variants, stock/ETF splits/dividends, company financials, earnings, short
+interest/volume, sentiment and valuation metrics. Valuation archive5945
+members has date/market_cap plus ratios; its readme defines marketcapUSD.
+Quarterly financials15779members/74fields include filing_date. These fields
+do not establish historical availability/PIT or full six-sleeve coverage.
+
+Eight selected unadjusted daily members (six ETF contexts and two stocks)
+were date/schema checked. All span the warmup2020-09-01 and frozen2026-10-09
+end; sampled latestdate2026-10-16. Only dates/header structure were interpreted.
+A bounded LMB minute scan found444rows2021-02-10,04:49..19:54NewYork
+start labels, reading2420468B until nextsession. This establishes availability
+in this independent vendor file, not equivalence to the frozen exact native
+QC SID/cache or admissibility of an external replacement price.
+
+A concrete identity/provenance anomaly exists: the REMX ETF daily file has
+323 observations before official fund inception2010-10-27, in2005/2006,
+and begins2005-01-04. It has1449 unique dates in the frozen financial window
+and no duplicate dates, but these facts do not explain the earlier lineage.
+Do not silently purge the pre-inception rows, assume historical ticker
+identity, substitute this ETF for stock sleeves, or accept the source.
+Official inception support:
+https://www.vaneck.com/us/en/investments/rare-earth-strategic-metals-etf-remx/overview/
+
+The readmes declare NewYork period-start labels and omission of zero-volume
+intraday bars. The adapter must preserve gaps and distinguish start/end
+clocks; a daily label is not a native close witness. No analyst price-target
+revision-event history, historical ETF constituent history, permanent security
+master or as-of insurance classifications were found in this catalog/header
+assessment. Thus the disk is useful for independent price/action diagnostics
+and potentially cap/fundamental research, but it does not supply all required
+TPR signal/universe/identity/PIT inputs or repair the4096 bookkeeping/resource
+guard. Native RAW/SID/custody acceptance remains separate.
+
+The current generic FirstRate license expressly permits service-provider/cloud
+hosting on the subscriber's behalf under its conditions; no blanket cloud or
+professional-use ban is inferred. This website does not attest the actual
+license/version/subscriber rights of the October17copy:
+https://firstratedata.com/about/license
+No raw licensed observations/values or download/API URLs enter Git.
+
+Private assessment proofs:
+- complete inventory115168B/SHA4495b48efbc70a3ea423d77246b84644866ebb5408fcced90d012ec50380dbb7;
+- schema/date report7005B/SHAec43d2154bf6c17340a6c43fa0a978e8ca747b4ebcab9927ca3b7f1bc54a3714;
+- quality closure1384B/SHA6d5c250a7d2a27d260d09bde4e23197693e7cde2f439c96f2f2e7913a777013c.
+These are data-utility/coverage observations, not new financial performance
+or a reset/consolidation of prior attempts, looks or failed/Completed history.
+
+## 112. Owner-directed offline build to the backtest boundary —2026-11-03
+
+Latest explicit owner instruction: after this inspection, proceed building
+until the final backtesting step; **do not access QC yet because another lane
+uses it; skip Claude review; push only once**. This new local round begins at
+actual local/Targetremote1b4aea22f7d9709d47762505b10aa53394e0c446.
+The prior section110 round already made its one successful push; none has yet
+occurred for this new round. No new side branch/worktree or shared/sibling
+edit is authorized. The heartbeat stays paused.
+
+Build scope is local code, synthetic focused checks, exact frozen five-arm
+source/config preparation, and separately pinned conservative resource
+recovery candidate. No QC status/source/UI/Mia/account/compile/job request
+or financial run is permitted in this round, including reads. The ambient
+browser tab grants no exception. Public VanEck/FirstRate documentation reads
+were separately bounded and did not access QC.
+
+Frozen dates/calendar/hash/economics/six STOCK sleeves/fixed60slots/ARdisabled
+and all old source/attempt/history receipts stay unchanged. The USB price
+adapter is independent diagnostics with admissionFALSE, never an automatic
+replacement for native RAW marks, signal events or memberships. Ordinary
+unheld/out-of-universe pruning is rejected: original code explicitly retains
+subscriptions for seven-day action/factor custody and future event flags.
+The candidate may reconcile only proved already-final native-delisted
+bookkeeping while preserving every historical dictionary, flag, factor,
+order/action record and the4096limit. It must never callRemoveSecurity or
+invent native capacity/identity evidence. Local build success cannot claim a
+full-window runtime fix or financial completion.
+
+All new implementation uses only lane-owned versioned modules and relevant
+focused synthetic tests under isolated49/52 runtime/syntheticDB before
+dispatch/config imports with network denied. No full lane/repository suite
+or routine Claude checkpoint is run. Root independently reviews delegated
+changes before one stable combined push. Actual staged artifacts/native
+activation limits and final verification follow below.
+
+
+### 112.1 Implemented local build and exact source epochs
+
+The FirstRate supplied-byte adapter validates exact member names/SHA/unadjusted
+Decimal OHLCV/positive integer shares/chronology/NY start-to-end clocks and
+DST; daily calendar labels never become native close witnesses. Missing
+sessions are reported, not filled. All323pre-inception REMX rows remain
+retained/quarantined. PermanentSID/PIT/rights/native/financial/trading
+admission always remainsFALSE. No file opener or provider client exists in
+that pure adapter.
+
+The new ResourceRecoveryMixin always executes original parent action/accounting
+first. It can release only a manual-bookkeeping ID for a typed native final
+delisting in the current bound slice/job, with exact registered identity,
+nontradable/delisted state, no engine configurations/open orders, explicit
+native AND independent ledger zero quantity, and known history. Missing
+ledger entry isUNKNOWN. Proofs are repeated after job-bound buffered audit;
+durability is unproved until parent journal export. It never removes native
+subscriptions, prunes ordinary unheld members, raises4096 or deletes symbol/
+custody/factor/flag/order/action history. Actual native active capacity and
+sufficient full-window relief remainNULL/FALSE.
+
+The five-arm pure preflight regenerates the preserved frozen baseline and a
+separate fixed INLINE recovery epoch. Local inspection found the old genuine
+API WRITE_FILES allowlist cannot upload a new helper filename. The resolved
+candidate therefore embeds EXACT pinned helper bytes plus a fixed Main MRO
+suffix inside main.py, with no old allowlist/API/runtime/builder modification.
+Every original non-Main financial function AST, policy/calendar and nonclosure
+economic config field remains unchanged. Only the fixed Main extension,
+source-template closure and corresponding config/driver SHA literals change.
+The inline candidate retains the original11OFF/15eachsignal Python filename
+sets (71source units across5arms), not the76units of the earlier standalone-
+helper draft. Pre-inline test results remain attributed to that draft.
+
+The local CLI requires all actual source bytes committed in currentHEAD;
+it durably claims source/HEAD/owner/operation/access BEFORE its single exact
+3573B registered-project read, then exports frozen and recovery source trees.
+It never opens the280MBsignal packet, brokerDB/stopflags, credentials or QC.
+Preview attempt1/source IDs are PROPOSED_METADATA_ONLY, not reservations,
+resets or a production action plan; fresh actual native assignments/HEAD/
+source claims are mandatory later. All prior history remains referenced by
+the committed sole-record snapshot SHA; consolidated counts are not invented.
+
+A new fixed INLINE financial-actions successor completes local future-run
+code without calling QC. It preserves the old approved producer and genuine
+registered API/TLS/native-fingerprint/shared-lock/readback/claim/deadline/
+cancellation/unknown-delivery/eight-compile-proof safeguards. Source bodies
+are regenerated; caller overrides and offline/preview IDs are refused.
+The production registry stays3573B/SHA154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1
+and immutable creation authority staysEA2D. Latest owner provenance is separate.
+The actual current noQC ownerSHA
+2a2c63386634e2ebbe4504bb8938827d5b19fdd0f895257b26a1df16673278c4
+is explicitly denied BEFORE source/private/native effects. A different SHA
+alone does not authenticate owner permission; the operational noQC deferral
+remains binding until actual availability/release.
+
+Only known research.ipynb/mia.ipynb may remain opaque extras. Fresh complete
+source inventories and all eight compile proofs preserve their exact bytes/
+hashes; they are never generated, uploaded, imported, executed or admitted
+as financial Python. Unknown executable extras are refused. No old generic
+mutation route, new upload permission or arbitrary source selector is enabled.
+No native compiled-source/accounting/economic acceptance is inferred.
+
+### 112.2 Verification, corrections and retained negative tests
+
+All checks below used isolated49/52 runtime plus a synthetic DB BEFORE
+dispatch/config imports, with network/DNS denied. No full lane/repo suite or
+Claude checkpoint was used.
+
+- Adapter45focused tests passed0.34s; financial-admission mutant detected.
+- Resource63focused tests passed0.43s at final13097B helper; missing-ledger
+  mutant detected and restored. Prior comment-only source hash is historical.
+- Final INLINE preflight50focused tests passed32.24s; source guard mutation
+  proof retained; earlier50/10/176runs are pre-inline or prior-hash evidence.
+- Local exporter20focused tests passed0.62s at final filesystem boundary.
+- New fixed financial route74focused tests passed63.49s; currentNoQC-authority
+  mutant detected, restored and verified. No actual native/private API effect.
+- Current112 document contract103passed/558deselected1.69s. An initial
+  102pass/1fail exposed repeatedNULL text masking a contradictory replacement;
+  the guard now explicitly rejects the contradiction. History/ranges remain.
+
+Independent Codex cross-review found CMP111-IO-001(P2): an ancestor path-check/
+use race could read outside the claimed subtree. A synthetic reproducer
+confirmed it. Root replaced reads/writes/directory creation/record notes with
+cwd-rooted directoryFD walks, O_DIRECTORY|O_NOFOLLOW and dir_fd leaf opens.
+Owner/private-directory checks, exclusive0600files and file/dirfsync remain.
+Regression tests cover old and current forced-swap boundaries; independent
+forced current-boundary probes stayed inside for reads and writes.
+No real private data was touched by the reproducer.
+
+Two P3s are corrected: buffered journal evidence is not called durable; CLI
+argument errors are sanitized before extra supplied values can echo. Root
+independently reviewed the helper, inline source transformation and AST/
+unified diff of the new financial producer against the reviewed old one.
+Native guard/correlation/source/deadline/cancel bodies are preserved; only
+fixed regeneration/provenance/schema/known-opaque handling and current-noQC/
+preview refusal change. No unresolved material local code finding remains;
+native SDK behavior/capacity/input parity remain intentionally unproved.
+
+Final module identities before local implementation commit:
+- firstrate_20261103.py10572B/SHA5aab24cc7e1c067d5a4c4de5337ca4c71b98f73cc03e857dee51007d0e28c755;
+- subscription_recovery_20261103.py13097B/SHA14083a5213f24e929c21308f507ad28e18fdd92dbfdd6c3d29581749631e253a;
+- comparison_20261103_preflight.py16141B/SHAe16d50cd8bb3fa0716b9e1994552f07b2dcf02554493c6bbf1b41661de847082;
+- comparison_20261103_prepare.py12537B/SHA6c04eb2951a54f339dcddc7e2699c26e8105ec60897084379d477588ce1056c8;
+- comparison_20261103_project_actions.py32251B/SHA92218f920c135c139e21cfcce7284142f7df8bb33ea0c0fa9b4ade69815c1c96.
+Old financial successor28663B/SHA962a215a02a57ec0aff53c1e4236c72ddad5f066c1bd0aa2af3bf7b55a74375e
+and all frozen execution/API/builders remain unchanged.
+Actual committed-source staging, data-adapter smoke observations and final
+Git verification are recorded after the implementation commit; no QC action
+is authorized by that local stage or these software checks.

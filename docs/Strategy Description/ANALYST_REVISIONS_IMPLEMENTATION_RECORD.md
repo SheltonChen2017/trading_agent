@@ -72215,3 +72215,99 @@ After actual evidence, choose only a coherent new source/provider/transport/
 run continuation whose remaining identity, complete-demand, valuation,
 processing, privacy, ownership/idle/capacity and attempt gates genuinely pass.
 Do not stop for routine review acknowledgment, and do not bypass a source stop.
+
+### 335.5 Actual A refusal and bounded CSV-representation recovery
+
+At clean frozenHEADdeb318f9232217ec31ee4f1d68b8d878aa07d1fe (code commit
+89c27bac89551b20a412e359601a6e92eded35ca), the sole A parent was invoked with
+the exact335.4 caller/profile arguments. Actual tool-observed parent exit2;
+parent-observed worker exit2, no stderr. Its retained1184-byte worker packet
+SHA2565ac648ca845e4cc913a516023389b5db823ec9f98f7b952c95f20e1c3b0b32bf
+states claim_state=consumed, failure_code=price_parse, parser_failure_code=
+line_ending, stage=stock_candidate, case_ordinal=0. The one separately native-
+denied stdout-only validator, supplied actualparentexit2, also exited2 with
+output_authenticated=true/accepted=false and the same finite failure.
+This is authenticated FAILURE evidence, not successful coverage. A and its
+validator are SPENT; all now-used v1 modules/caller stay frozen, no control
+inspection/repair or unchanged retry follows. No private diagnosis/report
+success pin, price admission, exact QC gap list, provider/QC contact, look or
+cell was returned. The338/259/54/699 floor is unchanged.
+
+The finite failure identifies the line-ending predicate, not which member of
+that predicate failed. A does not establish missing terminal LF versus mixed/
+bare CR. Preserve that ambiguity. Independently, source inspection proves v1
+unconditionally requires a final newline, a constraint not stated by the vendor.
+RFC4180 section2 explicitly permits a complete last record with no ending line
+break: https://www.rfc-editor.org/rfc/rfc4180. That supplies a coherent parser
+correction, not a reason to waive malformed records or rename an unchanged
+attempt. The successor must record count-only newline structure BEFORE parsing
+and keep six-field/numeric/date/order/OHLC/CRC/hash validation; mixed/bare CR,
+blank interior records and truncated final fields must still refuse. It must
+never append bytes to the actual USB file, refresh its pin or hide A's failure.
+
+Prepare a separately versioned v2 pure parser and caller with a NEW exclusive
+B claim and exact current source/profile freeze before invocation. All input
+pins/whole-five demand/source scope remain unchanged. The sole substantive
+parse delta is accepting an otherwise valid complete unterminated final record;
+new lexical evidence can then establish or refute that as A's actual cause.
+No source replacement, fresh input grant or strategy launch is supplied by
+this paragraph. The owner's current research review waiver/delegation covers
+this verified representation recovery; no routine authorization wait is needed.
+
+### 335.6 D2 separately versioned complete-final-record freeze
+
+The new M2 pure parser is scripts/arv2_r335_firstrate_prices_v2.py,
+15808bytes SHA256a0c8d235036d37c95af47d1719c69405b0c2e979d92fcb32070ef42ac672cc5e.
+The NEW caller scripts/inspect_arv2_r335_firstrate_coverage_v2.py is53115bytes
+SHA25601a8de6c3e29c207fc6986080ecf7518a460d4d2083a554f04d3c14c28e86bc1.
+It fixes only SOURCE/control/schema/parser bindings and attaches closed
+count-only lexical evidence before candidate parsing, on finite failure and
+on successful candidate/REMX summaries. Whole-five scope, I/USB pins, source/
+FD/security/publication/parent/exit machinery remain unchanged. A bounded
+inverse AST proof checks those exact declared deltas against original A;
+M2 likewise preserves all nonlexical functions and the row-loop financial/
+date/source guards. Original A and M1 remain byte-identical/spent, not edited.
+
+M2 allows an otherwise valid COMPLETE final record without a separator, even
+for a single-row member, and preserves its original bytes/offsets. It never
+appends data or discards a row. All bare CR/mixed separators, blank interior
+rows, incomplete final fields, invalid dates/order/OHLC/numbers still refuse.
+Lexical evidence is observed structure only, not price validity or historical
+cause proof. Input pin/CRC checks still precede source parsing.
+
+The NEW fixed B claim is
+artifacts/analyst_revisions_v2/firstrate/R335-20261103-B, not inspected or
+allocated before this decision. Its purpose is the substantive CSV correctness
+repair plus retained lexical evidence, not a renamed unchanged A retry. Under
+the owner's continuing explicit waiver/delegation, permit ONE exact B parent
+invocation after this freeze is committed clean, same designated host/Python/
+root/branch as335.4, expected-head equal that actual clean commit, caller hash
+above and canonical profile6086bytes SHA256
+cfc8fd0169e75ec49624fe29eb8a1d1bb43f37e2d609986de026e20726599be0.
+Native child policy6967bytes SHA256
+c05ca975b034b3f20acddc3ca60a9f172bf9bd4f5e8aafc8aa74e2a4b555963e.
+The same300s/5s-reap/output bounds, native network/USB-write/Keychain/old-
+artifact denials, current held/named checks and normal-return/publication
+requirements bind. Any failed/ambiguous use remains spent; no unchanged retry.
+Permit one subsequent same-source native-denied stdout-only validator with
+the EXTERNALLY OBSERVED actual parent exit; actual0/child0/authenticated full
+result are necessary for observation success, not source/identity admission.
+
+Root pre-B selection366distinctpasses4.18s, exit0:77REMX+110M2+77Bcaller+
+102record/redaction/active-document. Five selected pins/profile/policy match;
+all native-denied/in-root/noautoload/--noconftest/-B/no-cache discipline from
+335.3 retained. No full suite. The first root test tool request was aborted
+BEFORE dispatch; it supplies no pass/failure/operation evidence. Author M2
+110passes0.13s/B77passes2.92s and root/author earlier subsets overlap, not
+additive. B expanded draft76passes/1failure3.09s was a test purity allowlist
+omitting its validated pure delegate; only that expectation was corrected,
+with inverse proof already passing. Finally-restored omissions caught optional
+EOF handling, bare-CR evidence, lexical closed-schema checks(2failures) and
+success evidence retention(1failure). Four new files compile in memory.
+
+M2 tests21576bytes SHA256
+3d68778013658a5d449c2119ce26c13c1f283ff04dc1fde2498441460ce3df1f;
+B tests32693bytes SHA256
+66c1244fb6172ddd5328541a46b45f525439fe2e0b38fa24f6b1aaa32853611d.
+No B DATA read, source replacement, QC action, strategy job, look or cell has
+occurred at this freeze. All post-observation continuation gates in335.4 remain.

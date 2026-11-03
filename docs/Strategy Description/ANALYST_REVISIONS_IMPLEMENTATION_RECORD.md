@@ -73921,3 +73921,229 @@ unit/name event timing while preserving marginal counts. Same-round advice is
 not independent review. No N DATA/control access occurred during implementation
 or these synthetic checks. K/L/M remain spent; QC/Safari hold,338/259/54/699
 and all financial/source admission false flags remain binding.
+
+### 336.9 Actual N completed: roles and event/gap timing remain distinct
+
+At clean af7ebb09941f6d64df60310505645ea2a6241b25, the sole D2 N
+parent exited0, child0, and the sole stdin-only native-denied validator
+exited0/accepted. All3 DATA pins authenticated; normal guard return and the
+exclusive marker preceded output. N is now SPENT/frozen. No old control or
+source operation was replayed. Worker stdout23588B SHA256
+ab6c22fb572aeae9f61c763394a7ddda2da091c47beeb70b097f95184893fcaa;
+report23477B SHA256
+8fdaadc10667690c61a56a9486561da65729568a510094406747907f3f67fc4c;
+new identity_recovery/R336-20261103-N/private-diagnosis.json294888B SHA256
+fd52e0d4177bf5c6b74dd0f1b6e8616ca03a9c8fb60ae5d9c57f584f075de86e.
+Own marker320B SHA256
+af283e0d6a5c247397a694a6a2a9896c6885041dcf45e02bf5dd6bf5c1e76206.
+These are retained output pins; do not re-read N controls or replay its reader.
+
+All33 retained events have exact frozen definitions. They form6 ticker-change,
+1 name-change and2 industry-change metadata pairs, with no missing/duplicate/
+unsupported counterpart in THIS subset. The33 events comprise1 acquisition-
+consideration,1 delisting,4 industry-change,4 listing,2 merger,2 name-change,
+2 same-issuer relationship,2 SPAC business-combination,3 SPAC unit-separation
+and12 ticker-change rows. No alias, security continuity or payoff is admitted.
+
+|Case|Linked events|Required-window evidence|Events on any retained candidate missing-date union|
+|---|---:|---|---:|
+|0|7|Acquisition1, delisting1, merger2 and ticker2 occur at the first required price date; listing1 is inside the window.|0|
+|1|4|Listing1 precedes the window; unit-separation1 and ticker2 are inside.|0|
+|2|0|No event in this bounded retained subset; not proof of no action history.|0|
+|3|10|Listing1 precedes; industry2, relationship1, business-combination1, unit-separation1 and ticker4 are inside.|5: industry2, business-combination1, ticker2|
+|4|12|Listing1 precedes; industry2, name2, relationship1, business-combination1, unit-separation1 and ticker4 are inside.|11: industry2, name2, relationship1, business-combination1, unit-separation1, ticker4|
+
+The last column counts each source event once per case against the UNION of
+candidate gaps; it is not the earlier18 candidate-event links for case4.
+Joint family/timing matrices support the descriptions above. Marginal counts
+of original/current symbol predicates do NOT establish which instrument is
+the prior unit, acquired security or common share. No hypothesis of generic
+same-company ticker equivalence follows from these results. The date-complete
+case0 still has the original cross-perma/FIGI collision and action evidence,
+so date coverage cannot clear its identity stop. All5 identity stops, original
+bindings, dense/reference demand and terminal-payoff requirements remain.
+
+N interpreted retained current-vintage actions only; it did not reauthenticate
+the original/current full catalog, read price rows/USB, contact a provider or
+prove historical completeness. All source/PIT/permanent-master/readiness flags
+remain false. No stock/fund source assignment or strategy construction changed.
+No QC/Safari contact or accountable look/cell event occurred.
+
+### 336.10 Prospective O: genuinely new historical-symbol coverage
+
+The next substantive offline question is whether EXPLICIT action-role symbols
+lead to previously unsearched FirstRate members, and whether those members
+contain the fixed reference/valuation dates. Public source inspection corrects
+an imprecise shorthand: E priced ONLY binding.diagnostic_current_ticker and
+its -DELISTED spelling. F later inspected listing metadata for original/current
+names, without reading their additional price members. Neither step searched
+all historical symbols now identified by the six exact from/to pairs.
+
+O will consume only exact retained N DATA under a new claim/guard and interpret
+its already-frozen role evidence. It must retain the case/event/role provenance
+of every candidate, distinguish primary current-dataset symbol from as-of
+from/to payloads, and report joint family-by-original/current role predicates.
+Original symbols and prior units, common stocks, related securities, acquired
+and acquiring counterparties remain explicitly DIFFERENT search roles.
+A file hit is not an alias or security-master admission. Unit bars must never
+fill common-stock prices, nor vice versa, and acquisition share ratios/market
+cap must never create a synthetic liquidation/cash value.
+
+A bounded prospective new USB consumer may then read exact manifest/listing
+and ONLY relevant current-letter plus six delisted containers for supported
+NEW symbol members. Exclude every member already E priced before any member
+read; there is no unchanged E replay. Preserve every physical hit, missing
+candidate, opaque role token, date gap, ambiguity and original source byte.
+Known E container/member SHA pins retained inside N's F evidence stay binding;
+a container without a retained E SHA pin gets a newly RETAINED fingerprint
+under current manifest-size/MD5 corroboration, not independent cryptographic
+vendor provenance or a silently refreshed historical pin. E computed hashes
+for selected archives even when no member matched; only matching-candidate
+container hashes survived in its DATA. No first-ever historical read/hash or
+unchanged historical-container continuity is claimed. No whole-USB data census,
+customer URL/API_Access.txt, source modification, padding or substitution.
+
+For this observation only, a new lossless finite Decimal volume parser may
+measure integer/fractional source rows while keeping exact original bytes.
+It must still enforce bounded rows, valid ascending ISO dates, positive finite
+OHLC/consistent ranges and finite nonnegative volume. It does not admit RAW
+volume units, precision, exchange/session/official-close convention or prices.
+Do not weaken or modify the used v3 parser. The existing eight fund sources
+remain Sharadar; L's fractional reporting hypothesis and old REMX-era
+quarantine stay qualified, with no FR fund source substitution.
+
+This decision is NOT the O invocation freeze. Exact caller/helper/tests,
+selected source/profile/native-policy pins, host/HEAD, bounded claim/deadline/
+normal-return/strict actual-exit and one-shot stdin validation must be frozen
+in a separate committed decision before any new N/USB use. All tests are
+synthetic and native-denied. No N DATA/control or USB is read during design;
+QC/Safari stay off limits and all5 identity stops remain. The owner waiver
+permits this in-scope work without a Claude wait; it is not independent review.
+
+### 336.11 D3 exact O one-use historical-symbol coverage freeze
+
+Root's final new O selection passed149tests2.03s:76pure+56caller+17lane
+record. The132 new O test IDs extend the earlier460 to592distinct tests
+across development stages; the17record IDs overlap the earlier86record/
+active-document selection. Four changed-source/test memory compilations,
+all5 selected runtime source pins, pure/caller profiles, native policy and
+absence of dispatch_fence/QC imports passed. No full suite. Author132passes
+1.52s and earlier76pure/56caller selections overlap; they are not additive.
+
+|O source/test|Bytes|SHA256|
+|---|---:|---|
+|scripts/arv2_r336_historical_symbol_coverage.py|34774|17cce8bed6cc084d7e9fa420e15f6f02158c6a24804117eb0e6314f002d42be5|
+|scripts/inspect_arv2_r336_historical_symbol_coverage.py|57032|0bd370f8907611ca4f0c94817d118558518a70c39d18a9d50710b8f785e7062f|
+|tests/analyst_revisions_v2/test_r336_historical_symbol_coverage.py|16800|6870a0863442d817b89c6c890ee2437ceab01d20d398e065da964e9730bdea2b|
+|tests/analyst_revisions_v2/test_r336_historical_symbol_coverage_caller.py|28459|004ecc855e21e274d4b9cbfed5884da919a346cafa7232e0ee44db5eedc27a24|
+
+Canonical pure profile4134B SHA256
+7de294d58b8a72cec796ea08343ec4e7b76bd3ec12203414b47cbffaa33b883a;
+caller profile4449B SHA256
+b168333bf713c4ed9226569d2534dfa9b195948eb4283db6580cca5d6612b833;
+native worker policy6641B SHA256
+6f5a832cf0273f3260b43d1c1f75bc8dd10e17f6eba13b4e1b462481381b9d53.
+The selected closure is unchanged security3435bc07573697d682f25ea15fd2bfd10c5baf8220c184f73ae877016bae4a30,
+FixedDataGuard00de1fbde9ae1925d1231dc863cd4a5bb00974bb596f6368187059452cfae145,
+M puree0e829c662c5dbc7c1a1e95f720db0e87e0725f3f3d428b3b785d991b55bef5b,
+N pured95bfb69b9383306bbee8c83ac34d8c22fb8e9ed9cd33500c886742b8c652bbe
+and new O pure17cce8bed6cc084d7e9fa420e15f6f02158c6a24804117eb0e6314f002d42be5.
+These selected bytes are not whole-interpreter integrity.
+
+Permit ONE O launch only after these exact sources/tests and this decision
+are committed clean in the designated Mac root/branch, Darwin/POSIX isolated
+Python3.13 at /Users/sheltonchen/.venvs/trading_agent-py313/bin/python.
+Bind --expected-head to that actual new clean freeze, --caller-sha256 and
+--profile-sha256 to the exact values above. New uninspected/unallocated
+control: artifacts/analyst_revisions_v2/firstrate/R336-20261103-O.
+No argument can select a different token, source, root, output or renewed use.
+
+The new native worker exclusively claims/fsyncs and writes its owned start
+marker BEFORE DATA/USB access. Sole DATA is N's exact private294888B/
+fd52e0d4177bf5c6b74dd0f1b6e8616ca03a9c8fb60ae5d9c57f584f075de86e
+at the exact path in336.9. Whole-binding/row/case/demand/N normative-policy
+joins must match. It retains every typed origin and unresolved pair privately;
+only exact paired ticker metadata, explicit supported instrument-role tokens
+and unsearched original symbols are eligible. E exclusions are GLOBAL across
+all5 diagnostic symbols and their -DELISTED spellings BEFORE member lookup.
+No arbitrary opaque relatedtickers parsing, symbol normalization or alias.
+
+USB is read-only /Volumes/SANDISK/firstrate. Fixed manifest327907B/
+c681af584244d38e3f9dea2ff765cc2c991cb383107a3e542115a4338ee4cdf8
+and stock Ticker_Listing.txt889580B/
+584718095d81d576af0f83d6f31d5cda565e59ea2c6677e5b164e0db39e93464
+authenticate before the selected new member study. At most64 transport
+tokens/128typed leads select at most26 fixed current-letter and6 fixed
+delisted archives. Digit-first literals search only the six delisted archives.
+Each selected archive is held/named and size/manifest-MD5/current-SHA checked
+once, each planned physical named member is read/decompressed once, with all
+case/role links retained. All previously retained E container/member SHA pins
+remain binding. Newly retained SHA without an E pin has ONLY the explicitly
+qualified current manifest corroboration in336.10, not historical continuity.
+Whole-container hashing necessarily reads compressed bytes of old/unselected
+members; exclusion means no old named-member lookup/decompression/parsing.
+No customer URL/API_Access.txt, other USB source or data census is permitted.
+
+Finite observations validate all source rows, including nonrequired dates,
+with unchanged v3 numeric/date/line/OHLC guards except volume is lossless
+finite nonnegative Decimal. Raw bytes/offsets/terminators are retained;
+integer/fractional classes are observations, not units/precision/session-close
+or security admission. Each member/case is assessed SEPARATELY against all
+fixed required and reference dates. No union-splice, row dropping, calendar/
+endpoint change, UNIT-as-COMMON, acquired-security alias, payout application
+or source selection occurs. Non-order diagnostic exception: this validates
+source identity/coverage prerequisites, emits no strategy performance and
+cannot be interpreted as an order-based strategy evaluation.
+
+Each archive guard returns normally after all its own assessments; N,
+manifest and listing stay held over the overall study. ALL source/DATA/USB
+guards must return normally BEFORE any raw member/index/report publication.
+This is scoped endpoint authentication, not continuous cross-archive/whole-
+tree/historical stability. Native network denial, USB write/unrelated-read
+denial, BOTH Keychain/security-CLI denial and unrelated-artifact denial apply.
+No pyc execution or provider/QC/Safari operation. Synthetic tests additionally
+denied ALL production artifacts/USB. Native denial is not measured request
+accounting or whole-host sandbox proof.
+
+Own protected output is claim+marker, at most128sequential member-NNNN.bin
+files<=4MiB each and aggregate<=32MiB, private index<=8MiB and report.
+Original output descriptors, full metadata/security and exact byte pins remain
+held through output validation. Every physical hit has at least one eligible
+case/role; shared cases must agree on row/volume/lexical metadata. Public
+summary<=512KiB and whole stdout<=1MiB, finite counts/pins only. Exceeding any
+bound refuses; no truncation, alternate output or cleanup. Late failure may
+leave complete raw/index/report files but actual nonzero/unknown still refuses.
+
+Parent300s/worker240s/reader30s and own-child-only5s reap apply, with startup/
+host-suspension/uninterruptible-I/O qualifications. Register measured child
+exit/stdout/stderr facts BEFORE later failure predicates. No duplicate dispatch,
+automatic retry, unchanged renamed attempt or pin refresh. Partial/ambiguous
+claim is spent; even no-source/no-hit use is not automatically renewable.
+
+After the sole parent, permit ONE same-source native-denied stdin-only
+validator at the SAME clean freeze. Bind actual externally observed parent
+exit0or2 and the original complete bounded stdout. Root may retain that public
+stdout in tool memory for this validator and finite result recording; no
+control/USB/DATA reread or licensed-row output. Truncated/missing/ambiguous tool
+capture is terminal/spent, never replayed. Only actual parent0+child0, complete
+normal guard return, exact worker/report/private/raw pins and accepted matching
+validator output complete this observation. All admission/readiness flags
+remain false regardless of file hits or terminal status.
+
+|Finding|Priority/status before actual use|Correction/evidence|
+|---|---|---|
+|I336-009|P2 corrected|O public validators admitted impossible family-role combinations, eligible-lead omissions, contradictory row/coverage counts and extra/untyped lexical fields. Exact legal pairs, strict finite lexical shape/types/invariants, present-required<=rows, eligibility union lower bound and token-zero equivalence now have sensitive regressions.|
+|I336-010|P3 qualified/corrected|First-observed wording could overstate history for E-read archives whose unmatched SHA was discarded. The new schema says new_retained_SHA_without_E_pin; current checksum evidence and compressed-old-byte reads are explicitly qualified. No old pin was refreshed.|
+
+Nine restored real-module omission checks each caught the intended failure:
+helper global exclusion, lexical exactkeys, legal family-role pair and invalid
+nonrequired OHLC; caller known E SHA, global exclusion, normal source return
+before output, actual-parent exit and expected HEAD. Individual timings are
+0.10/0.06/0.07/0.05s and0.10/0.06/0.08/0.07/0.06s, not additive passes.
+Initial75pure passes/1fixture failure came from a wrong inverse-parser-test
+parenthesis replacement, corrected in the test. Actual parser inverse checks
+the frozen v3 row parser with ONLY the declared Decimal-volume delta.
+Caller56final passes supersede overlapping47/31subsets; all are synthetic.
+Same-round root/advisory audits are not independent review. No actual O
+allocation, N DATA/USB read or contact occurred before this exact freeze.
+K/L/M/N remain spent; QC/Safari hold and338/259/54/699 stay binding.

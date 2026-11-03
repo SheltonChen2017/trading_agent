@@ -31049,3 +31049,47 @@ denied. Canonical committed-anchor candidate941 bytes/SHA256
 1c9d897107babae6c0054232a7611195f28640020e8c265d2a2f1c44d3886511;
 its exact data came from the original actual observation, not a new stat.
 Whitespace passed; SDK/module/test bytes are unchanged from preparation.
+
+### 139.7 Actual durable held-loader check; harness refusal retained
+
+The independent anchor was committed as
+d3b7fd4127431607bd101a154c678362dd8f6bc0. Main reverified clean exact lane,
+committed anchor and matching actual origin before the read-only check.
+
+The FIRST auxiliary loader wrapper terminated exit1 before receipt access.
+Main's added all-write-open audit intercepted Python subprocess.DEVNULL's
+original /dev/null O_RDWR at the FIRST Git root guard. The actual traceback
+identified that exact denied operation. No loaded/provisional/durable value,
+source access or receipt rewrite occurred. This is a Main HARNESS defect,
+not a custody-file failure, native-proof failure or provider/Keychain cause.
+The failed execution remains failed.
+
+Main corrected only this auxiliary wrapper: the one exact root-owned
+character-device /dev/null identity may have O_RDWR with optional CLOEXEC,
+never O_WRONLY/create/truncate/append or another path/device. Eight fabricated
+classification checks prove both permitted nonpersistent handles and denied
+regular-file/other-device writes. The original full9/flags/bytes/descriptor/
+anchor/code/ancestry/clock barriers are untouched. Every Python socket and
+every persistent write-open remain denied. This is not a source-write,
+control-file or custody exception.
+
+The corrected v2 read-only check used original exec77284 and actually ended
+exit0. Only AFTER all load_registered context exits returned, its terminal
+status was closed_readonly_main_custody_contexts. The genuine factory-issued
+value inside that context was AuthenticatedDurableMainReceipt, status
+authenticated_durable_main_custody_observation, bound to original runtimeA71D,
+receipt629575 and projection57E5. Persistent write attempts0, Python socket
+attempts0;244 nonpersistent /dev/null handles were separately counted.
+No new output/probe/claim/namespace was created. The loader's own original
+finite clock and all post-close checks passed; no exact elapsed duration is
+invented from later agent polling.
+
+This establishes an ACTUAL finite durable custody observation against the
+original committed independent anchor. The value is not valid outside its
+held context and does not reconstruct Root, certify old actuals or grant
+SourceAUTH/budget/denominator/input/backtest permission. The separate pure
+negative accounting basis and actual nine-part/storage/lease composition are
+still required. USB offline qualification precedes any further downloads.
+Count and DAILY ceilings and permanent8START/16MiB stay unchanged; source/key/
+claim/START/charge/outcome/QC/Safari/purchases0. Images and every old failure
+remain preserved; no successful push occurred in this continuation.

@@ -30741,3 +30741,87 @@ Main post-record active-document checks69 passed/.64s, OS network denied;
 whitespace passed. Current seven-path byte mapping SHA256 is
 522744391f49c7200930e593360ca3644fb83524aa716b6b0b109586b6f8deee.
 The actual new local run remained absent; all development agents are frozen.
+
+### 138.6 Actual registered native success; durable Main still unavailable
+
+The preparation was intentionally committed as
+ca11659f8ce28dbd7a87d4aa4d48746f4a696480. Main verified clean physical/Git roots,
+branch, exact HEAD, matching actual/tracking origin2A6D, all seven current/
+committed source bytes and mapping522744, local3451 policy, absent local run
+and exact preserved metadata sibling. All agents froze before dispatch.
+The fully prebuilt original Main controller invoked coordinate-local-proof
+ONCE through original CP92780. No manual verification/publication adaptor was
+prepared during this successful run and no agent pause was part of its flow.
+
+Actual outer CP exit0/signalnull, stderr0, raw stdout865 bytes/SHA256
+707436e257dab8c22c3e9f9fdeb3e7830b5de444899fb665473fc69fdd0a6a48.
+Original monotonic close event51614.33937500045ms and final packet validation
+51614.44274999946ms were both within300000ms. Failure list empty, fixturefalse.
+Completion was recorded automatically by the owned close callback; later
+agent polling time is NOT substituted for that original event time.
+
+The genuine factory-issued closed result says
+closed_source_free_native_supervision_in_memory_only, storage_profile
+local-native-v1, policy3451, runtimeca116/remote2A6D, targetPID93242, actual
+kernel exit0 and actual worker exit0. Marker SHA256
+a8c0d5aefb13b508c9d7c2207e43ce1603d4fbe0a87335eb86c397e7b2ace855.
+The original full automated native/child/kernel/independent-reader/code/
+context/post-close conjunction completed. This is an ACTUAL source-free
+native result, distinct from the fabricated software checks. The earlier
+metadata-v1 deadline negative and old source failures remain unchanged.
+
+Main's subsequent anchored read-only observation authenticated EXACT ten
+positive proof members with no negative/private sibling. Eight original
+control seals/bytes/hashes and the inventory's original seal were checked
+through close; inventory SHA256
+a17725d88151876314c5d5a570ebc80c3ec5e25fd58f6470074bd757aa8685fc.
+Original native backing/mount/device/empty-Main identities were checked and
+the matching current GUI job was independently observed terminal exit0.
+No new file, Root object, source receipt or typed admission was minted by
+that observation. The marker's SHA matched the genuine returned Root SHA;
+its newly read stamp is explicitly only a POST-EXIT observation. The Root
+summary did not export the producer-original marker full9, so this new stamp
+MUST NOT be used to reconstruct that original seal.
+
+SI-LOCAL-20261103-006 is corrected for this NEW integrated invocation's
+automatic timing/closure; the failed standalone v1 is never retroactively
+accepted. The new fixed local location/profile has now completed its actual
+finite source-free conjunction. This does not assert perpetual filesystem
+stability or attribute the older journal's mtime. No old data/flag/timestamp,
+claim or accounting is repaired, reset or refunded.
+
+Durable_Main_receipt remainsfalse, SourceAUTH_blockedtrue, all fourteen
+authority fields remain their fixed false/zero/source-free values. Source
+requests/key reads/claims/STARTs/charges/outcomes/QC/Safari/purchases0. Count
+and DAILY caps, permanent8START/16MiB, looks0/0, exploratory0, alpha0 and
+IDsnone remain. No successful push has occurred in this continuation.
+
+### 138.7 Next code boundary after native closure
+
+The successful Root value/private registry/context snapshot lived only inside
+the now-terminated CP. Its865-byte summary cannot reconstruct that opaque
+capability, and the missing original marker seal cannot be supplied from a
+fresh stat. Do not rerun this namespace, retarget its job or retrofit a Main
+receipt from the saved JSON. Preserve this result as genuine native-only
+evidence. No owner permission gate is invented for the next safe code work.
+
+Next implement a purpose-specific prospective Root-to-Main durable bridge:
+project all required ORIGINAL closure/code/config/marker/inventory/control/
+native identities while the genuine Root value still exists; publish through
+original custody and export the projection's OWN final seal separately. The
+same original Main controller must open the original RO projection before
+Root releases it, own the actual CP wait0/EOF/deadline conjunction and issue a
+new typed counter-receipt. A later loader needs an independent immutable
+commit anchor, not caller-supplied exit/deadline flags. Do not cast this new
+type into ClosedNativeSupervision or release SourceAUTH through JSON.
+
+Only AFTER that custody bridge passes, implement distinct conservative
+negative readmission preserving UNKNOWN historical actuals/zero coverage and
+permanent8START/16MiB; never reconstruct the vanished Run13448Resolution or
+rerun its old resolver after reboot. Wire the genuine nine-part floor/ledger/
+budget into the actual count factory, whose current path still uses eight
+parts and Documents output; checkpoint pins remain PENDING. Independent USB/
+source qualification and all actual-input gates still follow. No source
+request begins merely because the native location proof succeeded.
+Main post-actual-result active-document checks69 passed/.82s with OS networking
+denied; whitespace passed. SDK and focused-test bytes remained unchanged.

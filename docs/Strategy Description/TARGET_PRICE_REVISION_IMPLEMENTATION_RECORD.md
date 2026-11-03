@@ -1,10 +1,19 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current owner-directed local REMX repair, section113 (2026-11-03):**
+**Current owner-directed REMX follow-up, section114 (2026-11-03):**
 QC access is deferred and Safari access is deferred until further owner notice.
 This round permits local investigation and derived data repair with no QC access
 and no Safari access: **0 QC requests, 0 Safari requests, 0 native compiles,
 0 backtests**. Skip Claude review and make exactly one final lane push.
+
+The follow-up investigation is complete with no verified local correction for
+the20fractional quantities. All20have the same nearest integer in both
+same-vendor adjusted daily variants, but there is no authenticated error
+bound or transformation rule. The five source sessions before and five
+after the anomaly agree exactly across all three daily variants. A private
+source/row-hash evidence packet preserves all20targets and10controls.
+The original source,3996row candidate and20row fractional quarantine are
+unchanged. No replacement volume was admitted.
 
 The exact USB REMX daily member has4339rows. The323rows before the ETF's
 2010-10-27 inception have unknown instrument identity. Of4016post-inception
@@ -43,10 +52,10 @@ completed, including a matching map/config trace with zero target bars in the
 tested session. Genuine Mia006/007 supplied no verified financial correction.
 All five financial backtests remain incomplete; full-window metrics are NULL.
 The concrete blocker is the lack of an admissible same-session native mark
-for the exact held OFF SID on2021-02-10. Section107.7 records its then-current role/counts; section113 owns the
+for the exact held OFF SID on2021-02-10. Section107.7 records its then-current role/counts; section114 owns the
 current local next action. Section106 retains the accepted Claude counter-review.
 
-**Standing earlier owner continuation (section107, subject to113):** create FIVE separate private QC
+**Standing earlier owner continuation (section107, subject to114):** create FIVE separate private QC
 projects, one per frozen arm, preserve old project37650980 and its source-drift
 evidence, use genuine Mia for verified fixes, exercise documented bestjudgment,
 skip routineClaude review, and push exactlyone time at the completed or
@@ -87,7 +96,7 @@ owner-answer checkpoint is added by this factual blocked handoff.
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **SECTION113 CONSERVATIVE LOCAL REMX REPAIR COMPLETE WITH20UNRESOLVED VOLUMES; QC AND SAFARI DEFERRED UNTIL FURTHER NOTICE; SKIP CLAUDE REVIEW;
+Status: **SECTION114 LOCAL FOLLOW-UP COMPLETE; NO VERIFIED CORRECTION FOR20UNRESOLVED VOLUMES; QC AND SAFARI DEFERRED UNTIL FURTHER NOTICE; SKIP CLAUDE REVIEW;
 ONE FINAL PUSH. ZERO QC REQUESTS/NATIVE COMPILES/BACKTESTS;
 0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
 in106 remains accepted after its document/current-routing correction.
@@ -483,7 +492,7 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, owner-directed local REMX repair and deferred backtesting (section113):**
+**Current qualification, owner-directed REMX follow-up and deferred backtesting (section114):**
 QC access is deferred and Safari access is deferred until further owner notice.
 This round has no QC access and no Safari access:
 **0 QC requests, 0 Safari requests, 0 native compiles, 0 backtests**. Skip Claude review and make
@@ -501,6 +510,17 @@ issuer, reconstruct missing daily market volume or admit the USB source to
 the frozen comparison. The20fractional dates remain2026-02-23..2026-03-20;
 same-vendor daily agreement and observed minute sums do not prove their
 official daily share volumes. No rounding or borrowed adjusted volume is used.
+
+The section114follow-up verified exact nearest-integer agreement on all20,
+a20unique-ratio/mixed-direction discrepancy pattern, and10predeclared
+neighboring source sessions with exact raw/split/div volume+OHLC agreement.
+The counterpart integers are within exact binary32/binary64 integer ranges,
+so simple integer-to-float serialization alone does not explain the changed
+fractional quantities. A further arithmetic transform is possible but unproved.
+No documented local volume formula or independent corrected daily series
+was found. A41956B private evidence packet and independent896B verification
+retain all witnesses; zero replacement rows and zero proven corrections.
+The prior source/candidate/fractional quarantine hashes remain unchanged.
 
 Codex has independently counter-reviewed the exact incoming Claude range
 `a7f83bb4f711cbb187a3bdde4de476f137eb243f..e2dac57607cf4ae068051a85dd2f0fa5f2f35a57`:
@@ -534,7 +554,7 @@ review; private custody, source rights and fresh per-effect claims remain.
 The standing earlier recovery sequence, subject now to the explicit noQC
 deferral, is: Codex uses genuine QC Mia under fresh bounded scopes to diagnose and verify a native source/routing correction, then continues all five frozen arms; no routine Claude checkpoint or owner-answer gate is required by the latest continuation.
 
-Historical workflow context: the last completed counter-review before this round was section106. Section 94 reviewed the owner-skipped continuation of section 93. The direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY; sections106/107 retain that history; section113 governs the current local repair.
+Historical workflow context: the last completed counter-review before this round was section106. Section 94 reviewed the owner-skipped continuation of section 93. The direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY; sections106/107 retain that history; section114 governs the current local follow-up.
 
 Historical source/attempt observations below remain attributed to their
 original rounds; they are not new currentIDE/operator/source inspections.
@@ -31907,3 +31927,199 @@ Afterward root verifies actual remote equality and a clean worktree. Actual
 final GitHEAD identifies that record commit without a self-referential hash.
 
 Final root verification after the actual export/handoff update passed157focused current-document checks/558deselected in2.85s, isolated49/52/syntheticDB with sockets/DNS denied and stable before/after record bytes. All five implementation/test files match committedc0665774, and received sections9..112 remain exact. No code changed after the109focused code checks. Only this sole record is staged for the final handoff commit; no raw/private artifact is tracked.
+
+## 114. Owner-directed follow-up of20unresolved REMX volumes —2026-11-03
+
+### 114.1 Scope and exact base
+
+Owner: "continue investigating and fix the remaining 20 REMX volume issues
+locally if possible. keep QC and Safari untouched, skip Claude review, and
+push only once when done." The exact local and actual Targetremote base was
+bb6fcff32404d1c52221aa4ad5a8a2a87e9e1121, clean. This is a new bounded
+local-data follow-up after the section113push, not permission to alter
+quantity contracts or reenter QC/Safari. It adds no Claude checkpoint.
+Latest-owner authority is recorded separately in every fresh claim; no prior
+registry/financial creation authority or spent look is reused.
+
+Only the original three REMX daily variants, exact REMX split/dividend
+members, bundled ETF documentation, bounded directory/archive metadata and
+the specified own local evidence/export files are read. Eight fresh local
+input-quality operations are separately claimed/fsynced before effects.
+No oldD0/280MBsignal packet, arbitrary capture, API_Access file, credentials,
+operatorDB/stopflag or provider payload is opened. All actual diagnostic and
+artifact processing uses isolated49/52/syntheticDB before dispatch/config
+imports and denies sockets/DNS. Git metadata/push is separate from market
+provider access; QC/Safari/provider requests and financial runs remain0.
+
+### 114.2 Fresh operation claims and retained observations
+
+Fresh REMX local claim REMX-20261103-FOLLOWUP-RATIO-001; HEADbb6fcff32404d1c52221aa4ad5a8a2a87e9e1121; bounds{"scope": "exact20fractional-day raw/sibling ratio structure and boundary-neighbor equality only; no rawprices/volumevalues/returns inchat; noquantitychange", "source_members_max": 3, "uncompressed_bytes_max": 602127, "usb_root": "/Volumes/SANDISK/firstrate/market/ETF-Complete_5000+_Tickers", "writes": ["REMX-20261103-FOLLOWUP-RATIO-001.result.json"]}; manifest2248B/SHAf14ef46ef6e99a7f7bd23f500a0a570202357c86388249a089192ae6580b6236 and record fsynced BEFORE effect. Owner scope is continued local20REMXvolume investigation/correction if provable only, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+Fresh20REMXvolume ratio diagnosis completed; targetexactratioUnique20; decimalprefixdistinct{"10": 19, "12": 20, "14": 20, "4": 2, "6": 2, "8": 2}; private proof8200B/SHA9f5e949b68609b9a70ba1e1cf4f6018cd546f5396e15f208a2314f6ac4a70baf. Ratios/tolerances are diagnostic only and authorize no rounding, counterpart borrowing or quantity correction; QC0/Safari0/provider0/backtests0.
+
+Fresh REMX local claim REMX-20261103-FOLLOWUP-LOCAL-METADATA-001; HEADbb6fcff32404d1c52221aa4ad5a8a2a87e9e1121; bounds{"directory_metadata_only": ["/Volumes/SANDISK/firstrate", "/Volumes/SANDISK/firstrate/market", "/Volumes/SANDISK/firstrate/market/ETF-Complete_5000+_Tickers"], "file_content_bytes": 0, "max_directories": 3, "max_entries_each": 500, "purpose": "findbundleddocs/code/alternateREMXarchives; noincidentalsignalpacket/provider/privatepayloadopens"}; manifest2255B/SHA86700cfd87880972e1f8cdca3232cf6e752edd9975b0a60c752a890b4bf23374 and record fsynced BEFORE effect. Owner scope is continued local20REMXvolume investigation/correction if provable only, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+Fresh bounded FirstRate local directory metadata inspection completed; threeexactdirectories max500entrieseach, no file-content reads; private proof31242B/SHA30dd368515aa16898208aee014cb6ea448f22e76fbb2439564d2d9e7e96b0836. QC0/Safari0/provider0/financialruns0.
+
+Fresh REMX local claim REMX-20261103-FOLLOWUP-DOCUMENTATION-001; HEADbb6fcff32404d1c52221aa4ad5a8a2a87e9e1121; bounds{"exact_bytes": 1837, "file": "/Volumes/SANDISK/firstrate/market/ETF-Complete_5000+_Tickers/Read_Me_Documentation.txt", "max_files": 1, "purpose": "readbundledvolume/adjustment/sessiondocumentationonly; noarbitrarymanifest/capture/marketpayloadread"}; manifest2163B/SHA27cae54662c6d9cf714ae6fb121c098606c1c5fa66a11b35ae657ca1007df598 and record fsynced BEFORE effect. Owner scope is continued local20REMXvolume investigation/correction if provable only, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+Fresh exact1837B bundledETFdocumentation read retainedSHAeb09be54bf112b0395e255407056285e455f80f34e845f6f9ba2f1fb60653ef4; metadata proof1838B/SHA0ce0010f4c209a3d051a4e7523d5e48d4e997a54beb921c2ae2876c468428466. Local documentation only; QC0/Safari0/provider0/backtests0.
+
+Fresh REMX local claim REMX-20261103-FOLLOWUP-ALTERNATE-METADATA-001; HEADbb6fcff32404d1c52221aa4ad5a8a2a87e9e1121; bounds{"directories": ["/Volumes/SANDISK/firstrate/market/misc", "/Volumes/SANDISK/firstrate/market/Stocks_Complete_10_000+_Tickers", "/Volumes/SANDISK/firstrate/fundamentals"], "entries_max_each": 500, "file_contents_bytes": 0, "purpose": "findonlypotentialREMXrawdailyduplicateormethoddocs; nostock/fundamentalrowopens"}; manifest2237B/SHAaf488a94f34ceef9b8caee418a04fbd65ce5b7c45b3400ed5f26230bb66af5f4 and record fsynced BEFORE effect. Owner scope is continued local20REMXvolume investigation/correction if provable only, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+Fresh bounded local alternative/provenance metadata inspection completed inexactmisc/Stocks/fundamentalsdirectories; nofilecontentread; private proof2040B/SHAb1f0d3b5b5cce430e1c22b32fb0891feb39bf361c6233a7c599cd8871b104efa. NoQC/Safari/provider/financialeffects.
+
+Fresh REMX local claim REMX-20261103-FOLLOWUP-STOCK-COPY-001; HEADbb6fcff32404d1c52221aa4ad5a8a2a87e9e1121; bounds{"archive_bytes_max_each": 20000000, "archives": 3, "central_bytes_max_each": 8388608, "exact_members": ["REMX_full_1day_UNADJUSTED.txt", "REMX_full_1day_adjsplit.txt", "REMX_full_1day_adjsplitdiv.txt"], "member_bytes_max_each": 2097152, "member_bytes_max_total": 6291456, "member_count_max_each": 50000, "purpose": "findonlyduplicatedREMXdailyrecordson20targetdates; nototherstockrows; noprices/volumereturnsinchat", "root": "/Volumes/SANDISK/firstrate/market/Stocks_Complete_10_000+_Tickers"}; manifest2389B/SHAe62e81ceeb85b6aebb9decb99a7828cbc10c5cdcedec35da6a63e4bd3cb90ff3 and record fsynced BEFORE effect. Owner scope is continued local20REMXvolume investigation/correction if provable only, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+Fresh threeexactStockRdailyarchive REMX-copy check completed; onlyexactREMXmemberopenedifpresent, private proof538B/SHA8f0c74ee8740bc8d6a1008751c760989fd403a1970006f82ff65f98f0c5696f0. Same-providercopy is not independentorigin/markettruth; no volumechange/QC/Safari/provider/backtests.
+
+Fresh REMX local claim REMX-20261103-FOLLOWUP-REPRESENTATION-001; HEADbb6fcff32404d1c52221aa4ad5a8a2a87e9e1121; bounds{"exact_members": ["REMXrawdaily181222BknownSHA", "REMXsplitdaily204873BknownSHA"], "max_uncompressed_bytes": 386095, "purpose": "parameterfree exactnearest-integer relation, half-tie/binaryintegerrepresentability bounds, same-rowOHLCfactor1; nofit/sweep/roundingcorrection or returns", "writes": ["REMX-20261103-FOLLOWUP-REPRESENTATION-001.result.json"]}; manifest2269B/SHA101aa60e49df3620faf86bddfb0c73f8c552d4dc21423b7275f239157cc150dd and record fsynced BEFORE effect. Owner scope is continued local20REMXvolume investigation/correction if provable only, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+Fresh parameter-free20REMXfractional representation diagnosis completed; aggregatebooleans{"less_than_half": 20, "less_than_one_hundredth": 1, "nearest_integer_equals_sibling": 20, "same_row_price_factor_exactly_one": 20, "sibling_at_most_2pow24": 20, "sibling_at_most_2pow53": 20}; private proof7209B/SHAb9f36f86e90608bcb8b9788d3f3212ba4fa46c0ac18ab68001adf90f88b3a6dd. Nearest-integer agreement is descriptive, not a certified rounding bound or permission to alter quantities; QC0/Safari0/provider0/backtests0.
+
+Fresh REMX local claim REMX-20261103-FOLLOWUP-EVIDENCE-PACKET-001; HEADbb6fcff32404d1c52221aa4ad5a8a2a87e9e1121; bounds{"controls": "fiveimmediatelybefore/fiveimmediatelyafterchronologicalsourcesessions; nosearch", "exact_documentation_bytes": 1837, "own_new_packet_selfcheck_read_max": 100000, "packet_bytes_max": 100000, "purpose": "fullrowhash/provenance evidencepacketONLY; replacementRowsEmpty/correctionProvenFalse, noquantitychange/returns/provider/QC/Safari", "source_bytes_max": 604253, "source_members": ["REMXrawdaily181222B", "REMXsplitdaily204873B", "REMXsplitdivdaily216032B", "REMXsplitactions38B", "REMXdividends251B"], "target_dates": "2026-02-23..2026-03-20", "writes": ["REMX-20261103-FOLLOWUP-EVIDENCE-PACKET-001.json", "REMX-20261103-FOLLOWUP-EVIDENCE-PACKET-001.result.json"]}; manifest2581B/SHAd1ab1492464bdfdf0f002b1499bb0cbc1c09b06ab6eeb3ca2939a9a36cff593b and record fsynced BEFORE effect. Owner scope is continued local20REMXvolume investigation/correction if provable only, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+Fresh exact-source20REMXevidence packet created and self-verified:20target rows retained; all10predeclaredneighborcontrols match raw/split/div volume+OHLC; target raw volumes remain unequal to their integer counterparts, though all20target nearestcounterpartswithinhalfshare with nocertifiederrorbound/formula; correctionProven0/replacementRows0. Packet41956B/SHAc72bbe2e7be5ca43bde8f5653610fb368ddcea30ff7fbfcaf9a9114d87747559; summary614B/SHA57b091a0e76f8463f61413d03a12df1cc50ae3289a025fd348b7902c59461fdc. No source/candidate volume changed; QC0/Safari0/provider0/backtests0.
+
+Fresh REMX local claim REMX-20261103-FOLLOWUP-PACKET-VERIFY-001; HEADbb6fcff32404d1c52221aa4ad5a8a2a87e9e1121; bounds{"files_max": 6, "private_files": ["followup/EVIDENCE-PACKET-001.json41956B/c72bbe2e...", "followup/DOCUMENTATION-001.source.txt1837B", "followup/DOCUMENTATION-001.result.json1838B/0ce0010f...", "prior-ownexport/source_original.csv181222B/b8c54990...", "prior-ownexport/candidate_post_inception.csv166663B/454a35c0...", "prior-ownexport/quarantine_fractional_volume.csv<=10240B"], "purpose": "independentpacket/originalsource/quarantine/unchangedcandidate/documentationbindings/counts/provenance only; noUSB/provider/QC/Safari/pricevolumeoutputs", "total_input_bytes_max": 403756}; manifest2488B/SHA50fee72b08f448c773034badf6d11c709d1d147e484d8f357444423ba2cf42c0 and record fsynced BEFORE effect. Owner scope is continued local20REMXvolume investigation/correction if provable only, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+Fresh independent local packet/immutability verification completed:20exactsource/quarantine witnesses+10predeclaredcontrols, documentationhashmatchesits prior freshcapture, original181222B and candidate166663B hashesunchanged,3996candidate/20unresolvedquarantine. PacketreplacementRowsEmpty/correctionsProven0. Private proof896B/SHAd4ca3d414235f415aca29d09d434649dff58ff8283d8077059e6908d78829cf1; QC0/Safari0/provider0/backtests0.
+
+### 114.3 Additional findings and correction decision
+
+The bundled ETF documentation was read afresh,1837B/SHA
+eb09be54bf112b0395e255407056285e455f80f34e845f6f9ba2f1fb60653ef4.
+It specifies individual-share volumes, US Eastern period-start timestamps,
+and omission of zero-volume intraday bars. Its three adjustment descriptions
+concern prices; it supplies no volume reconstruction/rounding formula.
+No web link in that file was opened. Local public-code searches found no
+FirstRate adjustment implementation. Sharadar/Databento-specific adjustment
+code is not transferable FirstRate semantics and was not applied.
+
+Fresh ratios on all20target dates are20different exact rational values and
+straddle1. No single simple split ratio in the preregistered1..20/1..20
+diagnostic grid was within1e-9 on any target. This is a negative diagnostic,
+not a fitted correction, and does not rule out a rounded arithmetic chain.
+Raw/split-only same-row OHLC is exactly equal on all20, implying a same-row
+price ratio of1, which cannot itself explain unequal volume via a reciprocal
+price adjustment. The latest bundled split remains2020-04-15 and latest
+bundled dividend2025-12-22; neither metadata provides a2026target-volume fix.
+
+All20same-vendor counterpart integers are the unique nearest integers to the
+fractional raw values, with absolute discrepancies below half a share.
+Nineteen discrepancies are at least0.01share, so this is not a negligible
+1e-9format dust claim. All20counterpart integers are at most2^24 and thus
+exactly representable as binary32 as well as binary64 integers. Simply
+casting those integers to those float formats and serializing them cannot,
+by itself, create a different fractional quantity. Some additional transform,
+a different intended quantity or source error would need evidence. A
+localized arithmetic-transformation problem is plausible; its mechanism
+and intended volume are not proved.
+
+The exact five chronological source sessions immediately before the target
+interval and five immediately after it were declared before processing.
+All10have exact raw/split/div volume and OHLC agreement. All20targets
+have matching same-row OHLC and integer agreement between the two adjusted
+variants; those variants share ONE provider lineage, not two independent
+market corrections. The earlier RTH/EXT/all observed-minute comparisons
+remain negative and were not swept or reinterpreted to create a match.
+
+Bounded alternative metadata found no independent REMX correction file or
+adjustment script. All three Stocks R daily archives contain307members and
+no exact REMX daily member; no other stock member was opened. The local
+market/misc directory contains API_Access.txt, which was deliberately not
+opened. No manifest URL/credential values or API account file were read.
+Fundamental directory names were metadata only and supplied no daily
+unadjusted ETF volume witness. No further speculative resampling or
+nearest-integer replacement was made.
+
+Decision: zero of20corrections are established by local evidence. Nearest
+agreement is not an authenticated error bound, and same-vendor agreement
+does not establish intended unadjusted daily share volume. The20rows
+therefore stay quarantined. No source/candidate row, strict volume contract,
+fixed inception boundary, frozen input or strategy economics is changed.
+
+### 114.4 Concrete local evidence packet and independent verification
+
+The fresh operationREMX-20261103-FOLLOWUP-EVIDENCE-PACKET-001 retained a
+41956B private packet/SHA
+c72bbe2e7be5ca43bde8f5653610fb368ddcea30ff7fbfcaf9a9114d87747559:
+artifacts/target_price_remx_followup_20261103/REMX-20261103-FOLLOWUP-EVIDENCE-PACKET-001.json
+
+It binds the exact current owner/HEAD and whole member hashes for all three
+daily variants, split/dividend members and documentation. Every target/control
+includes original row/ordinal/lexemes/base64/SHA, exact rational differences
+and ratios, price equality, integer-representation/nearest-pattern evidence
+and false correction flags. It emits replacement_rows[]/corrections_proven0,
+no corrected CSV, no source/input/financial promotion. Whole ZIP archive SHA
+is explicitlyNULL/notcomputed. The packet is private licensed evidence;
+only aggregate metadata and hashes are committed.
+
+A separate fresh verification checked the packet's exact41956B/SHA, current
+owner/HEAD,20original source/quarantine witnesses,10fixed neighboring
+controls, no replacement rows and false correction/admission flags.
+Documentation bytes match their earlier fresh1837B capture and metadata.
+Original181222B/SHAb8c54990689501ddc55183e6bb28c8eb7cd47a8817c04153480a6ef613b1de5e,
+candidate166663B/SHA454a35c07dec8ddbf236f868968cc457eaac20317be69ec8d9dab1eae5b2f731,
+and all20fractional quarantine rows remain unchanged. Independent proof896B/SHA
+d4ca3d414235f415aca29d09d434649dff58ff8283d8077059e6908d78829cf1.
+
+Technical outcome: within the20targets and10fixed controls, this follow-up
+isolates an unexplained daily volume discrepancy and produces a complete
+bounded source correction dossier. It does not identify a reversible documented transform,
+an independent intended volume, or a safe quantity-changing fix.
+
+In plain language, every suspect number sits near the same whole number
+in the other files, but the files do not explain why it changed. Choosing
+that whole number would still be guessing. The evidence is now packaged so
+a verified source correction can be checked against all20dates and the
+unchanged surrounding observations without losing the originals.
+
+### 114.5 Final limits and next action
+
+The existing local candidate remains3996of4339source rows, with323unknown-
+identity pre-inception rows and20fractional rows quarantined. Its observed
+frozen-window coverage remains1429of1449source dates, with20missing dates
+2026-02-23..2026-03-20. These are source-relative counts, not independent
+calendar/identity/market-origin authentication. No alternate price or ETF
+proxy is substituted for the six STOCK sleeves. All five arms have0new
+financial runs here and accepted full-window metricsNULL; consolidated
+historical outcome looks remainUNRECONCILED. Earlier negative minute,
+failed/Completed, source-drift and attempt/look histories are preserved.
+
+A verified correction needs authenticated intended unadjusted share volumes
+and session convention on those exact dates, or an independently specified
+transformation that reproduces the affected rows and fixed controls without
+fitting a rounding/tolerance rule. This is the concrete missing input fact.
+The current local files do not supply it. The20quarantines remain until
+that fact is available under a fresh bounded source/owner/HEAD claim.
+No provider contact or owner-message approval flow is initiated.
+
+QC and Safari remain untouched and deferred until further owner notice.
+No compile/job/status/Mia/cloud source effect or automatic resume occurred.
+Claude review is skipped as instructed; no routine review checkpoint is added.
+The repository change is confined to this sole record. The implementation,
+tests, original USB files, existing candidate/quarantines, shared plans/handoff,
+other lanes and all protected QC resources remain unchanged.
+
+One final nonforce push will target only
+HEAD:refs/heads/codex/strategy-target-price-revisions from this exact lane,
+after confirming actual Targetremote still equals the round base
+bb6fcff32404d1c52221aa4ad5a8a2a87e9e1121 and final current-document/history/
+diff checks. Actual final GitHEAD identifies the final record snapshot;
+afterward root verifies local/actualremote equality and clean status.
+
+Public-only independent Codex review verified the distinction between target
+price equality, target volume inequality and full neighboring-control equality.
+Root corrected an ambiguous new operation-note sentence that could have
+implied all20targets also had equal raw/counterpart volumes, and qualified the
+localization claim to the20targets/10fixed controls. No private source or
+packet fact changed. This is not a Claude review checkpoint.
+
+The focused current-document checks passed157/558deselected in2.94s under
+isolated49/52/syntheticDB with sockets/DNS denied and stable record bytes.
+Root verified exact received sections9..113, unchanged implementation/test
+bytes, sole-record diff/EOF discipline and ignored private evidence artifacts.
+No code changed, so the prior software runs are not represented as fresh
+reruns in this round. The same focused document checks and exact-history
+checks are repeated on the final corrected record before the sole push.

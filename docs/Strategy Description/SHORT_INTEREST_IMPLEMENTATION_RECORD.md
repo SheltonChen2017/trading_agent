@@ -30135,3 +30135,126 @@ local/tracking/actual-remote equality after the single publication and report
 the full hash, this lane-record link, missing readiness gates and required
 owner action. SourceAUTH remains unconditionally blocked.
 Main final post-result active-document checks:69 passed/.56s; whitespace clean.
+
+
+## 136. Owner-operated trace refusal and bounded v2 correction (2026-11-03)
+
+### 136.1 Actual v1 evidence, owner steering and preserved state
+
+The owner operated the command bound to published clean
+2a6d34c063da17dadeb98874344b628dcd6594a7, then supplied its terminal JSON.
+Main independently verified matching local/tracking/actual lane head, no known
+trace/producer process, original trace.private.json present as an EMPTY0-byte
+0600 owner file/SHAe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,
+and original exec/subject.json ABSENT. No subject or independent observer was
+invoked. The native child PID43917 exited1, input_bytes0/records0, discarded
+stderr168 bytes and no events. The supplied report is incomplete with
+trace_or_terminal_publication_failed in addition to native startup failures.
+It is not actor evidence or a successful original control. Keep the empty
+exclusive output spent; never delete, reset, retry or overwrite it.
+
+Only the supplied safe JSON was retained as a clearly labelled OWNER-SUPPLIED
+terminal-copy artifact, NOT reconstructed native evidence:1346 bytes/
+SHA101765f5187139ec1a3316760e416f6f88e2395659557f20b5e5e3fc86c1694b,
+trace-user-terminal-43917.private.json. No password, prompt/account text,
+arbitrary stderr, source row or unrelated event was retained. The owner later
+clarified that Terminal Full Disk Access had JUST been enabled. This supports
+a possible permission explanation but does not recover discarded stderr or
+prove the old native cause. The original journal actor remains UNKNOWN.
+
+SI-AUTH-20261103-02 records the owner's continuing-build direction and explicit
+NO QC/Safari UNTIL FURTHER NOTICE. This supersedes any earlier conditional
+release based on a sibling-lane push; no monitor is armed or changed. Existing
+source/rights/outcome/trading boundaries remain. Count84005 cumulative
+START/4294967296 bytes, separate DAILY residual36837 attempts/3327988047 bytes/
+71468572 rows and permanent8START/16777216 bytes are unchanged. No source/key/
+claim/START/charge/outcome/QC/Safari/purchase/email/other-chat action occurs.
+Canonical looks0/0, exploratory0, alpha0, permanent IDsnone and QCattempts0
+remain. SourceAUTH stays unconditionally blocked. Shared docs stay frozen.
+
+### 136.2 Verified lane defects; prospective fixes without custody relaxation
+
+| ID | Priority | Disposition and evidence |
+| --- | --- | --- |
+| SI-ATTR-20261103-001 | P2 | Corrected: old helper pinned directory link counts BEFORE its own output creation and the later reserved-subject creation. Main observed all-entry count+2 on these directories; a memory-only fabricated execution with sole owned creation9->10 refused directory_changed before any output write. Old original terminal pins were not persisted, so this verifies the code defect under the observed domain, not exact historical attribution. |
+| SI-ATTR-20261103-002 | P2 | Corrected: generic terminal-publication failure suppressed the original own contract/errno. V2 preserves fixed entered stage, allowlisted own contract/errno and separate cleanup failure, including negative paths. No exception formatting, arbitrary path/value or dynamic type is emitted. |
+| SI-ATTR-20261103-003 | P2 | Corrected: replacement after the first final target stat but during directory audit could return a closed trace for the wrong inode. Independent fabricated test reproduced it; target identity/protection is now rechecked after directory audit, with final subject audit AFTER post-close output check. This is finite observed consistency, not perpetual stability. |
+| SI-ATTR-20261103-004 | P3 | Corrected: uppercase-only enum tokenization accepted a known enum plus lowercase suffix. Lowercase characters now remain part of the word; malformed prefixes/suffixes cannot become exact native claims. |
+| SI-ATTR-20261103-005 | P3 | Corrected prospectively: explanatory prose in the command file produced zsh command-not-found messages when pasted. The new immutable command file will contain ONLY the executable shell command; all instructions stay in chat/metadata, not shell input. Old files are preserved. |
+
+V2 explicitly requires observed directory nlink==entrycount+2 BEFORE creation.
+It preserves original dev/ino/owner/group/mode, exact initial membership and
+the original link count. Only the exact approved one-entry addition is derived
+from that count; arbitrary new metadata is never adopted. The trace output's
+original O_EXCL descriptor/inode/0600/single-link protections bind its addition.
+The subject addition is allowed only after initial UF2 event calibration and
+must retain that first observed inode and file protections. Extra entries,
+deletion, replacement or unaccounted count drift refuse. Both directories
+remain checked through final handle closure. The native proof's original
+full9/flags/bytes rules and all source/capture implementations are untouched.
+
+Installed Apple eslogger manual confirms --format json, super-user and
+responsible-process Full Disk Access requirements. Installed binary enum
+literals support only prospective bounded classification of native stderr
+CLAIMS: too-many-clients, not-privileged, not-permitted, not-entitled, internal
+or invalid-argument. Unknown, malformed or multiple claims remain unclassified
+or ambiguous. No raw stderr survives and every classification explicitly says
+forensic_cause_verified=false. Old168 discarded bytes remain UNCLASSIFIED.
+
+### 136.3 Validation and exact prepared snapshot
+
+Only scripts/trace_short_interest_journal_actor.py, its tests and this record
+change. New helper SHAed462f3b0552d3f74c468c6a51e47ef215b90d9f7e38a372364aaec5c7fcdf63
+(35527 bytes); test SHA36e74bdd3578fe21bb048fc67f7b89ffee669c6556d80bc4fd410cc35d7c6351
+(35369 bytes). Schema is si-journal-actor-trace-v2. New fixed exclusive output
+is trace-v2.private.json in the SAME prepared directory; the original absent
+reserved subject is unchanged. This is a causally corrected prospective
+operation, not a namespace retry to guess around an unexplained source failure.
+
+Main final trace/import-boundary/active-document selection169 passed/1.48s,
+OS network denied. Author91/.65s and advisory peer91/.64s are separately
+attributed, not Main reruns or independent Claude review. Author memory-only
+owned-target-delta reversal:1 expected failure/86 deselected/.36s then restored
+1 pass/.03s; final target-recheck reversal:1 expected failure/1 pass/89
+deselected/.36s then restored2/.04s; old lexer reversal:2 expected failures/
+5 pass/84 deselected/.36s then restored7/.04s. The first causal harness used a
+global os mock and caused pytest internal error; isolated fixture proxies
+corrected that harness before the clean causal results. These are deliberate
+fabricated reversals, not production/native results. Python3.9 AST/in-memory
+compilation, fixed stage/contract literal catalogues and whitespace passed.
+No full suite, actual v2/native proof, new source or actor attribution occurred.
+
+### 136.4 Pending owner OS action and next authorized work
+
+This is a NEW local correction continuation from the prior published2A6D
+snapshot. Its exact following registration commit will be bound into a fresh
+reviewable command. The previous publication remains the only successful
+push so far; no interim push in this continuation. Claude review stays waived.
+All historical rows, old source data/images/claims/negative controls and prior
+commands remain unchanged. Never rerun the old command: its output already
+exists and its code/head binding will be stale. The new command-only file must
+be O_EXCL0600 and syntax-checked without execution before the owner uses it.
+
+After any other Terminal jobs finish, apply a macOS-requested Terminal restart
+for its newly granted permission. Only a genuine tracer_stream_ready permits
+the ONE original reserved producer plus independent RO observer; no active
+read may overlap edits/tests/commits/pushes. Preserve projected original
+packets in memory while the trace is active: writing unrelated packets into
+its exact-membership directory would correctly refuse. Actual process
+termination and independent original-report authentication are required;
+unknown/nonzero/incomplete overrides any provisional positive. A successful
+trace still needs genuine creator lineage and observed transition before an
+actor is named; it grants NO custody/source/input/backtest authority.
+
+Then fix only a verified lane-owned custody cause, freeze and complete a
+genuine source-free custody proof and durable Main/readmission boundary before
+releasing any source hold. Permanent old uncertainty is not refunded, native
+and checkpoint full9 schemas are not cast, and the nine-part accounting/ledger/
+lease/checkpoint bridge must be genuine. USB qualification and all identity,
+availability, denominator, rights, coverage and actual-input gates remain
+incomplete. The lane is NOT pre-QC ready. Do not access QC/Safari regardless
+of another lane's state; no purchases, provider retry, old-claim restart or
+source-cap enlargement is authorized by this prepared trace correction.
+Main post-record active-document checks:69 passed/.85s, OS network denied;
+final guarded check retained empty v1 output and absent v2 output/subject,
+matching published2A6D remote, no known active trace and exact reviewed hashes.

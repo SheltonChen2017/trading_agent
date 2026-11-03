@@ -1,6 +1,7 @@
 """Fabricated streams/handles only: no eslogger, source files, flags or root action."""
 import copy
 import builtins
+import errno
 import hashlib
 import importlib.util
 import json
@@ -369,9 +370,119 @@ def test_absence_means_any_entry_not_only_regular_file(monkeypatch):
     t.absent('subject.json', 31)
 
 
-def info(ino=1, mode=0o40700, size=0, uid=501):
+def info(ino=1, mode=0o40700, size=0, uid=501, links=None, clock=1, flags=0):
     return SimpleNamespace(st_dev=9, st_ino=ino, st_uid=uid, st_gid=20,
-                           st_mode=mode, st_nlink=1, st_size=size)
+                           st_mode=mode, st_nlink=(2 if stat.S_ISDIR(mode) else 1)
+                           if links is None else links, st_size=size,
+                           st_mtime_ns=clock, st_ctime_ns=clock, st_flags=flags)
+
+
+class RootWorld:
+    """Fabricated all-entry-count filesystem, never actual trace or files."""
+
+    def __init__(self, monkeypatch):
+        # Isolate fake filesystem calls to the helper. An expected causal
+        # failure must not poison pytest's own traceback/fixture cleanup.
+        real_os = t.os
+        monkeypatch.setattr(t, 'os', SimpleNamespace(**{
+            name: getattr(real_os, name) for name in dir(real_os) if not name.startswith('__')}))
+        class ObservedPath(type(Path())):
+            def resolve(self):
+                return self
+        for name in ('TRACE_DIR', 'TARGET', 'OUTPUT'):
+            monkeypatch.setattr(t, name, ObservedPath(getattr(t, name)))
+        self.trace_names = {'trace.private.json'}  # Preserve the old spent result.
+        self.subject_names = set()
+        self.trace_ino, self.subject_ino, self.output_ino, self.target_ino = 31, 32, 33, 71
+        self.trace_link_drift = self.subject_link_drift = 0
+        self.output_clock = 1
+        self.target_mode, self.target_uid, self.target_links = 0o100600, 501, 1
+        self.written = bytearray()
+        self.guards, self.absent, self.opened, self.owned = [], [], [], []
+        self.modes, self.synced, self.closed = [], [], []
+        self.guard_fails = self.close_fails = False
+        self.after_output_close = lambda: None
+        monkeypatch.setattr(t.sys, 'platform', 'darwin')
+        monkeypatch.setattr(t.os, 'geteuid', lambda: 0)
+        monkeypatch.setattr(t, 'ROOT', SimpleNamespace(stat=lambda: info()))
+        monkeypatch.setattr(t, 'guard', self.guard)
+        monkeypatch.setattr(t, 'open_directory', lambda path, *a: 31 if path == t.TRACE_DIR else 32)
+        monkeypatch.setattr(t, 'absent', self.require_absent)
+        monkeypatch.setattr(t.os, 'open', self.open_output)
+        monkeypatch.setattr(t.os, 'fchown', lambda *a: self.owned.append(a))
+        monkeypatch.setattr(t.os, 'fchmod', lambda *a: self.modes.append(a))
+        monkeypatch.setattr(t.os, 'fstat', self.fstat)
+        monkeypatch.setattr(t.os, 'stat', self.named)
+        monkeypatch.setattr(t.os, 'listdir', self.listdir)
+        monkeypatch.setattr(t.os, 'write', self.write)
+        monkeypatch.setattr(t.os, 'fsync', self.synced.append)
+        monkeypatch.setattr(t.os, 'pread', lambda *a: bytes(self.written))
+        monkeypatch.setattr(t.os, 'close', self.close)
+
+    def guard(self, *args):
+        self.guards.append(args)
+        if self.guard_fails and len(self.guards) > 1:
+            raise t.TraceRefusal('lane_git_binding')
+
+    def listdir(self, value):
+        if value in (31, t.TRACE_DIR):
+            return list(self.trace_names)
+        assert value in (32, t.TARGET.parent)
+        return list(self.subject_names)
+
+    def require_absent(self, name, fd):
+        self.absent.append((name, fd))
+        assert name not in self.listdir(fd)
+
+    def open_output(self, name, flags, mode, dir_fd):
+        self.opened.append((name, flags, mode, dir_fd))
+        assert name == 'trace-v2.private.json' and dir_fd == 31 and name not in self.trace_names
+        self.trace_names.add(name)
+        return 33
+
+    def fstat(self, fd):
+        assert fd not in self.closed
+        if fd == 31:
+            return info(self.trace_ino, links=len(self.trace_names) + 2 + self.trace_link_drift)
+        if fd == 32:
+            return info(self.subject_ino, links=len(self.subject_names) + 2 + self.subject_link_drift)
+        assert fd == 33
+        return info(self.output_ino, mode=0o100600, size=len(self.written), clock=self.output_clock)
+
+    def named(self, path, **kwargs):
+        if path == t.TRACE_DIR:
+            return info(self.trace_ino, links=len(self.trace_names) + 2 + self.trace_link_drift)
+        if path == t.TARGET.parent:
+            return info(self.subject_ino, links=len(self.subject_names) + 2 + self.subject_link_drift)
+        if path in (t.OUTPUT, t.OUTPUT.name):
+            return info(self.output_ino, mode=0o100600, size=len(self.written), clock=self.output_clock)
+        assert path in (t.TARGET, t.TARGET.name)
+        if t.TARGET.name not in self.subject_names:
+            raise FileNotFoundError
+        return info(self.target_ino, mode=self.target_mode, uid=self.target_uid,
+                    links=self.target_links)
+
+    def write(self, fd, data):
+        assert fd == 33
+        count = min(len(data), 137)
+        self.written.extend(data[:count])
+        self.output_clock += 1
+        return count
+
+    def close(self, fd):
+        self.closed.append(fd)
+        if fd == 33:
+            self.after_output_close()
+            if self.close_fails:
+                raise OSError('PRIVATE arbitrary close detail')
+
+    def observed(self, consumer, on_ready=lambda: None):
+        self.subject_names.add(t.TARGET.name)
+        consumer.tracer_pid = 900
+        consumer.consume(event())
+        on_ready()
+        consumer.consume(event(2, flags=64))
+        return -15, 0
 
 
 @pytest.mark.parametrize('bad', [info(mode=0o40755), info(uid=0)])
@@ -387,37 +498,14 @@ def test_directory_protection_never_adopts_drift(monkeypatch, bad):
 
 @pytest.mark.parametrize('failure', ['guard', 'directory', 'publication', 'guard_and_close'])
 def test_post_observation_failure_retains_only_projected_evidence(monkeypatch, failure):
-    monkeypatch.setattr(t.sys, 'platform', 'darwin')
-    monkeypatch.setattr(t.os, 'geteuid', lambda: 0)
-    monkeypatch.setattr(t, 'ROOT', SimpleNamespace(stat=lambda: info()))
-    guards = []
-    def guard(*args):
-        guards.append(args)
-        if len(guards) > 1 and failure.startswith('guard'):
-            raise t.TraceRefusal('lane_git_binding')
-    monkeypatch.setattr(t, 'guard', guard)
-    directories = iter([31, 32])
-    monkeypatch.setattr(t, 'open_directory', lambda *a: next(directories))
-    monkeypatch.setattr(t, 'absent', lambda *a: None)
-    opens, owners, closed = [], [], []
-    def open_output(name, flags, mode, dir_fd):
-        opens.append((name, flags, mode, dir_fd))
-        return 33
-    monkeypatch.setattr(t.os, 'open', open_output)
-    monkeypatch.setattr(t.os, 'fchown', lambda *a: owners.append(a))
-    monkeypatch.setattr(t.os, 'fchmod', lambda *a: None)
-    monkeypatch.setattr(t.os, 'fstat', lambda fd: info(ino=fd, mode=0o100600 if fd == 33 else 0o40700))
-    monkeypatch.setattr(t.os, 'stat', lambda path, **kw: info(
-        ino=99 if failure == 'directory' else (31 if path == t.TRACE_DIR else 32)))
-    def close(fd):
-        closed.append(fd)
-        if failure == 'guard_and_close' and fd == 33:
-            raise OSError('private exception text must never be emitted')
-    monkeypatch.setattr(t.os, 'close', close)
+    world = RootWorld(monkeypatch)
+    world.guard_fails = failure.startswith('guard')
+    world.close_fails = failure == 'guard_and_close'
     def observed(consumer, **kwargs):
-        consumer.consume(event())
-        consumer.consume(event(2, flags=64))
-        return -15, 0
+        result = world.observed(consumer)
+        if failure == 'directory': world.trace_ino = 99
+        if failure == 'publication': world.output_ino = 99
+        return result
     monkeypatch.setattr(t, 'supervise', observed)
     with pytest.raises(t.EvidenceRefusal) as caught:
         t.root_trace(HEAD, SHA)
@@ -427,66 +515,226 @@ def test_post_observation_failure_retains_only_projected_evidence(monkeypatch, f
         assert 'resource_cleanup_failed' in report['issues']
     assert report['matched_events'][-1]['requested_flags'] == 64
     assert 'secret-argument' not in json.dumps(report)
-    assert owners == [(33, 501, 20)] and sorted(closed) == [31, 32, 33]
-    assert opens[0][0] == 'trace.private.json' and opens[0][2:] == (0o600, 31)
-    assert opens[0][1] & t.os.O_EXCL and opens[0][1] & t.os.O_NOFOLLOW
+    assert 'PRIVATE' not in json.dumps(report)
+    assert report['terminal_failure']['contract_code'] in ('lane_git_binding', 'directory_changed',
+                                                          'output_creator_identity_changed')
+    assert world.owned == [(33, 501, 20)] and sorted(world.closed) == [31, 32, 33]
+    assert world.opened[0][0] == 'trace-v2.private.json' and world.opened[0][2:] == (0o600, 31)
+    assert world.opened[0][1] & t.os.O_EXCL and world.opened[0][1] & t.os.O_NOFOLLOW
 
 
 def test_successful_root_trace_writes_only_fixed_owned_output_and_returns_original_digest(monkeypatch, capsys):
-    monkeypatch.setattr(t.sys, 'platform', 'darwin')
-    monkeypatch.setattr(t.os, 'geteuid', lambda: 0)
-    monkeypatch.setattr(t, 'ROOT', SimpleNamespace(stat=lambda: info()))
-    guards, absent, opened, owned, modes, synced, closed = [], [], [], [], [], [], []
-    written = bytearray()
-    monkeypatch.setattr(t, 'guard', lambda *args: guards.append(args))
-    directories = iter([31, 32])
-    monkeypatch.setattr(t, 'open_directory', lambda *a: next(directories))
-    monkeypatch.setattr(t, 'absent', lambda *args: absent.append(args))
-    def open_output(name, flags, mode, dir_fd):
-        opened.append((name, flags, mode, dir_fd))
-        return 33
-    monkeypatch.setattr(t.os, 'open', open_output)
-    monkeypatch.setattr(t.os, 'fchown', lambda *args: owned.append(args))
-    monkeypatch.setattr(t.os, 'fchmod', lambda *args: modes.append(args))
-    monkeypatch.setattr(t.os, 'fstat', lambda fd: info(ino=fd, mode=0o100600 if fd == 33 else 0o40700))
-    def named(path, **kwargs):
-        if path == t.OUTPUT.name:
-            assert kwargs == {'dir_fd': 31, 'follow_symlinks': False}
-            return info(ino=33, mode=0o100600)
-        return info(ino=31 if path == t.TRACE_DIR else 32)
-    monkeypatch.setattr(t.os, 'stat', named)
-    def write(fd, data):
-        assert fd == 33
-        count = min(len(data), 137)  # Exercise partial writes.
-        written.extend(data[:count])
-        return count
-    monkeypatch.setattr(t.os, 'write', write)
-    monkeypatch.setattr(t.os, 'fsync', synced.append)
-    monkeypatch.setattr(t.os, 'pread', lambda fd, length, offset: bytes(written))
-    monkeypatch.setattr(t.os, 'close', closed.append)
-    def observed(consumer, on_ready):
-        consumer.tracer_pid = 900
-        consumer.consume(event())
-        on_ready()
-        consumer.consume(event(2, flags=64))
-        return -15, 0
-    monkeypatch.setattr(t, 'supervise', observed)
+    world = RootWorld(monkeypatch)
+    monkeypatch.setattr(t, 'supervise', world.observed)
     result = t.root_trace(HEAD, SHA)
-    report = json.loads(written)
+    report = json.loads(world.written)
     assert result['status'] == 'bounded_observation_closed' and result['matches'] == 2
-    assert result['original_report_sha256'] == hashlib.sha256(written).hexdigest()
-    assert result['original_report_bytes'] == len(written)
+    assert result['original_report_sha256'] == hashlib.sha256(world.written).hexdigest()
+    assert result['original_report_bytes'] == len(world.written)
     assert report['source_authority'] is False and report['tracer_pgid'] == 900
     assert report['matched_events'][-1]['requested_flags'] == 64
-    assert 'secret-argument' not in written.decode() and 'SECRET=' not in written.decode()
-    assert guards == [(HEAD, SHA), (HEAD, SHA)]
-    assert absent == [('subject.json', 32), ('trace.private.json', 31)]
-    assert opened == [('trace.private.json', t.os.O_RDWR | t.os.O_CREAT | t.os.O_EXCL | t.os.O_NOFOLLOW, 0o600, 31)]
-    assert owned == [(33, 501, 20)] and modes == [(33, 0o600)]
-    assert synced == [33] and closed == [33, 32, 31]
+    assert 'secret-argument' not in world.written.decode() and 'SECRET=' not in world.written.decode()
+    assert world.guards == [(HEAD, SHA)] * 3
+    assert world.absent == [('subject.json', 32), ('trace-v2.private.json', 31)]
+    assert world.opened == [('trace-v2.private.json', t.os.O_RDWR | t.os.O_CREAT | t.os.O_EXCL | t.os.O_NOFOLLOW, 0o600, 31)]
+    assert world.owned == [(33, 501, 20)] and world.modes == [(33, 0o600)]
+    assert world.synced == [33] and world.closed == [33, 32, 31]
+    assert world.trace_names == {'trace.private.json', 'trace-v2.private.json'}
+    assert world.subject_names == {'subject.json'}
     ready = json.loads(capsys.readouterr().out)
     assert ready == {'status': 'tracer_stream_ready', 'source_authority': False,
                      'tracer_pid': 900, 'tracer_pgid': 900}
+
+
+def test_native_failure_publishes_negative_under_owned_nlink_transition_without_creating_subject(monkeypatch):
+    world = RootWorld(monkeypatch)
+    def failed_native(consumer, **kwargs):
+        consumer.tracer_pid = 900
+        for code in ('tracer_exit_unsuccessful', 'native_stderr_observed'):
+            consumer.issue(code)
+        consumer.finish()
+        return 1, 168
+    monkeypatch.setattr(t, 'supervise', failed_native)
+    result = t.root_trace(HEAD, SHA)
+    report = json.loads(world.written)
+    assert result['status'] == report['status'] == 'incomplete'
+    assert report['native_stderr_claim']['classification'] == 'unclassified_native_stderr'
+    assert report['native_stderr_claim']['codes'] == []
+    assert report['terminal_failure'] is report['cleanup_failure'] is None
+    assert world.subject_names == set() and world.closed == [33, 32, 31]
+    assert world.trace_names == {'trace.private.json', 'trace-v2.private.json'}
+
+
+@pytest.mark.parametrize('place', ['trace', 'subject'])
+@pytest.mark.parametrize('mutation', ['extra_entry', 'link_only_drift'])
+def test_unowned_namespace_or_link_change_is_never_rebaselined(monkeypatch, place, mutation):
+    world = RootWorld(monkeypatch)
+    def observed(consumer, **kwargs):
+        result = world.observed(consumer)
+        if mutation == 'extra_entry':
+            (world.trace_names if place == 'trace' else world.subject_names).add('PRIVATE-unowned-name')
+        elif place == 'trace':
+            world.trace_link_drift += 1
+        else:
+            world.subject_link_drift += 1
+        return result
+    monkeypatch.setattr(t, 'supervise', observed)
+    with pytest.raises(t.EvidenceRefusal) as caught:
+        t.root_trace(HEAD, SHA)
+    report = caught.value.report
+    expected = 'directory_membership_changed' if mutation == 'extra_entry' else 'directory_creation_count'
+    assert report['terminal_failure']['contract_code'] == expected
+    assert report['terminal_failure']['stage'] == 'terminal_' + place + '_directory_audit'
+    assert len(report['matched_events']) == 2 and report['source_authority'] is False
+    assert 'PRIVATE' not in json.dumps(report)
+
+
+@pytest.mark.parametrize('bad', ['deleted', 'replaced', 'mode', 'owner', 'links'])
+def test_reserved_target_needs_original_calibration_inode_and_protection(monkeypatch, bad):
+    world = RootWorld(monkeypatch)
+    def observed(consumer, **kwargs):
+        result = world.observed(consumer)
+        if bad == 'deleted': world.subject_names.remove(t.TARGET.name)
+        elif bad == 'replaced': world.target_ino = 999
+        elif bad == 'mode': world.target_mode = 0o100644
+        elif bad == 'owner': world.target_uid = 999
+        else: world.target_links = 2
+        return result
+    monkeypatch.setattr(t, 'supervise', observed)
+    with pytest.raises(t.EvidenceRefusal) as caught:
+        t.root_trace(HEAD, SHA)
+    report = caught.value.report
+    expected = ('target_unseen_or_deleted' if bad == 'deleted' else
+                'target_original_inode_changed' if bad == 'replaced' else 'target_protection_changed')
+    assert report['terminal_failure']['contract_code'] == expected
+    assert len(report['matched_events']) == 2
+    assert world.closed == [33, 32, 31]
+
+
+def test_subject_creation_without_valid_native_calibration_is_not_adopted(monkeypatch):
+    world = RootWorld(monkeypatch)
+    def unobserved(consumer, **kwargs):
+        world.subject_names.add(t.TARGET.name)
+        consumer.finish()
+        return 1, 0
+    monkeypatch.setattr(t, 'supervise', unobserved)
+    with pytest.raises(t.EvidenceRefusal) as caught:
+        t.root_trace(HEAD, SHA)
+    assert caught.value.report['terminal_failure']['contract_code'] == 'target_unseen_or_deleted'
+
+
+def test_wrong_precreation_count_refuses_before_output_or_native_dispatch(monkeypatch):
+    world = RootWorld(monkeypatch)
+    world.trace_link_drift = 1
+    monkeypatch.setattr(t, 'supervise', lambda *a, **k: pytest.fail('dispatched after invalid pre-count'))
+    with pytest.raises(t.EvidenceRefusal) as caught:
+        t.root_trace(HEAD, SHA)
+    assert caught.value.report['terminal_failure']['contract_code'] == 'directory_count_contract'
+    assert world.opened == [] and world.trace_names == {'trace.private.json'}
+
+
+def test_deleting_an_old_entry_is_not_hidden_by_owned_addition(monkeypatch):
+    world = RootWorld(monkeypatch)
+    def observed(consumer, **kwargs):
+        result = world.observed(consumer)
+        world.trace_names.remove('trace.private.json')
+        return result
+    monkeypatch.setattr(t, 'supervise', observed)
+    with pytest.raises(t.EvidenceRefusal) as caught:
+        t.root_trace(HEAD, SHA)
+    assert caught.value.report['terminal_failure']['contract_code'] == 'directory_membership_changed'
+
+
+@pytest.mark.parametrize('mutation', ['output', 'target', 'directory'])
+def test_final_named_audit_outlives_all_owned_handle_closes(monkeypatch, mutation):
+    world = RootWorld(monkeypatch)
+    monkeypatch.setattr(t, 'supervise', world.observed)
+    def after_close():
+        if mutation == 'output': world.output_clock += 1
+        elif mutation == 'target': world.target_ino += 1
+        else: world.trace_link_drift += 1
+    world.after_output_close = after_close
+    with pytest.raises(t.EvidenceRefusal) as caught:
+        t.root_trace(HEAD, SHA)
+    report = caught.value.report
+    assert report['terminal_failure'] is None
+    assert report['cleanup_failure']['stage'] == 'post_close_original_audit'
+    assert report['cleanup_failure']['contract_code'] == {
+        'output': 'post_close_output_changed', 'target': 'target_original_inode_changed',
+        'directory': 'directory_creation_count'}[mutation]
+    assert 'post_close_original_audit_failed' in report['issues']
+    assert world.closed == [33, 32, 31] and len(report['matched_events']) == 2
+
+
+@pytest.mark.parametrize('trigger', ['subject_directory', 'output'])
+def test_last_target_check_follows_directory_and_other_file_audits(monkeypatch, trigger):
+    world = RootWorld(monkeypatch)
+    monkeypatch.setattr(t, 'supervise', world.observed)
+    state = {'armed': False, 'changed': False}
+    world.after_output_close = lambda: state.update(armed=True)
+    original_named = t.os.stat
+    def replace_after_named(path, **kwargs):
+        result = original_named(path, **kwargs)
+        match = path == (t.TARGET.parent if trigger == 'subject_directory' else t.OUTPUT)
+        if state['armed'] and not state['changed'] and match:
+            world.target_ino = 999
+            state['changed'] = True
+        return result
+    monkeypatch.setattr(t.os, 'stat', replace_after_named)
+    with pytest.raises(t.EvidenceRefusal) as caught:
+        t.root_trace(HEAD, SHA)
+    report = caught.value.report
+    assert state['changed'] and report['terminal_failure'] is None
+    assert report['cleanup_failure']['contract_code'] == 'target_original_inode_changed'
+    assert report['cleanup_failure']['stage'] == 'post_close_original_audit'
+    assert world.closed == [33, 32, 31]
+
+
+@pytest.mark.parametrize('literal,code', sorted(t._NATIVE_ENUMS.items()))
+def test_native_claim_literals_are_chunk_safe_and_never_forensic_cause(literal, code):
+    raw = b'PRIVATE-account/path ' + literal + b' description not retained'
+    for split in range(len(raw) + 1):
+        claims = t.NativeClaims()
+        claims.feed(raw[:split]); claims.feed(raw[split:]); claims.finish()
+        payload = claims.to_payload(len(raw))
+        assert payload == {'classification': 'one_allowlisted_native_literal_claim',
+                           'codes': [code], 'forensic_cause_verified': False}
+        assert claims.token == b'' and 'PRIVATE' not in json.dumps(payload)
+
+
+@pytest.mark.parametrize('raw,classification', [
+    (b'PRIVATE unknown native failure', 'unclassified_native_stderr'),
+    (b'ES_NEW_CLIENT_RESULT_ERR_NOT_PERMITTED_EXTRA', 'ambiguous_or_unknown_native_claim'),
+    (b'ES_NEW_CLIENT_RESULT_ERR_NOT_PERMITTEDevil', 'ambiguous_or_unknown_native_claim'),
+    (b'evilES_NEW_CLIENT_RESULT_ERR_NOT_PERMITTED', 'unclassified_native_stderr'),
+    (b'ES_NEW_CLIENT_RESULT_' + b'X' * 4096, 'ambiguous_or_unknown_native_claim'),
+    (b'ES_NEW_CLIENT_RESULT_ERR_NOT_PERMITTED ES_NEW_CLIENT_RESULT_ERR_NOT_ENTITLED',
+     'ambiguous_or_unknown_native_claim'),
+    (b'ES_NEW_CLIENT_RESULT_SUCCESS', 'ambiguous_or_unknown_native_claim'),
+])
+def test_unknown_conflicting_or_extended_native_literals_stay_unclassified_or_ambiguous(raw, classification):
+    claims = t.NativeClaims()
+    for value in raw: claims.feed(bytes((value,)))
+    claims.finish()
+    assert claims.to_payload(len(raw))['classification'] == classification
+    assert claims.to_payload(len(raw))['forensic_cause_verified'] is False
+    assert len(claims.token) == 0
+
+
+@pytest.mark.parametrize('error,category,contract,err', [
+    (t.TraceRefusal('directory_changed'), 'local_contract_refusal', 'directory_changed', None),
+    (t.TraceRefusal('PRIVATE unknown contract'), 'unclassified_local_failure', None, None),
+    (OSError(errno.EACCES, 'PRIVATE path'), 'local_os_refusal', None, 'EACCES'),
+    (OSError(987654, 'PRIVATE path'), 'local_os_refusal', None, None),
+    (subprocess.CalledProcessError(1, ['PRIVATE command']), 'local_subprocess_refusal', None, None),
+    (KeyboardInterrupt(), 'interrupted', None, None),
+])
+def test_terminal_failures_emit_only_fixed_category_contract_errno_and_entered_stage(error, category, contract, err):
+    payload = t.fixed_failure(error, 'output_write')
+    assert payload == {'stage': 'output_write', 'category': category,
+                       'contract_code': contract, 'errno': err}
+    assert 'PRIVATE' not in json.dumps(payload)
+    assert t.fixed_failure(error, 'PRIVATE stage')['stage'] == 'unknown_stage'
 
 
 @pytest.mark.parametrize('bad', ['dirty', 'head', 'branch', 'code'])

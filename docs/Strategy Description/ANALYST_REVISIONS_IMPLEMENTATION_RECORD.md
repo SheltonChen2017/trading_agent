@@ -1293,7 +1293,7 @@ claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
 
-Section 336 records the owner's later continued identity/price/REMX recovery request. The owner explicitly waives Claude review of section 336. QC and Safari remain entirely off limits. New work addresses original cross-table ownership, normative generic action definitions and the dated fractional-volume hypothesis under separate committed one-use contracts; it does not replay old claims or clear any identity/price gate before actual evidence. Section336 owns the current decision, validation, result and final-push handoff.
+Section 336 records the owner's continued identity/price/REMX recovery request. The owner explicitly waives Claude review of section 336. QC and Safari remain entirely off limits. K/L/M/N/O and their validators each passed once for their narrow observations and are now SPENT/frozen. Original source-table agreement ruled out copying a different table's FIGI; typed historical-symbol coverage found four new files, none complete/admissible for a required common-stock window. Original symbols did not match the three prior-unit labels, and a merger counterparty must not terminate its survivor's demand. All five identity stops and false readiness flags remain. The next useful input is dated exact-security/correction/conversion evidence and legitimate complete common-stock reference/NAV coverage, evaluated only under a new justified versioned freeze; no current-profile lookup, source splice, old operation replay or QC action is implied. Section336.12–336.13 own actual evidence, limitations and the one-push handoff.
 
 
 Sections 137–142 retain the owner-assisted cloud diagnoses, project cleanup,
@@ -4396,6 +4396,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-29 | Claude (Windows host) review snapshot R333 of `6076ef20..57bd3213`: sections 323–328 confirmed through the Mac reviews, the fourteen owner-waived Codex commits of sections 329, 331 and 332 reviewed after the fact, sixth QC census, three fixes | `57bd3213` -> `60580c90` -> `9a18d8e2` -> this record commit | Review of the ninety-three commits pushed since `6076ef20`: the Mac session's section 328 and 330 and Codex's counter-reviews confirmed by this host's gates; the fourteen tail commits (W5 native coverage tooling, the section-331 corrections, the thirteen-project QC cleanup) reviewed individually (R333) | Synced the lane clone by fast-forward from a clean tree. Immutability of V16–V19, the cap-90 bridge runtime and the three trust roots re-verified. The R-298 ledger chain reproduces to 337/259/53/699. Endpoint census of every changed script with both quote styles: eleven single-launch helpers, two plan-bound delete executors, no live, order or account endpoint. QC administrative reads (zero looks) confirm the thirteen recycled projects by name and time, find one unbooked R298 rerun, and find the W5 source project without its `main.py` (P2, cloud state, not repairable here). Fixed: three EOF blank lines in place with digests recorded, the rerun booked to **338/259/54/699**, stale ranges corrected. | Real tree at `57bd3213`: record and active-document gates **86 passed**; final record bytes **86 passed**; `compileall` exit 0; `git diff --check` clean on `6076ef20..HEAD` after the fix. Complete lane suite at `3c905d42` (owed from R323): 3422 failed, 15522 passed, 1357 skipped, 3182 errors in 3:20:42, host classes; at `57bd3213`: 27,253 collected with 100 collection errors; **not run to completion at push time**: the detached run started at 10:56 local on 2026-10-29 was stopped after the dependency diagnosis above, and the restart with a corrected environment was still pending at this push; the previous tip's counts are recorded in this table and this tip's counts are to be recorded in the next round. | 0 P0, 0 P1. `ARV2R333-001` (P2, open for Codex): project 38522505 has no `main.py`. `ARV2R333-002`/`-003`/`-004` (P3, corrected). `ARV2R333-005`/`-006`/`-007` (P3, documented). Carried P2s unchanged. | Codex counter-reviews R333, re-establishes Main under a new freeze before any coverage job, and reconciles the booked rerun by identity; the hold of 329.10 remains; no attempt, launch, replacement project, six/eight cell, paper/live deployment, broker, funded-account, real-order or trading action is authorised. |
 | 2026-10-30 | Codex R333 counter-review and exact public Main recovery preparation | `10b05ccac3b71af18599343a5b29975e9abee344` -> `b52fb5892c6c9f1c133bb94ba8c91ba279de5595` -> this final handoff commit; TWO total | All three incoming Claude commits accepted, record after five documentary corrections/qualifications; every R333 finding dispositioned in334 | Exact6892byte original Main reconstructed from pinned public sources without spentA read; tested public upload candidate and existing D pins retained | Root184distinct focused passes8.06s; exact AST/byte equality for three whitespace changes, public pins and memory compilations; final document repeat recorded below; no full suite | Missing-Main cloud report remains pending fresh authentication; other lane active in Safari/chat, availability unresolved; no QC request/upload/compile/job/result and338/259/54/699 unchanged | ONE matching-lane final push at shared-resource barrier; remaining source repair/readback, coverage and six/eight continuation await availability plus exact current run gates; no automatic monitor or other-lane interference |
 | 2026-11-03 | Owner-waived FirstRate parser, REMX partition and five-stock coverage recovery under QC/Safari hold | `381ae7ad54e35b05bc1ca6455abff7388e23c09d` -> ELEVEN local predecessors through `26dfac6ec8948c8cf8dedfe1ebeca3687058159e` -> this section335 final handoff commit; TWELVE total | No incoming Claude range; own implementation and same-round advice are not independent acceptance | A/B/C failures retained; D REMX field diagnosis, E stock coverage, F exact gap metadata, H predicate diagnosis, I event association and J dictionary each passed once; G retained HTTP200 but failed local row scope. Four stock envelopes still incomplete/absent; five identity stops unchanged; no accepted price book or strategy run | Focused stage results and nonadditive overlaps/failures in335; latest287distinct passes2.37s, four memory compiles and final document/diff/status checks; no full suite, raw-row disclosure or spent replay | I335-001..017 corrected/qualified prospectively; old refusals/source gates preserved; no QC/Safari/capacity/project/job;338shared/259development/54infrastructure/699cells unchanged | ONE matching nonforce final push at the concrete identity/coverage barrier. QC/Safari stay prohibited until explicit owner release; no next cell, source-stop bypass or readiness/financial clearance |
+| 2026-11-03 | Owner-waived offline identity, historical-symbol coverage and REMX recovery under QC/Safari hold | `372019d5e275248fe41bad000e638479f8cb7a0b` -> `0b78b00c7cf6a75cf21044a8aaaffee852c59a21` -> `af7ebb09941f6d64df60310505645ea2a6241b25` -> `0d131ac9d662ba5942ea9b67c16d108e2da3c627` -> this final section336 handoff commit; FOUR total | No incoming Claude range; current owner review waiver, no independent acceptance | K definitions, L fractional timing, M original ownership, N normative roles and O new historical-symbol coverage each passed once and are spent. Four new files retained; none completes its required window. Original UNIT and acquired-security hypotheses refined rather than assumed | Root592distinct focused passes across stages; latest149passes2.03s,16changed-source/test memory compiles across stages, exact source/profile/native pins. Record repeats nonadditive; no full suite or operational replay | I336-001..009 corrected pre-use, I336-010 qualified/corrected; five identity stops and RAW/session/payoff/coverage gates remain. No QC/Safari/provider data API/Keychain;338/259/54/699 unchanged | ONE matching nonforce final push at the concrete dated-identity/common-price evidence barrier. All controls/readers stay spent; no automatic source-splice, source-stop bypass, QC release, strategy cell or readiness clearance |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -74147,3 +74148,140 @@ Caller56final passes supersede overlapping47/31subsets; all are synthetic.
 Same-round root/advisory audits are not independent review. No actual O
 allocation, N DATA/USB read or contact occurred before this exact freeze.
 K/L/M/N remain spent; QC/Safari hold and338/259/54/699 stay binding.
+
+### 336.12 Actual O completed: new files did not close the coverage gaps
+
+At clean0d131ac9d662ba5942ea9b67c16d108e2da3c627, the sole O parent
+dispatched2026-11-03 22:45:18UTC, completion observed22:45:28UTC,
+actual exit0/child0, no child stderr. The sole native-denied stdin validator
+dispatched/completed within22:45:49UTC, actual exit0, accepted=true and
+output_authenticated=true. These second-resolution external brackets are NOT
+exact source-access timestamps or measured durations. Complete tool capture
+was24652characters with no truncation; no second launch/reader was needed.
+O is now SPENT/frozen; do not inspect its controls or replay the worker/reader.
+
+Worker stdout24020B SHA256
+3279ff83436345839276ee8cc306728961cf65912da15de6234e8188424f6538;
+report23909B SHA256
+120a2a2e7003f48809590eea6341094279ff75cbe61a0c1ad6ffaa037b86dd51;
+private-diagnosis.json164034B SHA256
+50b17a14c69b3d44b329c24eda8c8e01d7e3f5fbd057d11adc05e9c864a9e8a5.
+Marker331B SHA256
+4d5f7dc0c1a2f4e04f012c120a7c94f04a244b1c57dd9bd98c600e5e6ad1155c;
+N DATA receipt SHA256
+f7e362603f3f63a9569d6c07da0ed08514ecd23d9cb69840c3894fa61478b651.
+All paths are under the fixed new firstrate/R336-20261103-O control.
+All N/USB/source guards returned normally before output.
+
+Four retained original binary members total219534B:
+
+|Own ordinal output|Bytes|SHA256|
+|---|---:|---|
+|member-0000.bin|204878|29b179ca79100dcebac815f8a624af54340d79efe880459359add590c92b5f03|
+|member-0001.bin|5917|d22badb2a13d5beb3fcb6bcb7c2855fcfb49e0dfd961a13cd7ebd2d4e97db51d|
+|member-0002.bin|5488|5bb21e310bfd27ddaa603297133602adfed1d98cd8b9a16438cdcd4bc625b8de|
+|member-0003.bin|3251|08cfc7ed3bc329c0233a29a07acd4eb3739085b9893703810778c3d6634cda29|
+
+The exact typed plan retained28origins:19eligible,9globally E-excluded,
+0unsupported and0unresolved-pair leads, deduplicated to7transport tokens.
+Thirteen selected archives authenticated:5 matched retained E SHA pins and8
+received a new retained SHA under the qualified manifest corroboration.
+Ninety-eight exact new member probes yielded4physical files and94absence
+observations. No old named member was looked up/decompressed/parsed, though
+whole-archive authentication read compressed old/unselected bytes. These are
+local source observations, not API requests, QC looks or price-source admission.
+
+|Case|New member evidence|Required dates present/missing|Missing reference dates|Conclusion|
+|---|---|---|---:|---|
+|0|No new physical hit.|No added coverage.|No added coverage.|Existing E date-complete candidate remains unadmitted because of the original two-owner collision; no new identity resolution.|
+|1|Ordinal0, action-labeled current-common-primary;4986source rows.|0/417|87|No required date in this candidate; role label/ticker does not authenticate same security.|
+|1|Ordinal1, prior-unit-counterparty and historical-ticker-from;149rows.|143/274|54|Partial UNIT-associated dates, never common-stock replacement.|
+|2|No new typed lead or hit.|No added coverage.|No added coverage.|The original absent-candidate and identity stop remain; no general no-history conclusion.|
+|3|Ordinal3, prior-unit/related-security/historical-from;83rows.|82/350|75|Partial distinct-instrument evidence, no alias or union splice.|
+|4|Ordinal2, prior-unit/related-security/historical-from;145rows.|144/158|34|Partial distinct-instrument evidence, no alias or union splice.|
+
+Every row in these four files validated with unchanged numeric/date/OHLC/
+separator guards and lossless Decimal volume; all volumes happened to be
+integral. NONE is complete for its case's fixed dense/reference window.
+Their rows cannot fill E's missing COMMON prices by convenience. No missing
+date or security was dropped, period shortened, source cache injected or
+synthetic terminal cash/price created.
+
+Joint role counts REJECT the speculative shorthand that the original ticker
+is the prior UNIT in these three unit-separation records: original-symbol
+match is0 for each prior-unit role in cases1/3/4. Case1's original matches the
+ticker-to payload; cases3/4 each match one from and one to across two separate
+pairs. This does not authenticate common-share continuity through the graph.
+Case0's original matches survivor/received-security roles, not the acquired
+primary; an acquired counterparty's delisting must not end the original
+survivor's demand. Current primary symbols are dataset grouping labels, not
+guaranteed as-of aliases. These joint findings refine the hypotheses without
+rewriting any original FIGI/perma/CUSIP binding or applying an action/payoff.
+
+### 336.13 Final dispositions, concrete barrier and handoff
+
+No incoming Claude commits occurred this round; review is waived by the
+owner for this task, not independently completed. Exact contiguous own range
+starts372019d5e275248fe41bad000e638479f8cb7a0b and contains:
+
+|Own commit|Disposition and actual scope|
+|---|---|
+|0b78b00c7cf6a75cf21044a8aaaffee852c59a21|K/L/M implementation and D1 freeze; accepted for the exact delegated observations after pre-use corrections. All3 actuals passed once with their separate stdin validations and are spent.|
+|af7ebb09941f6d64df60310505645ea2a6241b25|Actual K/L/M record, exact reviewed normative rules and D2 N freeze; sole N plus validator passed and are spent. No historical identity/price gate cleared.|
+|0d131ac9d662ba5942ea9b67c16d108e2da3c627|Actual N record, new O parser/typed coverage and D3 freeze; sole O plus validator passed and are spent. No complete new stock envelope or identity admission resulted.|
+|This final section336 handoff commit|Actual O evidence, qualified conclusions, all findings/validation, current next step and ONE-push ledger row; records the concrete source barrier without another operation.|
+
+I336-001..009 are corrected before their applicable use; I336-010 is
+corrected/qualified before O. Zero new P0/P1 findings; historical open P2
+source/readiness/cloud issues remain. Pre-use expected red tests, fixture
+failures, author overlaps, selected-source/host/isolation limitations and
+old335EOF qualifications remain recorded, not erased by successful actuals.
+No complete Codex lane/repository suite ran. Root592distinct focused tests
+passed across the stages; O's149pass2.03s includes17overlapping record tests.
+Pre-O-freeze record/active-document86passes1.13s overlap prior86 and are not
+additive. Final record/diff/status verification is recorded with the push.
+No source/test bytes changed after the corresponding actual run freeze.
+
+Concrete barrier after safe in-scope local alternatives: the retained catalog
+does not uniquely authenticate the original five security bindings (one
+original collision, four changed composite AND share-class FIGIs). The new
+typed historical-symbol files provide no admissible complete common-stock
+coverage. The available unit/relationship/ticker metadata cannot independently
+supply dated exact-identifier continuity or conversion/consideration/payoff
+terms. Existing FMP current profiles or another equal current mapping would
+not supply those missing historical facts; no broad existence-only quote/API
+request is justified around that stop. No new purchase/access acknowledgment
+or routine owner approval is demanded.
+
+Next useful source input is dated exact-security/correction/issuance evidence
+resolving original versus current identifiers, with legitimate RAW common-
+security reference/NAV dates and any actually required conversion/terminal
+terms. It must preserve rival/ambiguous records and be evaluated under a
+separately justified versioned consumer/freeze. Do not copy the original
+stock-table FIGI (M disproved that alleged remedy), relabel a unit as common,
+assume a merger counterparty terminates its survivor, combine action-linked
+series, or renew E/F/I/M/N/O to seek a favorable result.
+
+REMX has two separate documented facts: a quarantined old ticker-reuse prefix,
+and20 ETF-era fractional volumes concentrated at/after the fractional-reporting
+transition. The latter are not explained by the prefix and their feed lineage/
+RAW units/official-close convention remain unconfirmed. The new parser can
+retain Decimal observations; it does not declare these RAW fund prices
+admissible. The selected8fund Sharadar routes are unchanged.
+
+QC and Safari remain entirely off limits until explicit owner release. No
+capacity/project/privacy/source/compile/job/result, provider data API,
+credential/Keychain, Mia or other-lane operation occurred in336. No strategy
+6/8cell was launched or accepted; all5 original identity stops and all
+PIT/permanent-master/formal/paper/live readiness false flags remain. Booked
+floor338shared/259development/54infrastructure/699cells is unchanged.
+Push this entire FOUR-commit round once to the matching lane and verify
+local/tracking/live agreement and clean status; no next operation is implied
+by that push. All new observations/validators are spent and stay frozen.
+
+Final result/handoff record gates before this validation sentence passed86
+tests1.11s under the same native synthetic isolation; this repeats the earlier
+86 and adds no distinct tests. Working-tree and complete372019d5..0d131ac9
+round whitespace checks passed. Local root/branch/HEAD/status were exact;
+live matching remote remained372019d5e275248fe41bad000e638479f8cb7a0b.
+Only this lane record is changed after O; no source/test/evidence leaf changes.

@@ -73036,3 +73036,131 @@ test-only inputs. Two finally-restored omissions produced expected failures.
 Same-round static advice is not independent review. No actual H DATA/control
 read occurred at freeze. QC/Safari remain held by335.17; floor338/259/54/699
 and all price/identity/formal/readiness/financial gates remain unchanged.
+
+### 335.21 Actual H isolates the counterparty-format stop; additive v2
+
+At clean freeze347c8dc32fd57bf20a5fae69108707fe3ccc41e0, sole H parent0/
+child0/no stderr and sole strengthened native-denied stdin-only validator0
+authenticated the matching result. H/validator are SPENT/frozen; no replay or
+old control read. Worker3634bytes SHA256
+5c286aca5fe1ac2cd6ed7077df884aba8d5142f7f3a1cd0fbc503ae9253be2a6;
+report3524bytes SHA256
+c17be9313e511403137f57ab0b2c50fd41e20619915d9cc4696b60a09b130e6d.
+New DATA under firstrate/R335-20261103-H/private-diagnosis.json is8380bytes
+SHA2565741f8fdab9afa43976482665a65593422c5a592c5e2ae2901079372343904fa.
+The exact output leaf was checked against public frozen source; no H control
+or DATA was reopened.
+
+All33CSV records have unambiguous seven-field shape. All original trim/control/
+length/date/window/order/value, primary-ticker/query-membership/action/name
+checks pass;21values are empty and12finite supported numbers. Exactly9rows
+fail only the returned contraticker stock-ticker grammar;24pass it. Frozen
+row_scope refusal is reproduced, with contraticker_grammar as first failed
+scope predicate. H's all-row examination is new forensic evidence, not a claim
+G processed later rows. No raw counterparty representation was emitted, so do
+not assert a particular delimiter/encoding/content or unique vendor cause.
+Parsed rows remain private/unadmitted and G's incomplete failed status persists.
+
+I335-014(P2 confirmed; corrected prospectively): using a stock-ticker lexical
+constraint as mandatory validation of the generic returned counterparty TEXT
+blocked otherwise bounded discovery metadata. A counterparty field is not
+automatically an instrument identifier. New
+scripts/arv2_r335_sharadar_actions_v2.py is31621bytes SHA256
+71417807bb3fc74dc58e8c53024d402a769165c275e2693b287a1561e3127216,
+canonical2952-byte profile SHA256
+af5caade64ddf6c93d5e58cd130f2c17c5e17f8d42f63f37fa32ed0f523d2676.
+It preserves returned contra text verbatim under existing field bounds and
+does not split, normalize, generate an alias or add a request. Exact primary
+ticker query membership and scalar contra equality remain binding. Dates,
+numeric/field guards, six-field PK, status/secret/transport/attempt/deadline/
+source mechanics are unchanged; five declared changes restore frozen v1 bytes
+exactly. v1/G remain unchanged/spent; v2 network producer is UNINVOKED and has
+no new contact authority from this correction.
+
+Root131focused passes0.36s, two in-memory compiles and pins match. Author
+131passes0.22s/0.40s overlap (111carried+20new), not additive. Restored contra-
+regex, scalar-filter and primary-membership omissions each turned a focused
+test red. Tests26978bytes SHA256
+93d84d245feaec9deea50bd78a6a3454c68528206c12509dd8a02bf40a2bfdca.
+All synthetic native denial/support rules persist; no full suite. Root102
+pre-H document checks1.23s overlap earlier selections. No new API/Keychain/
+USB/QC/Safari contact followed G;335.17 hold and338/259/54/699 remain unchanged.
+
+Next use is a separately frozen offline retained-body consumer, not a G retry:
+reauthenticate exact F plus G's three DATA leaves, prove only a v1-to-v2 plan
+schema projection, validate already retained response0, preserve every row/
+conflict and classify only statically documented action labels. The full
+action dictionary/ticker-change direction is not established by the public
+pages read, so unverified labels stay unknown and no ticker-change alias is
+admitted. A single supported contra token can be retained as a literal
+COUNTERPARTY metadata lead; it remains distinct from a security/alias assertion.
+Opaque contra is never tokenized. New query, same-share-class continuity,
+price assignment, payoff or source admission requires separate actual proof.
+
+### 335.22 D9 exact offline I retained-event association freeze
+
+New scripts/inspect_arv2_r335_actions_identity_links.py is58278bytes SHA256
+49fcfc0ef268097e752786c188cd77cf2b8c44c833d53d2a055b8ad98c7b8968;
+tests22431bytes SHA256
+fcf9a2c24c30c41ed0a8c07881a80fbe5fe7c119d8ebaf9e0fff8a1dd04cbb61.
+Canonical5730-byte profile SHA256
+1d437f8152acc18b3fb83c655885d5446fa2d169769145e328e396705db22d16;
+native2413-byte policy SHA256
+1a56fd45fa380b06bdc1371631100f318cd788901dd1510845c517801891b921.
+
+Permit ONE I parent after this exact source/v2/decision is committed clean in
+the designated root/branch/isolatedDarwinPython3.13, expected-head actual clean
+freeze and caller/profile hashes above. NEW claim
+artifacts/analyst_revisions_v2/firstrate/R335-20261103-I is uninspected and
+unallocated. It consumes ONLY exact335.16 F DATA and335.19 G plan/body/transport
+DATA, not H DATA or old claims/reports. Source guard/current native security,
+normal return before own publication, claim/FD/deadline/output/actual-exit rules
+remain binding. Native all-network/USB/BOTH-Keychain/security-CLI denial applies
+to actual private processing; no provider/credential/QC/Safari capability exists.
+
+I validates original G v1 plan/transport, rechecks all five F original/current
+bindings/metadata/explicit leads and G's exact nine-token union/lineage, then
+proves ONLY the schema field changes in the in-memory v2 plan. No request arg,
+token, window, source pin or original failed G fact changes. It parses ONLY
+already retained response0 through v2, preserving every row, duplicate/conflict
+and all primary-ticker owner relations, including shared/ambiguous cases.
+Per-case required-date/window links remain metadata, not a holding lifetime or
+eligibility revision. G's remaining queries are unexecuted and stay so; v2's
+network producer is not invoked. Current I source uses a bounded exact clone
+of G's pure F-lineage helper, not G's parent/worker, with AST equality proof.
+
+Action-family mapping is limited to exact publicly documented split, four
+acquisition-consideration, two SIC-change and two exchange-change labels;
+everything else remains unknown/raw privately. This classifies labels only,
+never security continuity, share conversion, cash payout or source authority.
+No verified ticker-change dictionary/direction exists in these static sources,
+so the documented ticker-change set is EMPTY and admitted-alias count is0.
+Each exact supported single contra token can be retained separately as a
+literal COUNTERPARTY metadata lead regardless of unknown action; it may be a
+venue, acquirer or different security and is not a ticker-change assertion.
+Opaque text stays verbatim/unsplit. All source rows and source-to-case relations
+are counted distinctly; no many-owner relation is mislabeled a unique security.
+Public output is only fixed aggregate family/interval/count labels, no private
+IDs/names/event dates/values. No automatic query, member choice, row dropping,
+source assignment, price book or selector is constructed from those leads.
+
+Permit ONE subsequent same-source native-denied stdin-only validator with
+externally observed parent0or2, exact host/HEAD/profile/source preflight and no
+DATA/control read. Actual0/child0 plus matching authenticated observation is
+required; failure/unknown use is spent, no unchanged retry or old acceptance.
+The standard300s/own5sreap/bounded-output and startup/uninterruptibleIO/host-
+suspension qualifications remain. QC/Safari hold335.17 is absolute until owner
+release, even if metadata succeeds. Floor338/259/54/699 remains unchanged.
+
+I335-015(P2 pre-use output consistency correction): conflict counts could exceed
+repeated rows, or per-case counterparty-link totals could contradict distinct
+source-row counts. New invariants require conflicts<=repeats and all literal
+source rows covered by at least1/at most5case-owner links. Producer already
+computed correctly; forged-output tests now enforce it. Root282focused passes
+1.92s:49I+131v2+102documents, source/profile/native pins match and both I files
+compile in memory; no full suite. Author49passes0.44s and43/46/48subsets overlap,
+no author failures. A final profile-only addition bound G's actual failed
+freeze/source/profile/report/status facts; root tested that final tree.
+Finally-restored F-lineage and false-alias omissions each caught one expected
+failure. Same-round source audit is advisory, not independent review. No actual
+I DATA/control read or new provider request occurred at this freeze.

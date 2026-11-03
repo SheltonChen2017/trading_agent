@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–335 retain the milestone, review, preregistration, QC
+strategy. Sections 1–336 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -1293,6 +1293,9 @@ claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
 
+Section 336 records the owner's later continued identity/price/REMX recovery request. The owner explicitly waives Claude review of section 336. QC and Safari remain entirely off limits. New work addresses original cross-table ownership, normative generic action definitions and the dated fractional-volume hypothesis under separate committed one-use contracts; it does not replay old claims or clear any identity/price gate before actual evidence. Section336 owns the current decision, validation, result and final-push handoff.
+
+
 Sections 137–142 retain the owner-assisted cloud diagnoses, project cleanup,
 and mutable QC 79/81 source comparisons. Their `Completed.` statuses do not
 authenticate historical source or create lane result cells. Sections 143–145
@@ -2576,7 +2579,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–335
+findings, outcomes, and per-run accounting remain in numbered sections 1–336
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -73469,3 +73472,226 @@ source or behavior defect follows from those two EOF blanks. This limitation
 does not clear any source/readiness gate. Final exact-document repeat, root/
 branch/HEAD/status, remote-baseline and commit-count checks precede the one
 push; source tests need not be repeated after this document-only change.
+
+
+## 336. Continued offline identity, price and REMX recovery, 2026-11-03
+
+### 336.1 Owner scope, exact baseline and decisions
+
+The owner directs: "Continue resolving the identity bindings, missing prices
+and REMX anomaly. Keep QC and Safari off limits, skip Claude review, document
+progress, and push once when done." This continues the research-only data
+work and supplies the current review waiver; no independent acceptance is
+claimed. No QC/Safari observation/API/capacity/project/privacy/source/compile/
+job/result, broker/funded/real-order/paper/live action is allowed. No shared or
+other-lane file, job, project, session or control can be changed.
+
+All repository work remains ONLY at
+/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2 on
+codex/strategy-analyst-revisions-v2. At start, local HEAD/tracking/live matching
+remote were372019d5e275248fe41bad000e638479f8cb7a0b and worktree clean. No new
+Claude push is present. Preserve concurrent work, verify exact root/branch/
+HEAD/status before edits/commits/push, and make ONE final nonforce matching
+push for this whole concluded round. Shared/root records stay frozen; this
+lane record is the branch-local handoff. Floor338shared/259development/
+54infrastructure/699cells remains until an actual accountable event; current
+offline work is not such a look/cell event.
+
+Section335 remains exact history: A/B/C/G failed and spent; D/E/F/H/I/J each
+passed once for their narrow observation scopes and are spent. Existing
+source/security bytes, refusal records, USB originals, four incomplete/absent
+stock envelopes, five identity stops and all false readiness flags remain.
+No ordinary retry, old FIGI request, raw-price existence request, source-pin
+refresh, date/universe/economic change or selector around a source stop is
+authorized by this continuation.
+
+New delegated decisions are specific and prospective:
+
+|Decision|Purpose and limits|
+|---|---|
+|ARV2OD336-K|Read exact retained I DATA plus J dictionary/transport under a new guard/claim to create a bounded GENERIC schema-documentation packet. Generic indicator/title/definition prose is normative metadata, distinct from private instrument market rows. Emit no I ticker/name/date/value/identifier, row ordinal, case association or event frequency. Exact joins retain missing/conflicting definitions; explicit review of the actual normative meanings precedes any code rule. No automatic prose classifier, alias, action/payoff application or source admission.|
+|ARV2OD336-L|Test the NEW fractional-reporting temporal/precision hypothesis on the exact unchanged raw REMX member. Preserve20 anomalous ETF-era source records privately; report only fixed timing/precision counts. The documented2026 fractional-feed capability is not proof of FirstRate feed lineage, correct units or valid prices, and is not an integer-policy waiver. No rounding/normalization or adjusted-price substitution.|
+|ARV2OD336-M|Investigate ORIGINAL full-catalog cross-table ownership for the fixed five original bindings. Reproduce the original SF1 rows against the exact retained original TICKERS archive, compare all original stock/fund owners and selected current candidates, and distinguish physical-row multiplicity from exact identifier consensus/conflict. This unspent original-ownership question differs from spent current FIGI hierarchy mapping. No original binding rewrite, fuzzy name/ticker rule, new provider request or automatic identity/price route.|
+
+Every actual private/USB use requires its own exact source/profile/host/clean
+HEAD/claim/normal-guard-return/output/actual-exit freeze committed BEFORE use.
+No new control has been inspected or allocated at this decision point. All
+pytest/mutations/private parsers use native remote-network denial, in-root
+support paths, -B/noautoload/--noconftest/no cacheprovider; synthetic tests also
+deny production artifacts/USB/BOTH-Keychains/security CLI. No full Codex suite.
+All raw instrument rows/credentials/exceptions remain out of output/Git.
+
+### 336.2 New evidence questions, before observing private results
+
+Original provenance is a concrete open question. The original input builder
+selected SF1 metadata and copied its FIGI into the binding. Prior checks proved
+that row's exact hash/schema, not that its instrument identity agreed with the
+same original snapshot's stock/fund tables. The prior I diagnostic explicitly
+did not reassess original full-snapshot CUSIP ownership. M therefore compares
+the exact ORIGINAL cross-table evidence, preserving all candidate/poisoned
+owners, rather than rerunning a negatively observed current OpenFIGI equality
+or shopping for a better-looking display ticker. A matching perma/CUSIP alone
+does not override changed FIGI/share-class or global-collision evidence.
+
+For REMX, FINRA's January14,2026 notice sets February23,2026 as the effective
+date for NMS fractional-share reporting enhancements, including quantities
+with up to six decimal digits. CTA CTS v2.11b describes a fractional
+consolidated end-of-day summary and fractional total volume with six implied
+decimals. These are feed/schema facts, NOT proof that any of the20 FirstRate
+rows uses that feed. L will preserve exact Decimal digits/exponents and count
+anomalies before/at/after that boundary and on/off the exact1e-6 grid. This
+distinguishes a plausible new unit convention from an unsupported generic
+integer-only assertion; actual FirstRate provenance still must be established.
+No private temporal/precision result has been observed yet.
+
+Primary sources: FINRA
+https://www.finra.org/sites/default/files/2026-01/Trade-Reporting-Notice-20260114.pdf
+and CTA https://www.ctaplan.com/publicdocs/ctaplan/CTS_Pillar_Output_Specification.pdf
+(sections6.6.4 and7.0 Fractional Total Volume). FirstRate's adjusted-volume
+FAQ does not by itself explain RAW volumes. Original323 old-ticker rows stay
+quarantined; existing Sharadar fund routes remain selected and all FirstRate
+REMX/input/close-convention gates remain unresolved pending actual evidence.
+
+
+### 336.3 D1 exact combined K/L/M source and one-use run freeze
+
+Root verified the held final bytes and public profiles; all eight new files
+compile in memory and have no trailing-whitespace/extra-EOF defect:
+
+|File|Bytes|SHA256|
+|---|---:|---|
+|scripts/inspect_arv2_r336_action_definitions.py|45372|b2843b6354bc8def875a1a26f21f1186ed951bad214b88e2124f9270cb77d37a|
+|tests/analyst_revisions_v2/test_r336_action_definitions.py|26030|09838bbeec907892adfb6a219dc132ec0962bedc79283d1c43c72a449a16ee29|
+|scripts/inspect_arv2_r336_remx_fractional.py|40279|7726576cb34ff03953ae5196509b6d889dfa0cc4218b0a3430f92edc06d28b59|
+|tests/analyst_revisions_v2/test_r336_remx_fractional.py|20670|2dc70be727334b6c933a6aff618a37621ae03b98d11c61238ba9bfbbc6282980|
+|scripts/arv2_r336_original_identity_ownership.py|32418|e0e829c662c5dbc7c1a1e95f720db0e87e0725f3f3d428b3b785d991b55bef5b|
+|scripts/arv2_r336_original_ticker_security.py|13173|d2ca80e67b51e79df443a5d6dee192ce15632ddbb64cfe4045d7219cc42de5c2|
+|scripts/inspect_arv2_r336_original_identity_ownership.py|34303|6119bba36a9706beb6772e87fe9af9d4f2e7d2b30998357d2237a093420af413|
+|tests/analyst_revisions_v2/test_r336_original_identity_ownership.py|26186|dc4938c224bcb3081be47079e0d3e9e0b4f56e13c335feaa8f4215958b3fb674|
+
+|Profile/policy|Bytes|SHA256|
+|---|---:|---|
+|K canonical caller profile|3569|e1cde9efbfbbcdf17045de236d2c689832d645124453628502712d1acdeeec78|
+|K native worker policy|2481|9a08526c6e820e3cb9d9b989324f978220d5fbfd3da580ae40a9433d47680b58|
+|L canonical caller profile|4084|d5b81de9ee23c9b797c37a4590db05a0b0985efa1f56b25eb9364a2c69b0d0f2|
+|L native worker policy|2099|8af6cd3a48fcb88e745f3a509a7810ab494cf19e67301908519e1f6b02fda786|
+|M pure profile|2103|4cc2106e62fc02f3ba8eb9230f9625bcaa820ba12152c83c37b9e3efb76fd911|
+|M current vintage-security profile|1727|6b649ba67feddfeea6531ff8acaca7cbe8ef74608234f7608f7d95b922faaa8c|
+|M canonical caller profile|3610|ca2537935cac338943022e0d14e7e4c09853963f34f03c804fcece368b7385e9|
+|M native worker policy|2937|1e439c1d843c4bd7921bacb2abd0c622c99fee8bf77e45d42c27c998907718a6|
+
+Permit exactly ONE launch and then ONE stdin-only validator for EACH new
+K/L/M contract, serialized in that order, only after this exact decision and
+all final source/test bytes are committed clean in the designated root/branch.
+Each expected-head is that actual clean freeze; caller/profile hashes are
+the exact values above. No control has been inspected or allocated. Fixed
+new controls are firstrate/R336-20261103-K, firstrate/R336-20261103-L and
+identity_recovery/R336-20261103-M, all under artifacts/analyst_revisions_v2.
+No concurrent private reads, source changes or operational calls are allowed.
+
+K reads only335.23 I private-diagnosis126797B/abf7c0b602757a6c915e1d7d452ad5ff88901f7c619b33aaee638ead6c7bbb7d
+and335.25 J response50967B/ad3acf93fedbdf7f4bd3af47ca7347beca615358a1736382360ba048ebfb415f
+and transport336B/a2aa22f2b22275f4972594b4dc2661569df2786844bd298b47070278db9c4dc2.
+It binds J's observed capture-receipt digest, exact table/header/schema and
+all33 original I rows before reducing their code set. ONLY dictionary-matched
+generic indicator/title/full-definition records and provenance/counts may
+leave the worker. Unknown unmatched action text remains private and only a
+missing count is emitted. No I row/case/frequency/date/ticker/name/value/ID
+association is exported. All matching generic duplicates/conflicts remain
+explicit; no heuristic interpretation or automatic economic/identity action.
+Packet<=64KiB, field<=16384characters and at most33 definition rows; exceeding
+a bound refuses the complete observation rather than truncating semantics.
+K parent exclusively claims/fsyncs before its single inherited-claim/intent
+native worker; the worker's exclusive marker prevents repeated dispatch.
+150s parent/90s worker/30s validator and own5s reap retain uninterruptible-I/O/
+host-suspension/startup limitations. The FixedDataGuard must RETURN normally
+before generic documentation publication. Native worker denies all network,
+USB, BOTH-Keychains, security CLI and unrelated artifact access.
+
+L freshly authenticates ONLY the unchanged335 USB manifest327907B/c681af584244d38e3f9dea2ff765cc2c991cb383107a3e542115a4338ee4cdf8,
+ETF listing355087B/4532194e351a00a51b0e379b4df86f20bd92aa9a98f8110f81ff9d90c112f559,
+R RAW ZIP5532476B/5730923356aac1b3ffedb7603fe60c2a7882eb2d43ae41a6b6bdc2a8ce3cd45e
+and REMX member181222B/b8c54990689501ddc55183e6bb28c8eb7cd47a8817c04153480a6ef613b1de5e.
+No stock archive, adjusted member or old control is read. Pinned D is reused
+only for parameterized held-file/archive/listing/timestamp/number helpers;
+no old worker/preflight/Store/inspection/profile or v1-v4 operation is called,
+and no frozen globals are patched. ZIP bytes authenticate BEFORE ZIP parsing;
+all4339 rows and exact323/4016 eras are revalidated, then20 fractional ETF-era
+source records are preserved privately including original terminators.
+Exact Decimal tuple arithmetic counts effective precision and micro-share
+grid membership without rounding/normalize/context-dependent multiplication.
+Native network/Keychain/security denial and USB write denial hold throughout.
+A new exclusive claim and normal return of source/helper guards precede own
+private/report publication. Parent/worker300s, validator30s and own5s reap
+retain the same I/O/host/startup qualifications. The FINRA separate fractional
+field does not replace its still-integer Quantity field, establish FirstRate
+lineage or waive that vendor's RAW contract.
+
+M reads ONLY four exact original retained DATA leaves:
+original capture manifest5998B/94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b,
+marker65B/1f57ad2bcf9aaff1fe9c9fdcff5a281043ad348c3bb596ce778f02ec34e0626f,
+01-tickers-years-full.zip4937076B/a7b129f159631ee50f1eefd2be8d4215c1c7818880570c0ad0a79c76c25e51bf
+at sharadar_capture/arv2-sharadar-source-20260914T003329843989Z;
+and newrule_available_history_identity/R327-20261027-I/identity-demand-private.json
+4984462B/c85ae5ddf2e918d194f6aa2939ee1249229d0989f75c334ef92ea793b61b711d.
+No ACTIONS archive, provider request, USB or old controls/readers are invoked.
+The full TICKERS member24939614B/562577ea331805c4d50229b783e37216c9422c09d921b17dc950cf267ecf7697,
+header291B/c9186ed191f4e51d5142287016dc99e3f80ecebed49aa63c3fa1ecf09e5d26f7,
+74150rows/28fields, ordered columns1162197271c19a530482df5e6accf7e1fe22b14e14b668c29b978b4daae5d824
+and ordered row stream e22569077935c73678c1d389535f98d9bb9d07fd3c6765d2a9161f86d591d54b
+are all checked before ownership comparison. Per-row and digest-stream hashes
+use ORIGINAL UTF8/ensure_asciiFalse JSON WITH LF; ordered columns use the
+separate old route ASCII/no-LF envelope serializer. No pin is refreshed.
+The private result preserves selected complete physical rows and all exact/
+poisoned ownership links; public output is only fixed five-case/count/predicate
+matrices. Identical physical rows remain distinct observations, not an excuse
+to dismiss a different-security collision. Both original and current DATA
+guards must RETURN normally before private/report publication.
+
+M's new inert original guard preserves the frozen reference guard's
+SourceGuard AST and exact vintage directory xattr names/sizes/hashes, native
+empty ACL and ten-field held/named checks. Only the dependency-unwrapped names
+census differs, retaining bounded SHOWCOMPRESSION/full names and strengthening
+current metadata equality around it. The original three leaves are not forced
+through an inappropriate ordinary-xattr waiver. No historical device/ctime
+projection or old snapshot/assessment is called; fresh equality does not prove
+historical preservation. Selected source bytes are compiled from held pins;
+this is not whole-interpreter integrity. M parent/worker300s, validator30s,
+own5s reap and native all-network/USB/BOTH-Keychain/security-CLI/unrelated-
+artifact denial remain mandatory.
+
+Every sole validator uses the externally OBSERVED parent0or2 and original
+bounded stdout via stdin after exact host/clean HEAD/self/profile bootstrap;
+it reads no DATA/control and cannot grant another use. K/M/L require actual
+parent0 AND child0, canonical source-bound worker/report pins and normal guard
+return for completed observations. Nonzero/unknown/trailing/malformed output,
+late publication/source/marker refusal or ambiguous claim is inadmissible/
+spent even if a retained report says accepted. No unchanged retry, cleanup,
+marker repair, pin refresh or original binding/source admission follows.
+
+Pre-use corrections, all retained prospectively:
+
+|ID|Priority/status|Verified issue and correction|
+|---|---|---|
+|I336-001|P2 corrected|K registered measured child facts only after marker adoption. Measured actual exit/stdout/stderr now survive a late marker refusal; direct regression and omission prove it.|
+|I336-002|P2 corrected|An unmatched I action string was not proven generic documentation and could have leaked private text. Only dictionary-matched codes/prose are exported; unmatched text stays private, with distinctive-marker leak regressions.|
+|I336-003|P2 corrected|New L/M launch modes inherited a parent-alarm omission. Both now arm actual parent SIGALRM before preflight/dispatch and keep finite evidence/own-child cleanup; tests reach live timers and handlers, rather than an earlier environment refusal. Old used callers stay frozen.|
+|I336-004|P2 corrected|M's ordered-digest stream used no-LF JSON, unlike the actual original serializer. An initial fixture mirrored that error. Independent public-source comparison caught it; the new serializer/regression checks the actual frozen UTF8+LF function.|
+|I336-005|P2 corrected|M caller clone omitted Refused and retained undefined failure globals; its validator initialization was incomplete. Direct finite-failure/CLI/fresh held-source bootstrap checks now cover these paths; no private use occurred before correction.|
+|I336-006|P2 corrected|M pure budget admitted +infinity and summary invariants admitted contradictory consensus/SF1/poison/tuple counts. Explicit finite<=300s budgets and strict cross-invariants/regressions correct them.|
+|I336-007|P3 corrected|An unnecessary physical-row uniqueness refusal was inconsistent with observing duplicate metadata. Exact source pins/row stream authenticate contents; all physical rows are preserved/count separately without identity acceptance.|
+
+Root329distinct focused passes:235 in2.69s (83K+66L+86record/doc) plus94M
+in0.29s, no failures/skips/warnings. Eight in-memory compiles and all selected/
+profile/native pins match; native isolation and no dispatch_fence asserted.
+No full suite or actual private/USB operation occurred during validation.
+Author83K/66L/94M selections and all earlier subsets overlap, not additive.
+Meaningful memory-only/finally-restored omissions caught K packet bound/
+worker pin/late marker evidence, L exact line retention/actual exit/parent
+alarm, and M stream LF/actual exit/parent alarm. M's initial64passes/2fails
+were one missing synthetic fixture directory and the REAL omitted Refused
+class; L's initial61passes/1fail was a synthetic pin-mutation fixture mismatch.
+All are preserved here. A copied-globals probe that failed for the wrong
+environment reason is not sensitivity evidence. Native child tests prove
+their scoped synthetic behavior under inherited denial, not whole OS isolation
+or operational market behavior. Same-round advice is not independent review.

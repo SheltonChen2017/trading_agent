@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–334 retain the milestone, review, preregistration, QC
+strategy. Sections 1–335 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -2383,6 +2383,14 @@ still precede any cloud repair or diagnostic launch. The first Safari
 observation shows another lane's project; it was left untouched while the
 owner is asked whether the shared resources are available. No operational
 source authentication, coverage result or strategy run is yet claimed.
+Section 335 records the later owner-directed FirstRate recovery: check the
+missing stock/date demand, resolve the mixed-era REMX source and use only
+validated prices before continuing all six matched cells. The owner explicitly
+waives Claude review of section 335. This supersedes334's source-preparation
+endpoint, but creates no automatic source/pin refresh, spent-protocol renewal,
+shared-resource lease or formal/PIT/paper/live clearance. The new source
+investigation stays offline until its actual source/identity/coverage gates
+permit a separately frozen QC submission.
 
 Section 328 is Claude's independent review of `3c905d42..0d38c59d`, the
 seventy-four Codex commits of sections 323 (Mac recovery) and 324–327.
@@ -2559,7 +2567,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–334
+findings, outcomes, and per-run accounting remain in numbered sections 1–335
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -71974,3 +71982,236 @@ Corrected document selection passed102cases1.09s, exit0, under the same native
 denial. Diff/status checks and a narrow added-document credential-shape scan
 passed; this scan is not a complete privacy proof. No additional operational
 action, look or cell followed. Final record-only checks repeat these cases.
+
+## 335. Owner-directed FirstRate price-source recovery, 2026-11-03
+
+### 335.1 Scope, exact starting state and prospective source decision
+
+The owner directs: "Proceed with FirstRate: check the missing stock/date pairs,
+resolve the REMX anomaly, and use the validated data to fix price coverage.
+Then continue the 6 and 8 universe backtests. Skip Claude review, document
+progress, and push once." This authorizes the bounded new source investigation,
+necessary qualified-research source implementation and later gated six-cell
+continuation without an interim Claude wait. It does not authorize a false
+source/identity/PIT claim, arbitrary callback, per-date fallback, paid-rights
+expansion, other-lane interference or funded/broker/real-order/paper/live action.
+All repository commands/edits/validation/commits/pushes remain exclusively at
+/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2 on
+codex/strategy-analyst-revisions-v2. Initial root/branch/HEAD/status and live
+matching remote verified clean381ae7ad54e35b05bc1ca6455abff7388e23c09d.
+No incoming Claude push is present. Accumulate this whole round locally and
+make exactly ONE nonforce matching-lane final push at the concluded endpoint.
+
+The prospective technical question is whether FirstRate's exact RAW daily
+series cover ALL of the five fixed native-binding demand envelopes, not just
+whether a favorable missing date can be patched. Same whole-binding assignment
+must apply for reference AND actual-held NAV across all six cells; unchanged
+5636Sharadar/510conditional-never/8fund roles remain unless a separate justified
+whole-role source decision is recorded. Do not disguise FirstRate rows as the
+old QC-native book or Sharadar shards. A source-evidence epoch/profile/result
+must distinguish any accepted FirstRate successor from original W5. The same
+2021Nov01..2026Oct13 geometry, firstprior2021Oct29, emptyUSD1m start, original
+rating/selection construction, signed bid/ask execution, split/cash/actions/
+fee/fill checks and owner max(ask,enginePrice) cash bound remain required.
+No source substitution or strategy deployment has yet occurred.
+
+Current public records contain only QC-book valid counts, not the exact list
+of its absent dates; that book remains QC-only. Accordingly an offline scan
+can validate FirstRate's complete five REQUIRED envelopes (432/417/302/417/718
+sessions,2286total) and potential references(90/87/63/87/150), but must not claim
+an exact native-book missing-cell comparison without reading that book under
+an admissible new contract. The historical2022Oct21 gap is before all five
+current first-required priors; it must not be falsely attributed to a current
+five-case missing observation or declared retroactively repaired.
+
+### 335.2 USB preparation, rights and REMX evidence
+
+The owner connected the FirstRate USB archive at/Volumes/SANDISK/firstrate.
+It is an ExFAT volume; no old native ACL/xattr/device/ctime waiver applies to
+it, and no historical custody or whole-disk authenticity claim is made.
+All parser/fingerprinting work uses native network denial, USB write denial,
+both Keychains/security-CLI denial and in-root temporary/cache paths. No API
+access file, customer URL, token, raw price/volume row or private company
+identifier is printed. Manifest URLs are never emitted or followed.
+
+Preparatory exact regular-file/nofollow/held-and-named endpoint fingerprints:
+
+| USB relative source | Bytes | SHA256 |
+|---|---:|---|
+|manifest.json|327907|c681af584244d38e3f9dea2ff765cc2c991cb383107a3e542115a4338ee4cdf8|
+|market/Stocks_Complete_10_000+_Tickers/Ticker_Listing.txt|889580|584718095d81d576af0f83d6f31d5cda565e59ea2c6677e5b164e0db39e93464|
+|market/ETF-Complete_5000+_Tickers/Ticker_Listing.txt|355087|4532194e351a00a51b0e379b4df86f20bd92aa9a98f8110f81ff9d90c112f559|
+|market/Stocks_Complete_10_000+_Tickers/Read_Me_Documentation.txt|1839|65488a86ad567ab432be31f86935445888cc41c1aaf8afb8f9d2dd49191fa5a1|
+|market/ETF-Complete_5000+_Tickers/Read_Me_Documentation.txt|1837|eb09be54bf112b0395e255407056285e455f80f34e845f6f9ba2f1fb60653ef4|
+
+These are current preparatory byte pins, not an authenticated vendor signing
+root or an actual R335 diagnostic. Download-manifest MD5 values can detect
+local copy mismatch when the exact manifest is pinned; they do not prove
+historical availability or independent vendor completeness. No bulk raw-data
+copy or private original I DATA read has occurred during this preparation.
+
+FirstRate's current published license permits private analysis and service
+providers hosting/processing on the subscriber's behalf, forbids raw-data
+redistribution and allows corrections without notice:
+https://firstratedata.com/about/license. Existing owner-provided access/data,
+not a new purchase, is the research scope. The current FAQ distinguishes
+official daily exchange series from intraday aggregation, acknowledges
+incomplete delisted coverage and ticker-history merging, and covers splits/
+dividends rather than merger/spinoff cashflows:
+https://firstratedata.com/about/faq. These limits remain material; daily trade
+bars cannot replace genuine signed execution quotes or prove terminal payoff.
+
+REMX raw member181222bytes SHA256
+b8c54990689501ddc55183e6bb28c8eb7cd47a8817c04153480a6ef613b1de5e
+contains323rows2005Jan04..2006Jun30, then4016rows2010Oct28..2026Oct16.
+The provider's ETF listing begins2010Oct28. VanEck's official inception is
+2010Oct27. A primary SEC release identifies RemedyTemp(NASDAQ:REMX) and an
+acquisition expected effective2006Jun30:
+https://www.sec.gov/Archives/edgar/data/1013467/000110465906044477/a06-14692_1ex99d1.htm.
+This strongly supports ticker-reuse contamination; no vendor merge process or
+row-level attribution of every early price is proved. A second SEC XML fetch
+was unavailable at the root; its child-reported issuer/symbol observation
+remains separately qualified. No contact to the vendor or any other chat.
+
+Prospective correction: preserve the full original member and explicitly
+quarantine the EXACT323-row prefix in the new provenance contract, retaining
+the4016-row ETF segment unchanged. Require exact raw pin/counts/boundaries,
+not a generic date filter or silent row drop; unexpected partition changes
+refuse. All1243required2021Oct29..2026Oct13 session dates lie in the later
+segment. This resolves the proposed interval boundary only, not each price's
+truth or permanent identity. Existing Sharadar REMX source is not changed merely
+because this alternate file is now understood.
+
+Same-round child qualification: after a narrowed pure-policy assignment said
+no further actual USB read, the REMX child made one additional read of this
+same181222-byte member to classify its4339 date-only timestamps. No rows/prices
+were printed, no writes/contact occurred. It is retained as preparatory
+forensic evidence, not a claim of zero additional reads or a separately frozen
+operational R335 result. Same-round advice is not independent review.
+
+### 335.3 Implemented bounded inspection and pre-use corrections
+
+Three new modules, all uninvoked at this paragraph's writing:
+
+| Source | Bytes | SHA256 |
+|---|---:|---|
+|scripts/arv2_r335_remx_identity.py|7704|8f124b390a3f81a0f50354d99f34b12d4c1cd8d5d2270661e58da5da4fefae63|
+|scripts/arv2_r335_firstrate_prices.py|14015|53a136d12f5e2979cfbec6395e57923078a398316fb6bab0678fb50db79d3868|
+|scripts/inspect_arv2_r335_firstrate_coverage.py|49762|4f600f3633b9fda42a7b32abf6d9f8ef35a8b9c000ba5c14631c1e7011b20197|
+
+The first module is an immutable supplied-metadata REMX declaration, not an
+actual source reader. The second checks full supplied member bytes/hash before
+decode; requires headerless ASCII six-field rows, consistent LF/CRLF and
+date-only/midnight representation, unique ascending ISO dates, finite positive
+Decimal OHLC relations and integral nonnegative volume. It retains the full
+original bytes/rows and an explicit323-row REMX quarantine view. Public coverage
+is counts only; date gaps/rows remain opaque private processing values. Copies
+of the frozen series cannot forge rows, offsets, alias types or a partition:
+private/coverage access reparses and rechecks against original bytes. No I/O,
+source identity or price admission is supplied by the pure parser.
+
+The new caller's separately versioned claim is fixed at
+artifacts/analyst_revisions_v2/firstrate/R335-20261103-A, UNALLOCATED and not
+inspected before this freeze. Its ONLY original private DATA input is
+artifacts/analyst_revisions_v2/newrule_available_history_identity/R327-20261027-I/identity-demand-private.json,
+4984462bytes SHA256
+c85ae5ddf2e918d194f6aa2939ee1249229d0989f75c334ef92ea793b61b711d.
+The public I anchor matches that exact plan. It is a fresh new consumer of
+retained DATA, not a replay of I, an old control/report/claim read or fresh
+genuine whole-package authentication. The five fixed whole-binding commitments,
+period1243price/259decision axes and required envelope/reference geometries
+are rechecked from those authenticated bytes. No exact missing QC-book dates
+are reconstructed or claimed; no native book is read.
+
+Before any repository import, stdlib-only current public-source/namespace
+checks bind the five selected exact files. After exclusive/fsynced claim, the
+unchanged fixed DATA guard holds original descriptors/native security through
+computation and normal return. Exact USB manifest/listing pins bind allowed
+26current raw-daily stock archives, six delisted daily archives and one REMX
+archive. Only exact original-ticker or original-ticker-DELISTED member names
+are candidates; neither fuzzy alias nor favorable-date candidate is admitted.
+Pinned local manifest MD5, held container SHA256, ZIP-member CRC and member
+SHA256 authenticate current bytes at their stated scopes, not vendor history.
+Candidate absence/ambiguity remains finite evidence. The private diagnosis
+retains candidate names/listing matches/date gaps; it publishes NO price marks.
+USB/source guards must all return normally before the new private diagnosis
+and bounded report are published. Output uses original/named directory/file
+FDs, native security and exact own names/modes/owner/single-link checks.
+
+| Issue | Priority/status | Correction before any operational use |
+|---|---|---|
+|I335-001|P2 confirmed; corrected|A frozen DailySeries could be copied with forged rows/offsets and report false completeness. Reparse supplied bytes and enforce exact values/types/partition before private/coverage access; constructor-copy regressions catch forged dates, close, NaN, bool volume/offset, integer-price and alias mismatches.|
+|I335-002|P2 confirmed; corrected|Initial output store held only its final directory and could follow unchecked ancestors. Full nofollow original/named ancestor FD chain, controlled own mkdir accounting, exact own-file census and UID/mode/nlink/security verification now precede source reads/publication.|
+|I335-003|P2 confirmed; corrected|Initial parent would discard a worker2 finite reason as generic child_failure. Closed failure packet now retains finite reason/stage/case ordinal/parser code, observed actual2 and stdout pin; parent remains2 and validator accepted=false. Failure is never reclassified as source success.|
+|I335-004|P3 confirmed; corrected|Dict numeric equality accepted bool/int aliases in REMX counts/flags and stderr count. Strict exact integer/boolean type checks replace equality-only acceptance.|
+|I335-005|P2 confirmed; corrected|Production listing decoder used unsupported utf8-sig. Initial author38passed/17failed3.31s exposed it; corrected to utf-8-sig, with real header/BOM functional coverage. This was a production typo, not a fixture-only failure.|
+
+Root pre-use final focused selection:326distinctpasses4.21s, exit0, no
+failure/skip/warning:77REMX+84parser+63caller+102record/redaction/active-document.
+All tests used native all-network/USB/production-artifact/BOTH Keychain and
+security-CLI denial, disabled plugin autoload, --noconftest --ignore=artifacts,
+-B/no cacheprovider and in-root support paths; dispatch_fence asserted absent.
+Six files compile in memory without bytecode; all five selected public caller
+pins match disk and its I-plan equals the original public anchor. Earlier
+root263passes1.37s and author subsets overlap, not additive. No full suite.
+
+Author final REMX77passes0.08s, parser84passes0.10s and caller63passes2.90s
+overlap the root selection. Restored memory omissions detected exact partition,
+frozen-result construction, expected pin before decode, raw/row binding, full
+REMX declaration boundary, missing-count computation, actual-exit enforcement
+and finite-parser-cause retention. One attempted omission of only the inner
+REMX validator did NOT fail because its constructor independently revalidates;
+it is invalid mutation evidence, replaced with the full declaration omission.
+All source hashes restored/unchanged. The caller's actual2 synthetic subprocess
+validator retained row_shape and accepted=false; no operational DATA was used.
+
+Test pins: REMX9850bytes/
+76c596197ba07038b70a1489625109543505b10011f438f4a4a4f89cf61c9e95;
+parser13912bytes/
+d23b17959f872e57a58e9bab4c8bc1b37ec7fb227facb2963b995d748f9b7178;
+caller23856bytes/
+e0361fcc16537fd41309be706de0ec2e0ace206898853a1fa40b4efc7bac7362.
+
+### 335.4 D1 exact offline first-use decision
+
+Under the current explicit owner waiver/delegation, invoke the new A parent
+ONCE, only from the clean committed designated root/branch snapshot containing
+this freeze, using the designated Darwin/POSIX Python3.13 executable
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python with -I -B. The actual
+CLI expected-head must equal that observed clean HEAD; caller pin is the exact
+49762byte hash in335.3. Canonical profile5898bytes SHA256
+931305160c81375891c028c3800196e5ccfde4254dc5beae86dd6d1637714d73;
+native child policy6967bytes SHA256
+7d5c89e81c49f90c2c330f9682a7b8a510a588047a95b4544d59870253a12b35.
+These are source/protocol bindings, not authorization booleans or independent
+acceptance. No profile/pin is refreshed at runtime.
+
+The stdlib parent starts a single native-network-denied worker via an inherited
+intent pipe and an explicit credential-free environment. The worker claims/
+fsyncs before the selected I or USB DATA; no credential/provider/QC/Safari call
+exists. Native policy denies all USB writes, Keychains/security CLI, pyc reads
+and every nonselected old artifact. Only the new control and in-root support
+writes are allowed. The300s deadline covers runtime preflight/worker/publication
+with own-child kill/reap(up to5s); uninterruptible I/O, host suspension and
+interpreter/stdlib startup before the entry deadline remain qualifications.
+Bound stdout131072bytes before accumulation; stderr is counted, never echoed.
+Partial claim, nonzero, timeout, malformed/mismatched/unknown outcome consumes
+or ambiguously spends this use; never rerun unchanged or repair its outputs.
+
+Conditional on actual parent completion, pass its ONLY returned bounded JSON
+envelope plus the EXTERNALLY OBSERVED actual exit(0or2) to one separate native
+all-network/USB/artifact/Keychain-denied validate invocation of this same source,
+with the same source/profile/HEAD arguments. It reads supplied stdout only,
+no control, DATA or USB file. Actual parent0/child0 plus complete authenticated
+result is required for successful coverage observation. Actual2 with an
+authenticated failure remains2/accepted=false. No report alone fabricates a
+successful process exit, source admission or price replacement.
+
+This justified no-order diagnostic is source/date/representation evidence,
+not strategy performance. It creates no QC look, result cell, new paid right,
+formal/PIT/master/paper/live flag or source assignment. Booked floor remains
+338shared/259development/54infrastructure/699cells until an accountable event.
+After actual evidence, choose only a coherent new source/provider/transport/
+run continuation whose remaining identity, complete-demand, valuation,
+processing, privacy, ownership/idle/capacity and attempt gates genuinely pass.
+Do not stop for routine review acknowledgment, and do not bypass a source stop.

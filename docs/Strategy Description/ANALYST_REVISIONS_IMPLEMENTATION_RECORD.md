@@ -73164,3 +73164,147 @@ freeze/source/profile/report/status facts; root tested that final tree.
 Finally-restored F-lineage and false-alias omissions each caught one expected
 failure. Same-round source audit is advisory, not independent review. No actual
 I DATA/control read or new provider request occurred at this freeze.
+
+### 335.23 Actual I retained-event association; coverage remains blocked
+
+At clean freeze108fce4e0cea38e45fb1587095be1ce6e699f148, the sole I parent and
+native worker exited0, with no worker stderr. The sole native-denied stdin-only
+validator, supplied externally observed parent0, exited0 and authenticated the
+matching completed observation. I and its validator are now SPENT/frozen; no
+control reread, repair or unchanged retry is permitted. Worker6949bytes SHA256
+1ad72406c383ef18350fc33f280793c0cb1aa40bc8b31d997b30c9272461fc2c;
+report6839bytes SHA256
+29bcde023699260cf0c975a6e2f4e8f75d20be39dc08b37038ab413540bb1af4.
+New DATA artifacts/analyst_revisions_v2/firstrate/R335-20261103-I/private-diagnosis.json
+is126797bytes SHA256
+abf7c0b602757a6c915e1d7d452ad5ff88901f7c619b33aaee638ead6c7bbb7d.
+The exact leaf name was verified against public source, without reopening it.
+
+All four planned F/G DATA leaves authenticated and both source guards returned
+normally before publication. The original443-byte G plan a091a39da8e26905b9a6aa6833c0e7b9c4dc655797045b799d7f14a6347e6c40
+became an in-memory443-byte v2 plan e7d694685176e94ba699a040eab190f4a3d9e5948fd0c66275b977a763f22025
+by the declared schema-only projection. This did not invoke v2's network
+producer, complete G's request plan or accept G's failed attempt.
+
+The retained body contains33 parsed rows/33 distinct six-field primary keys,
+zero repeats/conflicts, and33 source-to-case links: case ordinals0..4 have
+7/4/0/10/12 events. Every row has exactly one current explicit-lead owner;
+there are no shared or unmatched source rows. Exact publicly documented labels
+classify1 acquisition-consideration event and4 industry-change events;28 remain
+unknown. There are24 literal-counterparty source-row leads and9 opaque nonempty
+counterparty fields, all preserved privately. No counterparty was admitted as
+an alias, no ticker-change direction was inferred and admitted-alias count is0.
+Case2's zero events is an observation of this bounded subset, not proof of no
+corporate actions or a complete history.
+
+Case0 has no recorded missing dates. Case1 has no event exactly on a missing
+date; case3 has5 such event links; case4 has18 links across its two candidate
+gap sets. These are temporal metadata relations, not repaired prices, eligible
+holding periods, share-class continuity or terminal payoffs. All33 rows and
+unknown labels remain in private evidence; no row was dropped or normalized.
+FirstRate still covers only one of the five complete required date envelopes.
+The four incomplete/absent bindings, independent identity, exact close convention
+and production reader/price-book admission remain open.
+
+No provider/Keychain/USB access followed G. No QC/Safari/capacity/project/job or
+strategy action occurred; the owner's335.17 QC/Safari hold remains absolute.
+Booked floor338shared/259development/54infrastructure/699cells is unchanged.
+All PIT, formal admission, readiness, paper/live and financial false flags stay
+false. Root102document checks1.17s before I overlap the existing selection.
+Next useful step is one separately frozen current action-type dictionary
+observation, followed by an offline, evidence-bound interpretation of these
+unknown labels. It is not a repeat acquisition or an alias/price waiver.
+
+### 335.24 D10 exact J action-type dictionary observation freeze
+
+New source/test pins, verified by root against the held final files:
+
+|Source|Bytes|SHA256|
+|---|---:|---|
+|scripts/arv2_r335_action_types.py|26052|22c7d74679a44b33316a2b5facc1f678e73f131aaa443d6805ed1380885f9974|
+|tests/analyst_revisions_v2/test_r335_action_types.py|19469|b43294aa70a517f38fb68fc8ca825270d50589f77453687b0abf10adb53d8231|
+|scripts/run_arv2_r335_action_types.py|48986|2ae86b498e1b4e63696df7e7e15058e39c2a4a49a987dcc241670af2b88fcbc7|
+|tests/analyst_revisions_v2/test_r335_action_types_caller.py|29874|922691a05a1636e58891be9ca953fe9a0995ef712627e6d0370a31f15a25ac9a|
+
+Canonical observer profile2106bytes SHA256
+bccbea3345167e255fba90f61ed015326e35001654eff3002aeb45639bc88983;
+caller profile3019bytes SHA256
+5135fb286fb67feb820576957e041b44c42f3e8af2c49418907d1926fb7a40ee;
+native worker policy1884bytes SHA256
+0f342b1ac0aeed2bd35c91c6fd141921feda3e87cf5f424d8168460ab5a87abb.
+The selected security/Keychain source pins are frozen in the caller profile;
+selected held repo bytes are compiled directly, not loaded from repo pyc.
+This does not authenticate the entire interpreter or installed dependencies.
+
+Under the owner's current research/parser/price-recovery review waiver and
+existing personal Sharadar rights, permit ONE J launch after these exact files
+and this decision are committed clean in the designated root/branch/isolated
+Darwin Python3.13. Bind expected-head to that actual clean freeze, and self/
+profile to the hashes above. NEW control
+artifacts/analyst_revisions_v2/firstrate/R335-20261103-J has not been inspected
+or allocated. This is the first action-type dictionary observation: one static
+GET https://api.sharadar.com/v1.0/data/descriptions with only tablename=actiontypes,
+format=csv,limit=1000,skip=0,sort=indicator.asc plus the memory-only API key.
+No fields/date/years/bulk/status query, retry, pagination, fallback, old G query
+or price acquisition is authorized. The descriptions/FAQ primary docs establish
+this metadata table, seven fields and table=actiontypes; retained current data
+will not establish immutable history or independent security identity.
+Sources: https://sharadar.com/docs/descriptions and https://sharadar.com/docs/faqs.
+
+The parent claims/fsyncs before exactly one existing Sharadar login-Keychain
+lookup (20s bound), and performs at most one application dispatch with existing
+TLS/prepared-request/redirect/no-retry/credential-echo checks and30s HTTP timeout.
+Numeric status is retained before a failed-status refusal; a non200 body is
+never read by the application. A complete authenticated status200 body, at most
+512KiB, and finite transport metadata are retained before later close/parse
+failure. Physical request count remains null/unknown. No raw key, URL, exception,
+metadata row or security identifier is emitted. The opaque capture is discarded
+without public serialization; producer return is not dictionary acceptance.
+
+Only after session close and local key-reference clearing does ONE own native
+worker receive the original response READONLY descriptor and owned claim/intent/
+directory descriptors. This is not a claim of secure memory erasure. An exclusive
+started marker prevents repeated dispatch; native all-network/USB/BOTH-Keychain/
+security-CLI and unrelated-artifact denial applies. The worker reads no old DATA
+or controls and imports no Keychain implementation. It validates UTF8 CSV, the
+exact seven logical columns with explicit documented header-case aliases, exact
+table scope and strictly fewer than1000 rows. Opaque multiline/blank definitions,
+all duplicate/conflicting rows and original header bytes remain private. No
+dictionary definition is interpreted as an action, direction, alias or payoff.
+Only finite counts/pins enter the worker result. Guard normal return and original
+held/named/security checks remain binding before completed output.
+
+Parent150s/worker60s/validator30s bounds retain startup, uninterruptible-I/O,
+host-suspension and own5s kill/reap qualifications. Only own child can be killed.
+Claim consumption includes pre-contact failure; partial/unknown use is spent.
+Late failure may leave an accepted report with nonzero actual exit: report alone
+is never accepted. Permit ONE subsequent same-source native-denied stdin-only
+validator supplied externally observed parent0or2, exact clean host/HEAD/self/
+profile preflight and bounded original stdout; no control/DATA reread. Actual
+parent0, worker0, original canonical worker-stdout pin and all matching receipts
+are required for completed dictionary observation. No unchanged retry/cleanup/
+marker repair, G revival or downstream source admission follows failure.
+
+I335-016(P2 pre-use correction): after writing captured_body, a late guard
+failure tried to write a second terminal at the same exclusive name and masked
+the original finite cause. The new observer records one terminal and propagates
+late failure without a second journal write; three regression variants cover it.
+I335-017(P2 pre-use correction): a different internally consistent dictionary
+receipt could be substituted while retaining the original worker stdout pin.
+The final validator reconstructs the exact canonical worker packet with external
+run binding, body/capture pins and fixed flags and compares its original stdout
+pin. A forged-count regression and restored omission prove that boundary.
+
+Root287distinct focused passes2.37s (110observer+91caller+86record/document),
+four in-memory compiles, final selected/profile/native pins and diffcheck pass.
+Earlier root110observer0.27s overlaps; no full suite. Author201distinct passes
+1.22s and87/73caller subsets overlap. Meaningful memory-only/restored omissions
+caught actual-parent-exit, worker-stdout binding and alarm with one expected
+failure each; observer omissions caught external pin/header/late terminal/failed
+status body guards. Early copied-globals alarm/deadline probes failed for the
+wrong reason and are not sensitivity evidence. Tiny real-child FD/noise/finite2/
+own kill-reap checks ran under inherited outer native denial; they do not prove
+nested sandbox application. Actual J's native-worker policy must still apply.
+Same-round advice is not independent review. No J DATA/control/credential/API
+access occurred at this freeze. QC/Safari remain prohibited by335.17 regardless
+of J outcome; floor338/259/54/699 and every source/financial gate are unchanged.

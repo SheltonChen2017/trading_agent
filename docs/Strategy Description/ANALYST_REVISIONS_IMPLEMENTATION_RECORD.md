@@ -2389,8 +2389,11 @@ validated prices before continuing all six matched cells. The owner explicitly
 waives Claude review of section 335. This supersedes334's source-preparation
 endpoint, but creates no automatic source/pin refresh, spent-protocol renewal,
 shared-resource lease or formal/PIT/paper/live clearance. The new source
-investigation stays offline until its actual source/identity/coverage gates
-permit a separately frozen QC submission.
+investigation does not contact QC/Safari until actual source/identity/coverage
+gates permit a separately frozen submission. A needed provider-only discovery
+has its own exact source/rights/claim/deadline/contact freeze; metadata success
+does not clear coverage or strategy gates. See335.13–335.16 for actual FirstRate
+findings and the bounded corporate-action recovery.
 
 Section 328 is Claude's independent review of `3c905d42..0d38c59d`, the
 seventy-four Codex commits of sections 323 (Mac recovery) and 324–327.
@@ -72748,3 +72751,183 @@ each caused one expected failure. Same-round advisory audit found no additional
 material issue; not independent review. No F DATA/control read has occurred at
 this freeze. All financial/source/processing/current-identity/coverage/run/
 project/access/idle/capacity/attempt gates persist;338/259/54/699 unchanged.
+
+### 335.16 Actual F passed; gaps are not merely missing prefixes
+
+At clean freezeeb3a3d3ad3c6bc48ba0add1ce330584c01bc583a, sole F parent0/
+child0/no stderr and sole native-denied stdout-only validator0 authenticated
+the matching result. F/validator are SPENT/frozen, no control read or replay.
+Worker packet5251bytes SHA256
+f9c3c1c5707d1c1bd17f9b6203e8e33fb469f0f5934d8bdc775605a17f52a9ee;
+report5141bytes SHA256
+c87f59f8ff1c1eed330a6699c1c133d659734846f2fd7a38453db61d0da37f5d.
+New DATA artifacts/analyst_revisions_v2/firstrate/R335-20261103-F/private-diagnosis.json
+is87170bytes SHA256
+0e41dca1d48955f83bcd5dcb2ae6192d85d9cf9f9ff40593bceeb0b5a601ccab.
+It retains exact private missing dates and full original/current metadata,
+without prices, source assignment or any alias/continuity admission.
+
+Case0 has no gap. Case1 has73missing dates across25runs:33leading and40interior,
+no tail. Case2 has no candidate and one full417-date run. Case3 has151missing
+dates across52runs:35leading/108interior/8trailing. Case4's current candidate
+has46missing dates across3runs:13leading/1interior/32trailing; its separate old
+delisted candidate misses all302dates. A full missing run is both the leading
+and trailing run (417or302), not two additive sets of missing observations.
+The sparse interior and trailing gaps disprove any assertion that every E
+failure is explained solely by a newer filename's missing opening history.
+They do not by themselves prove a halt, delisting, corporate event or provider
+omission. Exact missing-price observations remain separate from actual target/
+holdings paths and terminal payoff; no metadata date is used to retire holdings.
+
+F retained16supported lead records (4/3/3/3/3 by case), not16distinct tickers.
+Exact listing relation counts3/2/0/2/2 and full-window relation counts3/0/0/0/0
+provide no additional complete-window listing lead for the four incomplete
+cases. Duplicated original/binding leads can refer to the same physical listing
+row. Current metadata is1row per incomplete case; relatedtickers remains raw/
+unparsed. Do not invent aliases, union files, fill a missing day or change the
+required window. No price/QC/provider/Safari/credential use followed F and
+booked floor remains338/259/54/699. Root102record repeat1.12s prefreeze overlaps.
+
+The next justified recovery is a separately implemented/frozen Sharadar ACTIONS
+observation under existing Prices access: current-vintage dated event evidence
+for only the canonical unique explicit F ticker leads, no price acquisition or
+strategy selection. Because the public docs document comma lists for ticker
+but not contraticker, choose ONE batch ticker query plus scalar contraticker
+queries for the SAME at-most16tokens (maximum17application dispatches), before
+use rather than silently relying on an unsupported filter. Fixed2023-11-01..
+2026-10-13, seven event fields, skip0/limit1000, each strictly fewer than1000
+rows/at most4MiB and aggregate16MiB; no paging/retry/fallback/new-token recursion.
+This window cannot exclude earlier events. Contra can identify an acquirer or
+different security; action values are not automatic aliases, cash payoff or
+share conversion. Preserve conflicting/duplicate event observations, never
+overwrite them to manufacture a unique source. Capture contract and exact
+source/current pins/credential/logging/host/deadline/claim/exit handling must be
+committed separately before any provider contact. No action call has occurred.
+
+### 335.17 Later owner QC/Safari hold
+
+The owner now directs: "do not access qc/safari until further notice. continue
+to build". This is a binding current hold: no Safari observation/action, QC
+API/capacity/project/privacy/source/compile/job/result call or backtest launch,
+including read-only capacity checks. Continue data/parser/identity work and
+offline construction toward the last pre-submission step. It does not cancel
+the FirstRate recovery or require replay of any spent operation. A separately
+frozen provider-only Sharadar event observation under existing rights can
+resolve a data prerequisite without touching QC/Safari. The six/eight strategy
+comparison stays pending until this hold is released AND all genuine gates pass.
+
+### 335.18 D7 exact provider-only ACTIONS G freeze
+
+New pure scripts/arv2_r335_sharadar_actions.py is31102bytes SHA256
+2d40d2c260a3fa2b484608df5ec43eaaad901848c345e1a60a215bf164c23d29;
+canonical2563-byte observer profile SHA256
+cc17301092d8f799e297f522db17297fc50288caada88a255cfdc38e3e177930.
+New scripts/run_arv2_r335_sharadar_actions.py is59132bytes SHA256
+2d23cfef4e3fb3fb890ef5f8868457de8c4bb402672fa08f6dcc618b57525df4;
+canonical4329-byte caller profile SHA256
+1ff19609d02ea284f4a04663e25aaef699db33e46c3f12c66083d6623b48a80d.
+This is the first bounded ACTIONS discovery, not a renewed price request,
+R287/R293 retry or old O/reference invocation. Existing owner-confirmed Sharadar
+Prices access and the published included-table scope support this qualified
+research request; no new paid right or routine access acknowledgment is sought.
+
+Under current explicit review waiver and255.2 delegation, permit ONE exact G
+launch after sources and this decision are committed clean in the designated
+root/branch/Darwin isolatedPython3.13. Bind expected-head to that actual clean
+commit, exact caller/profile above. NEW exclusive claim
+artifacts/analyst_revisions_v2/firstrate/R335-20261103-G is uninspected and
+unallocated. Launch in an empty allowed environment with all temp/cache support
+inside designated root, -I/-B and no secret environment/argv/file fallback.
+G claims/fsyncs before source/Keychain/contact. A native-denied worker consumes
+ONLY exact335.16 F DATA under fresh normal-return guard and derives at most16
+canonical unique explicit ticker tokens from the same five bindings. It never
+reads I/E DATA, their controls, USB, prices, native QC book or other lanes.
+
+Only after authenticated source-worker0/normal return may the parent perform
+ONE existing login-Keychain Sharadar lookup (at most20s), keep its key only in
+memory, and run the fixed request sequence335.16 using a fresh exact owned
+Session. TLS verification, exact prepared/response HTTPS host/path/query,
+no environment/proxy/cookie/hook or retry/redirect trust, identity encoding,
+bounded streams, credential-echo checks and safe logging/debug/environment
+guards bind every dispatch. This credential-bearing operational capture parent
+is separate from the all-network/BOTH-Keychain/security-CLI-denied source workers;
+do not weaken their policy or call the parent native-network-denied. Selected
+repo modules are compiled from held/pinned source bytes, not cached repo pyc;
+installed requests/stdlib are not whole-interpreter integrity. Event CSV parsing
+here is the declared provider-capture path, not an unfenced offline audit.
+
+The source/reauth native policies are each2021bytes, SHA256 respectively
+8f15770eb997ad0723d25ceeec086cb0e498215a19578c90f80c5dea2606ebfd
+and97f40b6dc4f46a064f6ee1cf083b25dbc906720df2ba7efc7dee11491c4cd836.
+Each worker exclusively/fsyncs its own stage-start marker before F read; claim,
+directory and intent capabilities are inherited/bound, not arbitrary callbacks.
+After network capture, a separate second F-only worker must return normally
+with the identical plan before acceptance. These endpoint observations do not
+prove continuous metadata/history stability across contact. Parent300s covers
+preflight/workers/keychain/contact/publication, each source child at most60s,
+with only own-child kill/reap (up to5s), finite131072-byte public/32768-byte
+worker channels. Interpreter/stdlib startup before entry clock, uninterruptible
+I/O and suspension remain qualifications. Failure/bound channel pins describe
+bounded observed output, not automatically complete streams.
+
+Each application intent/status/terminal event is exclusively retained; numeric
+status is journaled before failed-response refusal. No non200 response body is
+accessed through the application body interface or retained; this is not proof
+no transport bytes arrived. Complete credential-scanned status200 transport
+bytes returned normally by the bounded fetch are retained privately before CSV
+parsing, so later parse/reauth/publication failure preserves them. A fetch/read/
+close/secret-scan refusal can precede body retention; not every transient byte
+is claimed retained. No secret/raw exception/opaque return/URL/row is printed.
+Every query and conflicting/repeated event observation remains separate, no
+dedup overwrite, extra alias recursion, price acquisition or payoff synthesis.
+Application attempts are measured; physical provider_request_count stays null.
+
+Permit one subsequent same-source native-denied stdin-only validator supplied
+the externally observed actual parent exit0or2, without reopening G controls,
+F DATA or captures. Actual parent0 plus strict authenticated matching success
+is mandatory. Nonzero/unknown/malformed/partial/ambiguous actual use is spent,
+even if a late report exists or no request happened; never fabricate0/retry
+unchanged/repair evidence. Successful G is event observation only: no alias,
+share-class/permanent/PIT identity, price coverage, terminal payoff or strategy
+readiness is thereby cleared. Booked338/259/54/699 remains until a genuinely
+accountable research/QC event; these data-discovery requests launch no QC look.
+
+Pre-use findings: I335-010(P3 root false alarm/corrected before use) the root
+misread contraname as nonkey; official table marks it part of the SIX-field
+primary key. Restore the author's initially correct six fields (all except
+value), test distinct contraname keys and same-key conflicting values, retain
+all rows. I335-011(P2 corrected) final output validation initially checked event
+trace and receipt/body pins independently; now binds terminal ordinal/pin/count
+to exact retained bodies and receipt. I335-012(P2 corrected) impossible failure
+records with HTTP evidence but zero completed credential/source phase now
+refuse; empty purported-success stdout and zero stderr-count/nonempty hash
+also refuse. Producer sequencing already enforced those stages. Child actual
+exit/output facts are registered before marker/publication handling so a later
+failure cannot discard the original finite cause. Outer late source/Store close
+errors demote accepted/complete and exit2, never promote a report to success.
+
+Root278distinct focused passes2.65s (111observer+65caller+102record/documents),
+four in-memory compiles, selected source/profile/policy pins match; no full
+suite. Author111passes0.19s/65passes1.12s overlap root, not additive. Caller
+expanded draft54passes/1fixturefailure0.80s used the wrong observer-profile key;
+only fixture corrected. Nested sandbox application is unsupported from the
+already native-denied test harness: five initial child tests failed their
+marker expectation with60passes0.91s and inner exit71/sandbox_apply refusal.
+Production policy stayed unchanged; real tiny child FD/noise/stderr/timeout/
+kill/reap tests inherit the outer native denial, with exact production command/
+policy asserted separately. They do not exercise inner policy application.
+Finally-restored observer omissions caught non200 body access, retention,
+credential echo and wrong primary key; caller omissions caught HTTP/credential
+coupling, original finite child cause, actual-exit gate and terminal pins.
+Two parallel probes initially hit strict sibling-temp ancestor changes before
+their intended assertion, and are NOT sensitivity evidence; sequential probes
+then caught the intended omissions. Same-round audits are advisory, not
+independent review. No G source/credential/provider use occurred before freeze.
+
+Observer tests22406bytes SHA256
+f5c29c3e16af86052caf293c63a9ee75d3f2d313de4443bb754a214fa7b9859f;
+caller tests27884bytes SHA256
+aab00a41135880cdb432d7a7c4f4441f3e40da083d0c4af8706cfccf9451dcb3.
+All335.17 QC/Safari holds, source/rights/financial/attempt gates and false formal
+readiness flags persist. Continue only admissible data/identity recovery and
+offline construction after actual G evidence; no strategy submission during hold.

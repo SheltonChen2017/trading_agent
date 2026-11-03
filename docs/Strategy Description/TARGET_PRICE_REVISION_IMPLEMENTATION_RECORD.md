@@ -87,7 +87,7 @@ owner-answer checkpoint is added by this factual blocked handoff.
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **SECTION113 LOCAL REMX REPAIR IN PROGRESS; QC AND SAFARI DEFERRED UNTIL FURTHER NOTICE; SKIP CLAUDE REVIEW;
+Status: **SECTION113 CONSERVATIVE LOCAL REMX REPAIR COMPLETE WITH20UNRESOLVED VOLUMES; QC AND SAFARI DEFERRED UNTIL FURTHER NOTICE; SKIP CLAUDE REVIEW;
 ONE FINAL PUSH. ZERO QC REQUESTS/NATIVE COMPILES/BACKTESTS;
 0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
 in106 remains accepted after its document/current-routing correction.
@@ -31819,3 +31819,91 @@ committed locally before the actual private export. No push has occurred in
 this REMX round; actual export and fresh independent artifact verification
 remain to be performed under their own new scopes. No financial result or
 native/market-origin acceptance is inferred from software tests.
+
+Fresh REMX export claim REMX-20261103-EXPORT-001; HEADc06657742a5fe7ef2355894116fd2250e2ba4f89; manifestSHA8f55fabd568978a7b064c76617d68b328f81a0bc4a0bedfd6a467d9a8dc5722b fsynced BEFORE the one fixed USB member read. Local private derivation only; QC0/Safari0/provider0/backtests0; originals retained.
+
+REMX local export REMX-20261103-EXPORT-001 statusprepared_partial_local_candidate; receiptSHA437a13cda9f1dd406feb95e63654eeca7dd1d3e8210f5d5a1793a3b1eeedfc36; original/quarantine/row-ledger evidence remains private. QC0/Safari0/provider0/backtests0; full coverage and financial acceptance FALSE.
+
+Fresh REMX local claim REMX-20261103-EXPORT-VERIFY-001; HEADc06657742a5fe7ef2355894116fd2250e2ba4f89; bounds{"expected_receipt_bytes": 2008, "expected_receipt_sha256": "437a13cda9f1dd406feb95e63654eeca7dd1d3e8210f5d5a1793a3b1eeedfc36", "files_max": 9, "input_bytes_max": 16842752, "private_root": "artifacts/target_price_remx_20261103/REMX-20261103-EXPORT-001", "processing": "source/ledger/partition/exactvolume/date-OHLC/hash/mode/strictvalidation/counts only; nofinancialreturns; USB0/provider0/QC0/Safari0", "writes": ["REMX-20261103-EXPORT-VERIFY-001.result.json"]}; manifest2349B/SHA9cc60e60f62d822cb17063e138c907661e407b4fc306e4c2da24f6d58dcca980 and record fsynced BEFORE effect. Owner scope is local REMX correction only, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+Fresh REMX export verification completed:4339source rows=3996candidate+323identityquarantine+20fractionalquarantine;860exactintegral lexical normalizations, original reconstructed byte-for-byte and all candidate quantities/date/OHLC preserved. Study source dates1449 vs candidate1429,20explicit gaps2026-02-23..2026-03-20; full coverage/source/financial acceptanceFALSE. Proof1183B/SHA9cbbc892f0fcb537aba1d2d416bddf2d10a3c6d6e64469ac8cfabe6756d094e5; QC0/Safari0/provider0/backtests0.
+
+### 113.5 Actual local result, exact snapshot and factual remaining limits
+
+Implementation commitc06657742a5fe7ef2355894116fd2250e2ba4f89 was committed
+locally before the actual fixed-source private export
+REMX-20261103-EXPORT-001. That freshly claimed operation succeeded as
+prepared_partial_local_candidate. It used isolated49/52/syntheticDB and
+network denial, read the one fixed181222B USB member, retained original
+bytes first, and wrote the seven scoped private files:
+artifacts/target_price_remx_20261103/REMX-20261103-EXPORT-001/
+
+Receipt2008B/SHA437a13cda9f1dd406feb95e63654eeca7dd1d3e8210f5d5a1793a3b1eeedfc36;
+manifest2296B/SHAc4e319cf9003a8cfeddfaa688988e62ce1ddf45bcbeea1046e7fa5afddd25932.
+Candidate166663B/SHA454a35c07dec8ddbf236f868968cc457eaac20317be69ec8d9dab1eae5b2f731.
+The original181222B source retains its exact known SHA above. All seven
+outputs total2328883B. The full source and row ledger are private, and no
+licensed observation is staged or pushed.
+
+Fresh independent verificationREMX-20261103-EXPORT-VERIFY-001 claimed only
+the nine exact own-export files, never reopened USB/provider/oldsignal data,
+and verified receipt/claim/source/HEAD/owner bindings, every output hash and
+private file mode, all ledger ordinals/row hashes/original field lexemes,
+complete source reconstruction, exact quantity equality and unchanged
+date/OHLC fields for every candidate row. It independently used exact
+Fraction(Decimal) integrality, checked explicit partitions, regenerated all
+outputs, and passed the unchanged strict parser on all3996candidate rows.
+Private verification1183B/SHA9cbbc892f0fcb537aba1d2d416bddf2d10a3c6d6e64469ac8cfabe6756d094e5.
+
+| Exact source disposition | Rows | Local result |
+|---|---:|---|
+|Post-inception already strict positive integer volume|3136|Original candidate row preserved|
+|Post-inception exact positive integral decimal volume|860|Only volume representation normalized losslessly|
+|Before ETF inception2010-10-27|323|Unknown-identity quarantine; no guessed issuer/SID|
+|Post-inception genuinely fractional volume|20|Unresolved quantity quarantine; no rounding or borrowing|
+|Total original source|4339|Every row retained/reconstructed|
+|Partial candidate|3996|Strict compatible; not full coverage or input admission|
+
+The source has1449unique observed dates within the frozen
+2021-01-04..2026-10-09 window; the candidate has1429. All20missing source
+dates are2026-02-23..2026-03-20. This is a source-relative gap comparison,
+not independent authentication of a trading calendar. An authenticated
+market-volume correction/session convention for those20rows is unavailable
+in the local evidence. Same-vendor daily agreement and the negative minute
+corroboration cannot resolve it. No unchanged failing path is relaunched.
+
+| Frozen arm | New financial runs in this REMX round | Accepted full-window metrics |
+|---|---:|---|
+|OFF|0|NULL|
+|TPR50|0|NULL|
+|TPR100|0|NULL|
+|TPR200 long-only|0|NULL|
+|PureTPR|0|NULL|
+
+The local formatting/partition/provenance repair is complete. The20true
+fractional rows and permanent-identity/PIT/rights/native input questions
+remain factual limits; financial/full-coverage/source/canonical/trading
+acceptance staysFALSE. The USB ETF observations are not substituted for
+the frozen six STOCK sleeves. The earlier142file offline build, all
+failed/Completed histories and all earlier attempts/looks remain retained;
+consolidated historical financial looks remainUNRECONCILED.
+
+Next local data action is an authenticated correction of those20volumes
+and source/identity evidence under a new bounded claim/source epoch.
+The QC/Safari hold remains in force until further owner notice; no access,
+upload, compile, status read, Mia effect, backtest or automatic resume is
+authorized by this repair. There were0QC/Safari/provider requests,
+0native compiles and0backtests in this round. Claude review was skipped
+as directed. No original USB source, frozen input/economics, predecessor
+runtime/native module, shared plan/handoff or sibling file was changed.
+
+The final handoff commit followsc0665774 and records the actual private
+export/verification above. Before the sole final push, root rechecks exact
+physical root/branch/HEAD/status, actual Targetremote remains the round base
+89622e5d9e5598f95ae9b6a310d369b572cc148e, source hashes, final focused
+document checks and received-history preservation. Exactly one successful
+nonforce push targets onlyHEAD:refs/heads/codex/strategy-target-price-revisions.
+Afterward root verifies actual remote equality and a clean worktree. Actual
+final GitHEAD identifies that record commit without a self-referential hash.
+
+Final root verification after the actual export/handoff update passed157focused current-document checks/558deselected in2.85s, isolated49/52/syntheticDB with sockets/DNS denied and stable before/after record bytes. All five implementation/test files match committedc0665774, and received sections9..112 remain exact. No code changed after the109focused code checks. Only this sole record is staged for the final handoff commit; no raw/private artifact is tracked.

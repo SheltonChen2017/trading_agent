@@ -1,10 +1,16 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **USB coverage and quality audit recorded in section 59, 2026-11-03.
+Status: **FirstRate raw adapter and conservative USB reconciliation recorded in section 60,
+2026-11-03. The adapter and final virtual source reconciliation are complete as offline software.
+No QC navigation, query or launch; no purchases or strategy evaluation.
+Existing Massive/EODHD/FMP/Sharadar plan metadata refreshed. Guidance and historical NBBO remain unestablished.
+Targeted action-field coverage remains unverified; native provider-control failures are recorded below.
+Virtual reconciliation accepts 23,585,624 structural keys and quarantines 58,586 keys.
+USB coverage and quality audit recorded in section 59, 2026-11-03.
 The owner reports these FirstRate files were purchased under their licence.
 Date-gated quality checks found daily data conflicts and action-field gaps;
 the sampled minute bars pass scalar/OHLCV checks, not whole-dataset acceptance.
-No QC access, purchase, strategy evaluation or source-data repair occurred.
+Section 59: No QC access, purchase, strategy evaluation or source-data repair occurred.
 USB FirstRate structural audit recorded in section 58, 2026-11-03.
 Long-history raw stock/SPY OHLCV and action files are present as candidate inputs;
 historical NBBO and issuer-guidance coverage are still not established.
@@ -12,7 +18,7 @@ Coverage/licensing follow-up recorded in section 57, 2026-10-28.
 Known subscriptions still do not establish usable guidance and stock/SPY NBBO.
 Current-vintage exploratory reconstruction is permitted by the plan in principle;
 original receipt/version proof is required for PIT/confirmation claims.
-This audit is local-only; no new push, QC access, purchase or monitor rearm.
+Owner authorized one final matching-lane non-force push; monitor stays PAUSED.
 The section-55/56 round was published once as `7d633144`.
 Codex counter-review of sections 53 and 54 completed in section 55,
 2026-10-28; all four Claude commits are accepted after the recorded corrections.
@@ -38,7 +44,8 @@ real-data SPY comparison parity and native execution remain unverified or blocke
 This is not the final step before QC. One unintended passive QC screenshot
 occurred after shared Safari changed tabs; all provider UI work then stopped
 (52.2). No deliberate QC navigation, query or launch occurs in either round.
-No actual provider rows, purchase or empirical evaluation occurs.
+Section 52 did not inspect provider rows or perform a purchase/evaluation;
+section 60 separately records the later bounded action-schema export.
 Codex counter-review of section 49 completed in section 50.
 Claude's `23d06504` test hardening is accepted.
 Claude's `d6036b7d` review is accepted after documentation clarification.
@@ -80,8 +87,8 @@ and policy level, without a QC clearance. Native loading of the recovery
 carrier is unverified. Only `data/__init__.py` was observed as one LF at
 runtime;
 `research/__init__.py`, remains unobserved. The input layer parses supplied
-local files only. October 28 account observations refresh Massive/EODHD/FMP;
-Sharadar remains an October 24 owner report, not an account verification.
+local files only. The older October 28 account observations are historical; section 60 refreshes
+Massive/EODHD/FMP and the displayed Sharadar direct subscription.
 A licensed/versioned issuer-guidance source,
 historical stock and SPY NBBO, six usable common years and processing rights
 remain unverified; no purchase is recommended yet (45, 46, 48.4, 50.4, 52).
@@ -90,7 +97,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 59. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 60. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -8452,3 +8459,422 @@ Production source SHA is unchanged, sections 1 through 58 are byte-exact below
 the header, and `git diff --check` passes. Read-only author/subagent document
 QA found no material discrepancy; this is not independent Claude acceptance.
 No full lane/repository suite or empirical/native test was run.
+
+## 60. FirstRate adapter and conservative USB reconciliation, 2026-11-03
+
+### 60.1 Owner scope, branch custody and provider-session ownership
+
+Owner: "Proceed with reconciling the USB data and building the FirstRate
+adapter. Check my existing subscriptions for the missing guidance history,
+stock/SPY bid/ask and action fields. Don't access QC or buy anything."
+This authorizes this local source-normalization/reconciliation milestone and
+bounded existing-account coverage checks. It does not authorize a strategy
+backtest, outcomes/returns join, economic/family/look/date freeze, protected
+observations, QC, provider purchase or account/security change. Retain the
+FirstRate licensed-purchase owner report from 59.1 without demanding a new
+invoice or invented vendor approval for this local processing.
+
+Start clean local `e7a785c00d43e46bf25f66929e62b79dcb36c3da`, three known local
+notes commits ahead of unchanged live matching
+`7d63314472b4462e153dde82b0bf71c848a253fa`. Preserve sections 57/58/59 and
+all prior consumed reviews. Every repository action remains in the mandatory
+worktree/branch/origin in section 1. The initial request included no new push. The owner later explicitly directed:
+"Finish the USB reconciliation and FirstRate adapter, document exactly what
+still blocks backtesting, and push once when done. Don't access QC or buy
+anything." This authorizes exactly one final matching-lane non-force push,
+including the three accumulated local notes commits. The section-55/56 round's
+prior publication remains completed and is not a separate new push. Monitor
+remains PAUSED; no automation is created, resumed or rearmed.
+
+Read current CLAUDE/AGENTS, Action Plan, original GDR design, lane record and
+applicable review/handoff process. Only lane-owned source/tests and this
+record may change. Root Session Handoff, Action Plan, Feature Milestone Record,
+shared code, original Markdown/PDF/draft and retained invented carrier stay
+frozen. Author/subagent QA below is not independent Claude acceptance.
+
+On November 3 the owner clarified **Sharadar directly** as the Bundle 5Y
+purchase route. The direct purchase route was first owner-reported; after the other lane
+completed, an existing authenticated account page also displayed Sharadar
+Bundle / 5 Years / monthly / Personal use, active since October 24, with
+subscription status Cancelled. No subscription end date was displayed. This
+is not an already-expired inference; a bounded action export later returned
+data through that signed-in session.
+Massive, EODHD and FMP plan metadata below is observed through the existing
+signed-in Safari session. No password, Keychain item or session cookie is
+extracted/reconfigured; the API-key output incident and later bounded Sharadar
+export are disclosed explicitly below. Do not retain a blanket zero-provider-
+request or zero-credential-display claim for this round.
+
+Operational observation: initial native Safari attachment passively emitted
+its previously selected QC window title and toolbar; no QC application body,
+project, quota, source, log or outcome is inspected, refreshed or operated.
+A new provider tab is used immediately. Later Safari changed during a click
+on the FMP dividend endpoint's API-viewer link. The tool interrupted the
+action; no Try/request button was clicked and its resulting page was not
+re-read. All shared Safari interaction stopped. Do not infer whether that
+interrupted navigation completed or any provider-side automatic action ran.
+The owner then explained: **"insider buying lane is using qc/safari. after
+it is done, you can access it."** Treat that as explicit ownership: wait for
+that lane to finish before provider UI work. A compact read-only chat-status
+snapshot can check ownership without accessing QC or messaging the other lane;
+no cross-lane source, data or resource is changed. Do not infer release merely
+from elapsed time or interfere with that lane.
+
+### 60.2 Implemented pure raw-source adapter and reconciliation contract
+
+New `research/guidance_revision_drift/firstrate.py` implements:
+
+- `parse_line`: bounded raw bytes, explicit vendor symbol/kind/source/member/
+  line number, date gate before financial decoding or hashing. The maximum
+  window remains `2013-01-01 <= date < 2026-09-01`; callers may narrow it.
+  Known blank ASCII lines are retained `blank_nondata_line` exclusions, not
+  guessed data or source-set poison. Nonblank unknown dates remain refusals.
+- Explicit raw daily/minute member naming and exact plain/scientific Decimal
+  normalization. No binary float, rounded fractional volume, filled price,
+  adjusted-member substitution, source-data rewrite or quote fabrication.
+  Finiteness, bounded precision/exponent/magnitude, positive OHLC, bounds,
+  nonnegative integral volume and positive minute volume are enforced.
+  Zero daily volume is retained with a warning, not declared valid liquidity.
+- Immutable eligible-only line hashes and source references. Numeric-identical
+  duplicates collapse while retaining every distinct source location. Any
+  conflicting numeric copy or invalid known key quarantines the entire key;
+  a later good duplicate cannot revive it. No archive precedence is invented.
+  Nonblank unkeyed refusals block use of the supplied source set via `require`.
+- Strict checked `FirstRateLine`, `ReconciledRow`, `QuarantinedRow` and
+  `Reconciliation` values. Tuple/type, key partition, ordering, source-location
+  identity and bounded input-count validation prevents public construction
+  from bypassing the reconciler. Exact re-delivery remains idempotent while
+  its input count is retained.
+- New York period-start minute conversion, including explicit refusal of
+  ambiguous/nonexistent DST clocks. `regular_minute` requires an externally
+  supplied `CalendarSession` and explicit security ID, and returns a complete
+  in-session raw `HistoricalMinute`; no holiday/half-day or identity is
+  inferred. There is no NBBO, execution price, order, cash posting or native
+  route in this API.
+- Split effective dates and dividend ex-dates retain explicit missing payment
+  dates/currency/permanent identity/availability. Action rows never become
+  payable cash merely because a scalar parses. Warnings remain visible.
+
+Every FirstRate audit/reconciliation projection remains provider `firstrate`,
+Raw/non-filled, with PIT,
+coverage, calendar/reference/availability verification, execution and native
+claims false. The returned `HistoricalMinute` projection instead carries its
+source hash and supplied identity/session plus raw/non-filled fields; it does
+not carry provider/PIT verification flags or certify provenance. Its source
+hash binds the FirstRate references; use does not relabel them as Massive.
+A source ID/hash binds supplied bytes/lineage, not provider truth, completeness
+or original availability. The caller must bind the whole
+selected inventory and retain chronology diagnostics. Exact vendor symbols,
+including `-DELISTED`, remain distinct; no suffix, punctuation or latest-ticker
+join is a permanent-security mapping.
+
+The new module is explicitly added to the offline review bundle inventory;
+the fresh-process import guard includes it. Original Massive-shaped parsing,
+SYN input contracts, strategy/sizing/fill/settlement/SPY rules, native import
+closure, candidate and fixed 372-frame fixture are unchanged. This is an
+actual local normalization API used by the retained reconciliation driver,
+not a downloader or an empirical-ready/native adapter claim.
+
+### 60.3 Verified author findings and existing-subscription field checks
+
+| Finding | Priority / status | Evidence and correction |
+|---|---|---|
+| GDR-RP60-001 | P2 / corrected | The first public `Reconciliation` constructor accepted mutable lists and duplicate/conflicting accepted keys; `require` returned the first conflicting key, bypassing the normal path's quarantine. Three invented regression methods fail with 20 assertions before correction (0.002 s). Strict immutable checked construction and consuming validation now refuse these cases; the initial 23-method corrected set passes. Quarantine/source identity and idempotent input counts are included. |
+| GDR-RP60-002 | P2 / corrected | Nineteen specifically eligible source rows contain 58 finite scientific-notation fields, proven by date-gated exact-line/hash diagnosis without emitting lexemes. The first parser incorrectly rejected them as malformed. Separate provider token syntax from canonical normalized text: bounded ASCII grammar -> exact Decimal -> existing numeric caps. Three new methods fail twice before correction (0.001 s); the old `1e1`-is-invalid assertion is replaced by stronger scientific/duplicate/context and genuinely malformed/extreme/nonfinite cases. All 26 adapter methods pass (0.008 s). No source value or financial rule changes. |
+| GDR-RP60-003 | P3 / corrected before launch | Driver source IDs initially used archive basenames without their full USB-relative path, and unknown minute date prefixes could be skipped. Read-only driver QA required full path/index/member anchors and a hard nonblank unknown-date refusal. Duplicate ZIP names use their exact central-directory index, never `getinfo`'s arbitrary last match. Prior receipt hashes are pinned. |
+
+Two interrupted local author-validation runs are retained, not labelled
+completed. V1 was stopped for RP60-001 after approximately 53.681 s, exit 130;
+6,941 partial quarantined keys were retained and no final report exists.
+V2 was stopped for RP60-002 after approximately 144.602 s, exit 130; its last
+reported milestone was 1,000 groups / 1,447,250 input rows, with 7,037 partial
+quarantined keys retained. Neither is a native attempt, research look, failed
+backtest or final reconciliation count. The final v3 run binds the corrected
+source and the same financial/quarantine policy; incomplete streams never
+serve as completion evidence.
+
+Authenticated plan observations, November 3, 2026:
+
+| Provider | Observed existing access | Field/use consequence; actual data coverage is not inferred |
+|---|---|---|
+| Massive `/dashboard/subscriptions` | Stocks Starter, cancellation pending November 6; free Basic products for other asset classes. No Corporate Guidance or Stocks Advanced displayed. | Starter's documented dividend history is useful; it does not grant historical stock/SPY quotes or the separate guidance expansion. Legal Agreements page says no agreements currently to fill out; that is not a universal retention/external-processing grant. No agreement is signed. |
+| EODHD `/cp/dashboard` | EOD All World and EOD Calendar cancelled, each available until November 14. | Documented JSON dividend fields can supplement ex-date-only USB data within this existing plan. Generic dashboard feature links/On controls do not prove expanded intraday/NBBO entitlement. |
+| FMP dashboard subscription tab | Starter cancelled, active until November 13. | Product ownership refreshed. Dividend field schema exists, but general calendar tier is Premium; Starter/grandfathered endpoint access remains unproved. No Try request submitted. |
+| Sharadar directly | Authenticated Bundle / 5 Years / monthly / Personal use, active since October 24; status Cancelled, no end date displayed. | One bounded action CSV export returned data. Its ticker selector did not apply, so it proves schema/date-window access only; original availability, payment dates and targeted stock/SPY completeness remain unverified. |
+
+No exact expiry instant, hidden add-on, grandfathered grant, automatic renewal
+or purchase is inferred. Dates are access metadata, not historical versions.
+
+Public primary-source refresh supplies two positive existing-access leads:
+
+- [EODHD corporate actions](https://eodhd.com/financial-apis/api-splits-dividends)
+  explicitly includes All World. JSON fields include `paymentDate`, declaration/
+  record dates, currency and `unadjustedValue`; `value` is split-adjusted.
+  Prefer raw historical cash for raw-share accounting, and test null dates/
+  join coverage rather than assuming fields are populated. CSV omits extended
+  JSON fields. This is a documented route, not a completed stock/SPY row audit.
+- [Massive dividends](https://massive.com/docs/rest/stocks/corporate-actions/dividends)
+  lists Starter history from January 2000 with raw `cash_amount`, currency,
+  `pay_date`, declaration/record dates and IDs, separate from adjusted cash.
+  Existing Starter may close payment/currency gaps without an upgrade; actual
+  coverage and raw-versus-adjusted agreement with the USB still need samples.
+- [Sharadar actions](https://sharadar.com/docs/actions) includes ticker changes,
+  splits/dividends/spinoffs, listing/delisting/reasons/acquisition counterparties
+  and issuer relationships. These are useful terminal/reference metadata,
+  not proof of full cash/stock consideration or settlement timing.
+  [TICKERS](https://sharadar.com/docs/tickers) supplies permaticker/FIGI/type/
+  currency/exchange/sector as a current snapshot, not a dated sector history.
+- [FMP dividends](https://site.financialmodelingprep.com/developer/docs/stable/dividends-company)
+  documents payment/record/declaration dates and adjusted/raw dividends;
+  [calendar tiers](https://site.financialmodelingprep.com/datasets/calendars)
+  place general calendar access at Premium. No unsupported Starter entitlement
+  or upgrade recommendation is inferred.
+
+The two core signal/execution gaps remain: [Massive Corporate Guidance](https://massive.com/docs/rest/partners/benzinga/corporate-guidance)
+is a separate expansion, while [historical stock quotes](https://massive.com/docs/rest/stocks/trades-quotes/quotes)
+exclude Starter/Developer and document Advanced coverage. Guidance's FY
+current/prior bounds, methods and release/update clocks can support a declared
+current-vintage exploratory reconstruction, but do not prove immutable original
+predecessors, first delivery, timezone or correction/withdrawal propagation.
+Historical NBBO needs actual stock/SPY common dates, sizes/conditions and SIP/
+participant clocks; the [quote size-unit migration](https://massive.com/blog/change-stocks-quotes-round-lots-to-shares)
+also requires a version/unit binding. EODHD's [US live EDGX feed](https://eodhd.com/financial-apis/new-real-time-data-api-websockets)
+is not consolidated historical NBBO. Analyst estimates/ratings and USB earnings
+actuals remain distinct from management guidance.
+
+Published [FirstRate licence](https://firstratedata.com/about/license) plus the
+owner's licensed-purchase report supports this local use; no new invoice gate
+is imposed. [EODHD terms](https://eodhd.com/financial-apis/terms-conditions),
+[Massive private-use guidance](https://massive.com/knowledge-base/article/which-plan-do-i-need-to-show-massive-data-in-my-app)
+and [Sharadar direct terms](https://sharadar.com/terms) remain provider-specific.
+In particular Sharadar's termination/raw-retention provisions must be bound to
+the actual direct subscription before retaining its raw/reconstructible data.
+No source's rights transfer to another, no external upload is performed and
+public schemas are not account-specific licensed-field/coverage evidence.
+
+
+### 60.4 Completed real-source reconciliation and evidence boundaries
+
+Final v3 completed with exit 0 in **1,313.955 s**, using adapter SHA256
+`7889276ed58bd8f24c25c3fb6db4d81c2a3c463ae14b13d5bfb2c38ddc34631e`.
+The source inventory is the exact audited 32 raw stock daily containers, one
+SPY raw daily member, all four stock/ETF split/dividend archives and the same
+predeclared ten-symbol minute cohort. The minute integration exercise is
+limited to March 3–14 and November 3–14, 2025: 20 observed date buckets per
+symbol, not certified NYSE sessions. Section 59's broader minute-quality audit
+remains separate evidence. No strategy opportunity, return or parameter is
+computed or selected.
+
+| Supplied scope | Structurally accepted unique keys | Quarantined unique keys |
+|---|---:|---:|
+| Stock daily, all 32 containers | 23,163,763 | 58,564 |
+| SPY daily | 3,416 | 20 |
+| Stock dividends | 162,215 | 0 |
+| Stock splits | 3,896 | 2 |
+| ETF dividends | 126,070 | 0 |
+| ETF splits | 886 | 0 |
+| Fixed ten-symbol minute date-window exercise | 125,378 | 0 |
+| **Total** | **23,585,624** | **58,586** |
+
+There are 24,081,651 supplied input-row occurrences, including 44 explicit
+blank-line exclusions. Reconciliation collapses **386,621 numerically equal
+source duplicates**, retaining all source locations. Quarantined keys retain
+109,362 source rows; unkeyed refusals are zero. These figures balance exactly.
+Stock daily financial rows still total 23,659,724; the new stock scope's
+23,659,768 inputs include the 44 retained nondata lines.
+
+Quarantine reason counts are unique vendor-label/kind/timestamp keys and may
+overlap: 50,046 numeric conflicts; 6,613 nonintegral/excessive volumes (6,593
+stock and 20 SPY); 719 OHLC-bound failures; 1,208 sign failures including the
+two zero split ratios. No invalid/nonfinite numeric lexical refusal remains
+following RP60-002. These are different units from section 59's source-row
+occurrences; neither supersedes the other as if their denominators matched.
+Conflicting vendor histories are not adjudicated into guessed truth.
+
+Accepted structural rows still retain 275 zero-volume daily warnings, 25 zero
+dividends and two weekend action dates. All 293,067 accepted actions retain
+unverified identity/currency/availability; all 288,285 dividends retain missing
+payment dates. Structural acceptance is not permission to post cash, assert
+eligibility, fill an order or call the study complete.
+
+All eligible daily-prefix hashes reproduce the prior audit. Final member
+integrity is 21,323 EOF/CRC verified and 7,065 prefix-only/CRC unverified.
+Action archive SHA/size and USB file size/mtime guards pass; the manifest
+remains `c681af584244d38e3f9dea2ff765cc2c991cb383107a3e542115a4338ee4cdf8`.
+No USB data is changed and no full 324-GB integrity certificate is claimed.
+Descending action dates are normal for many files; the driver's aggregate
+order-event field is not a count of actual quality failures.
+
+This is a **virtual reconciled-source manifest** with aggregate counts,
+accepted-key lineage hash and date/source-line quarantine ledger. Accepted
+financial values are reconstructed from the pinned source inventory via the
+adapter; they are not duplicated into a new cleaned dataset. No licensed raw
+values enter Git. A separate verifier passes ten checks covering seven scope
+balances, all 28,388 source anchors, unique/date-gated quarantine keys, hashes,
+and nonfinancial ledger shape. It does not authenticate missing source copies,
+permanent identities, exchange sessions or historical availability.
+
+Retained local/ignored anchors, relative to
+`artifacts/guidance_revision_drift/usb-reconciliation-20261103/`:
+
+| Artifact | SHA256 |
+|---|---|
+| `v3/reconciliation-report.json` | `51826f9ebf31b7263746a4f181ce315e23af8b30b689724a61df8e208ed158d6` |
+| `v3/quarantine-dates.jsonl` | `b78701288b7d9a6d95711184a4662afbf84c04183ddcd8167c47bdc01ddefbbe` |
+| `v3/verification-report.json` | `f50eebf11638759673d0d8ae4a8901c79b64e342b817dc342ae1200565477107` |
+| `v3/reconcile_usb.py` | `9c373b92d33d55b73a4579c49ac2d9d723c325c97a9e11e420a9c255f0e8d456` |
+| `v3/run-plan.json` | `ea3260fdaa2fd49b4c454fb5d21ba3598aa745a801a7794cac17ea3162713479` |
+| `numeric-lexical-diagnosis.json` | `2f10ce4ae71ca1f97027c399a776bc92cbc2982d083929bfbf665be549c59168` |
+| `sharadar-action-schema-check.json` | `39ae03c64ebe880978908e2e035ad8737ca63fa6032cd0877c4f9cbb310603b8` |
+
+Accepted-key lineage SHA256 is
+`9800f49996f7e5cea36134a77da5461415987924650ce1f676d008deee83499b`;
+the empty unkeyed ledger is SHA256
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+Partial v1/v2 streams and interruption receipts remain retained separately.
+
+### 60.5 Provider follow-up, actual UI incidents and exact remaining blockers
+
+After a compact status snapshot showed the Insider Buying chat's turn
+completed/idle, resume only provider pages under the owner's conditional
+permission. The owner later also reported the Safari provider tab ready.
+Neither event authorizes QC navigation or use. No QC page is navigated,
+refreshed, queried or launched in this follow-up.
+
+The authenticated Sharadar action query was set to June 1–30, 2025,
+AAPL/SPY and limit 100. It returned a 6,584-byte, 100-row CSV with columns
+`date,action,ticker,name,value,contraticker,contraname`. All returned date
+prefixes are June 30, 2025 and pass the protected-date gate before any
+numerical-value parsing. No numeric value is parsed or emitted. None of the
+returned rows matches AAPL/SPY: the custom ticker selector did not apply
+its visible text. Therefore use this only as measured action-schema and
+bounded-date access evidence, never targeted stock/SPY coverage. Payment-date, currency and permanent-ID columns are absent. No raw CSV is committed;
+the ignored receipt binds the existing Downloads file/hash and exact limits.
+This also records the native browser's Sharadar download permission prompt;
+only the requested inbound download is allowed, no installation or account
+purchase occurs.
+
+Two actual UI incidents require explicit retention:
+
+- A filtered account-page read inadvertently emitted one standalone unmasked
+  Sharadar API-key table cell in tool output. The filter missed a cell whose
+  label contained no secret-related word. The owner was promptly informed and
+  asked to rotate that key. The value is not repeated, written to repository/
+  artifacts/memory, or reused programmatically. Captured account-page strings
+  were discarded; the existing transcript is not silently erased. No keychain
+  extraction, key reset, credential/account reconfiguration or new agreement
+  is performed. Subsequent output excludes table cells and masks long token
+  patterns; this does not retroactively undo the exposure.
+- While attempting the custom ticker selector, native focus remained in
+  Safari's address field. A search suggestion displayed a current SPY quote
+  outside this lane's data window. Do not repeat its value or claim zero
+  protected-content display. It is not used in the audit, copied to an input,
+  numerically analyzed, joined to returns or treated as a research result.
+  Protected USB financial fields remain excluded before decoding. This
+  incidental UI exposure must remain visible for later evidence-scope review.
+
+Coordinate control repeatedly reports `noWindowsAvailable`, including after
+the owner reports the provider tab ready; a field-specific caret attempt also
+fails. Do not assert the machine is locked or that the owner failed to prepare
+it. Native custom-selector control is not reliable in this session. Stop these
+experiments under the owner's later finish-and-push direction. Do not fall back
+to credential extraction, copied session tokens, an exposed key, an unfiltered
+current data request or unauthorized provider/connector reconfiguration.
+EODHD/Massive actual stock/SPY payment-date samples and FMP endpoint entitlement
+remain unverified, despite the useful documented owned-plan routes in 60.3.
+
+Exactly what still blocks an order-based backtest:
+
+1. **Signal data:** management FY revenue/adjusted-EPS guidance, comparable
+   predecessors and declared publication/correction/withdrawal/reconstruction
+   semantics. No owned Corporate Guidance expansion is displayed. Analyst
+   estimates, ratings and earnings actuals do not fill this input gap.
+2. **Execution quotes:** historical consolidated stock **and SPY** NBBO with
+   actual common dates, prices/sizes/conditions, source size units and SIP/
+   participant clocks. Owned Starter, bar data and EDGX live quotes do not
+   establish it. Six usable common years remain unproved. No quote or
+   trade-bar execution substitute is invented.
+3. **Canonical eligible inputs:** frozen dated identity/type/sector/status and
+   a documented treatment of relevant quarantined or missing keys. The new
+   refusal ledger makes the defects explicit; it does not choose the correct
+   conflicting vendor copy. Do not drop losing/inactive issuers or require
+   repairing every irrelevant instrument before a properly scoped study.
+   All minute files used by the frozen eligible universe still need audit;
+   the fixed cohort is not an all-minute certificate.
+4. **Actions and accounting:** actual nonnull payment/currency/raw-cash joins,
+   announcement/availability evidence appropriate to the evidence track,
+   merger/spinoff/delisting consideration, authentic sessions/early closes/
+   halts, dated settlement/fees and residual-position treatment. Existing
+   EODHD/Massive action fields and Sharadar metadata are candidates; targeted
+   coverage/rights/retention remain to be bound to actual inputs. No purchase
+   of another bar product is justified by this local result.
+5. **Integration and research gates:** integration of accurately labelled
+   FirstRate rows with a genuine quote source, dated reference/action inputs
+   and the real order runner. The current native runner remains invented-only.
+   New exact source, section-55/56 corrections and applicable native parity
+   still need independent review/validation. Original economic/family/look/
+   evidence-date decisions remain null/unfrozen. Current owner direction
+   prohibits QC, so neither a native integration run nor an empirical
+   evaluation is performed.
+
+Current-vintage/PIT-false exploration remains possible in principle under the
+original design, with its declared approximations and eventual frozen scope.
+Original-version/first-delivery proof is required for PIT/confirmation claims;
+it is not a new unconditional ban on exploratory reconstruction. No new source
+subscription, price, contract, account, research allocation or trading mandate
+is inferred from the completed adapter.
+
+### 60.6 Final focused verification, custody and one-push handoff
+
+Final production source SHA256 is
+`f570bb044504ec12439d74d49e27408337705286a7ca5d1ac46bb91526e1b11b`, 60 members.
+Adapter tests SHA256 is
+`58ed9d196326c205adebeec4165f7fc8c6772c4cbc667f1973f51a0dab5e5786`.
+The exact current native audit SHA stays
+`fa562a43d49f59e5e3305c3d99cb2d3537bf0045a494504c3f5e5711fd8ae3e6`.
+The new adapter is outside the native import closure. Original draft/fixture,
+strategy economics and original/recovery attempt ledgers are unchanged.
+
+The final source passed 55 focused methods in 0.679 s, zero failures/errors/
+skips: 26 FirstRate, 18 existing historical market, six boundary/import checks,
+two calendar, one actual deterministic bundle reconstruction and two native
+boundaries. Whole validation harness took 0.744 s. Four changed Python files
+compile in memory, and an omitted-adapter bundle-inventory mutant refuses.
+An earlier harness named the wrong calendar test class and failed to import;
+correcting the harness class name produced the reported run, not a production
+or native failure. No full lane/repository suite, dependency installation,
+market-return evaluation or engine run is claimed. Final active-document,
+source/history/anchor/diff/status checks complete before publication.
+
+Retain the exact final commit and publication result in automation memory/
+thread state after the one successful non-force push. Publish the combined
+range from `7d633144` through the final record snapshot, including preserved
+local `f95b84e5`, `918f405b`, `e7a785c0` and this bounded implementation.
+Verify mandatory root, matching branch, HEAD/status/origin and unchanged live
+remote `7d63314472b4462e153dde82b0bf71c848a253fa` immediately before commit/push.
+Only the matching lane ref is targeted; no intermediate/second push, PR,
+merge, resource/account change or force push. Source-changing independent
+review remains pending on the resulting exact published snapshot. Monitor
+stays PAUSED and no further round/provider/QC/recovery loop rearms.
+
+Original `GDR-base372-approved-20261008` remains CLOSED FAILED 3/3, project
+37647834 untouched. Separate `GDR-Mia-base372-recovery-authorized-20261011`
+remains zero unsuccessful attempts, zero intents and maximum three failures;
+no project/journal/launch is created. Producing `c589b3dd` and retained source/
+project/runtime/fixture identities in 56.3 remain separate custody; new offline
+source hashes do not rebind their authorization or erase the original cycle.
+Sections 1 through 59 remain byte-exact below the active header. Only this
+record, the lane module, its explicit review inventory and relevant tests
+change in tracked Git; root/shared documents stay frozen.
+
+
+Closing document/source checks pass: one active-document method in 0.012 s,
+zero failures/errors/skips; all seven new retained artifact anchors match;
+sections 1 through 59 below the header are byte-exact to `e7a785c0`; the
+production source remains `f570bb04...`. The changed four Python files compile
+in memory and `git diff --check` passes. A bounded scan finds no standalone
+credential-shaped token in the new code/section-60 notes; it cannot erase the
+disclosed tool-output incident. Read-only author document QA corrected the
+HistoricalMinute projection wording and scoped section 59's old no-QC claim;
+it is not independent review acceptance. Exact final Git/publication identity
+is retained after the guarded single push in the paused monitor checkpoint.

@@ -174,6 +174,27 @@ def test_zero_split_ratio_is_quality_refused_without_changing_cash_semantics():
     assert m._actions(iter(row), split=False)["invalid_numeric_rows"] == 0
 
 
+def test_underscore_action_members_are_fully_parsed_without_identity_admission(tmp_path):
+    root, _ = _source(tmp_path)
+    _replace_source(root, m.STOCK + "/Stock_Splits.zip", _zip({
+        "_INVENTED_STOCK.txt": b"2021-01-04,2\n2021-01-05,0\n"}))
+    pin = _replace_source(root, m.ETF + "/ETF_Splits.zip", _zip({
+        "_INVENTED_ETF.txt": b"2021-01-04,3\n"}))
+    result = _qualify(root, pin)
+    public, private = m.public_summary(result), m.private_coverage(result)
+    stock = private[m.STOCK + "/Stock_Splits.zip"]["members"]["_INVENTED_STOCK.txt"]
+    etf = private[m.ETF + "/ETF_Splits.zip"]["members"]["_INVENTED_ETF.txt"]
+    assert stock["source_label"] == "_INVENTED_STOCK" and stock["rows"] == 2
+    assert stock["numeric_rows_examined"] == 2 and stock["invalid_numeric_rows"] == 1
+    assert etf["rows"] == etf["numeric_rows_examined"] == 1
+    assert public["summary"]["rows_by_kind"]["stock_splits"] == 2
+    assert public["summary"]["rows_by_kind"]["etf_splits"] == 1
+    assert public["summary"]["action_invalid_rows"] == 1
+    assert "_INVENTED" not in m._raw(public).decode()
+    assert public["authority"]["historical_identity_verified"] is False
+    assert public["authority"]["backtesting_ready"] is False
+
+
 def test_earnings_buffer_is_separate_inclusive_and_finite_reported_is_only_candidate():
     rows = [["date", "eps_estimate", "eps_reported", "release_time"],
         ["2020-12-22", "", "1", ""], ["2020-12-23", "", "0", ""],

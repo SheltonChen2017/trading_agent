@@ -42225,3 +42225,145 @@ read-only source quality/date coverage, not canonical ingestion, source/PIT/
 identity/rights admission, financial returns/signals, a research look or
 backtest. Expected provider/credential/QC/look/backtest counts are all ZERO.
 All13 carried P2s and the new retained old-helper P3 remain unchanged.
+
+### 360.5 First actual attempt preserved FAILED; bounded format diagnosis
+
+Implementation **`5493b95f48105510b77396ef7310161bae25086d`** existed, was
+clean and one commit ahead of unchanged origin32caf7a5 throughout these
+observations. The final precommit129 boundary checks passed again in6.56s.
+A precommit status guard initially stripped the leading porcelain-status
+space and refused BEFORE staging/committing; preserving raw porcelain fixed
+the guard. This is a setup refusal, not concurrent work or a data failure.
+The first health launcher also refused BEFORE USB I/O/namespace creation
+because its parent omitted the required empty-cache-prefix flag. Correcting
+the invocation flags, without changing source or the bootstrap, produced
+source-only health **PASS in1,914,695,041ns**.139 committed-source images,
+inventory SHA-256 `99e301cdaa8b125f5a47fffb8b22100648b11e830ae1d8e8a34dff72ea11dd58`,
+worker `b02361083acef02e64de75224320ffa9fa87fad3c76971d20f0e9acd70ba6349`,
+health policy `34616ce528a187fa5a6d0f29f5e94aa8e08e9b46105896565a710ba502137f53`.
+Calendar/plan match360.3. ALL USB reads were denied in health; no private
+output namespace was made. Independently attributed invented publisher
+checks also passed five valid leaves and refused duplicate publication,
+unexpected epoch sibling, unsafe leaf mode, changed hash and a during-read
+version change; native controls/real guard stayed active and no actual
+source/private root was read for those tests.
+
+After clean/root/branch/HEAD and matching-only fetch checks, ONE actual
+qualification ran at that exact EXISTING5493b95f. Its worker/IPC interval was
+**3,451,798,375ns**, result **FAILED, `zip_member_refused`, public=null**;
+this is not successful qualification, source admission or readiness. The
+trusted parent nevertheless completed immutable failure publication/checks.
+Actual worker SHA-256
+`8c2d19a1655ca69540c19d8f80f8e37e95d63000cee4cc01612e9f67659a97b4`,
+native policy `534748e95bd82e3eae11d6006bf24e1d655cb06a1c157e3aed0437af80e391dd`.
+The SAME source epoch's permanently preserved `attempt-000001` contains
+exactly four0600 single-link leaves under0700 held directories:
+
+| Failure-attempt leaf | Bytes | SHA-256 |
+|---|---:|---|
+| scope-reservation.json | 18,704 | `9d0ed95c22ab92e8fb86bae845b2b75c2962cde56951712f9c829dd3e7d7da1b` |
+| observation-started.json | 228 | `aa6cad291e0b85a78ade26f9af0527664e572468d89840b4cfdf730fb3348c15` |
+| qualification-result.json | 1,116 | `50c8a2dd4e5f5cf119696eec92e58f3b8411629f47900f4b8b81389bc5fccb1b` |
+| complete.json | 426 | `8c5c66718f0a99745285df7e9d90e747ab818ce052d2b193d922a5d4f2409009` |
+
+There is no private coverage leaf or usable partial qualification. Exit0 of
+the trusted publisher would only mean it preserved this FAILED disposition.
+Do not rewrite/rename/resume/reclaim that attempt or infer a successful scan
+from its complete.json file.
+
+The360.2-authorized bounded format discovery then made FOUR separately
+identified metadata-only observations, using held manifest/fixed body pins,
+fresh/final hashes, native network/fork/all-write/security-exec denial,
+real memory guard and explicit USB path fences. It opened NO member bodies,
+computed NO financial values and made ZERO source requests. The first
+fixed earnings ZIP's7,992 entries have no ZIP-metadata violation (diagnostic
+worker `2dab2d5ea7c3e2608c3ea80347d2a384624b2729a5ee53137ac38f45cff2527f`,
+its narrower policy `3b4fbf7dd6141d73a62b2733bcc67b3f85808bfcf77d3fdb8d819cead9ac054c`).
+The second checks ALL63 selected ZIPs/41,532 directory entries and finds ONLY
+two name-grammar violations (worker
+`3a9073a320a396f4b34c3efc8286d780c22c7de014f155519dfcc029215961ca`):
+ETF splits selected ordinal3/member691 of692, archive
+`60402f97583ef1f547e0145f3cab8e69708d95fb8adcad2b79fbb43cff9e67be`;
+stock splits ordinal40/member2962 of2963, archive
+`31ff667f50d7f8508ee4a2e6d58d6edd8cc1988dce7dc7a614e41e09371c0226`.
+All indices are zero-based metadata ordinals, not security identifiers.
+The third two-archive classification disproves the proposed Finder-metadata
+name categories (worker
+`637137aa5274729b4627d08d2dc39e28e66c7ef533d039e7f1d3a2d68892790f`);
+DO NOT call these `.DS_Store` or `__MACOSX` entries. The fourth confirms both
+are single-component `.txt` names beginning with UNDERSCORE, not dots-only,
+and otherwise wholly within the existing bounded ASCII alphabet (worker
+`886c7fa3506846c042e95b91b35b004afd48d7e1d4fcf8e420b68a520562b964`).
+The latter three retain the actual69-leaf policy hash above, but interpret
+only central-directory metadata. This discovery is not a full semantic
+qualification replay, a new attempt receipt or a historical-body rewrite.
+No raw symbol/member name, manifest URL or supplied financial value is
+printed or recorded in Git.
+
+This establishes a real source-format incompatibility sufficient to explain
+the name guard at selected ordinal3. The original finite-code-only failure
+did not retain a stack trace or exact failing stage; do not retroactively
+claim it did. **IBDEC-360-05:** correct ONLY the additive qualifier's ZIP-
+component grammar to permit a leading underscore. Keep manifest path
+grammar, dots/traversal/normalization/depth/alphabet/length, symlink,
+encryption, duplicate, compression/resource and final hash guards intact.
+Skip no member or row, infer no identity and change no body-parser or
+source-admission semantics. Prove the defect with an invented whole-engine
+underscore action member on the preceding image, then test the corrected
+image. A corrected read-only attempt must use the SAME epoch, separately
+committed code and a new exclusive `attempt-000002`, binding and preserving
+all four failure-attempt leaves before/after every publication. No other
+source/provider/stopped root or old consumption claim is reactivated.
+
+### 360.6 Corrected ZIP grammar qualified; separately registered attempt2
+
+The corrected source SHA-256 is
+`3d0a48b96e440a3a1d645f967450a9a786f2d9724af57102ed595d49e9999eca`;
+test SHA-256 `d2cbd23fc7c0e636f58b7c0da34312ec7c33db828d18fc1158e2bbf930ce9754`.
+The ONLY source change introduces `_ZIP_COMPONENT` with the prior bounded
+ASCII grammar plus initial underscore and uses it for ZIP components.
+Manifest `_NAME`, all other path/custody/resource guards, member/row
+accounting and body semantics are unchanged. The new whole-engine invented
+stock/ETF split regression was **RED on the unchanged5493b95f source image,
+1 failure in1.09s at the name metadata guard**, then GREEN after correction.
+It proves every invented underscore member is parsed, every row counted,
+zero split value remains invalid, private labels stay out of public output
+and identity/admission stay false. Author observed65 focused/EXACT PASS in
+1.21s and source-only compilation PASS. Main independently observed **136
+focused/EXACT PASS in1.52s** and **129 boundary/record/active-document/
+platform/frozen-pin/old-planner-stop PASS in6.67s**, no skips/warnings.
+Native controls, real memory guard and all-USB/artifact-data/Keychain denial
+remain as360.4. Existing unsafe-path/symlink/ZIP-resource/CRC/hash tests
+remain GREEN; encryption/compression guards are inspected unchanged, not
+misrepresented as new independent reversal probes in this follow-up.
+
+Prospective corrected invocation bootstrap is13,482 UTF-8 bytes, SHA-256
+`fd8438a39a923152d2d2369838cceed3198d3e8d4408b9904d57069167abd3fb`.
+It preserves the accepted source-worker policy, memory/calendar/public-
+private controls and limits. New parent behavior verifies360.5's exact four
+previous-attempt hashes/sizes/0600 single-link leaves/0700 held directory
+and exact previous inventory before creating any corrected attempt. Every
+subsequent publication/final check revalidates those original bytes and
+permits EXACTLY the two attempt siblings. The new attempt directory and
+each leaf remain exclusive/no-overwrite. Independent invented-TMP tests of
+the exact extracted publisher/prior verifier accept prior4/current4 leaves
+and refuse overwrite, a third sibling, prior unsafe mode, coherent same-size
+changed bytes/hash, extra leaf, wrong size pin and during-read version change.
+Those probes used native isolation/real guard with all actual USB/artifact/
+Keychain reads denied; actual previous hashes remain MAIN-observed evidence.
+
+Register exactly ONE corrected actual call, operation
+`ib-pilot-firstrate-usb-qualification-20261103-v1-corrected-zip-components`,
+**attempt2 in SAME `source-c681af584244d38e` epoch** under separately committed
+corrected code. Reservation must retain attempt1's FAILED code, actual
+execution5493b95f and all four pins, without relabelling the original as
+successful. Run fresh source-only/no-USB/no-namespace health first, then
+reverify clean root/branch/existing corrected HEAD and unchanged matching
+origin before actual call. Open the same69 supplied source files AGAIN for
+this corrected offline qualification; no provider request, new acquisition,
+old consumed scope, old parent namespace or historical body rewrite occurs.
+Keep1800s deadline,128MiB output bound and all other prospective limits;
+no automatic further replay is registered. Freeze code/record/HEAD through
+actual completion. Only observed corrected results may establish source
+quality/date coverage; all historical-identity/source-availability/admission/
+rights/readiness flags stay false.

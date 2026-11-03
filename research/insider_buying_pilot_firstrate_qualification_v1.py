@@ -62,6 +62,7 @@ EARNINGS = "fundamentals/Earnings_Calendar_Estimates_Surprises"
 _SHA = re.compile(r"[0-9a-f]{64}\Z")
 _MD5 = re.compile(r"[0-9a-f]{32}\Z")
 _NAME = re.compile(r"[A-Za-z0-9^][A-Za-z0-9._+ ^-]{0,199}\Z")
+_ZIP_COMPONENT = re.compile(r"[A-Za-z0-9^_][A-Za-z0-9._+ ^-]{0,199}\Z")
 _NUMBER = re.compile(r"[+-]?[0-9]{1,24}(?:\.[0-9]{1,24})?(?:[eE][+-]?[0-9]{1,3})?\Z")
 _TOKEN = object()
 _SEALS = weakref.WeakKeyDictionary()
@@ -388,7 +389,7 @@ def _zip_members(stream):
         for item in rows:
             name = PurePosixPath(item.filename)
             _need(not name.is_absolute() and name.as_posix() == item.filename.rstrip("/")
-                and 1 <= len(name.parts) <= 3 and all(p not in {"", ".", ".."} and _NAME.fullmatch(p) for p in name.parts)
+                and 1 <= len(name.parts) <= 3 and all(p not in {"", ".", ".."} and _ZIP_COMPONENT.fullmatch(p) for p in name.parts)
                 and item.filename not in seen and not stat.S_ISLNK(item.external_attr >> 16)
                 and not item.flag_bits & 1 and item.compress_type in {zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED},
                 "zip_member_refused")

@@ -1,29 +1,40 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current owner-directed offline build, section112 (2026-11-03):**
+**Current owner-directed local REMX repair, section113 (2026-11-03):**
 QC access is deferred and Safari access is deferred until further owner notice.
-This round permits local preparation with no QC access and no Safari access:
-**0 QC requests, 0 Safari requests, 0 native compiles, 0 backtests**. Skip Claude review and make exactly one final lane push.
-The independent USB assessment is complete in111. The data is useful for
-price/action diagnostics; it is not an admitted replacement for the frozen
-TPR signal, membership, SID, PIT or native RAW input.
+This round permits local investigation and derived data repair with no QC access
+and no Safari access: **0 QC requests, 0 Safari requests, 0 native compiles,
+0 backtests**. Skip Claude review and make exactly one final lane push.
 
-The local build adds a supplied-byte FirstRate adapter, conservative
-already-final subscription bookkeeping candidate, pinned five-arm source
-preflight and claimed local exporter. Both five-arm source epochs are exported and verified under committed source
-ee282448 and the latest noQC/noSafari claim:142Pythonfiles compiled locally. The4096limit and all historical
-financial functions/economics remain unchanged; native activation/capacity
-and full-window completion are unproved. **0/5 accepted full-window results;
-all financial metrics NULL; financial acceptance remains FALSE.**
+The exact USB REMX daily member has4339rows. The323rows before the ETF's
+2010-10-27 inception have unknown instrument identity. Of4016post-inception
+rows,860volumes are positive whole numbers expressed as decimals;20others
+are genuinely fractional. The local repair preserves original source bytes,
+normalizes only exact integral representations, and explicitly quarantines
+the323identity-conflict rows and20fractional rows. The partial candidate has
+3996of4339source rows and20missing post-inception source dates; full coverage
+remains unverified. Quarantines are data-quality
+partitions, not exclusions from an accepted financial backtest.
 
-The last accepted Claude counter-review remains `a7f83bb4..e2dac576`;
-CR33-008 remains closed for its old frozen-financial route. The new candidate
-is a separate source epoch and cannot bypass that route. The retained
-October30 TPR100 RuntimeError and paused heartbeat are historical observations;
-QC was not freshly inspected in this round. Earlier failures and every
-Completed diagnostic/source/attempt/look record remain retained.
+The20fractional dates are2026-02-23..2026-03-20. Bundled adjusted daily
+counterparts agree internally but their integer volumes were not corroborated
+by the observed minute data. No rounding, volume borrowing, fabricated
+same-session price, carry or original-data overwrite is accepted. The repair
+candidate is partial, retains date gaps and remains unadmitted. Source origin,
+SID, PIT, rights, native RAW and frozen-input acceptance are unproved.
+
+Section112 retains the verified142file offline five-arm build. The4096limit,
+financial functions, frozen calendars/economics/inputs and six STOCK sleeves
+are unchanged. **0/5 accepted full-window results; all financial metrics NULL;
+financial acceptance remains FALSE.** The last accepted Claude counter-review
+remains `a7f83bb4..e2dac576`; no review checkpoint is added to this local task.
+All historical failures, Completed jobs, source/attempt/look records and
+negative USB/minute checks remain retained; QC was not inspected in this round.
 
 The next bounded action is deferred QC verification and backtesting only after further owner notice; the local build stops before any QC or Safari access, skips Claude review, and makes exactly one final lane push.
+The remaining REMX task is an authenticated correction of the20fractional
+volume rows and permanent-identity/input evidence; local normalization cannot
+supply those facts.
 
 **Retained published result, section107 (2026-10-29):** five separate lane-owned QC
 projects are created and source-verified; cleanup is complete with two older
@@ -32,10 +43,10 @@ completed, including a matching map/config trace with zero target bars in the
 tested session. Genuine Mia006/007 supplied no verified financial correction.
 All five financial backtests remain incomplete; full-window metrics are NULL.
 The concrete blocker is the lack of an admissible same-session native mark
-for the exact held OFF SID on2021-02-10. Section107.7 records its then-current role/counts; section112 owns the
-current offline next action. Section106 retains the accepted Claude counter-review.
+for the exact held OFF SID on2021-02-10. Section107.7 records its then-current role/counts; section113 owns the
+current local next action. Section106 retains the accepted Claude counter-review.
 
-**Standing earlier owner continuation (section107, subject to112):** create FIVE separate private QC
+**Standing earlier owner continuation (section107, subject to113):** create FIVE separate private QC
 projects, one per frozen arm, preserve old project37650980 and its source-drift
 evidence, use genuine Mia for verified fixes, exercise documented bestjudgment,
 skip routineClaude review, and push exactlyone time at the completed or
@@ -76,7 +87,7 @@ owner-answer checkpoint is added by this factual blocked handoff.
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **SECTION112 LOCAL BUILD/PREPARATION COMPLETE; QC AND SAFARI DEFERRED UNTIL FURTHER NOTICE; SKIP CLAUDE REVIEW;
+Status: **SECTION113 LOCAL REMX REPAIR IN PROGRESS; QC AND SAFARI DEFERRED UNTIL FURTHER NOTICE; SKIP CLAUDE REVIEW;
 ONE FINAL PUSH. ZERO QC REQUESTS/NATIVE COMPILES/BACKTESTS;
 0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
 in106 remains accepted after its document/current-routing correction.
@@ -472,13 +483,24 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, owner-directed local build and deferred backtesting (section112):**
+**Current qualification, owner-directed local REMX repair and deferred backtesting (section113):**
 QC access is deferred and Safari access is deferred until further owner notice.
 This round has no QC access and no Safari access:
 **0 QC requests, 0 Safari requests, 0 native compiles, 0 backtests**. Skip Claude review and make
 exactly one final lane push. The USB assessment in111 found useful independent
 OHLCV/action/cap/fundamental data, missing TPR/universe/SID/PIT inputs and a
 323row REMX pre-inception lineage anomaly. It is not an admitted price fallback.
+
+Section113 investigates the exact4339row REMX daily source locally. Its
+323pre-inception identity conflicts remain separate from860losslessly
+normalizable post-inception volume representations and20genuinely fractional
+volumes. The repair retains every original row and lexeme and produces a
+partial candidate with explicit quarantines:3996of4339source rows and20missing
+post-inception source dates; full coverage remains unverified. It cannot authenticate the old
+issuer, reconstruct missing daily market volume or admit the USB source to
+the frozen comparison. The20fractional dates remain2026-02-23..2026-03-20;
+same-vendor daily agreement and observed minute sums do not prove their
+official daily share volumes. No rounding or borrowed adjusted volume is used.
 
 Codex has independently counter-reviewed the exact incoming Claude range
 `a7f83bb4f711cbb187a3bdde4de476f137eb243f..e2dac57607cf4ae068051a85dd2f0fa5f2f35a57`:
@@ -512,7 +534,7 @@ review; private custody, source rights and fresh per-effect claims remain.
 The standing earlier recovery sequence, subject now to the explicit noQC
 deferral, is: Codex uses genuine QC Mia under fresh bounded scopes to diagnose and verify a native source/routing correction, then continues all five frozen arms; no routine Claude checkpoint or owner-answer gate is required by the latest continuation.
 
-Historical workflow context: the last completed counter-review before this round was section106. Section 94 reviewed the owner-skipped continuation of section 93. The direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY; sections106/107 retain that history; section112 governs the current offline build.
+Historical workflow context: the last completed counter-review before this round was section106. Section 94 reviewed the owner-skipped continuation of section 93. The direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY; sections106/107 retain that history; section113 governs the current local repair.
 
 Historical source/attempt observations below remain attributed to their
 original rounds; they are not new currentIDE/operator/source inspections.
@@ -31646,3 +31668,154 @@ HEAD/status; stop on unexpected advance. After push, verify actual local/
 remote equality and clean worktree. The final record commit is identified
 by actual GitHEAD/push verification, avoiding a self-referential hash here.
 No QC/Safari/nativebacktest access or further automatic wakeup is authorized.
+
+## 113. Owner-directed local REMX investigation and lossless repair —2026-11-03
+
+### 113.1 Scope, provenance and preserved source
+
+Owner: "investigate and fix the REMX data issues locally. keep QC and Safari
+untouched, skip Claude review, and push only once when done." This supersedes
+the old waiting heartbeat for this task; it authorizes no QC/Safari/provider
+request or financial run. Actual local/Targetremote base was independently
+verified as89622e5d9e5598f95ae9b6a310d369b572cc148e, clean. No new-round
+push has occurred. Every operation remains in the exact Target lane root
+and branch; no shared plan/handoff or sibling file is changed.
+
+The USB original remains read-only. The local source is the exact member
+REMX_full_1day_UNADJUSTED.txt from
+market/ETF-Complete_5000+_Tickers/Tickers_R_Day_Unadjusted_Full_Dataset.zip:
+181222B/SHAb8c54990689501ddc55183e6bb28c8eb7cd47a8817c04153480a6ef613b1de5e.
+Archive-level hashes were not computed; bounded member SHA/CRC and physical
+archive metadata are distinct from a hash of the entire archive.
+
+The ETF inception boundary2010-10-27 is retained from the earlier primary
+VanEck assessment in111, not a new provider lookup. It only identifies a
+conflict in323earlier rows; no historical issuer or permanentSID is guessed.
+All4339original rows must remain reconstructible in exact original order.
+Only declared local derived outputs may change representations.
+
+### 113.2 Fresh local investigation claims and retained negative evidence
+
+Fresh REMX local claim REMX-20261103-DIAGNOSIS-001; HEAD89622e5d9e5598f95ae9b6a310d369b572cc148e; bounds{"archive": "market/ETF-Complete_5000+_Tickers/Tickers_R_Day_Unadjusted_Full_Dataset.zip", "expected_sha256": "b8c54990689501ddc55183e6bb28c8eb7cd47a8817c04153480a6ef613b1de5e", "max_uncompressed_bytes": 181222, "member": "REMX_full_1day_UNADJUSTED.txt", "root": "/Volumes/SANDISK/firstrate", "scope": "date/row/schema and volume lexical classes only; no price/return output, writes only local audit proofs"}; manifest1740B/SHA1d3ded1648b29c8f002d74b4d1d9d56eca0d34b1f54b72545b2a6900008fc9a7 and record fsynced BEFORE effect. Owner scope is local REMX correction only, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+REMX exact181222B source diagnosis completed; 4339 rows; volume token classes{"etf_interval": {"positive_fractional": 20, "positive_integral_other_lexical": 860, "strict_positive_integer": 3136}, "pre_inception": {"strict_positive_integer": 323}}; private proof93650B/SHAfa2de88eaed25981a5715c62077a5ad08ef604b4d83b5a52516c4904368f8bdd. No prices/volumes/returns exported, no original write or QC/Safari/provider/backtest effect.
+
+Fresh REMX local claim REMX-20261103-COUNTERPARTS-001; HEAD89622e5d9e5598f95ae9b6a310d369b572cc148e; bounds{"file_content_bytes_max": 1200000, "members": ["REMXdailyunadjusted", "REMXdailySplitOnly", "REMXdailySplitDividend", "REMXsplits", "REMXdividends"], "minute_archives": "metadata only", "root": "/Volumes/SANDISK/firstrate/market/ETF-Complete_5000+_Tickers", "scope": "exactdecimalrepresentation classes, counterpart equality booleans, dates/actions metadata; no originalwrites, financialoutputs, provider/QC/Safari"}; manifest1753B/SHA30df9786173c3cf862256c05b306be4c566b500e309b3c7705046cccc38731df and record fsynced BEFORE effect. Owner scope is local REMX correction only, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+REMX counterpart/precision/action-date metadata inspection completed; private proof6101B/SHAdf38afa989b541d04f15569ca5df366045785395865df10d0e2bd30eaac7f7d5. This is not a rounding rule, permission to borrow adjusted data, SID proof or financial outcome; no numericprice/volume values exported.
+
+Fresh REMX local claim REMX-20261103-MINUTE-CORROBORATION-001; HEAD89622e5d9e5598f95ae9b6a310d369b572cc148e; bounds{"max_uncompressed_bytes": 28200000, "members": ["REMXrawdaily181222B", "REMXsplitdaily204873B", "REMXrawminute27581729B"], "root": "/Volumes/SANDISK/firstrate/market/ETF-Complete_5000+_Tickers", "scope": "full minute date/chronology check and exact20-day volume/OHLC equality for predefinedRTH09:30..16:00/extended04..20/allwindows; no round/tolerance/financialreturns, priceorvolumepublication, QC/Safari/provider"}; manifest1773B/SHA205fc159b91756193477574fe3662519f975fe090bf915597e2eee90d62639fd and record fsynced BEFORE effect. Owner scope is local REMX correction only, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+Whole REMX unadjusted-minute corroboration completed27581729B/SHAd18cdf03c52cc0b8c2002c7a38d503462ade59a1dbbdf7f8f61ff87ae1141497/552045rows, no price/volume values output. Scope comparison metadata{"ALL": {"ohlc_matches": 0, "rows_max": 457, "rows_min": 344, "volume_matches_adjusted_counterpart": 0}, "EXTENDED": {"ohlc_matches": 0, "rows_max": 457, "rows_min": 344, "volume_matches_adjusted_counterpart": 0}, "RTH": {"ohlc_matches": 3, "rows_max": 386, "rows_min": 332, "volume_matches_adjusted_counterpart": 0}}; private proof11983B/SHA47df88c7ac367b6b0f3080c71876dc2209b1c3f20f9e26bfecb25656d533976f. Exact counterpartequality is distinct from origin/SID/native or fullmarketvolume proof.
+
+Fresh REMX local claim REMX-20261103-DAILY-CONSISTENCY-001; HEAD89622e5d9e5598f95ae9b6a310d369b572cc148e; bounds{"max_uncompressed_bytes": 700000, "members": ["REMXrawdaily181222B", "REMXsplitdaily204873B", "REMXsplitdivdaily216032B"], "root": "/Volumes/SANDISK/firstrate/market/ETF-Complete_5000+_Tickers", "scope": "fullmatching date axes/positiveintegral volume consistency and OHLC equalities only; no prices,volumevalues,ratios,returns output, originalwrites or QC/Safari/provider"}; manifest1725B/SHA15ccd52ca872b259439314dca3e96f74ce2f989804b8f23629ea9214ecb8708f and record fsynced BEFORE effect. Owner scope is local REMX correction only, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+Full three-daily-file exact consistency crosscheck completed; metadata{"all_daily_dates": 4339, "post_last_split_raw_split_ohlc_equal": 1635, "post_last_split_rows": 1636, "raw_and_siblings_volume_equal": 1616, "sibling_volume_equal": 4339, "sibling_volume_positive_integral": 4260}; private proof272665B/SHA502625f41170483c89877f89eb9fa9fa287738257621924b7dde1c04b3d624e6. Minute aggregates did NOT match any20 sibling daily volumes, so no minute-derived replacement is claimed. This only supports transparent same-vendor corroboration, not independent officialmarketvolume/identity/native acceptance.
+
+### 113.3 Verified causes and conservative correction contract
+
+The original strict adapter's volume refusal is retained as a valid negative
+result. There are no zero/missing/negative/nonfinite volumes in the observed
+source. The860post-inception decimal tokens are mathematically positive
+integers, and can be represented as integer strings without changing quantity.
+The20other positive volumes are genuinely fractional, not floating epsilon;
+the20trading dates span2026-02-23..2026-03-20. Neither rounding nor tolerance
+can preserve those quantities under the integer share-volume contract.
+
+The two bundled adjusted daily members have equal date axes and equal
+volumes on4339dates;4260are positive integral. After the last bundled split
+date2020-04-15 there are1636rows, of which1635have exact raw/split-only OHLC
+equality. The historical earlier adjusted quantities are not a general
+raw-volume substitute. On the20fractional target dates, both adjusted
+counterparts have identical positive integer volumes and exact raw-price
+OHLC equality, but this is only same-vendor internal consistency.
+
+The complete observed unadjusted-minute member has552045unique ascending
+rows/27581729B/SHAd18cdf03c52cc0b8c2002c7a38d503462ade59a1dbbdf7f8f61ff87ae1141497.
+Predeclared RTH09:30..16:00, extended04:00..20:00 and all-calendar-day
+aggregates match none of the20counterpart volumes. RTH OHLC matches3/20;
+extended/all OHLC matches0/20. The discrepancy does not prove which daily
+volume is official. No minute reconstruction or adjusted-volume borrowing
+is performed, and this negative corroboration remains durable.
+
+The separate supplied-byte remx_repair_20261103 module binds the raw member
+SHA, fixes the2010-10-27identity boundary, bounds rows/tokens/exports and uses
+exact Decimal integrality before conversion. It preserves all original
+bytes, lexemes, row hashes and ordinals; rewrites only integral volume tokens;
+and quarantines identity conflicts, fractional values and malformed rows.
+Duplicates are all quarantined; source ordering faults are never repaired
+by sorting. The unchanged strict FirstRate parser must validate a nonempty
+candidate. A regenerated ledger refuses coherent tampering with quantities,
+dispositions or candidate bytes. No cutoff, borrowing, rounding, zero,
+financial-admission or identity override flag exists.
+
+The expected source partition is3136unchanged+860losslesslynormalized+
+323pre-inception-quarantine+20fractional-quarantine=4339. A3996row partial
+candidate can be locally strict-compatible while still lacking the20source
+dates. A complete original CSV, each quarantine, row ledger and aggregate
+manifest remain private. Nothing in this contract authenticates post-inception
+SID/PIT/rights or makes the candidate eligible for the frozen study. The
+full-coverage/backtesting/native/source/financial/canonical/trading flags
+remainFALSE. The original strict adapter and all frozen financial/native
+source epochs remain unchanged.
+
+In plain language, the local repair fixes a formatting incompatibility
+without changing860share quantities, separates323rows that cannot belong
+to this ETF, and makes20unresolved quantities explicit. It preserves every
+source row so the missing facts can be corrected later. The remaining20daily
+volumes need authenticated source clarification; claiming a complete
+backtest dataset from this disk would be unsupported.
+
+### 113.4 Export safety and focused verification before local production
+
+The fixed remx_prepare_20261103 route accepts only a fresh operation identifier,
+not arbitrary source/output/hash/admission arguments. It verifies the exact
+physical lane root, branch, HEAD, status and committed source closure.
+Exclusive private0700/0600 fsynced operation/claim plus the sole record are
+durable BEFORE the one fixed USB member read. The claim binds current owner,
+HEAD/source/history/access/attempt/input-quality-look/read/write limits.
+Every processing/export stage rechecks source/HEAD and UTC/monotonic deadlines.
+Original bytes are retained FIRST; derived candidate, separate quarantines,
+ledger, manifest and success/refusal receipt follow. Partial failures and
+spent scopes remain retained and cannot be replayed or overwritten.
+
+ZIP metadata is bounded before central-directory materialization; exact
+member uniqueness/size/SHA/CRC and physical archive pre/post metadata are
+checked. All ancestors are descriptor-walked without following symlinks.
+FIFO/nonregular sources, private records and USB leaves refuse without
+blocking; public-mode artifact directories refuse. Whole-archive SHA is
+explicitlyNULL/notcomputed. No provider or native predecessor is imported.
+The writer permits an honestly empty invalid-row quarantine. Its fixed
+body-free error framing never prints market observations or exception bodies.
+
+Independent Codex review accepted the conservative partial-candidate
+contract; it does not authenticate a counterpart-derived daily volume.
+One P3 forged-dataclass candidate_line integer framing issue was corrected
+to fixed RepairRefusal before bytes.join. Root also required original-first
+retention and strengthened the interrupted-export regression.
+
+Final stable implementation identities:
+- remx_repair_20261103.py13867B/SHA58b1fe49c47ee4e1d9aa023fa88aad6e955d89bea98b1cb81772350f3e2688db;
+- remx_prepare_20261103.py15252B/SHAf92e8f9a623d24c4158e00f676e36c3a816f79b72e143f8bdc82251fe2d4768d;
+- repair tests9504B/SHA8679317ee3c4688c0e0bedac2ef0818f038e49ee68a56df3a0f9bae0f4c583f0;
+- preparation tests10477B/SHAb3852b007e0f66bb9be34ee50561b2143f0084618ba9d6ced71e6400c265df82;
+- current document tests337323B/SHAd831b23ba9f071ddae942c95e0840779e10eab112b2ce5b64c49269f317eec95.
+
+Root independently ran109focused checks in0.49s:40repair+24export+45unchanged
+strict-adapter checks, before/after hashes stable. The final focused current
+document run passed157checks/558deselected in2.64s with stable record bytes.
+Both used isolated49/52 runtime and syntheticDB BEFORE dispatch/config
+imports and denied sockets/DNS. No full lane/repo suite or Claude review ran.
+Earlier84/85pure/strict and20export subsets are attributed intermediate checks,
+not extra distinct final coverage. An intermediate document run had119failed/
+10passed/558deselected in7.95s while the record changed, with the established
+short-range backtick token missing; that format issue was corrected, its
+single baseline passed, then the final157passed. This retains the unsuccessful
+software check without implying a market/native failure or erasing history.
+
+Root verified syntax/EOF/diff checks, predecessor byte equality, and exact
+preservation of received historical sections9..112. The new source is
+committed locally before the actual private export. No push has occurred in
+this REMX round; actual export and fresh independent artifact verification
+remain to be performed under their own new scopes. No financial result or
+native/market-origin acceptance is inferred from software tests.

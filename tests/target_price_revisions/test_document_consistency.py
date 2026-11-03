@@ -1226,6 +1226,7 @@ def _assert_section93_current_facts(text: str) -> None:
     normalized = " ".join(text.split()).lower()
     _assert_section106_current_scope(text)
     _assert_section112_current_facts(text)
+    _assert_section113_current_facts(text)
     for required in (*SECTION93_CURRENT_FACTS, SECTION106_NEXT_ROLE, SECTION112_NEXT_ROLE,
                      "last completed counter-review", "skip 1, proceed to 2 and 3 directly"):
         assert required.lower() in normalized, required
@@ -5866,6 +5867,31 @@ def _assert_section112_current_facts(text: str) -> None:
         assert re.search(pattern, folded) is None, "contradictory current handoff count/status"
 
 
+def _assert_section113_current_facts(text: str) -> None:
+    """The REMX representation repair is partial; count gaps are not zeros."""
+    folded = " ".join(text.replace("*", "").replace(chr(96), "").split()).casefold()
+    ratios = re.findall(r"(?<![0-9])([0-9]+)\s*of\s*([0-9]+)\s*source\s+rows", folded)
+    assert ratios and all(pair == ("3996", "4339") for pair in ratios), "partial REMX candidate counts"
+    gaps = re.findall(r"(?<![0-9])([0-9]+)\s*missing\s+post-inception\s+source\s+dates", folded)
+    assert gaps and all(count == "20" for count in gaps), "unresolved REMX date gaps"
+    identity = re.findall(r"(?<![0-9])([0-9]+)\s*(?:identity-conflict|pre-inception)", folded)
+    assert identity and all(count == "323" for count in identity), "pre-inception identity quarantine"
+    fractional = re.findall(r"(?<![0-9])([0-9]+)\s*(?:genuinely\s+)?fractional", folded)
+    assert fractional and all(count == "20" for count in fractional), "unresolved fractional volumes"
+    assert "partial candidate" in folded and "quarantin" in folded
+    assert "full coverage remains unverified" in folded
+    assert "unknown instrument identity" in folded or "cannot authenticate the old issuer" in folded
+    assert "preserves original source bytes" in folded or "retains every original row and lexeme" in folded
+    for contradiction in (
+        "all remx data fixed", "all remx data are fixed", "full coverage accepted",
+        "full coverage is accepted", "full coverage is verified",
+        "permanent sid binding is verified", "usb source is admitted",
+        "fractional volumes are rounded", "fractional volumes are truncated",
+        "original rows are discarded", "missing volumes are zero",
+    ):
+        assert contradiction not in folded, "contradictory REMX repair claim: " + contradiction
+
+
 SECTION106_COMMITS = ("1ebb720852820056ec6f30af8afd4fdbdc9eae8f", SECTION106_HEAD)
 SECTION106_OWNER_SHA256 = "abdd8bc5542b89ff0815b9d433a216279b1271f71755ddd7fc0bf779cdabd907"
 SECTION106_HEADING = "## 106. Owner-directed genuine Mia recovery and five-arm continuation"
@@ -6902,6 +6928,50 @@ def test_section112_current_fact_guard_refuses_replacements(monkeypatch, surface
     SECTION112_PRE_NOTICE_NEXT_ROLE,
 ))
 def test_section112_current_fact_guard_refuses_appended_contradictions(monkeypatch, surface, contradiction):
+    test_exact_next_step_names_the_current_artifacts()
+    _mutate_section112_current_surface(monkeypatch, surface,
+        lambda text: text + "\n" + contradiction + "\n")
+    with pytest.raises(AssertionError):
+        test_exact_next_step_names_the_current_artifacts()
+
+
+@pytest.mark.parametrize("surface", ("current", "preamble"))
+def test_section113_current_partial_repair_facts_are_explicit(surface):
+    text = _current_qualification(_record_section("## 8. Exact next step")) if surface == "current" else _record_preamble()
+    _assert_section113_current_facts(text)
+
+
+@pytest.mark.parametrize("surface", ("current", "preamble"))
+@pytest.mark.parametrize("pattern,replacement", (
+    (r"3996\s*of\s*4339\s*source\s+rows", "4339 of 4339 source rows"),
+    (r"20\s*missing\s+post-inception\s+source\s+dates", "0 missing post-inception source dates"),
+    (r"323(?=\s*(?:identity-conflict|pre-inception))", "0"),
+    (r"20\s*(?:genuinely\s+)?fractional", "0 fractional"),
+    (r"full\s+coverage\s+remains\s+unverified", "full coverage is accepted"),
+))
+def test_section113_current_repair_guard_refuses_false_complete_replacements(monkeypatch, surface, pattern, replacement):
+    test_exact_next_step_names_the_current_artifacts()
+    def mutate(text):
+        changed, count = re.subn(pattern, lambda _: replacement, text, count=1, flags=re.I)
+        assert count == 1
+        return changed
+    _mutate_section112_current_surface(monkeypatch, surface, mutate)
+    with pytest.raises(AssertionError):
+        test_exact_next_step_names_the_current_artifacts()
+
+
+@pytest.mark.parametrize("surface", ("current", "preamble"))
+@pytest.mark.parametrize("contradiction", (
+    "All REMX data are fixed.",
+    "Full coverage is accepted.",
+    "0 missing post-inception source dates.",
+    "4339 of 4339 source rows are usable.",
+    "Permanent SID binding is verified.",
+    "USB source is admitted.",
+    "Fractional volumes are rounded.",
+    "Original rows are discarded.",
+))
+def test_section113_current_repair_guard_refuses_appended_promotions(monkeypatch, surface, contradiction):
     test_exact_next_step_names_the_current_artifacts()
     _mutate_section112_current_surface(monkeypatch, surface,
         lambda text: text + "\n" + contradiction + "\n")

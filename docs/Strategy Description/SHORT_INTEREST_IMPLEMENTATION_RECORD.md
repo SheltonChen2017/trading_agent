@@ -30552,3 +30552,192 @@ actual-input gates remain open. No QC/Safari, purchase, source/key/claim/START/
 charge/outcome occurs. No successful push has occurred in this continuation.
 Main post-result active-document checks69 passed/.80s with OS network denied;
 record whitespace passed. No source/native proof or full suite was rerun.
+
+
+## 138. Integrated local native profile and automatic deadline observation (2026-11-03)
+
+### 138.1 Bounded decision and unchanged authority
+
+SI-DEC-20261103-04 under continuing SI-AUTH-20261103-02 prepares ONE integrated
+source-free native-supervision profile. Starting exact clean lane HEAD is
+07ca0ea90439cda2622a5e825d7cd1ee80ef1d8f; actual/tracking origin stays
+2a6d34c063da17dadeb98874344b628dcd6594a7. The owner-authenticated trace and
+deadline-negative metadata-v1 observations in137 are retained, not upgraded.
+No additional standalone metadata probe, old-namespace retry, restored stamp,
+flag clear, datum move/delete, failed-claim reset or budget refund occurs.
+
+The entire existing automated coordinate_registered transaction is reused.
+Its selected local profile places bootstrap, backing image, mount, proof,
+empty Main directory, native/negative controls and results together under
+Library/Application Support/CodexShortInterestCustody/native-supervision-
+20261103-v1. The existing local-metadata-20261103-v1 sibling stays untouched.
+ROOT/cwd/Git/branch/code are still the designated Short Interest lane. This
+is a fixed operational storage location, not another checkout or worktree.
+
+The genuine producer/collector/kernel query/original independent reader and
+all code/native/context/post-close checks remain. Total successful operation
+limit300s, native-command cap120s, original8GiB virtual source-free volume,
+required ownership/local APFS/capacity/nobrowse/association constraints and
+worker's original two-second/two-line proof remain. No new permission,
+credential, purchase, source request/claim/START/charge/outcome or QC/Safari
+access is granted. Count84005/4GiB, separate DAILY residual36837 attempts/
+3327988047 bytes/71468572 rows and permanent8START/16777216 bytes are unchanged.
+SourceAUTH remains unconditionally blocked; looks0/0, exploratory0, alpha0,
+IDsnone and QCattempts0 remain. No monitor is created or changed.
+
+### 138.2 Exact profile propagation and prospective corrections
+
+Only native-supervision SDK, its focused tests, retirement regressions in the
+spent metadata profile's test file, and this lane record change. Two exact
+internal selector objects are admitted: LEGACY_V4 by default and explicit
+LOCAL_NATIVE_V1. Caller-built equal objects, arbitrary paths and ROOT/PARENT
+monkeypatches are not public profile mechanisms. Strong retained object
+bindings distinguish profile identities through clocks, directories, code,
+inputs, domain/creation/negative state, original processes/origins/waits,
+prepared keys, observers, kernel query objects, private Root contexts and
+factory-issued results. Profile mismatches refuse; no JSON or caller flag can
+mint a typed Root/Main receipt or source authority.
+
+Local CLI actions prepare-local-proof/run-local-proof/coordinate-local-proof
+select the exact local object while preserving the existing startup envelope
+arity. Legacy action/default API, policy, wrapper, bootstrap payload and plist
+bytes remain unchanged. Local private wire records add their exact storage
+tag and local policy identity; service label/plist path/spec/marker/inventory/
+independent-reader/kernel-query targets stay bound to that same profile. Local
+container creation happens once inside prepare_bootstrap AFTER its real code
+guard, covering both standalone preparation and the automated coordinator.
+
+The unchanged genuine publisher preserves original O_EXCL0600/single-link
+creation, original RO handoff, UF2 and full9/flags/bytes with original anchors.
+Local ancestry requires nofollow root-or-owner nonwritable directories and
+owner0700 private base/run; exact old metadata sibling plus the single new run
+are required. Known creation derives only its one owned directory addition;
+old contents are never opened or admitted by preparing the container. Host
+and mounted-native identities are distinct and checked against their original
+observations after contexts close. No new native domain is created by tests.
+
+| ID | Priority | Disposition / causal evidence |
+| --- | --- | --- |
+| SI-LOCAL-20261103-006 | P2 | Software orchestration correction prepared: full existing coordinator plus prebuilt automatic owned-process observer removes agent pauses. Original metadata-v1 remains deadline-negative; no retroactive repair. Actual integrated result is still pending. |
+| SI-NATIVE-20261103-001 | P2 | Corrected before freeze: a collector that issued its genuine original worker wait and then raised before return left that existing wait without the local profile binding. Negative closure refused and held already-terminal diagnostics. Binding now follows BOTH existing/fallback branches only after exact identity against the original worker._WAITS or _NEGATIVE_WAITS registry. Original process/origin/frame checks remain. Causal omission produced two expected failures; restoring the binding passed. Caller-created waits remain rejected. |
+| SI-NATIVE-20261103-002 | P3 | Retracted false alarm: proposed bootstrap-ancestry drift after domain creation does not follow the real call order. LoadTransaction closes/audits before kickstart; later Root snapshot serializes those finite closed originals. No topology or check was changed for this concern. |
+
+Editing the SDK intentionally retires the already-spent plain metadata-v1
+runtime. Its original e477 SDK pin and policy stay FROZEN; they are not changed
+to bless the new bytes. Added fabricated producer/observer entry regressions
+prove current SDK drift refuses before old namespace, handshake, publication
+or Git-eighth read, with original code-holder cleanup. Historical33F8 Git bytes
+and all actual v1 files/controls/negative Main result remain available. No old
+entry point is resumed and no old fixture assertion is deleted or weakened.
+
+### 138.3 Exact software identities and independent legacy comparison
+
+SDK184031 bytes/SHA256
+947697d03ac5dc99cbd663337cedc57ad8460db3a8db33b943db7ccb7b6dc267;
+native tests170637 bytes/SHA256
+e6911978109e5ac807c74c883a894750a4a687482360140e5a71f1516e50632d;
+metadata retirement tests39656 bytes/SHA256
+d7ab894ceacbe1d88107a279e1082c6a45faae492368bc48a997c991a5fd6ace.
+New local policy SHA256
+3451e95b0073165067b95b2c98eaada1b82cda035bc22c966a317ec57ce98e5f.
+Legacy policy remains848ceb48bc42aa02a4974d95da2ba113c172a26aed31d5d0827a4a8fa62c3a94;
+legacy body8ef2cb1f267ce3682b591daa005cb73a9fbee0177024beb8ab9d3e91607b390b,
+wrapperfee43fc39c8df2b96b751c81f2972f156f1fd4e0257bfdbc4cda237a0c99c024.
+
+Main independently hash-authenticated Git07CA/e477 source BEFORE loading it in
+an isolated trusted reference namespace. Updated default policy/wrapper bodies
+and representative payload/plist bytes matched that original reference, not
+only asserted expected hashes. With head a*40/remote b*40, observer nonce c*32,
+terminal[1,2,3,4,5,6], slave_path/dev/ttys999 and each code hash d*64, payload
+1514 bytes/SHA799c7d8a13562730046e0e9637d82538156847b62a85ace30df8109a85d7880c;
+plist3325 bytes/SHAb816cec206422477a85aad2490b5383cb417fda3257c656ad3f7943ffd42e7ae.
+This vector performs no real TTY, filesystem, launchd or provider operation.
+
+Main compared nine complete protected definitions as AST-identical, including
+the full _Files class, creator/current identity, RO handoff, freeze/check and
+SDK flag setter. Peer compared sixteen protected definitions. Seven code-file
+names and all fourteen authority keys remain identical to the old SDK. Main
+independently verified all three new hashes and Python3.9 AST/in-memory compile.
+The local profile's new policy is separately frozen; legacy preservation does
+not admit the new profile or imply an actual native result.
+
+### 138.4 Validation, retained failed run and automatic observer
+
+Author final fabricated selection350 passed/13.08s; advisory peer350/13.41s.
+Exactly TWO explicitly named real_kernel_immutable tests are deselected from
+this fabricated scope, not weakened or deleted: they deliberately invoke real
+SDK flags rather than fixture flag boundaries. Actual native operation remains
+separately gated on the frozen registered invocation. Source/native/launchd/
+flag seams for the selected tests are fabricated; OS networking was denied,
+inherited environment empty, bytecode/pytest cache disabled. No full lane or
+repository suite is run. Peer original-wait binding reversal:2 expected
+failures/237 deselected/1.84s, restored2/1.01s. Author earlier same omission:
+2 expected failures/236 deselected/1.56s, restored; the later pure legacy-vector
+regression explains the count difference. These are not actual native failures.
+
+Main's FIRST four-file selection failed one existing metadata observer cleanup
+reachability assertion:427 passed/1 failed/2 realUF deselected/14.23s. The
+observer_open packet existed but observer_closed did not precede refusal. Its
+fixture held the fixed refusal diagnostic only in memory, and the original
+pytest process ended without printing it. The exact earlier refusal gate is
+UNKNOWN. No filesystem/provider/profile/clock actor is inferred from it.
+
+SI-NATIVE-20261103-003 (P3 verification concern, OPEN/unreproduced): Main isolated
+observer case then passed1/.58s, emitting observer_closed followed by its
+intentional terminal local_original refusal. Author isolated cases2/.60s passed.
+Peer's exact original four-file order passed428/14.20s; collection audit found
+no native/OS/time seam mutation. Main ONE diagnostic-retaining exact-order
+recheck passed428/13.86s,2 explicit realUF deselected, on IDENTICAL code/test
+bytes and original reachability assertion. No production/fixture assertion or
+custody check was changed to cure this unexplained prior failure. Preserve the
+historical failed execution; green rechecks do not identify its cause. Any
+actual refusal will still veto the registered proof.
+
+Main prepared the complete automatic CP observation envelope BEFORE another
+dispatch. Its exact session body SHA256 is
+e3b1c64a3a92985940158c65cfefd6511176a9801ba736c9aef670facf54165c.
+It starts one original private monotonic clock before preflight, owns the
+coordinator process/stdio/actual close, drains raw packets, retains original
+text, requires a single canonical bound Root closure, unchanged exact false/
+zero authority, real exit0/no signal and no stderr/extra bytes. Completion time
+is captured automatically at the owned close event AND after final packet
+validation; later agent polling cannot reset it. Deadline, duplicate/malformed
+output, unsafe integer round-trip, EPIPE/spawn/abnormal exit or late data vetoes
+the result. It never kills/restarts the Root process or mints durable Main.
+
+Main23 fabricated controller checks passed, including an explicit missing-final-
+clock variant that incorrectly accepts crossing300s during final validation,
+then restored rejection. Initial causal harnesses were corrected for unsupported
+runtime string code generation and an older fixture function binding; the final
+23 checks explicitly received the exact final factory. No actual process,
+namespace, mount, job or source was launched by these simulated checks.
+The genuine fully automated native coordinator performs its own independent
+producer/kernel/original-reader/context-close conjunction; this observation
+envelope is not a substitute durable Main/SourceAUTH factory.
+
+### 138.5 Prepared next operation and exclusions
+
+After this preparation is committed, reverify clean exact new HEAD/branch/root,
+all seven current/committed code bytes, local3451 policy, absent new local run
+and GUI service, no pinned operation and unchanged actual matching origin.
+Invoke ONLY coordinate-local-proof ONCE from this designated worktree, with
+the prebuilt automatic observer and all original bounds. No edit/test/commit/
+push overlaps an active proof. No second standalone probe, image/label restart,
+namespace reuse, detach/remount/adoption, SourceAUTH release or longer window
+is inferred from a failure. Unknown lifecycle keeps original contexts held.
+Any actual OS permission gate is reported precisely; preauthorization does
+not fabricate that permission or an exit. All existing data and budgets stay.
+
+A success would establish only source-free native supervision in memory plus
+its genuinely owned outer process exit. Durable Main/readmission/accounting,
+the original permanent8START/16MiB, nine-part ledger/lease/checkpoint bridge,
+USB/source qualification, exact class/date/CIK/USD/reported-count/availability/
+rights/coverage/cash and actual-input gates remain. No QC/Safari until further
+notice and no purchases. The lane is not at the last step before QC setup.
+No successful push has occurred in this continuation; accumulate locally and
+reserve the ONE matching-lane publication for the completed round or a concrete
+terminal owner-required blocker, with final concurrency/clean-equality checks.
+Main post-record active-document checks69 passed/.64s, OS network denied;
+whitespace passed. Current seven-path byte mapping SHA256 is
+522744391f49c7200930e593360ca3644fb83524aa716b6b0b109586b6f8deee.
+The actual new local run remained absent; all development agents are frozen.

@@ -2513,3 +2513,334 @@ def test_observation_wire_is_strict_and_cannot_attest_kernel(mutation):
     elif mutation == "duplicate": raw = raw.replace(b'"pid":123', b'"pid":123,"pid":123')
     with pytest.raises((proof.SupervisionRefusal, json.JSONDecodeError)):
         proof._filtered_observation(raw, observer, digest, pid)
+
+
+
+def test_local_profile_legacy_payload_and_plist_match_trusted_07ca_vector():
+    # Expected bytes were independently compared with Git07CA's e477 SDK,
+    # executing only pure serializers; no TTY, source, job or native operation.
+    observer = {"nonce": "c" * 32, "terminal": [1, 2, 3, 4, 5, 6], "slave_path": "/dev/ttys999"}
+    manifest = {name: "d" * 64 for name in proof.CODE_FILES}
+    raw = canonical_json(proof._payload(HEAD, REMOTE, manifest, observer)).encode()
+    assert len(raw) == 1514 and hash_bytes(raw) == "799c7d8a13562730046e0e9637d82538156847b62a85ace30df8109a85d7880c"
+    job = plistlib.dumps(proof.build_launchd_plist(HEAD, REMOTE, hash_bytes(raw), observer), sort_keys=True)
+    assert len(job) == 3325 and hash_bytes(job) == "b816cec206422477a85aad2490b5383cb417fda3257c656ad3f7943ffd42e7ae"
+    assert "storage_profile" not in json.loads(raw)
+
+
+def test_local_profile_preserves_exact_legacy_hashes_and_fixed_local_contract():
+    assert proof.POLICY_SHA256 == hash_payload(proof.policy()) == "848ceb48bc42aa02a4974d95da2ba113c172a26aed31d5d0827a4a8fa62c3a94"
+    assert hash_bytes(proof._wrapper_body().encode()) == "8ef2cb1f267ce3682b591daa005cb73a9fbee0177024beb8ab9d3e91607b390b"
+    assert hash_bytes(proof._wrapper().encode()) == "fee43fc39c8df2b96b751c81f2972f156f1fd4e0257bfdbc4cda237a0c99c024"
+    root, parent = proof.ROOT, proof.PARENT
+    local = proof.policy(proof.LOCAL_NATIVE_V1)
+    assert local["storage_profile"] == "local-native-v1"
+    assert local["base"] == "/Users/sheltonchen/Library/Application Support/CodexShortInterestCustody"
+    assert local["run"] == str(proof.LOCAL_BASE / "native-supervision-20261103-v1")
+    assert local["bootstrap"] == str(proof.LOCAL_RUN / "bootstrap")
+    assert local["domain"] == str(proof.LOCAL_RUN / "domain")
+    assert all("Documents" not in Path(local[key]).parts for key in ("base", "run", "bootstrap", "domain"))
+    assert local["maximum_seconds"] == proof.MAXIMUM_SECONDS == 300
+    assert local["authority"] == proof.authority()
+    assert all(local["authority"][key] is False for key in
+        ("source_admitted", "source_dispatch_authority", "budget_release_authority", "ready_for_backtest", "QC_or_Safari"))
+    assert proof._bootstrap_path(proof.LEGACY_V4) == root / parent / proof.BOOTSTRAP
+    assert proof._domain_path(proof.LEGACY_V4) == root / parent / proof.DOMAIN
+    assert (proof.ROOT, proof.PARENT) == (root, parent)
+
+
+@pytest.mark.parametrize("fake", [None, "local-native-v1", {}, SimpleNamespace(profile="local-native-v1")])
+def test_local_profile_rejects_unissued_profile_before_io(fake, monkeypatch):
+    calls = []
+    monkeypatch.setattr(proof, "_require_immutable_platform", lambda: calls.append("platform"))
+    with pytest.raises(proof.SupervisionRefusal): proof.policy(fake)
+    with pytest.raises(proof.SupervisionRefusal): proof.registered(fake)
+    with pytest.raises(proof.SupervisionRefusal): proof._Clock(profile=fake)
+    with pytest.raises(proof.SupervisionRefusal): proof._Directory("container", create=True, profile=fake)
+    assert calls == []
+
+
+def test_local_profile_sealed_identity_and_external_rebind_do_not_crosscast():
+    with pytest.raises(proof.SupervisionRefusal): proof._StorageProfile()
+    forged = object.__new__(proof._StorageProfile)
+    with pytest.raises(proof.SupervisionRefusal): proof.policy(forged)
+    with pytest.raises((AttributeError, TypeError)): proof.LOCAL_NATIVE_V1.path = Path("/private/fabricated")
+    value = SimpleNamespace(storage_profile=proof.LEGACY_V4)
+    proof._bind_profile(value, proof.LOCAL_NATIVE_V1)
+    value.storage_profile = proof.LEGACY_V4
+    assert proof._profile_of(value) is proof.LOCAL_NATIVE_V1
+    proof._bind_profile(value, proof.LOCAL_NATIVE_V1)
+    with pytest.raises(proof.SupervisionRefusal): proof._bind_profile(value, proof.LEGACY_V4)
+    with pytest.raises(proof.SupervisionRefusal): proof._same_profile(proof.LEGACY_V4, value)
+    assert proof._profile_of(value) is proof.LOCAL_NATIVE_V1
+
+
+def test_local_profile_clock_keeps_original_global_300_second_boundary(monkeypatch):
+    now = [100.0]
+    monkeypatch.setattr(proof.time, "monotonic", lambda: now[0])
+    clock = proof._Clock(profile=proof.LOCAL_NATIVE_V1)
+    assert proof._profile_of(clock) is proof.LOCAL_NATIVE_V1
+    now[0] = 400.0
+    assert clock.check() == 0
+    now[0] = 400.001
+    with pytest.raises(proof.SupervisionRefusal, match="native_proof_deadline"): clock.check()
+    assert proof._profile_of(clock) is proof.LOCAL_NATIVE_V1
+
+
+@pytest.mark.parametrize("field", ["LOCAL_BASE", "LOCAL_RUN", "LOCAL_LABEL"])
+def test_local_profile_registration_binds_exact_fixed_storage_before_platform(field, monkeypatch):
+    calls = []
+    monkeypatch.setattr(proof, "_require_immutable_platform", lambda: calls.append("platform"))
+    proof.registered(proof.LOCAL_NATIVE_V1)
+    assert calls == ["platform"]
+    calls.clear()
+    value = "fabricated.other.label" if field == "LOCAL_LABEL" else Path("/private/fabricated-other-profile")
+    monkeypatch.setattr(proof, field, value)
+    with pytest.raises(proof.SupervisionRefusal, match="supervision_unregistered"):
+        proof.registered(proof.LOCAL_NATIVE_V1)
+    assert calls == []
+
+
+def test_local_profile_wrapper_plist_and_prepared_keys_are_disjoint(fabricated):
+    h = fabricated; digest = "d" * 64; local = proof.LOCAL_NATIVE_V1; legacy = proof.LEGACY_V4
+    root, parent = proof.ROOT, proof.PARENT
+    value = proof.build_launchd_plist(HEAD, REMOTE, digest, h.observer, profile=local)
+    assert value["Label"] == proof.LOCAL_LABEL != proof.LABEL
+    assert value["WorkingDirectory"] == str(root)
+    assert value["ProgramArguments"][3] == proof._wrapper(local)
+    assert value["ProgramArguments"][4] == "run-local-proof"
+    assert "run-local-proof" in proof._wrapper_body(local)
+    assert "run-local-proof" not in proof._wrapper_body()
+    assert value["RunAtLoad"] is value["KeepAlive"] is False
+    a = proof._prepared_key(HEAD, REMOTE, digest, h.observer, legacy)
+    b = proof._prepared_key(HEAD, REMOTE, digest, h.observer, local)
+    assert a == (HEAD, REMOTE, digest, h.observer["nonce"])
+    assert b == (*a, "local-native-v1", proof.LOCAL_POLICY_SHA256) and a != b
+    proof._PREPARED[a] = ()
+    with pytest.raises(proof.SupervisionRefusal, match="supervision_original"):
+        proof._LoadTransaction(HEAD, REMOTE, digest, h.observer, profile=local)
+    assert (proof.ROOT, proof.PARENT) == (root, parent)
+
+
+def _local_profile_kernel_raw(profile, *, started=True, exit_code=0):
+    return ("\n".join([proof._target(profile) + " = {",
+        "\tpath = " + str(proof._bootstrap_path(profile) / "job.plist"), "\tstate = not running",
+        "\truns = " + str(int(started)), "\tactive count = 0",
+        "\tlast exit code = " + (str(exit_code) if started else "(never exited)"), "}"]) + "\n").encode()
+
+
+@pytest.mark.parametrize("profile", [proof.LEGACY_V4, proof.LOCAL_NATIVE_V1])
+def test_local_profile_kernel_service_targets_and_original_query_cannot_crosscast(profile, monkeypatch):
+    other = proof.LOCAL_NATIVE_V1 if profile is proof.LEGACY_V4 else proof.LEGACY_V4
+    target = proof._target(profile)
+    assert proof._service_arguments("query", profile=profile) == [proof.LAUNCHCTL, "print", target]
+    assert proof._service_arguments("load", profile=profile) == [proof.LAUNCHCTL, "bootstrap", "gui/" + str(os.getuid()),
+        str(proof._bootstrap_path(profile) / "job.plist")]
+    assert proof._service_arguments("start", profile=profile) == [proof.LAUNCHCTL, "kickstart", "-p", target]
+    raw = _local_profile_kernel_raw(profile)
+    assert proof._kernel_metadata(raw, profile=profile)["exit"] == 0
+    with pytest.raises(proof.SupervisionRefusal, match="supervision_kernel"): proof._kernel_metadata(raw, profile=other)
+    monkeypatch.setattr(proof, "_guard", lambda head, remote: None)
+    def launch(role, **kwargs):
+        assert kwargs.get("profile", proof.LEGACY_V4) is profile
+        return subprocess.CompletedProcess(proof._service_arguments(role, profile=profile), 0, raw, b"")
+    monkeypatch.setattr(proof, "_launch_service", launch)
+    issued = proof._query_service(HEAD, REMOTE, profile=profile)
+    assert proof._profile_of(issued) is profile and proof._kernel_origin(issued)[0] is issued
+    with pytest.raises(proof.SupervisionRefusal): proof._same_profile(other, issued)
+    copy = dict(issued)
+    with pytest.raises(proof.SupervisionRefusal): proof._kernel_origin(copy)
+
+
+@pytest.fixture
+def local_profile_domain(genuine_domain, monkeypatch):
+    """The genuine local path/domain lifecycle, with explicit temporary/native facts.
+
+    Actual file creation, original seals, nofollow descriptors, bootstrap,
+    producer and collector code execute. Ancestor protection, directory link
+    counts and mounted-device/APFS facts are projected only for this fixture;
+    no actual configured local base, image, flags, service or source is touched.
+    """
+    h = genuine_domain
+    base = h.root / "fabricated-owner" / "Library" / "Application Support" / "CodexShortInterestCustody"
+    base.mkdir(parents=True, mode=0o700)
+    base.parent.chmod(0o700)
+    (base / "local-metadata-20261103-v1").mkdir(mode=0o700)
+    run = base / "native-supervision-20261103-v1"
+    monkeypatch.setattr(proof, "LOCAL_BASE", base); monkeypatch.setattr(proof, "LOCAL_RUN", run)
+    monkeypatch.setattr(proof, "LOCAL_POLICY_SHA256", hash_payload(proof.policy(proof.LOCAL_NATIVE_V1)))
+    h.local_base, h.local_run = base, run
+    h.domain_path = run / "domain"; h.mount_path = h.domain_path / "mount"; h.image_path = h.domain_path / "backing.sparseimage"
+    original_local_dir, original_statfs = proof._local_dir, proof._native_statfs
+    def local_dir(info, private=False):
+        if private: return original_local_dir(info, True)
+        fields = {name: getattr(info, name) for name in dir(info) if name.startswith("st_")}
+        fields.update(st_mode=stat.S_IFDIR | 0o700, st_uid=os.getuid())
+        return original_local_dir(SimpleNamespace(**fields), False)
+    monkeypatch.setattr(proof, "_local_dir", local_dir)
+    def statfs(fd):
+        value = original_statfs(fd)
+        return value if value["fstype"] == "apfs" else {**value, "fstype": "apfs"}
+    monkeypatch.setattr(proof, "_native_statfs", statfs)
+    h.prepare_local = lambda: proof.prepare_bootstrap(HEAD, REMOTE, h.observer, profile=proof.LOCAL_NATIVE_V1)["spec_sha256"]
+    h.produce_local = lambda digest: proof.run_registered(HEAD, REMOTE, digest, h.observer, profile=proof.LOCAL_NATIVE_V1)
+    return h
+
+
+def test_local_profile_bootstrap_original_controls_and_crosscast_refusal(local_profile_domain):
+    h = local_profile_domain; clock = proof._Clock(profile=proof.LOCAL_NATIVE_V1)
+    root, parent = proof.ROOT, proof.PARENT
+    digest = h.prepare_local()
+    spec = json.loads((h.local_run / "bootstrap" / "launch.spec.json").read_bytes())
+    assert spec["storage_profile"] == "local-native-v1" and spec["policy_sha256"] == proof.LOCAL_POLICY_SHA256
+    assert set(proof._PREPARED) == {proof._prepared_key(HEAD, REMOTE, digest, h.observer, proof.LOCAL_NATIVE_V1)}
+    code = proof._Code7(HEAD, REMOTE, clock)
+    directory = config = None
+    try:
+        directory, config = proof._read_config(HEAD, REMOTE, digest, h.observer, code.manifest, profile=proof.LOCAL_NATIVE_V1)
+        proof._same_profile(proof.LOCAL_NATIVE_V1, clock, code, directory, config)
+        # The same exact local bytes copied only into a new fabricated legacy
+        # directory remain the wrong profile; absence alone is not this proof.
+        legacy = proof._Directory(proof.BOOTSTRAP, create=True)
+        try:
+            for name in proof._Inputs.ROLES:
+                proof._config_write(legacy, name, (h.local_run / "bootstrap" / name).read_bytes())
+        finally: legacy.close()
+        with pytest.raises(proof.SupervisionRefusal, match="supervision_code"):
+            proof._read_config(HEAD, REMOTE, digest, h.observer, code.manifest)
+        assert (proof.ROOT, proof.PARENT) == (root, parent)
+    finally:
+        if config is not None: config.close()
+        if directory is not None: directory.close()
+        code.close()
+
+
+def test_local_profile_genuine_fabricated_producer_tags_every_original_positive_control(local_profile_domain):
+    h = local_profile_domain
+    digest = h.prepare_local(); result = h.produce_local(digest)
+    public = result.public_summary()
+    assert public["actual_child_exit"] == 0 and public["kernel_exit_attested"] is False
+    assert proof._profile_of(result) is proof.LOCAL_NATIVE_V1
+    volume = h.volumes[-1]
+    assert volume.path == h.local_run / "domain"
+    for name in ("run.started.json", "child.exit.provisional.json", proof.INVENTORY_ROLE, proof.MARKER_ROLE):
+        control = json.loads((volume.mount / "proof" / name).read_bytes())
+        assert control["storage_profile"] == "local-native-v1" and control["policy_sha256"] == proof.LOCAL_POLICY_SHA256
+        assert control["authority"] == proof.authority()
+    assert len(h.processes[0].waits) == 1 and h.processes[0].waits[0] > 0
+    assert not (h.root / proof.PARENT / proof.DOMAIN).exists()
+
+
+def test_local_profile_full_fabricated_coordinator_preserves_genuine_reader_and_closure(local_profile_domain, monkeypatch):
+    h = local_profile_domain; loaded = started = False; local = proof.LOCAL_NATIVE_V1; kernel_calls = []
+    writer = [None]
+    def launch(role, *, profile=proof.LEGACY_V4):
+        nonlocal loaded, started
+        assert profile is local; kernel_calls.append(role)
+        if role == "query":
+            return subprocess.CompletedProcess(proof._service_arguments(role, profile=local), 0 if loaded else 113,
+                _local_profile_kernel_raw(local, started=started) if loaded else b"", b"")
+        if role == "load":
+            assert not loaded; loaded = True
+            return subprocess.CompletedProcess(proof._service_arguments(role, profile=local), 0, b"", b"")
+        assert role == "start" and loaded and not started; started = True
+        spec_raw = (h.local_run / "bootstrap" / "launch.spec.json").read_bytes()
+        spec = json.loads(spec_raw); digest = hash_bytes(spec_raw)
+        writer[0] = os.open(spec["observer"]["slave_path"], os.O_RDWR | os.O_NOFOLLOW | getattr(os, "O_NOCTTY", 0))
+        result = proof.run_registered(HEAD, REMOTE, digest, spec["observer"], profile=local)
+        monkeypatch.setattr(proof, "_observer_fd", lambda: writer[0])
+        observer = proof._Observer(spec["observer"], digest)
+        proof._bind_profile(observer, local)  # Exact local CLI performs this binding.
+        observer.emit(result=result)
+        return subprocess.CompletedProcess(proof._service_arguments(role, profile=local), 0, str(os.getpid()).encode() + b"\n", b"")
+    monkeypatch.setattr(proof, "_launch_service", launch)
+    try:
+        result = proof.coordinate_registered(HEAD, REMOTE, profile=local)
+        public = result.public_summary()
+        assert public["storage_profile"] == "local-native-v1" and public["policy_sha256"] == proof.LOCAL_POLICY_SHA256
+        assert public["actual_kernel_exit"] == public["actual_child_exit"] == 0
+        assert public["durable_Main_receipt"] is False and public["sourceAUTH_blocked"] is True
+        assert public["authority"] == proof.authority()
+        assert kernel_calls.count("start") == kernel_calls.count("load") == 1
+        receipt = proof._ROOT_RECEIPTS[result._anchor[2]]
+        reader, code, config, load = receipt[3]
+        assert type(reader) is proof._OriginalRead and all(not item.fds for item in (reader, code, load))
+        proof._same_profile(local, result, reader, code, config, load)
+        assert not (h.root / proof.PARENT / proof.BOOTSTRAP).exists()
+    finally:
+        if writer[0] is not None: os.close(writer[0])
+
+
+
+@pytest.mark.parametrize("command", ["prepare-local-proof", "run-local-proof", "coordinate-local-proof"])
+def test_local_profile_cli_routes_only_the_exact_sealed_profile(command, fabricated, monkeypatch, capsys):
+    h = fabricated; calls = []; digest = "d" * 64
+    class Observation:
+        def __init__(self, config, value):
+            assert config == h.observer and value == digest
+            self.config = config
+        def emit(self, result=None, error=None):
+            calls.append(("emit", proof._profile_of(self), result, error))
+    monkeypatch.setattr(proof, "_Observer", Observation)
+    def prepare(head, remote, observer, *, profile):
+        calls.append(("prepare", profile)); return {"status": "fabricated_only"}
+    def run(head, remote, value, observer, *, profile):
+        calls.append(("run", profile)); return "fabricated_only"
+    def coordinate(head, remote, *, profile):
+        calls.append(("coordinate", profile)); return SimpleNamespace(public_summary=lambda: {"status": "fabricated_only"})
+    monkeypatch.setattr(proof, "prepare_bootstrap", prepare)
+    monkeypatch.setattr(proof, "run_registered", run)
+    monkeypatch.setattr(proof, "coordinate_registered", coordinate)
+    assert proof.main([command, "--head", HEAD, "--remote", REMOTE, "--spec-sha256", digest,
+        "--observer", canonical_json(h.observer)]) == 0
+    assert calls and all(row[1] is proof.LOCAL_NATIVE_V1 for row in calls)
+    capsys.readouterr()
+
+
+def test_local_profile_prepare_preserves_and_never_opens_spent_metadata_sibling(local_profile_domain, monkeypatch):
+    h = local_profile_domain; old = h.local_base / "local-metadata-20261103-v1"
+    sentinel = old / "FABRICATED_old_spent_control"
+    sentinel.write_bytes(b"FABRICATED old spent metadata; never adopt or mutate\n")
+    sentinel.chmod(0o600)
+    before = sentinel.read_bytes(), proof._stamp(sentinel.lstat())
+    real_open = os.open; openings = []
+    def open_file(path, flags, mode=0o777, *, dir_fd=None):
+        if not isinstance(path, int):
+            value = Path(path)
+            assert old not in (value, *value.parents) and value.name != old.name
+        openings.append(path)
+        return real_open(path, flags, mode, dir_fd=dir_fd)
+    monkeypatch.setattr(os, "open", open_file)
+    h.prepare_local()
+    assert openings and (sentinel.read_bytes(), proof._stamp(sentinel.lstat())) == before
+
+
+
+@pytest.mark.parametrize("case", ["nonzero", "partial_tail"])
+def test_local_profile_original_collector_wait_before_failure_closes_only_negative(local_profile_domain, monkeypatch, case):
+    h = local_profile_domain; _collection_fault(h, monkeypatch, case)
+    held = _bounded_test_hold(monkeypatch)
+    with pytest.raises(proof.worker.ProcessSupervisorRefusal) as caught:
+        h.produce_local(h.prepare_local())
+    assert held == [] and proof._HELD == []
+    assert len(proof._CAPTURED) == len(proof._NEGATIVE_CLOSURES) == 1
+    state = proof._CAPTURED[0]; child = h.processes[0]
+    assert state["failure"] is caught.value and state["preservation_error"] is None
+    assert state["frame"].f_code is proof._COLLECT_CODE and state["frame"].f_globals is proof.worker.__dict__
+    wait = proof.worker._WAITS[child]
+    assert state["wait"] is wait and wait[0] is state["origin"] is proof.worker._CHILDREN[child]
+    assert child not in proof._NEGATIVE_WAITS and len(child.waits) == 1
+    proof._same_profile(proof.LOCAL_NATIVE_V1, state, child, state["origin"], wait)
+    path = h.volumes[0].output.path
+    buffers = json.loads((path / "child.failure.buffers.private.json").read_bytes())
+    assert buffers["private_bytes_hex"] == {name: raw.hex() for name, raw in state["buffers"].items()}
+    assert (path / "child.remaining.pipe.private.bin").read_bytes() == state["tail"]
+    assert (path / "child.partial.stdout.private.bin").read_bytes() == state["partial_log"] == (path / "stdout.jsonl").read_bytes()
+    closed = json.loads((path / "child.negative.closed.json").read_bytes())
+    assert closed["status"] == "all_original_collection_bytes_preserved_negative_only"
+    assert closed["actual_child_exit"] == h.status and closed["collector_returned"] is False and closed["pipe_EOF"] is True
+    assert (path / "run.refused.json").is_file() and child.stdout.closed
+    assert not any((path / role).exists() for role in (proof.MARKER_ROLE, proof.INVENTORY_ROLE, "child.exit.provisional.json"))
+    assert proof._PRODUCERS == proof._CLOSED == proof._ROOT_RECEIPTS == {}
+    creation = proof._CREATION_STATES[h.volumes[0]]
+    assert creation["carrier"].closed and (h.volumes[0].mount / proof.CREATION_MANIFEST_ROLE).is_file()

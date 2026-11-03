@@ -787,3 +787,81 @@ def test_final_read_does_not_accept_untyped_pid_claim(fabricated_local_profile, 
     monkeypatch.setattr(m, "_USED", False)
     with pytest.raises(m.LocalMetadataRefusal, match="local_handshake"):
         m.final_read(HEAD, REMOTE, OPERATION, (m.canonical_json(value) + "\n").encode())
+
+
+def test_retirement_keeps_original_local_metadata_sdk_pin_frozen():
+    original_sdk = "e477f8921c71410c36aa8c4b23e9c76f46aa68286b62bf2991882832b7a73237"
+    assert m.SDK_SHA256 == original_sdk
+    assert m.policy()["SDK_sha256"] == original_sdk
+
+
+@pytest.mark.parametrize("actor", ["producer", "observer"])
+def test_retirement_changed_sdk_refuses_before_namespace_or_publication(tmp_path, monkeypatch, actor):
+    """Only fabricated code custody reaches the old pin; no old namespace is opened."""
+    original_sdk = "e477f8921c71410c36aa8c4b23e9c76f46aa68286b62bf2991882832b7a73237"
+    assert m.SDK_SHA256 == original_sdk
+    eighth = tmp_path / m.DRIVER
+    eighth.parent.mkdir(mode=0o700)
+    eighth_raw = b"FABRICATED eighth code bytes; no source or namespace data\n"
+    eighth.write_bytes(eighth_raw)
+    events, holders, git_reads, namespace_accesses, handshakes, publications, closed = [], [], [], [], [], [], []
+
+    class ChangedSdkCode7:
+        def __init__(self, head, remote, clock):
+            assert (head, remote) == (HEAD, REMOTE)
+            self.manifest = {path: "d" * 64 for path in m.p.CODE_FILES}
+            self.manifest[m.p.DRIVER] = "f" * 64
+            assert self.manifest[m.p.DRIVER] != original_sdk
+            self.closed = False
+            holders.append(self)
+
+        def named(self):
+            events.append("original_seven_named")
+
+        def close(self):
+            self.closed = True
+            events.append("original_seven_closed")
+
+    def fabricated_git(arguments):
+        assert arguments == ["show", HEAD + ":" + m.DRIVER]
+        git_reads.append(tuple(arguments))
+        return eighth_raw
+
+    def forbidden_namespace(*args, **kwargs):
+        namespace_accesses.append((args, kwargs))
+        raise AssertionError("Retired local SDK reached a namespace")
+
+    def forbidden_handshake(*args, **kwargs):
+        handshakes.append((args, kwargs))
+        raise AssertionError("Retired local SDK reached a handshake")
+
+    original_close = m.p._close
+
+    def observed_close(fd):
+        closed.append(fd)
+        return original_close(fd)
+
+    # These explicit fixture seams concern only code identity. The real old
+    # _Code8 pin, entrypoint ordering and its temporary eighth-file FD remain.
+    monkeypatch.setattr(m, "ROOT", tmp_path)
+    monkeypatch.setattr(m.Path, "cwd", lambda: tmp_path)
+    monkeypatch.setattr(m, "registered", lambda: None)
+    monkeypatch.setattr(m.p, "_Code7", ChangedSdkCode7)
+    monkeypatch.setattr(m.p, "_guard", lambda head, remote: events.append("lane_guard"))
+    monkeypatch.setattr(m.p, "_git", fabricated_git)
+    monkeypatch.setattr(m.p, "_close", observed_close)
+    monkeypatch.setattr(m, "_Scope", forbidden_namespace)
+    monkeypatch.setattr(m, "_Lines", forbidden_handshake)
+    monkeypatch.setattr(m, "_emit", lambda *args, **kwargs: publications.append((args, kwargs)))
+
+    with pytest.raises(m.LocalMetadataRefusal, match="local_code"):
+        getattr(m, actor)(HEAD, REMOTE, OPERATION)
+
+    assert len(holders) == 1 and holders[0].closed
+    assert "original_seven_named" in events and "original_seven_closed" in events
+    assert git_reads == namespace_accesses == handshakes == publications == []
+    assert m.SDK_SHA256 == original_sdk and m._USED is True
+    assert len(closed) == 1
+    with pytest.raises(OSError) as caught:
+        os.fstat(closed[0])
+    assert caught.value.errno == errno.EBADF

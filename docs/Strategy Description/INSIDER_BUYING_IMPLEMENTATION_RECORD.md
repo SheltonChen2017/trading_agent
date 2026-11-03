@@ -1,11 +1,13 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **364 REGISTERS A NEW BOUNDED FMP INSIDER/SEC AND EODHD MAPPING
-QUALIFICATION AGAINST EIGHT RETAINED2020Q4 AND FOUR FIXED2022–2023 ORIGINALS.
-CODE MUST BE QUALIFIED AND COMMITTED BEFORE ACTUAL SOURCE/PROVIDER WORK.
+Status: **364 RECORDS A FAILED PRE-INPUT RESERVATION ATTEMPT ON650cd9ba.
+NO INPUT STAGE, CREDENTIAL READ OR PROVIDER REQUEST BEGAN. ORIGINAL FAILURE
+CAUSE REMAINS UNESTABLISHED; ONE EXPLICIT PRE-INPUT CONTINUATION IS REGISTERED
+AGAINST THE PRESERVED EMPTY/PINNED ROOT, NOT A REPEATED PROVIDER REQUEST.
+CONTINUATION CODE MUST BE QUALIFIED AND COMMITTED BEFORE REAL ACTIVATION.
 SUBSCRIPTIONS REMAIN ACTIVE; CANCELLED RENEWAL IS NOT EXPIRED ACCESS.
 CURRENT MAPPINGS/NAIVE ACCEPTANCE ARE NOT HISTORICAL IDENTITY/PUBLIC-KNOWN-BY.
-THIRTEEN P2s AND THE HISTORICAL SOURCE/PIT/POPULATION FACTUAL GATES REMAIN
+FOURTEEN P2s AND THE HISTORICAL SOURCE/PIT/POPULATION FACTUAL GATES REMAIN
 OPEN. USB QUALIFICATION360–361 REMAINS COMPLETE AT ITS CANDIDATE SCOPE.
 NO QC/SAFARI, PURCHASE, UPGRADE, VENDOR REPLY OR MONITOR REARM THIS ROUND.**
 
@@ -42975,3 +42977,101 @@ No actual retained metadata/body stage, credential read or provider GET has
 occurred at this prospective commit point. Reservation/inputs/HTTP output
 and successful committed execution evidence must be recorded subsequently,
 not backdated into this qualification or later commit hashes.
+
+
+### 364.4 Actual first attempt — stopped before inputs; cause unresolved
+
+On already-existing clean commit
+`650cd9ba4569f6ef059246944a62fcd107d0de29`, source-only native health PASS
+exit0 in8.883687125s, stderr0;158 current source images, inventory SHA
+`649ee0642811176d3899f62f753ddeab6cd2f91ec9b7e8fdb00b9d3b143681a2`.
+It opened no retained data and consumed no epoch. Then exactly ONE original
+qualification CLI was invoked on that SAME existing commit, not a later
+commit/uncommitted image. It exited2 in6.587679s, stdout36B/stderr0,
+finite `qualification_stopped`. This is FAILED, not successful qualification.
+
+Read-only own-output diagnosis found only the20,994B root reservation SHA
+`faef6d685ed93f9d225abe94c9377df93bd3c0031547d46335c05ddfeef7b299`
+and EMPTY original audit directory. No metadata-start/body-start, credential,
+request-plan/started/completed or source response exists. Exact executed code
+cannot reach any input/credential/HTTP stage before those durable leaves.
+Thus this invocation made ZERO such stages/reads/transport invocations; no
+remote request count/bytes is inferred from a failed HTTP request because
+there was no HTTP invocation. Original reservation and directory are preserved.
+
+A native read-only reconstruction using held current paths/content pins and
+main's real Git/source checks now passes. It uses a newly observed stat
+version, so it does NOT prove the original check passed or establish why it
+failed. Initial diagnosis harnesses refused directory-ancestor reads and Git
+index refresh under overly broad write denial; the corrected parent diagnostic
+retains native process-tree network/security/USB/Keychain/source-data denial,
+permits routine Git metadata refresh, and prohibits writes to the actual output.
+These were diagnostic harness restrictions, not evidence of the original cause.
+A main fresh-TMP fixture using the real20,994B reservation's identity also
+passes (fixture reservation20,993B due true/false length), without actual
+namespace publication or input/credential/provider operation.
+
+Independent invented checks do NOT reproduce the stop: author64 fresh
+exact20,994B reservation cycles all pass;32 instrumented cycles'64 writes
+have identical before-close/post-close versions and successful independent
+verification. QA40 additional exact-size fixtures,200 repeat custody checks
+and240 immutable identity checks pass, plus20 simulated parent-Git cases.
+Git-dirt and latch-version-drift countermodels each reproduce the SAME
+reservation+empty-directory footprint. They are models, NOT observed actual
+events. The original close-time/version hypothesis is unverified; no byte-
+custody weakening or source correction is justified by it.
+
+**IBFMPEOD-OBS36401, P2, OPEN:** exact reservation-stage cause unestablished;
+original execution codec lost the specific constructor refusal. Preserve
+that failed attempt regardless of any later operation's success. It is not
+a vendor refusal, missing entitlement, successful original replay or coverage
+result. This adds one operational P2 to the13 carried topical P2s; none closes.
+
+### 364.5 Explicit sole pre-input continuation; no repeated provider operation
+
+**IBDEC-364-06, delegated bounded engineering decision:** the owner's ongoing
+qualification/pre-QC direction permits one separately committed and validated
+control-plane continuation. Do not reclaim/overwrite/re-enter the consumed
+original namespace or call the original entry point again. Authenticate the
+EXACT20,994B/faef6d68 reservation from650cd9ba and prove the original audit is
+EMPTY before any new write. Any input, credential, request, completion, extra
+root leaf, changed byte/mode/owner, or prior continuation refuses. Preserve
+original latch/audit permanently; publish one NEW `scope-continuation-2.json`
+and one NEW audit directory with suffix `-preinput-continuation-2` inside the
+SAME existing epoch. Every subsequent custody check rechecks old content and
+empty directory plus the exact four-entry root. A third attempt is forbidden.
+This is an explicit narrow change to the unactivated-input control policy,
+not a silent renamed retry or an inference that the original cause is fixed.
+
+The original operation made no metadata/body stage, credential read, request
+plan or transport claim. The continuation therefore runs those stages for
+the FIRST time; the aggregate request budget remains at most36 unique
+requests/ONE attempt each and ONE credential read attempt per provider,
+not72 requests/two credential reads. Never retry a failed/claimed/ambiguous
+provider request, even if the continuation itself stops. Default old entry
+still refuses the occupied epoch. Code/test/scope must again be qualified and
+exist in an already-created clean commit before explicit continuation CLI.
+Finite own refusal codes now survive the new entry's outer exception codec;
+this improves future telemetry without supplying the lost original cause.
+No pre-existing/frozen custody helper is edited. No purchase,
+QC/Safari, provider correspondence, old campaign activation or gate promotion.
+
+
+Continuation preactivation validation: main197 focused/EXACT checks PASS4.73s
+(all three new files),129 boundary/document/platform/frozen-pin/old-stop checks
+PASS6.64s; all six source/test images compile and the four frozen custody
+sources still equal exact historical bytes. Agent157 focused checks PASS2.61s,
+including24 new continuation cases; those include predecessor byte/hash/head/
+canonical binding before writes, original nonempty audit and extra-root
+refusal, old-state rechecks, exact four-entry custody, exclusive second/no
+third claim, default old entry still consumed, fixture/actual pin isolation,
+finite failure propagation and CLI routing. Original failure remains OPEN.
+New continuation source is43,876B SHA
+`7ff446976d05cc97b982e9a9a5ba53c915d4d5ab74409af4e68e7239197ca074`;
+test36,895B SHA
+`af70fac230ea704a0fb2bf2b6a4d8db38d72c0fb0d8ed0349ad6ee82b3438485`.
+Other four images remain364.3. Read-only source QA finds no concrete original
+root bypass, HTTP retry, fixture promotion or third-attempt route. Actual
+continuation has NOT occurred at this commit point; no provider qualification
+is yet claimed. Native network denial, private-input isolation and real
+memory guards remain active for focused tests/diagnostics; no full suite.

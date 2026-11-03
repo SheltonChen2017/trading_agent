@@ -43,6 +43,9 @@ OWN_PATHS = (SELF_PATH, TEST_PATH,
 SCHEMA = "insider-pilot-fmp-eod-retained-control-qualification-v1"
 OUTPUT_PARTS = ("artifacts", "insider_buying", "pilot_fmp_eod_qualification_v1")
 AUDIT_ID = "ib-fmp-eod-retained-control-qualification-20261103-once-v1"
+PREINPUT_HEAD = "650cd9ba4569f6ef059246944a62fcd107d0de29"
+PREINPUT_PIN = {"bytes": 20994, "sha256": "faef6d685ed93f9d225abe94c9377df93bd3c0031547d46335c05ddfeef7b299", "head": PREINPUT_HEAD}
+CONTINUATION_SUFFIX = "-preinput-continuation-2"
 RECENT_ROOT = LANE_ROOT.parent / "insider_buying_sec_complete_16_9ab2ed0"
 MAX_BODY = 128 * 1024
 MAX_CONTROL = 2 * 1024 * 1024
@@ -103,6 +106,9 @@ def registration():
         "http_total_wall_seconds": HTTP_SECONDS + CLOSE_SECONDS, "source_worker_seconds": SOURCE_SECONDS,
         "projection_worker_seconds": PROJECT_SECONDS, "finish_to_next_start_ns": SPACING_NS,
         "redirect_retry_paging_fallback_or_resume_permitted": False,
+        "one_explicit_preinput_continuation_only": True,
+        "continuation_requires_pinned_failed_reservation_and_empty_original_audit": True,
+        "provider_attempt_budget_shared_across_original_and_continuation": 1,
         "paid_era_controls_before_warmup_within_provider": True,
         "http_402_403_stop_family_not_prove_providerwide_failure": True,
         "raw_or_normalized_provider_rows_retained": False,
@@ -375,22 +381,46 @@ def _child(role, identity, supplied=None, *, paths=()):
 
 
 class _Context:
-    def __init__(self, root, identity, *, fixture=False, checker=None):
+    def __init__(self, root, identity, *, fixture=False, checker=None, continuation=False, predecessor_pin=None):
         _need(type(root) is Path or isinstance(root, Path), "arguments_refused")
         _need((fixture and not root.resolve().is_relative_to(LANE_ROOT) and callable(checker))
             or (not fixture and root == LANE_ROOT and checker is None), "arguments_refused")
+        _need(type(continuation) is bool and (predecessor_pin is None or fixture and continuation), "arguments_refused")
         self.root, self.identity, self.fixture = root, identity, fixture
+        self.continuation = continuation
+        self.latch_name = "scope-continuation-2.json" if continuation else "scope-reservation.json"
+        self.audit_name = AUDIT_ID + CONTINUATION_SUFFIX if continuation else AUDIT_ID
         self.checker = checker if fixture else lambda: _parent_current(identity)
-        self.parent = self.directory = None
+        self.parent = self.directory = self.old_directory = None
+        self.predecessor = None
         self.pins, self.versions, self.latch, self.active = {}, {}, None, None
         self.dispatched = set()
         self.token = None if fixture else _ACTUAL
         try:
-            self.parent = custody._Chain(root, OUTPUT_PARTS, create=True)
-            _need(not os.listdir(self.parent.fd), "namespace_consumed")
-            self.latch = self._write(self.parent.fd, "scope-reservation.json", _raw({
-                "registration": registration(), "execution_identity": identity, "fixture_only": fixture}))
-            self.directory = custody._Chain(root, (*OUTPUT_PARTS, AUDIT_ID), create=True, exclusive_last=True)
+            self.parent = custody._Chain(root, OUTPUT_PARTS, create=not continuation)
+            if continuation:
+                pin = predecessor_pin if fixture else PREINPUT_PIN
+                _need(type(pin) is dict and set(pin) == {"bytes", "sha256", "head"}
+                    and type(pin["bytes"]) is int and 0 < pin["bytes"] <= MAX_CONTROL
+                    and type(pin["sha256"]) is str and _SHA.fullmatch(pin["sha256"])
+                    and type(pin["head"]) is str and _HEAD.fullmatch(pin["head"]), "arguments_refused")
+                _need(set(os.listdir(self.parent.fd)) == {"scope-reservation.json", AUDIT_ID}, "namespace_consumed")
+                raw = custody._read_leaf(self.parent.fd, "scope-reservation.json", limit=MAX_CONTROL)
+                _need(len(raw) == pin["bytes"] and _sha(raw) == pin["sha256"], "custody_refused")
+                old = json.loads(raw)
+                _need(_raw(old) == raw and set(old) == {"registration", "execution_identity", "fixture_only"}
+                    and old["fixture_only"] is fixture and old["execution_identity"]["head"] == pin["head"], "custody_refused")
+                self.old_directory = custody._Chain(root, (*OUTPUT_PARTS, AUDIT_ID))
+                _need(not os.listdir(self.old_directory.fd), "namespace_consumed")
+                self.predecessor = {**pin, "version": custody._version(os.stat("scope-reservation.json", dir_fd=self.parent.fd, follow_symlinks=False))}
+                self._verify(self.parent.fd, "scope-reservation.json", self.predecessor)
+            else:
+                _need(not os.listdir(self.parent.fd), "namespace_consumed")
+            self.latch = self._write(self.parent.fd, self.latch_name, _raw({
+                "registration": registration(), "execution_identity": identity, "fixture_only": fixture,
+                **({"preinput_predecessor": {k: self.predecessor[k] for k in ("bytes", "sha256", "head")},
+                    "original_failure_cause_established": False} if continuation else {})}))
+            self.directory = custody._Chain(root, (*OUTPUT_PARTS, self.audit_name), create=True, exclusive_last=True)
             self.check()
         except BaseException:
             self.close(); raise
@@ -420,12 +450,18 @@ class _Context:
 
     def check(self):
         self.checker(); self.parent.recheck(); self.directory.recheck()
-        _need(set(os.listdir(self.parent.fd)) == {"scope-reservation.json", AUDIT_ID}
+        expected = {self.latch_name, self.audit_name}
+        if self.continuation:
+            expected.update({"scope-reservation.json", AUDIT_ID})
+            self.old_directory.recheck()
+            _need(not os.listdir(self.old_directory.fd), "output_changed")
+            self._verify(self.parent.fd, "scope-reservation.json", self.predecessor)
+        _need(set(os.listdir(self.parent.fd)) == expected
             and set(os.listdir(self.directory.fd)) == set(self.pins), "output_changed")
         for folder in (self.parent, self.directory):
             info = os.fstat(folder.fd)
             _need(info.st_uid == os.geteuid() and stat.S_IMODE(info.st_mode) == 0o700, "custody_refused")
-        self._verify(self.parent.fd, "scope-reservation.json", self.latch)
+        self._verify(self.parent.fd, self.latch_name, self.latch)
         for name, pin in self.pins.items(): self._verify(self.directory.fd, name, pin)
         self.parent.recheck(); self.directory.recheck()
 
@@ -442,7 +478,7 @@ class _Context:
 
     def close(self):
         failed, primary = False, sys.exc_info()[0] is not None
-        for name in ("directory", "parent"):
+        for name in ("directory", "old_directory", "parent"):
             held = getattr(self, name, None); setattr(self, name, None)
             if held is not None:
                 try: held.close()
@@ -655,10 +691,10 @@ def preflight_actual(expected_head):
         "source_inventory_sha256": identity["source_inventory_sha256"], **value}
 
 
-def run_actual(expected_head):
+def run_actual(expected_head, *, continuation=False):
     identity = _identity(expected_head); context = None; stage = "reservation"
     try:
-        context = _Context(LANE_ROOT, identity)
+        context = _Context(LANE_ROOT, identity, continuation=continuation)
         stage = "controls_metadata"
         context.publish("controls-metadata-started.json", {"worker_invocations": 1})
         metadata = _child("metadata", identity, paths=controls.metadata_paths())
@@ -672,18 +708,21 @@ def run_actual(expected_head):
         stage = "provider_qualification"
         result = _drive(context, cases, identity)
         result.update(scope_reservation_sha256=context.latch["sha256"],
+            preinput_continuation=continuation,
+            preserved_failed_reservation_sha256=PREINPUT_PIN["sha256"] if continuation else None,
             control_evidence_sha256=context.pins["controls.json"]["sha256"],
             request_plan_sha256=context.pins["request-plan.json"]["sha256"],
             published_leaf_pins={name: {"bytes": pin["bytes"], "sha256": pin["sha256"]}
                 for name, pin in context.pins.items()})
         context.publish("complete.json", result); context.check()
         return public_summary(result)
-    except Exception:
+    except Exception as exc:
+        code = safe_failure(exc)
         if context is not None:
             try: context.publish("failure.json", {"schema": SCHEMA+"/failure", "stage": stage,
-                "code": "qualification_stopped", "authority": authority()})
+                "code": code, "authority": authority()})
             except Exception: pass
-        raise ProviderQualificationError("qualification_stopped") from None
+        raise ProviderQualificationError(code) from None
     finally:
         if context is not None: context.close()
 
@@ -699,8 +738,11 @@ def main(argv=None):
     cli = argparse.ArgumentParser(description=__doc__)
     cli.add_argument("--expected-head", required=True)
     cli.add_argument("--health", action="store_true")
+    cli.add_argument("--continue-pre-input", action="store_true")
     args = cli.parse_args(argv)
-    try: value = preflight_actual(args.expected_head) if args.health else run_actual(args.expected_head)
+    try:
+        _need(not (args.health and args.continue_pre_input), "arguments_refused")
+        value = preflight_actual(args.expected_head) if args.health else run_actual(args.expected_head, continuation=args.continue_pre_input)
     except Exception as exc:
         print(_raw({"refused": safe_failure(exc)}).decode()); return 2
     print(_raw(value).decode())

@@ -465,7 +465,7 @@ def test_bad_projection_cannot_store_rows_credentials_or_claim_readiness(tmp_pat
 
 
 def test_unscoped_projection_is_not_success_and_cli_returns_refusal(monkeypatch, capsys):
-    monkeypatch.setattr(m, "run_actual", lambda _: {"clean_scoped_responses": 0, "planned_requests": 1})
+    monkeypatch.setattr(m, "run_actual", lambda _, **kwargs: {"clean_scoped_responses": 0, "planned_requests": 1})
     assert m.main(["--expected-head", "1" * 40]) == 2
     assert "clean_scoped_responses" in capsys.readouterr().out
 
@@ -514,3 +514,154 @@ def test_parent_current_requires_live_exact_head_branch_and_clean_status_without
     else:
         with pytest.raises(m.ProviderQualificationError, match="identity_refused"): m._parent_current(identity)
     assert checks == [identity]
+
+
+def _seed_preinput_predecessor(tmp_path):
+    context = _context(tmp_path)
+    root = context.root
+    pin = {k: context.latch[k] for k in ("bytes", "sha256")}; pin["head"] = "1" * 40
+    parent = root.joinpath(*m.OUTPUT_PARTS)
+    raw = (parent / "scope-reservation.json").read_bytes()
+    assert list((parent / m.AUDIT_ID).iterdir()) == []
+    context.close()
+    return root, parent, pin, raw
+
+
+def _continuation(root, pin):
+    return m._Context(root, {"head": "2" * 40}, fixture=True, checker=lambda: None,
+        continuation=True, predecessor_pin=pin)
+
+
+def test_one_preinput_continuation_preserves_failed_scope_and_never_claims_fixed_cause(tmp_path):
+    root, parent, pin, old_raw = _seed_preinput_predecessor(tmp_path)
+    context = _continuation(root, pin)
+    try:
+        assert context.latch_name == "scope-continuation-2.json"
+        assert context.audit_name == m.AUDIT_ID + "-preinput-continuation-2"
+        assert set(p.name for p in parent.iterdir()) == {"scope-reservation.json", m.AUDIT_ID,
+            context.latch_name, context.audit_name}
+        assert (parent / "scope-reservation.json").read_bytes() == old_raw
+        assert list((parent / m.AUDIT_ID).iterdir()) == []
+        new = json.loads((parent / context.latch_name).read_bytes())
+        assert new["preinput_predecessor"] == pin
+        assert new["execution_identity"]["head"] == "2" * 40
+        assert new["original_failure_cause_established"] is False
+        context.publish("invented-stage.json", {"fixture_only": True})
+        assert context.read("invented-stage.json") == {"fixture_only": True}
+        with pytest.raises(FileExistsError): context.publish("invented-stage.json", {"overwrite": True})
+        assert (parent / "scope-reservation.json").read_bytes() == old_raw
+    finally: context.close()
+    snapshot = {p.name: p.read_bytes() for p in parent.iterdir() if p.is_file()}
+    with pytest.raises(m.ProviderQualificationError, match="namespace_consumed"):
+        _continuation(root, pin)
+    with pytest.raises(m.ProviderQualificationError, match="namespace_consumed"):
+        m._Context(root, {"head": "2" * 40}, fixture=True, checker=lambda: None)
+    assert {p.name: p.read_bytes() for p in parent.iterdir() if p.is_file()} == snapshot
+    assert list((parent / m.AUDIT_ID).iterdir()) == []
+
+
+@pytest.mark.parametrize("leaf", ("controls-metadata-started.json", "controls.json", "fmp-credential-started.json",
+    "request-000-started.json", "foreign.json"))
+def test_continuation_refuses_any_old_input_credential_or_request_evidence_before_write(tmp_path, leaf):
+    root, parent, pin, old_raw = _seed_preinput_predecessor(tmp_path)
+    path = parent / m.AUDIT_ID / leaf; path.write_bytes(b"{}"); path.chmod(0o600)
+    with pytest.raises(m.ProviderQualificationError, match="namespace_consumed"):
+        _continuation(root, pin)
+    assert set(p.name for p in parent.iterdir()) == {"scope-reservation.json", m.AUDIT_ID}
+    assert (parent / "scope-reservation.json").read_bytes() == old_raw
+
+
+@pytest.mark.parametrize("fault", ("bytes", "sha256", "head", "root_extra", "old_mode", "old_noncanonical"))
+def test_continuation_external_predecessor_pin_and_exact_prior_inventory_are_binding(tmp_path, fault):
+    root, parent, pin, old_raw = _seed_preinput_predecessor(tmp_path)
+    if fault == "bytes": pin["bytes"] += 1
+    if fault == "sha256": pin["sha256"] = "0" * 64
+    if fault == "head": pin["head"] = "3" * 40
+    if fault == "root_extra": (parent / "unexpected.json").write_bytes(b"{}")
+    if fault == "old_mode": (parent / "scope-reservation.json").chmod(0o644)
+    if fault == "old_noncanonical":
+        altered = json.dumps(json.loads(old_raw), indent=2).encode()
+        (parent / "scope-reservation.json").write_bytes(altered)
+        pin.update(bytes=len(altered), sha256=m._sha(altered))
+    before = set(p.name for p in parent.iterdir())
+    with pytest.raises((m.ProviderQualificationError, ValueError)):
+        _continuation(root, pin)
+    assert set(p.name for p in parent.iterdir()) == before
+    assert not (parent / "scope-continuation-2.json").exists()
+    assert not (parent / (m.AUDIT_ID + m.CONTINUATION_SUFFIX)).exists()
+
+
+@pytest.mark.parametrize("fault", ("old_body", "old_audit_leaf", "old_audit_mode", "root_extra"))
+def test_continuation_rechecks_preserved_old_scope_at_every_check(tmp_path, fault):
+    root, parent, pin, _ = _seed_preinput_predecessor(tmp_path)
+    context = _continuation(root, pin)
+    try:
+        if fault == "old_body":
+            path = parent / "scope-reservation.json"; previous = path.stat()
+            raw = path.read_bytes(); altered = raw.replace(b"1" * 40, b"3" * 40, 1)
+            assert altered != raw and len(altered) == len(raw)
+            path.write_bytes(altered); os.utime(path, ns=(previous.st_atime_ns, previous.st_mtime_ns))
+        if fault == "old_audit_leaf": (parent / m.AUDIT_ID / "request-000-started.json").write_bytes(b"{}")
+        if fault == "old_audit_mode": (parent / m.AUDIT_ID).chmod(0o750)
+        if fault == "root_extra": (parent / "third-scope.json").write_bytes(b"{}")
+        with pytest.raises((m.ProviderQualificationError, ValueError)): context.check()
+    finally: context.close()
+
+
+def test_fixture_requires_explicit_predecessor_pin_and_actual_pin_override_is_forbidden(tmp_path, monkeypatch):
+    root, _, _, _ = _seed_preinput_predecessor(tmp_path)
+    with pytest.raises(m.ProviderQualificationError, match="arguments_refused"):
+        m._Context(root, {"head": "2" * 40}, fixture=True, checker=lambda: None, continuation=True)
+    monkeypatch.setattr(m.custody, "_Chain", lambda *a, **k: pytest.fail("actual namespace opened from pin override"))
+    with pytest.raises(m.ProviderQualificationError, match="arguments_refused"):
+        m._Context(m.LANE_ROOT, {"head": "2" * 40}, continuation=True, predecessor_pin=dict(m.PREINPUT_PIN))
+
+
+@pytest.mark.parametrize("continuation", (2, 3, None))
+def test_no_numeric_third_or_implicit_continuation_namespace(tmp_path, monkeypatch, continuation):
+    monkeypatch.setattr(m.custody, "_Chain", lambda *a, **k: pytest.fail("unbounded continuation opened a namespace"))
+    with pytest.raises(m.ProviderQualificationError, match="arguments_refused"):
+        m._Context(tmp_path, {"head": "2" * 40}, fixture=True, checker=lambda: None, continuation=continuation,
+            predecessor_pin={"bytes": 1, "sha256": "a" * 64, "head": "1" * 40})
+
+
+@pytest.mark.parametrize("continuation", (False, True))
+def test_run_entry_preserves_finite_cause_and_continuation_selection_without_actual_access(monkeypatch, continuation):
+    events = []; identity = {"head": "2" * 40}
+    monkeypatch.setattr(m, "_identity", lambda head: identity)
+    class Context:
+        def __init__(self, root, supplied, **kwargs):
+            assert root == m.LANE_ROOT and supplied is identity and kwargs == {"continuation": continuation}
+        def publish(self, name, value):
+            if name == "controls-metadata-started.json": raise m.ProviderQualificationError("output_changed")
+            assert name == "failure.json"
+            events.append(value)
+        def close(self): events.append("closed")
+    monkeypatch.setattr(m, "_Context", Context)
+    with pytest.raises(m.ProviderQualificationError, match="^output_changed$"):
+        m.run_actual(identity["head"], continuation=continuation)
+    assert events[0]["stage"] == "controls_metadata" and events[0]["code"] == "output_changed"
+    assert events[-1] == "closed"
+    assert events[0]["authority"]["backtesting_ready"] is False
+
+
+def test_continuation_cli_routes_only_explicit_flag_and_health_is_mutually_exclusive(monkeypatch, capsys):
+    calls = []
+    def run(head, *, continuation=False):
+        calls.append((head, continuation))
+        return {"clean_scoped_responses": 0, "planned_requests": 1}
+    monkeypatch.setattr(m, "run_actual", run)
+    monkeypatch.setattr(m, "preflight_actual", lambda *a: pytest.fail("health launched with continuation"))
+    assert m.main(["--expected-head", "2" * 40]) == 2
+    assert m.main(["--expected-head", "2" * 40, "--continue-pre-input"]) == 2
+    assert calls == [("2" * 40, False), ("2" * 40, True)]
+    assert m.main(["--expected-head", "2" * 40, "--continue-pre-input", "--health"]) == 2
+    assert len(calls) == 2 and "arguments_refused" in capsys.readouterr().out
+
+
+def test_continuation_budget_never_increases_provider_attempts():
+    policy = m.registration()
+    assert policy["one_explicit_preinput_continuation_only"] is True
+    assert policy["continuation_requires_pinned_failed_reservation_and_empty_original_audit"] is True
+    assert policy["provider_attempt_budget_shared_across_original_and_continuation"] == 1
+    assert policy["maximum_attempts_per_request"] == 1 and policy["maximum_unique_requests"] == 36

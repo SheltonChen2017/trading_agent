@@ -72590,3 +72590,161 @@ its tests20585bytes SHA256
 These prospective components are not invoked by D/E and provide no additional
 DATA/contact/run authority. All original v1/v2/v3 used parsers/callers and
 historical claims stay unchanged/spent; no QC/Safari use has occurred this round.
+
+### 335.13 Actual D/E passed; FirstRate does not yet close the five-role gap
+
+Both separate parents ran ONCE at clean freeze7699f6b6d619bc77410432a4fe4de4d1512767f7,
+actual parent0/child0/no stderr, followed by their one native-denied stdout-only
+validator using observed exit0; both validators exited0/output_authenticated=true.
+D/E/validators are now SPENT and frozen; no control inspection/repair/replay.
+Root final102document checks1.09s before freeze overlap prior648, not additive.
+
+D worker packet2697bytes SHA256
+7715149dd2dd755690fcabfc75aa2fc63978ae4649691efbc01c397e5ab18f8b;
+report2587bytes SHA256
+5ee2471aa4c67eaf79cafab1942ee129cca5d30d841e748f4b781e3aebf95f68.
+Original R archive5532476bytes SHA256
+5730923356aac1b3ffedb7603fe60c2a7882eb2d43ae41a6b6bdc2a8ce3cd45e;
+fixed full REMX member pin unchanged. Exact original4339rows/two eras and
+all row shapes/dates/order/positive OHLC validated. The323old-prefix volumes
+are integral nonnegative. In the4016ETF-era rows,3996are integral and20are
+fractional nonnegative;880tokens contain a decimal point. No malformed,
+negative or nonfinite volume token occurred. Thus quarantine of the old prefix
+does NOT remove the fractional-volume anomaly. Its cause/correction is unknown;
+do not attribute it to vendor adjustments or round values. Retain original
+bytes,323-row ticker-era quarantine and separate20-row volume qualification.
+FirstRate REMX is NOT adopted; the existing Sharadar fund source stays unchanged.
+
+E worker packet5249bytes SHA256
+623278941be0078aed91f256ae77de4c66630c176527647748d7384afdb2321c;
+report5139bytes SHA256
+2c393ee25d03b54686f3645785063ba8566db0ea3ccbce4301bcdf5ff4b3b8b6.
+Its NEW private DATA is
+artifacts/analyst_revisions_v2/firstrate/R335-20261103-E/private-diagnosis.json,
+17445bytes SHA256abb076cbfe46bdf0290cfb2299c923d0d822df168ea7e5a4fcd98bac1b3068d8.
+All11actually needed stock containers authenticated under fixed manifest;
+no ETF source read by E. Count-only results over the exact2286dense required
+and477potential reference observations are:
+
+|Case|Candidates|Required dates|Missing dates per candidate|Potential references|Missing references per candidate|
+|---|---:|---:|---|---:|---|
+|0|1|718|0|150|0|
+|1|1|417|73|87|14|
+|2|0|417|all417; no exact-ticker candidate|87|all87|
+|3|1|432|151|90|28|
+|4|2|302|46;302|63|10;63|
+
+One case is date-complete, three have only partial coverage, one is absent
+under exact permitted aliases. Case4 retains a second older delisted candidate
+with zero required-date overlap; neither is silently selected as identity proof.
+Original mixed-delimiter members now parse without normalization; all stock
+financial/volume checks passed. These are observed file/date facts, not genuine
+stock identity, complete strategy coverage, historical old-gap repair, missing
+actual-held positions or accepted price marks. No private identifiers/prices
+were emitted. No provider/QC/Safari call, look or result cell occurred; floor
+338/259/54/699 unchanged. The all-five price-book materializer/reader/run path
+cannot be used with these gaps, and its implementation is deferred accordingly.
+
+Next safe recovery is a separately frozen finite metadata/missing-pair diagnosis
+from ONLY exact retained I DATA, new E DATA and fixed stock listing: preserve
+every missing date privately, compare only explicit original/current ticker
+metadata fields and documented symbol eras, and report count/geometry evidence
+without prices or identity admission. Do not fuzzy-map a ticker, splice an
+unproved predecessor, relax required dates or launch a partial universe. Any
+later alternate member/era consumption needs a coherent new exact source and
+identity/units decision, not unchanged E replay or per-date fallback.
+
+### 335.14 Public history conventions and next metadata scope
+
+FirstRate FAQ https://firstratedata.com/about/faq states that company history
+is stored under the most recent ticker, with post-2022 ticker changes merged,
+while delisted history remains incomplete. This supplies a plausible next
+search route, NOT the observed cause of any particular E gap. Its daily series
+uses exchange eligibility/late-reported trades and is distinct from intraday
+aggregation; do not reconstruct official closes by summing/minute aggregation.
+The dataset card also describes extended-session bars. A current RAW filename
+and date presence alone do not establish the frozen regular-session valuation
+close or availability-at-that-clock convention. Preserve that external gate;
+the new format explicitly cannot prove it.
+
+Sharadar's current ticker docs https://sharadar.com/docs/tickers describe
+permaticker as a vendor security/share-class identifier, relatedtickers as text,
+and first/last price metadata as separate fields. Its actions table
+https://sharadar.com/docs/actions provides dated ticker changes, acquisition/
+spinoff/ADR/split/counterparty events and is included in Prices/Bundle. These
+published schemas are supporting evidence, not authenticated actual rows or
+independent immutable historical master proof. Existing I contains no actions
+evidence. A same-name/ticker/permaticker/CUSIP lead must not silently establish
+historical continuity, units, terminal payoff or an original FIGI replacement.
+
+The prospective F metadata-only diagnosis will preserve those distinctions.
+It joins I and E by BOTH case ordinal and whole-binding SHA (ordinal order is
+not the sorted-five-hash order), retains exact missing dates separately per
+candidate, and checks their count/reference intersection/calendar-run geometry.
+Only explicit binding/original/current ticker fields supply exact listing
+leads; optional original relatedtickers is retained raw/unparsed. Current
+candidate rows have12fixed metadata fields and no name/relatedtickers; do not
+fabricate them. All full original28fields remain private.
+
+I335-009(P2 caught before F implementation): original source_row_sha256 uses
+the composer's ensure_ascii=false canonical UTF-8 JSON PLUS terminal LF,
+unlike these diagnostic ASCII/no-LF envelopes. F must reproduce the exact
+original serialization and test non-ASCII content, not compare a different
+canonical representation and misdiagnose valid retained bytes. This has not
+caused an operational failure and grants no private source read before F freeze.
+
+### 335.15 D6 exact missing-pair/metadata F freeze
+
+New scripts/inspect_arv2_r335_firstrate_gap_metadata.py is58937bytes SHA256
+fd41a4d434503edc15d71d25775b520e98728a0e0d2e455c5bc03c69dabbbfa0;
+tests26716bytes SHA256
+c29efb1e502fe70fd900e1c88870a81b9ebc0c7f21f59805b3dc3cb83ac43009.
+Its canonical4683-byte profile SHA256
+be389b2f95163b85df17c263b37dd186203e890a7e1c60dc9efcb5b1fa53e735;
+native2686-byte policy SHA256
+02f01061b5c51b86385a6bd600cda45de2653134da12d7389706b89cfe664454.
+
+Permit ONE F parent after this source/decision is committed clean in the
+designated root/branch/Darwin isolatedPython3.13, expected-head that actual
+clean freeze and exact caller/profile arguments above. NEW exclusive claim
+artifacts/analyst_revisions_v2/firstrate/R335-20261103-F is uninspected and
+unallocated. It consumes ONLY exact335.13 E private DATA, retained I DATA and
+fixed USB stock listing; all archives, price rows, native book, old claims/
+reports, network and BOTH Keychains/security CLI remain denied. New lineage
+includes the actual successful E source/profile/freeze/report/DATA pins and
+external0/0/0 observations, not an E report/control reread or operation replay.
+
+F rechecks all five paired ordinals/whole bindings and exact unchanged demand,
+canonical original-row proof, candidate missing-date counts/reference subsets,
+and separate prefix/internal/suffix trading-session runs. It preserves original
+and all current candidate metadata/explicit leads privately without source or
+quality filtering, joins exact tokens to listing rows only, and does not infer
+relatedtickers, corporate continuity or price availability. Listing counts are
+lead-by-listing-row relations; identical retained leads can count one physical
+row repeatedly, never distinct-security/source counts. No candidates are unioned.
+The no-candidate case retains its full417-date missing envelope. Full private
+dates and metadata remain bounded; public output is finite counts/geometry,
+never ticker/FIGI/CUSIP/name/price rows. Guard normal return precedes own private/
+report publication. All source/identity/price/formal readiness flags stay false.
+
+Original-row serialization reference canonical.py14651bytes SHA256
+c1d1d1aab633b16868fccc371de7c4cf4f3a692943e04a8d785109110e17ae6e
+is held/pinned before repo imports; Unicode-plus-LF regressions match the real
+helper. Other source/FD/claim/deadline/publication/exit machinery is preserved
+from E and verified by focused AST equality. All300s/own5sreap/output bounds
+and startup/uninterruptibleIO/suspension qualifications remain. Failed/unknown
+use is spent; no unchanged retry or output repair. Permit one subsequent same-
+source native-denied stdout-only validator with externally observed parent
+exit, without reopening F controls or DATA. Actual0/child0 plus strict matching
+authentication is required for observation success, never alias/price admission.
+
+Root158focused passes4.07s (56F+102record/document), no full suite;102repeat
+overlaps prior selections. Source/profile/policy/reference pins match and both
+new files compile in memory. Author56passes2.97s and earlier53passes3.14s
+overlap. Adding the serialization reference initially caused52passes/1fixture
+failure2.89s because the fake root lacked that public file; corrected only its
+fixture. Finally-restored wrong-ASCII-serialization and omitted whole-hash join
+each caused one expected failure. Same-round advisory audit found no additional
+material issue; not independent review. No F DATA/control read has occurred at
+this freeze. All financial/source/processing/current-identity/coverage/run/
+project/access/idle/capacity/attempt gates persist;338/259/54/699 unchanged.

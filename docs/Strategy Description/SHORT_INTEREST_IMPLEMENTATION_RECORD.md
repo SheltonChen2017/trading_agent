@@ -29848,3 +29848,148 @@ adopt current stamps, disable controls, release SourceAUTH or spend source
 budgets from this preparation. No push has occurred in this new owner round;
 its ONE publication remains deferred until work is done or a genuine
 owner-required terminal blocker is resolved/reported.
+
+
+## 135. Owner-directed USB short-interest offline inspection (2026-11-03)
+
+### 135.1 Authority, preserved data and pending custody action
+
+The owner explicitly directed: qualify the newly connected USB short-interest
+archive offline before more downloads, preserve data/custody checks and existing
+budgets, continue toward the last step before QC/Safari, no QC/Safari or purchases,
+and push once when done. SI-AUTH-20261103-01 identifies that chat instruction;
+it is not a fabricated provider permission or source-admission receipt.
+The starting lane is the same designated Short Interest worktree/branch,
+clean33ab4da445536dc3ebfd86c084167c083d88339c, with matching tracking/actual
+origin b556bee695694a5ef79cd285be9631f288f5e679. The earlier local33AB commit
+remains unpublished and will accumulate with this work for ONE final push.
+No other checkout, branch, history rewrite, unrelated ref or shared document
+is used. Claude review remains waived by the owner; delegated advisory checks
+below are not independent Claude review.
+
+Count authority remains84005 cumulative START/4294967296 bytes. DAILY retains
+its separate existing residual36837 attempts/3327988047 bytes/71468572 rows.
+Permanent8START/16777216 bytes stays charged, with conservative count upper
+baseline14000START/40229897 bytes and residual70005START/4254737399 bytes.
+No old claim, negative, original data, file flag, stamp or budget is changed.
+SourceAUTH stays unconditionally blocked. No provider/key/claim/START/charge,
+outcome join/S1/rank/order/evaluation/backtest, look, alpha, QC/Safari, purchase,
+email or other-chat action occurs. Canonical looks0/0, exploratory0, alpha0,
+permanent IDsnone, QCattempts0 remain. No full lane/repository suite is run.
+
+The USB is ExFAT with ownership enforcement disabled. It is an external byte
+inspection operand, NEVER protected=True HeldFiles, a native/APFS evidence
+domain or a replacement custody journal. Its original bytes remain on USB;
+there is no extraction, conversion, write, reflag, move or adoption of current
+stamps as an old seal. The journal actor remains UNKNOWN. Main guarded checks
+found no active known attribution/proof process and both fixed trace output
+and reserved exec subject absent. The owner's administrator action remains
+unperformed. The old command file binds clean33AB: it is explicitly superseded
+as UNINVOKED when this new snapshot advances. Preserve that old file; do not
+silently overwrite it or run it against a changed snapshot. A freshly bound,
+reviewable command is needed before the original reserved trace can proceed.
+
+### 135.2 Frozen inspection, not source or backtest qualification
+
+SI-DEC-20261103-01 freezes a finite supplied-byte inspection before its actual
+registered replay. New pure module firstrate_short_interest_inspection.py has
+no file, credential, provider, custody/native-count or compiler API. Its reports
+export aggregate counts, date bounds and origin/disposition commitments only;
+no symbols, source values, count/cell iterator or actual-input cast exists.
+All source/custody/PIT/native/class/denominator/input/outcome/QC/backtest
+authorities remain false. A source-only structural pass cannot clear a later
+semantic, rights or custody gate.
+
+Exact original input pins (role / bytes / SHA256):
+
+| Role | Bytes | SHA256 |
+| --- | ---: | --- |
+| Full archive | 34319601 | 08f019c20384bde811b10d1674dc5067cfded4e4c0097fc8c383649c528429c8 |
+| 2026 archive | 9660009 | 3a8a07dec5c91f4e54cda396d9b1483895769d6ecac1a8d1a15a64e873fa191a |
+| Provided manifest | 327907 | c681af584244d38e3f9dea2ff765cc2c991cb383107a3e542115a4338ee4cdf8 |
+| SI documentation | 1051 | bbcddf477ba3ffacb4b0116e9d3f6c2c2a864576ae748abc8daa825602a16ecf |
+
+The supplied manifest is a consistency observation, not upstream authentication.
+Its unrelated URL/path fields never escape. The policy SHA256 is
+a403579c17c31010ae26eaddf1350a7f1d313cbf6bdae9b6d815f1ccd83121fe.
+Each archive is bounded64MiB compressed,128MiB inflated,50000 members,
+1MiB/member,3000000 rows and128 characters/field. Both complete local and
+central ZIP32 membership must agree, contiguous with no prefix/gap/trailer,
+comments/extra fields/links/encryption/flags/multidisk ambiguity. Only stored
+or exact bounded raw-deflate and matching CRC are accepted. Root-level claimed
+symbol spellings remain exact, never normalized into native identity.
+
+CSV requires exact settlement_date/short_interest/avg_daily_share_volume/
+days_to_cover headers, strict UTF8/CSV, canonical dates and exact nonnegative
+Decimal/Fraction values. SI must be integral; reported average volume may be
+rational without rounding. Every row's original lexical tokens/origin are
+committed before validation; all identifiable duplicate peers are quarantined,
+including malformed peers. Original archives retain all rows. Only per-member
+temporary state and cryptographic inventory/disposition commitments are kept;
+no raw row is published. DTC remains independently reported: there is NO ratio
+recalculation, invented floor/tolerance, substitution or auxiliary-field
+admission. Full/year comparison is an exact2026 lexical-token multiset check,
+not an economic/outcome join. Initial read-only audit informed these format
+contracts; no blinded preregistration or empirical claim is implied.
+
+### 135.3 Verified pre-release findings and focused validation
+
+| ID | Priority | Status / concrete correction |
+| --- | --- | --- |
+| SI-USB-20261103-001 | P2 | Corrected: normal research package import reached omitted calendar/pandas code. The operational reader executes only already-held committed MODEL code in a private module, avoiding shared package initialization; isolated -I -S regression verifies four-file scope. |
+| SI-USB-20261103-002 | P2 | Corrected: last fresh file close could change metadata after comparison. Final named original root/directory/file comparisons now occur AFTER close; memory-only reversal produces the expected causal failure. |
+| SI-USB-20261103-003 | P2 | Corrected: a post-close refusal did not latch. Every public after_close failure now permanently refuses, including after attempted restoration. |
+| SI-USB-20261103-004 | P2 | Corrected: remote/HEAD could advance during final reads. A final matching-lane guard and deadline check veto positive output. |
+| SI-USB-20261103-005 | P3 | Corrected: Decimal exponentiation cap depended on ambient context. Exact lexical cap plus restrictive-context regression; memory-only old-power reversal causes1 expected failure/73 deselected/.15s, restored. |
+| SI-USB-20261103-006 | P3 | Corrected: coordinated reflected fields could reissue a self-consistent report. Original factory issuance is held outside the instance; coordinated reseal refuses. Strong references are bounded to this finite process, not an unbounded service. |
+| SI-USB-20261103-007 | P3 | Corrected: stat import violated the unchanged pure-package boundary. ZIP Unix-host mode metadata now uses explicit format masks; no whitelist/test weakening. Initial focused run1 failed/178 passed/1.51s; corrected final179 passed/1.36s. |
+
+Main final four-file selection (two new test files, import boundary, active
+documents):179 passed/1.36s with Python socket events denied. Prior two-file
+draft100/.53s and reader22/.43s are superseded for the final selection.
+Main post-close memory reversal:1 expected failure/26 deselected/.60s, restored;
+these deliberate causal failures are not production failures. Author72/.79s,
+advisory pure peer74/.36s and reader peer27/.62s are separately attributed,
+not Main reruns or Claude review. Peer checks also reproduced the reflective
+reseal defect before correction and refusal after restoration. Python3.9 AST
+parsing/in-memory compile and own-file whitespace pass; actual runtime uses
+the existing approved Python3.13 environment. A system3.9 policy-only import
+attempt refused dataclass slots before any USB replay; no dependency was
+installed and it is not an operational invocation.
+
+### 135.4 Prospective registered read-only replay
+
+The new operational reader inspect_short_interest_usb_archive.py accepts only
+exact runtime HEAD/matching remote, fixes the four original USB paths/pins and
+requires clean designated root/branch. O_NOFOLLOW original RO file descriptors
+and complete observed root/path-chain/file stamps, flags and hashes are checked
+before/after reads, through all original context exits, and on post-close named
+comparisons against the ORIGINAL observations. Refusal latches; no reseal,
+retry/adoption or mutable caller flag creates authority. Fresh committed-code
+and matching-remote checks plus the180-second successful-closure window must
+pass. This is finite observed byte consistency, not perpetual filesystem
+stability or protected-source custody. A negative/nonzero/unknown termination
+vetoes any provisional result. No local output/journal/control is created.
+
+Exact four-file list SHA256:
+856e24b212b991e0217ae9405e03f36213e4a574a3ca17e80068f80839613c26.
+Current code mapping SHA256:
+f1ae3b3615718d303f8005b67e803c46e20d2703bff4f22f6739f60368018108.
+Model SHA54e1582975fc0bfaccbf53f6567333551594a58aa6b8ea114ff8142e50429d2c;
+reader SHA80730a97437301d0a081109efea46bb9f1096342230da9ee6e5f7e5cd42613d4.
+The fixed fresh isolated3.13 wrapper verifies held reader code BEFORE execution,
+denies Python write-opens/mutations/sockets and all subprocesses except exact
+read-only Git lane metadata/code commands. Git may inspect only the matching
+origin lane ref; no source endpoint is used. Every denied seam must stay0 and
+original actual exit0 plus terminal observation is required. This registration
+is prospective, not an actual successful replay, source qualification or
+permission for a new capture. All authors are frozen before invocation; no
+edit/test/commit/push while the finite actual read is active. Record its true
+terminal result only after closure; do not rerun a failed invocation to guess.
+
+The exact finite wrapper is2578 bytes/SHA256
+dc588b096b77c1fc4ce8e09c795989292dc56488abeabd0c6ef6dbe97236fc45;
+runtime HEAD/remote are separate exact arguments, not mutable source paths.
+Main post-record active-document checks:69 passed/.62s. Original full135.1+
+notes are additive; no historical rows were rewritten. No actual replay or
+push has occurred at this prospective checkpoint.

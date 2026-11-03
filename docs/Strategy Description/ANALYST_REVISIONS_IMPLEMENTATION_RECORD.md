@@ -72931,3 +72931,108 @@ aab00a41135880cdb432d7a7c4f4441f3e40da083d0c4af8706cfccf9451dcb3.
 All335.17 QC/Safari holds, source/rights/financial/attempt gates and false formal
 readiness flags persist. Continue only admissible data/identity recovery and
 offline construction after actual G evidence; no strategy submission during hold.
+
+### 335.19 Actual G retained HTTP200 then refused local row scope
+
+At clean freezecd3fd302e53a40a8478ea36c07899d53c1f62d87, the sole sanitized-
+environment G parent exited2. Its source worker exited0 with normal F guard
+return, nine canonical unique explicit tokens, no stderr, worker stdout1104
+bytes SHA25649a15b2de8825a44199f595c7892b5b64b95159de8d726b3104fda5e66a43855.
+Exactly one Keychain lookup was attempted/completed. The first ticker-union
+application intent observed HTTP200, then terminal row_scope refusal. Actual
+failure_code=provider_row_scope/accepted=false/complete=false/claimconsumed.
+The sole native-denied stdin-only validator, supplied actualparent2, exited2
+with output_authenticated=true/accepted=false. G/observer/caller/validator are
+SPENT/frozen; no unchanged retry, control read/repair or remaining-query renewal.
+
+Report3211bytes SHA256
+30b28adc179bcc8edd44fbecd2f7e3955b9fe06d52b55a3b3cb18e181853acd0.
+New retained DATA under artifacts/analyst_revisions_v2/firstrate/R335-20261103-G:
+
+|Leaf|Bytes|SHA256|
+|---|---:|---|
+|plan-private.json|443|a091a39da8e26905b9a6aa6833c0e7b9c4dc655797045b799d7f14a6347e6c40|
+|response-00.csv|2388|20411a9b177645aa441a40a5021f88095808f7aa39e1b1db0a4731235983ac09|
+|transport-00.json|400|5520e213fa87353fef6246bf26a81648771d30f52b6f2720682b431f7db1a271|
+
+These are preserved failure-recovery DATA, not permission to reopen G's claim/
+report or run G again. No contra query and no final reauth worker was invoked.
+There was one application dispatch attempt; physical provider_request_count
+remains null/unknown. This specific request was not an HTTP access refusal,
+but200 alone proves neither full entitlement nor valid event rows/identity.
+It says nothing about old Massive failures. No API key, URL, raw exception or
+licensed row escaped; the opaque observer return was never inspected.
+No QC/Safari/capacity/project/job or strategy call occurred;335.17 hold and
+338/259/54/699 floor remain. Root102pre-freeze document checks1.23s overlap.
+
+Static frozen observer source shows row_scope combines ticker grammar, optional
+contra grammar, exact query membership, bounded nonempty ASCII action and
+nonempty name. It does NOT identify which one failed, its row or downstream
+conditions. Published text schema does not establish all our local lexical/
+nonempty constraints as vendor promises, but no relaxation is justified yet.
+Next is a NEW offline H diagnosis consuming only the exact three new DATA
+leaves under a fresh committed guard/claim. Reproduce the old finite refusal,
+then independently count every predicate over all rows and preserve unambiguous
+parsed rows privately. Later-row H observations are not conditions G reached
+after its original short-circuit. No names/tickers/values/dates/row ordinals
+are emitted; no filter bypass, field splitting, alias or price admission.
+Any later compatibility repair is separately versioned and justified by actual
+evidence, with G's partial/failed status unchanged and no automatic new request.
+
+### 335.20 D8 exact offline H row-scope diagnosis freeze
+
+New scripts/inspect_arv2_r335_sharadar_scope.py is45871bytes SHA256
+6b989a7de0241074c9dd8582d30683324ef04b7c294a6ce6d3ae325706b5326a;
+tests20707bytes SHA256
+8b2f3915585b5480cd86e4cc9f8c48674848920ab012428e51ab9f127d474b5f.
+Canonical4987-byte profile SHA256
+162c682b939c35b3f2ac7590b4c3bf4c3d42a2f0d8eababac711c9f593f3abcd;
+native2106-byte policy SHA256
+ad9b55af953b2cb72f91e63ecc849ec95db46e87bb06a57b6c4d2242a9bb9d86.
+
+Permit ONE H parent after this source/decision is committed clean in the exact
+designated root/branch/isolatedDarwinPython3.13, expected-head that actual clean
+freeze and caller/profile pins above. NEW claim
+artifacts/analyst_revisions_v2/firstrate/R335-20261103-H is uninspected and
+unallocated. Under continuing owner research waiver/delegation it authenticates
+ONLY the exact three335.19 G DATA leaves, never G claims/reports or a G worker.
+Native all-network/USB/BOTH-Keychain/security-CLI denial remains mandatory.
+Plan/transport/body relationships and G's observed failed/spent lineage are
+bound before pure inspection; no new request or credential capability exists.
+
+H reproduces frozen observer parse_response ONCE on supplied bytes, separately
+counts all rows' ticker/contra grammar, query membership, action empty/ASCII/
+length, name empty, trim/control/field bounds, date/order/window and finite
+numeric predicates. It reports fixed labels/counts only: no row ordinal/date,
+ticker/name/FIGI/CUSIP/value/raw exception. All-row observations after G's
+original short-circuit are not claims G reached those rows. First-row failed
+scope labels can be multiple; H does not falsely assert one unique cause.
+Parsed rows are retained privately only when seven-column CSV/header/field
+shape is unambiguous. Unsupported values remain unadmitted, not dropped,
+split, normalized or converted into aliases/prices. Complete H observation is
+not a successful G capture or completion of its unexecuted queries.
+
+Source guard and source stack must both RETURN normally before own private/
+report publication, with original FD/security/finite failure/300s+5s-reap/output
+bounds and qualifications retained. Permit ONE subsequent same-source native-
+denied stdin-only validator, supplied externally observed parent0or2. H now
+checks exact host/clean HEAD/self/profile/selected source bootstrap before stdin;
+it reads no DATA/control. This prospectively strengthens H and does not edit
+old used D/E/F readers whose source binding was externally checked by root.
+Actualparent0/child0 and matching authenticated output is necessary for H's
+diagnostic completion. Any failed/unknown/partial use is spent, no unchanged
+retry, report repair, G acceptance or extra provider call.
+
+I335-013(P2 pre-use correction): contradictory first-failure labels/zero-fail
+counts or old row_scope reproduction without any failed scope predicate could
+pass output validation. New cross-invariants bind labels/counts, scope/shape
+unions and value classes/rules; regressions catch contradictions and ambiguous
+partial parsed-row retention. Root167focused passes1.76s (65H+102documents),
+two in-memory compiles and all source/profile/native pins match. No full suite.
+Author65passes0.45s and earlier64/58selections overlap. Initial56passes/2fixture
+failures0.50s were an equally valid value-class swap (not a contradiction) and
+oversize synthetic token strings against fixed443-byte plan bound; corrected
+test-only inputs. Two finally-restored omissions produced expected failures.
+Same-round static advice is not independent review. No actual H DATA/control
+read occurred at freeze. QC/Safari remain held by335.17; floor338/259/54/699
+and all price/identity/formal/readiness/financial gates remain unchanged.

@@ -18,10 +18,12 @@ import re
 import stat
 import sys
 import time
+from types import FrameType
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.short_interest_etf import native_count_recovery_budget as research_budget
 from research.short_interest_etf import native_count_epoch_ledger as epoch_model
+from research.short_interest_etf import native_count_conservative_readmission as conservative
 from scripts import load_short_interest_count_epoch_ledger as archive_loader
 from scripts import short_interest_lane_batch_guard as lane
 from scripts import short_interest_count_durable_budget as accounting
@@ -36,6 +38,7 @@ from scripts import short_interest_count_checkpoint as checkpoints
 from scripts import short_interest_count_source_authority as source_scope
 from scripts import resolve_short_interest_count_run13448 as resolution_reader
 from scripts import diagnose_short_interest_body_receipt_custody as antecedent
+from scripts import short_interest_native_main_receipt as native_main
 
 ROOT, BRANCH = transport.ROOT, lane.BRANCH
 SOURCE_AUTHORITY_SHA256 = "9d67d93ad79657031befd8849659bc20fc5834173d76a569bccb9307347e3a6c"
@@ -65,6 +68,12 @@ _WRITTEN_CHECKPOINTS = {}
 _ATTEMPT_SLOTS, _ATTEMPT_BY_TICKET, _RESPONSE_SLOTS = {}, {}, {}
 _ATTEMPT_USED, _RESPONSE_USED, _ATTEMPT_RESULTS = set(), set(), {}
 _WORKER_RETAINED = {}
+_CONSERVATIVE_ARCHIVES, _CONSERVATIVE_ATTEMPTED, _CONSERVATIVE_FAILED = {}, set(), set()
+_PREFLIGHTS, _PREFLIGHT_FAILED, _PREFLIGHT_ATTEMPTED, _PREFLIGHT_ENDED = {}, set(), set(), set()
+_PREFLIGHT_CLOCKS = {}
+CONSERVATIVE_PREFLIGHT_SHA256 = "4edb2b0f6e04c3d2c99d43c84494dbe5c2c9039bd9d522ea8184272f9edf1829"
+MAXIMUM_PREFLIGHT_SECONDS = 300
+_PREFLIGHT_MAIN_CLASS = native_main.AuthenticatedDurableMainReceipt
 _RLOCK_TYPE = type(_thread.RLock())
 _CODES = frozenset("""durable_capture_registration_pending durable_capture_exact_root_required
 durable_capture_archive_factory_required durable_capture_archive_not_closed
@@ -80,7 +89,11 @@ durable_capture_retention_required durable_capture_START_evidence_required
 durable_capture_START_evidence_changed durable_capture_contribution_changed
 durable_capture_checkpoint_changed durable_capture_checkpoint_required
 durable_capture_worker_slot_changed durable_capture_worker_stage_failed
-durable_capture_CLI_arguments_refused durable_capture_hold_report_refused""".split())
+durable_capture_CLI_arguments_refused durable_capture_hold_report_refused
+durable_preflight_registration_pending durable_preflight_conservative_required
+durable_preflight_attempt_spent durable_preflight_binding_changed durable_preflight_factory_required
+durable_preflight_not_live durable_preflight_failed durable_preflight_Main_required
+durable_preflight_Main_changed durable_preflight_code_changed durable_preflight_clock_refused""".split())
 _HOLD_CONTRACT_CODES = frozenset((*_CODES, *transport.diagnostics.LOCAL_CONTRACT_CODES,
     *(name for module in (transport, controls, responses, storage, reader, accounting, negative,
         transport_union, checkpoints, source_scope, negative.primitive, negative.immutable,
@@ -232,10 +245,239 @@ def sourcelease_model(token):
 
 
 def freeze_recovery_from_archive(token):
+    require(not (type(token) is OriginalClosedArchiveToken and token in _CONSERVATIVE_FAILED),
+        "durable_capture_plan_changed")
     original = _archive_binding(token)
-    require(token not in _ARCHIVE_PLANS, "durable_capture_plan_changed")
+    require(token not in _ARCHIVE_PLANS and token not in _CONSERVATIVE_ATTEMPTED,
+        "durable_capture_plan_changed")
     plan = research_budget.freeze_count_recovery_plan(original[3])
     _ARCHIVE_PLANS[token] = plan; return plan
+
+
+def conservative_preflight_code_paths():
+    """The complete existing source closure plus the two custody-only inputs."""
+    return tuple(sorted(set((*code_paths(), *native_main.code_paths(),
+        "research/short_interest_etf/native_count_conservative_readmission.py"))))
+
+
+def conservative_preflight_authority():
+    return {"source_free_preflight_only": True, "pending_USB_qualification": True,
+        "dispatch_authority": False, "credential_authority": False, "claim_authority": False,
+        "storage_creation_authority": False, "budget_reservation_authority": False,
+        "source_admitted": False, "denominator_admitted": False, "ready_for_backtest": False,
+        "provider_HTTP": 0, "credential_reads": 0, "new_claims": 0, "new_STARTs": 0,
+        "new_charged_bytes": 0, "outcome_looks": 0, "qc_attempts": 0, "QC_or_Safari": False}
+
+
+def conservative_preflight_policy():
+    return {"schema": "si-conservative-count-preflight-policy-v1",
+        "basis_policy_sha256": conservative.POLICY_SHA256,
+        "Main_protocol_sha256": native_main.PROTOCOL_SHA256,
+        "Main_native_policy_sha256": native_main.p._policy_sha(native_main._profile()),
+        "code_paths": list(conservative_preflight_code_paths()),
+        "archive": "original_closed_before_Main_open_never_old_process_or_mounted_epoch_resolution",
+        "basis": "one_attempt_original9_reuses_original_plan4_never_second_exposure_or_plan_mint",
+        "lifetime_tries": "unchanged_original_exposure_and_plan_algorithms_no_inferred_HTTP_or_coverage",
+        "Main": "new_genuine_live_held_receipt_only_no_JSON_no_closed_receipt_reconstruction",
+        "code": "full_current_equals_committed_original_held_context_before_Main_through_final_exits",
+        "candidate": "original_generator_frame_LIVE_only_permanent_release_and_failure_latches",
+        "maximum_seconds_after_Main_open": MAXIMUM_PREFLIGHT_SECONDS,
+        "maximum_process_preflights": 1, "authority": conservative_preflight_authority()}
+
+
+def _preflight_producers():
+    return (conservative.freeze_conservative_count_basis, conservative.conservative_basis_binding,
+        native_main.load_registered, native_main.load_registered.__wrapped__,
+        native_main.AuthenticatedDurableMainReceipt.validate,
+        native_main.AuthenticatedDurableMainReceipt.public_summary)
+
+
+_PREFLIGHT_PRODUCERS = tuple((value, value.__code__) for value in _preflight_producers())
+
+
+def _preflight_registered():
+    conservative._registered()
+    require(_digest(CONSERVATIVE_PREFLIGHT_SHA256)
+        and hash_payload(conservative_preflight_policy()) == CONSERVATIVE_PREFLIGHT_SHA256
+        and type(MAXIMUM_PREFLIGHT_SECONDS) is int and MAXIMUM_PREFLIGHT_SECONDS == 300,
+        "durable_preflight_registration_pending")
+    require(native_main.AuthenticatedDurableMainReceipt is _PREFLIGHT_MAIN_CLASS,
+        "durable_preflight_Main_changed")
+    require(all(value is original and value.__code__ is code for value, (original, code)
+        in zip(_preflight_producers(), _PREFLIGHT_PRODUCERS)), "durable_preflight_binding_changed")
+
+
+def freeze_conservative_recovery_from_archive(token):
+    """One pure allocation after original archive closure; no source permission."""
+    try:
+        require(type(token) is OriginalClosedArchiveToken and token not in _CONSERVATIVE_FAILED,
+            "durable_preflight_failed")
+        _preflight_registered(); archive = _archive_binding(token)
+        require(token not in _CONSERVATIVE_ATTEMPTED and token not in _ARCHIVE_PLANS,
+            "durable_preflight_attempt_spent")
+        _CONSERVATIVE_ATTEMPTED.add(token)  # Before either genuine upstream mint.
+        basis = conservative.freeze_conservative_count_basis(archive[3])
+        bound = conservative.conservative_basis_binding(basis)
+        require(len(bound) == 9 and bound[2] is archive[3] and len(bound[4]._parts) == 9
+            and bound[4]._parts[1] is archive[3] and bound[4]._parts[8] is bound[3],
+            "durable_preflight_conservative_required")
+        plan = bound[4]  # The pure basis ALREADY minted this exact plan once.
+        record = token, archive, basis, bound, plan, sys._getframe(), object()
+        _CONSERVATIVE_ARCHIVES[token] = record; _ARCHIVE_PLANS[token] = plan
+        _conservative_archive_binding(token, basis); return basis
+    except BaseException:
+        if type(token) is OriginalClosedArchiveToken: _CONSERVATIVE_FAILED.add(token)
+        raise
+
+
+def _conservative_archive_binding(token, basis):
+    try:
+        require(type(token) is OriginalClosedArchiveToken and token not in _CONSERVATIVE_FAILED,
+            "durable_preflight_failed")
+        record = _CONSERVATIVE_ARCHIVES.get(token)
+        require(type(record) is tuple and len(record) == 7 and record[0] is token
+            and token in _CONSERVATIVE_ATTEMPTED and _archive_binding(token) is record[1]
+            and type(basis) is conservative.ConservativeCountRecoveryBasis and record[2] is basis
+            and conservative.conservative_basis_binding(basis) is record[3]
+            and record[3][2] is record[1][3] and record[3][4] is record[4]
+            and _ARCHIVE_PLANS.get(token) is record[4], "durable_preflight_binding_changed")
+        frame = record[5]
+        require(type(frame) is FrameType and frame.f_code is freeze_conservative_recovery_from_archive.__code__
+            and frame.f_globals is globals() and frame.f_locals.get("token") is token
+            and frame.f_locals.get("archive") is record[1] and frame.f_locals.get("basis") is basis
+            and frame.f_locals.get("bound") is record[3] and frame.f_locals.get("record") is record,
+            "durable_preflight_factory_required")
+        return record
+    except BaseException:
+        if type(token) is OriginalClosedArchiveToken: _CONSERVATIVE_FAILED.add(token)
+        raise
+
+
+class ConservativeCountPreflight:
+    """A LIVE custody-only candidate; no lease, budget or filesystem authority."""
+    __slots__ = ("_anchor", "_identity")
+    def __init__(self): raise DurableCountCaptureRefusal("REFUSED: durable_preflight_factory_required")
+    def public_summary(self): return json.loads(conservative_count_preflight_binding(self)[11])
+
+
+def _preflight_window(record):
+    clock = record[13]
+    original = _PREFLIGHT_CLOCKS.get(record[14])
+    frame = record[15]
+    require(type(frame) is FrameType and frame.f_code is _CONSERVATIVE_PREFLIGHT_CODE
+        and frame.f_globals is globals() and frame.f_locals.get("record") is record
+        and frame.f_locals.get("scope") is record[14], "durable_preflight_clock_refused")
+    origin = frame.f_locals.get("clock_origin")
+    require(type(origin) is tuple and len(origin) == 5 and origin[0] is clock
+        and frame.f_locals.get("clock") is clock and frame.f_locals.get("began") == origin[1],
+        "durable_preflight_clock_refused")
+    require(type(original) is tuple and len(original) == 5 and original[0] is clock
+        and type(clock) is list and len(clock) == 2 and clock[0] == original[1]
+        and clock[1] == original[2] and time.monotonic is original[3]
+        and original[1] == origin[1] and original[3] is origin[2] and original[4] is origin[3]
+        and getattr(time.monotonic, "__code__", None) is original[4], "durable_preflight_clock_refused")
+    now = original[3]()
+    require(type(now) in (int, float)
+        and 0 <= clock[0] <= clock[1] <= now <= 2 ** 53
+        and now - clock[0] <= MAXIMUM_PREFLIGHT_SECONDS, "durable_preflight_clock_refused")
+    clock[1] = now
+    _PREFLIGHT_CLOCKS[record[14]] = clock, original[1], now, original[3], original[4]
+
+
+def conservative_count_preflight_binding(value):
+    try:
+        require(type(value) is ConservativeCountPreflight, "durable_preflight_factory_required")
+        record = _PREFLIGHTS.get(id(value))
+        require(type(record) is tuple and len(record) == 16 and record[0] is value
+            and value._anchor is value._identity is record, "durable_preflight_binding_changed")
+        require(id(value) not in _PREFLIGHT_FAILED, "durable_preflight_failed")
+        require(record[14] not in _PREFLIGHT_ENDED, "durable_preflight_not_live")
+        frame = record[15]
+        require(type(frame) is FrameType and frame.f_code is _CONSERVATIVE_PREFLIGHT_CODE and frame.f_globals is globals()
+            and frame.f_locals.get("candidate") is value and frame.f_locals.get("record") is record
+            and frame.f_locals.get("main") is record[5] and frame.f_locals.get("code") is record[7],
+            "durable_preflight_factory_required")
+        _preflight_registered(); _preflight_window(record)
+        require(_conservative_archive_binding(record[1], record[3]) is record[2]
+            and record[2][3] is record[4], "durable_preflight_binding_changed")
+        require(type(record[5]) is _PREFLIGHT_MAIN_CLASS
+            and record[5]._anchor is record[6], "durable_preflight_Main_required")
+        record[5].validate()
+        require(canonical_json(record[5].public_summary()).encode() == record[12],
+            "durable_preflight_Main_changed")
+        record[8].check(); record[7].check()
+        require(type(record[9]) is tuple and tuple(sorted(record[9])) == record[9]
+            and tuple(name for name, unused in record[9]) == conservative_preflight_code_paths()
+            and _code_identity(record[10], record[9]) == json.loads(record[11])["code_identity_sha256"],
+            "durable_preflight_code_changed")
+        _preflight_window(record); return record
+    except BaseException:
+        if type(value) is ConservativeCountPreflight and id(value) in _PREFLIGHTS:
+            _PREFLIGHT_FAILED.add(id(value))
+        raise
+
+
+@contextmanager
+def prepare_conservative_count_preflight(token, basis, *, root, runtime_head, actual_remote,
+        complete_code_manifest):
+    """The original archive must already be closed before Main is opened.
+
+    No budget is opened, ticket reserved, namespace created or source lease
+    issued. Releasing either held context permanently ends this candidate.
+    """
+    _preflight_registered(); _require_lane_root(root)
+    archive = _conservative_archive_binding(token, basis)
+    require(token not in _PREFLIGHT_ATTEMPTED and not _PREFLIGHTS,
+        "durable_preflight_attempt_spent")
+    require(type(complete_code_manifest) is dict
+        and all(type(name) is str for name in complete_code_manifest)
+        and tuple(sorted(complete_code_manifest))
+        == conservative_preflight_code_paths() and all(_digest(item) for item in complete_code_manifest.values()),
+        "durable_preflight_code_changed")
+    manifest = tuple(sorted(complete_code_manifest.items()))
+    guard = lane.LaneGuard(root, expected_head=runtime_head, expected_remote=actual_remote)
+    _PREFLIGHT_ATTEMPTED.add(token); candidate = None; scope = object()
+    try:
+        guard.refresh()
+        with archive_loader.count.old.cache.HeldFiles(tuple(root / name for name, unused in manifest),
+                protected=False, boundary=guard.check) as code:
+            _audit_code(root, guard, manifest, code)
+            began = time.monotonic(); clock = [began, began]
+            require(type(began) in (int, float) and 0 <= began <= 2 ** 53,
+                "durable_preflight_clock_refused")
+            clock_origin = clock, began, time.monotonic, getattr(time.monotonic, "__code__", None), object()
+            _PREFLIGHT_CLOCKS[scope] = clock, began, began, clock_origin[2], clock_origin[3]
+            with native_main.load_registered(runtime_head, actual_remote) as main:
+                require(type(main) is _PREFLIGHT_MAIN_CLASS,
+                    "durable_preflight_Main_required")
+                main.validate(); raw_main = canonical_json(main.public_summary()).encode()
+                report = {"schema": "si-conservative-count-preflight-v1", "status": "LIVE_source_free_candidate",
+                    "basis_sha256": basis.sha256, "plan_sha256": archive[4].sha256,
+                    "Main_receipt_sha256": json.loads(raw_main)["receipt_sha256"],
+                    "code_identity_sha256": _code_identity(runtime_head, manifest),
+                    "runtime_head": runtime_head, "actual_remote": actual_remote,
+                    "policy_sha256": CONSERVATIVE_PREFLIGHT_SHA256,
+                    "authority": conservative_preflight_authority()}
+                candidate = object.__new__(ConservativeCountPreflight)
+                record = (candidate, token, archive, basis, archive[3], main, main._anchor, code, guard,
+                    manifest, runtime_head, canonical_json(report).encode(), raw_main, clock, scope, sys._getframe())
+                candidate._anchor = candidate._identity = record; _PREFLIGHTS[id(candidate)] = record
+                conservative_count_preflight_binding(candidate)
+                try:
+                    yield candidate
+                    conservative_count_preflight_binding(candidate)
+                finally:
+                    _PREFLIGHT_ENDED.add(scope)
+                code.check(); guard.refresh(); _preflight_window(record)
+            code.check(); guard.refresh(); _preflight_window(record)
+        _audit_code(root, guard, manifest); _preflight_window(record)
+    except BaseException:
+        _PREFLIGHT_ENDED.add(scope)
+        if candidate is not None: _PREFLIGHT_FAILED.add(id(candidate))
+        raise
+
+
+_CONSERVATIVE_PREFLIGHT_CODE = prepare_conservative_count_preflight.__wrapped__.__code__
 
 
 def load_registered_closed_archive(root, *, runtime_head, actual_remote, complete_code_manifest):

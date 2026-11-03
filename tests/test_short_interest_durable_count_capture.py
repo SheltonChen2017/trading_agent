@@ -51,6 +51,10 @@ def fresh_outer_registries(monkeypatch, tmp_path_factory):
         monkeypatch.setattr(outer, name, value)
     monkeypatch.setattr(outer, "_SETTLED_CONTRIBUTIONS", {})
     monkeypatch.setattr(outer, "_CONTRIBUTION_ORIGINS", {})
+    for name, value in (("_CONSERVATIVE_ARCHIVES", {}), ("_CONSERVATIVE_ATTEMPTED", set()),
+        ("_CONSERVATIVE_FAILED", set()), ("_PREFLIGHTS", {}), ("_PREFLIGHT_FAILED", set()),
+        ("_PREFLIGHT_ATTEMPTED", set()), ("_PREFLIGHT_ENDED", set()), ("_PREFLIGHT_CLOCKS", {})):
+        monkeypatch.setattr(outer, name, value)
     for name, value in (("_CHECKPOINT_FACTS", {}), ("_CHECKPOINT_FACTS_FAILED", set()),
         ("_CHECKPOINT_CAPS", {}), ("_CHECKPOINT_ROUND", {}), ("_WRITTEN_CHECKPOINTS", {})):
         monkeypatch.setattr(outer, name, value)
@@ -1029,6 +1033,367 @@ def test_failed_settlement_never_enters_outer_union_registry(fabricated_outer_ru
     with pytest.raises(RuntimeError, match="FABRICATED_ORIGINAL_SETTLEMENT_FAILURE"): h.run()
     assert h.budget not in outer._SETTLED_CONTRIBUTIONS
     assert outer.accounting.settled_chunk_accounting(h.budget)[3] == ()
+
+
+@pytest.fixture
+def conservative_archive(monkeypatch):
+    """Genuine pure/token factories with explicit synthetic archive closure.
+
+    Source/clock closure facts are a named unit seam, not actual archive I/O.
+    The original wrapper, witness, token and all pure allocation factories run.
+    """
+    import test_short_interest_conservative_readmission as support
+    b = outer.conservative
+    for owner, pairs in ((b, (("_MINTS", {}), ("_SCOPES", {}), ("_KEYS", {}),
+            ("_ATTEMPTED", set()), ("_FAILED", set()), ("_CURRENT_SCOPE", None))),
+        (b.exposure, (("_MINTS", {}), ("_KEYS", set()), ("_FAILED", set()))),
+        (b.plans, (("_PLAN_MINTS", {}), ("_PLAN_KEYS", set())))):
+        for name, value in pairs: monkeypatch.setattr(owner, name, value)
+    model = support._toy_ledger(monkeypatch); loader = outer.archive_loader
+    registration = {"started_at": "2026-10-25T00:00:00Z", "head": "c" * 40,
+        "remote": "b" * 40, "code_identity_sha256": "d" * 64, "code_manifest_sha256": "e" * 64}
+    loaded = loader._bind_ledger(model, registration, lambda: None)
+    report = {**model.public_summary(), "schema": "si-count-epoch-ledger-context-closed-v1",
+        "status": "closed_offline_source_only_slice", "closed_at": "2026-10-25T00:00:01Z",
+        "started_at": registration["started_at"], "loader_protocol_sha256": loader.PROTOCOL_SHA256,
+        "head": registration["head"], "remote": registration["remote"],
+        "code_identity_sha256": registration["code_identity_sha256"],
+        "code_manifest_sha256": registration["code_manifest_sha256"],
+        "model_ledger_sha256": model.sha256, "provisional_ledger_sha256": loaded._anchor[3],
+        "authority": loader.authority()}
+    witness = loader._ClosureWitness(loaded._anchor, canonical_json(report).encode(), seal=loader._SEAL)
+    state = loaded._state_identity; state["phase"] = "CLOSED"
+    loaded._closure = loaded._closure_identity = witness
+    loader._LEDGER_MINTS[loaded] = loaded._anchor, state, witness
+    monkeypatch.setattr(outer, "BASELINE_LEDGER_SHA256", model.sha256)
+    monkeypatch.setattr(outer, "CONSERVATIVE_PREFLIGHT_SHA256", hash_payload(outer.conservative_preflight_policy()))
+    token = outer._token_from_original_closed_archive(loaded)
+    return SimpleNamespace(token=token, model=model, wrapper=loaded, events=["archive_closed"])
+
+
+def test_conservative_preflight_registration_preserves_old_protocol_and_source_gate():
+    outer._preflight_registered()
+    assert hash_payload(outer.protocol()) == outer.RUN_PROTOCOL_SHA256
+    paths = outer.conservative_preflight_code_paths()
+    assert paths == tuple(sorted(set(paths))) and set(outer.code_paths()) <= set(paths)
+    assert set(outer.native_main.code_paths()) <= set(paths)
+    with pytest.raises(outer.source_scope.CountSourceAuthorityRefusal, match="prior_run_unresolved"):
+        outer.source_scope.require_dispatch_allowed()
+    a = outer.conservative_preflight_authority()
+    assert a["pending_USB_qualification"] is a["source_free_preflight_only"] is True
+    assert all(value is False or type(value) is int and value == 0 for name, value in a.items()
+        if name not in {"pending_USB_qualification", "source_free_preflight_only"})
+
+
+def test_conservative_archive_retains_original9_without_second_upstream_mint(conservative_archive):
+    h = conservative_archive; before = h.model.private_payload()
+    basis = outer.freeze_conservative_recovery_from_archive(h.token)
+    record = outer._conservative_archive_binding(h.token, basis)
+    original = outer.conservative.conservative_basis_binding(basis)
+    assert record[1] is outer._ARCHIVES[h.token] and record[2] is basis and record[3] is original
+    assert original[2] is h.model and record[4] is original[4] is outer._ARCHIVE_PLANS[h.token]
+    assert len(original) == len(record[4]._parts) == 9 and record[4]._parts[8] is original[3]
+    assert len(outer.conservative.exposure._MINTS) == len(outer.research_budget._PLAN_MINTS) == 1
+    assert h.model.private_payload() == before
+    assert record[4]._parts[4][0] == tuple(original[3].lifetime_try_upper_bound(n) for n in range(1, 39))
+    assert basis.public_summary()["historical_actual_counts"]["provider_GET_requests"] is None
+
+
+@pytest.mark.parametrize("supplied", [None, {}, True, "closed"])
+def test_conservative_archive_wrong_token_cannot_allocate(conservative_archive, supplied):
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer.freeze_conservative_recovery_from_archive(supplied)
+    assert not outer.conservative.exposure._MINTS and not outer._ARCHIVE_PLANS
+
+
+def test_conservative_archive_token_clone_cannot_allocate(conservative_archive):
+    h = conservative_archive; clone = object.__new__(outer.OriginalClosedArchiveToken)
+    clone._anchor = clone._identity = h.token._anchor
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer.freeze_conservative_recovery_from_archive(clone)
+    assert not outer.conservative.exposure._MINTS
+
+
+def test_conservative_archive_second_mint_latches_without_refunding(conservative_archive):
+    h = conservative_archive; basis = outer.freeze_conservative_recovery_from_archive(h.token)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="attempt_spent"):
+        outer.freeze_conservative_recovery_from_archive(h.token)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="preflight_failed"):
+        outer._conservative_archive_binding(h.token, basis)
+    assert len(outer.conservative.exposure._MINTS) == 1
+    assert basis.public_summary()["permanent_unknown_START_upper_debits"] == 8
+
+
+def test_conservative_archive_partial_failure_blocks_retry_and_legacy8(conservative_archive, monkeypatch):
+    h = conservative_archive
+    monkeypatch.setattr(outer.research_budget, "_PLAN_MINTS",
+        {n: object() for n in range(outer.research_budget.MAXIMUM_PLANS)})
+    with pytest.raises(outer.research_budget.CountRecoveryBudgetRefusal, match="capacity_exhausted"):
+        outer.freeze_conservative_recovery_from_archive(h.token)
+    assert h.token in outer._CONSERVATIVE_ATTEMPTED and not outer._ARCHIVE_PLANS
+    assert len(outer.conservative.exposure._MINTS) == 1
+    monkeypatch.setattr(outer.research_budget, "_PLAN_MINTS", {})
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer.freeze_conservative_recovery_from_archive(h.token)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="plan_changed"):
+        outer.freeze_recovery_from_archive(h.token)
+    assert len(outer.conservative.exposure._MINTS) == 1 and not outer._ARCHIVE_PLANS
+
+
+@pytest.mark.parametrize("route", ["conservative", "legacy"])
+def test_conservative_archive_failed_registration_permanently_precedes_all_mints(conservative_archive, monkeypatch, route):
+    h = conservative_archive; policy = outer.CONSERVATIVE_PREFLIGHT_SHA256
+    monkeypatch.setattr(outer, "CONSERVATIVE_PREFLIGHT_SHA256", "0" * 64)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="registration_pending"):
+        outer.freeze_conservative_recovery_from_archive(h.token)
+    assert h.token in outer._CONSERVATIVE_FAILED and not outer._CONSERVATIVE_ATTEMPTED
+    monkeypatch.setattr(outer, "CONSERVATIVE_PREFLIGHT_SHA256", policy)
+    method = outer.freeze_conservative_recovery_from_archive if route == "conservative" else outer.freeze_recovery_from_archive
+    with pytest.raises(outer.DurableCountCaptureRefusal): method(h.token)
+    assert not outer.conservative.exposure._MINTS and not outer.research_budget._PLAN_MINTS
+    assert not outer._ARCHIVE_PLANS
+
+
+@pytest.fixture
+def conservative_preflight(conservative_archive, monkeypatch, tmp_path):
+    """Genuine held Main factory/type, real code inode, explicit I/O seams.
+
+    Main anchor/native readers and lane Git facts are fabricated. No actual
+    private archive, native operation, namespace, key, budget or source is used.
+    """
+    h = conservative_archive; h.tick = 100.; h.expired = h.fail_main_close = False
+    h.root = tmp_path.resolve(); monkeypatch.chdir(h.root); monkeypatch.setattr(outer, "ROOT", h.root)
+    name = "fabricated-preflight-code.py"; h.code_path = h.root / name
+    h.code_raw = b"# explicit fabricated committed preflight code\n"; h.code_path.write_bytes(h.code_raw)
+    h.manifest = {name: hash_bytes(h.code_raw)}
+    monkeypatch.setattr(outer, "conservative_preflight_code_paths", lambda: (name,))
+    monkeypatch.setattr(outer, "CONSERVATIVE_PREFLIGHT_SHA256", hash_payload(outer.conservative_preflight_policy()))
+    monkeypatch.setattr(outer.time, "monotonic", lambda: h.tick)
+    class Guard:
+        def __init__(self, root, *, expected_head, expected_remote):
+            assert root == h.root; self.root, self.head, self.remote = root, expected_head, expected_remote
+        def refresh(self): h.events.append("source_ref_refresh"); self.check()
+        def check(self):
+            h.events.append("source_code_guard")
+            if getattr(h, "code_guard_failed", False): raise outer.DurableCountCaptureRefusal("REFUSED: durable_preflight_code_changed")
+        def binding(self): return self.root, self.head, self.remote
+    monkeypatch.setattr(outer.lane, "LaneGuard", Guard)
+    def git(root, args, guard):
+        guard.check(); assert root == h.root and args == ["show", "c" * 40 + ":" + name]
+        h.events.append("source_committed_code_audit"); return h.code_raw
+    monkeypatch.setattr(outer.archive_loader.count.old.cache, "_git", git)
+    m = outer.native_main
+    for key, value in (("_AUTHENTICATED", {}), ("_AUTHENTICATED_FAILED", set())): monkeypatch.setattr(m, key, value)
+    class Anchor:
+        def close(self): h.events.append("Main_anchor_close")
+    def anchor(head):
+        assert head == "c" * 40; h.events.append("Main_open")
+        return {"runtime_head": head, "receipt_sha256": "a" * 64, "projection_sha256": "b" * 64}, Anchor()
+    monkeypatch.setattr(m, "_anchor", anchor)
+    class Code:
+        def __init__(self, *args): pass
+        def close(self): h.events.append("Main_code_close")
+    monkeypatch.setattr(m.p, "_Code7", Code)
+    monkeypatch.setattr(m.p, "_guard", lambda *args: h.events.append("Main_code_guard"))
+    monkeypatch.setattr(m.p, "_require_immutable_platform", lambda: None)
+    class Loaded(m._Latched):
+        def __init__(self, head, remote, clock, *args):
+            super().__init__(); self.closed = False; self.clock = clock; h.loaded = self
+        def validate(self):
+            def action():
+                m.require(not self.closed and not h.expired, "main_closed"); self.clock.check(); return True
+            return self._run(action)
+        def close(self):
+            self.closed = True; h.events.append("Main_close")
+            if h.fail_main_close: raise m.NativeMainReceiptRefusal("REFUSED: main_original")
+    monkeypatch.setattr(m, "_Loaded", Loaded)
+    h.forbidden = []
+    def denied(*args, **kwargs): h.forbidden.append(True); raise AssertionError("preflight cannot spend or create storage")
+    for module, attribute in ((outer.accounting, "open_durable_count_budget"),
+        (outer.storage, "prepare_registered_volume"), (outer.transport, "read_named_keychain"),
+        (outer.controls, "prepare_owned_count_claim"), (outer.transport.wire, "http"),
+        (outer.resolution_reader, "resolve_registered"), (outer.source_scope, "require_dispatch_allowed")):
+        monkeypatch.setattr(module, attribute, denied)
+    h.basis = outer.freeze_conservative_recovery_from_archive(h.token)
+    h.context = lambda **kw: outer.prepare_conservative_count_preflight(h.token, h.basis,
+        root=h.root, runtime_head="c" * 40, actual_remote="b" * 40,
+        complete_code_manifest=kw.pop("manifest", h.manifest), **kw)
+    return h
+
+
+def test_conservative_preflight_original_live_Main_code_and_archive_are_bound(conservative_preflight):
+    h = conservative_preflight
+    with h.context() as value:
+        row = outer.conservative_count_preflight_binding(value)
+        assert row is value._anchor is value._identity and row[1] is h.token and row[3] is h.basis
+        assert row[4] is outer.conservative.conservative_basis_binding(h.basis)
+        assert type(row[5]) is outer._PREFLIGHT_MAIN_CLASS and row[5]._anchor is row[6]
+        assert row[11] == canonical_json(value.public_summary()).encode()
+        assert value.public_summary()["authority"] == outer.conservative_preflight_authority()
+        assert h.events.index("archive_closed") < h.events.index("Main_open")
+        assert h.events.index("source_committed_code_audit") < h.events.index("Main_open")
+        assert not h.forbidden and not outer._LEASES and not outer.accounting._BUDGETS
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="not_live"): value.public_summary()
+
+
+def test_conservative_preflight_substituted_Main_class_refuses_before_open(conservative_preflight, monkeypatch):
+    h = conservative_preflight; original = outer.native_main.AuthenticatedDurableMainReceipt
+    class Replacement(original): pass
+    monkeypatch.setattr(outer.native_main, "AuthenticatedDurableMainReceipt", Replacement)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="Main_changed"):
+        with h.context(): pytest.fail("wrong Main class accepted")
+    assert "Main_open" not in h.events and not h.forbidden
+
+
+def test_conservative_preflight_registration_pins_Main_class_even_with_original_methods(monkeypatch):
+    original = outer._PREFLIGHT_MAIN_CLASS
+    class Replacement(original): pass
+    assert Replacement.validate is original.validate and Replacement.public_summary is original.public_summary
+    monkeypatch.setattr(outer.native_main, "AuthenticatedDurableMainReceipt", Replacement)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="Main_changed"): outer._preflight_registered()
+
+
+def test_conservative_preflight_substituted_Main_validator_is_not_a_live_witness(conservative_preflight, monkeypatch):
+    h = conservative_preflight
+    monkeypatch.setattr(outer._PREFLIGHT_MAIN_CLASS, "validate", lambda self: True)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="binding_changed"):
+        with h.context(): pytest.fail("substituted Main validator accepted")
+    assert "Main_open" not in h.events
+
+
+def test_conservative_preflight_expired_Main_never_issues_candidate(conservative_preflight):
+    h = conservative_preflight; h.expired = True
+    with pytest.raises(outer.native_main.NativeMainReceiptRefusal):
+        with h.context(): pytest.fail("expired Main accepted")
+    assert not outer._PREFLIGHTS and not outer._LEASES and not h.forbidden
+
+
+@pytest.mark.parametrize("mutation", ["candidate", "Main", "code", "clock"])
+def test_conservative_preflight_mutation_restore_never_revives(conservative_preflight, mutation):
+    h = conservative_preflight; reached = []
+    with pytest.raises(Exception):
+        with h.context() as value:
+            reached.append(True); row = value._anchor; clock = list(row[13])
+            if mutation == "candidate": value._anchor = tuple(list(row))
+            elif mutation == "Main": h.expired = True
+            elif mutation == "code": h.code_path.write_bytes(b"# changed\n")
+            else: row[13][0] += 1
+            with pytest.raises(Exception): value.public_summary()
+            value._anchor = row; h.expired = False; row[13][:] = clock
+            if mutation == "code": h.code_path.write_bytes(h.code_raw)
+            with pytest.raises(outer.DurableCountCaptureRefusal, match="preflight_failed"): value.public_summary()
+    assert reached == [True] and not outer._LEASES and not h.forbidden
+
+
+def test_conservative_preflight_copied_generator_frame_cannot_mint(conservative_preflight):
+    h = conservative_preflight
+    with h.context() as original:
+        clone = object.__new__(outer.ConservativeCountPreflight)
+        row = (clone, *original._anchor[1:]); clone._anchor = clone._identity = row
+        outer._PREFLIGHTS[id(clone)] = row
+        with pytest.raises(outer.DurableCountCaptureRefusal, match="factory_required"): clone.public_summary()
+        assert original.public_summary()["authority"]["dispatch_authority"] is False
+
+
+@pytest.mark.parametrize("barrier", ["Main_close", "fresh_code"])
+def test_conservative_preflight_final_failures_veto_released_candidate(conservative_preflight, monkeypatch, barrier):
+    h = conservative_preflight
+    if barrier == "Main_close": h.fail_main_close = True
+    else:
+        audit = outer._audit_code
+        def failed(root, guard, manifest, held=None):
+            if held is None: raise outer.DurableCountCaptureRefusal("REFUSED: durable_preflight_code_changed")
+            return audit(root, guard, manifest, held)
+        monkeypatch.setattr(outer, "_audit_code", failed)
+    value = None
+    with pytest.raises(Exception):
+        with h.context() as value: assert value.public_summary()["authority"]["new_STARTs"] == 0
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="preflight_failed"): value.public_summary()
+    assert not h.forbidden and not outer._LEASES
+
+
+def test_conservative_preflight_missing_code_refuses_before_Main(conservative_preflight):
+    h = conservative_preflight
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="code_changed"):
+        with h.context(manifest={}): pytest.fail("missing source closure accepted")
+    assert "Main_open" not in h.events
+
+
+def test_conservative_preflight_wrong_basis_refuses_before_Main(conservative_preflight):
+    h = conservative_preflight
+    clone = object.__new__(outer.conservative.ConservativeCountRecoveryBasis)
+    object.__setattr__(clone, "_anchor", h.basis._anchor)
+    object.__setattr__(clone, "_identity", h.basis._identity)
+    with pytest.raises((outer.DurableCountCaptureRefusal, outer.conservative.ConservativeReadmissionRefusal)):
+        with outer.prepare_conservative_count_preflight(h.token, clone, root=h.root,
+                runtime_head="c" * 40, actual_remote="b" * 40, complete_code_manifest=h.manifest):
+            pytest.fail("copied basis accepted")
+    assert "Main_open" not in h.events
+
+
+def test_conservative_preflight_second_context_never_reopens_Main(conservative_preflight):
+    h = conservative_preflight
+    with h.context(): pass
+    openings = h.events.count("Main_open")
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="attempt_spent"):
+        with h.context(): pytest.fail("second preflight opened")
+    assert h.events.count("Main_open") == openings
+
+
+def test_conservative_preflight_replaced_clock_is_refused_before_invocation(conservative_preflight, monkeypatch):
+    h = conservative_preflight; calls = []
+    with pytest.raises(outer.DurableCountCaptureRefusal):
+        with h.context() as value:
+            def hostile(): calls.append(True); return h.tick
+            monkeypatch.setattr(outer.time, "monotonic", hostile)
+            with pytest.raises(outer.DurableCountCaptureRefusal, match="clock_refused"):
+                value.public_summary()
+    assert calls == []
+
+
+def test_conservative_preflight_returned_report_cannot_release_source(conservative_preflight):
+    h = conservative_preflight
+    with h.context() as value:
+        report = value.public_summary()
+        report["authority"]["dispatch_authority"] = report["authority"]["claim_authority"] = True
+        report["authority"]["pending_USB_qualification"] = False
+        assert value.public_summary()["authority"] == outer.conservative_preflight_authority()
+        assert not h.forbidden and not outer._LEASES
+
+
+def test_conservative_preflight_original_code_context_exit_failure_is_terminal(conservative_preflight, monkeypatch):
+    h = conservative_preflight; old = outer.archive_loader.count.old.cache.HeldFiles.__exit__
+    def close(self, *args):
+        result = old(self, *args)
+        if "Main_close" in h.events:
+            raise outer.DurableCountCaptureRefusal("REFUSED: durable_preflight_code_changed")
+        return result
+    monkeypatch.setattr(outer.archive_loader.count.old.cache.HeldFiles, "__exit__", close)
+    value = None
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="code_changed"):
+        with h.context() as value: assert value.public_summary()["authority"]["dispatch_authority"] is False
+    assert value is not None
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="preflight_failed"): value.public_summary()
+
+
+def test_conservative_preflight_postMain_clock_and_registry_reset_cannot_extend_window(conservative_preflight, monkeypatch):
+    h = conservative_preflight; candidate = None
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="clock_refused"):
+        with h.context() as candidate:
+            close = h.loaded.close
+            def rebase_after_close():
+                close(); h.tick += 301
+                row = candidate._anchor; original = outer._PREFLIGHT_CLOCKS[row[14]]
+                row[13][:] = [h.tick, h.tick]
+                outer._PREFLIGHT_CLOCKS[row[14]] = row[13], h.tick, h.tick, original[3], original[4]
+            monkeypatch.setattr(h.loaded, "close", rebase_after_close)
+    assert candidate is not None and "Main_close" in h.events
+
+
+def test_conservative_preflight_nonexact_manifest_key_refuses_before_code_open(conservative_preflight):
+    h = conservative_preflight
+    class Alias(str): pass
+    bad = {Alias(name): digest for name, digest in h.manifest.items()}
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="code_changed"):
+        with h.context(manifest=bad): pytest.fail("nonexact code path key accepted")
+    assert "Main_open" not in h.events and "source_committed_code_audit" not in h.events
 
 
 def test_all_frozen_registration_hashes_match_without_source_IO(monkeypatch):

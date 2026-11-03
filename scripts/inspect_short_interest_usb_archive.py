@@ -18,7 +18,7 @@ import stat
 import subprocess
 import sys
 import time
-from types import ModuleType
+from types import FrameType, ModuleType
 
 from data.hashing import hash_payload
 
@@ -50,6 +50,20 @@ exact_git_hashes_required designated_physical_root lane_snapshot_changed
 matching_remote_changed working_code_differs_from_commit fixed_usb_input_changed
 terminal_code_changed exact_head_remote_arguments_required model_namespace_occupied
 """.split())
+_STAMP_FIELDS = ("dev", "ino", "uid", "gid", "mode", "nlink", "size",
+                 "mtime_ns", "ctime_ns", "flags")
+_STAMP_FAILURES = {}
+_READ_ORIGINS = {}
+_PHASES = frozenset(("initial_audit", "held_audit", "close_audit",
+    "post_close_reopen_initial_audit", "post_close_reopen_close_audit",
+    "post_close_compare", "post_close_named_audit"))
+_RELATIONS = frozenset(("root_descriptor_vs_original", "root_name_vs_original",
+    "directory_descriptor_vs_original", "directory_name_vs_original",
+    "file_descriptor_before_bytes_vs_original", "file_name_before_bytes_vs_original",
+    "file_descriptor_after_bytes_vs_original", "file_name_after_bytes_vs_original",
+    "reopened_file_descriptor_vs_original", "reopened_root_descriptor_vs_original",
+    "reopened_directory_descriptor_vs_original", "post_close_root_name_vs_original",
+    "post_close_directory_name_vs_original", "post_close_file_name_vs_original"))
 
 
 class UsbInspectionRefusal(ValueError):
@@ -67,6 +81,98 @@ def _stamp(info):
             getattr(info, "st_flags", 0))
 
 
+def _component(value):
+    if type(value) is tuple and len(value) == 2:
+        role, ordinal = value
+        if type(role) is str and role == "code" and type(ordinal) is int and 1 <= ordinal <= 4:
+            return role, ordinal
+        if type(role) is str and role in ("full", "year", "manifest", "readme") and ordinal is None:
+            return role, None
+    return "unknown", None
+
+
+def _original_labels(item):
+    """Constructor-issued metadata lineage; drift never becomes a new label."""
+    origin = _READ_ORIGINS.get(id(item))
+    if type(origin) is not tuple or len(origin) != 4 or origin[0] is not item:
+        return None, None
+    frame = origin[3]
+    if (type(frame) is not FrameType or frame.f_code is not _Read.__init__.__code__
+            or frame.f_globals is not globals() or frame.f_locals.get("self") is not item
+            or frame.f_locals.get("origin") is not origin
+            or item.component is not origin[1] or item._reopen is not origin[2]):
+        return None, None
+    return origin[1], origin
+
+
+def _compare_stamp(item, actual, original, code, phase, chain_ordinal, relation):
+    """Original equality, with evidence minted ONLY at its actual failure.
+
+    Never call another stat to diagnose a prior comparison. In particular, a
+    restored current stamp cannot replace the original failed observation.
+    """
+    if actual == original:
+        return True
+    error = UsbInspectionRefusal(code)
+    frame = sys._getframe()
+    component, origin = _original_labels(item)
+    row = (error, item, actual, original, code, phase, chain_ordinal, relation, frame, component, origin)
+    _STAMP_FAILURES[id(error)] = row
+    raise error
+
+
+def _compare_chains(item, actual, original):
+    # Both lists were already materialized by the old expression. Preserve
+    # its left-to-right tuple comparison and first-mismatch short circuit.
+    if len(actual) != len(original):
+        return False
+    for ordinal, (left, right) in enumerate(zip(actual, original), 1):
+        _compare_stamp(item, left, right, "post_close_original_changed",
+            "post_close_compare", ordinal, "reopened_directory_descriptor_vs_original")
+    return True
+
+
+def comparison_diagnostic(error):
+    """Project controlled labels and field NAMES from genuine failed frames."""
+    row = _STAMP_FAILURES.get(id(error))
+    if type(error) is not UsbInspectionRefusal or type(row) is not tuple or len(row) != 11 or row[0] is not error:
+        return None
+    unused, item, actual, original, code, phase, ordinal, relation, frame, component, origin = row
+    if (type(item) is not _Read or type(frame) is not FrameType
+            or frame.f_code is not _compare_stamp.__code__ or frame.f_globals is not globals()
+            or frame.f_locals.get("row") is not row or frame.f_locals.get("error") is not error
+            or frame.f_locals.get("item") is not item or frame.f_locals.get("actual") is not actual
+            or frame.f_locals.get("original") is not original
+            or frame.f_locals.get("component") is not component
+            or frame.f_locals.get("origin") is not origin
+            or component is None or type(origin) is not tuple or len(origin) != 4
+            or origin[0] is not item or origin[1] is not component
+            or type(actual) is not tuple or type(original) is not tuple
+            or len(actual) != 10 or len(original) != 10 or actual == original
+            or phase not in _PHASES or relation not in _RELATIONS
+            or type(ordinal) is not int or not 0 <= ordinal <= len(item.directories) + 1
+            or code not in ("original_directory_changed", "original_file_stamp_changed", "post_close_original_changed")
+            or BaseException.args.__get__(error, BaseException) != (code,)):
+        return None
+    caller = frame.f_back
+    valid = (type(caller) is FrameType and caller.f_globals is globals()
+        and ((caller.f_code in (_Read.audit.__code__, _Read.after_close.__code__)
+              and caller.f_locals.get("self") is item)
+             or (caller.f_code is _compare_chains.__code__ and caller.f_locals.get("item") is item
+                 and type(caller.f_back) is FrameType
+                 and caller.f_back.f_code is _Read.after_close.__code__
+                 and caller.f_back.f_globals is globals() and caller.f_back.f_locals.get("self") is item)))
+    if not valid:
+        return None
+    names = [name for name, left, right in zip(_STAMP_FIELDS, actual, original) if left != right]
+    if not names:
+        return None
+    role, code_ordinal = component
+    return {"schema": "si-usb-original-comparison-diagnostic-v1", "entered_phase": phase,
+        "role": role, "code_ordinal": code_ordinal, "chain_ordinal": ordinal,
+        "relation": relation, "mismatching_fields": names}
+
+
 class _Clock:
     def __init__(self):
         self.start = self.last = time.monotonic()
@@ -82,12 +188,16 @@ class _Clock:
 class _Read:
     """Original RO descriptor and original path-chain observations; no reseal."""
 
-    def __init__(self, path, maximum, clock, *, minimum=1):
+    def __init__(self, path, maximum, clock, *, minimum=1, component=None, _reopen=False):
         self.path = Path(path)
         require(self.path.is_absolute() and maximum > 0
                 and type(minimum) is int and minimum in (0, 1), "read_arguments")
         self.maximum, self.clock, self.fds, self.directories = maximum, clock, [], []
         self.minimum = minimum
+        self.component = _component(component)
+        self._reopen = _reopen is True
+        origin = (self, self.component, self._reopen, sys._getframe())
+        _READ_ORIGINS[id(self)] = origin
         self.failed = False
         try:
             fd = os.open("/", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
@@ -133,24 +243,37 @@ class _Read:
     def audit(self):
         require(not self.failed, "read_failure_latched")
         try:
+            caller = sys._getframe(1)
+            phase = ("initial_audit" if caller.f_code is _Read.__init__.__code__
+                     else "close_audit" if caller.f_code is _Read.close.__code__ else "held_audit")
+            if self._reopen:
+                phase = "post_close_reopen_" + phase
             self.clock.check()
-            require(_stamp(os.fstat(self.fds[0])) == self.root_original
-                    and _stamp(os.stat("/", follow_symlinks=False)) == self.root_original,
+            require(_compare_stamp(self, _stamp(os.fstat(self.fds[0])), self.root_original,
+                        "original_directory_changed", phase, 0, "root_descriptor_vs_original")
+                    and _compare_stamp(self, _stamp(os.stat("/", follow_symlinks=False)), self.root_original,
+                        "original_directory_changed", phase, 0, "root_name_vs_original"),
                     "original_directory_changed")
-            for parent, name, fd, original in self.directories:
-                require(_stamp(os.fstat(fd)) == original
-                        and _stamp(os.stat(name, dir_fd=parent, follow_symlinks=False)) == original,
+            for ordinal, (parent, name, fd, original) in enumerate(self.directories, 1):
+                require(_compare_stamp(self, _stamp(os.fstat(fd)), original,
+                            "original_directory_changed", phase, ordinal, "directory_descriptor_vs_original")
+                        and _compare_stamp(self, _stamp(os.stat(name, dir_fd=parent, follow_symlinks=False)), original,
+                            "original_directory_changed", phase, ordinal, "directory_name_vs_original"),
                         "original_directory_changed")
-            require(_stamp(os.fstat(self.fd)) == self.original
-                    and _stamp(os.stat(self.name, dir_fd=self.parent,
-                                       follow_symlinks=False)) == self.original,
+            require(_compare_stamp(self, _stamp(os.fstat(self.fd)), self.original,
+                        "original_file_stamp_changed", phase, len(self.directories) + 1, "file_descriptor_before_bytes_vs_original")
+                    and _compare_stamp(self, _stamp(os.stat(self.name, dir_fd=self.parent,
+                                       follow_symlinks=False)), self.original,
+                        "original_file_stamp_changed", phase, len(self.directories) + 1, "file_name_before_bytes_vs_original"),
                     "original_file_stamp_changed")
             raw = self._read()
             require(raw == self.raw and hashlib.sha256(raw).hexdigest() == self.digest,
                     "original_file_bytes_changed")
-            require(_stamp(os.fstat(self.fd)) == self.original
-                    and _stamp(os.stat(self.name, dir_fd=self.parent,
-                                       follow_symlinks=False)) == self.original,
+            require(_compare_stamp(self, _stamp(os.fstat(self.fd)), self.original,
+                        "original_file_stamp_changed", phase, len(self.directories) + 1, "file_descriptor_after_bytes_vs_original")
+                    and _compare_stamp(self, _stamp(os.stat(self.name, dir_fd=self.parent,
+                                       follow_symlinks=False)), self.original,
+                        "original_file_stamp_changed", phase, len(self.directories) + 1, "file_name_after_bytes_vs_original"),
                     "original_file_stamp_changed")
         except BaseException:
             self.failed = True
@@ -180,26 +303,32 @@ class _Read:
         try:
             require(not self.failed and not self.fds, "closed_original_required")
             # A new read is compared to the ORIGINAL observation, never adopted.
-            fresh = _Read(self.path, self.maximum, self.clock, minimum=self.minimum)
+            fresh = _Read(self.path, self.maximum, self.clock, minimum=self.minimum,
+                          component=self.component, _reopen=True)
             try:
-                require(fresh.original == self.original and fresh.raw == self.raw
+                require(_compare_stamp(self, fresh.original, self.original, "post_close_original_changed",
+                            "post_close_compare", len(self.directories) + 1, "reopened_file_descriptor_vs_original")
+                        and fresh.raw == self.raw
                         and fresh.digest == self.digest
-                        and fresh.root_original == self.root_original
-                        and [row[3] for row in fresh.directories]
-                        == [row[3] for row in self.directories],
+                        and _compare_stamp(self, fresh.root_original, self.root_original, "post_close_original_changed",
+                            "post_close_compare", 0, "reopened_root_descriptor_vs_original")
+                        and _compare_chains(self, [row[3] for row in fresh.directories], [row[3] for row in self.directories]),
                         "post_close_original_changed")
             finally:
                 fresh.close()
             # The last fresh data/parent handles are now CLOSED. This is a
             # named comparison against the ORIGINAL stamps, not a new baseline.
-            require(_stamp(os.stat("/", follow_symlinks=False)) == self.root_original,
+            require(_compare_stamp(self, _stamp(os.stat("/", follow_symlinks=False)), self.root_original,
+                        "post_close_original_changed", "post_close_named_audit", 0, "post_close_root_name_vs_original"),
                     "post_close_original_changed")
             current = Path("/")
-            for unused_parent, name, unused_fd, original in self.directories:
+            for ordinal, (unused_parent, name, unused_fd, original) in enumerate(self.directories, 1):
                 current /= name
-                require(_stamp(os.stat(current, follow_symlinks=False)) == original,
+                require(_compare_stamp(self, _stamp(os.stat(current, follow_symlinks=False)), original,
+                            "post_close_original_changed", "post_close_named_audit", ordinal, "post_close_directory_name_vs_original"),
                         "post_close_original_changed")
-            require(_stamp(os.stat(self.path, follow_symlinks=False)) == self.original,
+            require(_compare_stamp(self, _stamp(os.stat(self.path, follow_symlinks=False)), self.original,
+                        "post_close_original_changed", "post_close_named_audit", len(self.directories) + 1, "post_close_file_name_vs_original"),
                     "post_close_original_changed")
             self.clock.check()
         except BaseException:
@@ -254,16 +383,16 @@ def inspect_registered(head, remote):
     _guard(head, remote)
     codes, sources = [], []
     with ExitStack() as stack:
-        for rel in CODE_FILES:
+        for ordinal, rel in enumerate(CODE_FILES, 1):
             # Empty committed Python package initializers are valid CODE.
             # The four external source roles retain minimum=1 and exact pins.
-            item = _Read(ROOT / rel, 1024 * 1024, clock, minimum=0)
+            item = _Read(ROOT / rel, 1024 * 1024, clock, minimum=0, component=("code", ordinal))
             stack.callback(item.close)
             require(item.raw == _git("show", head + ":" + rel), "working_code_differs_from_commit")
             codes.append(item)
         blobs = {}
         for role, rel, length, digest in INPUTS:
-            item = _Read(USB / rel, length, clock)
+            item = _Read(USB / rel, length, clock, component=(role, None))
             stack.callback(item.close)
             require(len(item.raw) == length and item.digest == digest, "fixed_usb_input_changed")
             sources.append(item)
@@ -313,8 +442,12 @@ def main(argv=None):
         code = (exc.args[0] if type(exc) is UsbInspectionRefusal and len(exc.args) == 1
                 and type(exc.args[0]) is str and exc.args[0] in _CODES
                 else "unexpected_local_refusal")
-        print(json.dumps({"status": "refused_external_byte_inspection", "code": code,
-                          "custody_qualified": False, "source_admitted": False}), flush=True)
+        negative = {"status": "refused_external_byte_inspection", "code": code,
+                    "custody_qualified": False, "source_admitted": False}
+        detail = comparison_diagnostic(exc)
+        if detail is not None:
+            negative["original_comparison"] = detail
+        print(json.dumps(negative), flush=True)
         return 2
 
 

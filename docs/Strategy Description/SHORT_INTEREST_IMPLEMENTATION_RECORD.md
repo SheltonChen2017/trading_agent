@@ -31093,3 +31093,210 @@ still required. USB offline qualification precedes any further downloads.
 Count and DAILY ceilings and permanent8START/16MiB stay unchanged; source/key/
 claim/START/charge/outcome/QC/Safari/purchases0. Images and every old failure
 remain preserved; no successful push occurred in this continuation.
+
+## 140. Offline USB original-comparison diagnostics (2026-11-03)
+
+### 140.1 Bounded scope after genuine custody closure
+
+SI-DEC-20261103-06, under continuing SI-AUTH-20261103-02 and the owner's
+instruction to qualify the USB archive offline before further downloads,
+registers improved diagnostics and ONE prospective finite read-only v3
+observation. This follows the actual native/Main/held-loader conjunction in139,
+not an automatic retry authorized by the old135.7 failure. It does not recreate
+v1/v2, infer their actor, adopt a new stamp or qualify a source from matching
+bytes alone. The old v2 original_directory_changed veto remains UNKNOWN and
+overrides its old provisional/structural observations.
+
+The fixed four USB inputs, all byte/hash pins, pure inspection policy,
+four-code-file catalogue and180-second limit are unchanged. ExFAT remains an
+external unprotected input, not an APFS evidence domain. No data/claim/control/
+report namespace is created. No source/key/claim/START/charge/purchase or
+QC/Safari/outcome action is authorized by this diagnostic. Existing separate
+budgets and permanent8START/16MiB stay unchanged; SourceAUTH stays locked.
+
+### 140.2 Original failure projection without relaxed comparisons
+
+The reader records only a genuinely failed original ten-field comparison,
+its exact failure frame/tuple/objects, fixed code ordinal or full/year/manifest/
+readme role, entered phase, root0/chain/file ordinal and descriptor/name
+relation. Terminal original_comparison contains only those fixed labels and
+MISMATCHING FIELD NAMES. There is no second stat to diagnose a prior failure,
+no path/value/arbitrary exception/dynamic type, and no inferred actor or
+historical component. Unknown, forged or copied evidence yields no detail.
+Original short-circuit order, all ten fields, byte/hash checks, failure latch,
+minimum size, final fresh-code and post-close/named barriers remain intact.
+
+SI-USB-20261103-011 (P2, confirmed/corrected before dispatch): Main review found
+that mutable component and reopen attributes could relabel a genuine later
+failure as another source/code role or post-close phase. The author reproduced
+both directions, then bound the original labels to the exact constructor
+frame and original row. Pre-failure drift suppresses the detail while retaining
+the custody refusal; later current restoration/relabel cannot replace the
+captured failed observation. Causal reversal produced2 expected failures,
+restored2 passed. This does not identify the old010 failure or any writer.
+
+Main independently compared the full _stamp, _Clock, _git, _guard,
+_inspect_pair and _Read._read/_close/close ASTs against committedDF51; identical.
+The read stamps retain dev/ino/uid/gid/mode/nlink/size/mtime_ns/ctime_ns/flags.
+The existing29 reader cases remain; no prior expectation or protection is
+removed. New cases cover all ten fields, root/name short circuit, constructor,
+held/close/post-close failures, final named-file comparison, wrong/forged
+provenance and unknown exceptions. The fixed model and data pins are unchanged.
+
+Reader22469 bytes/SHA256
+d5774516cfdcf0796b0d10d9e57501ba63ab7fb18bf5418fb8f51f457f46899e;
+tests24555 bytes/SHA256
+04b3738db7649033725164d39cb23225eb9bb0a37d1a85755e53638c5201a120.
+Four-code mapping SHA256
+ff4e722680091ec9530bfab6a91f4fb363b497596b21b726cad18f85fa6748cf.
+Original model SHA54e1582975fc0bfaccbf53f6567333551594a58aa6b8ea114ff8142e50429d2c;
+pure inspection policy
+a403579c17c31010ae26eaddf1350a7f1d313cbf6bdae9b6d815f1ccd83121fe.
+
+Author54 fabricated focused tests/.64s passed, OS networking denied. Independent
+Main reader/model/import-boundary/active-document selection206 passed1.49s;
+Python3.9 AST/in-memory compile passed. Author method-provenance and final
+post-close comparison reversals produced expected failures, restored checks
+passed. These are fabricated software tests, not actual USB closure, source
+usability or independent Claude review. Main is the reviewing agent here.
+
+### 140.3 Fully prepared finite read wrapper and observer
+
+The new wrapper is4724 bytes/SHA256
+5c3193092deb711599373a7898bf5652bed3117ea2d6dd544119f5cc8d33e19e.
+It verifies exact current/committed driver bytes BEFORE executing them, keeps
+the original four-file reader, denies EVERY Python write-open/mutation/socket
+and all subprocesses except exact read-only Git commands on this lane/ref/code.
+The USB wrapper needs no /dev/null exception: its original Git stderr uses PIPE.
+All denied seam counters must remain0. Private aggregate report content stays
+inside the wrapper; only cryptographic report/origin commitments, closed
+context booleans or a safe original negative diagnostic are projected.
+
+A separate automatic observer owns original CP/stdio/actual close and a whole
+180-second monotonic window, ending after final packet validation. It binds
+head/remote/four-code mapping/pure policy, exact two canonical packets,
+all-zero seam counters, no stderr/signal/extra output and actual exit0 for a
+positive closed-byte observation. A genuine original reader exit2 may be
+reported only as an observed refusal, never positive closure. It never stops,
+signals, restarts or replaces the process. Body SHA256
+07488d062044417d687d418abad6f44c9ddc01bd43151b5847cd7a4a36cef403.
+Main37 simulated observer checks passed; removing the final-validation clock
+caused the expected specific failure, then the exact factory37 passed.
+No USB/native/source operation was performed by those simulations.
+
+After code/tests/records are committed clean and all authors freeze, reverify
+exact physical/Git roots, branch/HEAD/status, actual matching remote and all
+four current/committed code hashes; then invoke this ONE fresh registered
+read with the fully prepared wrapper/observer. No edit/test/commit/push while
+active. Preserve any negative and exact fields rather than infer old causes,
+weaken the directory rule or create another invocation to guess.
+
+Even an actual positive result is closed_external_byte_inspection_not_custody.
+Protected original custody, upstream authentication, processing rights, corpus
+coverage, publication/revision/availability, exact native/date/class/CIK/USD,
+own-class denominator and reported DTC/volume semantics remain separate source
+qualification gates. No row/compiler route or candidate scope change is
+introduced. Assess those offline before more downloads. The lane is not
+backtest-ready or at the final step before QC setup; no push is claimed here.
+
+## 141. Source-free conservative archive/Main composition (2026-11-03)
+
+### 141.1 Purpose and still-closed operational boundary
+
+SI-DEC-20261103-07, under continuing SI-AUTH-20261103-02, adds only a source-free
+preflight to the existing capture coordinator. Long original archive replay
+must close BEFORE Main's new300s holder is opened. A current original closed
+archive token creates one genuine conservative basis, retaining its original
+nine-part binding and already-issued plan at row4. Neither exposure nor plan
+is minted again. No durable budget, ticket, storage namespace, source lease,
+credential or START is created.
+
+freeze_conservative_recovery_from_archive(token) performs that one attempted
+pure allocation. prepare_conservative_count_preflight(token,basis,root,
+runtime_head,actual_remote,complete_code_manifest) then holds the complete
+current/committed92-path code context and genuine LIVE
+AuthenticatedDurableMainReceipt. The opaque candidate has original generator
+provenance, immutable report bytes, release/failure latches and the exact
+original clock through terminal code/context checks. Public report copies
+grant nothing. Candidate getters refuse after context exit and cannot reuse
+or stretch Main's300s lifetime to a3600s source lease or long archive replay.
+
+The active preflight policy is
+4edb2b0f6e04c3d2c99d43c84494dbe5c2c9039bd9d522ea8184272f9edf1829;
+92-path current-byte mapping
+448d1bfc1af971b40c77df99c1f2c69a51ccdcd5d858caefdf9849c77aa237cd.
+All dispatch/key/claim/storage/reservation/source/denominator/readiness
+authority is false; pending_USB_qualification remains TRUE. Only the exact
+original ledger/exposure/plan algorithms supply accounting. Unknown8 are not
+observed HTTP, actual exits, qualified coverage or an additional try grant.
+The existing exposure policy's possible first-eight typed-matrix positions and
+lifetime upper bounds are unchanged, not new observed descriptor evidence.
+
+### 141.2 Preserved history and concrete integration gaps
+
+The old operational protocol remains
+0eb57c3e1b7461df5e111709373215b51e913ebafd617da351d199df0b3c1815,
+behind the unchanged UNCONDITIONAL count_source_prior_run_unresolved gate.
+Main directly exercised that refusal without any source I/O. New preflight
+imports are eager solely to pin original producer/class identities; their
+extra paths are included in the active92-path catalogue. The old operational
+catalogue is HISTORICAL/BLOCKED, not a complete closure for a future operation
+using these imports. Never unlock it without a newly frozen complete
+operational catalogue/protocol and the full nine-part/storage/lease/checkpoint
+conjunction. Its old default factory still selects the eight-part plan.
+The new distinct preflight API is not silently substituted into a source run.
+
+Production paths still need the separately frozen isolated storage profile;
+they must not reuse proof namespaces or the mounted empty proof main.
+The long-lived production Main boundary is still unresolved; this LIVE-only
+candidate does not solve it. Future checkpoint loading also needs a distinct
+conservative branch instead of the obsolete forensic resolver. PENDING
+checkpoint pins remain PENDING until real future process/control evidence.
+The old resolver is not invoked or reconstructed after reboot. USB and all
+source/input/rights/cash gates remain. No source operation is started here.
+
+### 141.3 Verified pre-release corrections and exact validation
+
+| ID | Priority | Disposition |
+| --- | --- | --- |
+| SI-PREFLIGHT-20261103-001 | P2 | Corrected: pin original Main class object as well as producer methods; a substituted class cannot pass an otherwise matching method catalogue. |
+| SI-PREFLIGHT-20261103-002 | P2 | Corrected: pre-mint registration failure permanently blocks BOTH conservative retry and legacy8 fallback before either upstream mint. Peer reproduced both failed-entry routes before correction; a final-binding refusal alone was insufficient. |
+| SI-PREFLIGHT-20261103-003 | P2 | Corrected: an immutable original generator-issued clock origin survives Main closure; resetting a mutable clock list plus its registry cannot extend final300s checks. |
+| SI-PREFLIGHT-20261103-004 | P2 | Corrected: require exact dictionary/string manifest keys before sorting or opening anything; a nonexact key cannot execute comparison behavior inside a supposedly fixed catalogue. |
+
+Author final relevant seven-file selection418 passed10.31s with OS networking
+denied; independent reviewer31 new cases/3.14s passed. Four confirmed reviewer
+regressions were RED before correction, then all31 passed; issuer-clock causal
+omission failed as expected and restored passed. Independently, Main's exact
+seven-file capture/basis/Main/budget/source-gate/import-boundary/active-document
+selection418 passed10.26s. No full lane/repository suite is run.
+
+Main verified Python3.9 AST/in-memory compile, registration and unchanged
+operational gate/protocol. Nine original archive/run/catalogue/authority
+functions remained AST-identical; only the legacy factory gains the intended
+failed/attempted-conservative fallback veto. The budget engine, original
+exposure and plan arithmetic were not changed. Main's USB selection206/1.49s
+in140 remains a separate focused execution.
+
+Reviewer's first line-based porcelain guard falsely rejected the authorized
+space-containing lane record and its shell continued into read-only output.
+That validation-harness mistake is retained separately; Main independently
+reverified physical/Git roots, exactDF51/branch and all five authorized dirty
+paths. Subsequent reviewer commands used NUL-delimited status and stopped on
+guard failure. No off-lane read, unexpected change, edit or actual operation
+was observed. This is not a source/custody failure or a successful first guard.
+
+Final coordinator118982 bytes/SHA256
+cbaef7d19eb82c971202922ff526d3a117521074fbdb3cfbbc5454294a7d1a9a;
+tests119937 bytes/SHA256
+fcf2d964c03fe80cff887576185723a9efa0799acbf8bf59af0fb4f0f367a681.
+All authors are frozen before the next actual operation. The next bounded
+action is the fully prepared offline USB v3 read in140 after clean commit/
+concurrency checks; no new archive/Main/source replay occurs concurrently.
+A later genuine source-free archive/basis/Main check remains prospective.
+Count84005/4GiB, separate DAILY residual36837/3327988047/71468572 and permanent
+8START/16MiB remain; provider/key/claim/START/charge/outcome/QC/Safari/purchase0,
+looks0/0, exploratory0, alpha0, IDsnone and QCattempts0. No readiness or push
+is claimed; reserve the one matching-lane publication for the completed round
+or concrete terminal owner-required blocker.
+Main final post-record active-document checks69 passed1.16s; whitespace passed.

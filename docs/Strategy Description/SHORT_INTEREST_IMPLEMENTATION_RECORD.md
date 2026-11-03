@@ -30447,3 +30447,108 @@ ca4394423f4a31c0c8f994e4d9ad78fef8f929ca6d45365b8b0ca25ea538c248.
 Main independently verified both frozen new-file hashes, unchanged SDK/literal,
 policy equality, Python3.9 AST/in-memory compile and fixed own stage/contract
 literal catalogues. Whitespace passed; actual local base remained absent.
+
+### 137.6 Authenticated root completion and deadline-negative local observation
+
+The owner subsequently supplied the root helper's genuine final CLI line:
+bounded_observation_closed, matches5, original_report_bytes3873 and
+original_report_sha256
+4a3c83432f14b43be6bbf6ec8872a58a6c73ebe74d0f792c3180855eebd58d54.
+Main reauthenticated the original report with held FD/name full stamps,
+0600/single-link/owner protections and exact bytes/hash through close; no
+issue/terminal_failure/cleanup_failure was present. The requested final root
+return is now authenticated. The earlier private lineage-retention copy still
+honestly says pending at its creation time and is NOT rewritten. No administrator
+command, original trace or old subject is rerun.
+
+Main intentionally committed the prepared profile as
+33f8413c60742127310e3641b404b046ef7ac4bc, then verified clean physical/Git root,
+branch, exact HEAD, every working/committed code8 byte, frozen policy/mapping
+and unchanged matching actual/tracking origin2A6D. All development agents were
+frozen before the ONE actual local-metadata-20261103-v1 invocation. Operation
+ID is9ac2b1df3775cc2baa32fccf2e2a49e38f3fd123bfdc71d6e04c9306195fed5d.
+The parent and namespace were exclusively created by this invocation outside
+Documents; no old artifact, FileProvider configuration or source was changed.
+
+The independently owned Node controller retained raw original lines without
+lossy nanosecond conversion, required its actual PID/order bindings, recursively
+canonicalized only its newly generated producer_exit packet, handled EPIPE/
+spawn/errors, drained complete output and permanently vetoed late/extra/negative
+packets, stderr or abnormal exits. Advisory review accepted that protocol; it
+was not independent Claude review. ProducerPID67086 actually exited0,4184 stdout
+bytes/SHAaac1a87cfc835c99d663824b12f952dbd22305aeed3144470f723b4d2a0e01ce.
+ObserverPID67087 actually exited0,3068 stdout bytes/SHA256
+28582adb12b3f27ddc6545a7bb132ff7c4d9417dc59c107d97c593f1c43217b2.
+Both stderr counts0, signalsnull, exact two expected packets each. The observer
+held the original RO file through the genuine producer exit0 and40s tail.
+No original file/stamp/flags/bytes/host/code/context-close refusal was emitted.
+
+Fresh original-seal reader exec53501 terminated0; subsequent genuine original
+p._Files controller-holder exec63973 terminated0 after publishing EXACT seven
+fixed controls and completing original code/file/directory/post-close audits.
+There are no refused process/control packets from those child/holder checks.
+Their positive output is explicitly conditional on the external controller's
+actual wait and original whole-operation deadline; it is not source authority.
+
+| Original control | Bytes | Original SHA256 |
+| --- | ---: | --- |
+| registration.private.json | 1915 | d09e17bfa31df38f67d604c3588f4fa7e02f1cc6a3066cca5aa967931d941c10 |
+| producer.sealed.private.json | 2200 | ddaec898beeecf172b7bb9acb2a593b69e8425bc6f771211508e8edcd6b5edb1 |
+| producer.closed.private.json | 1984 | cecea6a318b691fae9761ba5abab94e491bd9f5b7c1a950a1a38978b68eb68ae |
+| observer.open.private.json | 874 | 3b8ad00eec69f8bb465438e64b5228561e0b32a3e02eb6abde4e4792e8d17ab8 |
+| observer.closed.private.json | 2194 | dd6db9f7d37e97af8ac1342e72e7b355a819a90e4d540add8f36b3064d8c6aeb |
+| process.waits.private.json | 764 | 536cc859b196d89b85e35c58d094147225922598e7d57cc4fa9d2b562a620a38 |
+| run.closed.json | 1034 | aa9620203feabefdb8b5e902debef84a985b064651a31841d87381329eedcf36 |
+
+SI-LOCAL-20261103-006 (P2 Main orchestration defect, OPEN): the independently
+started original Main monotonic300s deadline expired. First queried negative
+was318.82542570899983s with permanent controller_deadline latch. Main prepared
+the later verification/publication adapter WHILE the clock was already running
+and interposed agent/tool pauses and separate full original code readers.
+That was Main's orchestration mistake; it is not a newly observed filesystem,
+FileProvider, original publisher or source failure. No window is increased,
+clock reset, original audit removed or late result relabelled on-time.
+
+This negative OVERRIDES the otherwise successful process/holder observations.
+The entire v1 profile is terminal deadline-negative and UNQUALIFIED. In
+particular run.closed.json itself says original_metadata_published_holder_
+contexts_and_external_controller_clock_still_required; its presence cannot
+complete the failed external conjunction. There is NO durable Main/source/
+production-storage/native-supervision/readiness admission. Original source-free
+files/controls stay unchanged. No run.refused.json exists in this closed
+publisher; do not reopen/reseal it or manufacture an original negative control.
+This durable Main negative records the missing conjunction honestly.
+
+After all owned operations terminated, Main's independent read-only anchored
+FD/name checks matched all seven ORIGINAL control stamps/bytes/hashes and UF2,
+plus the original41-byte literal's full9/flags/bytes, through each reader close.
+Known original directory pins and exactly seven owned control additions were
+checked; no fresh stamp, flags or membership baseline was adopted. No new file
+was written by that read. The original producer/observer and their direct
+children were absent, consistent with already retained owned actual exits.
+These later finite observations DO NOT undo the deadline negative.
+
+### 137.7 Causal next unit; no more standalone metadata probes
+
+Preserve v1 as spent negative evidence. Do not create a standalone successor
+probe merely to remove Main thinking time, retry the same namespace, weaken
+the deadline, adopt an old seal or repeat any source claim. The next coherent
+implementation is a fully prepared automated controller and the NEW fixed local
+native storage profile: prepare all sequencing before dispatch, own every
+actual wait, relay raw packets automatically and enforce one original monotonic
+deadline through final verification/publication/actual holder exit. Fabricated
+regressions must reject deadline expiry during observation, after provisional
+publication and immediately after the final owned wait, as well as late output,
+stderr, EPIPE/spawn/abnormal exits, duplicate events and large integer stamps.
+
+All NEW native bootstrap/backing-image/mount/host/Main controls/results must
+move together outside Documents while ROOT/cwd/Git/code remain in this lane.
+The location hypothesis is supported by the observed finite UF2/full9 stability,
+but neither that hypothesis nor software tests repair v1 or grant production
+custody. Preserve legacy profiles and every old datum/image/claim/negative;
+retain the genuine publisher/native checks and exact existing source budgets.
+Full native closure, durable negative-accounting readmission and all source/
+actual-input gates remain open. No QC/Safari, purchase, source/key/claim/START/
+charge/outcome occurs. No successful push has occurred in this continuation.
+Main post-result active-document checks69 passed/.80s with OS network denied;
+record whitespace passed. No source/native proof or full suite was rerun.

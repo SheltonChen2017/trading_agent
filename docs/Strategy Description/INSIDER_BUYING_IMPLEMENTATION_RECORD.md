@@ -1,14 +1,14 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **359 HANDS OFF THE COMPLETED AVAILABLE-INPUT CONSUMPTION-CHAIN
-ROUND. IMPLEMENTATION `85862391` AND ITS ONE ACTUAL SELECTED-METADATA
-OBSERVATION AUTHENTICATE20,044+8=20,052 EXCLUSIONS; NO ORIGINAL BODY,
-SOURCE REQUEST OR QC/SAFARI ACCESS. THE OLD PLANNER STOP REMAINS BINDING.
-THIS IS NOT FULL CAMPAIGN MIGRATION, ORIGINAL ADMISSION OR PRE-QC READINESS.
-THIRTEEN P2s REMAIN OPEN; HISTORICAL VERSION/AVAILABILITY, PARENT/PIT/CONTEXT/
-RIGHTS/POPULATION FACTS ARE MISSING. SHARADAR'S ACCOUNT QUESTION IS STILL
-HELD; NO VENDOR REPLY, PURCHASE OR UPGRADE. THE SEPARATE FAILED MASSIVE
-READBACK STAYS PRESERVED/OPEN. MONITOR REMAINS DISARMED. ONE FINAL PUSH.**
+Status: **360 IS THE OWNER-AUTHORIZED AVAILABLE-INPUT PRE-QC BUILD IN
+PROGRESS. THE ADDITIVE READ-ONLY USB DAILY/ACTION/EARNINGS QUALIFIER IS
+PROSPECTIVELY BOUNDED; ACTUAL RESULTS FOLLOW ONLY AFTER COMMITTED CODE,
+SOURCE-ONLY HEALTH AND NATIVE ISOLATION. NO PRICE/IDENTITY/ACTUAL-RELEASE
+ADMISSION OR BACKTEST READINESS IS INFERRED. THIRTEEN P2s REMAIN OPEN.
+HISTORICAL SEC PUBLIC-AVAILABILITY AND PARENT/PIT/POPULATION FACTS REMAIN
+MISSING. OLD CONSUMED/FAILED ROOTS, PLANNER STOP AND FROZEN BYTES STAY
+PRESERVED. NO QC/SAFARI, VENDOR REPLY, PURCHASE OR UPGRADE; MONITOR DISARMED.
+ONE FINAL PUSH AFTER THE COMPLETED OR FACTUALLY BLOCKED ROUND.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -41939,3 +41939,289 @@ subprocesses and freshTMP/`/dev/null` test writes. Current two code hashes still
 equal357.3, no other tracked source changed, and cumulative whitespace/private-
 shape/status checks precede the final record-only commit. Neither the actual
 metadata reader nor any source-only runtime control is repeated by this check.
+
+
+## 360. Owner-authorized USB source qualification and continued pre-backtest build — prospective scope (2026-11-03)
+
+### 360.1 Current authority and actual boundary
+
+The owner supplied a USB disk, requested examination, then explicitly said
+"yes proceed. build until the last step before backtesting". Starting exact
+local/matching origin is `32caf7a5521ef4fae21b504feac816c8e7f692ef`, clean;
+a matching-only fetch has no incoming commits. Continue available-input
+engineering and source qualification without another Claude checkpoint.
+The existing NO-QC/Safari, no-purchase/upgrade and no-vendor-reply holds remain;
+this instruction does not release them. The archive reply monitor stays
+DISARMED. Use only the designated Insider worktree/branch, leave shared
+records/Action Plan/root handoff frozen, and make ONE final matching-lane
+push for the completed or factually blocked round. No other local work is
+silently bundled or independent review inferred.
+
+The read-only supplied-source discovery found `/Volumes/SANDISK/firstrate`:
+770 regular files including a manifest,324,284,056,191 bytes by filesystem
+metadata. The manifest has769 download records, all reporting2026-10-17;
+all769 remapped supplied-root paths exist and their sizes match that manifest.
+This is a present download snapshot, NOT historical first-seen evidence.
+Manifest327,907B SHA-256
+`c681af584244d38e3f9dea2ff765cc2c991cb383107a3e542115a4338ee4cdf8`.
+Thirteen small README/earnings byte checks agree with their manifest MD5s;
+this is local consistency, not independently authenticated provider custody
+or full324GB rehash. All667 `.zip` names have ZIP magic;82 other ZIP files
+have `.txt` names. An initial byte-literal mistake misclassified ZIP headers;
+it was corrected before interpreting results, never called data corruption.
+No source file was copied, extracted, executed, altered or admitted.
+
+Actual discovery scope was filesystem inventory, documentation, selected ZIP
+metadata/headers and date/status-presence summaries under native network/
+fork/write/security-exec denial, no signal/outcome join. No key, signed URL,
+API-access file or private row was emitted or committed. Manifest may contain
+private download URLs; only sanitized schema/count/hash information is used.
+Stock listing has16,306 rows/16,136 unique labels;31 raw-day stock ZIPs expose
+14,826 unique member labels. An exact-label inventory comparison gives1,506
+listed labels without a raw-day member and196 member labels absent from the
+listing; these are unresolved naming/snapshot differences, not proved price
+absence or an allowed eligibility filter. Sampled AAPL/META/SPY/QQQ/IWM dates
+cover2021-2025 and2020Q4, including1,255/64 rows respectively. Several delisted
+raw-day histories exist, but the SBNY/current-versus-delisted case remains an
+identity hazard. This is candidate evidence, not the actual source cohort.
+
+Earnings discovery sees7,992 ticker-file CSVs/497,776 rows spanning2000-01-01
+to2027-05-19;139,921 rows across7,187 files fall in2020-10-01..2025-12-31.
+Only `date`, `eps_estimate`, `eps_reported`, `release_time` occur; ticker is
+filename-implied.55,797 required-window rows have blank timing. The README
+mixes scheduled/actual events; nonblank reported EPS alone is NOT explicit
+source confirmation of actual release. ZIP SHA-256
+`fda981b80cff30c14d9a6b90ce6ddc9e565b16baa7dfcfa849ed49aa91c117cf`.
+Do not turn this preliminary inventory into complete historical coverage,
+issuer identity or admission. No exact historical SEC version/publication
+archive was found in the inspected data.
+
+### 360.2 Decisions and candidate deliverable
+
+**IBDEC-360-01:** qualify unadjusted daily stock/ETF coverage, corporate actions
+and earnings BEFORE considering another purchase or any QC processing. Preserve
+all label/coverage/schema refusals; no survivor-only selection, arbitrary lag,
+zero-event substitute or strategy/window/economics change. Ticker labels are
+candidates, not historical CIK/share-class/listing/security identities. Current
+price/earnings discovery does not repair SEC historical known-by evidence or
+original admission. The pilot remains2021-2025 with2020Q4 warm-up, separate
+from the frozen original82-quarter study.
+
+**IBDEC-360-02, earnings policy:** follow210.3 and the existing
+`pilot_earnings_contract`: local diagnostics may use one truthful PRESENT
+source version. Missing universal forecast/version archives are NOT a newly
+invented earnings gate. Unknown time may use the entire exchange-local civil
+date under the existing interval diagnostic, requiring both±2/±5 memberships
+to be invariant across every possible reaction session; otherwise the whole
+diagnostic is unavailable. Still require explicit source-confirmed published
+actual results and genuine issuer completeness. Neither a past date nor a
+nonblank reported-EPS field alone supplies that confirmation. Keep this
+policy distinct from the separately missing SEC filing-version availability
+archive; do not call every blank timing field an automatic missing event.
+
+FirstRate's [published license](https://firstratedata.com/about/license) permits
+private evaluation and provider processing on the subscriber's behalf, with
+raw redistribution restricted. This supports investigating the owner-supplied
+files locally without inventing a separate-letter requirement. Current
+published terms are not a fabricated historical download-time contract or
+account receipt; any eventual exact cloud representation still needs its
+applicable rights and the owner's explicit QC release. No provider credential,
+purchase, upgrade, vendor correspondence or QC account is used for this check.
+
+New candidate files are
+`research/insider_buying_pilot_firstrate_qualification_v1.py` and its focused
+test. Select ONLY58 unadjusted daily ZIPs (32 stock including five delisted
+archives and the misnamed2025+ delisted ZIP;26 ETF), two listings/two market READMEs, four stock/ETF splits and
+dividends ZIPs, earnings full ZIP/README and the external-pinned manifest.
+No minute-history bulk scan, other fundamentals/news/short-data body,
+`API_Access.txt`, provider request or old source root is activated. Initial
+bounded supplied-source format discovery may read only these documentation/
+listing/member headers to implement the source-specific parser; it is not
+claimed as the committed qualification or a completed source operation.
+
+Authenticate the exact manifest before parsing; remap only known relative
+paths inside this supplied root and never follow original absolute paths or
+URLs. Before interpreting selected content, check manifest size/MD5, calculate
+fresh SHA-256 and hold no-follow files/ancestry with final version/hash
+rechecks. exFAT does NOT inherit private0700/0600/single-link immutable source
+custody guarantees; state this limitation explicitly. USB files remain read-only
+and are not copied into canonical storage. Bound ZIP central-directory bytes
+BEFORE allocation, entry count/size/ratio/total expansion, member paths and
+symlink treatment. Never extract or execute supplied bytes. Stream dates,
+shape and finite OHLCV/corporate-action fields for data quality only; no
+returns, signal/outcome join, selection, metric or research look is computed.
+
+Public results contain counts/hashes/date ranges/refusal codes only. Private
+coverage maps remain behind explicit consumers and out of Git/stdout. Neither
+fixtures nor present-day metadata mint historical identity, source-publication,
+PIT, rights, canonical, QC or backtest readiness. Qualify strict parsing,
+conservation, refusal/resource/path/privacy directions and native controls
+before any actual qualification. Keep frozen sources/pins/stopped roots,
+consumed/ambiguous claims and all13 open P2 scopes intact.
+
+### 360.3 Bounded format discovery, complete selected scope and genuine calendar
+
+Before qualification, the permitted read-only format discovery verifies both
+listing headers as `Ticker,Name,First Date,Last Date`, headerless daily six-
+column date/OHLCV rows and headerless corporate-action date/value pairs. Dates
+are ISO civil dates; no raw financial values are emitted.31 stock `.zip`
+archives in the preliminary inspection were an EXTENSION-LIMITED inventory:
+the additional `1-Day_Unadjusted_2025+_Delisted_tickers.txt` is also a ZIP and
+adds1,651 members. Include it rather than conclude those source labels are
+missing. The complete selected raw-day source is **32 stock ZIPs/16,477 members/
+1,579,033,898 declared expanded bytes plus26 ETF ZIPs/5,161 members/382,917,927
+bytes**. These are ZIP-metadata counts before the qualified actual scan, not
+deduplicated securities, verified raw bytes or corpus completeness.
+
+Four corporate-action archives are `Stock_Dividends.zip`, `Stock_Splits.zip`,
+`ETF_Dividends.zip`, `ETF_Splits.zip`, respectively3,900/2,963/4,347/692 members
+and4,307,557/105,444/2,728,907/18,815 declared expanded bytes. Full earnings
+has14,348,892 declared expanded bytes. There are **68 selected leaves plus
+the externally pinned manifest,69 distinct source files**. The exact previous
+ZIP-only label comparison in360.1 remains preliminary and must be superseded
+by full qualification, not silently promoted or erased. All selected inputs
+are read on the USB without extraction or a bulk copy.
+
+**IBDEC-360-03, frozen context rather than a new window:** the supplied pilot
+plan already requires the market envelope **2019-10-01..2026-06-30**,253 prior
+opens starting2020-01-02 for the first2021-01-04 entry, and a60-session maturity
+tail through2026-03-30 for the final2025-12-31 entry. The earlier64-row2020Q4
+sample alone is insufficient factor/listing context. Thus numerical SOURCE-
+QUALITY validation uses that exact existing market envelope; dates/order/
+counts are examined throughout files and outside-envelope financial lexemes
+stay opaque. This is not a return calculation, signal/outcome join, strategy
+look, changed economic rule, widened SEC event source or released holdout.
+Earnings diagnostic context separately needs2020-12-23..2026-01-08; keep that
+buffered date-accounting distinct from required21's2020Q4..2025Q4 inventory.
+
+A new SOURCE-ONLY calendar reconstruction, with ALL USB/artifact/Keychain
+reads denied, reproduces the existing genuine calendar159,412B SHA-256
+`cf89f63750992981001461030434ee95776b1f4b387f95084514fb42e5958aae`
+and genuine pilot plan383,551B SHA-256
+`f74310ade5bb09047b0b2edc3a25b3f40608289857bc9575e8b7310b9e349037`:
+1,695 exchange sessions/1,255 pilot sessions. Native network/fork/all-write/
+security-exec denial and the real VM/sampled-RSS monitor remain live through
+stdout. There is no fabricated weekday calendar or retained calendar capsule.
+Use `pandas_market_calendars==5.4.0` from the explicit installed package path;
+current pandas3.0.5/numpy2.5.1/python-dateutil2.9.0.post0/pytz2026.3.post1 are
+reported separately, not labelled the old environment. Package-init SHA-256
+`b03b9fb6f9e134514bf37515c3ad8e7166c47a92c3ec385bb982d20fc4d82849`
+and NYSE-definition SHA-256
+`175045c15d8ad58755977f6a450fcb498508ca8dff34b15dbea41ae4e3c53ad5`
+match the existing source anchors. Actual qualification must bind the exact
+calendar/plan before opening USB inputs. Date presence against this genuine
+plan is NOT valid-bar admission, listing seasoning or historical identity.
+
+The current process RLIMIT_NOFILE is1,048,575 soft,9,223,372,036,854,775,807
+hard. Verify sufficient capacity before any actual source claim; do not raise
+limits by inference. Selected ZIP metadata implies about1.984GB expanded
+content; register an explicit bounded1800-second worker limit, finite input/
+output/line/member/directory/expansion limits and live memory enforcement.
+This is not a claim of instantaneous/hard RSS enforcement or a performance
+benchmark. File counts are distinct inputs, not exact physical-open/read
+counts: initial/full/final rehashes and held ancestry checks are intentional.
+
+**IBIPC-36001, P3, retained old-helper concern; not reused.** Independent
+source-only mock probes confirm the old campaign helper's failure cleanup
+can call `process.wait()` without timeout and can leak its just-created child
+when selector construction fails before the try block. No actual child/input
+is used in those probes. Do not modify consumed/frozen old code or reuse that
+helper as an1800-second launcher. Qualify a new bounded caller in the additive
+USB module, with Popen/selector initialization inside protected cleanup,
+nonblocking bounded anonymous calendar input, finite canonical output and
+stderr, deadline enforcement, kill/reap even after leader exit and bounded
+close-all cleanup. Reuse only the already-qualified bounded cleanup helper
+where appropriate; never monkeypatch old timeout constants or expose foreign
+stderr. This new caller corrects its own prospective route, not the old
+helper's historical disposition.
+
+Read-only USB validation creates no remote request or research look. It need
+not invent a forever-one-shot restriction for correcting an offline verifier:
+any necessary corrected replay must keep the SAME source epoch, use separately
+committed qualified code, preserve every earlier immutable attempt receipt and
+state that inputs were read again. Never overwrite/resume a failed attempt or
+alias any OLD source/provider/353/358 consumed operation. No retry acquires new
+source authority or rewrites a failed result. The actual registration below
+must identify finite attempts explicitly before source I/O; no silent fallback.
+
+### 360.4 Qualified candidate, red/green evidence and prospective actual scope
+
+The final candidate source SHA-256 is
+`c4d122f5353131ecf18bc6d1b873cbe6fad1acfe76edabbd4fa0613dc780ce4f`;
+the focused test SHA-256 is
+`59812dc0b4080c79771e02f09c6e86fb41b7f959dfa24c895b6dc80766170583`.
+These are new additive files; no frozen production/test pin was changed.
+Main independently observed **135 focused tests PASS in1.60s** (63 new,
+71 genuine-pilot tests and the EXACT package guard) and **129 boundary/
+record/active-document/platform/frozen-pin/old-planner-stop checks PASS in
+6.80s**. No skips/warnings. The first group uses native network/fork/write/
+security-exec denial except fresh owned test-TMP writes, real baseline-VM+
+4GiB growth/sampled4GiB RSS monitoring and explicit installed test libraries.
+The boundary group retains native process-tree network/security denial,
+permits Git/child processes and only fresh test-TMP or `/dev/null` writes;
+ALL USB, Keychain and artifact DATA reads remain denied. This is a focused
+selection, not the complete lane/repository suite. Source-only compilation
+of both new images also passed under native controls. One earlier main test
+harness refused before collection because site was enabled; it was corrected
+to isolated `-I -S -B` plus explicit test-library paths. That setup error is
+not a product/test failure or a source operation.
+
+Author-side source-only evidence is separately attributed:64 focused checks
+PASS in1.48s and compilation PASS on these final images; four final in-memory
+guard reversals produced11 expected REDs (literal IPC bound1, stream bound
+before another read1, deadline before read1, failed-process-group cleanup8).
+Earlier candidate63-green/23-RED and peer62-green/three whole-function RED
+proofs remain preceding-image engineering evidence, not final-image runs.
+Real invented-byte changes preserving inode/size/mtime were refused by the
+real final hash check and accepted only with that check reversed. Peer
+bootstrap probes accepted a valid invented envelope and refused coherently
+rehashed private-data leakage and a boolean request count. No guard reversal
+or fixture proof used the USB, provider credentials or actual private data.
+Author harness pre-collection `/dev/null` logging and artifact-root traversal
+errors, and earlier fixture/mutant setup corrections, are setup evidence and
+are not counted as expected REDs or actual source failures.
+
+**IBDEC-360-04:** a deliberately broad synthetic catalog-sizing envelope
+is75,753,656B, SHA-256
+`5c0040f912037f141809368d891595d82b79b5328b7d0ce8140c9159b1e687da`.
+It uses the discovered member/listing cardinalities but invented20-character
+labels,57-year counters/full date masks and nine-digit counts; it is NOT an
+actual corpus result or coherent security population. It exceeded the
+initial64MiB IPC limit before activation. Increase ONLY this new candidate's
+finite stdout limit to128MiB (134,217,728B payload plus one newline), leaving
+58,464,073B/43.5591% headroom for that synthetic envelope. Retain256KiB input,
+4096B foreign-stderr ceiling,1800s maximum worker deadline, finite ZIP/row/
+line/member/decoded-byte limits and live memory checks. No old source helper
+constant, consumed scope, frozen image or global resource limit is changed.
+
+The independently reviewed private invocation bootstrap is11,971 UTF-8 bytes,
+SHA-256 `2a1cd9860167e45eec29b419a4e5e678838722dbb17591e01b20893dc1b82c91`.
+Its exact-byte loader will bind that hash and the EXISTING implementation
+commit before execution. It inventories/rechecks the committed source/test
+closure and genuine calendar/plan. The trusted metadata publisher/calendar
+orchestrator is not falsely described as the fork-denied source worker.
+Only the worker reads the69 fixed supplied USB files; it denies native
+network/fork/all writes/security-exec, every other USB path, lane artifacts
+and effective-user Keychain reads before source I/O. The real memory guard
+stays live through serialization/stdout flush/final sample. Parent validates
+the exact public-key whitelist, authority/zero counts, actual source/calendar
+pins and reconstructed private/result hashes; private coverage is never
+printed or staged. exFAT source immutability/private-mode guarantees remain
+explicitly FALSE. Parent private outputs require held0700 directories,
+0600 regular single-link leaves, exclusive publication, fsync, exact attempt/
+epoch inventories and final byte/version rechecks.
+
+Register operation `ib-pilot-firstrate-usb-qualification-20261103-v1`, source
+epoch `pilot_firstrate_qualification_v1/source-c681af584244d38e`, exactly ONE
+initial attempt `attempt-000001`; no existing epoch or semantic retry is
+consumed. First run a60-second source-only health child with ALL USB reads
+denied and NO output namespace. Only on health success, clean exact committed
+HEAD and unchanged matching origin may parent exclusively publish scope
+reservation and observation-started receipts, invoke the one1800-second
+actual qualification call, then preserve private coverage/result/completion
+receipts. A failure preserves its finite disposition and claimed attempt;
+there is no automatic replay, fallback parser or renamed retry. This is
+read-only source quality/date coverage, not canonical ingestion, source/PIT/
+identity/rights admission, financial returns/signals, a research look or
+backtest. Expected provider/credential/QC/look/backtest counts are all ZERO.
+All13 carried P2s and the new retained old-helper P3 remain unchanged.

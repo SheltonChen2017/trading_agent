@@ -72311,3 +72311,98 @@ B tests32693bytes SHA256
 66c1244fb6172ddd5328541a46b45f525439fe2e0b38fa24f6b1aaa32853611d.
 No B DATA read, source replacement, QC action, strategy job, look or cell has
 occurred at this freeze. All post-observation continuation gates in335.4 remain.
+
+### 335.7 Actual B diagnoses mixed separators; A/B remain refused
+
+At clean freezefad83253f253e0721fa88b5d80264dc1828cfd34 (M2/B code
+11b71b39d2f403f7984882404137192fc381672b), the sole B parent exited2,
+worker2/no stderr. The1523-byte worker failure packet SHA256
+2927b7b559759d1ea6a62bcb41aa7f462531e462b196f01eda79fdbe8752e429
+retains stock_candidate/case0/price_parse/line_ending/claimconsumed. The sole
+stdout-only native validator also exited2, output_authenticated=true and
+accepted=false, preserving all fields. B and its validator are now SPENT,
+M2/B unchanged/frozen, no control inspection, repair or replay.
+
+This time actual lexical evidence identifies the representation:55296bytes,
+1341LFs of which5are CRLF, zero bareCRs,1341physical records, terminal CRLF
+present and a structurally complete six-field final record. Uniformity=false.
+Thus the actual current pinned candidate is MIXED LF/CRLF, not an unterminated
+final record. Preserve this correction to the hypothesis in335.5: M2's optional
+EOF fix is valid CSV behavior but did not remedy this observed input refusal.
+The exact vendor append/export mechanism is not established by separator counts.
+No price/source admission or partial coverage completion is claimed.
+
+I335-006(P2 confirmed): requiring one uniform newline spelling across an entire
+vendor member is an unsupported transport constraint for this otherwise bounded
+CSV input. A prospective M3 may recognize LF or CRLF PER RECORD, including a
+mixture, while retaining zero-bareCR, complete six fields, strict date/numeric/
+OHLC/order/bounds and original byte/hash/CRC checks. Only one CR immediately
+before its LF can be classified as part of that terminator; do not strip
+arbitrary field whitespace, normalize the USB file or accept embedded/bare CR.
+Original byte offsets/rows/quarantine must remain exact. Lexical uniformity
+stays truthfully false; separate supported-format evidence must distinguish
+valid mixed delimiters from uniform formatting. This is a verified targeted
+format recovery, not a blanket metadata or invalid-price waiver.
+
+Prepare an additive M3/callerC with a separately committed exact source/profile
+and one-shot decision before DATA. No independent-review wait is needed under
+the current owner direction; all technical/source/financial gates persist. These
+two failures are offline source-parser attempts, not QC launches; no QC attempt,
+look or cell was consumed. Floor338/259/54/699 is unchanged. Never rerun A/B,
+rename an unchanged program or claim the missing QC-book cells are repaired.
+
+### 335.8 D3 exact mixed-separator correction and one-shot C freeze
+
+M3 scripts/arv2_r335_firstrate_prices_v3.py is16361bytes SHA256
+b2b10d2b57d4524434c3a04ed059442417d1c4138abb2e76173f133e31979b0a.
+It recognizes LF or CRLF per record, including mixed members, rejects every
+bareCR, and strips only the one CR immediately before its LF for parsing.
+Original bytes and exact offsets remain retained; no USB normalization occurs.
+All M2 financial/date/order/hash/bounds/quarantine guards remain binding, as
+verified by the narrowly declared inverse AST. Optional complete EOF support
+remains. Count-only line_endings_consistent stays false on mixed files while
+line_endings_supported is true only with zero bareCR. Neither is price truth.
+
+C scripts/inspect_arv2_r335_firstrate_coverage_v3.py is53227bytes SHA256
+827259694d4746b715e9280c48ec2fcdc56c74548b30e2f224f9ea25ec26522e.
+Its twelve declared substitutions restore frozen B source byte-for-byte:
+new SOURCE/control/schema/M3 pin and supported-format lexical validation.
+Whole-five demand, I/USB pins, original metadata/FD/security/deadline/claim/
+publication/actual-exit machinery are unchanged. M1/M2/A/B remain frozen and
+spent; this corrects observed I335-006 rather than retrying unchanged logic.
+
+The NEW C claim artifacts/analyst_revisions_v2/firstrate/R335-20261103-C
+has not been inspected or allocated. Under current explicit owner waiver and
+delegated research decisions, permit ONE C parent after this exact source and
+decision are committed clean on the designated root/branch/Python, expected-head
+bound to that actual clean commit, caller SHA above, canonical6099-byte profile
+SHA256c4fd69eafe3d9ca9c05a6079fdfa7e4156183abfb36d48ddd528266ed248b3b9
+and6967-byte native policy SHA256
+f8772fc492a90bb4f658a0b830bea0446e3eea81a57669f51b2138a11ae11930.
+All335.4 bounds/denials/normal-return and partial/ambiguous/spent rules apply.
+Permit exactly one subsequent same-source native-denied stdout-only validator,
+supplied the EXTERNALLY OBSERVED parent exit. Actualparent0/child0 plus complete
+authenticated output is necessary for coverage observation, never automatic
+identity/source/price admission. No A/B controls, old operations or QC data read.
+
+Root pre-C390distinct passes:321in3.60s (77REMX+127M3+84C+33record/redaction)
+plus69nonoverlapping active-document checks0.63s. Four new sources/tests compile
+in memory; source/profile/native pins match and old M1/M2/A/B hashes unchanged.
+The first root selection named nonexistent document-test paths: exit4/no tests
+ran, then corrected names above; not a product failure or operational attempt.
+All synthetic tests retain native network/USB/artifact/BOTH-Keychain denial,
+in-root support, noautoload/--noconftest/-B/no cache. No complete suite.
+M3 author127passes0.18s/C84passes2.88s overlap root, not additive. Author C draft
+83passes/1fixturefailure3.04s used an empty required calendar; corrected only
+that synthetic argument. Restored memory omissions caught uniformity regression,
+offset normalization, false uniform evidence, supported-relation omission and
+success reversion. No actual USB/private/control read occurred during this work.
+
+M3 tests26846bytes SHA256
+533e04338111e42535ff13e2f37f0b4c6e2358c1afe668e3a00a974a754113b7;
+C tests33607bytes SHA256
+9e7351db39d992dc901482d582a430e3d889a718807902edca3fd6d791e5fdf1.
+At freeze C is uninvoked, no source assignment or backtest readiness claimed.
+Bookkeeping338/259/54/699 remains unchanged; continuation still requires
+meaningful identities, complete common reference/NAV prices and all genuine
+source/valuation/processing/project/access/idle/capacity/attempt/run gates.

@@ -1,14 +1,14 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **360 IS THE OWNER-AUTHORIZED AVAILABLE-INPUT PRE-QC BUILD IN
-PROGRESS. THE ADDITIVE READ-ONLY USB DAILY/ACTION/EARNINGS QUALIFIER IS
-PROSPECTIVELY BOUNDED; ACTUAL RESULTS FOLLOW ONLY AFTER COMMITTED CODE,
-SOURCE-ONLY HEALTH AND NATIVE ISOLATION. NO PRICE/IDENTITY/ACTUAL-RELEASE
-ADMISSION OR BACKTEST READINESS IS INFERRED. THIRTEEN P2s REMAIN OPEN.
-HISTORICAL SEC PUBLIC-AVAILABILITY AND PARENT/PIT/POPULATION FACTS REMAIN
-MISSING. OLD CONSUMED/FAILED ROOTS, PLANNER STOP AND FROZEN BYTES STAY
-PRESERVED. NO QC/SAFARI, VENDOR REPLY, PURCHASE OR UPGRADE; MONITOR DISARMED.
-ONE FINAL PUSH AFTER THE COMPLETED OR FACTUALLY BLOCKED ROUND.**
+Status: **361 HANDS OFF THE COMPLETED USB SOURCE-QUALITY ROUND AT A
+CONCRETE PRE-QC FACTUAL STOP. CORRECTED QUALIFICATION ON EXISTING51177f3e
+SUCCEEDED230.497046375s:68 DATA FILES PLUS MANIFEST,21,638 DAILY MEMBERS,
+47,802,869 DAILY ROWS; PRIVATE COVERAGE IS RETAINED/HASH-BOUND. FIRST
+FAILED ATTEMPT IS PRESERVED; NOTHING IS CANONICALLY ADMITTED OR BACKTEST
+READY. THIRTEEN P2s REMAIN OPEN. HISTORICAL SEC PUBLIC-AVAILABILITY,
+ORIGINAL/PIT/IDENTITY/POPULATION FACTS STILL BLOCK THE FINAL HANDOFF.
+NO QC/SAFARI, VENDOR REPLY, PURCHASE, UPGRADE OR OUTCOME LOOK; MONITOR
+DISARMED. ONE FINAL MATCHING-LANE PUSH FOR THIS ROUND.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -318,6 +318,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-29 | Codex monitor disarm and scoped cleanup reconciliation | Starting clean Insider`2f9ee6e8906c048e8b4852dbe60334d36cbfdf23`; prior Analyst completion`57bd3213ab78145118a67e2ae753579e22cec59d` | Pause archive monitor; user limits QC cleanup to Analyst Revisions only | Existing source-completion heartbeat PAUSED, instructions retained. Exact cleanup already completed in Analyst chat; current two read-only QC metadata calls confirm300 projects, empty nextpage and all13 expected projects inRecycleBin. No new deletion. | App configuration readback; prior Analyst completed-turn evidence; current metadata inventory; record checks below. No browser, job, strategy result/statistics read, source or vendor message. | Successful research/current dependencies and other lanes preserved. Cleanup does not release Insider QC/backtest/source/rights gates. Twelve OPENP2s unchanged. | Do not rearm monitor or repeat deletion; use Analyst record for cleanup receipts. Any later Insider continuation retains no-reply/purchase/QC restrictions except the completed metadata-check scope. |
 | 2026-10-29 | Claude review (Windows session) and corrections | `1635900d` -> `0f70bbe0` (42 collection guards, custody-platform convention test, SEP-2 manifest declaration) -> this review record | Review of `d1990c49..1635900d` (four record-only Codex commits: sections 343-349, zero merges); every earlier commit since `86700b1c` carries a disposition from the macOS Claude session in sections 159-342. Owner direction for this round: fix, do not just log. | All four commits accepted after verifying hashes, counts, time conversions, append-only status edits, and the absence of contact or credential shapes. Corrections: `IBWIN-CR02` (42 lane tests added after section 161 reached `fcntl` unguarded, so Windows collection errored on 42 of 200 lane files) fixed by guards plus a convention test that enforces the rule for every lane test; `IBSH-CR02` fixed by declaring `IPython`, `QuantConnect`, `clr` as hosted platform imports in the shared SEP-2 manifest (flagged shared edit); `IBQC-SHARED-META01` left open with the exact proposed patch and blocker. Full detail in section 350, including the required 1-10 rating. | All runs under proven process-level network denial. Windows lane-set collection 6,770 tests, 0 errors (was 42); custody-platform file 61 passed, 58 skipped; 44 guarded files 44 skipped; project-separation files 35 passed (was 2 failed); boundary/package/document selection 1 failed, 156 passed (the one failure is the section-155 harness artifact: the denial harness preloads `socket`; the test passes without the harness); record/active-document gates **72 passed** (measured on the tree carrying this section; the re-run after this value was written reported the same count); compileall tests+research exit 0; `git diff --check` clean. No full lane gate or complete repository suite on this host. No SEC/EDGAR, provider, Gmail, QC, credential, journal, custody, broker, or trading access; **0 research looks**. | `01138636`, `9a35d71e`, `2f9ee6e8`, `1635900d` accepted (the last with a cross-lane QC-read note). Open P2s: ten remain (twelve minus `IBSH-CR02`, plus none new; `IBWIN-CR02` opened and fixed in the same round). | Codex counter-reviews this round, including the shared manifest edit; `IBQC-SHARED-META01` waits for one captured real orders response under a permitted QC round; substantive blockers unchanged from 344/348. |
 | 2026-10-30 | Codex continued pre-QC implementation | `e7e65b9f` -> `8586239117f09c3b59802e14c1c6791f5e502848` -> this separate final handoff | Additive required21 selected-control consumption chain | Sections357-359 authenticate exact20,044+8=20,052 exclusions and add a genuine full25/restricted21 selector adapter; old planner stop remains; zero new requests/body reads/credential/QC access or historical archive promotion. | Main126 focused13.39s;129 boundary/document/pin/stop checks6.81s;23 manual source images compile; one source-only health1.926698709s and one actual selected-metadata observation1.992836416s on existing clean85862391,168 current code images; no looks/jobs/backtests. | No P0/P1;13 carried P2s remain OPEN, actual Massive readback P3 remains OPEN; prior scoped closures preserved. | Genuine historical availability/version archive and remaining original/PIT/context/rights/population inputs; release held subscriber-verification reply only by explicit owner direction. No purchase/QC/Safari/vendor reply, automatic monitor rearm or interim push. |
+| 2026-11-03 | Codex owner-authorized pre-QC USB build | Clean32caf7a5521ef4fae21b504feac816c8e7f692ef -> implementation5493b95f48105510b77396ef7310161bae25086d -> correction51177f3e9dbad613de61b341e632b228d747fe71 -> this separate361 handoff | Qualify supplied FirstRate daily/action/earnings bytes without purchases or QC | Failed attempt1 preserved; ZIP-only underscore correction proved RED/GREEN; same-epoch attempt2 succeeded230.497046375s,68 data files+manifest/21,638 daily members/47,802,869 daily rows, private catalog37,210,827B hash-bound; no canonical/source/PIT/actual-release/rights/backtest promotion. | Main136 focused/EXACT1.52s,129 boundary6.67s and final checks below; author65 focused/compile; native no-USB health plus bounded metadata diagnosis and actual read-only scan; independent nine-leaf integrity/hash reconstruction, zero requests/credentials/looks/QC/backtests. | No P0/P1;13 carried P2s OPEN; IBUSB-FORMAT-36001 resolved narrowly, old-helper IBIPC-36001 P3 retained/open; prior closures/failed roots preserved. | Concrete missing historical SEC availability/version, original/PIT/identity/whole-population facts; no vendor reply, purchase/upgrade, QC/Safari, optional EOD comparison, monitor rearm or interim push. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -42367,3 +42368,227 @@ no automatic further replay is registered. Freeze code/record/HEAD through
 actual completion. Only observed corrected results may establish source
 quality/date coverage; all historical-identity/source-availability/admission/
 rights/readiness flags stay false.
+
+### 360.7 Corrected actual qualification observed; evidence and coverage
+
+Corrected implementation **`51177f3e9dbad613de61b341e632b228d747fe71`**
+existed and stayed CLEAN throughout health/actual execution; source code,
+record and HEAD were frozen. The final precommit boundary selection passed
+129 tests again in6.40s. Matching-only fetch showed unchanged origin32caf7a5
+before commit and again before the corrected actual call. No incoming
+commits, alternate worktree, merge, reset, new source acquisition or interim
+push. The fresh no-USB health succeeded **1,900,925,917ns**,139 source images,
+inventory SHA-256
+`797a4cd07e91809b03c9b7522fdf6d6e6501821461a123e373fa23cb46e43edb`,
+health worker `a3c5b8b850544589756ed08579d40066c7fa4826eac1ce1f501134dcb9ec6f9a`.
+Calendar/plan, runtime package versions and health policy retain360.3/360.5's
+pins. Health made no source attempt/output namespace.
+
+ONE corrected actual qualification completed **SUCCESSFULLY in
+230,497,046,375ns (230.497046375s)** measured around worker launch/IPC;
+this is not whole-parent preparation/publication wall time. Actual worker
+SHA-256 `ff91bd8a8d2f23227ef2762f8af168ec1828c18bbce8a9aa0da8a14b1e70ccc6`,
+native policy `534748e95bd82e3eae11d6006bf24e1d655cb06a1c157e3aed0437af80e391dd`,
+bootstrap `fd8438a39a923152d2d2369838cceed3198d3e8d4408b9904d57069167abd3fb`.
+Result code is `none`, audit_completed=true, qualification SHA-256
+**`d55a83adb0c8b4e3b17571590d8ac70e19a761b0c69e3294f6392ca576797730`**.
+Actual source139-image inventory is the health inventory above. Do not
+relate these observed runs to the later handoff commit as if it already
+existed. `attempt-000001` remains FAILED with the exact original360.5 bytes.
+Corrected SAME-epoch `attempt-000002` has these independently checked leaves:
+
+| Corrected-attempt leaf | Bytes | SHA-256 |
+|---|---:|---|
+| scope-reservation.json | 19,318 | `e858d67549883eb0dd93ca9cdcc493e09486050f691e9138a869179ea3774cc6` |
+| observation-started.json | 228 | `4b073280f91e9eedc59fc6b707e64fe1689c382f1142e5a1a3f7cff2003abe0e` |
+| qualification-result.json | 19,339 | `fdd67221402d208b243f86f2a000ce95379e790fb1e08738bef1e2204439905c` |
+| private-coverage.json | 37,210,827 | `dd8edc54518cb48aa35ac9359ccdbd6238f11dad2682f5bff5838b1b203b9c8c` |
+| complete.json | 487 | `4c5563a407966f11a4c0f33807053ff3d70ba748fb4cde734c0e2dbfd6180105` |
+
+Each of68 selected data files matches its manifest size/MD5 and fresh/final
+SHA-256; the separate externally pinned manifest makes69 input files. There
+were63 ZIPs/41,532 members. ZIP-declared expanded bytes total1,983,461,440;
+the streaming row budget totals1,984,706,107 because it also counts listing
+text. No archive extraction, input copy to canonical storage, source file
+rewrite or supplied code execution. Public output is counts/hashes/ranges/
+refusal codes; private coverage contains source labels/date masks/quality
+counts behind explicit consumers, no raw OHLC/EPS values, URLs or secrets.
+
+| Source-quality observation | Actual result |
+|---|---|
+| Stock daily | 32 ZIPs;16,477 members;38,794,823 rows;16,180 unique source labels and297 duplicate-label occurrences |
+| ETF daily | 26 ZIPs;5,161 members;9,008,046 rows;5,161 unique source labels |
+| Frozen market envelope | 17,447,251 numeric rows examined over2019-10-01..2026-06-30;13,298,311 pilot rows;2,237,027 rows in calendar2020;673,308 rows in2026-01-01..2026-03-30 maturity tail |
+| Price quality accounting | 712 OHLC-bound refusals;1,179 nonpositive-price/negative-volume rows;44 wrong-width rows;3 empty price members;22,602 zero-volume rows;9,306 duplicate dates;6 out-of-order dates. These overlapping counts are not a deduplicated rejected-row total. |
+| Listing comparison | Stock listing16,306 rows/16,136 labels,170 duplicates and8 invalid-date rows;734 listed labels lack exact daily labels and778 daily labels are absent from listing. ETF listing5,100 labels,zero listed-without-daily and61 daily labels absent from listing. |
+| Corporate actions | Stock dividends243,209 rows/splits6,150;ETF dividends145,542/splits1,167;38 invalid rows retained in accounting. No return/factor/adjustment series calculated. |
+| Earnings overall | 7,992 members;497,776 rows;zero width/date-invalid rows. Current supplied version only. |
+| Required21 earnings window | 139,921 rows;133,402 finite reported-EPS provider candidates,6,519 blank-report rows;zero malformed reported fields. Timing43,385 after-close/40,739 before-open/55,797 unknown. |
+| Genuine pilot diagnostic buffer | 135,055 rows over2020-12-23..2026-01-08;128,505 provider candidates/6,550 unknown-report/zero malformed;timing41,690 after-close/39,562 before-open/53,803 unknown. This separate interval is not a superset of the raw required21 window. |
+
+This supersedes360.1's preliminary extension-limited label comparison; it
+does not erase that earlier observation. Exact labels are NOT historical
+issuer/share-class identities, and neither a last bar nor a current listing
+is a historically verified delisting event. All raw quality/refusal/underfill
+counts remain present; no favorable security/date exclusion is applied.
+
+Against the exact1,695-session calendar, all21,638 daily members have private
+date-presence masks and reproducible missing-date counts. Complete date
+presence counts are7,068 for first253 warm-up opens,5,446 for all1,255 pilot
+sessions,10,162 for final60 maturity sessions and4,528 for the whole envelope.
+Missing date-presence cells are respectively3,237,897/13,860,382/624,977/
+19,232,832, plus37 extra noncalendar date-presence cells. These are descriptive
+comparisons of ALL supplied members, including IPO/delisted/duplicate/source
+labels. They are NOT an expectation that every historical security existed
+every session, SEC-cohort coverage, valid-bar admission, listing seasoning or
+a strategy universe. Historical identities/listings must determine which
+cells are actually required before any completeness or delisting conclusion.
+
+Independent post-publication integrity corroboration used exact-leaf private
+output access, ALL USB/Keychain denied, native network/fork/all-write/security
+denial and the real memory guard. It verified all NINE leaves across both
+attempts, canonical metadata,0700 directories/0600 regular owned single-link
+leaves, exact epoch inventories, original-failure/corrected-success lineage,
+false authorities and aggregate conservation. It streamed the37,210,827B
+private catalog only for byte hashing, never decoded it, and reconstructed
+the canonical aggregate qualification hash from public fields plus those raw
+bytes. Both digests match. This is independent saved-evidence integrity
+corroboration, NOT independent USB reexecution. Its initial harness assumed
+the separate diagnostic buffer contained the entire raw required21 interval;
+correcting that false harness assumption preserved both separate conservation
+equations. No source result/receipt was changed.
+
+All actual source-authority flags remain FALSE: authenticated provider
+provenance, historical public-known-by/PIT identity, actual published-results
+status, canonical admission, complete population, promoted processing rights,
+QC and backtesting readiness. Missing earnings timing is still NOT automatic
+failure, finite EPS is still only a provider-reported candidate, and a
+truthful present source version remains allowed by the existing LOCAL
+retrospective earnings policy. No new universal earnings revision-archive
+or private-analysis permission-letter prerequisite is invented. The current
+published FirstRate private-evaluation license scope in360.2 is not relabelled
+as a full authenticated source/cloud-processing chain. exFAT private modes/
+immutable source-snapshot guarantees are explicitly FALSE. New requests,
+credential reads, financial returns/signals, outcome looks, QC jobs and
+backtests all remain ZERO.
+
+### 360.8 Decisions, P0-P3 disposition and precise pre-QC stop
+
+Owner's subsequent `continue` keeps this pre-QC build/closeout active; it
+does not release the explicit QC/Safari or vendor-reply holds. **IBDEC-360-06:**
+accept corrected USB source quality/date coverage within its narrow supplied-
+data scope; retain both attempts and all anomaly/underfill accounting. Do
+not publish a canonical price/earnings panel, join current symbols as PIT
+identities, select a favorable subset, infer historical available-by from
+acceptance/delivery heuristics or substitute a zero-event population.
+
+| Finding | Priority | Disposition / exact scope |
+|---|---|---|
+| IBUSB-FORMAT-36001 | P3 | **RESOLVED in the additive USB route only:** leading-underscore ZIP-member incompatibility; RED on preceding image, minimal51177f3e fix, focused GREEN and observed corrected actual qualification. Original failed attempt remains failed. |
+| IBIPC-36001 | P3 | **OPEN, retained old helper; not reused:** old campaign launcher can wait without a finite cleanup timeout or leak on selector-construction failure. New USB launcher has its own qualified bounded cleanup. No frozen/consumed old code changed. |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 | P2 | **OPEN, carried exact scopes:** USB quality cannot establish original-parent admission, source integration or historical custody/availability facts. |
+| IBSH-CR02, IBQC-SHARED-META01 | P2 | **OPEN, shared scopes retained:** no shared behavior or QC metadata action this round. |
+| IBARCHIVE-OBS-01, IBARCHIVE-OBS-02, IBPARENT-PLAN-OBS01, IBPUBLIC-KNOWNBY-01, IBQC-ACK-33001 | P2 | **OPEN, carried exact scopes:** genuine archives, source operations/observations and QC ACK evidence still missing/unresolved. |
+| IBPILOT-COMP-33001, IBWIN-CR02 | P2 | **OPEN, prior partial corrections retained:** genuine older target-affecting history/production composition and default Windows invocation scopes remain; no Windows custody port. |
+| IBMASSIVE2-OBS34101, IBSH-CR01 | P3 | **OPEN, previous actual readback/shared scopes retained:** no retry, outcome relabelling or shared correction. |
+
+No openP0/P1; exactly13 carried P2s remain OPEN. Resolved findings stay
+resolved only within their recorded scopes. Source-only engineering tests
+and saved-evidence integrity do not close any factual P2.
+
+**Concrete blocker, not another routine approval checkpoint:** the existing
+inputs still lack a genuine accession/body/version-linked SEC historical
+public-available-by archive for2020-10-01..2025-12-31 with usable upper bounds
+before09:28/09:30 America/New_York, clock meaning, correction/deletion/backfill
+lineage, gaps and applicable use evidence. Exact first-public seconds are not
+required. Massive's latest corrected rows and Sharadar's held subscriber-
+verification question do not supply it. The USB is a present supplied market/
+earnings source, not that archive; no internal decision can manufacture it.
+Genuine historical issuer/share-class/CIK/listing/PIT identity and mapping
+evidence are also missing, so even the actual USB coverage cannot be bound
+to the required original SEC/control population. Full required21 original
+admission/all-six-form corroboration, genuine older target-affecting lots,
+actual whole-cohort contexts including factor/RF evidence, both prescribed
+earnings diagnostics and permanent population/look/engine-parity roots
+remain unfinished. No honest fixed order-based QC candidate can be promoted
+from these facts. This is NOT the last mechanical step before backtesting.
+
+**IBDEC-360-07:** do not activate an optional retained-EODHD/USB provider-
+agreement reconciliation merely as another milestone. It is UNATTEMPTED,
+not failed; retained bodies remain reusable under a separately bounded
+offline scope. Agreement could support source comparison but cannot close
+the missing SEC archive, historical identity or actual event population.
+The authoritative plan does not require it before declaring these independent
+blockers. No extra historical earnings-version gate is inferred. Do not buy
+another dataset based on these gaps alone. Next external dependency is a
+genuine version-linked archive sample/coverage answer, initially against the
+already-retained originals, plus authentic historical mapping evidence.
+The held existing Sharadar/Massive conversations can advance only when the
+owner explicitly releases the vendor-reply hold; no correspondence or
+subscriber/account disclosure was sent this round. No QC/Safari/account/API/
+SDK/job/upload/backtest/outcome access occurs without a later explicit
+release and actual prerequisites. Monitor stays DISARMED.
+
+## 361. Separate durable final handoff — USB qualified, factual pre-QC stop (2026-11-03)
+
+Starting clean local/origin **`32caf7a5521ef4fae21b504feac816c8e7f692ef`**;
+ordered incoming range EMPTY throughout captured checks. This owner-directed
+round has implementation **`5493b95f48105510b77396ef7310161bae25086d`** and
+verified lane-only correction **`51177f3e9dbad613de61b341e632b228d747fe71`**;
+this separate lane-record handoff follows both exact hashes. No new Claude
+review was requested or claimed; historical review acceptance stays as
+recorded. Main observed136 final focused/EXACT and129 boundary/document/pin/
+old-stop checks, author compilation/red-green and separately attributed
+peer source/bootstrap/publisher/integrity checks, with narrow scopes and
+setup errors retained in360.4–360.7. Two genuinely executed USB qualification
+attempts are distinct: FAILED5493b95f and SUCCESSFUL51177f3e, plus their
+separate no-USB health and bounded metadata-format observations. No third
+qualification replay is registered. Code and record stayed frozen during
+each actual run; later commits are not represented as existing during them.
+All private outputs remain ignored/out of Git. This round changes only the
+two additive source/test files and this lane record; shared records, Action
+Plan, SESSION_HANDOFF, frozen IB1C/v3 sources and all prior claims stay intact.
+
+Plain language: the USB does provide substantial usable raw daily market,
+corporate-action and earnings material without another purchase. Its actual
+quality and missing-date/label counts are now known and retained, including
+the corrected parser's first failed attempt. This does not establish what
+SEC filing version was public before each historical decision, historical
+security identity or the complete eligible event/control population. Those
+missing facts still prevent pre-QC/backtest readiness. Continue only when
+genuine archive/mapping evidence is available; no fabricated lag, favorable
+exclusion, proxy population, extra purchase or QC launch is justified.
+Owner decisions360-01..07 and existing no-reply/no-QC/no-purchase holds are
+documented; no further routine engineering approval is needed. Make exactly
+ONE matching-lane final push after final checks, then independently verify
+the exact remote tip and clean/synced status. Do not rearm a monitor or send
+another chat/vendor message.
+
+Preserved invariants: required21 eight originals/81,620B and20,052 consumed
+accessions remain unchanged; old planner's unchained-later-capture stop is
+not bypassed. Legacy2022Q4–2023Q1 remains19,846 source-bound of99,394 with
+79,548 originally unattempted. Stoppedv3 remains1,846 completed/1,847 starts,
+unresolved/unresumed; separate7,373B diagnostic/report
+`206e6db9677fb169455f62357ce966384926080b6eba582094e9536e88d705b7`
+does not resolve the unmatched start or establish authenticity/PIT/rights.
+StrictD23 retains seven nonexact quarters/no82-quarter promotion digest.
+Frozen82-quarter original study, distinct2021–2025 pilot, both prescribed
+earnings diagnostics and strategy economics/causal/refusal accounting remain
+unchanged. The372 requests retain `historical authorization provenance not
+established`; the separate reviewer incident retains `reviewer-reported
+probable unintended SEC access; exact request count and transferred bytes
+not established`, both without retroactive approval. No SEC original-body/provider
+request repetition, old campaign/helper rewrite, SDK namespace reclamation,
+private draft activation, broker/operator DB/scheduler/deployment/capital/
+paper/live/order/trading action occurred.
+
+Final handoff checks: main129 boundary/record/active-document/import/EXACT/
+platform/frozen-pin/old-stop checks PASS in8.10s on the completed handoff
+content before this validation sentence. Four current frozen v3 source
+SHA-256s independently equal their exact aa0d635d historical Git bytes;
+this byte comparison is NOT historical root replay. Private outputs are
+ignored and no leaf under the qualification source epoch is Git-tracked.
+Diff whitespace is clean; no full lane/repository suite was run. Source/test
+images remain the observed51177f3e images. Final commit/push guards must still
+verify exact root/branch/HEAD/expected status and unchanged matching origin;
+remote completion is reported only after independent exact-tip readback.

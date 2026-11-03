@@ -72406,3 +72406,187 @@ At freeze C is uninvoked, no source assignment or backtest readiness claimed.
 Bookkeeping338/259/54/699 remains unchanged; continuation still requires
 meaningful identities, complete common reference/NAV prices and all genuine
 source/valuation/processing/project/access/idle/capacity/attempt/run gates.
+
+### 335.9 Actual C reaches REMX and refuses its volume predicate
+
+At clean freeze0dfd5f17591803dbe9288953065c7de0cd37c1fd, the sole C
+parent exited2, child2/no stderr. Its1549-byte worker packet SHA256
+764f86765eec38769732e5f9d9a574f44a2af5a5856727fd6b35f7d3d256d7c2
+retains claimconsumed, stageREMX_partition, case_ordinal=null,
+failure_code=partition/parser_failure_code=volume. REMX lexical evidence is
+181222bytes/4339LF/5CRLF/zero bareCR, complete terminal record,
+line_endings_supported=true/line_endings_consistent=false. The sole separately
+native-denied stdout-only validator supplied observed parent2 also exited2,
+output_authenticated=true/accepted=false. C/M3 and this validator are SPENT
+and frozen. No C controls are reread or repaired; no diagnosis/coverage-success
+pin, price admission, QC/provider call, look or result cell was returned.
+
+The new representation parser passed the former line-ending stop; the actual
+finite refusal now concerns REMX's whole-nonnegative-volume predicate. Static
+M3 ordering establishes that this code follows unsigned finite decimal grammar
+and OHLC checks: it therefore indicates a nonnegative nonintegral volume,
+not a negative/nonfinite/malformed token. Its count, era and effect on required
+current prices remain unknown. Do not invent those or weaken a price predicate.
+Prepare a NEW separately frozen REMX-only numeric-shape diagnostic:
+authenticate exact manifest/listing/archive/member, preserve all4339original
+rows and the exact323/4016era boundary, validate row/date/order/OHLC, and retain
+only per-era finite volume-class counts. No price/volume values, I DATA, five-
+stock scan, old controls, price book or source admission is required for this
+diagnostic. Further recovery must follow its actual evidence rather than an
+unchanged C retry. These remain local no-order data diagnostics;338/259/54/699
+is unchanged. Root102record checks1.08s pre-C overlap390above, not additive.
+
+### 335.10 D4/D5 separate REMX-field and five-stock coverage decisions
+
+Official current FirstRate ETF schema describes raw volume as integer shares
+(https://firstratedata.com/ai/datasets/us-etfs-intraday); its FAQ's decimal-volume
+explanation concerns adjusted data. That is insufficient to relabel fractional
+RAW volume as valid or round it. Preserve C's refusal. REMX is not one of the
+five stock roles needing replacement: the existing eight own-fund sources
+remain Sharadar. Its forensic check must therefore be separated from stock
+coverage instead of letting an unused alternate ETF source block that result.
+
+D scripts/inspect_arv2_r335_remx_fields.py is44953bytes SHA256
+3cea894108d8ccc0498913aef03217e85e3f6a7aa2e7c14e718d59f04710857c.
+Its NEW claim is artifacts/analyst_revisions_v2/firstrate/R335-20261103-D,
+uninspected/unallocated. It reads ONLY exact USB manifest/ETF listing/R daily
+archive/member pins above; all I DATA/stock archives/other artifacts/credentials
+are denied. It validates original4339row shapes/dates/order/positive OHLC and
+the exact323/4016era metadata, while independently counting volume classes
+(integer/fractional nonnegative, negative finite, nonfinite, malformed).
+Unsafe volume is observed only, never accepted, rounded or serialized. Counts
+include malformed empty sixth fields; six-field row structure remains strict.
+Original bytes remain unchanged. Sources close normally before a report is
+published under the retained nofollow/held-FD/native-security machinery.
+
+Permit ONE exact D parent after this decision and sources are committed clean,
+same designated host/root/branch/Python, expected-head actual clean freeze and
+caller hash above, canonical3244-byte profile SHA256
+fa82996157aef3ef7562a8d87b94b4426e420f53f18454b345f9791429668617;
+2049-byte native policy SHA256
+454fa960af3361a42985427d9f8da991eed73ce409be25468c5b1b44e6789f8d.
+Permit one subsequent native-denied stdout-only validator using externally
+observed parent exit, never rereading D controls. Actual0/child0/authenticated
+matching result is required for observation success; abnormal/unknown use is
+spent. D cannot admit a price or prove complete stock coverage.
+
+E scripts/inspect_arv2_r335_firstrate_stock_coverage.py is50133bytes SHA256
+cc804e71d86d1e4fbe792a841379db7acb41080d092f6a8b7e16c60a23435c7d.
+Its NEW claim artifacts/analyst_revisions_v2/firstrate/R335-20261103-E is
+uninspected/unallocated. This substantive contract separates only five original
+whole-stock binding demands from unused REMX/ETF checks. It preserves exact I
+DATA provenance/demand, M3 all-row financial/volume validation, exact ticker or
+ticker-DELISTED candidates, full2286dense dates/477potential references, source
+guard, bounded claim/publication/exit protocols. A byte-level declared inverse
+restores C outside the scoped REMX/ETF removal and source/control/schema change.
+No ETF listing/archive/result field is read or accepted. The original C/M3 and
+old failed controls stay byte-identical/spent. E is not price materialization:
+its private output retains candidate/listing/date-gap metadata/pins, no marks.
+
+Permit ONE exact E parent after the same clean freeze under current owner
+waiver/delegation, expected-head actual clean commit, caller above,5955-byte
+canonical profile SHA256
+50c0b836867a11d826e9f184f9524d7bdec8c350c9d4d9e0329868a9d0a35280;
+6648-byte native policy SHA256
+58b753c013f427062c5175d243fb557de94e18fa4125e0fd9777d64ca1aac150.
+One subsequent same-source native-denied stdout-only validator receives the
+externally observed parent exit. D/E are separate one-use observations, not
+QC launches or unchanged C retries. Both retain300s/own5sreap/finite stdout/
+stderr-noecho bounds and startup/uninterruptibleIO/suspension qualifications.
+All original source/normal-return/partial-or-ambiguous-spent rules persist.
+No new contact, quote/price substitution, strategy run or source admission is
+authorized by diagnostic success. New source materialization and exact runtime
+freeze must still establish identities, complete reference/NAV coverage and
+all technical/rights/project/access/idle/capacity/attempt gates.
+
+D tests24328bytes SHA256
+5c7dd70938f70204623b168024f8e6e5aeb085fb5198f914d0aa0121bafb7278;
+E tests37219bytes SHA256
+7349aa1404700b07ce2bc6195f6ced0730da4c182f61b06d7bb645c6f4d8f513.
+Author D75passes0.61s/E86passes2.90s, no actual inputs read. Restored memory
+omissions caught volume-class totals/normal source closure, integral stock
+volume, ETF-scope reintroduction and extra REMX result acceptance. Root517
+distinct focused passes4.95s:77REMX+127M3+86E+75D+50new-router+102documents.
+Earlier root122passes0.81s and author/subset counts overlap, not additive.
+All synthetic isolation/support rules335.8 retained; no complete suite.
+
+### 335.11 Prospective three-source monetary composition, not a run permit
+
+The new additive newrule_firstrate_common_price_qc_runtime.py preserves the
+old CommonPriceLedger, clock and Decimal-input ASTs exactly, including cash,
+positive whole holdings, actual same-session RAW marks,96-digit NAV/gross,
+reference clock, missing-price stops and repeated-close equality. Only the
+exact original five whole-binding price roles route to a separately required
+concrete FirstRate reader; all other vendor/fund roles remain unchanged.
+The original native concrete reader still authenticates its entire QC-local
+book and fresh full identity/calendar bridge, but supplies zero price lookups.
+Zero lookups does not mean no native price bytes are read. Preserve the exact
+existing own-fund schema required by the unchanged Sharadar reader.
+
+I335-007(P2 confirmed; corrected prospectively): type checks and fingerprints
+of original methods did not reject replacing a provider field with a different
+already-authenticated same-class object. The new successor binds each exact
+original object before type/method/receipt/price use; regression covers all3.
+The old frozen two-provider implementation has the same generalized guard
+limitation and is recorded, not modified or retroactively accepted. New pins
+and separate bridge/FirstRate/vendor counters remain honest; no callbacks or
+per-date fallback exists. This is source binding, not arbitrary Python-memory
+or whole-interpreter integrity.
+
+Root50passes0.22s after correction (47earlier overlap); four finally-restored
+memory omissions caught native routing1failure0.12s, object replacement3in
+0.13s, fund-schema drift1in0.12s and false counter attribution1in0.12s.
+Same-round advice detected the object flaw and separately reproduced two
+omissions; it is not independent review. Initial local source-generation and
+one tool-orchestration syntax error occurred before file write/test dispatch,
+then corrected; they are not operational attempts. This pure composition is
+UNINVOKED and still lacks its concrete FirstRate reader, validated actual book,
+complete new driver/result/projection and transfer/run freezes. It grants no
+readiness, source admission or QC contact. Floor338/259/54/699 is unchanged.
+
+### 335.12 Prospective immutable five-binding price format
+
+New research/analyst_revisions_v2_qc/newrule_firstrate_price_format.py is
+23629bytes SHA256bc126780627233eeda33d0a95eaa51e4facd7c60409e882ec177cf5acdef14b5;
+tests21669bytes SHA256
+493edc2416a201a92c12b3b61ef25f64a07852c0733aaef66617c8dcf677459e.
+Canonical3413-byte technical profile SHA256
+cdcdfd65027e20727b2172af1479fce6b4231f8486a873186beea46be3b69d3d.
+It binds externally supplied, separately authenticated real6151 normalized
+originals by canonical-row-plus-LF stream and full3466axis before deriving
+1243W5sessions. Exact five whole/semantic bindings, distinct native stable SIDs,
+source container/member/selected-era/evidence pins and immutable canonical
+positive RAW-USD Decimal strings are mandatory. A5x1243grid can contain null
+only outside each independently pinned required dense envelope; all2286demanded
+cells and477potential references are fixed by public geometry/digests. No date
+fallback, changed eligibility/holding expiry or source selection exists here.
+
+I335-008(P2 prospective API-chain gap; corrected before use): book/manifest/
+context initially validated their project IDs independently. A native-denied
+synthetic manifest1/context2 chain demonstrated the gap without real market
+data. All book/book-bytes/manifest/context/object-key APIs now require a
+mandatory externally expected positive exact integer project ID, with no
+default or bool alias; every component must match. Cross-project regressions
+pass. The future caller must supply its frozen real project, never take its
+expected value from the untrusted record. Container bound is the existing
+64MiB scope, not an unsolicited4GiB expansion.
+
+Root131distinct passes7.12s plus prior517nonoverlapping selection yields
+648distinct focused tests in this pre-D/E validation union (not a full suite).
+Author131passes7.08s overlap root; finally-restored missing-demanded-price and
+external-project omissions each turned focused tests red. All new code/tests
+compile in memory, source/profile pins match, document checks retain isolation.
+The new technical source_policy_epoch_id is only a distinct current-vintage
+research source-version label, never a non-backfillable formal forward epoch.
+All format source/authentication/admission/PIT/master/paper/live flags stay
+false. Pinning supplied evidence does not authenticate that evidence or prove
+identity/close semantics. The actual materializer, reader, cloud transfer,
+driver, run source and operational decision remain separate unfinished work.
+
+The335.11 new monetary source is21133bytes SHA256
+8d4f091c4860ce5a4809649c7276dc5a4fad3a5a1d28299e4ac9295837e6e009;
+its tests20585bytes SHA256
+2c37b61cd1a538b227dad7b270ba867247bd48f3d62120b2b117b5a50a50ff56.
+These prospective components are not invoked by D/E and provide no additional
+DATA/contact/run authority. All original v1/v2/v3 used parsers/callers and
+historical claims stay unchanged/spent; no QC/Safari use has occurred this round.

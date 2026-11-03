@@ -4,8 +4,9 @@ Run from the designated lane root after these source bytes are committed:
   python -m research.target_price_revisions_qc.comparison_20261103_prepare \
       TPR-OFFLINE-20261103-PREP-001
 
-No QC transport, environment/credential reader, upload, native compile or run
-exists here. Exported configurations are previews, never attempt reservations.
+No QC/Safari transport, environment/credential reader, upload, native compile
+or run exists here. Both services remain deferred until further owner notice.
+Exported configurations are previews, never attempt reservations.
 """
 from __future__ import annotations
 
@@ -28,9 +29,7 @@ REGISTRY = ('artifacts/target_price_qc_recovery_20261028/'
             'TPR-CMP28-R107-PROJECT-BINDINGS-001.json')
 DESTINATION = 'artifacts/target_price_offline_20261103'
 BRANCH = 'codex/strategy-target-price-revisions'
-OWNER_INSTRUCTION = ('when you are done, proceed to build until the last step of '
-    'backtesing. do not access qc yet as another lane is using it. '
-    'skip claude review. push only once')
+OWNER_INSTRUCTION = 'do not access qc/safari until further notice. continue to build'
 OWNER_SHA256 = hashlib.sha256(OWNER_INSTRUCTION.encode('utf-8')).hexdigest()
 MAX_LIFETIME_SECONDS = 180
 
@@ -230,7 +229,7 @@ def prepare_workspace(operation_id):
         'worktree': str(ROOT), 'branch': BRANCH, 'git_head': head,
         'created_utc': now.isoformat(), 'expires_utc': deadline.isoformat(),
         'latest_owner_instruction_sha256': OWNER_SHA256,
-        'owner_authority': 'LOCAL_PRE_BACKTEST_ONLY_NO_QC',
+        'owner_authority': 'LOCAL_PRE_BACKTEST_ONLY_NO_QC_OR_SAFARI',
         'source_hashes': {name: _sha(raw) for name, raw in sorted(sources.items())},
         'private_inputs': [{'path': REGISTRY, 'bytes': preflight.REGISTRY_BYTES,
             'sha256': preflight.REGISTRY_SHA256}],
@@ -239,14 +238,15 @@ def prepare_workspace(operation_id):
         'prior_history_record_sha256': history_sha,
         'history_counts_consolidated': False,
         'reserved_attempt': None, 'financial_outcome_look': None,
-        'qc_requests_authorized': 0, 'financial_runs_authorized': 0,
+        'qc_requests_authorized': 0, 'safari_requests_authorized': 0,
+        'financial_runs_authorized': 0,
         'signal_packet_open_authorized': False,
     }
     claim_descriptor = _retain(operation / 'claim.json', _wire(claim))
     _note('Fresh offline build claim ' + operation_id + '; HEAD' + head +
-        '; ownerLOCAL_PRE_BACKTEST_ONLY_NO_QC; claimSHA' + claim_descriptor['sha256'] +
+        '; ownerLOCAL_PRE_BACKTEST_ONLY_NO_QC_OR_SAFARI; claimSHA' + claim_descriptor['sha256'] +
         ' fsynced BEFORE the one3573B registered-project read. No signal packet, '
-        'credentials, provider, QC, native compile/job or financial run is authorized.')
+        'credentials, provider, QC/Safari, native compile/job or financial run is authorized.')
     status, exports = 'refused', {}
     try:
         if _context() != head or datetime.now(timezone.utc) >= deadline:
@@ -275,16 +275,18 @@ def prepare_workspace(operation_id):
             'status': status, 'git_head': head, 'claim_sha256': claim_descriptor['sha256'],
             'exports': exports, 'source_builder_epochs_separate': True,
             'proposal_attempts_are_reserved': False, 'fresh_native_attempt_assignment_required': True,
-            'all_qc_contacts': 0, 'native_compiles': 0, 'backtests': 0,
+            'all_qc_contacts': 0, 'all_safari_contacts': 0,
+            'native_compiles': 0, 'backtests': 0,
             'source_inputs_admitted': False, 'backtesting_ready': False,
             'financial_acceptance': False, 'actual_native_results': None,
             'current_head_and_sources_must_be_refreshed_before_native_work': True}
         descriptor = _retain(operation / 'receipt.json', _wire(receipt))
         _note('Offline build ' + operation_id + ' status' + status +
-            '; receiptSHA' + descriptor['sha256'] + '; QC0/nativeCompiles0/backtests0; '
+            '; receiptSHA' + descriptor['sha256'] + '; QC0/Safari0/nativeCompiles0/backtests0; '
             'preview metadata is not an attempt reservation or financial/native acceptance.')
     return {'status': status, 'operation_id': operation_id, 'directory': str(operation),
-        'receipt': descriptor, 'qc_contacts': 0, 'backtests': 0, 'backtesting_ready': False}
+        'receipt': descriptor, 'qc_contacts': 0, 'safari_contacts': 0,
+        'backtests': 0, 'backtesting_ready': False}
 
 
 class _BodyFreeParser(argparse.ArgumentParser):
@@ -293,14 +295,15 @@ class _BodyFreeParser(argparse.ArgumentParser):
 
 
 def main(argv=None):
-    parser = _BodyFreeParser(description='Local-only frozen five-arm source export; no QC access.')
+    parser = _BodyFreeParser(description='Local-only five-arm source export; no QC/Safari access.')
     parser.add_argument('operation_id')
     try:
         args = parser.parse_args(argv)
         result = prepare_workspace(args.operation_id)
     except (Exception, KeyboardInterrupt):
         print(json.dumps({'status': 'refused', 'automatic_retry': False,
-            'qc_contacts': 0, 'backtests': 0, 'backtesting_ready': False}, sort_keys=True))
+            'qc_contacts': 0, 'safari_contacts': 0,
+            'backtests': 0, 'backtesting_ready': False}, sort_keys=True))
         return 1
     print(json.dumps(result, sort_keys=True))
     return 0

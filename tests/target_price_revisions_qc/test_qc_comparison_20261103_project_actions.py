@@ -491,10 +491,19 @@ def test_offline_preview_identities_never_become_actual_effect_plans(field, mark
         m.prepare_compile(**args)
 
 
-def test_current_explicit_no_qc_directive_is_denied_before_source_private_or_native_effect(tmp_path, monkeypatch):
+@pytest.mark.parametrize('instruction,owner_sha256', (
+    ('when you are done, proceed to build until the last step of backtesing. do not access qc yet as another lane is using it. skip claude review. push only once',
+     m.CURRENT_NO_QC_OWNER_SHA256),
+    ('do not access qc/safari until further notice. continue to build',
+     m.CURRENT_NO_QC_OR_SAFARI_OWNER_SHA256),
+))
+def test_current_explicit_no_qc_directive_is_denied_before_source_private_or_native_effect(
+        tmp_path, monkeypatch, instruction, owner_sha256):
     args, _, _ = common()
     action = m.prepare_compile(**args)
-    action['financial_spec']['latest_owner_instruction_sha256'] = m.CURRENT_NO_QC_OWNER_SHA256
+    assert hashlib.sha256(instruction.encode('utf-8')).hexdigest() == owner_sha256
+    assert owner_sha256 in m.BLOCKED_OWNER_INSTRUCTION_SHA256S
+    action['financial_spec']['latest_owner_instruction_sha256'] = owner_sha256
     effects = []
     monkeypatch.setattr(m, '_load_sources', lambda *_: effects.append('public-source-load'))
     monkeypatch.setattr(m.api.ops, 'read_private', lambda *_: effects.append('private'))
@@ -508,14 +517,17 @@ def test_current_explicit_no_qc_directive_is_denied_before_source_private_or_nat
     assert effects == [] and not (tmp_path/'actions').exists()
 
 
-@pytest.mark.parametrize('fault', ('missing', 'same_as_creation', 'invalid', 'current_no_qc'))
+@pytest.mark.parametrize('fault', ('missing', 'same_as_creation', 'invalid', 'current_no_qc', 'current_no_qc_or_safari'))
 def test_latest_authority_is_separate_required_valid_and_cannot_be_current_deferral(fault):
     args, _, _ = common()
     if fault == 'missing': args['financial_spec'].pop('latest_owner_instruction_sha256')
     elif fault == 'same_as_creation':
         args['financial_spec']['latest_owner_instruction_sha256'] = args['owner_instruction_sha256']
     elif fault == 'invalid': args['financial_spec']['latest_owner_instruction_sha256'] = 'not-a-hash'
-    else: args['financial_spec']['latest_owner_instruction_sha256'] = m.CURRENT_NO_QC_OWNER_SHA256
+    elif fault == 'current_no_qc':
+        args['financial_spec']['latest_owner_instruction_sha256'] = m.CURRENT_NO_QC_OWNER_SHA256
+    else:
+        args['financial_spec']['latest_owner_instruction_sha256'] = m.CURRENT_NO_QC_OR_SAFARI_OWNER_SHA256
     with pytest.raises(m.ActionRefusal):
         m.prepare_compile(**args)
 

@@ -5814,20 +5814,26 @@ SECTION110_NEXT_ROLE = (
     "under fresh bounded scopes; keep the heartbeat PAUSED during this blocked handoff, then run OFF and the remaining "
     "frozen arms serially only after verified source recovery."
 )
-SECTION112_NEXT_ROLE = (
+SECTION112_PRE_NOTICE_NEXT_ROLE = (
     "The next bounded action is deferred QC verification and backtesting once QC is available again; "
     "the local build stops before any QC access, skips Claude review, and makes exactly one final lane push."
+)
+SECTION112_NEXT_ROLE = (
+    "The next bounded action is deferred QC verification and backtesting only after further owner notice; "
+    "the local build stops before any QC or Safari access, skips Claude review, and makes exactly one final lane push."
 )
 
 
 def _assert_section112_current_facts(text: str) -> None:
-    """The latest owner defers every QC effect; old execution remains history."""
+    """QC/Safari stay deferred until further owner notice; old effects remain history."""
     folded = " ".join(text.replace("*", "").replace(chr(96), "").split()).casefold()
     assert SECTION112_NEXT_ROLE.casefold() in folded
     assert SECTION110_NEXT_ROLE.casefold() not in folded, "obsolete immediate Mia recovery role"
     assert SECTION109_NEXT_ROLE.casefold() not in folded, "obsolete running-job role"
+    assert SECTION112_PRE_NOTICE_NEXT_ROLE.casefold() not in folded, "QC availability is not an owner release"
     for required in (
         "qc access is deferred", "no qc access", "0 qc requests",
+        "safari access is deferred", "no safari access", "0 safari requests",
         "0 native compiles", "0 backtests",
         "0/5 accepted full-window results", "all financial metrics null",
         "financial acceptance remains false",
@@ -5836,6 +5842,10 @@ def _assert_section112_current_facts(text: str) -> None:
         assert required in folded, required
     for stale in (
         "qc access is authorized now", "qc access has resumed",
+        "safari access is authorized now", "safari access has resumed",
+        "start safari now", "start qc now", "start qc/safari now",
+        "resume automatically when qc is available", "qc is available so resume",
+        "no further owner notice is required",
         "codex accesses qc now", "consult mia now",
         "fresh qc inspection performed", "fresh native status observed",
         "claude review is required before continuation",
@@ -5848,6 +5858,7 @@ def _assert_section112_current_facts(text: str) -> None:
         assert stale not in folded, "contradictory current handoff: " + stale
     for pattern in (
         r"\b[1-9][0-9]* qc requests?\b",
+        r"\b[1-9][0-9]* safari requests?\b",
         r"\b[1-9][0-9]* native compiles?\b",
         r"\b[1-9][0-9]* backtests?\b",
         r"\b[1-9][0-9]*/5 accepted full-window results\b",
@@ -6783,8 +6794,8 @@ def test_section109_history_guard_refuses_retrospective_rewrite(monkeypatch) -> 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
 @pytest.mark.parametrize("before,after", (
-    ("once QC is available again", "while another lane is using QC"),
-    ("before any QC access", "after accessing QC"),
+    ("only after further owner notice", "once QC is available again"),
+    ("before any QC or Safari access", "after accessing QC or Safari"),
     ("skips Claude review", "requires Claude review"),
     ("exactly one final lane push", "multiple intermediate lane pushes"),
 ))
@@ -6843,6 +6854,9 @@ def test_section112_current_offline_handoff_facts_are_explicit(surface):
     (r"QC access is deferred", "QC access is authorized now"),
     (r"no QC access", "QC access now"),
     (r"0 QC requests", "1 QC request"),
+    (r"Safari access is deferred", "Safari access is authorized now"),
+    (r"no Safari access", "Safari access now"),
+    (r"0 Safari requests", "1 Safari request"),
     (r"0 native compiles", "1 native compile"),
     (r"0 backtests", "1 backtest"),
     (r"0/5 accepted full-window results", "5/5 accepted full-window results"),
@@ -6865,9 +6879,18 @@ def test_section112_current_fact_guard_refuses_replacements(monkeypatch, surface
 @pytest.mark.parametrize("contradiction", (
     "QC access is authorized now.",
     "QC access has resumed.",
+    "Safari access is authorized now.",
+    "Safari access has resumed.",
+    "Start Safari now.",
+    "Start QC now.",
+    "Start QC/Safari now.",
+    "Resume automatically when QC is available.",
+    "QC is available so resume.",
+    "No further owner notice is required.",
     "Consult Mia now.",
     "Fresh QC inspection performed.",
     "1 QC request.",
+    "1 Safari request.",
     "1 native compile.",
     "1 backtest.",
     "5/5 accepted full-window results.",
@@ -6876,6 +6899,7 @@ def test_section112_current_fact_guard_refuses_replacements(monkeypatch, surface
     "Multiple intermediate lane pushes.",
     SECTION109_NEXT_ROLE,
     SECTION110_NEXT_ROLE,
+    SECTION112_PRE_NOTICE_NEXT_ROLE,
 ))
 def test_section112_current_fact_guard_refuses_appended_contradictions(monkeypatch, surface, contradiction):
     test_exact_next_step_names_the_current_artifacts()

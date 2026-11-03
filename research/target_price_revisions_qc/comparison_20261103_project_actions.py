@@ -5,6 +5,8 @@ preparation regenerates each frozen arm plus the pinned INLINE recovery mixin; i
 config hash, generic adapter marker or noneconomic bypass. Production dispatch
 uses the real registered API and claims each retained compile input before
 reading it. Receipt framing is not independent native-origin attestation.
+QC and Safari remain held until explicit further notice. The blocked instruction
+hashes record that hold as framing, not cryptographic permission or a release.
 """
 from __future__ import annotations
 
@@ -25,6 +27,9 @@ MODULE = 'research/target_price_revisions_qc/comparison_20261103_project_actions
 PREFLIGHT_MODULE = 'research/target_price_revisions_qc/comparison_20261103_preflight.py'
 REGISTRY_CREATION_OWNER_SHA256 = 'ea2dd7037a0f33ab78771a2f6deb3016da34b164ab04f5b2c69f30c4ae31157f'
 CURRENT_NO_QC_OWNER_SHA256 = '2a2c63386634e2ebbe4504bb8938827d5b19fdd0f895257b26a1df16673278c4'
+CURRENT_NO_QC_OR_SAFARI_OWNER_SHA256 = '248f50170a8b85644a109959aafe181b2240c5e09e50165c61cfa36b986086b8'
+BLOCKED_OWNER_INSTRUCTION_SHA256S = frozenset((
+    CURRENT_NO_QC_OWNER_SHA256, CURRENT_NO_QC_OR_SAFARI_OWNER_SHA256))
 OPAQUE_NOTEBOOKS = frozenset(('research.ipynb', 'mia.ipynb'))
 BUNDLE_MODULE = 'research/target_price_revisions_qc/comparison_20261029_project_bundle.py'
 PINNED = {
@@ -133,7 +138,7 @@ def _spec(spec):
         _fail()
     _hash(spec['prior_attempts_looks_sha256'])
     _hash(spec['latest_owner_instruction_sha256'])
-    if spec['latest_owner_instruction_sha256'] == CURRENT_NO_QC_OWNER_SHA256:
+    if spec['latest_owner_instruction_sha256'] in BLOCKED_OWNER_INSTRUCTION_SHA256S:
         _fail()  # The current explicit deferral is never native-effect authority.
     _operational_id(spec['operation_id'])
     return _clone(spec)

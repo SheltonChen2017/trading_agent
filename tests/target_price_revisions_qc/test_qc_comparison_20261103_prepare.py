@@ -172,6 +172,8 @@ def test_claim_is_fsynced_and_recorded_before_only_registry_read(tmp_path, monke
             claim = json.loads((operation / 'claim.json').read_bytes())
             assert claim['git_head'] == head
             assert claim['qc_requests_authorized'] == 0
+            assert claim['safari_requests_authorized'] == 0
+            assert claim['owner_authority'] == 'LOCAL_PRE_BACKTEST_ONLY_NO_QC_OR_SAFARI'
             assert claim['reserved_attempt'] is None
             assert claim['signal_packet_open_authorized'] is False
             assert op in (tmp_path / p.RECORD).read_text()
@@ -187,11 +189,13 @@ def test_claim_is_fsynced_and_recorded_before_only_registry_read(tmp_path, monke
     result = p.prepare_workspace(op)
     assert reads == [registry]
     assert result['qc_contacts'] == result['backtests'] == 0
+    assert result['safari_contacts'] == 0
     assert result['backtesting_ready'] is False
     receipt = json.loads((operation / 'receipt.json').read_bytes())
     assert receipt['proposal_attempts_are_reserved'] is False
     assert receipt['fresh_native_attempt_assignment_required'] is True
     assert receipt['source_inputs_admitted'] is receipt['financial_acceptance'] is False
+    assert receipt['all_safari_contacts'] == 0
 
 
 def test_head_drift_after_claim_refuses_before_registry_read_and_keeps_receipt(tmp_path, monkeypatch):

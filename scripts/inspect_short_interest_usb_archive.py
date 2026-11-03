@@ -82,10 +82,12 @@ class _Clock:
 class _Read:
     """Original RO descriptor and original path-chain observations; no reseal."""
 
-    def __init__(self, path, maximum, clock):
+    def __init__(self, path, maximum, clock, *, minimum=1):
         self.path = Path(path)
-        require(self.path.is_absolute() and maximum > 0, "read_arguments")
+        require(self.path.is_absolute() and maximum > 0
+                and type(minimum) is int and minimum in (0, 1), "read_arguments")
         self.maximum, self.clock, self.fds, self.directories = maximum, clock, [], []
+        self.minimum = minimum
         self.failed = False
         try:
             fd = os.open("/", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
@@ -105,7 +107,7 @@ class _Read:
             self.fds.append(self.fd)
             info = os.fstat(self.fd)
             require(stat.S_ISREG(info.st_mode) and info.st_nlink == 1
-                    and 0 < info.st_size <= maximum, "regular_bounded_single_link")
+                    and minimum <= info.st_size <= maximum, "regular_bounded_single_link")
             self.original = _stamp(info)
             self.raw = self._read()
             self.digest = hashlib.sha256(self.raw).hexdigest()
@@ -178,7 +180,7 @@ class _Read:
         try:
             require(not self.failed and not self.fds, "closed_original_required")
             # A new read is compared to the ORIGINAL observation, never adopted.
-            fresh = _Read(self.path, self.maximum, self.clock)
+            fresh = _Read(self.path, self.maximum, self.clock, minimum=self.minimum)
             try:
                 require(fresh.original == self.original and fresh.raw == self.raw
                         and fresh.digest == self.digest
@@ -227,7 +229,7 @@ def _inspect_pair(model_bytes, **blobs):
 
 def _git(*args):
     return subprocess.check_output(["git", *args], cwd=ROOT,
-                                   stderr=subprocess.DEVNULL, timeout=20)
+                                   stderr=subprocess.PIPE, timeout=20)
 
 
 def _guard(head, remote):
@@ -253,7 +255,9 @@ def inspect_registered(head, remote):
     codes, sources = [], []
     with ExitStack() as stack:
         for rel in CODE_FILES:
-            item = _Read(ROOT / rel, 1024 * 1024, clock)
+            # Empty committed Python package initializers are valid CODE.
+            # The four external source roles retain minimum=1 and exact pins.
+            item = _Read(ROOT / rel, 1024 * 1024, clock, minimum=0)
             stack.callback(item.close)
             require(item.raw == _git("show", head + ":" + rel), "working_code_differs_from_commit")
             codes.append(item)

@@ -29993,3 +29993,59 @@ runtime HEAD/remote are separate exact arguments, not mutable source paths.
 Main post-record active-document checks:69 passed/.62s. Original full135.1+
 notes are additive; no historical rows were rewritten. No actual replay or
 push has occurred at this prospective checkpoint.
+
+### 135.5 Actual v1 refusal and verified wrapper defects
+
+The registered v1 was dispatched ONCE at exact clean
+d10a9b2a113eb19908773b5b6faa24e2c741c6d8 / matching originB556 and terminated
+exit1 immediately. Original stdout reports refused_external_byte_inspection /
+unexpected_local_refusal, custody_qualified=false/source_admitted=false; the
+outer wrapper then failed its all-seams-zero assertion at line42. No positive
+inspection, qualified journal or source authority was issued. Its particular
+seam counter and thrown exception were not persisted by v1; do not invent an
+original exception trace or call this successful closure.
+
+SI-USB-20261103-008 (P2, verified/corrected): the reader's FIRST Git metadata
+call used subprocess.DEVNULL for stderr. Python opens /dev/null O_RDWR, which
+the exact unchanged all-write-open audit necessarily refuses. Main reproduced
+that exact call source-free, observing one denied fixed /dev/null read-write
+open, zero USB reads. This verifies the harness defect; it says nothing about
+the old journal actor/provider/Keychain/filesystem cause. stderr now uses PIPE
+and its private error text is never emitted; the no-write guard has NO sink
+exception and remains unchanged. A real isolated Git-read regression succeeds
+with zero Python write-opens, and would fail under the old DEVNULL behavior.
+
+SI-USB-20261103-009 (P2, verified/corrected prospectively): the committed
+data/__init__.py is genuinely empty, but the reader required every CODE file
+to have positive size. This separate latent defect would refuse if reached;
+it is NOT the persisted v1 exception. CODE reads now explicitly permit empty
+regular single-link code while verifying its exact committed bytes/hash.
+External source reads retain positive-size default AND their exact positive
+length/hash pins. Post-close checks preserve the original minimum. A focused
+regression proves default source refusal and explicit empty-code readback.
+No original custody/source protection rule, source file or old proof changed.
+
+### 135.6 Corrected prospective v2 read-only replay
+
+SI-DEC-20261103-02 registers one fresh corrected finite read, after verified
+causal fixes, not a reset/restart of v1 or any source claim. All original USB
+pins, pure inspection policy and180-second successful-closure window remain
+unchanged. No output namespace/claim is created or reused. V1 remains failed.
+The new wrapper emits safe aggregate seam counters BEFORE its terminal
+assertions, preserving negative diagnostics without paths/values/secrets.
+Every seam must still be0, the private research/calendar packages absent,
+and actual process exit0 plus genuine terminal observation are required.
+
+New reader SHA7d0325d895fe5132fabd26803e3c87bcc5a3a72491ead8054970935ea049f396;
+reader-test SHAde6f9fa1c18969ab6c9268dbcc60dd8e997cd32da72628d1909b70a65145ce24.
+The same exact four-file list now maps to SHA
+fc8cc20acfc22e47e7b10b9788992832c6099a2e9975f85fe87c960852471d91.
+V2 wrapper2601 bytes/SHAe3c8a17e715f87eea38dff0ad3caed6511124262ee733b23c40269f7264cd692.
+Model, code-list and pure-policy hashes in135.4 stay unchanged. Main final
+focused four-file selection181 passed/1.32s, Python socket events denied;
+Python3.9 AST/in-memory compile passed. These fabricated checks do not cure
+v1 or prove actual USB closure. Preserve historical135.1..135.5 unchanged.
+V2 remains prospective until its own guarded registered invocation terminates.
+Advisory reader peer29 passed/.37s, OS network denied; independent in-memory
+DEVNULL reversal observed one denied write-open versus fixed PIPE zero,
+separately attributed and not Main/Claude or actual USB closure.

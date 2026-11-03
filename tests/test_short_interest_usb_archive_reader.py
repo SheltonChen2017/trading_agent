@@ -35,6 +35,17 @@ def test_original_read_is_readonly_and_exact_and_closes_all_handles(tmp_path):
             os.fstat(fd)
 
 
+def test_empty_code_is_explicit_and_source_default_still_refuses(tmp_path):
+    target = tmp_path / "empty_code.py"
+    target.write_bytes(b"")
+    with pytest.raises(driver.UsbInspectionRefusal, match="regular_bounded_single_link"):
+        driver._Read(target, 64, Clock())
+    item = driver._Read(target, 64, Clock(), minimum=0)
+    assert item.raw == b"" and item.original[6] == 0
+    item.close()
+    item.after_close()
+
+
 @pytest.mark.parametrize("change", ["bytes", "timestamps", "replacement"])
 def test_any_original_file_change_refuses_and_latches(tmp_path, change):
     target = tmp_path / "literal"
@@ -176,7 +187,7 @@ def test_registered_read_rejects_pin_mismatch_before_parser(monkeypatch, tmp_pat
     def forbidden(**unused):
         pytest.fail("changed source reached parser")
     class FakeRead:
-        def __init__(self, path, maximum, clock):
+        def __init__(self, path, maximum, clock, **unused):
             self.raw = b"changed"
             self.digest = hashlib.sha256(self.raw).hexdigest()
         def close(self):
@@ -196,7 +207,7 @@ def test_no_result_escapes_failed_terminal_boundary(monkeypatch, terminal_failur
         def to_payload(self):
             return {"authority": {"source_admitted": False}}
     class FakeRead:
-        def __init__(self, path, maximum, clock):
+        def __init__(self, path, maximum, clock, **unused):
             self.path = str(path)
             self.raw = b"fabricated"
             self.digest = hashlib.sha256(self.raw).hexdigest()
@@ -261,3 +272,30 @@ print("isolated_four_file_inspector_only")
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=10)
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip() == "isolated_four_file_inspector_only"
+
+
+def test_git_metadata_reads_work_under_unchanged_all_write_open_denial():
+    root = Path(__file__).resolve().parents[1]
+    program = r'''
+import sys, os
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv[1])
+namespace = {"__name__": "_fixture_reader", "__file__": sys.argv[2]}
+with open(sys.argv[2], "rb") as f: source = f.read()
+exec(compile(source, sys.argv[2], "exec"), namespace)
+attempts = []
+def deny(event, args):
+    if event == "open" and args[2] & (os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND):
+        attempts.append("write_open_denied")
+        raise RuntimeError("write_open_denied")
+sys.addaudithook(deny)
+assert namespace["_git"]("rev-parse", "--show-toplevel").decode().strip() == sys.argv[1]
+assert attempts == []
+print("lane_Git_read_no_Python_write_open")
+'''
+    result = subprocess.run([sys.executable, "-I", "-S", "-B", "-c", program,
+        str(root), str(root / driver.DRIVER)], cwd=root,
+        env={"PATH": "/usr/bin:/bin", "GIT_OPTIONAL_LOCKS": "0"}, text=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=10)
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "lane_Git_read_no_Python_write_open"

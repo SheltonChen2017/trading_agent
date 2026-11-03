@@ -30049,3 +30049,89 @@ V2 remains prospective until its own guarded registered invocation terminates.
 Advisory reader peer29 passed/.37s, OS network denied; independent in-memory
 DEVNULL reversal observed one denied write-open versus fixed PIPE zero,
 separately attributed and not Main/Claude or actual USB closure.
+
+### 135.7 Actual v2 terminal custody veto; qualification remains blocked
+
+The corrected finite v2 was invoked ONCE at exact clean
+b30201d4aa348b658678a83de2daaed5fa00136b / matching tracking and actual
+origin b556bee695694a5ef79cd285be9631f288f5e679, exec50387. Main polled
+the known handle only after physical/Git root, branch, exact HEAD and clean
+status guards. The original process actually terminated exit2. Its complete
+safe terminal fields were:
+
+```json
+{"status":"refused_external_byte_inspection","code":"original_directory_changed","custody_qualified":false,"source_admitted":false}
+{"status":"readonly_wrapper_terminal","reader_exit":2,"external_seams":{"nonlane_subprocess_attempts":0,"python_mutation_attempts":0,"python_socket_attempts":0,"python_write_open_attempts":0},"source_authority":false}
+```
+
+SI-USB-20261103-010 (P2 operational gate, OPEN): an original held root/path-chain
+directory comparison refused. The particular component, mismatching field and
+actor were not persisted by this invocation; do NOT infer that it was the USB,
+APFS, a provider, cloud service, journal actor or another agent. There is NO
+closed external-byte observation/report, qualified original source or source
+admission. Zero denied seams does not cure the original-directory veto. No
+source request, credential read, claim, START, charge or source write occurred.
+The original USB files were not changed by this reader; no extraction, control
+file, new journal, stamp adoption or budget refund was performed. Preserve v1
+and v2 negatives. No third USB invocation, weaker directory rule, new probe
+namespace or source recapture is authorized by this failure.
+
+Earlier independent read-only structural audit observed matching pinned hashes,
+complete CRC/schema checks and full/year lexical consistency, as described in
+135.2. It was not this registered original-context closure and cannot replace
+the missing terminal result. In particular, the reported auxiliary DTC/volume
+semantics remain unverified. Publication/revision/availability clocks, exact
+native/date/share-class/CIK/USD relation and same-date own-class denominator,
+processing rights, corpus coverage and actual-input admission also remain
+separate missing facts. No latest-revised candidate is relabelled historical
+PIT, no frozen scope is narrowed, and no result or readiness is invented.
+
+### 135.8 Final handoff and one-publication boundary
+
+This owner round is at a concrete environment/owner-action blocker, NOT the
+last step before QC/Safari and NOT backtest-ready. The journal metadata actor
+remains UNKNOWN; no causal code-only custody repair can be justified from
+matching bytes or these refusals. The next authorized environmental action is
+the already reviewed, separately bound owner-run native administrator trace,
+then the ONE original reserved source-free subject and independent observer
+only after genuine tracer_stream_ready. A usable trace requires root and
+responsible-process Full Disk Access; no security settings are changed by
+Codex. Correlate genuine target events with original creator metadata before
+attributing an actor. If trace access/schema/closure fails, preserve that
+negative rather than guess. ExFAT is not a replacement APFS evidence domain.
+
+After resolving that environment gate, a newly frozen genuine custody proof,
+durable negative-accounting readmission retaining permanent8START/16MiB and
+the separate source/identity/availability/denominator/input gates are still
+required before downloads or QC setup. No old mounted/in-memory proof is
+assumed to survive the owner-confirmed reboot. No source cap, spent reservation
+or existing datum is reset or enlarged. Count84005 cumulative START/4GiB and
+the separate DAILY residual budget in135.1 remain unchanged.
+
+Exact accumulated local implementation commits and Main dispositions:
+
+| Commit | Disposition / limits |
+| --- | --- |
+| 33ab4da445536dc3ebfd86c084167c083d88339c | Accepted prepared attribution helper; administrator invocation still pending, no actor proof. |
+| d10a9b2a113eb19908773b5b6faa24e2c741c6d8 | Accepted after135.5 corrections; actual v1 remains refused. |
+| b30201d4aa348b658678a83de2daaed5fa00136b | Accepted bounded reader corrections; actual v2 has the overriding operational custody veto above. |
+
+The following final record-only commit resolves its full ID from Git HEAD;
+it is not a self-referential implementation claim. Main focused181/1.32s and
+advisory counts above remain prior executions on the final unchanged code.
+No full suite, independent Claude review, native administrator trace, native
+proof, actual-input build, outcome look, QC/Safari or purchase occurred.
+Shared docs and every historical record row remain unchanged; only this lane
+record is the handoff. Guarded checks after exec50387 termination found no
+known pinned-role process, and the original reserved trace/subject still absent.
+
+The owner-directed ONE final nonforce matching-lane push may now publish this
+honest blocked snapshot after final record/status/concurrency checks. No interim
+push occurred. After the final full hash exists, prepare a NEW O_EXCL private
+command file bound to that exact clean hash and the unchanged reviewed helper;
+preserve the earlier33AB command as superseded/uninvoked. Do not execute either
+command automatically, restart an old invocation or arm a monitor. Verify clean
+local/tracking/actual-remote equality after the single publication and report
+the full hash, this lane-record link, missing readiness gates and required
+owner action. SourceAUTH remains unconditionally blocked.
+Main final post-result active-document checks:69 passed/.56s; whitespace clean.

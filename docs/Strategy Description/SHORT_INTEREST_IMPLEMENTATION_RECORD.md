@@ -30825,3 +30825,166 @@ source qualification and all actual-input gates still follow. No source
 request begins merely because the native location proof succeeded.
 Main post-actual-result active-document checks69 passed/.82s with OS networking
 denied; whitespace passed. SDK and focused-test bytes remained unchanged.
+
+## 139. Prospective durable Main custody and conservative post-restart basis (2026-11-03)
+
+### 139.1 Scope, authority and exact prior state
+
+SI-DEC-20261103-05, under continuing SI-AUTH-20261103-02, freezes one
+prospective source-free Root-to-Main custody bridge after the actual native-only
+closure in138.6. This is implementation under the owner's existing direction,
+not a new owner approval or an assertion of Claude review. Start HEAD is
+f8cb9833bb4460ef57fd70bcc3c76849338c10a0; matching tracking/actual origin remains
+2a6d34c063da17dadeb98874344b628dcd6594a7. The five preceding local commits in this
+continuation remain95C7,33F8,07CA,CA11,F8CB with their original dispositions and
+evidence. No successful push has occurred in this continuation.
+
+All older failures, native-only success, mounted images, inactive terminal jobs,
+original controls and spent budgets remain. The new fixed local-main-v1 namespace
+is native-supervision-main-20261103-v1 below the existing private local custody
+base; its GUI label is separately fixed. It never reuses the old local metadata
+or native-only namespace. Root-export and main-receipt host directories are
+created empty before the original load transaction; mounted main remains empty.
+No source row, credential, claim, START or new charged byte is involved.
+
+### 139.2 New bridge contract and retained checks
+
+The SDK adds a third exact storage profile, with policy
+a05247ff9f4203caea24cbc8e78aaa5c5abf97797c16bdf19d1b6532eb469526.
+The purpose-specific scripts/short_interest_native_main_receipt.py protocol is
+8e99009d217b81aa6720e8b313d495943831679cdb7948d21cf11be590ead4c0.
+Its eight-path code closure adds only that Main module to the old seven.
+Legacy848C and native-only3451 policy, wrapper and representative payload/plist
+bytes remain exact. Main independently compared trusted hash-verified GitF8CB
+SDK bytes with the new SDK: sixteen protected full definitions PLUS
+_OriginalRead.read remain both AST- and source-identical.
+
+RootClosureProjection is issued only from the live genuine Main-profile
+ClosedNativeSupervision. It revalidates the original context/code/native
+conjunction and uses the SAME Root coordinator monotonic clock. It exports
+original marker/inventory full9 and creator-frozen flags, with authenticated
+inventory references covering complete native/control/code membership.
+Config identity7 and load-window9 are explicitly separate observations, never
+invented timestamp continuity. Main-only original flags are checked before,
+after, through close and named rechecks; current flags cannot supply an
+original flag baseline.
+
+The Root publisher retains original immutable RO state through ready, Main's
+original RO open/ACK, all source/code exits and the same-seal closed frame.
+Main owns the original Popen, ready+closed bytes, EOF and wait0 with no stderr,
+performs its independent original reader/code/config/native checks, and publishes
+one custody-only counter-receipt in the separate precreated host directory.
+Initial empty directory9 and ONE postpublication directory9 seal are distinct.
+Strict APFS all-entry nlink+1, exact membership, full9, original flags, bytes,
+O_EXCL, original creator/RO handoff and every post-close barrier remain.
+Unknown process/pipe lifecycle holds original process/FDs/raw bytes; poll0,
+caller exit flags, retry, rebaseline or killing cannot create success.
+
+ReceiptObservation remains a candidate until Main's actual OUTER process exit0,
+no stderr and original whole300s conjunction. A future durable loader also
+requires an independent committed anchor binding exact original receipt,
+directory and projection stamp digests and raw outer stdout. Full9 values
+cross the JavaScript boundary as canonical JSON STRINGS, avoiding unsafe
+integer rounding. The anchor is currently ABSENT, and loading refuses before
+private I/O. A later loader holds original receipt/projection/code/anchor/
+native/config contexts; every public failure latches and getters after close
+refuse. This is custody-only, not Root reconstruction, accounting resolution,
+SourceAUTH, denominator, actual-input or backtest admission.
+
+### 139.3 Separate permanent-negative accounting basis
+
+The pure native_count_conservative_readmission factory retains the exact
+original CountEpochLedger, original permanent exposure and original NINE-part
+plan. It does not recreate the vanished Run13448Resolution, reopen the old
+mounted epoch or invoke the old resolver after reboot. Original historical
+actuals stay UNKNOWN, including old process exit; qualified coverage0 and
+positive closed chunks0. A mint attempt is spent BEFORE either upstream
+factory, so a partial failure cannot be retried. Copies, reflected anchors,
+duplicate issuance, producer drift and mutation/restoration refuse and latch.
+
+Its fixed policy is828c2b34b3cf1817a912aef00f27948b049b296cf4493b071ba9771d738ee5d3.
+The permanent8START/16777216-byte floor is never refunded or settled. Baseline
+14000START/40229897 bytes and residual70005START/4254737399 bytes preserve the
+84005 cumulative START/4294967296-byte count ceiling. DAILY stays separately
+bounded at36837 attempts/3327988047 bytes/71468572 rows. The pure basis grants
+no storage, dispatch, credential, retry, claim or budget-release authority.
+The actual capture factory still needs explicit nine-part/basis/Main/storage/
+lease integration; it is not fixed by this pure software unit.
+
+### 139.4 Verified pre-release findings and validation
+
+| ID | Priority | Disposition |
+| --- | --- | --- |
+| SI-MAIN-20261103-001 | P2 | Corrected before dispatch: committed-anchor ancestry was checked only at construction. An original-inode/full9-preserving ancestor rename and symlink could escape later checks. Physical-path continuity now precedes/follows reads and named post-close checks; peer causal reversal reproduced2 failures. |
+| SI-MAIN-20261103-002 | P2 | Corrected before dispatch: copied origin/wait tuples could reuse a genuine frame without being that frame's exact issued tuple. Registry entries now bind original frame-local row identity, process/pump/arguments/environment and original wait. Peer causal reversal reproduced2 failures and1 unchanged passing case. |
+| SI-MAIN-20261103-003 | P2 | Corrected before dispatch: typed observation/load registries now bind exact original factory/generator issuance frames and public failure latches; a synthetic row cannot reuse genuine supporting objects. These are software provenance regressions, not actual process exits. |
+| SI-BASIS-20261103-001 | P2 | Corrected before dispatch: new pure package-root import spelling violated the existing import boundary. Fully qualified internal module imports preserve the original boundary; no boundary expectation or budget check is weakened. |
+
+Author native269 passed/16.47s with exactly2 named real_kernel_immutable cases
+deselected; Main-profile32 cases7.80s. Author bridge75/.98s; independent advisory
+peer75/.97s. Author/peer causal clock, poll0, anchor-path and wait-row omissions
+produced expected failures, restored checks passed. These are separately
+attributed fabricated executions, not Main reruns, Claude review or actual
+native proof. Pure author/peer initial93 selections passed; Main initial pure93
+passed2.03s. A prior resumed command named a nonexistent test filename and its
+tool output was truncated; no successful result is attributed to that command.
+
+Main combined selection initially445 passed/1 FAILED/2 explicit realUF deselected
+19.30s: the existing import-boundary test found SI-BASIS-001. The original test
+remains unchanged. The subsequent corrected selection and exact final hashes
+are recorded below before commit; none of the initial green subtests is called
+a complete successful combined run. The old metadata cleanup failure from138.4
+remains UNKNOWN/unreproduced; this new import finding does not explain it.
+
+Main prebuilt a new automatic OUTER observer before actual dispatch. Its body
+SHA256 is22f0000d3d0aa8754239f52241ade836260a6db0e862b3df7039f85a663c27a3.
+Forty-one simulated checks passed, including precise canonical packet/authority/
+operation/code binding, raw stdout+LF hash, full9 string hashes, actual exit/
+signal/stderr/EOF/deadline failures and no reinvocation/reclock. A memory-only
+omission of all final validation/anchor deadline barriers produced the expected
+specific late-validation failure, then the exact factory's41 checks passed.
+The initial causal variant retained a redundant ns ceiling and remained safe;
+that harness was corrected, not production. Simulations launch no process,
+namespace, native job, source or claim.
+
+### 139.5 Prospective actual boundary and next action
+
+After the entire preparation is committed clean, reverify physical/Git roots,
+branch/exact HEAD, all eight committed/current code hashes, both frozen policies,
+actual matching origin, absent new namespace/GUI label/anchor and no pinned
+operation. Freeze every author before dispatch. Invoke the new Main coordinate
+role ONCE through the prebuilt automatic observer, retaining its original whole
+300s clock through real close AND final validation/anchor construction. Do not
+edit, test, commit or push while active. Unknown closure retains evidence and
+cannot mint an anchor, a positive receipt or a replacement namespace.
+
+Only after genuine outer0 may Main append the actual result and independently
+commit its original anchor, then exercise the held loader. Even success is a
+source-free custody observation. SourceAUTH remains blocked. USB must undergo
+offline qualification before more downloads; the failed external-byte reader
+requires causal diagnostics rather than retrospective admission. Exact native/
+class/date/CIK/USD/reported-count/availability/rights/coverage/cash and actual
+compiler-input gates remain. No QC/Safari, purchases or outcomes; looks0/0,
+exploratory0, alpha0, IDsnone and QCattempts0. No new monitor is armed.
+No readiness or successful push is claimed. Reserve one matching-lane push for
+the completed round or concrete terminal owner-required blocker.
+
+Main corrected basis/exposure/budget/import-boundary/active-document selection171
+passed2.76s after the import-only fix. Author corrected102/2.63s is separately
+attributed. Main Python3.9 AST/in-memory compile and controlled own-contract
+catalogues passed; Main eight-path current-byte mapping SHA256 is
+35ae944fee3d3694f36b7ab0cd8e842bd87398871cbfd4a6b45501d3eb4e82ce.
+No full lane/repository suite, real source, native job or actual proof was run
+by these checks. The two real-kernel fixture exclusions remain explicitly
+separate from the prospective actual source-free invocation.
+
+Final software byte identities before commit:
+
+| File | Bytes | SHA256 |
+| --- | ---: | --- |
+| native SDK | 199309 | b36b5bafcbdb3f4dd27bfe63b61dee3c14850f7ff430b55d9c5ca1b137fdd757 |
+| native tests | 187115 | c8acd3b712774d561ae13a44851e156d28546826cac9a9882b8b46f6abf62f25 |
+| Main receipt module | 51885 | f4999e7ef0921a3c6a3e7145aa9b1fee288b9c53fc88b70f310051e391d6f4c9 |
+| Main receipt tests | 38170 | bfe6b5e5cec7734de54550c7f11890a9294ca7083837ecf59ef735257603637f |
+| conservative basis | 12774 | b438f4f6b6410acd35b8cc8bf305d63831c8bdeea4818cff617ce4c13c2b4b96 |
+| conservative basis tests | 15638 | 0c70808ce59f6bb2b35f6aee46b5db7c4445164934ff89c0eb10335fcc58d5e9 |

@@ -2844,3 +2844,268 @@ def test_local_profile_original_collector_wait_before_failure_closes_only_negati
     assert proof._PRODUCERS == proof._CLOSED == proof._ROOT_RECEIPTS == {}
     creation = proof._CREATION_STATES[h.volumes[0]]
     assert creation["carrier"].closed and (h.volumes[0].mount / proof.CREATION_MANIFEST_ROLE).is_file()
+
+
+@pytest.fixture
+def main_profile_domain(local_profile_domain, monkeypatch):
+    """Main's third profile with genuine SDK objects; native facts stay fake."""
+    h = local_profile_domain
+    h.local_run.mkdir(mode=0o700)  # Named preserved, already spent native-only antecedent.
+    run = h.local_base / "native-supervision-main-20261103-v1"
+    monkeypatch.setattr(proof, "MAIN_RUN", run)
+    module = h.root / proof.MAIN_DRIVER
+    module.write_bytes(b"# EXPLICIT FABRICATED MAIN CONTROLLER CODE\n")
+    def git(arguments):
+        assert len(arguments) == 2 and arguments[0] == "show"
+        head, separator, name = arguments[1].partition(":")
+        assert separator and head == HEAD and name in proof._code_files(proof.LOCAL_MAIN_V1)
+        return (h.root / name).read_bytes()
+    monkeypatch.setattr(proof, "_git", git)
+    monkeypatch.setattr(proof, "MAIN_POLICY_SHA256", hash_payload(proof.policy(proof.LOCAL_MAIN_V1)))
+    h.main_run = run
+    h.domain_path = run / "domain"; h.mount_path = h.domain_path / "mount"; h.image_path = h.domain_path / "backing.sparseimage"
+    h.prepare_main = lambda: proof.prepare_bootstrap(HEAD, REMOTE, h.observer, profile=proof.LOCAL_MAIN_V1)["spec_sha256"]
+    h.produce_main = lambda digest: proof.run_registered(HEAD, REMOTE, digest, h.observer, profile=proof.LOCAL_MAIN_V1)
+    h.main_after_produce = None
+    return h
+
+
+@pytest.fixture
+def main_profile_coordinator(main_profile_domain, monkeypatch):
+    h = main_profile_domain
+    h.main_loaded = h.main_started = False; h.main_writer = None
+    main = proof.LOCAL_MAIN_V1
+    def launch(role, *, profile=proof.LEGACY_V4):
+        assert profile is main
+        if role == "query":
+            return subprocess.CompletedProcess(proof._service_arguments(role, profile=main),
+                0 if h.main_loaded else 113,
+                _local_profile_kernel_raw(main, started=h.main_started) if h.main_loaded else b"", b"")
+        if role == "load":
+            assert not h.main_loaded; h.main_loaded = True
+            return subprocess.CompletedProcess(proof._service_arguments(role, profile=main), 0, b"", b"")
+        assert role == "start" and h.main_loaded and not h.main_started; h.main_started = True
+        spec_raw = (h.main_run / "bootstrap" / "launch.spec.json").read_bytes()
+        spec = json.loads(spec_raw); digest = hash_bytes(spec_raw)
+        h.main_writer = os.open(spec["observer"]["slave_path"], os.O_RDWR | os.O_NOFOLLOW | getattr(os, "O_NOCTTY", 0))
+        result = proof.run_registered(HEAD, REMOTE, digest, spec["observer"], profile=main)
+        if h.main_after_produce is not None: h.main_after_produce(result)
+        monkeypatch.setattr(proof, "_observer_fd", lambda: h.main_writer)
+        endpoint = proof._Observer(spec["observer"], digest); proof._bind_profile(endpoint, main); endpoint.emit(result=result)
+        return subprocess.CompletedProcess(proof._service_arguments(role, profile=main), 0,
+            str(os.getpid()).encode() + b"\n", b"")
+    monkeypatch.setattr(proof, "_launch_service", launch)
+    h.coordinate_main = lambda: proof.coordinate_registered(HEAD, REMOTE, profile=main)
+    try: yield h
+    finally:
+        if h.main_writer is not None: os.close(h.main_writer)
+
+
+def test_main_profile_fixed_third_profile_keeps_old_contracts_and_eight_code_files():
+    assert proof._profile_id(proof.LOCAL_MAIN_V1) == "local-main-v1"
+    value = proof.policy(proof.LOCAL_MAIN_V1)
+    assert value["schema"] == "si-native-supervision-Main-policy-v1"
+    assert value["run"] == str(proof.LOCAL_BASE / "native-supervision-main-20261103-v1")
+    assert value["host_directories"] == ["root-export", "main-receipt"]
+    assert value["projection_bytes"] == 4096 and value["maximum_seconds"] == 300
+    assert proof._code_files(proof.LOCAL_MAIN_V1) == (*proof.CODE_FILES, "scripts/short_interest_native_main_receipt.py")
+    assert proof._code_files(proof.LEGACY_V4) == proof._code_files(proof.LOCAL_NATIVE_V1) == proof.CODE_FILES
+    assert len(proof.CODE_FILES) == 7 and len(value["code_files"]) == 8
+    assert hash_payload(proof.policy()) == proof.POLICY_SHA256 == "848ceb48bc42aa02a4974d95da2ba113c172a26aed31d5d0827a4a8fa62c3a94"
+    assert hash_payload(proof.policy(proof.LOCAL_NATIVE_V1)) == proof.LOCAL_POLICY_SHA256 == "3451e95b0073165067b95b2c98eaada1b82cda035bc22c966a317ec57ce98e5f"
+    assert hash_payload(value) == proof.MAIN_POLICY_SHA256
+    assert value["authority"] == proof.authority()
+    assert "Documents" not in Path(value["run"]).parts
+
+
+def test_main_profile_bootstrap_precreates_empty_host_originals_before_load(main_profile_domain):
+    h = main_profile_domain; digest = h.prepare_main()
+    key = proof._prepared_key(HEAD, REMOTE, digest, h.observer, proof.LOCAL_MAIN_V1)
+    hosts = proof._MAIN_HOST_ORIGINS[key]
+    assert hosts[0] is proof.LOCAL_MAIN_V1 and [name for name, pin in hosts[1]] == ["root-export", "main-receipt"]
+    for name, original in hosts[1]:
+        assert not os.listdir(h.main_run / name)
+        assert proof._stamp((h.main_run / name).lstat()) == original
+        assert len(original) == 9 and original[4] == 0o700
+    job = plistlib.loads((h.main_run / "bootstrap" / "job.plist").read_bytes())
+    assert job["Label"] == proof.MAIN_LABEL and job["ProgramArguments"][4] == "run-main-proof"
+    assert job["WorkingDirectory"] == str(h.root)
+    code = proof._Code7(HEAD, REMOTE, proof._Clock(profile=proof.LOCAL_MAIN_V1))
+    try: assert len(code.manifest) == 8
+    finally: code.close()
+
+
+def test_main_profile_genuine_publisher_exports_original_flags_in_wire_and_inventory(main_profile_domain):
+    h = main_profile_domain
+    result = h.produce_main(h.prepare_main()); volume = h.volumes[-1]
+    marker = result.public_summary()["marker"]
+    assert set(marker) == {"sha256", "stamp", "original_flags"} and marker["original_flags"] == 2
+    controls = volume.output.originals
+    inventory = json.loads(controls[proof.INVENTORY_ROLE][3])
+    assert len(inventory["code_manifest"]) == 8
+    for row in inventory["controls"]:
+        assert row["original_flags"] == proof._creator(volume.output.creators[row["name"]])["frozen_flags"] == 2
+    body = json.loads(controls[proof.MARKER_ROLE][3])
+    assert body["inventory_original_flags"] == proof._creator(volume.output.creators[proof.INVENTORY_ROLE])["frozen_flags"] == 2
+
+
+def test_main_profile_full_genuine_coordinator_projects_live_originals_and_same_clock(main_profile_coordinator):
+    h = main_profile_coordinator; closed = h.coordinate_main()
+    result = proof.project_root_closure(closed)
+    raw = result.canonical_bytes(); value = json.loads(raw)
+    assert raw == canonical_json(value).encode() and 0 < len(raw) <= 4096
+    assert value["schema"] == "si-native-root-closure-projection-v1" and value["storage_profile"] == "local-main-v1"
+    assert value["actual_kernel_exit"] == value["actual_child_exit"] == 0
+    assert value["authority"] == proof.authority() and value["authority"]["durable_Main_receipt"] is False
+    receipt = proof._ROOT_RECEIPTS[closed._anchor[2]]
+    reader, code, config, load = receipt[3]
+    assert type(reader) is proof._OriginalRead and len(code.manifest) == 8
+    for role, name in ((proof.MARKER_ROLE, "marker"), (proof.INVENTORY_ROLE, "inventory")):
+        row = next(row for row in reader.files if row[0] == role)
+        assert value[name]["native_full9"] == list(row[2])
+        assert value[name]["sha256"] == hash_bytes(row[3]) and value[name]["original_flags"] == 2
+    assert value["code_manifest_sha256"] == hash_payload(code.manifest)
+    assert value["native_inventory_sha256"] == hash_payload(reader.native)
+    assert value["config_identity7_sha256"] == proof.config_identity7_sha256(config)
+    assert value["load_window9_sha256"] == proof._load_window9_sha256(load)
+    assert value["root_context_snapshot_sha256"] == hash_bytes(receipt[4].encode())
+    assert proof._ROOT_CLOSURE_CLOCKS[closed._anchor[2]][1] is result._anchor[4][1]
+    assert 0 < result.remaining_seconds() <= 300
+    assert not os.listdir(h.mount_path / "main")
+    with pytest.raises(proof.SupervisionRefusal): proof.project_root_closure(closed)
+
+
+@pytest.mark.parametrize("value", [None, {}, {"status": "closed_source_free_native_supervision_in_memory_only"}])
+def test_main_profile_projection_rejects_payloads_before_filesystem(value):
+    with pytest.raises(proof.SupervisionRefusal, match="supervision_factory"): proof.project_root_closure(value)
+    with pytest.raises(proof.SupervisionRefusal, match="supervision_factory"): proof.RootClosureProjection()
+
+
+def test_main_profile_projection_cannot_cast_native_only_value(local_profile_domain):
+    h = local_profile_domain; producer = h.produce_local(h.prepare_local())
+    with pytest.raises(proof.SupervisionRefusal, match="supervision_factory"): proof.project_root_closure(producer)
+
+
+def test_main_profile_projection_remaining_uses_expiring_original_clock_and_latches(main_profile_coordinator, monkeypatch):
+    now = [100.0]
+    monkeypatch.setattr(proof.time, "monotonic", lambda: now[0])
+    closed = main_profile_coordinator.coordinate_main(); result = proof.project_root_closure(closed)
+    now[0] = 399.0
+    assert result.remaining_seconds() == 1
+    now[0] = 400.001
+    with pytest.raises(proof.SupervisionRefusal, match="native_proof_deadline"): result.canonical_bytes()
+    now[0] = 101.0
+    with pytest.raises(proof.SupervisionRefusal, match="supervision_factory"): result.remaining_seconds()
+
+
+@pytest.mark.parametrize("mutation", ["marker", "inventory", "control"])
+def test_main_profile_exact_original_flags_survive_closed_root_and_veto_late_drift(main_profile_coordinator, fabricated_kernel_file_flags, mutation):
+    h = main_profile_coordinator; closed = h.coordinate_main()
+    role = {"marker": proof.MARKER_ROLE, "inventory": proof.INVENTORY_ROLE, "control": "run.started.json"}[mutation]
+    path = h.mount_path / "proof" / role
+    fd = os.open(path, os.O_RDONLY)
+    try: info = fabricated_kernel_file_flags.actual_fstat(fd)
+    finally: os.close(fd)
+    fabricated_kernel_file_flags.flags[info.st_dev, info.st_ino] = 66  # Keeps UF2; fabricated no stamp change.
+    with pytest.raises(proof.SupervisionRefusal, match="supervision_original"): proof.project_root_closure(closed)
+
+
+def test_main_profile_projection_rejects_changed_private_context_and_copied_anchor(main_profile_coordinator):
+    closed = main_profile_coordinator.coordinate_main(); result = proof.project_root_closure(closed)
+    copy = object.__new__(proof.RootClosureProjection); copy._anchor = result._anchor
+    with pytest.raises(proof.SupervisionRefusal): copy.canonical_bytes()
+    receipt = proof._ROOT_RECEIPTS[closed._anchor[2]]; reader = receipt[3][0]
+    previous = reader.marker["nonce"]; reader.marker["nonce"] = "f" * 32
+    with pytest.raises(proof.SupervisionRefusal): result.canonical_bytes()
+    reader.marker["nonce"] = previous
+    with pytest.raises(proof.SupervisionRefusal): result.canonical_bytes()
+
+
+def test_main_profile_initial_host9_is_distinct_from_own_postpublication_state(main_profile_coordinator):
+    h = main_profile_coordinator; closed = h.coordinate_main(); projection = proof.project_root_closure(closed)
+    raw = projection.canonical_bytes(); original = json.loads(raw)["host_directory_originals"]
+    # A named fabricated own publication occurs only AFTER projection issuance.
+    # The descriptor module owns its separate postpublication seal and guards.
+    path = h.main_run / "root-export" / "FABRICATED_own_export"
+    path.write_bytes(raw); path.chmod(0o600)
+    assert proof._stamp(path.parent.lstat()) != tuple(original["root-export"])
+    assert projection.canonical_bytes() == raw and projection.remaining_seconds() > 0
+
+
+@pytest.mark.parametrize("flags", [None, False, 0, 64, -1, 2 ** 32])
+def test_main_profile_original_flags_require_exact_uint32_UF2(flags):
+    with pytest.raises(proof.SupervisionRefusal, match="supervision_original"): proof._original_flags(flags)
+    assert proof._original_flags(2) == 2
+
+
+@pytest.mark.parametrize("mutation", ["missing", "bool", "extra", "legacy"])
+def test_main_profile_wire_flags_are_explicit_original_fields_not_current_guesses(mutation):
+    observer = {"nonce": "c" * 32}; digest = "d" * 64
+    marker = {"sha256": "e" * 64, "stamp": [1, 2, os.getuid(), os.getgid(), 384, 1, 100, 5, 6], "original_flags": 2}
+    value = {"schema": "si-native-supervision-observation-v1", "nonce": observer["nonce"], "spec_sha256": digest,
+        "pid": 123, "status": "producer_complete_provisional", "marker": marker, "failure": None,
+        "authority_sha256": hash_payload(proof.authority())}
+    if mutation == "missing": marker.pop("original_flags")
+    elif mutation == "bool": marker["original_flags"] = True
+    elif mutation == "extra": marker["current_flags"] = 2
+    raw = canonical_json(value).encode() + b"\n"
+    with pytest.raises(proof.SupervisionRefusal):
+        proof._validated_observation(raw, observer, digest, 123,
+            profile=proof.LOCAL_NATIVE_V1 if mutation == "legacy" else proof.LOCAL_MAIN_V1)
+
+
+@pytest.mark.parametrize("mutation", ["begin", "callable"])
+def test_main_profile_projection_cannot_reset_or_replace_original_clock(main_profile_coordinator, mutation):
+    closed = main_profile_coordinator.coordinate_main(); projection = proof.project_root_closure(closed)
+    clock = proof._ROOT_CLOSURE_CLOCKS[closed._anchor[2]][1]
+    original_begin, original_callable = clock.begin, clock.clock
+    if mutation == "begin": clock.begin += 1
+    else: clock.clock = lambda: original_callable()
+    with pytest.raises(proof.SupervisionRefusal): projection.remaining_seconds()
+    clock.begin, clock.clock = original_begin, original_callable
+    with pytest.raises(proof.SupervisionRefusal): projection.remaining_seconds()
+
+
+def test_main_profile_projection_rejects_nonempty_original_host_before_export(main_profile_coordinator):
+    h = main_profile_coordinator; closed = h.coordinate_main()
+    (h.main_run / "root-export" / "FABRICATED_unregistered").write_bytes(b"x")
+    with pytest.raises(proof.SupervisionRefusal, match="supervision_original"): proof.project_root_closure(closed)
+
+
+@pytest.mark.parametrize("stage", ["after_producer", "after_reader_close"])
+def test_main_profile_original_flag_drift_cannot_close_the_Root_conjunction(main_profile_coordinator, fabricated_kernel_file_flags, monkeypatch, stage):
+    h = main_profile_coordinator
+    def change():
+        path = h.mount_path / "proof" / proof.MARKER_ROLE
+        fd = os.open(path, os.O_RDONLY)
+        try: info = fabricated_kernel_file_flags.actual_fstat(fd)
+        finally: os.close(fd)
+        fabricated_kernel_file_flags.flags[info.st_dev, info.st_ino] = 66
+        assert proof._file_flags(path.lstat()) == 66
+    if stage == "after_producer": h.main_after_produce = lambda result: change()
+    else:
+        original = proof._OriginalRead.close
+        def close_then_change(self):
+            original(self); change()
+        monkeypatch.setattr(proof._OriginalRead, "close", close_then_change)
+    with pytest.raises(proof.SupervisionRefusal, match="supervision_original"): h.coordinate_main()
+    assert proof._CLOSED == {}
+
+
+@pytest.mark.parametrize("command", ["prepare-main-proof", "run-main-proof", "coordinate-main-proof"])
+def test_main_profile_cli_uses_only_third_sealed_profile(command, fabricated, monkeypatch, capsys):
+    h = fabricated; calls = []; digest = "d" * 64
+    class Observation:
+        def __init__(self, config, value): self.config = config
+        def emit(self, result=None, error=None): calls.append(("emit", proof._profile_of(self)))
+    monkeypatch.setattr(proof, "_Observer", Observation)
+    def prepare(head, remote, observer, *, profile): calls.append(("prepare", profile)); return {"status": "fabricated"}
+    def run(head, remote, value, observer, *, profile): calls.append(("run", profile)); return object()
+    def coordinate(head, remote, *, profile):
+        calls.append(("coordinate", profile)); return SimpleNamespace(public_summary=lambda: {"status": "fabricated"})
+    monkeypatch.setattr(proof, "prepare_bootstrap", prepare); monkeypatch.setattr(proof, "run_registered", run)
+    monkeypatch.setattr(proof, "coordinate_registered", coordinate)
+    assert proof.main([command, "--head", HEAD, "--remote", REMOTE, "--spec-sha256", digest,
+        "--observer", canonical_json(h.observer)]) == 0
+    assert calls and all(profile is proof.LOCAL_MAIN_V1 for name, profile in calls)
+    capsys.readouterr()

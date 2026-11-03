@@ -2,7 +2,9 @@
 
 PTY bytes are observation only. A Root-closed in-memory result requires an
 actual kernel0 receipt and independently authenticated original APFS controls.
-A durable Main receipt/SourceAUTH bridge is deliberately unavailable here.
+Legacy and native-only profiles do not publish durable Main receipts. The
+Main profile exports a live factory projection for a separate owned-wait and
+custody-only receipt module. Root alone never grants Main or SourceAUTH.
 """
 import argparse
 import base64
@@ -39,6 +41,10 @@ LOCAL_POLICY_SHA256 = "3451e95b0073165067b95b2c98eaada1b82cda035bc22c966a317ec57
 LOCAL_BASE = Path("/Users/sheltonchen/Library/Application Support/CodexShortInterestCustody")
 LOCAL_RUN = LOCAL_BASE / "native-supervision-20261103-v1"
 LOCAL_LABEL = "com.openai.codex.short-interest-native-supervision-local-v1"
+MAIN_RUN = LOCAL_BASE / "native-supervision-main-20261103-v1"
+MAIN_LABEL = "com.openai.codex.short-interest-native-supervision-main-v1"
+MAIN_DRIVER = "scripts/short_interest_native_main_receipt.py"
+MAIN_POLICY_SHA256 = "a05247ff9f4203caea24cbc8e78aaa5c5abf97797c16bdf19d1b6532eb469526"
 CODE_FILES = (*old.CODE_FILES, startup.DRIVER, DRIVER)
 MAXIMUM_SECONDS, COMMAND_SECONDS, VIRTUAL_BYTES = 300, 120, 8 * 1024 ** 3
 MAXIMUM_NATIVE_BYTES, MAXIMUM_CONTROL_BYTES, MAX_CONFIG, MAX_WIRE = 4194304, 4096, 4096, 1024
@@ -74,6 +80,8 @@ _SYSTEM_BASELINES = {}
 _SYSTEM_INITIALIZATIONS, _FILE_CREATORS, _COLLECT_RETURNS, _STDOUT_FREEZES, _ACTIVE_FREEZES = {}, {}, {}, {}, {}
 _RO_ORIGINS, _RO_HANDOFFS = {}, {}
 _PROFILE_BINDINGS = {}
+_MAIN_HOST_ORIGINS, _ROOT_CLOSURE_CLOCKS, _ROOT_PROJECTIONS, _ROOT_PROJECTION_FAILED = {}, {}, {}, set()
+_ORIGINAL_READ_FLAGS = {}
 CREATION_NATIVE_ROLES = tuple("creation.native." + role + ".private.plist" for role in ("before", "create", "attach", "initial", "terminal"))
 CREATION_SYSTEM_ROLE = "creation.system.private.json"
 CREATION_FAILURE_ROLE = "creation.failure.private.json"
@@ -94,16 +102,17 @@ class _StorageProfile:
     def __init__(self): raise SupervisionRefusal("REFUSED: supervision_arguments")
 
 
-LEGACY_V4, LOCAL_NATIVE_V1 = object.__new__(_StorageProfile), object.__new__(_StorageProfile)
+LEGACY_V4, LOCAL_NATIVE_V1, LOCAL_MAIN_V1 = (object.__new__(_StorageProfile) for unused in range(3))
 
 
 def _profile(value):
-    require(value is LEGACY_V4 or value is LOCAL_NATIVE_V1, "supervision_arguments")
+    require(value is LEGACY_V4 or value is LOCAL_NATIVE_V1 or value is LOCAL_MAIN_V1, "supervision_arguments")
     return value
 
 
 def _profile_id(value):
-    return "legacy-v4" if _profile(value) is LEGACY_V4 else "local-native-v1"
+    value = _profile(value)
+    return "legacy-v4" if value is LEGACY_V4 else "local-native-v1" if value is LOCAL_NATIVE_V1 else "local-main-v1"
 
 
 def _bind_profile(value, profile):
@@ -125,7 +134,29 @@ def _same_profile(profile, *values):
 
 
 def _policy_sha(profile):
-    return POLICY_SHA256 if _profile(profile) is LEGACY_V4 else LOCAL_POLICY_SHA256
+    profile = _profile(profile)
+    return POLICY_SHA256 if profile is LEGACY_V4 else LOCAL_POLICY_SHA256 if profile is LOCAL_NATIVE_V1 else MAIN_POLICY_SHA256
+
+
+def _code_files(profile):
+    return CODE_FILES if _profile(profile) is not LOCAL_MAIN_V1 else (*CODE_FILES, MAIN_DRIVER)
+
+
+def _local_run(profile):
+    require(_profile(profile) is not LEGACY_V4, "supervision_arguments")
+    return MAIN_RUN if profile is LOCAL_MAIN_V1 else LOCAL_RUN
+
+
+def _local_children(profile):
+    return {"bootstrap", "domain", "root-export", "main-receipt"} if _profile(profile) is LOCAL_MAIN_V1 else {"bootstrap", "domain"}
+
+
+def _base_children(profile, *, before_creation=False):
+    profile = _profile(profile)
+    values = {"local-metadata-20261103-v1"}
+    if profile is LOCAL_MAIN_V1 or not before_creation: values.add(LOCAL_RUN.name)
+    if profile is LOCAL_MAIN_V1 and not before_creation: values.add(MAIN_RUN.name)
+    return values
 
 
 def _tag(value, profile):
@@ -137,15 +168,16 @@ def _keys(values, profile):
 
 
 def _bootstrap_path(profile):
-    return ROOT / PARENT / BOOTSTRAP if _profile(profile) is LEGACY_V4 else LOCAL_RUN / "bootstrap"
+    return ROOT / PARENT / BOOTSTRAP if _profile(profile) is LEGACY_V4 else _local_run(profile) / "bootstrap"
 
 
 def _domain_path(profile):
-    return ROOT / PARENT / DOMAIN if _profile(profile) is LEGACY_V4 else LOCAL_RUN / "domain"
+    return ROOT / PARENT / DOMAIN if _profile(profile) is LEGACY_V4 else _local_run(profile) / "domain"
 
 
 def _label(profile):
-    return LABEL if _profile(profile) is LEGACY_V4 else LOCAL_LABEL
+    profile = _profile(profile)
+    return LABEL if profile is LEGACY_V4 else LOCAL_LABEL if profile is LOCAL_NATIVE_V1 else MAIN_LABEL
 
 
 def _prepared_key(head, remote, digest, observer, profile):
@@ -260,13 +292,22 @@ def policy(profile=LEGACY_V4):
         "wrapper_body_sha256": hash_bytes(_wrapper_body().encode()), "wrapper_inline_sha256": hash_bytes(_wrapper().encode()),
         "authority": authority()}
     if profile is LEGACY_V4: return value
-    return {**value, "schema": "si-native-supervision-local-policy-v1", "storage_profile": _profile_id(profile),
-        "base": str(LOCAL_BASE), "run": str(LOCAL_RUN), "bootstrap": str(_bootstrap_path(profile)),
+    local = {**value, "schema": "si-native-supervision-local-policy-v1", "storage_profile": _profile_id(profile),
+        "base": str(LOCAL_BASE), "run": str(_local_run(profile)), "bootstrap": str(_bootstrap_path(profile)),
         "domain": str(_domain_path(profile)), "label": _label(profile),
         "local_ancestry": "nofollow_root_or_owner_nonwritable_ancestors_owner0700_private_base_exact_old_metadata_sibling_one_new_run_no_old_adoption",
         "local_host": "local_writable_APFS_ownership_enabled_then_unchanged_separate_native_APFS_mount_contract",
         "coordination": "unchanged_full_automated_coordinate_kernel_child_original_context_closure_Main_owned_wait_and_global300_required",
         "wrapper_body_sha256": hash_bytes(_wrapper_body(profile).encode()), "wrapper_inline_sha256": hash_bytes(_wrapper(profile).encode())}
+    if profile is LOCAL_NATIVE_V1: return local
+    return {**local, "schema": "si-native-supervision-Main-policy-v1", "code_files": list(_code_files(profile)),
+        "host_directories": ["root-export", "main-receipt"], "projection_bytes": MAXIMUM_CONTROL_BYTES,
+        "host_originals": "empty_prepublication_native_full9_before_load_retained_separately_from_later_own_publication_seal",
+        "flags": "original_genuine_publisher_frozen_flags_in_producer_wire_marker_inventory_and_Root_original_reader_no_current_flag_adoption",
+        "Root_projection": "exact_live_ClosedNativeSupervision_original_receipt_contexts_and_same_remaining_coordinator_clock_factory_only",
+        "projection_output": "new_Main_module_original_Files_root_export_two_frames_RO_handoff_then_all_context_close_same_descriptor_Main_owned_wait0_required",
+        "Main_receipt": "separate_purpose_specific_Main_module_custody_only_publication_after_original_projection_RO_handoff_both_frames_and_original_owned_Root_exit0_SourceAUTH_blocked_Root_alone_has_no_Main_authority",
+        "Main_anchor": "separate_committed_receipt_original_stamp_digest_anchor_after_original_outer_wait_not_caller_booleans_sourceAUTH_still_blocked"}
 
 
 def registered(profile=LEGACY_V4):
@@ -665,13 +706,30 @@ def _local_host(fd):
 
 def _prepare_local_container(clock):
     """One new integrated domain; the spent metadata sibling is never reopened."""
-    _same_profile(LOCAL_NATIVE_V1, clock)
-    directory = _Directory("container", create=True, profile=LOCAL_NATIVE_V1)
+    profile = _profile_of(clock)
+    require(profile is LOCAL_NATIVE_V1 or profile is LOCAL_MAIN_V1, "supervision_arguments")
+    directory = _Directory("container", create=True, profile=profile)
+    hosts, originals = [], []
     try:
         clock.check(); directory.check()
         require(not os.listdir(directory.fd), "native_proof_membership")
-    finally: directory.close()
+        if profile is LOCAL_MAIN_V1:
+            for name in ("root-export", "main-receipt"):
+                child = _Directory(name, create=True, profile=profile); hosts.append(child)
+            for name, child in zip(("root-export", "main-receipt"), hosts):
+                child.check(); require(not os.listdir(child.fd), "native_proof_membership")
+                originals.append((name, _stamp(os.fstat(child.fd))))
+    finally:
+        first = None
+        for obj in (*reversed(hosts), directory):
+            try: obj.close()
+            except BaseException as error:
+                if first is None: first = error
+        if first is not None: raise first
     directory.named(); clock.check()
+    for (name, original), child in zip(originals, hosts):
+        child.named(); _same(_stamp(child.path.lstat()), original)
+    return tuple(originals)
 
 
 def _directory_for(kind, *, create, profile):
@@ -685,7 +743,7 @@ class _Directory:
     def __init__(self, name, *, create, profile=LEGACY_V4):
         _bind_profile(self, profile)
         self.fds, self.nodes, self.closed = [], [], False
-        if profile is LOCAL_NATIVE_V1:
+        if profile is not LEGACY_V4:
             self._local(name, create=create); return
         self.path = ROOT / PARENT / name
         try:
@@ -709,8 +767,9 @@ class _Directory:
             except BaseException: pass
             raise
     def _local(self, name, *, create):
-        require(name in {"container", "bootstrap", "domain"}, "supervision_arguments")
-        self.path = LOCAL_RUN if name == "container" else LOCAL_RUN / name
+        profile = _profile_of(self); run = _local_run(profile)
+        require(name in {"container", *_local_children(profile)}, "supervision_arguments")
+        self.path = run if name == "container" else run / name
         try:
             require(ROOT.resolve() == ROOT and Path.cwd().resolve() == ROOT, "native_proof_path")
             parent = os.open("/", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW); self.fds.append(parent)
@@ -719,18 +778,18 @@ class _Directory:
                 path /= part
                 if path == self.path and create:
                     if name == "container":
-                        require(set(os.listdir(parent)) == {"local-metadata-20261103-v1"}, "native_proof_membership")
+                        require(set(os.listdir(parent)) == _base_children(profile, before_creation=True), "native_proof_membership")
                     try: os.stat(part, dir_fd=parent, follow_symlinks=False)
                     except FileNotFoundError: pass
                     else: raise SupervisionRefusal("REFUSED: native_proof_exists")
                     before = os.fstat(parent); os.mkdir(part, 0o700, dir_fd=parent); os.fsync(parent)
                     after = os.fstat(parent)
-                    require(_local_dir(before, path.parent in {LOCAL_BASE.parent, LOCAL_BASE, LOCAL_RUN})
-                        == _local_dir(after, path.parent in {LOCAL_BASE.parent, LOCAL_BASE, LOCAL_RUN})
+                    require(_local_dir(before, path.parent in {LOCAL_BASE.parent, LOCAL_BASE, run})
+                        == _local_dir(after, path.parent in {LOCAL_BASE.parent, LOCAL_BASE, run})
                         and after.st_nlink == before.st_nlink + 1, "native_proof_protection")
                 fd = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
                 self.fds.append(fd)
-                private = path in {LOCAL_BASE.parent, LOCAL_BASE, LOCAL_RUN, self.path}
+                private = path in {LOCAL_BASE.parent, LOCAL_BASE, run, self.path}
                 self.nodes.append((path, fd, _local_dir(os.fstat(fd), private))); parent = fd
             self.fd, self.parent = self.fds[-1], self.fds[-2]
             self.host = _local_host(self.fd); self.check()
@@ -743,23 +802,23 @@ class _Directory:
         for path, fd, pin in self.nodes:
             private = path == self.path
             operation = _dir
-            if _profile_of(self) is LOCAL_NATIVE_V1:
-                operation = _local_dir; private = path in {LOCAL_BASE.parent, LOCAL_BASE, LOCAL_RUN, self.path}
+            if _profile_of(self) is not LEGACY_V4:
+                operation = _local_dir; private = path in {LOCAL_BASE.parent, LOCAL_BASE, _local_run(_profile_of(self)), self.path}
             require(path.resolve() == path and operation(path.lstat(), private)
                 == operation(os.fstat(fd), private) == pin, "native_proof_path")
-        if _profile_of(self) is LOCAL_NATIVE_V1:
-            require(set(os.listdir(LOCAL_BASE)) == {"local-metadata-20261103-v1", LOCAL_RUN.name}
-                and set(os.listdir(LOCAL_RUN)) <= {"bootstrap", "domain"}
+        if _profile_of(self) is not LEGACY_V4:
+            require(set(os.listdir(LOCAL_BASE)) == _base_children(_profile_of(self))
+                and set(os.listdir(_local_run(_profile_of(self)))) <= _local_children(_profile_of(self))
                 and _local_host(self.fd) == self.host, "native_proof_membership")
     def named(self):
         for path, unused, pin in self.nodes:
             operation = _dir; private = path == self.path
-            if _profile_of(self) is LOCAL_NATIVE_V1:
-                operation = _local_dir; private = path in {LOCAL_BASE.parent, LOCAL_BASE, LOCAL_RUN, self.path}
+            if _profile_of(self) is not LEGACY_V4:
+                operation = _local_dir; private = path in {LOCAL_BASE.parent, LOCAL_BASE, _local_run(_profile_of(self)), self.path}
             require(path.resolve() == path and operation(path.lstat(), private) == pin, "native_proof_path")
-        if _profile_of(self) is LOCAL_NATIVE_V1:
-            require(set(os.listdir(LOCAL_BASE)) == {"local-metadata-20261103-v1", LOCAL_RUN.name}
-                and set(os.listdir(LOCAL_RUN)) <= {"bootstrap", "domain"}, "native_proof_membership")
+        if _profile_of(self) is not LEGACY_V4:
+            require(set(os.listdir(LOCAL_BASE)) == _base_children(_profile_of(self))
+                and set(os.listdir(_local_run(_profile_of(self)))) <= _local_children(_profile_of(self)), "native_proof_membership")
             fd = os.open(self.path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
             try:
                 require(_local_dir(os.fstat(fd), True) == self.nodes[-1][2]
@@ -844,7 +903,7 @@ class _Code7:
         _bind_profile(self, _profile_of(clock))
         self.head, self.remote, self.clock, self.rows, self.fds = head, remote, clock, {}, []
         try:
-            for ordinal, name in enumerate(CODE_FILES, 1):
+            for ordinal, name in enumerate(_code_files(_profile_of(self)), 1):
                 _component("code_file", ordinal)
                 path = ROOT / name; require(path.resolve() == path, "native_proof_path")
                 fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK); self.fds.append(fd)
@@ -1273,7 +1332,7 @@ class _DomainVolume:
             # On a pre-anchor/unknown failure it retains this original state.
             raise
     def arguments(self, verb):
-        if verb == "create": return [native.HDIUTIL, "create", "-type", "SPARSE", "-size", "8g", "-fs", "APFS", "-uid", str(os.getuid()), "-gid", str(os.getgid()), "-mode", "0700", "-volname", "SI_NATIVE_SUPERVISION_V2_V4" if _profile_of(self) is LEGACY_V4 else "SI_NATIVE_SUPERVISION_LOCAL_V1", "-nospotlight", "-plist", str(self.image)]
+        if verb == "create": return [native.HDIUTIL, "create", "-type", "SPARSE", "-size", "8g", "-fs", "APFS", "-uid", str(os.getuid()), "-gid", str(os.getgid()), "-mode", "0700", "-volname", "SI_NATIVE_SUPERVISION_V2_V4" if _profile_of(self) is LEGACY_V4 else "SI_NATIVE_SUPERVISION_LOCAL_V1" if _profile_of(self) is LOCAL_NATIVE_V1 else "SI_NATIVE_SUPERVISION_MAIN_V1", "-nospotlight", "-plist", str(self.image)]
         if verb == "attach": return [native.HDIUTIL, "attach", "-mountpoint", str(self.mount), "-mount", "required", "-nobrowse", "-owners", "on", "-noautoopen", "-noautoopenro", "-noautoopenrw", "-plist", str(self.image)]
         require(verb == "info", "native_proof_command"); return [native.HDIUTIL, "info", "-plist"]
     def command(self, role, verb):
@@ -1480,7 +1539,8 @@ def _payload(head, remote, manifest, observer, *, profile=LEGACY_V4):
 
 
 def _wrapper_body(profile=LEGACY_V4):
-    action = "run-proof" if _profile(profile) is LEGACY_V4 else "run-local-proof"
+    profile = _profile(profile)
+    action = "run-proof" if profile is LEGACY_V4 else "run-local-proof" if profile is LOCAL_NATIVE_V1 else "run-main-proof"
     body = startup._import_body().replace(startup.MODULE, MODULE).replace("run-readonly", action)
     body = body.replace("si-startup-PTY-observation-v7", "si-native-supervision-observation-v1")
     body = body.replace(hash_payload(startup.authority()), hash_payload(authority()))
@@ -1497,7 +1557,8 @@ def _wrapper(profile=LEGACY_V4):
 def build_launchd_plist(head, remote, digest, observer, *, profile=LEGACY_V4):
     require(worker._hash(head) and worker._hash(remote) and re.fullmatch(r"[0-9a-f]{64}", digest), "supervision_arguments")
     observer = startup._observer_config(observer)
-    return {"Label": _label(profile), "ProgramArguments": [worker.PYTHON, "-B", "-c", _wrapper(profile), "run-proof" if profile is LEGACY_V4 else "run-local-proof", "--head", head,
+    action = "run-proof" if profile is LEGACY_V4 else "run-local-proof" if profile is LOCAL_NATIVE_V1 else "run-main-proof"
+    return {"Label": _label(profile), "ProgramArguments": [worker.PYTHON, "-B", "-c", _wrapper(profile), action, "--head", head,
         "--remote", remote, "--spec-sha256", digest, "--observer", canonical_json(observer)],
         "WorkingDirectory": str(ROOT), "EnvironmentVariables": worker._environment(), "RunAtLoad": False, "KeepAlive": False,
         "StandardOutPath": "/dev/null", "StandardErrorPath": observer["slave_path"]}
@@ -1505,10 +1566,10 @@ def build_launchd_plist(head, remote, digest, observer, *, profile=LEGACY_V4):
 
 def prepare_bootstrap(head, remote, observer, *, profile=LEGACY_V4):
     _registered_for(profile); observer = startup._observer_config(observer); clock = _clock_for(profile)
-    code = directory = inputs = None; error = None
+    code = directory = inputs = None; error = None; hosts = ()
     try:
         _phase("current_code"); _guard(head, remote); code = _Code7(head, remote, clock)
-        if profile is LOCAL_NATIVE_V1: _prepare_local_container(clock)
+        if profile is not LEGACY_V4: hosts = _prepare_local_container(clock)
         _phase("bootstrap"); directory = _directory_for("bootstrap", create=True, profile=profile)
         raw = canonical_json(_payload(head, remote, code.manifest, observer, profile=profile)).encode(); digest = hash_bytes(raw)
         job = plistlib.dumps(build_launchd_plist(head, remote, digest, observer, profile=profile), sort_keys=True)
@@ -1528,6 +1589,10 @@ def prepare_bootstrap(head, remote, observer, *, profile=LEGACY_V4):
         if error is None and first is not None: raise first
     code.named(); inputs.audit(named=True); clock.check()
     _PREPARED[_prepared_key(head, remote, digest, observer, profile)] = tuple((name, *inputs.rows[name]) for name in inputs.ROLES)
+    if profile is LOCAL_MAIN_V1:
+        key = _prepared_key(head, remote, digest, observer, profile)
+        require(tuple(name for name, unused in hosts) == ("root-export", "main-receipt"), "supervision_original")
+        _MAIN_HOST_ORIGINS[key] = profile, hosts, clock, head, remote, digest, hash_payload(code.manifest), object()
     return {"status": "prepared_not_loaded", "spec_sha256": digest, "authority": authority()}
 
 
@@ -1556,6 +1621,13 @@ def _audit_local(outputs):
         os.lseek(fd, 0, os.SEEK_SET); require(os.read(fd, len(raw) + 1) == raw, "native_proof_stamp")
         _check_frozen(outputs.creators.get(name), os.fstat(fd)); _same(_stamp(os.fstat(fd)), stamp)
         _check_frozen(outputs.creators.get(name), os.stat(name, dir_fd=outputs.fd, follow_symlinks=False))
+
+
+def _control_inventory(outputs, profile):
+    values = outputs.inventory()
+    if _profile(profile) is not LOCAL_MAIN_V1: return values
+    _same_profile(profile, outputs)
+    return [{**row, "original_flags": _creator(outputs.creators[row["name"]])["frozen_flags"]} for row in values]
 
 
 class _NegativeReporter:
@@ -1956,13 +2028,15 @@ def _produce(head, remote, digest, observer, *, profile=LEGACY_V4):
         _phase("terminal_code"); code.audit(); _guard(head, remote)
         _phase("terminal_native"); volume.terminal(); outputs.write("native.terminal.plist", volume.origins["terminal"])
         _phase("inventory_publication")
-        inventory = _tag({"schema": "si-native-supervision-inventory-v1", "controls": outputs.inventory(), "native": volume.inventory(),
+        inventory = _tag({"schema": "si-native-supervision-inventory-v1", "controls": _control_inventory(outputs, profile), "native": volume.inventory(),
             "code_manifest": code.manifest, "runtime_head": head, "policy_sha256": _policy_sha(profile), "nonce": observer["nonce"], "authority": authority()}, profile)
         inventory_raw = canonical_json(inventory).encode(); outputs.write(INVENTORY_ROLE, inventory_raw)
         inventory_stamp = outputs.originals[INVENTORY_ROLE][2]
         marker = {**report, "schema": "si-native-supervision-marker-v1", "inventory_sha256": hash_bytes(inventory_raw),
             "inventory_bytes": len(inventory_raw), "inventory_original_stamp": list(inventory_stamp), "code_manifest_sha256": hash_payload(code.manifest),
             "durable_Main_receipt": False}
+        if profile is LOCAL_MAIN_V1:
+            marker["inventory_original_flags"] = _creator(outputs.creators[INVENTORY_ROLE])["frozen_flags"]
         marker_raw = canonical_json(marker).encode(); outputs.write(MARKER_ROLE, marker_raw)
         marker_pin = tuple(outputs.originals[MARKER_ROLE][2]); marker_sha = hash_bytes(marker_raw)
         # Finish all Git/native callbacks before the final original-only audit.
@@ -2097,6 +2171,8 @@ def _produce(head, remote, digest, observer, *, profile=LEGACY_V4):
     require(set(os.listdir(outputs.path)) == POSITIVE_ROLES, "supervision_negative")
     public = {"status": "producer_checks_complete_provisional", "marker": {"sha256": marker_sha, "stamp": list(marker_pin)},
         "actual_child_exit": 0, "kernel_exit_attested": False, "durable_Main_receipt": False, "authority": authority()}
+    if profile is LOCAL_MAIN_V1:
+        public["marker"]["original_flags"] = _creator(outputs.creators[MARKER_ROLE])["frozen_flags"]
     value = object.__new__(ProducerObservation); row = (value, canonical_json(public), wait, origin, object())
     _bind_profile(value, profile); _bind_profile(wait, profile); _bind_profile(origin, profile)
     value._anchor = row; _PRODUCERS[id(value)] = row; return value
@@ -2138,7 +2214,7 @@ def _checked_failure(detail):
     return json.loads(canonical_json(detail))
 
 
-def _validated_observation(raw, observer, digest, pid):
+def _validated_observation(raw, observer, digest, pid, *, profile=LEGACY_V4):
     require(type(raw) is bytes and 0 < len(raw) <= MAX_WIRE and raw.count(b"\n") == 1, "supervision_original")
     value = json.loads(raw)
     require(type(value) is dict and set(value) == {"schema", "nonce", "spec_sha256", "pid", "status", "marker", "failure", "authority_sha256"}
@@ -2150,16 +2226,19 @@ def _validated_observation(raw, observer, digest, pid):
         require(value["marker"] is None, "supervision_original"); _checked_failure(value["failure"]); return value
     require(value["status"] == "producer_complete_provisional" and value["failure"] is None, "supervision_original")
     marker = value["marker"]
-    require(type(marker) is dict and set(marker) == {"sha256", "stamp"} and type(marker["sha256"]) is str
+    marker_keys = {"sha256", "stamp"} | ({"original_flags"} if _profile(profile) is LOCAL_MAIN_V1 else set())
+    require(type(marker) is dict and set(marker) == marker_keys and type(marker["sha256"]) is str
         and re.fullmatch(r"[0-9a-f]{64}", marker["sha256"]) and type(marker["stamp"]) is list and len(marker["stamp"]) == 9
         and all(type(v) is int and 0 <= v <= 2 ** 64 for v in marker["stamp"])
         and marker["stamp"][2] == os.getuid() and tuple(marker["stamp"][4:6]) == (0o600, 1)
         and 0 < marker["stamp"][6] <= MAXIMUM_CONTROL_BYTES, "supervision_marker")
+    if profile is LOCAL_MAIN_V1: _original_flags(marker["original_flags"])
     return value
 
 
-def _filtered_observation(raw, observer, digest, pid):
-    value = _validated_observation(raw, observer, digest, pid)
+def _filtered_observation(raw, observer, digest, pid, *, profile=LEGACY_V4):
+    value = (_validated_observation(raw, observer, digest, pid) if profile is LEGACY_V4
+        else _validated_observation(raw, observer, digest, pid, profile=profile))
     require(value["status"] == "producer_complete_provisional" and value["failure"] is None, "supervision_negative")
     return value["marker"]
 
@@ -2250,10 +2329,45 @@ class _RootReceipt:
 _ROOT_RECEIPTS = {}
 
 
+def _original_flags(value):
+    require(type(value) is int and 0 <= value < 2 ** 32 and value & UF_IMMUTABLE, "supervision_original")
+    return value
+
+
+def _read_profile_control(reader, name, seal, digest, maximum, flags=None):
+    """The original reader stays unchanged; only Main adds declared flags."""
+    if _profile_of(reader) is not LOCAL_MAIN_V1: return reader.read(name, seal, digest, maximum)
+    expected = _original_flags(flags)
+    require(_file_flags(os.stat(name, dir_fd=reader.proof_fd, follow_symlinks=False)) == expected, "supervision_original")
+    raw = reader.read(name, seal, digest, maximum)
+    row = reader.files[-1]
+    require(row[0] == name and row[3] is raw and row[2] == tuple(seal), "supervision_original")
+    for info in (os.fstat(row[1]), os.stat(name, dir_fd=reader.proof_fd, follow_symlinks=False)):
+        _same(_stamp(info), tuple(seal)); require(_file_flags(info) == expected, "supervision_original")
+    issued = _ORIGINAL_READ_FLAGS.get(id(reader))
+    require(type(issued) is tuple and issued[0] is reader and name not in issued[1], "supervision_factory")
+    issued[1][name] = expected
+    return raw
+
+
+def _audit_profile_flags(reader, *, named=False):
+    if _profile_of(reader) is not LOCAL_MAIN_V1: return
+    issued = _ORIGINAL_READ_FLAGS.get(id(reader))
+    require(type(issued) is tuple and len(issued) == 3 and issued[0] is reader
+        and set(issued[1]) == {row[0] for row in reader.files}, "supervision_factory")
+    for name, fd, original, unused in reader.files:
+        infos = [(reader.proof_path / name).lstat()]
+        if not named: infos.append(os.fstat(fd))
+        for info in infos:
+            _same(_stamp(info), original)
+            require(_file_flags(info) == _original_flags(issued[1][name]), "supervision_original")
+
+
 class _OriginalRead:
     """Independent reads compare reported ORIGINAL seals, never a new baseline."""
     def __init__(self, head, remote, digest, observer, producer_pid, marker, *, profile=LEGACY_V4):
         _bind_profile(self, profile)
+        if profile is LOCAL_MAIN_V1: _ORIGINAL_READ_FLAGS[id(self)] = self, {}, object()
         self.head, self.remote, self.digest, self.observer, self.producer_pid = head, remote, digest, observer, producer_pid
         self.directory = None; self.fds, self.files, self.anchors = [], [], []
         try:
@@ -2261,11 +2375,13 @@ class _OriginalRead:
             self.mount_fd = os.open("mount", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=self.directory.fd); self.fds.append(self.mount_fd)
             self.proof_path = self.mount / "proof"
             self.proof_fd = os.open("proof", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=self.mount_fd); self.fds.append(self.proof_fd)
-            marker_raw = self.read(MARKER_ROLE, marker["stamp"], marker["sha256"], MAXIMUM_CONTROL_BYTES)
+            marker_raw = _read_profile_control(self, MARKER_ROLE, marker["stamp"], marker["sha256"], MAXIMUM_CONTROL_BYTES,
+                marker.get("original_flags"))
             self.marker = json.loads(marker_raw); m = self.marker
             expected_keys = {"schema", "runtime_head", "actual_remote", "policy_sha256", "spec_sha256", "nonce", "producer_pid", "authority",
                 "child_pid", "actual_child_exit", "stdout_sha256", "kernel_exit_attested", "status", "inventory_sha256", "inventory_bytes",
                 "inventory_original_stamp", "code_manifest_sha256", "durable_Main_receipt"}
+            if profile is LOCAL_MAIN_V1: expected_keys.add("inventory_original_flags")
             require(type(m) is dict and set(m) == _keys(expected_keys, profile) and marker_raw == canonical_json(m).encode()
                 and m["schema"] == "si-native-supervision-marker-v1" and m["runtime_head"] == head and m["actual_remote"] == remote
                 and m["policy_sha256"] == _policy_sha(profile) and m.get("storage_profile") == (None if profile is LEGACY_V4 else _profile_id(profile))
@@ -2274,23 +2390,26 @@ class _OriginalRead:
                 and type(m["child_pid"]) is int and 0 < m["child_pid"] < 2 ** 31 and m["actual_child_exit"] == 0
                 and type(m["actual_child_exit"]) is int and m["kernel_exit_attested"] is False and m["durable_Main_receipt"] is False
                 and m["status"] == "provisional_until_Root_kernel0" and m["authority"] == authority(), "supervision_marker")
-            raw = self.read(INVENTORY_ROLE, m["inventory_original_stamp"], m["inventory_sha256"], MAXIMUM_NATIVE_BYTES)
+            raw = _read_profile_control(self, INVENTORY_ROLE, m["inventory_original_stamp"], m["inventory_sha256"], MAXIMUM_NATIVE_BYTES,
+                m.get("inventory_original_flags"))
             require(len(raw) == m["inventory_bytes"], "supervision_original"); self.inventory = json.loads(raw); inv = self.inventory
             require(type(inv) is dict and set(inv) == _keys({"schema", "controls", "native", "code_manifest", "runtime_head", "policy_sha256", "nonce", "authority"}, profile)
                 and raw == canonical_json(inv).encode() and inv["schema"] == "si-native-supervision-inventory-v1"
                 and inv["runtime_head"] == head and inv["policy_sha256"] == _policy_sha(profile)
                 and inv.get("storage_profile") == (None if profile is LEGACY_V4 else _profile_id(profile)) and inv["nonce"] == observer["nonce"]
-                and inv["authority"] == authority() and type(inv["code_manifest"]) is dict and set(inv["code_manifest"]) == set(CODE_FILES)
+                and inv["authority"] == authority() and type(inv["code_manifest"]) is dict and set(inv["code_manifest"]) == set(_code_files(profile))
                 and all(type(value) is str and re.fullmatch(r"[0-9a-f]{64}", value) for value in inv["code_manifest"].values())
                 and hash_payload(inv["code_manifest"]) == m["code_manifest_sha256"], "supervision_original")
             controls = inv["controls"]
             require(type(controls) is list and len(controls) == len(POSITIVE_ROLES) - 2, "supervision_original")
             names = set(); self.raw_controls = {}
             for row in controls:
-                require(type(row) is dict and set(row) == {"name", "sha256", "bytes", "original_stamp"}
+                required = {"name", "sha256", "bytes", "original_stamp"} | ({"original_flags"} if profile is LOCAL_MAIN_V1 else set())
+                require(type(row) is dict and set(row) == required
                     and row["name"] in POSITIVE_ROLES - {MARKER_ROLE, INVENTORY_ROLE} and row["name"] not in names, "supervision_original")
                 names.add(row["name"]); limit = MAXIMUM_NATIVE_BYTES if row["name"] in RAW_ROLES else MAXIMUM_CONTROL_BYTES
-                body = self.read(row["name"], row["original_stamp"], row["sha256"], limit)
+                body = _read_profile_control(self, row["name"], row["original_stamp"], row["sha256"], limit,
+                    row.get("original_flags"))
                 require(len(body) == row["bytes"], "supervision_original"); self.raw_controls[row["name"]] = body
             require(names == POSITIVE_ROLES - {MARKER_ROLE, INVENTORY_ROLE}, "supervision_original")
             expected_stdout = b"".join(canonical_json(worker._worker_line(stage, m["child_pid"], producer_pid)).encode() + b"\n" for stage in ("entered", "completed"))
@@ -2370,6 +2489,7 @@ class _OriginalRead:
     def audit(self):
         self.directory.check(); self.native_audit(); self.audit_local()
     def audit_local(self):
+        _audit_profile_flags(self)
         for path, fd, pin in self.anchors: require(path.resolve() == path and _dir(os.fstat(fd), True) == _dir(path.lstat(), True) == pin, "supervision_original")
         require(set(os.listdir(self.proof_fd)) == POSITIVE_ROLES, "supervision_negative")
         for name, fd, seal, raw in self.files:
@@ -2378,7 +2498,9 @@ class _OriginalRead:
             os.lseek(fd, 0, os.SEEK_SET); require(os.read(fd, len(raw) + 1) == raw, "supervision_original")
             _require_file_immutable(os.fstat(fd)); _same(_stamp(os.fstat(fd)), seal)
             _require_file_immutable((self.proof_path / name).lstat()); _same(_stamp((self.proof_path / name).lstat()), seal)
+        _audit_profile_flags(self)
     def _named_originals(self):
+        _audit_profile_flags(self, named=True)
         self.directory.named()
         for path, unused, pin in self.anchors: require(path.resolve() == path and _dir(path.lstat(), True) == pin, "supervision_original")
         n = self.native
@@ -2396,6 +2518,7 @@ class _OriginalRead:
             info = (self.proof_path / name).lstat(); _require_file_immutable(info); _same(_stamp(info), seal)
         _same(_stamp((self.mount / "main").lstat()), _tuples(n["main_original_seal"]))
         require(not os.listdir(self.mount / "main"), "supervision_original")
+        _audit_profile_flags(self, named=True)
     def named(self):
         self._named_originals(); fds = []; primary = None
         try:
@@ -2433,7 +2556,7 @@ def _root_context_snapshot(reader, code, config, load):
         and type(load) is _LoadTransaction and not reader.fds and not code.fds and not load.fds
         and reader.directory.closed and config.directory.closed and load.directory.closed, "supervision_factory")
     profile = _profile_of(reader); _same_profile(profile, code, config, load)
-    return canonical_json(_tag({
+    value = {
         "reader": {"head": reader.head, "remote": reader.remote, "digest": reader.digest, "observer": reader.observer,
             "producer_pid": reader.producer_pid, "marker": reader.marker, "inventory": reader.inventory,
             "anchors": [[str(path), fd, pin] for path, fd, pin in reader.anchors],
@@ -2443,7 +2566,12 @@ def _root_context_snapshot(reader, code, config, load):
             "rows": {name: [fd, seal, hash_bytes(raw), len(raw)] for name, (fd, seal, raw) in code.rows.items()}},
         "config": {name: [pin, hash_bytes(raw), len(raw), digest] for name, (pin, raw, digest) in config.rows.items()},
         "load": {"rows": [[name, fd, seal, hash_bytes(raw), len(raw)] for name, fd, seal, raw in load.rows],
-            "nodes": [[str(path), fd, seal] for path, fd, seal in load.nodes]}}, profile))
+            "nodes": [[str(path), fd, seal] for path, fd, seal in load.nodes]}}
+    if profile is LOCAL_MAIN_V1:
+        flags = _ORIGINAL_READ_FLAGS.get(id(reader))
+        require(type(flags) is tuple and flags[0] is reader and set(flags[1]) == {row[0] for row in reader.files}, "supervision_factory")
+        value["reader"]["original_flags"] = dict(flags[1])
+    return canonical_json(_tag(value, profile))
 
 
 def _target(profile=LEGACY_V4): return "gui/" + str(os.getuid()) + "/" + _label(profile)
@@ -2624,14 +2752,17 @@ def _coordinate(head, remote, *, profile=LEGACY_V4):
             clock.check(); time.sleep(1)
         require(_terminal(kernel), "supervision_unknown")
         raw = _drain_private(master, raw); startup._tty_check(slave, observer)
-        try: observed = _validated_observation(raw, observer, digest, producer_pid)
+        try:
+            observed = (_validated_observation(raw, observer, digest, producer_pid) if profile is not LOCAL_MAIN_V1
+                else _validated_observation(raw, observer, digest, producer_pid, profile=profile))
         except BaseException: observed = {"status": "observer_unavailable", "failure": None}
         if kernel["exit"] != 0 or observed["status"] != "producer_complete_provisional":
             negative = SupervisionRefusal("REFUSED: supervision_negative")
             advisory = {"status": "negative_source_free_native_supervision", "target_pid": producer_pid, "actual_kernel_exit": kernel["exit"],
                 "producer_observation": {"status": observed["status"], "failure": observed["failure"]}, "authority": authority()}
             _ADVISORIES[id(negative)] = negative, canonical_json(advisory); raise negative
-        original_marker = _filtered_observation(raw, observer, digest, producer_pid)
+        original_marker = (_filtered_observation(raw, observer, digest, producer_pid) if profile is not LOCAL_MAIN_V1
+            else _filtered_observation(raw, observer, digest, producer_pid, profile=profile))
         _phase("root_verification")
         root_read = (_OriginalRead(head, remote, digest, observer, producer_pid, original_marker) if profile is LEGACY_V4
             else _OriginalRead(head, remote, digest, observer, producer_pid, original_marker, profile=profile))
@@ -2676,24 +2807,127 @@ def _coordinate(head, remote, *, profile=LEGACY_V4):
     receipt = object.__new__(_RootReceipt); _ROOT_RECEIPTS[receipt] = (scope, canonical_json(public), original_kernel, contexts, context_snapshot, object())
     value = object.__new__(ClosedNativeSupervision); row = (value, canonical_json(public), receipt, scope)
     _bind_profile(receipt, profile); _bind_profile(value, profile)
+    if profile is LOCAL_MAIN_V1:
+        _ROOT_CLOSURE_CLOCKS[receipt] = receipt, clock, clock.clock, clock.begin, scope, object()
     value._anchor = row; _CLOSED[id(value)] = row; return value
+
+
+def config_identity7_sha256(inputs):
+    """Config identity/bytes only; no timestamp continuity across reads."""
+    require(type(inputs) is _Inputs and set(inputs.rows) == set(_Inputs.ROLES), "supervision_factory")
+    return hash_payload({"schema": "si-native-config-identity7-v1",
+        "window": "independent_control_reads_not_original_timestamps", "files": {
+            name: [list(pin), hash_bytes(raw), len(raw), digest]
+            for name, (pin, raw, digest) in inputs.rows.items()}})
+
+
+def _load_window9_sha256(load):
+    require(type(load) is _LoadTransaction and not load.fds and load.directory.closed, "supervision_factory")
+    return hash_payload({"schema": "si-native-load-window9-v1", "window": "closed_original_load_transaction_before_initial_kickstart",
+        "files": [[name, list(pin), hash_bytes(raw), len(raw)] for name, unused, pin, raw in load.rows],
+        "ancestry": [[str(path), list(pin)] for path, unused, pin in load.nodes]})
+
+
+def _projection_source(value):
+    require(type(value) is ClosedNativeSupervision and _profile_of(value) is LOCAL_MAIN_V1, "supervision_factory")
+    public = value.public_summary(); original = _CLOSED.get(id(value))
+    require(type(original) is tuple and original[0] is value and value._anchor is original, "supervision_factory")
+    receipt = original[2]; record = _ROOT_RECEIPTS.get(receipt)
+    require(type(record) is tuple and len(record) == 6 and record[0] is original[3], "supervision_factory")
+    clocks = _ROOT_CLOSURE_CLOCKS.get(receipt)
+    require(type(clocks) is tuple and len(clocks) == 6 and clocks[0] is receipt
+        and type(clocks[1]) is _Clock and clocks[1].clock is clocks[2] and clocks[1].begin == clocks[3]
+        and clocks[4] is record[0], "supervision_factory")
+    reader, code, config, load = record[3]
+    _same_profile(LOCAL_MAIN_V1, receipt, clocks[1], reader, code, config, load)
+    _audit_profile_flags(reader, named=True)
+    require(public["storage_profile"] == "local-main-v1" and public["policy_sha256"] == MAIN_POLICY_SHA256
+        and type(public["actual_kernel_exit"]) is int and public["actual_kernel_exit"] == 0
+        and type(public["actual_child_exit"]) is int and public["actual_child_exit"] == 0,
+        "supervision_factory")
+    key = _prepared_key(reader.head, reader.remote, reader.digest, reader.observer, LOCAL_MAIN_V1)
+    hosts = _MAIN_HOST_ORIGINS.get(key)
+    require(type(hosts) is tuple and len(hosts) == 8 and hosts[0] is LOCAL_MAIN_V1
+        and hosts[3:6] == (reader.head, reader.remote, reader.digest)
+        and hosts[6] == hash_payload(code.manifest)
+        and tuple(name for name, unused in hosts[1]) == ("root-export", "main-receipt"), "supervision_factory")
+    flags = _ORIGINAL_READ_FLAGS.get(id(reader))
+    require(type(flags) is tuple and flags[0] is reader and set(flags[1]) == {row[0] for row in reader.files}, "supervision_factory")
+    files = {name: (seal, raw) for name, unused, seal, raw in reader.files}
+    marker9, marker_raw = files[MARKER_ROLE]; inventory9, inventory_raw = files[INVENTORY_ROLE]
+    require(hash_bytes(marker_raw) == public["marker_sha256"]
+        and hash_bytes(inventory_raw) == reader.marker["inventory_sha256"]
+        and tuple(reader.marker["inventory_original_stamp"]) == inventory9
+        and flags[1][INVENTORY_ROLE] == reader.marker["inventory_original_flags"], "supervision_original")
+    body = {"schema": "si-native-root-closure-projection-v1", "storage_profile": "local-main-v1",
+        "runtime_head": reader.head, "actual_remote": reader.remote, "policy_sha256": MAIN_POLICY_SHA256,
+        "spec_sha256": reader.digest, "nonce": reader.observer["nonce"], "producer_pid": reader.producer_pid,
+        "actual_kernel_exit": 0, "actual_child_exit": 0,
+        "marker": {"sha256": hash_bytes(marker_raw), "native_full9": list(marker9), "original_flags": _original_flags(flags[1][MARKER_ROLE])},
+        "inventory": {"sha256": hash_bytes(inventory_raw), "native_full9": list(inventory9),
+            "original_flags": _original_flags(flags[1][INVENTORY_ROLE]), "bytes": len(inventory_raw)},
+        "code_manifest_sha256": hash_payload(code.manifest), "native_inventory_sha256": hash_payload(reader.native),
+        "config_identity7_sha256": config_identity7_sha256(config), "load_window9_sha256": _load_window9_sha256(load),
+        "root_context_snapshot_sha256": hash_bytes(record[4].encode()),
+        "host_directory_originals": {name: list(pin) for name, pin in hosts[1]}, "authority": authority()}
+    raw = canonical_json(body).encode()
+    require(0 < len(raw) <= MAXIMUM_CONTROL_BYTES, "supervision_original")
+    return receipt, record, clocks, hosts, raw
+
+
+class RootClosureProjection:
+    __slots__ = ("_anchor",)
+    def __init__(self): raise SupervisionRefusal("REFUSED: supervision_factory")
+
+    def _binding(self):
+        try:
+            row = _ROOT_PROJECTIONS.get(id(self)) if type(self) is RootClosureProjection else None
+            require(type(row) is tuple and len(row) == 10 and row[0] is self and self._anchor is row
+                and id(self) not in _ROOT_PROJECTION_FAILED, "supervision_factory")
+            source = _projection_source(row[1])
+            require(source[:4] == row[2:6] and source[4] == row[6] and hash_bytes(row[6]) == row[7], "supervision_changed")
+            clock = source[2][1]
+            require(clock.last >= row[8][0], "native_proof_clock")
+            remaining = clock.check(); row[8][0] = clock.last
+            return row, remaining
+        except BaseException:
+            if type(self) is RootClosureProjection and id(self) in _ROOT_PROJECTIONS: _ROOT_PROJECTION_FAILED.add(id(self))
+            raise
+
+    def canonical_bytes(self): return self._binding()[0][6]
+    def remaining_seconds(self): return self._binding()[1]
+
+
+def project_root_closure(value):
+    receipt, record, clocks, hosts, raw = _projection_source(value)
+    require(not any(row[1] is value for row in _ROOT_PROJECTIONS.values()), "supervision_factory")
+    for name, original in hosts[1]:
+        path = MAIN_RUN / name
+        require(not os.listdir(path), "supervision_original")
+        _same(_stamp(path.lstat()), original)
+    remaining = clocks[1].check(); require(remaining > 0, "native_proof_deadline")
+    result = object.__new__(RootClosureProjection)
+    row = result, value, receipt, record, clocks, hosts, raw, hash_bytes(raw), [clocks[1].last], object()
+    result._anchor = row; _ROOT_PROJECTIONS[id(result)] = row; _bind_profile(result, LOCAL_MAIN_V1)
+    result.canonical_bytes(); return result
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="One registered source-free typed native-supervision proof")
-    parser.add_argument("command", choices=("prepare-proof", "run-proof", "coordinate-proof", "prepare-local-proof", "run-local-proof", "coordinate-local-proof", "capture"))
+    parser.add_argument("command", choices=("prepare-proof", "run-proof", "coordinate-proof", "prepare-local-proof", "run-local-proof", "coordinate-local-proof", "prepare-main-proof", "run-main-proof", "coordinate-main-proof", "capture"))
     parser.add_argument("--head"); parser.add_argument("--remote"); parser.add_argument("--spec-sha256"); parser.add_argument("--observer")
     args = parser.parse_args(argv); observer = None
-    profile = LOCAL_NATIVE_V1 if args.command in {"prepare-local-proof", "run-local-proof", "coordinate-local-proof"} else LEGACY_V4
+    profile = (LOCAL_MAIN_V1 if args.command in {"prepare-main-proof", "run-main-proof", "coordinate-main-proof"}
+        else LOCAL_NATIVE_V1 if args.command in {"prepare-local-proof", "run-local-proof", "coordinate-local-proof"} else LEGACY_V4)
     try:
         if args.command == "capture": raise SupervisionRefusal("REFUSED: supervision_source_refused")
-        if args.command in {"run-proof", "run-local-proof"}:
+        if args.command in {"run-proof", "run-local-proof", "run-main-proof"}:
             observer = _Observer(json.loads(args.observer), args.spec_sha256)
             _bind_profile(observer, profile)
             result = (run_registered(args.head, args.remote, args.spec_sha256, observer.config) if profile is LEGACY_V4
                 else run_registered(args.head, args.remote, args.spec_sha256, observer.config, profile=profile))
             observer.emit(result=result)
-        elif args.command in {"prepare-proof", "prepare-local-proof"}:
+        elif args.command in {"prepare-proof", "prepare-local-proof", "prepare-main-proof"}:
             value = (prepare_bootstrap(args.head, args.remote, json.loads(args.observer)) if profile is LEGACY_V4
                 else prepare_bootstrap(args.head, args.remote, json.loads(args.observer), profile=profile))
             print(canonical_json(value))
@@ -2706,7 +2940,7 @@ def main(argv=None):
         if observer is not None:
             try: observer.emit(error=error)
             except BaseException: pass
-        elif args.command not in {"run-proof", "run-local-proof"}: print(canonical_json(_tag({"status": "refused", "failure": failure_summary(error), "producer_diagnostic": advisory_summary(error), "authority": authority()}, profile)))
+        elif args.command not in {"run-proof", "run-local-proof", "run-main-proof"}: print(canonical_json(_tag({"status": "refused", "failure": failure_summary(error), "producer_diagnostic": advisory_summary(error), "authority": authority()}, profile)))
         return 2
 
 

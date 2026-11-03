@@ -30988,3 +30988,64 @@ Final software byte identities before commit:
 | Main receipt tests | 38170 | bfe6b5e5cec7734de54550c7f11890a9294ca7083837ecf59ef735257603637f |
 | conservative basis | 12774 | b438f4f6b6410acd35b8cc8bf305d63831c8bdeea4818cff617ce4c13c2b4b96 |
 | conservative basis tests | 15638 | 0c70808ce59f6bb2b35f6aee46b5db7c4445164934ff89c0eb10335fcc58d5e9 |
+
+### 139.6 Actual new Main custody closure and original anchor
+
+The entire preparation was committed as
+a71d21b6a64b2a558ac32f93928dac35cb7e2d87. All authors froze. Main's automatic
+observer began its ORIGINAL clock before the fresh code/root/branch/HEAD/clean/
+actual matching remote/namespace/GUI-label/anchor preflight. Committed/current
+eight-path mapping35AE and Main/native policies matched. Main invoked the
+canonical Main coordinate role ONCE; no manual adaptor was prepared while
+the process ran.
+
+ACTUAL original outer CP10833 exited0/signalnull, stderr0, stdout1690 bytes/
+SHA256027dcdf095446930770777a537868896467bfd7d9f6608d2eec6c83ee3d20f41.
+Original automatic close69276.51258299872ms, final packet validation
+69276.7517909985ms and final anchor-construction check69276.76266600005ms
+were all below300000ms. Failure list empty, fixturefalse. Later agent polling
+time is not substituted for any original event. Operation450982dbc12b3b910573decea24b703f.
+The genuine Root wait0/worker0/kernel0, original RO handoff, both ready/closed
+frames and all original context/code/native/clock barriers completed. Public
+status remains closed_candidate_requires_outer_actual_exit_and_committed_anchor,
+not source admission.
+
+Original Main receipt3072 bytes/SHA256
+6295752e10b58d533ca7d69ad8b8a2598042d18365768f46d90ce939ab94849e,
+original full9 digest
+d174bfdd0575d002fcb01b50f0d5452b7ed0478af03222712d4176dd832f44f6,
+original directory9 digest
+4a9749770e078dc6c4097cb2e5996adb10cbf2198f9a9873717733105e384456.
+Original Root projection1909 bytes/SHA256
+57e5e7bd8d32353be625b348f6f7a75fb12db18c6b4e2b157d71de9a6b639c4a,
+original full9 digest
+07f7e6ccc428c550ca11295923c366dd22ef83d236a7b139926c55036f3af669.
+Main then independently opened BOTH original files read-only/nofollow,
+compared their current descriptor/name full9 against these EXPORTED original
+digests before/after reads, original flags2/owner0600/singlelink and exact
+bytes/hashes; all passed. No new stamp became an original seal.
+
+Only after actual outer0, Main creates the separate committed anchor
+research/short_interest_etf/specs/native_main_receipt_anchor_20261103_v1.json
+from that original observation. It binds the original raw stdout including LF,
+original receipt/projection/directory digests and flags, and original
+final-validation elapsed69276751791ns. The later final anchor-clock check also
+passed as recorded above. The file contains only source-free custody hashes,
+fixed policy/code identity and honest zero exit/deadline observations. No
+licensed/private source data or old actuals enter it.
+
+The anchor must be committed clean before the held loader is invoked; that
+loader's ACTUAL result is still pending at this entry. No JSON is cast back
+into Root, no mounted epoch after reboot is recreated, no SourceAUTH is
+released, no old8START/16MiB floor is refunded and no data is deleted or
+modified. Native images/jobs and all earlier failures remain. This is an actual
+custody-only success, not source qualification or last-step-before-QC readiness.
+No QC/Safari, purchase, key/provider/claim/START/charge/outcome or push occurred.
+The next step is one read-only held-loader check of this committed anchor,
+then explicit basis/storage/source composition and offline USB qualification
+before more downloads.
+Main anchor+receipt/active-document selection144 passed1.33s with OS networking
+denied. Canonical committed-anchor candidate941 bytes/SHA256
+1c9d897107babae6c0054232a7611195f28640020e8c265d2a2f1c44d3886511;
+its exact data came from the original actual observation, not a new stat.
+Whitespace passed; SDK/module/test bytes are unchanged from preparation.

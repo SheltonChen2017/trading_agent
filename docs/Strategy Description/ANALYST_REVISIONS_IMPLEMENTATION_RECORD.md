@@ -2389,11 +2389,17 @@ validated prices before continuing all six matched cells. The owner explicitly
 waives Claude review of section 335. This supersedes334's source-preparation
 endpoint, but creates no automatic source/pin refresh, spent-protocol renewal,
 shared-resource lease or formal/PIT/paper/live clearance. The new source
-investigation does not contact QC/Safari until actual source/identity/coverage
-gates permit a separately frozen submission. A needed provider-only discovery
+investigation MUST NOT contact QC/Safari until the owner explicitly releases
+the later335.17 hold AND actual source/identity/coverage gates permit a
+separately frozen submission. A needed provider-only discovery
 has its own exact source/rights/claim/deadline/contact freeze; metadata success
 does not clear coverage or strategy gates. See335.13–335.16 for actual FirstRate
-findings and the bounded corporate-action recovery.
+findings and335.19–335.27 for retained corporate-action evidence, actual J's
+75-definition dictionary success and the unresolved identity/price barrier.
+This is an offline checkpoint, NOT backtesting readiness. No further generic
+price/existence capture, spent FIGI replay, alias inference or selector around
+the source stop is the next step. The specific original/share-class/global
+ownership and complete daily-price evidence described in335.26 is required.
 
 Section 328 is Claude's independent review of `3c905d42..0d38c59d`, the
 seventy-four Codex commits of sections 323 (Mac recovery) and 324–327.
@@ -4386,6 +4392,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-28/29 PDT | Codex owner-directed Analyst-only QC cleanup | `e18e306959e9172e23fff78b21358b0628149104` -> this final handoff commit; FIVE recorded predecessors through `0f637a41`, SIX total | No incoming Claude review; bounded cleanup scope and standing waiver, same-round advice is not independent acceptance | Catalog300,134namespace plus one corroborated legacy;13Analyst projects recoverably removed:9verification,2zero-run,2failed-only. B first-delete postcondition2 retained; D confirms it, E0 confirms remaining12. Protected/successful/other-lane projects excluded | Latest232focused passes5.48s; pre-A207/pre-B202overlap; code compilation/inverse/mutation evidence in332; actual A0/C0/B2/D0/E0 and pinned reports; no full suite.204dispatch attempts,13deletes;337/259/53/699 unchanged | Four P2s corrected prospectively; original refusals/ambiguity and historical successful R280 retained; no strategy/source/financial gate clearance | ONE nonforce matching-lane final push; cleanup concludes. QC/Safari/backtesting remain held pending owner release and exact subsequent source/run gates; no monitor/automatic continuation |
 | 2026-10-29 | Claude (Windows host) review snapshot R333 of `6076ef20..57bd3213`: sections 323–328 confirmed through the Mac reviews, the fourteen owner-waived Codex commits of sections 329, 331 and 332 reviewed after the fact, sixth QC census, three fixes | `57bd3213` -> `60580c90` -> `9a18d8e2` -> this record commit | Review of the ninety-three commits pushed since `6076ef20`: the Mac session's section 328 and 330 and Codex's counter-reviews confirmed by this host's gates; the fourteen tail commits (W5 native coverage tooling, the section-331 corrections, the thirteen-project QC cleanup) reviewed individually (R333) | Synced the lane clone by fast-forward from a clean tree. Immutability of V16–V19, the cap-90 bridge runtime and the three trust roots re-verified. The R-298 ledger chain reproduces to 337/259/53/699. Endpoint census of every changed script with both quote styles: eleven single-launch helpers, two plan-bound delete executors, no live, order or account endpoint. QC administrative reads (zero looks) confirm the thirteen recycled projects by name and time, find one unbooked R298 rerun, and find the W5 source project without its `main.py` (P2, cloud state, not repairable here). Fixed: three EOF blank lines in place with digests recorded, the rerun booked to **338/259/54/699**, stale ranges corrected. | Real tree at `57bd3213`: record and active-document gates **86 passed**; final record bytes **86 passed**; `compileall` exit 0; `git diff --check` clean on `6076ef20..HEAD` after the fix. Complete lane suite at `3c905d42` (owed from R323): 3422 failed, 15522 passed, 1357 skipped, 3182 errors in 3:20:42, host classes; at `57bd3213`: 27,253 collected with 100 collection errors; **not run to completion at push time**: the detached run started at 10:56 local on 2026-10-29 was stopped after the dependency diagnosis above, and the restart with a corrected environment was still pending at this push; the previous tip's counts are recorded in this table and this tip's counts are to be recorded in the next round. | 0 P0, 0 P1. `ARV2R333-001` (P2, open for Codex): project 38522505 has no `main.py`. `ARV2R333-002`/`-003`/`-004` (P3, corrected). `ARV2R333-005`/`-006`/`-007` (P3, documented). Carried P2s unchanged. | Codex counter-reviews R333, re-establishes Main under a new freeze before any coverage job, and reconciles the booked rerun by identity; the hold of 329.10 remains; no attempt, launch, replacement project, six/eight cell, paper/live deployment, broker, funded-account, real-order or trading action is authorised. |
 | 2026-10-30 | Codex R333 counter-review and exact public Main recovery preparation | `10b05ccac3b71af18599343a5b29975e9abee344` -> `b52fb5892c6c9f1c133bb94ba8c91ba279de5595` -> this final handoff commit; TWO total | All three incoming Claude commits accepted, record after five documentary corrections/qualifications; every R333 finding dispositioned in334 | Exact6892byte original Main reconstructed from pinned public sources without spentA read; tested public upload candidate and existing D pins retained | Root184distinct focused passes8.06s; exact AST/byte equality for three whitespace changes, public pins and memory compilations; final document repeat recorded below; no full suite | Missing-Main cloud report remains pending fresh authentication; other lane active in Safari/chat, availability unresolved; no QC request/upload/compile/job/result and338/259/54/699 unchanged | ONE matching-lane final push at shared-resource barrier; remaining source repair/readback, coverage and six/eight continuation await availability plus exact current run gates; no automatic monitor or other-lane interference |
+| 2026-11-03 | Owner-waived FirstRate parser, REMX partition and five-stock coverage recovery under QC/Safari hold | `381ae7ad54e35b05bc1ca6455abff7388e23c09d` -> ELEVEN local predecessors through `26dfac6ec8948c8cf8dedfe1ebeca3687058159e` -> this section335 final handoff commit; TWELVE total | No incoming Claude range; own implementation and same-round advice are not independent acceptance | A/B/C failures retained; D REMX field diagnosis, E stock coverage, F exact gap metadata, H predicate diagnosis, I event association and J dictionary each passed once; G retained HTTP200 but failed local row scope. Four stock envelopes still incomplete/absent; five identity stops unchanged; no accepted price book or strategy run | Focused stage results and nonadditive overlaps/failures in335; latest287distinct passes2.37s, four memory compiles and final document/diff/status checks; no full suite, raw-row disclosure or spent replay | I335-001..017 corrected/qualified prospectively; old refusals/source gates preserved; no QC/Safari/capacity/project/job;338shared/259development/54infrastructure/699cells unchanged | ONE matching nonforce final push at the concrete identity/coverage barrier. QC/Safari stay prohibited until explicit owner release; no next cell, source-stop bypass or readiness/financial clearance |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -73308,3 +73315,157 @@ nested sandbox application. Actual J's native-worker policy must still apply.
 Same-round advice is not independent review. No J DATA/control/credential/API
 access occurred at this freeze. QC/Safari remain prohibited by335.17 regardless
 of J outcome; floor338/259/54/699 and every source/financial gate are unchanged.
+
+### 335.25 Actual J completed once; dictionary is retained, not interpreted
+
+At clean freeze26dfac6ec8948c8cf8dedfe1ebeca3687058159e the sole sanitized
+J parent exited0. Exactly one existing Sharadar Keychain lookup attempted/
+completed, one application dispatch observed HTTP200, session closed and local
+key reference cleared before one actual native dictionary worker exited0.
+The worker's exclusive marker and original inherited-descriptor/held-named
+checks authenticated; stderr was0. Sole native-denied stdin-only validator,
+supplied externally observed parent0, exited0/output_authenticated=true/
+accepted=true with matching external binding/report/worker/capture receipts.
+J/capture/worker/validator are now SPENT/frozen. No control or DATA was reopened.
+
+Report5087bytes SHA256
+2ccb9768b9a92a0b91d736c463f2e3d0c077c6a296d4c31142cd8830e9e5a5ff;
+worker stdout1997bytes SHA256
+9086f5a2a155885268bba43667b82eadc5529f850219d30b3daea8cd94aa30e6.
+New retained DATA under artifacts/analyst_revisions_v2/firstrate/R335-20261103-J:
+
+|Leaf|Bytes|SHA256|
+|---|---:|---|
+|response-00.csv|50967|ad3acf93fedbdf7f4bd3af47ca7347beca615358a1736382360ba048ebfb415f|
+|transport-00.json|336|a2aa22f2b22275f4972594b4dc2661569df2786844bd298b47070278db9c4dc2|
+
+These exact DATA leaves may support only a separately justified/frozen future
+consumer; they are not permission to replay J, inspect old controls or contact
+the provider again. The204-byte static plan pin remains
+51ba55c0ec99b69bba99f099983684e7036ec413246f9f65f3f7835dbfce45b9;
+capture-receipt SHA256
+592ba194651bf86e7e85aeffdc586edeba02c9f44521b38e6f5c382a5a819d45.
+The complete dictionary observation has75 rows/75 unique primary keys, zero
+repeats/conflicts, zero blank indicator/description fields, and lower-case
+header aliases accepted exactly as frozen. Both flag columns contain75N and
+zeroY/blank/other. No raw metadata definition or security row was emitted.
+The definitions' economic directions were NOT interpreted; no alias, dated
+identity interval, payoff, price or source admission was produced.
+
+G and J together made two application dispatch attempts in this round, each
+with HTTP200; physical provider_request_count remains null/unknown. Their
+different endpoints/purposes and G's local failure are retained. This is not
+evidence that another vendor's subscription is active or that every Sharadar
+endpoint/history entitlement is sufficient. No USB access followed F; no QC/
+Safari/capacity/project/compile/job/result or strategy action occurred anywhere
+in335. No look/cell event is booked;338/259/54/699 stays fixed. The pre-J86
+document checks1.08s overlap the latest287selection. All formal/PIT/source/
+financial false flags remain false.
+
+### 335.26 Concrete remaining barrier and bounded next action
+
+The current FirstRate result is NOT a usable replacement price book. One of
+five stock date envelopes is complete; three have73/151/46 missing required
+dates in their current candidates and one has no candidate/all417 dates
+missing. The old case4 delisted candidate has0 overlap. This is unchanged
+after metadata diagnostics. Reference and possible held-NAV demand cannot be
+replaced by a count of present dates, price existence, stale marks or a changed
+selection. Actual selected/held paths have not been evaluated in this round.
+The prospective format/router tests do not materialize or admit actual data;
+the concrete production reader/price-book publication remains unimplemented.
+
+Public-source/record review also confirms why a fresh Sharadar close query is
+not an identity remedy. Section326.13 corrected74 of79 vendor refusals but
+left4 identity_missing and1 global_collision. The frozen
+arv2_r298_price_lineage_routes._price_route first requires a unique intersection
+of original permaticker AND original FIGI, then globally unique perma/FIGI/
+ticker/CUSIP ownership. The raw-price planner maps those five refused/no-route
+cases to pending_native and excludes them from vendor queries. Section327.7
+found original perma/CUSIP agreement, but four changed current FIGIs; case0's
+second same-FIGI physical stock owner differs in original perma/CUSIP/ticker/
+category/quality. Display-ticker prices cannot clear either stop.
+
+The apparently useful OpenFIGI share-class alternative was ALREADY examined
+in spent R327-H, not left untested. Section327.5 records one same composite/
+share-class pair and FOUR unresolved_composite_disagreement pairs. Public
+arv2_r327_public_figi_hierarchy.py explicitly distinguishes share_class_only;
+its validator requires unresolved_composite_disagreement to mean BOTH composite
+AND shareClass equality are false. Root checked that code and historical record
+without reading private H data or making another API call. Do not relaunch H,
+assume share-class equality, infer ticker reuse/merger/vendor corruption, or
+substitute a new identity policy to seek a pass. This is a current bounded
+observation, not historical-interval proof or a statement that every FIGI was
+queried at every date.
+
+Additional enum joining alone would not repair this barrier: exact I-to-J joins
+could index unique/missing/conflicting definitions privately, but cannot turn
+unknown event text into same-security proof. No new bookkeeping-only consumer,
+prose heuristic, inferred alias or generic existence-only price request is
+created just to report another completed diagnostic. Interpretation must bind
+the actual normative definition plus dated original/share-class/security and
+counterparty evidence; an acquisition counterparty is not an automatic alias.
+The five original binding hashes and all reference/NAV intervals stay fixed.
+
+The required external evidence is specific: an authoritative dated identity
+bridge for the four disagreements and an unambiguous original owner for the
+collision, then complete authenticated exchange-close coverage for every
+required stock/date under a consistent whole-binding source, with any actual
+terminal payoff supported separately. FirstRate's exact RAW close convention
+and the20 fractional REMX ETF-era volumes also remain source questions; never
+round volumes, call the old323-row quarantine their remedy, or substitute
+adjusted prices. Existing Sharadar fund roles remain selected; no FirstRate
+REMX price is admitted. No additional subscription is yet shown to solve
+these identity gaps, so no purchase or routine access acknowledgment is asked.
+
+This is the genuine offline source barrier, not a QC storage/API error and not
+backtesting readiness. Owner QC/Safari hold335.17 is independently binding even
+if new evidence later resolves the data. Preserve the separately prepared Main
+repair, all cloud/spent protocol facts and every source/readiness false flag.
+Next admissible work uses concrete new dated identity/price evidence under a
+separate exact consumer/source freeze; QC release alone does not authorize a
+launch. There is no new attempt, retry, review waiver expansion, source-pin
+refresh, selector, six/eight cell, deployment or efficacy claim here.
+
+### 335.27 Outgoing per-commit handoff and single-push endpoint
+
+No incoming Claude commits are counter-reviewed in this round. Every row below
+is Codex implementation/documentation under the owner's current scoped waiver;
+same-round advisory checks are not independent acceptance. The exact continuous
+range is381ae7ad54e35b05bc1ca6455abff7388e23c09d..this final handoff commit:
+
+|Commit|Disposition and operational status|
+|---|---|
+|89c27bac89551b20a412e359601a6e92eded35ca|Retain initial parser/REMX/one-shot coverage candidate and tests; prospective corrections/failures recorded, not retroactive source acceptance.|
+|deb318f9232217ec31ee4f1d68b8d878aa07d1fe|Exact A freeze; actual line-ending failure retained and A spent.|
+|11b71b39d2f403f7984882404137192fc381672b|Additive complete-final-record M2 parser/caller; not evidence it fixed the actual mixed-ending cause.|
+|fad83253f253e0721fa88b5d80264dc1828cfd34|A failure and exact B freeze; actual B mixed-ending refusal retained/spent.|
+|0dfd5f17591803dbe9288953065c7de0cd37c1fd|M3 per-record separators/exact C freeze; C reached REMX volume refusal and is spent, not successful coverage.|
+|7699f6b6d619bc77410432a4fe4de4d1512767f7|Separate D/E purpose/freezes and prospective strict format/router. D/E observations passed once; actual grid remains incomplete/unadmitted.|
+|eb3a3d3ad3c6bc48ba0add1ce330584c01bc583a|D/E actual dispositions and exact F metadata freeze. F passed once; metadata is not a holding lifetime or price source.|
+|cd3fd302e53a40a8478ea36c07899d53c1f62d87|F outcome, owner QC/Safari hold and exact G discovery freeze. G HTTP200/local row-scope refusal preserved; no remaining G queries executed.|
+|347c8dc32fd57bf20a5fae69108707fe3ccc41e0|G failure DATA pins and exact H diagnosis freeze. H passed once and isolated the contra-text lexical stop.|
+|108fce4e0cea38e45fb1587095be1ce6e699f148|H result, additive opaque-contra v2 and exact I freeze. I passed once; all33 rows retained, zero aliases/prices admitted; v2 network producer uninvoked.|
+|26dfac6ec8948c8cf8dedfe1ebeca3687058159e|I outcome and exact J dictionary freeze. J passed once with75 definitions; actual pins/result recorded in335.25, semantics/source identity unresolved.|
+|This final handoff commit|Retain J actual/validation, live owner hold, precise unresolved identity/coverage barrier, nonadditive focused evidence and one contiguous push-ledger row. No next diagnostic or strategy operation.|
+
+Exactly TWELVE total commits are to be included in ONE nonforce matching-lane
+final push from the designated root/branch. No push has occurred yet at this
+recording point. Pre-final live remote and tracking ref still equal the original
+381ae7ad54e35b05bc1ca6455abff7388e23c09d. Recheck immediately before final push;
+stop/reassess any concurrent change. No shared/root/other-lane file is changed;
+USB originals/private evidence and every old used source remain intact.
+Final validation below is limited to the new document changes/diff/status;
+the latest287distinct focused source/document passes2.37s and four memory
+compilations stand without rerunning spent operations or a complete suite.
+
+Final86document/record checks passed1.10s; these repeat the86 already included
+in287 and are not additive. Working-document diffcheck passed. The full outgoing
+range diffcheck exited2 on exactly two new blank lines at EOF in frozen tests:
+test_r335_firstrate_prices_v3.py:526 and
+test_r335_firstrate_stock_coverage.py:637. I335-018(P3 documented/open): preserve
+these already pinned historical test bytes rather than silently rewriting the
+used C/E freeze evidence. There is no claimed green range check; no operational
+source or behavior defect follows from those two EOF blanks. This limitation
+does not clear any source/readiness gate. Final exact-document repeat, root/
+branch/HEAD/status, remote-baseline and commit-count checks precede the one
+push; source tests need not be repeated after this document-only change.

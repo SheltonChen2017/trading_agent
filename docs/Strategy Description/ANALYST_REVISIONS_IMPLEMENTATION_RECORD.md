@@ -73695,3 +73695,229 @@ All are preserved here. A copied-globals probe that failed for the wrong
 environment reason is not sensitivity evidence. Native child tests prove
 their scoped synthetic behavior under inherited denial, not whole OS isolation
 or operational market behavior. Same-round advice is not independent review.
+
+
+### 336.4 Actual K completed: normative definitions now available
+
+At clean0b78b00c7cf6a75cf21044a8aaaffee852c59a21 the sole K parent0/child0
+and sole native-denied stdin validator0 authenticated the matching result.
+Marker authenticated, no worker stderr and original guard normal return.
+K/worker/validator are now SPENT/frozen; no control/DATA reread or retry.
+Worker stdout13155B SHA256
+ec4286b96158fdcdbc76cde66b0fd4300668e6e70eb4bb99f7db1c4aacb517b3;
+report13804B SHA256
+6430ce4e54746272084707db462b10fbc7bee06af3c8df8bd7b6f663792ac66d.
+The bounded generic packet matched14 exact action codes to14 unique normative
+definitions, with0 missing/repeated/conflicting codes. No instrument row,
+identifier, case association or event frequency was emitted. K itself did not
+interpret definitions or apply identity/financial semantics. Root then reviewed
+this already captured generic documentation for a prospective exact-rule
+consumer; this is Codex specification review, not independent acceptance.
+
+The documentation makes several material distinctions explicit: an ACTIONS
+primary ticker is the current DATASET ticker and may differ from the ticker
+as of an event; a historical ticker change requires both from/to records.
+SPAC unit separation links a prior UNIT to current COMMON, not an automatic
+same-security alias. Relation/merger/acquisition counterparties may be different
+securities. A delisting or merger value can be market capitalization and must
+not be fabricated into per-share cash. Name/SIC changes alone do not establish
+security continuity. The exact row pins below, not prose keywords, bind N's
+prospective rules.
+
+### 336.5 Actual L completed: fractional pattern matches reporting transition
+
+At the same clean freeze sole L parent0/child0 and sole native-denied stdin
+validator0 authenticated the matching completed observation. L/worker/reader
+are SPENT/frozen. Worker stdout2472B SHA256
+149441d6d2e5df84182f20e780486cfc8508aab54a1e82d5a4dce3f3faadfa56;
+report2362B SHA256
+536025330bbae066181efb66625f9723911ddda67f74c8f2f8ae94e4dfc9107c.
+New DATA firstrate/R336-20261103-L/private-diagnosis.json is9781B SHA256
+d12eafcc6298f884966a0f88fa142dcc078bcf415a0353586185fc4286e2034a.
+
+All4339 original rows and323/4016 partition validated under unchanged source
+pins. Among the20 fractional ETF-era volumes,0 are before February23,2026,
+1 is on that date and19 are after. Effective decimal scale is4 for1 row,
+5 for1 and6 for18; all20 lie exactly on the micro-share grid, with none over
+six effective decimal places. Original source lines/terminators are retained
+privately; no token or value was rounded, normalized or replaced.
+
+This timing/precision is STRONGLY CONSISTENT WITH the documented fractional-
+share reporting transition, and the universal claim that RAW bar volume can
+never be fractional is not a sound corruption test. This is a qualified
+inference, not proof of FirstRate's actual feed path, unit choice, value
+correctness or official-close convention. The FirstRate card still documents
+integer volume; the regulatory separate-field convention does not silently
+rewrite that vendor contract. L's cause/feed/unit/price-admission flags remain
+false. Keep the source evidence and existing323-row quarantine; the latter
+does not explain these20 later rows. Existing Sharadar fund routes remain
+selected. Another observation-only parser would add no price coverage, so none
+is created just to repeat L. A future real FirstRate consumer would require a
+separately justified Decimal-volume compatibility/source policy; whole-share
+order quantities must remain distinct.
+
+### 336.6 Actual M completed: original tables agreed; collision was present
+
+At the same clean freeze sole M parent0/child0 and sole native-denied stdin
+validator0 authenticated the matching completed observation. Both source
+guards returned normally before publication, all four exact DATA byte pins
+matched, and no worker stderr occurred. M/worker/validator are SPENT/frozen.
+Worker stdout27584B SHA256
+cdba81ac61279d976c9c26e757a2c4087f1fd9be33c2aa3010b43e0dc3d363a4;
+report27473B SHA256
+14a41444839bd07f0d7d5d7bc78c59b006c6f916315dbd0dd59e209c7bad8941.
+New DATA identity_recovery/R336-20261103-M/private-diagnosis.json is71708B
+SHA256ed177bf0b7b8ec5683d3bda27ef69c82b72ef97b57efa8e3db5605effde4044a.
+
+The full original74150-row/28-field catalog authenticated, with74150 distinct
+full-row digests and0 repeated full rows. This operation READ the original
+catalog bytes privately; it is not a no-private-byte or metadata-only claim.
+Each of the five original SF1 rows reproduced exactly once.
+
+|Case|Related original rows by fundamentals/stocks/funds/other|Original/current finding|
+|---|---|---|
+|0|2/2/0/1|Both original stock owners already share the original FIGI; only one matches original perma/CUSIP. Both retained current candidates have an exact original perma/FIGI/CUSIP counterpart. The collision is present in the original snapshot and is not removed by choosing the original stock table.|
+|1|1/1/0/1|All three original table scopes agree original perma/FIGI/CUSIP. Current candidate retains perma/CUSIP tuple but its FIGI differs.|
+|2|1/1/0/1|Same original cross-table agreement and current FIGI disagreement.|
+|3|1/1/0/1|Same original cross-table agreement and current FIGI disagreement.|
+|4|1/1/0/1|Original table scopes agree; current perma agrees but FIGI differs and the full current CUSIP tuple is not identical to the old tuple. Prior subset evidence is not erased.|
+
+No selected related owner has a malformed-vocabulary poison token. These are
+physical/identifier observations, not proof that two different permas are
+different issuers, that current rows are correct, or of when/why the vendor
+changed a mapping. The original SF1-versus-stock-table mismatch hypothesis
+is NEGATIVE for these four changes: simply copying the original stock FIGI
+would not fix them. Historical intervals, original/current equivalence and
+global collision remain unadmitted. No original binding is rewritten, no
+FIGI query is replayed and no price-source switch follows.
+
+K/L/M used no provider/credential/QC/Safari/capacity/project/job call. L alone
+read its exact USB sources with native write denial. Floor338/259/54/699 and
+all source/financial/strategy readiness false flags remain unchanged. The
+pre-freeze86document checks1.09s overlap root329, not additive.
+
+### 336.7 Prospective N decision: apply exact meanings to retained evidence
+
+The next useful step is deterministic evidence classification, using the
+now-reviewed generic meanings plus M's actual original-ownership evidence.
+Permit IMPLEMENTATION ONLY here; no N DATA/control read or operation is yet
+authorized before its separate committed exact run freeze. It must preserve
+all33 I rows and5 original whole-binding hashes, consume only exact I/J/M
+DATA, retain complete private source/event/ambiguity records and emit fixed
+families/counts/temporal/predicate matrices. It must not invent aliases,
+security intervals, acquisition payouts, missing prices or eligibility edits.
+
+The root-reviewed normative rule anchors are exact generic J rows:
+
+|Indicator|J row|Full generic row bytes/SHA256|Meaning relevant to recovery|
+|---|---:|---|---|
+|acquisitionstock|43|832/fd4525b5f8d8ac39b70d88bfe8ea092db2f6202e107fd014f78bc8dedca7e441|Primary is non-survivor, contra is consideration security; ratio is not applied.|
+|delisted|48|481/a1c549f73280ffee80d0b283e598a873e68fba820b2e40c316cf7e6eb4ab10d7|Last-trade date; market-cap value is not cash payoff.|
+|listed|54|474/f15e58ec595be71e42597064155c0f803d21a7a634c4ca69b47039dff420d7dd|Listing date observation, not an automatic eligibility rewrite.|
+|mergerfrom|55|533/fb70da410dee6ecf90af280a486e229f057ac9d8eeeb61fcbc723f10739c42cd|Primary survivor, contra non-survivor; value is non-survivor market cap.|
+|mergerto|56|529/758e77f88350dcd74a6e0eb83c434a00af9e2352ffc0cf28fb23b3f45150b3e0|Primary non-survivor, contra survivor; different securities, no alias.|
+|namechangefrom|57|593/dc2716dc656de0ce3b2cee46302e1d5a3ec2252c5ebc175646dd230c6cd35f20|Current dataset primary; prior name in contraname; pair with to.|
+|namechangeto|58|523/3a050fe3f0d2ae52cd5b20e566860dcb73cd138a9b0413584d6177ee30b9e176|Current dataset primary; new name as of date in contraname.|
+|relation|60|429/612bfa86b955c33c1da26e5bad571cc058d10eab277f1d8cca1fe58c229342c8|Primary/related securities of one issuer, not same-instrument proof.|
+|sicchangefrom|64|647/78f8fa1c80a1498f5e8030612da7f9f490294610394b0701f8da0a2f5df89fb3|Prior industry code/title; pair with to, no identity inference.|
+|sicchangeto|65|606/f2b2959a9972babf059d4b9ad63bf30164763f4e057c505e254378767a9056c2|New industry code/title as of date.|
+|spacmerger|66|508/f44b221f94b5d94d8c6c1df32f71380ecee796ece56cdcd67a84986dc6aba819|Business-combination effective date; SIC change separately recorded.|
+|spacunitseparation|67|524/064c1ae7604eb0a7668675653390911d94692e574c83d8dbd15182663c4d9540|Current common versus prior unit; unit bars are not common aliases.|
+|tickerchangefrom|72|711/7290011eb478ad9b9cc060e77b921b9d86c0b33d3372d57987eb4b3e63accdb2|Primary is current DATASET ticker; contra is prior symbol as of effective date.|
+|tickerchangeto|73|711/a69e48795e3693fa4145d6c3674edfdad5cfb8c25babd340b67a9cf251647961|Primary may differ from then-new symbol; contra is new symbol as of date.|
+
+Ticker pairing requires exact same dataset-primary and effective date with
+exactly one supported single-literal from record and one to record. Missing,
+duplicate, conflicting, opaque and unsupported pairs remain unresolved; do
+not make a Cartesian product or guess direction from the current primary.
+Name/SIC pairs similarly remain metadata and cannot prove ticker continuity.
+All source unknowns/conflicts are retained. Binding these explicit reviewed
+definitions is not independent master/source/price admission or a strategy
+performance observation.
+
+
+### 336.8 D2 exact N evidence-classification freeze
+
+New held N sources/tests:
+
+|File|Bytes|SHA256|
+|---|---:|---|
+|scripts/arv2_r336_action_semantics.py|30955|d95bfb69b9383306bbee8c83ac34d8c22fb8e9ed9cd33500c886742b8c652bbe|
+|tests/analyst_revisions_v2/test_r336_action_semantics.py|19375|8049ec5a212d5794b9d369fcb6d2285a2a56c7a6b3d7cf3464c3d6e8afdf0eb8|
+|scripts/inspect_arv2_r336_action_semantics.py|34777|e064d30f43a3bb5f65c0b6826ed325fc90aee5ec3a7940413a33057af0383360|
+|tests/analyst_revisions_v2/test_r336_action_semantics_caller.py|22830|a86a49196dea644d1dbfad65f95bb937cb2687f5b93c8b94a92447b59617d637|
+
+Canonical pure profile5562B SHA256
+752b75a4f750c2c1c85c437c22bb22061735a65d77b2f53cce2de162f9bdf7cd;
+caller profile3513B SHA256
+7d2a6a00bf903baa7fa04b29799d07ff59ff669b4b5883a4905121ca5a914391;
+native policy2582B SHA256
+aa28d42fe60a0c1dd83d5b75ce690d3edec0d20104088621c3c8ad72c10531c1.
+Root compared ALL14 rule row ordinals/bytes/hashes against the actual accepted
+K generic packet, in memory, without re-reading K controls or J DATA. Roles
+are the explicit reviewed meanings in336.7, not inferred from event strings.
+
+Permit ONE N parent after these exact sources and this decision are committed
+clean in the designated root/branch/Darwin isolatedPython3.13. Bind expected-
+head to that actual new freeze; self/profile hashes above. NEW uninspected/
+unallocated control is identity_recovery/R336-20261103-N under
+artifacts/analyst_revisions_v2. It reads ONLY exact I private126797B/abf7c0b602757a6c915e1d7d452ad5ff88901f7c619b33aaee638ead6c7bbb7d,
+M private71708B/ed177bf0b7b8ec5683d3bda27ef69c82b72ef97b57efa8e3db5605effde4044a
+and J response50967B/ad3acf93fedbdf7f4bd3af47ca7347beca615358a1736382360ba048ebfb415f
+at the exact paths already recorded above. No original catalog/USB/capture/
+old controls are re-read, and no old producer/reader is invoked. Four selected
+public modules (security, FixedDataGuard, original M pure proof helper, new N
+pure helper) are compiled from held exact bytes; no repo pyc or Keychain/J
+network observer is imported.
+
+The new native worker exclusively claims/fsyncs and creates its own marker
+before DATA reads. It authenticates all3 pins, I/M exact original whole-binding/
+row/current-candidate agreements and fixed required windows, then retains all
+33 events, every source-to-case link, all unknown/ambiguous definitions and
+all pair evidence privately. Exact from/to pairing uses dataset-primary/date;
+primary is never presumed as-of-new symbol. Missing/duplicate/conflicting/
+opaque or unreviewed pairs remain unresolved. Unit/related/merger/acquisition
+counterparties cannot become same-security price aliases; market cap cannot
+become a cash payout. No membership, demand endpoint, price assignment,
+corporate-action execution or formal identity is changed.
+
+Public summary has finite family/rule/pair counts and per-case FAMILY by
+required-window relation and FAMILY by recorded-gap matrices. Joint counts,
+not marginal coincidence, distinguish a listing/unit event after first
+required prior close from unrelated name/industry events. All matrix row/
+column/gap and source-vs-case invariants are enforced; zero-event case remains
+allzero, not a claim of complete no-action history. No actual event date,
+ticker/name/value/identifier, row or normative prose is emitted. Private
+enrichment<=2MiB, public output<=128KiB. Normal DATA AND source guard return
+must precede own private/report publication.
+
+Parent150s/worker90s/validator30s/own5s reap, actual parent alarm and early
+measured-child failure evidence are required, with existing startup/host-
+suspension/uninterruptible-I/O qualifications. Native all-network/USB/BOTH-
+Keychain/security-CLI/unrelated-artifact denial applies to private processing.
+Permit ONE subsequent same-source native-denied stdin-only validator with
+actual externally observed parent0or2 and original bounded stdout after exact
+clean host/HEAD/self/profile bootstrap; no DATA/control reread. Only actual
+parent0+child0 and matching canonical worker/report/private pins complete this
+observation. Late/nonzero/unknown/ambiguous use is spent, never repaired/retried,
+and cannot be relabeled price/strategy/source readiness.
+
+I336-008(P2 corrected before use): Counter.update of boolean mappings retained
+bool for a singleton predicate, violating integer count schema. Explicit int
+contributions and a sensitive regression correct the producer. Root131
+distinct focused N passes1.10s (57pure+74caller), four in-memory compiles,
+public-whitespace and final source/profile/native pins match. These are new
+test IDs relative to root329, yielding460distinct checks across the two
+development stages; repeated86record selections are not additive. No full
+suite. Author131passes1.07s overlaps root; earlier70/63caller and50/51pure
+selections overlap. Initial49pure passes/1fail exposed the REAL Counter bool
+bug; initial19caller passes/44fail were only an incomplete synthetic Pure
+stub missing Refused. Both kinds remain disclosed.
+
+Finally-restored real-module omissions caught external I pin, normative-row
+pin, opaque ticker guard, actual-parent exit, observed worker-stdout/private
+pin and early failure-evidence registration. The joint-matrix regression swaps
+unit/name event timing while preserving marginal counts. Same-round advice is
+not independent review. No N DATA/control access occurred during implementation
+or these synthetic checks. K/L/M remain spent; QC/Safari hold,338/259/54/699
+and all financial/source admission false flags remain binding.

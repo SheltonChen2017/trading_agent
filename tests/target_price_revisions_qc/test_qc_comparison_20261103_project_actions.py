@@ -491,12 +491,21 @@ def test_offline_preview_identities_never_become_actual_effect_plans(field, mark
         m.prepare_compile(**args)
 
 
-@pytest.mark.parametrize('instruction,owner_sha256', (
+HOLD_DIRECTIVES = (
     ('when you are done, proceed to build until the last step of backtesing. do not access qc yet as another lane is using it. skip claude review. push only once',
      m.CURRENT_NO_QC_OWNER_SHA256),
     ('do not access qc/safari until further notice. continue to build',
      m.CURRENT_NO_QC_OR_SAFARI_OWNER_SHA256),
-))
+    ('investigate and fix the REMX data issues locally. keep QC and Safari untouched, skip Claude review, and push only once when done.',
+     m.CURRENT_REMX_LOCAL_REPAIR_OWNER_SHA256),
+    ('continue investigating and fix the remaining 20 REMX volume issues locally if possible. keep QC and Safari untouched, skip Claude review, and push only once when done.',
+     m.CURRENT_REMX_FOLLOWUP_OWNER_SHA256),
+    ('leave the 20 REMX rows quarantined and continue building locally up to the backtesting step. keep QC and Safari untouched, skip Claude review, and push only once when done.',
+     m.CURRENT_LOCAL_PREBACKTEST_OWNER_SHA256),
+)
+
+
+@pytest.mark.parametrize('instruction,owner_sha256', HOLD_DIRECTIVES)
 def test_current_explicit_no_qc_directive_is_denied_before_source_private_or_native_effect(
         tmp_path, monkeypatch, instruction, owner_sha256):
     args, _, _ = common()
@@ -579,3 +588,46 @@ def test_frozen_legacy_epoch_cannot_be_relabelled_as_recovery():
         name: {'bytes': len(raw), 'sha256': m._sha(raw)} for name, raw in frozen.items()}
     with pytest.raises(m.ActionRefusal):
         m.prepare_compile(**args)
+
+
+@pytest.mark.parametrize('instruction,owner_sha256', HOLD_DIRECTIVES)
+def test_all_local_hold_specs_refuse_before_operational_identity_processing(
+        monkeypatch, instruction, owner_sha256):
+    spec = {'arm': 'cap_off', 'operation_id': 'TPR-CMP28-OFF-SYNTHETIC-HOLD',
+        'attempt': 1, 'prior_attempts_looks_sha256': 'e'*64,
+        'latest_owner_instruction_sha256': owner_sha256}
+    assert hashlib.sha256(instruction.encode('utf-8')).hexdigest() == owner_sha256
+    reached = []
+    monkeypatch.setattr(m, '_operational_id', lambda value: reached.append(value))
+    with pytest.raises(m.ActionRefusal):
+        m._spec(spec)
+    assert reached == []
+
+
+@pytest.mark.parametrize('instruction,owner_sha256', HOLD_DIRECTIVES)
+@pytest.mark.parametrize('phase', ('upload', 'compile', 'launch'))
+def test_all_local_holds_refuse_production_preparation_before_source_registry_or_api(
+        monkeypatch, phase, instruction, owner_sha256):
+    args, _, _ = common()
+    # Satisfy the earlier metadata-only production envelope. These synthetic
+    # bytes must never be parsed or used as a real registry under any hold.
+    args.update(mode='production', owner_instruction_sha256=m.REGISTRY_CREATION_OWNER_SHA256,
+        project_bindings_raw=b'x'*m.preflight.REGISTRY_BYTES,
+        expected_project_bindings_sha256=m.preflight.REGISTRY_SHA256)
+    args['financial_spec']['latest_owner_instruction_sha256'] = owner_sha256
+    assert hashlib.sha256(instruction.encode('utf-8')).hexdigest() == owner_sha256
+    effects = []
+    sha = m._sha
+    def source_hash(raw):
+        effects.append('source-validation')
+        return sha(raw)
+    monkeypatch.setattr(m, '_sha', source_hash)
+    monkeypatch.setattr(m.api.projects, 'validate_bindings',
+        lambda *a, **k: effects.append('registry'))
+    monkeypatch.setattr(m.api, 'prepare_plan', lambda **k: effects.append('api-plan'))
+    monkeypatch.setattr(m, '_load_sources', lambda *a: effects.append('source-read'))
+    monkeypatch.setattr(m.api.ops, 'read_private', lambda *a: effects.append('private'))
+    monkeypatch.setattr(m.api, 'execute_plan', lambda *a: effects.append('native'))
+    with pytest.raises(m.ActionRefusal):
+        getattr(m, 'prepare_' + phase)(**args)
+    assert effects == []

@@ -1,12 +1,19 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current owner-directed REMX follow-up, section114 (2026-11-03):**
+**Current owner-directed local prebacktest build, section115 (2026-11-03):**
 QC access is deferred and Safari access is deferred until further owner notice.
-This round permits local investigation and derived data repair with no QC access
+This round permits local source preparation with the20REMXrows quarantined and no QC access
 and no Safari access: **0 QC requests, 0 Safari requests, 0 native compiles,
 0 backtests**. Skip Claude review and make exactly one final lane push.
 
-The follow-up investigation is complete with no verified local correction for
+The owner directs Codex to leave the20REMXrows quarantined and continue
+building locally up to the backtesting step. A fresh current-HEAD capsule
+will bind both preserved five-arm source epochs, explicit per-arm readiness
+and unchanged quarantine provenance. Local preparation completion will not
+claim native compilation, full-window inputs, capacity or financial results.
+No REMX diagnostic price row is injected into a frozen financial arm.
+
+The section114follow-up investigation is complete with no verified local correction for
 the20fractional quantities. All20have the same nearest integer in both
 same-vendor adjusted daily variants, but there is no authenticated error
 bound or transformation rule. The five source sessions before and five
@@ -41,9 +48,10 @@ All historical failures, Completed jobs, source/attempt/look records and
 negative USB/minute checks remain retained; QC was not inspected in this round.
 
 The next bounded action is deferred QC verification and backtesting only after further owner notice; the local build stops before any QC or Safari access, skips Claude review, and makes exactly one final lane push.
-The remaining REMX task is an authenticated correction of the20fractional
-volume rows and permanent-identity/input evidence; local normalization cannot
-supply those facts.
+The REMX correction is parked with20rows quarantined. It is not a prerequisite
+for completing the current local source capsule, and it is not an admitted
+substitute for the frozen native/SID/STOCK inputs. Authenticated correction,
+permanent-identity and input evidence remain separate unresolved facts.
 
 **Retained published result, section107 (2026-10-29):** five separate lane-owned QC
 projects are created and source-verified; cleanup is complete with two older
@@ -52,10 +60,10 @@ completed, including a matching map/config trace with zero target bars in the
 tested session. Genuine Mia006/007 supplied no verified financial correction.
 All five financial backtests remain incomplete; full-window metrics are NULL.
 The concrete blocker is the lack of an admissible same-session native mark
-for the exact held OFF SID on2021-02-10. Section107.7 records its then-current role/counts; section114 owns the
+for the exact held OFF SID on2021-02-10. Section107.7 records its then-current role/counts; section115 owns the
 current local next action. Section106 retains the accepted Claude counter-review.
 
-**Standing earlier owner continuation (section107, subject to114):** create FIVE separate private QC
+**Standing earlier owner continuation (section107, subject to115):** create FIVE separate private QC
 projects, one per frozen arm, preserve old project37650980 and its source-drift
 evidence, use genuine Mia for verified fixes, exercise documented bestjudgment,
 skip routineClaude review, and push exactlyone time at the completed or
@@ -96,7 +104,7 @@ owner-answer checkpoint is added by this factual blocked handoff.
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **SECTION114 LOCAL FOLLOW-UP COMPLETE; NO VERIFIED CORRECTION FOR20UNRESOLVED VOLUMES; QC AND SAFARI DEFERRED UNTIL FURTHER NOTICE; SKIP CLAUDE REVIEW;
+Status: **SECTION115 LOCAL PREBACKTEST BUILD IN PROGRESS;20REMXROWS REMAIN QUARANTINED; QC AND SAFARI DEFERRED UNTIL FURTHER NOTICE; SKIP CLAUDE REVIEW;
 ONE FINAL PUSH. ZERO QC REQUESTS/NATIVE COMPILES/BACKTESTS;
 0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
 in106 remains accepted after its document/current-routing correction.
@@ -492,7 +500,7 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, owner-directed REMX follow-up and deferred backtesting (section114):**
+**Current qualification, owner-directed local prebacktest build and deferred backtesting (section115):**
 QC access is deferred and Safari access is deferred until further owner notice.
 This round has no QC access and no Safari access:
 **0 QC requests, 0 Safari requests, 0 native compiles, 0 backtests**. Skip Claude review and make
@@ -521,6 +529,14 @@ No documented local volume formula or independent corrected daily series
 was found. A41956B private evidence packet and independent896B verification
 retain all witnesses; zero replacement rows and zero proven corrections.
 The prior source/candidate/fractional quarantine hashes remain unchanged.
+
+The section115owner continuation parks those20rows and continues local
+preparation. The current deliverable is a freshly claimed current-HEAD
+capsule with both frozen and pinned INLINE five-arm source trees, per-arm
+local readiness and verified unchanged quarantine provenance. It contains
+no admitted USB price input and does not change financial/economic source
+epochs. Known REMX gaps do not justify blocking unrelated local source
+preparation or silently changing a frozen financial comparison.
 
 Codex has independently counter-reviewed the exact incoming Claude range
 `a7f83bb4f711cbb187a3bdde4de476f137eb243f..e2dac57607cf4ae068051a85dd2f0fa5f2f35a57`:
@@ -554,7 +570,7 @@ review; private custody, source rights and fresh per-effect claims remain.
 The standing earlier recovery sequence, subject now to the explicit noQC
 deferral, is: Codex uses genuine QC Mia under fresh bounded scopes to diagnose and verify a native source/routing correction, then continues all five frozen arms; no routine Claude checkpoint or owner-answer gate is required by the latest continuation.
 
-Historical workflow context: the last completed counter-review before this round was section106. Section 94 reviewed the owner-skipped continuation of section 93. The direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY; sections106/107 retain that history; section114 governs the current local follow-up.
+Historical workflow context: the last completed counter-review before this round was section106. Section 94 reviewed the owner-skipped continuation of section 93. The direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY; sections106/107 retain that history; section115 governs the current local build.
 
 Historical source/attempt observations below remain attributed to their
 original rounds; they are not new currentIDE/operator/source inspections.
@@ -32123,3 +32139,153 @@ bytes, sole-record diff/EOF discipline and ignored private evidence artifacts.
 No code changed, so the prior software runs are not represented as fresh
 reruns in this round. The same focused document checks and exact-history
 checks are repeated on the final corrected record before the sole push.
+
+## 115. Owner-directed local build to the backtesting boundary —2026-11-03
+
+### 115.1 Scope, exact base and bounded deliverable
+
+Owner: "leave the 20 REMX rows quarantined and continue building locally up
+to the backtesting step. keep QC and Safari untouched, skip Claude review,
+and push only once when done." Exact local base is
+f06e34d4739acbad7abd6ed5f1f9a3d5c80f3f43, clean; actual Targetremote is
+rechecked before any final push. This permits local source preparation and
+focused software checks, not QC/Safari/provider/native or financial effects.
+It does not authorize rounding/replacing the20volumes, source admission,
+ETF substitution, changed economics, a date extension or missing-as-zero.
+
+The deliverable is a fresh local-only prebacktest capsule that regenerates
+the existing frozen five-arm baseline and distinct fixed INLINE subscription
+candidate using their unchanged pinned builders. It binds exact current
+HEAD/source/history/latest-owner identity, verified REMX original/candidate/
+quarantine provenance and all remaining readiness gates. Software preparation
+can complete with the20rows still quarantined; native/backtesting/financial
+readiness remainsFALSE. Source/export preview attempt1 is not a real attempt,
+reservation, outcome look, retry or reset of prior failures/history.
+
+Each private operation has its own fresh source/HEAD/owner/access/operation/
+attempt/look/read/write bounds and fsynced claim/record before effect. No
+spent claim is reused. The old registry's immutable EA2Dcreation authority
+remains distinct from this current owner's local-only authority. No
+oldD0/provider capture/280MBsignal packet or real operatorDB/stopflag/
+credential is opened. All focused testing/actual local processing uses
+isolated49/52runtime and syntheticDB before dispatch/config imports and
+denies sockets/DNS. Original USB and existing quarantine artifacts remain
+read-only; no market body is copied into the cloud-source trees.
+
+### 115.2 Fresh REMX provenance pins
+
+Fresh REMX local claim TPR-PREBACKTEST-20261103-REMX-PINS-001; HEADf06e34d4739acbad7abd6ed5f1f9a3d5c80f3f43; bounds{"private_bytes_max": 4304, "private_files": ["artifacts/target_price_remx_20261103/REMX-20261103-EXPORT-001/manifest.json2296B/c4e319cf...", "artifacts/target_price_remx_20261103/REMX-20261103-EXPORT-001/receipt.json2008B/437a13cd..."], "private_reads_max": 2, "scope": "metadataidentity/count/hashpins only; noUSB/rawmarketrow/signalpacket/registry/QC/Safari/provider/financialread"}; manifest2301B/SHA0bb174602b2f5b0f15cf391846559e4d8f9b58a0043b689ca4853b1a750c7f5a and record fsynced BEFORE effect. Owner scope is local preparation only with20REMXrows quarantined, original inputs/history retained, QC0/Safari0/provider0/backtests0; latest authority separate from all earlier creation/financial claims.
+
+Fresh prebacktest REMXmetadata pins verified fromexact2296Bmanifest/2008Breceipt; candidate3996/source4339 and20fractional+323identityquarantines retained, allinput/financialflagsFalse. Private proof1753B/SHAd32b60d8eb58b818c52b24111dad8c4ca25a747ea79779d1d1322fc8d739298b. This metadata read does not admit USB prices or authorize QC/Safari/provider/backtests.
+
+### 115.3 Local producer boundary and strengthened hold framing
+
+The new comparison_20261103_prebacktest route is a fixed local producer,
+not a caller-configurable backtest controller. It accepts a fresh operation
+identifier only. It regenerates the preserved frozen and separate pinned
+INLINE five-arm sources, keeps both generated manifests verbatim, locally
+syntax-checks142Pythonunits, and writes per-arm source/readiness metadata
+without calling an upload, compile, backtest, browser or native API producer.
+OFF has11source files per epoch and each other arm15. Source/economic
+functions,4096limit, calendars/policy/input hashes and stock sleeves are
+unchanged. Local preparation completeness is separate from native readiness.
+
+The committed public-source closure includes the producer, pinned preflight/
+anchored IO helpers and their imports, projects.REQUIRED_SOURCES including
+extended_operations/extended_evidence, financial primitives, package inits,
+the frozen source templates and the current native hold guard. All are
+HEAD/hash-checked before claims and through source-live checks. Imported
+transport definitions grant no call authority and are not invoked. The
+signal packet descriptor is preserved; its280105389B body stays unopened.
+
+The seven fixed private inputs total368601B:3573Bregistry plus the six REMX
+manifest/receipt/original/candidate/pre-inception/fractional artifacts. They
+are bound by exact bytes/SHA, original creationHEAD/owner stays distinct
+from the current local-only owner, and the two quarantines remain323/20rows.
+The old1965863Brow ledger and zero-byte invalid quarantine are not reopened.
+No USB/provider file is read or edited by this capsule. The REMX artifact
+bytes/dates are revalidated locally; this is not fresh original-USB/market-
+origin/PIT/SID validation. Its20diagnostic gaps are not a new requirement to
+assemble the frozen six-STOCK financial source.
+
+Exclusive0700directories/0600files, nofollow/regularity/custody checks,
+fresh fsynced claim+record before reads, currentHEAD/source and both UTC/
+monotonic deadlines, no replay/overwrite, original read-only paths and
+bounded body-free partial failure receipts are enforced. Source/readiness
+exports have an8MiB bound plus separate64KiBclaim and64KiBreceipt control
+allowances. Empty historical record refuses. Preview IDs containOFFLINE,
+proposedattempt1 reserves nothing, and all historical counters remain intact.
+
+The future action guard now also refuses the three subsequent explicit
+local-only owner directives: REMX repairSHAfeaed725a68dabae6283578d21e55dddd70bb78ace7a6cedfc40b2b5665dfeb0,
+REMX follow-upSHA4cb8250f94c8f79e54b0bad593d926fc4d36527733e661c239126800ffdc757a,
+and current prebacktestSHAcbe4ec0970d66d09ab8da68d35b78383ead0ae6ea5c0b19177003492a89ddc2e.
+The earlier2a2c6338/248f5017holds remain. These hashes document deferral,
+not cryptographic release authority. Every function/class AST, economic
+pin, registry creation ownerEA2D and existing REQUIRED_SOURCES assignment
+in that action module is unchanged; only the constant hold set expands.
+
+Root independently ran99focused action checks in67.68s under isolated49/52/
+syntheticDB before imports and socket/DNS denial, with stable hashes:
+actions33087B/SHAc5ff845b652618edd7ffbe6caea599b70ba7e0d540f059167c1b15367671edac;
+tests33402B/SHA3f6871fa261351d0586d7686a9edc46e5e5228b42d658028f0b4b17bed5b0eef.
+All five holds refuse metadata validation/execution and all three production
+preparation phases before source/private/API effects. Three in-memory
+hold-removal mutations demonstrated test sensitivity and were restored in
+finally; no private/native effect occurred.
+
+The capsule's first30synthetic checks passed in1.80s, before the additional
+custody correction below. That intermediate pass is not promoted to final
+validation. Public-only Codex review verified the economic/local boundaries
+and identified one new capsule-only custody issue:
+
+| Finding | Priority/status | Verified issue and correction |
+|---|---|---|
+|TPR-C115-001|P2 confirmed; CLOSED after correction|The initial private UID/mode check and later helper read opened a leaf in two phases. A same-content leaf could change custody between checks while retaining its SHA. The new reader must use one descriptor and check actual opened UID/mode/type/size plus stable before/after snapshots and exact SHA; synthetic race regression required before any actual private capsule effect.|
+
+No historical helper, registry bytes or private artifact is rewritten to fix
+this new producer. The POSIX/macOS checks do not prove Windows signer/ACL
+custody, hostile-host protection, native authenticity or financial acceptance.
+No full lane/repo suite or Claude review is performed.
+
+### 115.4 Corrected exact source snapshot and pre-effect validation
+
+TPR-C115-001 is corrected only in the new capsule reader. One anchored
+O_NOFOLLOW/O_NONBLOCK descriptor is opened under the checked parent; actual
+opened regularity/UID/0600/size, named-vs-open identity/snapshot and post-read
+custody/snapshot/length/SHA must all match. It reads exactly the pinned bytes,
+not an unclaimed extra guard byte; growth is detected by fstat. FDs close on
+all paths. The seven-file368601B prospective content bound is unchanged.
+
+The synthetic parent-close race regression was RED against the former reader:
+it incorrectly reported prepared_prebacktest_local after same-content mode
+changed between first custody stat and reopening;1expected failed check in
+0.82s. The corrected implementation passed33checks in1.73s. Root added the
+exact private byte-budget regression and independently passed the final
+34capsule checks in2.48s, with stable before/after source/test hashes.
+The earlier30pass1.80s and33pass runs remain attributed intermediate checks.
+Public-only Codex review accepted the final one-FD fix and full local scope;
+no further material issue was found. No Claude checkpoint was invoked.
+
+Final source/test identities:
+- comparison_20261103_prebacktest.py22266B/SHA17af2dbbc2e7a6032085475bc4e1d620cd2102fb6c6e23b80cdc8f7ee419e9eb;
+- capsule tests22532B/SHA93752d9daef116e9c752d8663fcce50bfcc88927fa97a59e1597987a51bf827a;
+- action guard33087B/SHAc5ff845b652618edd7ffbe6caea599b70ba7e0d540f059167c1b15367671edac;
+- action tests33402B/SHA3f6871fa261351d0586d7686a9edc46e5e5228b42d658028f0b4b17bed5b0eef.
+
+All focused runs use isolated49/52runtime/syntheticDB before dispatch/config
+imports and sockets/DNS denied. No full lane/repo suite is run. Root checked
+syntax/EOF/diff hygiene, unchanged financial/native predecessors and exact
+preservation of received historical sections9..114. The local producer and
+hold framing are committed before the actual freshly claimed private capsule
+operation; no push has occurred in this new round.
+
+In plain language, this build prepares the five source packages and a clear
+checklist for the point where backtesting would begin. It keeps the20suspect
+REMXrows set aside, preserves the original study, and leaves all service
+access and actual backtests pending. The successful software tests do not
+claim that QC can run the candidate or that its missing native inputs are
+repaired. Actual local capsule creation and independent artifact verification
+are the next effects, under fresh claims.
+
+Before the implementation commit, root passed157focused current-document checks/558deselected in3.25s with stable record bytes and exact historical sections9..114. Together the final focused code runs cover99action+34capsule checks; prior unchanged-template checks are not represented as fresh reruns. Actual private capsule work remains gated on these source bytes being committed.

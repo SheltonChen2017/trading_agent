@@ -1,16 +1,23 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current owner-released QC preflight and serial backtests, section116 (2026-11-03):**
-QC and Safari access are released for this bounded preflight and serialized backtest continuation.
+**Section 117 (2026-11-03) is the Claude review of the fifteen Codex commits after
+section 108:** the section-109 counter-review, the section-110 terminal TPR100 handoff, the
+section-111 USB assessment, the section-112 offline build, the section-113 and 114 REMX
+repair rounds, the section-115 prebacktest capsule and the section-116 owner-released QC
+preflight. QC and Safari access are released for this bounded preflight and serialized backtest continuation.
 The owner directs QC preflight, then OFF and the remaining frozen arms when
-source, input and resource prerequisites pass. Keep the20REMXrows quarantined,
-skip Claude review and make exactly one final lane push. No additional routine
-review/owner checkpoint is introduced. Ownership/collaborator metadata passed5/5. No verified Mia diagnosis was obtained in this round. Zero new Codex financial launches occurred. OFF2021-02-10 same-session native RAW/SID input remains unresolved. The TPR1008192subscription increase is rejected.
+source, input and resource prerequisites pass, with the 20 REMX rows left quarantined and
+Claude review treated as a skipped progress stop; the owner separately asked Claude, in the Claude chat,
+to review every unreviewed commit after each push. Ownership/collaborator metadata passed5/5. No verified Mia diagnosis was obtained in this round. Zero new Codex financial launches occurred. OFF2021-02-10 same-session native RAW/SID input remains unresolved. The TPR1008192subscription increase is rejected.
 
-Section115's142file local build and290focused checks are retained. They prove
-local preparation only. Current cloud source/custody, native compilation,
-capacity and exact RAW/SID/action/signal inputs need fresh verification.
-A completed native job alone does not accept source/economics/accounting.
+Section 117 accepts all fifteen commits, four after correction: two offline command entry
+points swallowed an operator interrupt into a refusal, two spent-action tests accepted
+any exception, the REMX repair's row-partition invariant had no test, and the zero-quantity
+boundary of the subscription-recovery helper was undocumented. Three P2 design points are
+documented for Codex and the owner (`TPR-CR34-001` to `-003`): the QC hold was a deny-list of
+instruction hashes rather than an unconditional refusal while it stood (no request was made
+under it), the older prepare command sits outside the capsule's pinned closure, and the
+recovery helper's zero check refuses floats, so its release path depends on the native type.
 **0/5 accepted full-window results; all financial metrics NULL;
 financial acceptance remains FALSE.** All historical failed/Completed jobs,
 source drift and distinct attempts/looks remain retained and unreset.
@@ -26,14 +33,14 @@ same-session marks or original overwrite is accepted. These diagnostic rows
 are unadmitted and are not substituted for the frozen six STOCK sleeves.
 The REMX gap is not a prerequisite for assembling those frozen source trees.
 
-The last accepted Claude counter-review remains `a7f83bb4..e2dac576`.
+The last accepted Claude counter-review remains section 109's review of section 108.
 The waiver continues; source/economic validation remains required.
 The registry's immutable EA2Dcreation authority is separate from the latest
 owner release; every private read/processing and native effect needs fresh
 source/HEAD/owner/access/operation/attempt/look limits and fsynced durable claim.
 Former local-only hold hashes remain historical deferrals, not new authority.
 
-The next bounded action is owner-released QC preflight recovery, blocked on controllable genuine QC Mia input and verified same-session native RAW/SID recovery, under fresh bounded source/HEAD/access/operation/attempt/look claims; after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, keeps the20REMXrows quarantined, skips Claude review, and makes exactly one final lane push.
+Codex next counter-reviews section 117 and this round's Claude commits; the owner-released QC preflight recovery continues, blocked on controllable genuine QC Mia input and verified same-session native RAW/SID recovery, under fresh bounded source/HEAD/access/operation/attempt/look claims; after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, keeps the20REMXrows quarantined, skips Claude review as a progress stop, and makes exactly one final lane push.
 
 **Retained published result, section107 (2026-10-29):** five separate lane-owned QC
 projects are created and source-verified; cleanup is complete with two older
@@ -86,7 +93,14 @@ owner-answer checkpoint is added by this factual blocked handoff.
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **SECTION116 QC PREFLIGHT CONCRETELY BLOCKED ON NATIVE INPUT/SOURCE RECOVERY AND CONTROLLABLE MIA INPUT;20REMXROWS REMAIN QUARANTINED; SKIP CLAUDE REVIEW; ONE FINAL PUSH. NATIVE SOURCE/INPUT/CAPACITY AND ACCOUNTING GATES REMAIN;0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
+Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
+`e2dac576..432205ad` IN SECTION 117: THE SECTION-109 COUNTER-REVIEW, THE
+SECTION-110 TERMINAL HANDOFF, THE USB, OFFLINE-BUILD, REMX AND PREBACKTEST ROUNDS
+AND THE SECTION-116 QC PREFLIGHT. CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION
+(TWO COMMAND ENTRY POINTS AND FOUR TESTS; NO FROZEN SOURCE CHANGED). THE PREFLIGHT
+IS CONCRETELY BLOCKED ON NATIVE INPUT/SOURCE RECOVERY AND CONTROLLABLE MIA INPUT;
+20REMXROWS REMAIN QUARANTINED; 0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL
+METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
 in106 remains accepted after its document/current-routing correction.
 Historicalsection105 review/disposition/fullrange remains intact in105.
 
@@ -520,10 +534,12 @@ no admitted USB price input and does not change financial/economic source
 epochs. Known REMX gaps do not justify blocking unrelated local source
 preparation or silently changing a frozen financial comparison.
 
-Codex has independently counter-reviewed the exact incoming Claude range
-`a7f83bb4f711cbb187a3bdde4de476f137eb243f..e2dac57607cf4ae068051a85dd2f0fa5f2f35a57`:
-one correction/review commit, accepted after the section109 current-record
-correction. CR33-007 is verified and future legacy cleanup retired.
+Claude has independently reviewed the exact range
+`e2dac57607cf4ae068051a85dd2f0fa5f2f35a57..432205ad90741db3840abdedf016f4c17fabbf88`:
+fifteen Codex commits carrying sections 109 to 116. Section 117 accepts them all,
+four after correction, and documents three P2 design points; no frozen source,
+receipt or economics changed. Section 109 counter-reviewed section 108 (one Claude
+commit, accepted after the section109 current-record correction). CR33-007 is verified and future legacy cleanup retired.
 CR33-008 is closed for the preserved frozen-financial route; the new resource
 candidate has a separately pinned source epoch and is ineligible for that
 old route. No override flag or unreviewed Mia correction is admitted.
@@ -536,7 +552,7 @@ identity guess, missing-as-zero or financial acceptance is introduced.
 **0/5 accepted full-window results; all financial metrics NULL;
 financial acceptance remains FALSE.**
 
-The next bounded action is owner-released QC preflight recovery, blocked on controllable genuine QC Mia input and verified same-session native RAW/SID recovery, under fresh bounded source/HEAD/access/operation/attempt/look claims; after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, keeps the20REMXrows quarantined, skips Claude review, and makes exactly one final lane push.
+Codex next counter-reviews section 117 and this round's Claude commits; the owner-released QC preflight recovery continues, blocked on controllable genuine QC Mia input and verified same-session native RAW/SID recovery, under fresh bounded source/HEAD/access/operation/attempt/look claims; after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, keeps the20REMXrows quarantined, skips Claude review as a progress stop, and makes exactly one final lane push.
 
 Ownership/collaborator metadata passed5/5. No verified Mia diagnosis was obtained in this round. Zero new Codex financial launches occurred. OFF2021-02-10 same-session native RAW/SID input remains unresolved. The TPR1008192subscription increase is rejected. The fresh100status isRuntimeError for
 21d48f35420052b3c20d2bf628b5a0ae. Nine current100jobs(7RuntimeError/2Completed)
@@ -1112,6 +1128,7 @@ known.
 | 2026-10-26 | Codex counter-review | Reviewed `12be489416af00e266c3a47286f2cabafbf74e27..69ecaf91bd123d24138b915bcb5a37798d676b96`; exact outgoing correction/handoff identities follow in section 102 | Counter-review only; no next milestone | Accepted both Claude commits after three P3 corrections: unpublished close-stop accounting, publisher cancellation/fatal priority and appended contradictory scope guards. Native custody, shipped closed policy, frozen source/inputs and shared documents remain unchanged. | Separate red/green, 703 independent direct model cases and exact final selected counts/limitations in section 102. Nine inherited Windows byte-anchor failures remain visible; no full-suite or Mac-native green claim. | CCR31-001/002/003 closed by scoped corrections. CR31-003 public figures confirmed; CR31-004 historical untracked work not absorbed. Runtime/input/canonical findings stay open. | None; zero QC/provider/private/operator access, attempts, jobs and looks. No monitor or sibling change. | No implementation milestone started. Later resource-release verification and fresh scope remain distinct from this counter-review; retained future-checkpoint waiver is not rescinded. |
 | 2026-10-28 | Claude review | `69ecaf91bd123d24138b915bcb5a37798d676b96..2cce8dfcec2077e7a06987055654eca3e6dfbcad` reviewed; test-correction commit `1ebb7208` and this record/guard commit on this same lane branch | Independent review of sections 102, 103 and 104 (counter-review, offline preparation, owner-released five-arm execution with eight financial jobs); no feature milestone | Dispositioned all thirty Codex commits: twenty-seven accepted, three accepted after correction. Verified the claimed file hashes, section digests, Git attribution, the Lean primary source for the Morningstar group names, and the private safe census and publication receipts. Fixed, not only documented: the open Morningstar stub (now closed to Lean's 56 names, with a misspelling mutant), the untested sell side of the accounting replay (buy-then-sell regression with gross-credit and debit negatives), and the unpinned section-104 outcome (guard pins with outcome-drift and grant mutants). Documented the held-mark policy blocker for the owner's decision. No production source, executed candidate, receipt, shared document or shared test changed; no provider or QC access by Claude. | Algorithm and accounting test modules, the four document-guard modules, the whole QC test package, compileall and `git diff --check` on the final tree, designated worktree, network-denied (figures in 105.5); no full lane suite and no complete suite, per the owner. Provider requests **0**; QC requests **0**; private rows read **0** (safe receipts only); looks **0** by Claude. | No P0. `TPR-CR32-001` (P1) documented for the owner's decision; `TPR-CR32-003`, `TPR-CR32-004` (P2) closed by correction; `TPR-CR32-002` (P3) closed by correction; `TPR-CR32-005` through `TPR-CR32-012` (P3) documented. `TPR-OFF98-010` (P1) open; `TPR-CR30-005`, `TPR-CCR28-003`, `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added; QuantConnect access stays forbidden for Claude. | Make this round's one push. Codex counter-reviews section 105; the owner decides the held-mark policy (105.7) before any five-arm rerun. |
 | 2026-10-29 | Claude review | `cf5157d8433d870dc24376d20a6e5c320e0503f7..a7f83bb4f711cbb187a3bdde4de476f137eb243f` reviewed; this correction and record commit on this same lane branch | Owner-requested independent review of sections 106-107 (Mia005-007, five isolated QC projects, cleanup, 009/010 diagnostics); no feature milestone | Reviewed all eight Codex commits individually with three read-only reviewer passes, each finding re-verified. Fixed the API client's unpinned compile/launch path (P1) and caller-asserted write target, the map probe's reversible ticker digest, the cleanup test gaps, the document guard red since `49d0e144`, and Windows checkout bytes for the QC package and this record. No executed artifact, receipt or frozen economics changed. | Seven new modules: 468 passed, 136 Mac-only skips, 0 failed (before the map-probe fix; that module then gives 72 passed). Lane guard: 600 passed. `compileall` exit 0; `git diff --check` clean. No full lane or repository suite, at the owner's direction. Provider requests **0**; QC requests **0**; Mia **0**; private archives not read (on the Mac); authorized/spent looks **0**. | No P0. `TPR-CR33-001` (P1), `-002`, `-003`, `-005`, `-006` (P2) and `-004` (P3) closed by correction; `-007` and `-008` (P2) open for Codex; `-009` to `-011` (P3) documented. `TPR-CR23-001` and the other open register items unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex next counter-reviews section 108 and this round's Claude commits, then continues the five frozen arms under the section106/107 owner continuation; the retrospective receipt-chain check of `TPR-CR33-007` runs on the Mac. |
+| 2026-11-03 | Claude review | `e2dac57607cf4ae068051a85dd2f0fa5f2f35a57..432205ad90741db3840abdedf016f4c17fabbf88` reviewed; correction commit `dc9c67ad` and this record/guard commit on this same lane branch | Independent review of sections 109 to 116 (counter-review of section 108, terminal TPR100 handoff, USB assessment, offline build and hold, REMX repair and follow-up, prebacktest capsule, owner-released QC preflight); no feature milestone | Dispositioned all fifteen Codex commits: eleven accepted, four accepted after correction. Verified every section-116 hash and private safe receipt by name, size and digest, the section-112 to 115 digests through the guard, and the absence of any QC-named receipt during the owner's hold window. Fixed, not only documented: the prepare and prebacktest entry points swallowed operator interrupts; two spent-action tests accepted any exception; the REMX repair partition invariant was untested; the zero-quantity boundary was undocumented. Three P2 design points documented: deny-list hold, unpinned prepare command, float-refusing zero check. No frozen source, executed candidate, receipt, shared document or shared test changed; no provider or QC access by Claude. | Eight changed QC test modules, the four document-guard modules, the whole QC test package, compileall and `git diff --check` on the final tree, designated worktree, network-denied (figures in 117.5); three read-only review-agent passes over the ten modules from sections 109 to 115; no full lane suite, per the owner. Provider requests **0**; QC requests **0**; private rows read **0** (safe receipts only); looks **0** by Claude. | No P0. `TPR-CR34-001`, `TPR-CR34-002`, `TPR-CR34-003` (P2) documented; `TPR-CR34-004`, `TPR-CR34-005`, `TPR-CR34-006` (P3) closed by correction; `TPR-CR34-007` through `TPR-CR34-010` (P3) documented. `TPR-OFF98-010` (P1), `TPR-CR32-001` (P1, held-mark policy), `TPR-CR30-005`, `TPR-CCR28-003`, `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added; QuantConnect access stays forbidden for Claude. | Make this round's one push. Codex counter-reviews section 117 and continues the owner-released preflight recovery; the owner reads 117.7. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 | 2026-10-05 | Codex counter-review and TPR-D0 implementation | Reviewed `9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`; corrections/decisions `cf11788f39a2148d7bc3b801e88807bd2caca5ea`; D0 implementation `8dcfb71851ff22db6f0727395e18292c19f080ef`; this record-only handoff follows | Four-commit Claude counter-review, five bounded owner selections, strict D0 plan and one retained structural audit | Accepted the cumulative Claude range after three record/encoding corrections; selected explicit native/host test variants without changing production trust policy. Implemented the separate standard-library D0 package and immutable aggregate artifacts; retained-source inventory/hashes and all canonical freezes match. Sections 46/47 contain exact dispositions, scope, evidence and remaining limitations. | Cumulative focused suite 491 passed, 5 symlink-permission skips; final routing/artifact guards 107 passed. Standard suite blocked by 110 Analyst `fcntl` collection errors, with zero tests executed. Optional continuation diagnostics capped and incomplete, not reported as totals. Compileall exit 0; diff hygiene clean; Python 3.13.14 / pytest 9.1.1. | CCR16-001/002/003 closed; no new in-lane P0/P1/P2. Six canonical findings remain open and parked. TPR-OOL-017 opened for Windows Analyst collection, documented only. | Exact local retained-structure scope only, expiring 2026-10-12; 587,046 retained rows audited. Provider/outcome/QC/development-look/trading counts zero. No vendor-rights attestation or canonical admission. | One matching-branch non-force push of this Codex round, then independent Claude review of every commit after `c0bfb213` through the exact pushed tip. No automatic D1; later action/source scope must be selected after review and counter-review. |
 
@@ -32702,3 +32719,142 @@ recorded input-control failures. The temporary new in-app tab is not marked
 as a delivered result and closes normally with the turn. Fixed native TLS
 request counts, source inventory, financial counts and all current guards
 remain unchanged. Final public-doc review found no concrete inconsistency.
+
+## 117. Claude review of the counter-review, offline-build and preflight rounds - 2026-11-03
+
+**Disposition: accepted after correction.** The owner asked me to watch this
+lane and review every unreviewed commit after Codex's push. Fifteen Codex
+commits were unreviewed, all after the section-108 Claude review from the
+Windows host: Codex's counter-review of that section, the terminal handoff of
+the owner's TPR100 job, the USB data assessment, the offline build under the
+owner's QC hold, the REMX repair and its follow-up, the prebacktest capsule,
+and today's owner-released QC preflight. No financial backtest ran in any of
+these rounds; the five arms remain at 0/5 accepted results, now behind a
+concrete native-input blocker and an undeliverable Mia control surface.
+I accept all fifteen commits, four after correction, and document three P2
+design points. No frozen source, receipt or economics changed.
+
+### 117.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Branch and worktree | `codex/strategy-target-price-revisions`; the lane worktree resolved from `git worktree list`; clean, local equal to remote at the start of the review |
+| Reviewed range | `e2dac57607cf4ae068051a85dd2f0fa5f2f35a57..432205ad90741db3840abdedf016f4c17fabbf88` (fifteen commits, no merges, in `git rev-list --reverse` order below) |
+| Commit 1 | `782ec389883b8a9fcdbc8f23d5d78c156667af09` - Counter-review CR33 and bind financial actions to frozen source evidence |
+| Commit 2 | `499afd43f4819b1171a4ebe71509e066220e6806` - Record local CR33 continuation snapshot and active QC monitor |
+| Commit 3 | `bdd648bade79150a51bc17ce7ff20011dc5ead92` - Restore bounded QC job status observation |
+| Commit 4 | `91f66ba4bdf534415c1efa85689b9f13a2570235` - Record committed status-reader monitor handoff |
+| Commit 5 | `1b4aea22f7d9709d47762505b10aa53394e0c446` - docs(target-price): retain terminal QC failure and Mia control handoff |
+| Commit 6 | `6c399a4c957980b1b4acbaa55890f06054aae86a` - feat(target-price): prepare offline data diagnostics and fixed backtest source epoch |
+| Commit 7 | `ee282448f9f4231272f4880688ca0b66ea27da31` - fix(target-price): enforce QC and Safari hold until further notice |
+| Commit 8 | `89622e5d9e5598f95ae9b6a310d369b572cc148e` - docs(target-price): hand off verified local backtest preparations under access hold |
+| Commit 9 | `c06657742a5fe7ef2355894116fd2250e2ba4f89` - Repair REMX volume formats and quarantine unverified rows |
+| Commit 10 | `bb6fcff32404d1c52221aa4ad5a8a2a87e9e1121` - Record verified partial REMX repair and remaining data gaps |
+| Commit 11 | `f06e34d4739acbad7abd6ed5f1f9a3d5c80f3f43` - Document unresolved REMX volume evidence and preserve quarantines |
+| Commit 12 | `aea3443c5f5e07b30b5765098967ca55366b9ee8` - Build local prebacktest capsule with retained REMX quarantines |
+| Commit 13 | `83715aac39c7b452f2fdbff257cc74200324d4e9` - Record verified local prebacktest capsule and preserved quarantines |
+| Commit 14 | `670f7cfd2cf7b13a8a6bde3f23aeab939cf82a2f` - Add fresh read-only QC custody preflight and preserve source refusals |
+| Commit 15 | `432205ad90741db3840abdedf016f4c17fabbf88` - Record QC preflight input blockers and frozen-arm readiness |
+| Files changed | 24; +10,945 / -60: this record, the lane guard, eleven new research modules and eleven new test modules |
+| Claude commits this round | `dc9c67ad816b2369f7834b2af149627e366165fe` (corrections and tests), this record/guard commit |
+| Scope checks | Lane-only paths; `git diff --check` clean; no credential, token or URL beyond public VanEck and FirstRate documentation; the only tickers are ETF names; no licensed row; no provider or QC access by this review; no QC-named receipt was written during the owner's hold window (2026-10-30 07:30 to 2026-11-03 15:40) |
+| Codex activity | Codex was mid-round in this worktree when the earlier push landed; the review waited for the section-116 push and started on a clean tree |
+
+### 117.2 Commit-by-commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `782ec389883b8a9fcdbc8f23d5d78c156667af09` | **Accepted after correction** | Counter-review of section 108 (accepted after a current-record correction) and the source-bound financial actions successor that closes CR33-008 for the frozen route: regenerated candidate, eight compile proofs before launch, claims before every read. Its spent-action replay test accepted any exception; corrected (`TPR-CR34-004`). |
+| `499afd43f4819b1171a4ebe71509e066220e6806` | **Accepted** | Record-only continuation snapshot and the five-minute app heartbeat for the then-running TPR100 job; no financial effect. |
+| `bdd648bade79150a51bc17ce7ff20011dc5ead92` | **Accepted** | Bounded four-megabyte job-status reader for the oversized TPR100 result; body-free, no retry. Its top-level status labels a successful observation `completed` even for a failed job (`TPR-CR34-008`). |
+| `91f66ba4bdf534415c1efa85689b9f13a2570235` | **Accepted** | Record-only monitor handoff. |
+| `1b4aea22f7d9709d47762505b10aa53394e0c446` | **Accepted** | Section 110: the owner/Mia TPR100 job ended in Runtime Error at the 4096-subscription guard; the four-file Mia source changes (stale-mark bypass, identity heuristics) are rejected for port; Mia UI input could not be delivered; the heartbeat is paused. Guard rotated to section 110. |
+| `6c399a4c957980b1b4acbaa55890f06054aae86a` | **Accepted after correction** | Section 112 offline build: FirstRate supplied-byte adapter, the subscription-recovery mixin, the inline five-arm preflight, the local prepare command and the fixed financial actions successor. The prepare command swallowed operator interrupts (`TPR-CR34-006`, corrected); its zero-quantity predicate refuses floats (`TPR-CR34-003`); the hold design is a deny-list (`TPR-CR34-001`). |
+| `ee282448f9f4231272f4880688ca0b66ea27da31` | **Accepted** | Stronger QC/Safari hold bound into the actions guard and current routing. The hold is a set of refused instruction hashes with no unconditional production refusal (`TPR-CR34-001`); the prepare command's new bytes are cited nowhere (`TPR-CR34-002`). No request was made under the hold. |
+| `89622e5d9e5598f95ae9b6a310d369b572cc148e` | **Accepted** | Record-only handoff of the verified local build under the hold. |
+| `c06657742a5fe7ef2355894116fd2250e2ba4f89` | **Accepted after correction** | Section 113 REMX repair and prepare commands: lossless normalization of 860 integral lexemes, 323 pre-inception and 20 fractional quarantines, byte-for-byte ledger reconstruction. The partition invariant had no test (`TPR-CR34-005`, corrected). |
+| `bb6fcff32404d1c52221aa4ad5a8a2a87e9e1121` | **Accepted** | Record-only: verified partial repair, 3996 of 4339 rows, 20 missing dates. |
+| `f06e34d4739acbad7abd6ed5f1f9a3d5c80f3f43` | **Accepted** | Record-only: the 20 fractional volumes stay unresolved; the evidence packet retains all witnesses; no correction proven. |
+| `aea3443c5f5e07b30b5765098967ca55366b9ee8` | **Accepted after correction** | Section 115 prebacktest capsule producer (142 files, one-descriptor custody read after TPR-C115-001) and the extended hold set. Its entry point swallowed operator interrupts (`TPR-CR34-006`, corrected). |
+| `83715aac39c7b452f2fdbff257cc74200324d4e9` | **Accepted** | Record-only: the actual capsule and independent verification. |
+| `670f7cfd2cf7b13a8a6bde3f23aeab939cf82a2f` | **Accepted** | Section 116 read-only project-custody preflight: fixed metadata and collaborator reads for the five registered projects under the shared API lock, claims before every request, credential-echo refusal, budget check before transport. Verified against the module; its tests cover cancellation, contention, drift and budget exhaustion. |
+| `432205ad90741db3840abdedf016f4c17fabbf88` | **Accepted** | Section 116 record and guard: ten custody requests passed for 5/5 projects; Mia input undeliverable through two control surfaces; nine TPR100 jobs observed including an unattributed Completed job; no financial launch. Facts pinned by Codex's own guard; verified here against the private safe receipts. |
+
+**Cumulative disposition: accepted after correction.**
+
+### 117.3 P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CR34-001` | P2 | **Documented** | `ee282448` | `comparison_20261103_project_actions.py` hold set; `comparison_20261030_project_actions.py` and `comparison_20261030_job_status.py` entry points | While the owner's QC/Safari hold stood, it was enforced as a deny-list of known instruction hashes: a production call with any other hash passed, and the two earlier entry points had no hold check at all. No request was made under the hold (no QC-named receipt exists in the hold window), and the owner lifted the hold today, so this is a design weakness, not a breach. | Code reading by a review agent, verified; receipt-name census of the private roots. | A future hold needs an unconditional production refusal, not a growing list of refused hashes. | None now; the hold is lifted. | Not applicable. |
+| `TPR-CR34-002` | P2 | **Documented** | `ee282448` | `comparison_20261103_prepare.py` | The section-112 prepare command is a second capsule producer outside the prebacktest closure: not in its required sources, pinning nothing, bound to an older owner hash, and its committed bytes (12,672 bytes, SHA-256 `e4d092ccf653` prefix) are cited nowhere in the record, which names the earlier 12,537-byte version. | Hash census of the changed modules against the record; closure reading. | A parallel unpinned lineage could emit a manifest the capsule accepts. | None here; Codex should retire the command or pin it in the capsule closure. | Not applicable. |
+| `TPR-CR34-003` | P2 | **Documented** | `6c399a4c` | `subscription_recovery_20261103.py` zero-quantity predicate | The predicate returns False for every float, so if the native runtime exposes a held quantity as a float the release path can never fire. Fail-closed and therefore safe, but the helper's only purpose would be inert. The lane's other native conversions accept floats through exact text. | Code reading; the fixture uses exact Fractions. | The INLINE recovery candidate must be checked against the real native type before it is relied on. | A boundary test now documents the behaviour (`TPR-CR34-005` commit); the module is unchanged because it is pinned by the preflight and the capsule. | Not applicable. |
+| `TPR-CR34-004` | P3 | **Closed by correction** | `782ec389` | spent-action replay tests in both project-actions test modules | `pytest.raises(Exception)` accepted any error for a spent action's replay, so a regression raising a different exception would still pass. | Test reading. | The replay refusal is a safety property. | Both tests now require the module's refusal class. | 146 passed in the two modules. |
+| `TPR-CR34-005` | P3 | **Closed by correction** | `c0665774` | `test_qc_remx_repair_20261103.py`; `test_qc_subscription_recovery_20261103.py` | No test asserted that candidate rows plus every quarantine equal the source rows, or that the ledger has one entry per row; the zero-quantity predicate had no float, boolean or None case. | Test reading. | The partition is the repair's correctness claim. | A mixed eight-row source (pre-inception, integral, fractional, duplicate, negative, thousands separator, plain) now checks the partition and the ledger; fifteen zero-predicate cases pin the boundary. | 175 passed in the four light modules. |
+| `TPR-CR34-006` | P3 | **Closed by correction** | `6c399a4c`, `aea3443c` | `comparison_20261103_prepare.py` and `comparison_20261103_prebacktest.py` command entry points | Both caught `KeyboardInterrupt` together with ordinary errors, printing a refusal and returning exit code 1, so an operator interrupt looked like a refusal. The prebacktest workspace deliberately re-raises the interrupt only for its entry point to swallow it. | Two regressions red on the received modules. | An interrupt is not a refusal; wrapping scripts must see it. | The entry points re-raise the interrupt; ordinary errors still print the body-free refusal. | Red before, green after; no pin rotates (nothing pins these two modules by hash). |
+| `TPR-CR34-007` | P3 | **Documented** | `6c399a4c`, `c0665774`, `670f7cfd` | `extended_off_recovery_cli.py`, `remx_prepare_20261103.py`, `comparison_20261103_project_custody.py` | Owner chat instructions, including "skip Claude review", are embedded verbatim as module constants where only their SHA-256 is used. | Code reading. | Hygiene: process directives in public modules; every new instruction forces a source edit. | None here. | Not applicable. |
+| `TPR-CR34-008` | P3 | **Documented** | `bdd648ba`, `6c399a4c` | job-status reader; preflight and prepare modules | Top-level `completed` for a successful observation of a failed job; an unreachable node bound equal to the byte bound; a Zip64 locator can bypass the central-directory bound; the repair manifest publishes the 20 quarantined session dates; the prepare workspace lets OS errors carry absolute paths; the arm-id pattern accepts an OFF prefix for other arms; two tautological post-conditions; the wire layer is HEAD-bound rather than hash-pinned. | Review-agent findings, verified by reading. | Surprises and hygiene, not safety. | None here. | Not applicable. |
+| `TPR-CR34-009` | P3 | **Documented** | `432205ad` | section 116 and the registered TPR100 project | The registered TPR100 project now holds nine jobs, including an unattributed Completed job and the owner/Mia job that ran with a 8192-subscription workaround; Codex correctly keeps them unadmitted, but the owner's own experiments share the project Codex must keep frozen. | Section 116.3 and the post-UI safe receipt. | Shared custody of a frozen-arm project blurs attempt and look accounting. | None here; see 117.7. | Not applicable. |
+| `TPR-CR34-010` | P3 | **Documented** | `432205ad` | lane guard at the pushed head | Two guard tests fail at the pushed head on this Mac (the received-tree document baseline was 846 passed, 2 failed); section 117 repairs the guard with its rotation. | Document-guard baseline run. | The guard is the record's integrity check. | The section-93 fact loop now runs before the section-106, 113 and 116 helpers, so a fact mutant is refused with its own message; the helpers still run on every surface. | 2 red at the received head, green after; 117.5 has the full figure. |
+
+### 117.4 Independent reproduction and verification evidence
+
+- **Git and hashes.** Fifteen linear commits; 24 changed paths, +10,945 / -60.
+  Section 116's custody source (20,880 bytes) and tests (15,736 bytes) and the
+  guard (346,232 bytes) match the recorded digests; the section-112 to 115
+  digests are verified by the guard's own history pins.
+- **Private safe receipts** (names, sizes and digests only; no body read): the
+  custody result (7,917 bytes), its outer receipt (1,385 bytes), the post-UI
+  receipt (1,889 bytes), the heartbeat configuration proof (206 bytes) and the
+  source audit (37,553 bytes) all match section 116. The hold-window census
+  found no QC-named receipt between the section-110 push and today's release.
+- **Review agents.** Three read-only passes covered the ten modules from
+  sections 109 to 115 with their tests (194, 104 and 172 passed); the custody
+  module and its tests were read directly. No P0 or P1 survives verification:
+  the two hold-mechanism points are moot after today's release and are
+  recorded as `TPR-CR34-001`.
+- **Regressions** (designated worktree, network-denied):
+
+| Case | Received tree | After the correction |
+|---|---|---|
+| prepare and prebacktest entry points propagate `KeyboardInterrupt`; ordinary errors still print a body-free refusal | red (2 failed) | green |
+| spent-action replay raises the module's refusal class | passes (narrowed from any exception) | green |
+| REMX partition: candidate plus quarantines equal source rows; one ledger entry per row | new | green |
+| zero-quantity predicate boundary (fifteen cases) | new | green |
+
+### 117.5 Validation on the final tree
+
+All runs in the designated lane worktree, network-denied
+(`sandbox-exec` deny network), isolated plugin loading, no conftest, no
+cache; no full lane suite and no complete repository suite, per the owner.
+
+| Scope | Result |
+|---|---|
+| The two project-actions test modules with the narrowed replay assertions | 146 passed |
+| REMX repair, subscription recovery, prepare and prebacktest test modules with this round's four regressions | 175 passed |
+| Three review-agent group runs over the ten modules from sections 109 to 115 | 194, 104 and 172 passed |
+| Document guards: lane record consistency (rotated, section-93 order repair, section-117 pins), shared active-document consistency, offline coverage handoff, offline-103 handoff | 860 passed |
+| Received-head baseline of the same four guard modules | 846 passed, 2 failed (`TPR-CR34-010`) |
+| Whole `tests/target_price_revisions_qc` package on the final tree | 8,227 passed, 67 skipped (the audit-key cases that need the cloud-only plugin) |
+| Received-head baseline of the same package | 8,209 passed, 67 skipped |
+| `compileall` on the changed Python files; `git diff --check` on both commits | clean |
+
+Provider requests 0; QuantConnect requests 0; private rows read 0 (safe
+receipts by name, size and digest only); looks 0.
+
+### 117.6 Milestone and authority decision
+
+No milestone is advanced. The five arms remain at 0/5 accepted full-window results with all financial metrics NULL; the preflight is blocked on native input recovery and a controllable Mia surface. This review grants nothing: canonical admission is not authorized, no real-row canonical D1 is authorized, and no QuantConnect launch, Mia launch, ON launch, broker, paper, live, capital or trading authority is granted by it. QuantConnect access stays forbidden for Claude; Codex's access is the owner's release and is unchanged here. Codex next counter-reviews section 117 and this round's Claude commits; the owner-released QC preflight recovery continues, blocked on controllable genuine QC Mia input and verified same-session native RAW/SID recovery, under fresh bounded source/HEAD/access/operation/attempt/look claims; after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, keeps the20REMXrows quarantined, skips Claude review as a progress stop, and makes exactly one final lane push.
+
+### 117.7 Recommendation to the owner
+
+Three things are yours to decide. First, the held-mark policy question from
+section 105.7 is still open and still the reason no arm can finish: Codex's
+preflight is now blocked on finding a same-session bar that the data does not
+have, and no amount of Mia consultation changes that. Choosing a stale-mark
+rule (carry the last real mark and flag the session) would unblock every arm
+at once. Second, your own Mia experiments run inside the registered TPR100
+project; either stop them there or give Codex a fresh project, otherwise
+attempt and look accounting stays blurred. Third, the REMX disk data has 20
+volumes that only the vendor can confirm; the quarantine is correct and needs
+no further local work.

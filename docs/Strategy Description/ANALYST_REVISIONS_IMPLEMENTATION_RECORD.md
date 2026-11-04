@@ -4413,7 +4413,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-03 | Owner-waived offline identity, historical-symbol coverage and REMX recovery under QC/Safari hold | `372019d5e275248fe41bad000e638479f8cb7a0b` -> `0b78b00c7cf6a75cf21044a8aaaffee852c59a21` -> `af7ebb09941f6d64df60310505645ea2a6241b25` -> `0d131ac9d662ba5942ea9b67c16d108e2da3c627` -> this final section336 handoff commit; FOUR total | No incoming Claude range; current owner review waiver, no independent acceptance | K definitions, L fractional timing, M original ownership, N normative roles and O new historical-symbol coverage each passed once and are spent. Four new files retained; none completes its required window. Original UNIT and acquired-security hypotheses refined rather than assumed | Root592distinct focused passes across stages; latest149passes2.03s,16changed-source/test memory compiles across stages, exact source/profile/native pins. Record repeats nonadditive; no full suite or operational replay | I336-001..009 corrected pre-use, I336-010 qualified/corrected; five identity stops and RAW/session/payoff/coverage gates remain. No QC/Safari/provider data API/Keychain;338/259/54/699 unchanged | ONE matching nonforce final push at the concrete dated-identity/common-price evidence barrier. All controls/readers stay spent; no automatic source-splice, source-stop bypass, QC release, strategy cell or readiness clearance |
 | 2026-11-03 | Claude review snapshot R337 of `10b05cca..3a3350dc`: the eighteen Codex commits of sections 334–336 reviewed after the fact | `3a3350dc` -> `134fbbc4` (correction) -> this record commit | All eighteen accepted, `7699f6b6` after correction; section R337 | FirstRate price-format JSON helpers keep the `bound` refusal code; deadline-taxonomy, `requests` redirect/cookie, reversible transport-pin and record-wording findings documented | 27 range test files 2,151 passed; 86 record gates; 48 section-330 regressions; 189 correction-affected passed; 1/1 mutation caught; no full suite, no QC/Safari/provider access; 0 looks, 338/259/54/699 unchanged | 0 P0, 0 P1, 1 P2 documented, 8 P3 (one corrected) | Codex counter-reviews section R337; Codex's owner-directed section-337 round continues |
 | 2026-11-04 | Completed owner-directed exact-five quarantine for matched six/eight exploratory cells; section337 | `18e6d567` -> `864c9b97` -> this final record commit | Incoming two Claude commits accepted/qualified in337.3; new variant review expressly waived | Final post-tilt denied weight to own sleeve ETF; genuine vendor-only monetary/runtime/source chain; sole local preparation/validator both exit0 and spent | 727 distinct focused passes24.37s; 17 memory compiles; exact5bindings/73ranges authenticate; no full suite or QC/Safari contact; one final push | 0 new P0/P1; seven pre-use P2 corrected; historical open P2 retained | Hold QC/Safari; future genuine project/input/source/run binding and demanded coverage pending; 338/259/54/699 unchanged |
-| 2026-11-04 | Local full-input, conservative RAW coverage and six-cell source binding; section338 | `94c2030d` -> this D1 implementation/run freeze; final result record pending | Owner expressly waives current Claude review; no new incoming review range | Fresh sealed full6151/3466 input, all71price shards, retained missing pairs and private proposed-project20file/six-cell bundle | 456 distinct focused passes29.12s; 10memorycompiles; 130held source pins/4profiles; no full suite or QC/Safari | One pre-use P2 serializer defect corrected; loader-policy composition/held-path limits and nonce privacy recorded | Sole new offline preparation/validator after exact freeze; 338/259/54/699 unchanged; one final push |
+| 2026-11-04 | Local full-input, conservative RAW coverage and six-cell source binding; section338 | `94c2030d` -> `754563a4` -> this B metadata freeze; continuation pending | Owner expressly waives current Claude review; no new incoming review range | A authenticated input_shape failure/spent; exact new B metadata-only diagnosis before any prospective policy correction | A456focused passes29.12s; B301focused passes4.81s; no full suite or QC/Safari | Corrected serializer/privacy; current genuine input shape boundary remains unresolved until B evidence; no source mode changes | Sole B metadata observe/validator under exact new freeze; A never rerun; 338/259/54/699 unchanged; one final push |
 
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
@@ -75240,3 +75240,197 @@ selected pins and unchanged matching live remote94c2030d are rechecked.
 QC/Safari hold and all financial/source/readiness gates remain. This is NOT
 a strategy/QC attempt, return/efficacy look or new admitted result cell.
 Book338/259/54/699 unchanged. Actual result/handoff follow in338.5.
+
+### 338.5 Actual A authenticated failure: genuine input shape gate, now SPENT
+
+At clean exact754563a41113ae1b5e8672426027407d638ce69f, root/branch/status/
+caller/profile/selected pins and unchanged live remote94c2030d were checked.
+Sole D1 parent was dispatched2026-11-04 17:45:54UTC; completion observation
+recorded17:46:22UTC. ACTUAL parent2 and child2, zero child stderr,
+output_authenticated=true, failure_code=input_shape, stage=retained_DATA,
+claim_state=consumed. The once-only stdin validator was dispatched17:46:22UTC,
+completion observed17:47:44UTC: ACTUAL validator2, output_authenticated=true,
+accepted=false and the SAME finite input_shape failure. These brackets are
+external second-resolution observations, not exact input/provider timestamps
+or measured execution duration.
+
+Original captured parent stdout1837B/
+bb5c96b1aba35cb86a67e1b58dd29cd03ab1a513b507282fa6cc2dd0ec145a97.
+Validator stdout1564B/
+d4d81140d0c1b9eb88989a62a1a72d3b27214ed2174898388f509fa4acd79ff6.
+Pins computed ONLY from original in-memory captured finite output, not old
+control/source reinspection. No successful coverage/source-bundle/report pin
+was returned. A is an authenticated FAILURE, not readiness or cancellation.
+Its parent/worker/stdin validation uses are now SPENT; all10 code/test bytes
+are FROZEN. Preserve claim/marker/any partial evidence; no replay, repair, cleanup,
+source-mode/attribute change or renamed unchanged attempt.
+
+Code order establishes that the fixed catalog/archive read precedes genuine
+input entry. The category input_shape does NOT identify which path or field
+failed, or establish that no earlier genuine leaf bytes were read. Do not
+invent a source leaf, permission/root cause or no-read claim. Current task
+can proceed only by a separately justified bounded diagnostic, not by
+weakening a mode predicate or relaunching A.
+
+Public authoring-code audit gives a testable hypothesis only:
+build_arv2_october_comparison_inputs.py passes CONTROL/package to the genuine
+builder; accepted_risk_preliminary_package.py1488–1490 creates output_root
+with default mkdir mode, then private mkdtemp stage; its final leaf is renamed.
+accepted_risk_october_order_package.py511–514 similarly uses default root
+mkdir, but explicitly0700 for the lineage child. Payload files are0600.
+Thus the intermediate package CONTAINER has no authored explicit0700
+contract, while A's new guard requires0700 for every below-root directory.
+That makes a container-mode mismatch plausible, NOT observed or causal fact.
+Actual current metadata is still unknown here. No chmod/umask/ACL/xattr
+setting change or broad700→755 waiver follows.
+
+### 338.6 Prospective B: fixed-path metadata-only shape diagnosis
+
+A new narrow purpose is to identify the actual shape predicate/path at the
+already-failed genuine-input boundary. It does NOT repeat A's source reads,
+coverage computation, materializer, parent/worker or validator, and it does
+not renew A. New B may observe only parent-first metadata for the fixed
+original source package/lineage ancestry, known transport-manifest.json and
+lineage.json. No dynamic payload inventory, directory listing, source leaf
+open/read/pread, genuine package load, old A control content, RAW price/
+membership/licensed row, provider, QC/Safari, credential or USB access.
+
+B will exclusively claim/fsync its own new claim and own directory before
+source observation. Literal native file-read-data denial applies to ALL other
+artifacts; ONLY new own-control byte readback may be permitted for output
+authentication. Ancestor/path observation uses os.lstat twice. A discovered
+symlink/non-directory/unavailable ancestor blocks descendants. A directory
+with a policy mode mismatch can still be inspected as metadata to determine
+whether other actual shape predicates also disagree.
+
+os.lstat does not follow its FINAL component but can follow intermediate
+components: this metadata-only contract therefore explicitly leaves
+all_component_nofollow_proven=false, held_source_descriptors=false,
+native_source_security_authenticated=false and source_byte_authentication=false.
+Equal endpoints are NOT continuous/transient nofollow/source integrity.
+No source FD is opened under read-data denial, even with O_EVTONLY. New
+output directory/claim fsync is real; parent-directory creation fsync cannot
+be claimed under this scope. Lost/partial claims remain spent/ambiguous.
+
+Finite public evidence may identify a fixed PUBLIC path ordinal/role,
+observed permission mode, owner/flag/type/size predicate classification and
+all/first failures. Full ten-field endpoint metadata/UID stays in a protected
+private evidence body, with a fresh private256bit nonce before its published
+pin, <=64KiB. No permission/ownership/security policy is automatically changed,
+no source is admitted and no A failure is retroactively accepted.
+
+The exact B code/profile/source pins, compatible host, one-shot decision,
+deadline/claim/actual-exit/stdin validation and native policies must be
+COMMITTED and checked clean before any B metadata observation. No actual
+B control allocation/source metadata access has occurred yet. Source/input/
+price/financial/readiness flags and338/259/54/699 remain unchanged.
+
+### 338.7 B implementation and exact metadata-only one-shot freeze
+
+NEW pure scripts/arv2_r338_input_shape.py and bounded
+scripts/inspect_arv2_r338_input_shape.py implement338.6. The pure classifier's
+14 fixed paths exactly match A's known traversal through source activation
+and lineage; it has no filesystem API. All shape predicates are individually
+classified against the USED input guard, not inferred from the refusal text.
+It accepts observed/unavailable/blocked endpoints, emits finite public modes/
+predicates/indices and retains full ten-field pairs only in nonce-blinded
+private evidence. No source-authentication/policy-waiver flag can become true.
+
+Observe uses parent-first absolute lstat twice and blocks descendants of
+unavailable/non-directory/symlink ancestors. This does NOT create held source
+descriptors or all-component nofollow proof. It has no source read/open/list/
+resolve/ACL/xattr/genuine-loader path. New own-control FD byte readback and
+security snapshot are separately allowed; source artifact read-data remains
+DENIED. Claim+own directory fsync precede lstat/nonce; parent-creation fsync
+is not claimed. Existing/partial/ambiguous control is spent, never reused.
+Public held-code guards return before derived private/report publication.
+
+Root selection300passes4.79s includes162pure+36caller+102record/redaction;
+final caller37passes0.34s adds ONE distinct test, union301 (not337 or any
+other additive author count). Subsequent final record/combined repeats
+overlap. Final exact combined301passes4.81s (162+37+102), no failures/skips/
+warnings. Author pure162passes3.17s; caller37passes0.31s. All4new files compile
+in memory/single-EOF.98 cases directly align actual used _InputGuard._policy
+on an uninitialized instance with synthetic metadata; no filesystem source
+is read. All ten field drift, unavailable/symlink descendants, exact scope,
+mode/owner/flag/size/link predicates, nonce/output typing, actual exit/report/
+private-pin joins and claim-before-observation are reached.
+Restored pure single-link/ctime/nonce omissions each1expectedfailure0.09s;
+caller actual-exit/private-pin omissions1expectedfailure0.08s each.
+An initial caller private-pin omission did NOT catch because an unrehashed
+report was rejected first; the coherent fixture was strengthened and original
+miss retained as a qualification. No production bytes changed in these probes.
+
+Native INERT profile-only startup under exact observe policy exits0, no
+source observation/claim. A separate top-level synthetic proof (dummy files
+ONLY under ignored inroot cache and extra actual-artifact denial) confirms
+selected lstat allowed, source leaf open/directory listing/unlisted metadata
+DENIED, and real frozen security snapshot+new own Store readback/fsync pass.
+The first probe used absent Python os.listxattr/os.setxattr APIs and failed
+as a fixture; corrected probe uses the actual supported security helper.
+No source/data policy weakened. Parent/leaf source FDs, including O_EVTONLY,
+are denied under literal read-data restriction and are never claimed.
+
+|New file|Bytes|SHA256|
+|---|---|---|
+|scripts/inspect_arv2_r338_input_shape.py|23420|9a148bf3122c1a27b42816564ce28a53e1e05d01191b113ada9cd50d2f1ed93a|
+|scripts/arv2_r338_input_shape.py|16128|1446e661446934114044f788a9c8702cd50d5004f51243ac358562bbfbe0dd27|
+|tests/analyst_revisions_v2/test_r338_input_shape_caller.py|16843|15b2dcc1cacf081338d0e28b21175c7366f0eb15202ea0c95482adb62942b869|
+|tests/analyst_revisions_v2/test_r338_input_shape.py|11726|0167bf3ac25e50d8dc8a9f82712a67758d55339c57fd4ad6e7d72cf0fdf8e21e|
+
+Helper profile5082B/
+61d08e4df669aba66b9eae412a1a44089eed405dee9c9cf5c980fdad098d0e2f.
+Caller profile2295B/
+b87d050c6a9c430ef5e11cd0ddfb35c9063b1ab708e863e2384eb794791d66e5.
+Selected existing output-security source
+scripts/arv2_relocation_security.py/
+3435bc07573697d682f25ea15fd2bfd10c5baf8220c184f73ae877016bae4a30.
+The source policy being DIAGNOSED remains original frozen inputa7e56ca5,
+not a new role exemption. No B actual metadata/control has been accessed.
+
+Decision D2: at THIS new committed clean exact freeze, invoke ONLY the NEW
+B observe CLI ONCE, then ONE new stdin-only validate of original captured
+single-LF output and EXTERNALLY OBSERVED actual exit0or2. This new purpose
+is fixed-path metadata observation of A's current shape boundary, NOT another
+A parent/worker/input/coverage/materializer/reader. A remains spent and its
+historical failing path/cause unknown. No unchanged retry or mode fix is
+authorized by the B result itself.
+
+Fixed NEW control:
+artifacts/analyst_revisions_v2/quarantine/R338-20261104-B, UNINSPECTED/
+UNALLOCATED before this freeze. Normal files claim.json,metadata-private.json,
+report.json; no cleanup/repair/overwrite. Fresh32byte OS nonce after claim,
+raw value only private. Private<=65536B/public<=32768B. Observe30s SIGALRM
+covers preflight/claim/metadata/output; validate30s. Uninterruptible IO/host
+suspension remain qualifications. Only new own outputs opened for data I/O.
+
+Compatible host ONLY designated Code root/branch/Darwin/POSIX Python3.13,
+exact /Users/sheltonchen/.venvs/trading_agent-py313/bin/python -I -B.
+Both operations require --expected-head equal THIS committed freeze,
+--caller-sha2569a148bf3122c1a27b42816564ce28a53e1e05d01191b113ada9cd50d2f1ed93a,
+--helper-sha2561446e661446934114044f788a9c8702cd50d5004f51243ac358562bbfbe0dd27,
+--profile-sha256b87d050c6a9c430ef5e11cd0ddfb35c9063b1ab708e863e2384eb794791d66e5.
+Validator also --actual-exit equal actual observed0or2.
+Clean exact Git HEAD/blob/source/helper/security/profile checks before action;
+no silent refresh. External native sandbox is REQUIRED and exactly pinned:
+observe3307B/24435d393d47ae37a715494ace79568933e292ca5d3367d63657bfa29d0563c5,
+validate598B/3eae68c943bbb450421ab7edd934c3a490e48ae66ca45eab17286b330a244158.
+Observe denies source read-data/xattr/unlisted metadata; validator denies ALL
+artifact read/write except inroot support writes, reads original stdout ONLY.
+
+Use env-i EXACT safe_env values: PATH/usr/bin:/bin:/usr/sbin:/sbin,
+LANG=C,LC_ALL=C,GIT_OPTIONAL_LOCKS=0,PYTHONDONTWRITEBYTECODE=1,
+TMPDIR=<designatedroot>/.pytest_cache/r338-B-runtime and
+PYTHONPYCACHEPREFIX=<that>/pycache. Do NOT add the pytest-only environment
+variable to this strict operational environment. All support paths inroot;
+no logging/raw exceptions/private values in stdout.
+
+Actual observe0 AND strict authenticated matching output+actual validator0+
+accepted_observation=true are mandatory for a completed metadata observation.
+A validator0 can authenticate actual observe2 FAILURE evidence with
+accepted_observation=false; this is not successful observation/source proof.
+Late publication failure/nonzero/unknown/noise/trailing/timeout/ambiguous
+claim spends this B invocation. Record actual process facts, not a fabricated0
+or no-read/root-cause inference. No current source permissions, owner/flags/
+ACL/xattrs, old control/evidence or source policy is changed. QC/Safari/
+provider/credential/USB/financial holds and338/259/54/699 stay unchanged.

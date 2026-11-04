@@ -1,31 +1,31 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE (WINDOWS SESSION) HAS REVIEWED THE TWENTY-TWO COMMITS
-`20c49ac..f27d836` (SECTION 132): ALL ACCEPTED, NO P0/P1. BY OWNER DIRECTION
-("DO NOT JUST LOG THE FINDINGS. MAKE EFFORT TO FIX THE ISSUE YOU FIND") THE
-WINDOWS LANE IS RESTORED AT `ccea2fb`: 157 FILES COLLECT 5,156 TESTS WITH ZERO
-ERRORS AND THE 31 AFFECTED FILES PASS 442 / SKIP 220 / FAIL 0; THE COMPLETE LANE
-RUN WAS STOPPED BY OWNER DIRECTION ("SKIP THE FULL LANE SUITE AND PUSH") AT
-4,240 of 5,156 tests executed (82.2%) in 1,546 s: 3,501 passed, 739 skipped, 0 failed, 0 errors; 916 tests in 21 files not executed, SO NO COMPLETE LANE FIGURE EXISTS FOR THIS TREE. FOUR PATH STRINGS INSIDE HASHED PROTOCOLS AND SERIALIZED
-REPORTS ARE NOW HOST-NEUTRAL (`as_posix`; EVERY REGISTERED DIGEST IS UNCHANGED
-ON THE DESIGNATED MAC), THE DAILY PINNED-FILE CONSTRUCTOR REFUSES WITH THE FIXED
-PLATFORM CODE BEFORE ANY BOUNDARY, STAT OR OPEN (SI-CR18-006), AND THE
-SECTION-114 MARKER PLUS A NEW `_DESIGNATED_ROOT_ONLY` MARKER COVER EVERY
-PROTECTED OR ROOT-PINNED TEST. NO PHYSICAL-ROOT, PROTOCOL, CUSTODY OR SOURCE
-PIN IS WEAKENED. PRIOR COUNT RUN 13448 UNRESOLVED (SI-BUILD-20261028-052
-OPEN). SOURCE DISPATCH BLOCKED IN CODE ON ALL THREE DURABLE-COUNT ENTRY ROUTES,
-WITH NO CALLER RELEASE. 84005 CUMULATIVE COUNT STARTS / UNCHANGED 4GiB
-CEILINGS; THE PRIOR BASELINE 13992 START / 23452681 CHARGED BYTES IS NOT A
-VERIFIED CURRENT BALANCE, AND PERMANENT FULL-PAGE ACCOUNTING WOULD ALLOW AT
-MOST 2036 NEW SLOTS FROM THAT BASELINE, NOT A RELEASE. ALL OLD CLAIMS,
-NEGATIVES, RECEIPTS AND CHARGES REMAIN SPENT/IMMUTABLE; NO OLD FILE IS ADOPTED.
-LOCAL BACKTEST READINESS FALSE; NOT PRE-QC READY. QUANTCONNECT PAUSED BY OWNER.
-NO QC/SAFARI/MIA, INCLUDING CAPACITY/METADATA, SETUP, UPLOAD, COMPILE OR JOB.
-TWO HISTORICAL QC METADATA REQUESTS REMAIN ACCOUNTED FOR. NO PURCHASE, NEW
-TERMS/CREDENTIAL, BROKER/OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL,
+Status: **CLAUDE (MACOS SESSION) HAS REVIEWED THE THIRTY-SEVEN COMMITS
+`f27d836..a184a41` (SECTION 147): THE 34 CODEX COMMITS OF SECTIONS 132-146, THE
+TWO WINDOWS CLAUDE COMMITS ALREADY COUNTER-REVIEWED IN 133.1 AND THE SAME-LANE
+MERGE `572ed52`. NO P0/P1. CORRECTION COMMIT `3a8f39211bb3e0ec2b68603e5ee91492a0265885` FIXES FOUR P2
+DEFECTS: THE CHECKPOINT LOADER'S CODE CATALOGUE AFTER `808df63`'S EAGER IMPORTS
+(A RED TEST AT `a184a41`), THE STARTUP DIAGNOSTIC RELEASING ENDPOINTS AFTER A
+POST-START CONTROLLER DEATH, AND THE PREPARED DOCUMENTS TRACE RUNNING A
+PATH-RESOLVED `sudo` AND ROOT GIT UNDER `safe.directory` (SI-CR27-001..004);
+TESTS CLOSE SI-CR27-005..007. THE PREPARED OWNER DOCUMENTS-TRACE COMMAND IS
+STALE AND MUST NOT BE RUN; CODEX FIXES SI-CR27-009 AND REGENERATES IT.
+SI-CR27-008 (THE OLD OPERATIONAL RUN PATH STILL MINTS THE FLOORLESS EIGHT-PART
+PLAN) IS A PRECONDITION OF ANY GATE REPLACEMENT. PRIOR COUNT RUN 13448
+UNRESOLVED (SI-BUILD-20261028-052 OPEN). SOURCE DISPATCH BLOCKED IN CODE ON ALL
+THREE DURABLE-COUNT ENTRY ROUTES, WITH NO CALLER RELEASE. 84005 CUMULATIVE COUNT
+STARTS / UNCHANGED 4GiB CEILINGS; THE PERMANENT UNKNOWN-RUN DEBIT 8 START /
+16777216 BYTES STAYS CHARGED; THE PRIOR BASELINE 13992 START / 23452681 CHARGED
+BYTES IS NOT A VERIFIED CURRENT BALANCE, AND PERMANENT FULL-PAGE ACCOUNTING
+WOULD ALLOW AT MOST 2036 NEW SLOTS FROM THAT BASELINE, NOT A RELEASE. ALL OLD
+CLAIMS, NEGATIVES, RECEIPTS AND CHARGES REMAIN SPENT/IMMUTABLE; NO OLD FILE IS
+ADOPTED. LOCAL BACKTEST READINESS FALSE; NOT PRE-QC READY. QUANTCONNECT PAUSED
+BY OWNER. NO QC/SAFARI/MIA, INCLUDING CAPACITY/METADATA, SETUP, UPLOAD, COMPILE
+OR JOB. TWO HISTORICAL QC METADATA REQUESTS REMAIN ACCOUNTED FOR. NO PURCHASE,
+NEW TERMS/CREDENTIAL, BROKER/OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL,
 ORDER OR TRADING ACTION. NO OUTCOME JOIN OR BACKTEST. CANONICAL ACTUAL LOOKS
 0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, PERMANENT LOOK IDS NONE, QC LAUNCH
-ATTEMPTS0. CODEX COUNTER-REVIEW OF `ccea2fb` AND THIS RECORD COMMIT IS NEXT.**
+ATTEMPTS0. CODEX COUNTER-REVIEW OF THIS ROUND IS NEXT.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -263,6 +263,10 @@ Append one row before every push. Never rewrite earlier rows.
 
 | 2026-10-28 | Codex counter-review and verified lane corrections | Published Claude range `757e3634511d2160f24ef2b274f101f0952c4f84..49d024dfc8ff276d7366d7989c19704cc4d77ce5`; correction `202e9bf3508cd0f80359bfdee2a4e43371b01bc6` plus this record commit, one matching-lane push | Section131: all three Claude commits accepted after correction | Repair containing-parent durability barrier, original-path/exact-byte checks and bounded writes; replace historical stamp assertions with present observations and explicit unknown historical counts. Preserve all original data/spending and052 gate. | Main22 focused files953passed/65.88s; no full suite, actual source/proof, QC/Safari or outcome look. All89 held/changed files compile in memory. | SI-CCR-20261028-001..005 closed by verified correction/errata;052 remains open. SI-CR24-001 is conditional evidence only;002 closes projected-report subissue only. | No new implementation/source release. Resolve original accounting/custody under a separate frozen policy before any dispatch; remain pre-QC blocked. |
 | 2026-10-29 | Claude review + owner-directed corrections (Windows session) | `20c49ac` -> `f27d836` reviewed from the published head after a fast-forward; **correction commit `ccea2fb4e4e31ffb0b68656445fd6d1736fea70b`**; this record commit follows, so the round has two Claude commits | Independent review of Codex sections 127-128 and 131 and the macOS session's 129-130 (isolated custody proofs, durable count chain, exec13448 hold, stamp observer V2), plus restoration of the Windows lane under the owner's "make effort to fix" direction | Dispositions for all twenty-two commits; read the 202e9bf production and test diffs in full and the final hold-report writer; verified the dispatch gate raises unconditionally on all three routes; recomputed the 84005 / 67885 / 2036 arithmetic. Corrected on this host: nine new test modules uncollectable (POSIX imports), four host-rendered paths inside hashed protocols and reports, the daily pinned-file constructor's missing platform preflight, and every protected or root-pinned test without a marker (227 classified Windows failures resolved). | 157-file lane on `ccea2fb`: 4,240 of 5,156 tests executed (82.2%) in 1,546 s: 3,501 passed, 739 skipped, 0 failed, 0 errors; 916 tests in 21 files not executed; collection **5,156 tests, 0 errors** (from 9 errors); the 31 affected files **442 passed, 220 skipped, 0 failed**; the new regression **1 failed** with the preflight removed and **1 passed** with it; both re-rendered protocol digests equal their registered constants on this host; compileall exit 0; `git diff --check` clean; record-reading tests **95 passed, 3 skipped** (the three skips are the macOS-only anchor-cache constructor cases) and active-document **69 passed** after this record. No credential, provider, image, namespace, QC or macOS artifact was touched; none exists here. **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | No P0/P1. `SI-CR26-001` (P2, closed: Windows collection, recurrence), `SI-CR26-002` (P2, closed: host-dependent protocol digests), `SI-CR26-003` (P2, closed: daily preflight; my 126 anchor-cache claim withdrawn per `SI-CCR-20261026-001`), `SI-CR26-004` (P3, closed: markers, ids, harness keys), `SI-CR26-005` (P3, open advisory: lazy POSIX imports), `SI-CR26-006` (P3, open: Windows lane scope now explicit). `SI-BUILD-20261028-052`, `SI-CR24-002` residual, `SI-CR24-007`, source P2s, `SI-CR15-001` and `SI-CR17-002` unchanged. | Codex counter-reviews `ccea2fb` and this record commit and considers `SI-CR26-005`; 052 keeps every durable-count dispatch refused; QC stays paused; every source, outcome, purchase and trading gate remains closed. Push once at the end of this round per the standing rule. The complete lane figure on `ccea2fb` is owed to the next Windows round. |
+| 2026-10-30 | Codex counter-review + continuation publication (row added by Claude review, `SI-CR27-018`) | Starting matching origin `4be7c1ea043baa86f1030b5b0a20e9e0e1faeade`; fourteen local commits `b1b5fd6faf12b5873f2609d7869ea728806da697` .. `9fa0ade3b14079637a10ec390d30737001460869`, merge `572ed522742f037a0a83a3c55bb6832138fefcc9` and `58d00461ac33a68adc0f2eeb895dff3c0ef08134` .. `b556bee695694a5ef79cd285be9631f288f5e679`, one non-force push at 11:44 UTC | Second section 132 and section 133: conservative unknown-run accounting, supervisors, startup diagnosis, native supervision proof, counter-review of the Windows round | Windows commits accepted (SI-CCR-20261030-001 P3 erratum); permanent 8 START / 16,777,216-byte unknown-run debit; the actual native proof refused and its hold ended with the owner's Mac restart | Codex attributes 472 focused tests (133.3); no complete lane suite, QC or outcome look. | `SI-BUILD-20261030-001` (P2) and Codex's own pre-release findings. No ledger row was written for this push; Claude added this one. | Claude review (section 147). |
+| 2026-11-03 | Codex offline continuation publication (row added by Claude review, `SI-CR27-018`) | `33ab4da445536dc3ebfd86c084167c083d88339c` .. `2a6d34c063da17dadeb98874344b628dcd6594a7`, one non-force push at 18:05 UTC | Sections 134-135: journal actor attribution and read-only USB archive inspection | The USB custody refusal and blocked handoff are recorded as the blocker | Codex attributes focused selections per 134-135; no complete lane suite, QC or outcome look. | No ledger row was written for this push; Claude added this one. | Claude review (section 147). |
+| 2026-11-04 | Codex custody/attribution publication (row added by Claude review, `SI-CR27-018`) | `95c72ca85d7b3e082901a5ad3f6f0f0a6ccff07d` .. `a184a414c00cea327ef80d29837e3a8a2a3b4abe`, one non-force push at 01:44 UTC | Sections 136-146: local metadata and native custody proofs, durable Main receipt and anchor, conservative preflight, USB code windows, prepared passive Documents observer | Concrete owner-action blocker published, not pre-QC readiness | Codex attributes focused selections per 136-146 (Main 69 active-document checks after the record); no complete lane suite, QC or outcome look. | Codex's SI-*-20261103 pre-release findings. No ledger row was written for this push; Claude added this one. | Claude review (section 147); the prepared owner command is stale (147.6). |
+| 2026-11-04 | Claude review + corrections (macOS session) | `f27d836` -> `a184a41` reviewed after the push watcher fired; **correction commit `3a8f39211bb3e0ec2b68603e5ee91492a0265885`**; this record commit follows, so the round has two Claude commits, published in one push | Independent review of Codex sections 132 (second heading) and 133-146, the two Windows Claude commits and the same-lane merge | 37 dispositions; the merge kept every line of both parents; record hashes recomputed; four P2 defects corrected (loader catalogue, startup hold after ack1, PATH-resolved sudo, root Git under safe.directory) and three test gaps closed, each mutation-verified | Baseline at `a184a41`: the round's 42 changed test files 2,340 passed / 1 failed. Final tree: 2,378 passed, 0 failed in 163 s; record tests 29 passed in the three status-pin files plus 69 active-document checks passed, both after this record; network denied. No full lane suite (owner direction). **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | No P0/P1. `SI-CR27-001`..`-007` fixed or tested; `SI-CR27-008` (P2, gate-replacement precondition) and `SI-CR27-009` (P2, before the owner trace) open; `SI-CR27-010`..`-017` P3 open; `SI-CR27-018` fixed in the record. `SI-BUILD-20261028-052` unchanged. | Codex counter-reviews this round, fixes `SI-CR27-009` and regenerates the owner Documents command; 052 keeps every durable-count dispatch refused; QC stays paused. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -31808,3 +31812,192 @@ qualification; no USB/profile retry to guess, source request, QC/Safari or
 purchase. All preserved data, permanent uncertainty debits and separate
 budgets remain. No monitor is armed and no external chat is messaged.
 Main's final handoff active-document checks69 passed/.86s; whitespace passed.
+
+## 147. Claude independent review — 2026-11-04 UTC (macOS session: `f27d836..a184a41`, Codex sections 132-146, the Windows commits and the same-lane merge)
+
+### 147.1 Scope, trigger and method
+
+The owner asked Claude to monitor this lane and, on Codex's push, review every
+unreviewed commit, correct where necessary and push once, without the full
+lane suite. The watcher armed on matching origin
+`2a6d34c063da17dadeb98874344b628dcd6594a7` fired at 2026-11-04T01:45:05Z on
+`a184a414c00cea327ef80d29837e3a8a2a3b4abe`. The worktree was clean and local
+HEAD already equalled that origin; nothing was rebased or reset.
+
+The last Claude review is the Windows section 132 (`20c49ac..f27d836`), so the
+range is the 37 commits `f27d836..a184a41`. That covers:
+
+- the 34 Codex commits behind sections 132 (the second heading) and 133-146;
+- the two Windows Claude commits `ccea2fb` and `4be7c1e`, which Codex
+  counter-reviewed in 133.1;
+- the same-lane merge `572ed52`.
+
+Codex published those commits in three non-force pushes to `b556bee`, `2a6d34c`
+and `a184a41`; section 5 now carries their ledger rows. Six read-only reviewers
+each took one module group:
+
+| Group | Area |
+| --- | --- |
+| A1 | Accounting and durable capture |
+| A2 | Supervisors and startup diagnosis |
+| B1 | Native supervision proof |
+| B2 | Main receipt and conservative readmission |
+| C | Actor traces and local metadata |
+| D | USB inspection |
+
+Claude checked the merge, the record and every reported finding itself before
+acting on any of them. All test and mutation runs were made under
+`sandbox-exec` with `(deny network*)`, after an EPERM probe (errno 1). Nothing
+in this round touched any of the following: a provider, a credential, the
+Keychain, QuantConnect or Safari, the USB volume, the Documents directory,
+eslogger, sudo, launchctl, hdiutil, a mounted proof image, or the exec13448
+namespace.
+
+The baseline at `a184a41` ran the 42 test files changed in the range:
+**2,340 passed, 1 failed** in 168 s. The failure is
+`test_loader_catalogue_binds_every_reachable_eager_or_fixed_lazy_repository_import`
+(SI-CR27-001). It passes at `df51ed1` and fails at `808df63`; Codex's
+seven-file selection in 141.3 did not include that test file.
+
+### 147.2 Merge, record and hash checks
+
+`572ed52` is accepted. Its remerge diff touches only the lane record. Every one
+of the 239 lines that `4be7c1e` added since `f27d836`, and every one of the
+1,798 lines that `9fa0ade` added, survives in the merge. The only lines
+removed are the 27 lines of the old status paragraph, which Windows replaced.
+The two section-132 bodies are both retained, as section 133 says.
+
+These record claims were recomputed from Git blobs and all match: 135.4, 135.6,
+139.5, the 139.6 anchor (941 bytes, `1c9d8971…`), 140.2, 141.3 (coordinator
+118,982 bytes / `cbaef7d1…`; tests 119,937 bytes / `fcf2d964…`), 144.3 and
+146 (driver 33,537 bytes / `c4343dd9…`; tests 20,716 bytes / `9c9c275e…`;
+framer 35,527 bytes / `ed462f3b…`). The accounting arithmetic in the second
+132 table and in 139.3 also reproduces.
+
+### 147.3 Dispositions (one per commit)
+
+| Commit | Author/section | Disposition |
+| --- | --- | --- |
+| `b1b5fd6f` | Codex 132 | Accepted with findings: SI-CR27-007 (test gap, closed here), SI-CR27-008 (open P2), and P3 items in SI-CR27-012 and SI-CR27-016 |
+| `edbd13a0` | Codex 132 | Accepted |
+| `60baad81` | Codex 132 | Accepted |
+| `e1ed26a1` | Codex 132 | Accepted |
+| `5ceea3bc` | Codex 132 | Accepted; component labels remain non-forensic as recorded |
+| `b58f992a` | Codex 132 | Accepted |
+| `2a8410f5` | Codex 132 | Accepted with P3 items in SI-CR27-013 |
+| `08f334ba` | Codex 132 | Accepted |
+| `77d551bc` | Codex 132 | **Corrected**: SI-CR27-002 (P2); its P3 receipt label is in SI-CR27-013 |
+| `5f96cbcd` | Codex 132 | Accepted |
+| `64c5ece4` | Codex 132 | Accepted |
+| `b05d30dd` | Codex 132 | Accepted with a P3 test-portability note (SI-CR27-013) |
+| `5416d095` | Codex 132 | Accepted; SI-CR27-002 also makes its 132.30 retention claim true |
+| `9fa0ade3` | Codex 132 | Accepted with P3 items in SI-CR27-014 |
+| `ccea2fb4` | Claude (Windows) 132 | Claude's own correction; Codex counter-review 133.1 stands and is not re-reviewed here |
+| `4be7c1ea` | Claude (Windows) 132 | Claude's own record; Codex's 133.1 P3 erratum SI-CCR-20261030-001 stands |
+| `572ed522` | Codex merge | Accepted (147.2) |
+| `58d00461` | Codex 133 | Accepted |
+| `67351775` | Codex 133 | Accepted with a P3 note: the negative window is shared, not "fresh" (SI-CR27-014) |
+| `b556bee6` | Codex 133 | Accepted with a P3 test gap (SI-CR27-014) |
+| `33ab4da4` | Codex 134 | Accepted as a spent historical v1 trace, with P3 hindsight items in SI-CR27-011 |
+| `d10a9b2a` | Codex 135 | Accepted with P3 items in SI-CR27-017 |
+| `b30201d4` | Codex 135 | Accepted |
+| `2a6d34c0` | Codex 135 (record) | Accepted; "USB not changed" covers bytes, flags and the ten stamped fields only (SI-CR27-017) |
+| `95c72ca8` | Codex 136 | Accepted as a spent v2 trace, with P3 hindsight items in SI-CR27-011 |
+| `33f8413c` | Codex 137 | Accepted; no material finding (its driver is retired by its SDK pin) |
+| `07ca0ea9` | Codex 137 (record) | Accepted |
+| `ca11659f` | Codex 138 | Accepted with P3 items in SI-CR27-014 |
+| `f8cb9833` | Codex 138 (record) | Accepted with a P3 sequencing remark in SI-CR27-015 |
+| `a71d21b6` | Codex 139 | Accepted; test gaps SI-CR27-005 closed here; P3 items in SI-CR27-014 and SI-CR27-015 |
+| `d3b7fd41` | Codex 139 | Accepted; the anchor matches the record (SI-CR27-015 notes that nothing pins its SHA-256) |
+| `df51ed1d` | Codex 139 (record) | Accepted; its 139.7 figures came from an untracked wrapper (SI-CR27-015) |
+| `808df637` | Codex 140-141 | **Corrected**: SI-CR27-001 (P2; red test) |
+| `9582cdd9` | Codex 142 (record) | Accepted |
+| `aa060e3a` | Codex 143-144 | Accepted; test gap SI-CR27-006 closed here; P3 items in SI-CR27-017 |
+| `4a6c9256` | Codex 145-146 | **Corrected**: SI-CR27-003 and SI-CR27-004 (P2). SI-CR27-009 (P2) is open; P3 items are in SI-CR27-010 |
+| `a184a414` | Codex 146.1 (record) | Accepted; superseded by 147.6 on the prepared owner command |
+
+### 147.4 Findings ledger (SI-CR27; SI-CR25 is unused and the Windows round used SI-CR26)
+
+| ID | Priority | Status | Introduced | Finding, evidence and disposition |
+| --- | --- | --- | --- | --- |
+| SI-CR27-001 | P2 | **Fixed** in the correction commit | `808df637` | The producer now eagerly imports the conservative readmission and Main-receipt modules, which pull six modules (readmission, Main receipt, process supervisor, native supervisor, native proof, startup diagnostic) into the checkpoint loader's import closure. `loader.code_paths()` still held only the producer's historical operational catalogue, so its held-code audit did not cover code it executes, and the existing AST closure test went red. The loader protocol is still `PENDING`, so its catalogue now uses `producer.conservative_preflight_code_paths()`. The producer's operational catalogue and protocol `0eb57c3e` are unchanged (141.2 marks them historical/blocked). Regression: the existing test (98 loader cases pass); the in-memory mutant restoring the old catalogue fails it. |
+| SI-CR27-002 | P2 | **Fixed** | `77d551bc` | After the barrier, the root kept the pre-start never-started kernel row while writing ack1. If the controller died after its single kickstart and before its terminal receipt, the hold test read that stale row (`running` false) and closed the master, slave and pipes without a fresh query, although the target might still run. That contradicts 132.22/132.30. The root now clears `kernel` before ack1, so unknown post-start state holds. Regression: `test_controller_death_after_initial_start_without_receipt_holds_endpoints` (one hold); the mutant fails it. |
+| SI-CR27-003 | P2 | **Fixed** | `4a6c9256` | The prepared Documents command ran `sudo` by bare name through the owner's PATH, where a user-writable directory precedes `/usr/bin`. A planted `sudo` could have captured the administrator password before any held-byte check. The command now uses `/usr/bin/sudo`; the plan test asserts that and the bare-name mutant fails it. |
+| SI-CR27-004 | P2 | **Fixed** | `4a6c9256` | Root ran `/usr/bin/git -c safe.directory=ROOT …`, which honours owner-writable repository config. A same-user process could configure a clean or process filter that `git status` then executes as root, with empty porcelain output, contrary to 146's "Root executes only those held bytes". Every root Git read now runs as the lane owner (`user`, `group` and `extra_groups=[]`, supported by the system Python 3.9.6 that runs the bootstrap), and the `safe.directory` override is gone. Regression: `test_root_code_guard_runs_every_Git_read_as_the_lane_owner` (seven fake Git calls). The mutants that drop the owner arguments or restore `safe.directory` each fail it. |
+| SI-CR27-005 | P2 | **Fixed** (tests only) | `a71d21b6` | The Main-receipt loader had three test gaps. (a) No test required that the anchor equal its committed bytes: a mutant deleting that clause passed all 75 tests. (b) No test exercised the `merge-base --is-ancestor` refusal. (c) In `test_held_durable_getter_permanently_latches_late_mutation`, the close-time refusal masked a getter that had stopped rechecking: a no-op `validate` mutant failed only the `association` case. New tests cover (a) and (b), and the latch test now records each getter refusal inside the context. All four cases and both new tests fail on their mutants. |
+| SI-CR27-006 | P2 | **Fixed** (tests only) | `aa060e3a` | The check that the running orchestrator's functions, methods and pinned constants equal the committed fifth file had no test: removing either block left all 46 tests passing. A parametrized test now commits a same-line-count variant (one function constant, one pinned constant) and expects bootstrap `runtime_changed`. Each copied-tree mutant fails its case. |
+| SI-CR27-007 | P3 | **Fixed** (tests only) | `b1b5fd6f` | The nine-part plan's first-chunk repeat cap (+8) was untested. The existing tests reached the chunk START cap first or used eight-part plans. New durable-budget and research-budget tests refuse the ninth repeat. The mutant that reverts each cap to the global +16 fails its test. |
+| SI-CR27-008 | P2 | Open for Codex/owner (precondition of any gate replacement) | `b1b5fd6f` | `run_registered` still mints the old floorless eight-part plan through `freeze_recovery_from_archive`. `_prepare_registered_source_lease` accepts any plan, although registered protocol `0eb57c3e` states a typed negative-exposure floor. If the 052 gate were replaced without also replacing this factory, the run would budget from 13,992 instead of 14,000 with a zero-byte floor and +16 first-chunk extras, and could exceed 84,005. The loader rebuilds the nine-part plan, so producer and loader would also disagree on the plan SHA. The resolver's and producer's operational catalogues likewise miss the six SI-CR27-001 modules. Only the unconditional gate stands in front today. Claude trialled a lease guard (`len(plan._parts) == 9` with a negative exposure): it fails closed but breaks six lease tests that use eight-part fixtures. Wiring the conservative plan into a run is the operational design 141.2 reserves for a newly frozen protocol, so it is not done here. |
+| SI-CR27-009 | P2 | Open for Codex, **before** the owner's Documents trace | `4a6c9256` | Diagnosability of a one-shot run. `diagnostic()` keeps only `DocumentsTraceRefusal` codes: framer `TraceRefusal` codes (`input_limit`, `invalid_json`, `schema_*` …) and errno names (for example EPERM from missing Full Disk Access) all become `code None / unknown_local_failure`. Separately, the framer's 8 MiB input cap covers about 4.4k records (about 2 KB each, measured on the spent v2 stream) over a 34 s system-wide nine-event subscription. That plausibly ends an active Mac's run with `input_limit` after the exclusive report is created. Map framer contracts and allowlisted errno names, choose and record a Documents-specific cap, then regenerate the command. |
+| SI-CR27-010 | P3 | Open for Codex | `4a6c9256` | Documents observer gaps. (a) No tests cover bootstrap execution, `code_guard` before this round, planned SIGTERM/EOF, the deadline kill, the stderr limit, or the subclass's sequence-gap and no-records checks. (b) A nonzero first `global_seq_num` is accepted. (c) `native_active` labels cover samples before the first record and after SIGTERM. (d) The fixture's default create uses the rarer `NEW_PATH` shape. (e) An expired publication reserve discards all projected evidence. |
+| SI-CR27-011 | P3 | Historical; no rerun | `33ab4da4`, `95c72ca8` | The spent journal traces v1 and v2 ran root Git under `safe.directory` with a bare `sudo`, and v1 had no `GIT_OPTIONAL_LOCKS=0`. The present config has no filters and the index is user-owned; their recorded outputs stand as recorded. |
+| SI-CR27-012 | P3 | Open, lane-wide pattern | `b1b5fd6f`, `d10a9b2a`, `aa060e3a` | `git ls-remote` runs under the CommandLineTools system gitconfig (`credential.helper=osxkeychain`), so `credential_reads: 0` is not enforced if the remote ever demands authentication. The old USB reader's `_git` also inherits the full environment. Use `-c credential.helper=`, `GIT_TERMINAL_PROMPT=0` and `GIT_CONFIG_NOSYSTEM=1`. The process supervisor's bytes are pinned by the startup diagnostic's `TARGET_MANIFEST`, so the fix belongs to its next version. |
+| SI-CR27-013 | P3 | Open for Codex | `b1b5fd6f`, `2a8410f5`, `77d551bc`, `b05d30dd`, `5416d095` | Supervisor and startup robustness. (a) The process supervisor's `_code_manifest` opens without `O_NONBLOCK`, so a FIFO swap could block before any deadline (bytes pinned, as above). (b) A failed `start` leaves the receipt carrying the pre-start row. (c) The diagnostic `_Status.close` compares with the current size, not the emit snapshot. (d) The standalone `prepare-readonly` CLI can spend a diagnostic version, and `slave_path` is unvalidated in `_observer_config`. (e) Real-child tests use the hard-coded worktree path and venv. |
+| SI-CR27-014 | P3 | Open for Codex | `9fa0ade3`, `67351775`, `b556bee6`, `ca11659f`, `a71d21b6` | Native-proof robustness. (a) A late producer refusal leaves exactly `POSITIVE_ROLES` on disk with no `run.refused.json`; Root still refuses. (b) Cleanup errors replace the primary error in `_prepare_local_container` and `_read_config`, and `_Inputs` is built outside its `try`. (c) 133.4's "fresh 5 s" negative window is shared with the preceding refusal work; it fails safe. (d) Projection host-stamp, hosts-binding and native-only cast tests are missing. (e) `_sdk_fchflags` refusal branches never execute in fabricated tests. (f) 139.2 overstates what `RootClosureProjection` revalidates. (g) `prepare-main-proof` and `coordinate-main-proof` remain CLI actions. |
+| SI-CR27-015 | P3 | Open for Codex | `a71d21b6`, `d3b7fd41`, `f8cb9833`, `df51ed1d` | Main receipt. (a) No constant or test pins the anchor's SHA-256. (b) The `load` CLI prints the success summary before the close-time checks. (c) Root digests that could be recomputed are treated as opaque. (d) Record wording: 139.3 calls 14,000 / 40,229,897 the "Baseline" (it is the initial upper bound). 139.6 says the anchor binds projection flags (only receipt flags directly). 139.7's figures come from an untracked wrapper. 138.7's stated order was not followed (harmless). |
+| SI-CR27-016 | P3 | Open for Codex | `b1b5fd6f` | Accounting hygiene. (a) The hard-coded 70,013 and 528 bounds are looser than the nine-part 70,005 and 520 that the budget enforces. (b) `test_new_plan_json_or_caller_status_cannot_replace_registered_resolution` refuses at the identity check before reaching `resolution_binding`. (c) The resolver's `finally: footprint.close()` and volume refusals can misreport the cause; the resolver is obsolete. |
+| SI-CR27-017 | P3 | Open for Codex | `d10a9b2a`, `808df637`, `aa060e3a` | USB inspection. (a) The old reader loaded `data.hashing` bytecode before verification; the RAM graph fixes this. (b) Real-Git tests use the hard-coded worktree. (c) The zlib `max_length` bound is untested. (d) Several negative guards are untested. (e) A positive five-code status is issued whatever the model's verdict, so it is not a structural pass. (f) No read-only mount check, so "USB not changed" covers bytes, flags and the ten stamped fields, not access times. (g) The reader's positive tests do not freeze shared temporary ancestors. (h) Code-object equality ignores defaults and globals, so 144.1's "globals are compared" overstates it. |
+| SI-CR27-018 | P3 | **Fixed** in this record | Codex 132-146 | The status paragraph still described the Windows review and named a counter-review as next. Section 5 had no rows for Codex's three publications. Both are corrected here. The duplicate section-132 numbers remain historical identifiers, as 133 states. |
+
+### 147.5 Corrections and validation
+
+The correction commit is `3a8f39211bb3e0ec2b68603e5ee91492a0265885`. It changes three production files and
+six test files, and nothing else:
+
+| File | Change |
+| --- | --- |
+| `scripts/load_short_interest_count_checkpoints.py` | The `code_paths()` catalogue (SI-CR27-001) |
+| `scripts/diagnose_short_interest_native_supervisor_startup.py` | One `kernel = None` before ack1 (SI-CR27-002) |
+| `scripts/trace_short_interest_documents_actor.py` | `/usr/bin/sudo`, and owner-run Git without `safe.directory` (SI-CR27-003 and -004) |
+
+No policy hash, registered protocol, `TARGET_MANIFEST` pin, source gate,
+budget constant or historical code changes. No existing assertion was
+weakened. The plan test's `tokens.count('sudo') == 1` became the stronger
+absolute-path assertion, because the old one accepted the PATH-resolved name.
+
+Every regression was shown to fail without its fix:
+
+| Fix | Mutation used |
+| --- | --- |
+| SI-CR27-001, -002, -003, -004, -005, -007 | In-memory source mutants executed into each module's own namespace |
+| SI-CR27-006 | Copied-tree mutants, because that fixture compiles the driver from disk |
+
+Results on the final tree, network-denied:
+
+- The six edited test files plus the loader file passed. That includes 48
+  Documents cases, 77 Main-receipt cases, 98 loader cases and 115
+  budget/recovery cases.
+- The full selection of the round's 42 changed test files plus the
+  import-boundary and body-receipt closure tests: 2,378 passed, 0 failed in 163 s.
+- The three status-pin record tests: 29 passed in the three status-pin files plus 69 active-document checks passed, both after this record.
+- Whitespace (`git diff --check`) passed.
+- All nine edited files compile under Python 3.13, and the Documents driver
+  also compiles under the system Python 3.9.6.
+
+No full lane suite was run, by owner direction.
+
+### 147.6 Prepared owner command is stale; do not run it
+
+The command-only file prepared in 146.1 binds HEAD `a184a41`, matching tracking
+`a184a41` and driver SHA-256 `c4343dd9…`. All three change with this round.
+The root bootstrap now refuses before any code runs, because the held driver
+hash differs. Even with a matching hash, `code_guard` would refuse at `lane`
+before the exclusive report is created, so a mistaken run spends nothing. Codex
+should address SI-CR27-009, regenerate the command against the new committed
+HEAD and driver hash, and only then hand it to the owner.
+
+### 147.7 Unchanged state
+
+| Item | State |
+| --- | --- |
+| `require_dispatch_allowed()` | Still refuses unconditionally (`scripts/short_interest_count_source_authority.py` is unchanged in the range) |
+| SI-BUILD-20261028-052 | Open |
+| Count ceiling | 84,005 STARTs / 4 GiB |
+| Permanent unknown-run debit | 8 START / 16,777,216 bytes, still charged |
+| DAILY residual | 36,837 / 3,327,988,047 / 71,468,572, separate |
+| Old claims, negatives, receipts and charges | Spent and immutable |
+
+This round made no provider or key request, created no claim, START or charged
+byte, made no QC or Safari access or purchase, and did no outcome join. Looks
+remain 0/0 canonical and 0 exploratory, alpha 0, permanent look IDs none, and
+QC attempts 0. Codex's counter-review of this round is next.

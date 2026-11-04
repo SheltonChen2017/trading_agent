@@ -887,6 +887,10 @@ Section 330 applies the owner-directed corrections of those findings: W5
 cash-limited buys are sized on max(ask, engine price), twenty spent-caller pin
 closures pass again, a guard requires the resolver literal, and reversible
 fingerprints and the owner's display name are withheld from the current text.
+Review snapshot R337 is Claude's after-the-fact review of the eighteen Codex
+commits of sections 334–336: all accepted, one P3 price-format refusal-code
+defect corrected in `134fbbc4`, and a P2 timeout-taxonomy requirement
+recorded for successor callers.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -2345,6 +2349,16 @@ current live continuation, superseding325's no-next-milestone endpoint.
 This supersedes the prior round's readiness-only endpoint, preserves all spent
 attempts and does not require another routine permission question.
 
+Review snapshot R337 is Claude's independent after-the-fact review of the
+eighteen Codex commits of sections 334–336 (`10b05cca..3a3350dc`). All are
+accepted, `7699f6b6` after the price-format refusal-code correction
+`134fbbc4` (`ARV2R337-001`). Successor callers must keep a deadline from
+being relabelled as a data or transport code (`ARV2R337-002`), and the
+uninvoked Sharadar v2 producer needs the redirect and cookie fix of
+`ARV2R337-003` before any dispatch. QC and Safari remain off limits. The
+immediate next step is that Codex counter-reviews section R337 and its
+correction.
+
 Section 330 applies the owner-directed corrections of Claude's section-328
 findings. W5 cash-limited buys are now sized on max(ask, engine price),
 overriding 329.2's delegated decision (`ARV2R328-004`, `8381e0cb`). Twenty
@@ -2535,8 +2549,8 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 327 (section 328; owner-directed corrections
-in section 330); for section 250 the owner
+the pushed range through section 336 (sections 328 and 330, then the snapshots
+R333 and R337); for section 250 the owner
 directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
@@ -4397,6 +4411,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-30 | Codex R333 counter-review and exact public Main recovery preparation | `10b05ccac3b71af18599343a5b29975e9abee344` -> `b52fb5892c6c9f1c133bb94ba8c91ba279de5595` -> this final handoff commit; TWO total | All three incoming Claude commits accepted, record after five documentary corrections/qualifications; every R333 finding dispositioned in334 | Exact6892byte original Main reconstructed from pinned public sources without spentA read; tested public upload candidate and existing D pins retained | Root184distinct focused passes8.06s; exact AST/byte equality for three whitespace changes, public pins and memory compilations; final document repeat recorded below; no full suite | Missing-Main cloud report remains pending fresh authentication; other lane active in Safari/chat, availability unresolved; no QC request/upload/compile/job/result and338/259/54/699 unchanged | ONE matching-lane final push at shared-resource barrier; remaining source repair/readback, coverage and six/eight continuation await availability plus exact current run gates; no automatic monitor or other-lane interference |
 | 2026-11-03 | Owner-waived FirstRate parser, REMX partition and five-stock coverage recovery under QC/Safari hold | `381ae7ad54e35b05bc1ca6455abff7388e23c09d` -> ELEVEN local predecessors through `26dfac6ec8948c8cf8dedfe1ebeca3687058159e` -> this section335 final handoff commit; TWELVE total | No incoming Claude range; own implementation and same-round advice are not independent acceptance | A/B/C failures retained; D REMX field diagnosis, E stock coverage, F exact gap metadata, H predicate diagnosis, I event association and J dictionary each passed once; G retained HTTP200 but failed local row scope. Four stock envelopes still incomplete/absent; five identity stops unchanged; no accepted price book or strategy run | Focused stage results and nonadditive overlaps/failures in335; latest287distinct passes2.37s, four memory compiles and final document/diff/status checks; no full suite, raw-row disclosure or spent replay | I335-001..017 corrected/qualified prospectively; old refusals/source gates preserved; no QC/Safari/capacity/project/job;338shared/259development/54infrastructure/699cells unchanged | ONE matching nonforce final push at the concrete identity/coverage barrier. QC/Safari stay prohibited until explicit owner release; no next cell, source-stop bypass or readiness/financial clearance |
 | 2026-11-03 | Owner-waived offline identity, historical-symbol coverage and REMX recovery under QC/Safari hold | `372019d5e275248fe41bad000e638479f8cb7a0b` -> `0b78b00c7cf6a75cf21044a8aaaffee852c59a21` -> `af7ebb09941f6d64df60310505645ea2a6241b25` -> `0d131ac9d662ba5942ea9b67c16d108e2da3c627` -> this final section336 handoff commit; FOUR total | No incoming Claude range; current owner review waiver, no independent acceptance | K definitions, L fractional timing, M original ownership, N normative roles and O new historical-symbol coverage each passed once and are spent. Four new files retained; none completes its required window. Original UNIT and acquired-security hypotheses refined rather than assumed | Root592distinct focused passes across stages; latest149passes2.03s,16changed-source/test memory compiles across stages, exact source/profile/native pins. Record repeats nonadditive; no full suite or operational replay | I336-001..009 corrected pre-use, I336-010 qualified/corrected; five identity stops and RAW/session/payoff/coverage gates remain. No QC/Safari/provider data API/Keychain;338/259/54/699 unchanged | ONE matching nonforce final push at the concrete dated-identity/common-price evidence barrier. All controls/readers stay spent; no automatic source-splice, source-stop bypass, QC release, strategy cell or readiness clearance |
+| 2026-11-03 | Claude review snapshot R337 of `10b05cca..3a3350dc`: the eighteen Codex commits of sections 334–336 reviewed after the fact | `3a3350dc` -> `134fbbc4` (correction) -> this record commit | All eighteen accepted, `7699f6b6` after correction; section R337 | FirstRate price-format JSON helpers keep the `bound` refusal code; deadline-taxonomy, `requests` redirect/cookie, reversible transport-pin and record-wording findings documented | 27 range test files 2,151 passed; 86 record gates; 48 section-330 regressions; 189 correction-affected passed; 1/1 mutation caught; no full suite, no QC/Safari/provider access; 0 looks, 338/259/54/699 unchanged | 0 P0, 0 P1, 1 P2 documented, 8 P3 (one corrected) | Codex counter-reviews section R337; Codex's owner-directed section-337 round continues |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -74285,3 +74300,163 @@ tests1.11s under the same native synthetic isolation; this repeats the earlier
 round whitespace checks passed. Local root/branch/HEAD/status were exact;
 live matching remote remained372019d5e275248fe41bad000e638479f8cb7a0b.
 Only this lane record is changed after O; no source/test/evidence leaf changes.
+
+## R337. Independent Claude review of `10b05cca..3a3350dc`: the eighteen Codex commits of sections 334–336, reviewed after the fact, 2026-11-03
+
+### R337.1 Scope, synchronization and method
+
+The owner directed Claude to review all unreviewed commits once Codex pushed,
+to apply corrections where necessary and to push once, without the complete
+lane suite.
+
+**Starting state.** A fetch showed local, tracking and live heads equal at
+`3a3350dcd0c92de3435808c25370a616413fb1b9`, with a clean worktree.
+
+**Range.** The range after Claude's section-330 push `b065e98c` holds 29
+commits:
+
+- Eight Codex commits (`619425b0..57bd3213`, sections 331–332) were already
+  reviewed by the Windows-host snapshot R333.
+- The three R333 commits are Claude's own and are excluded.
+- The remaining eighteen Codex commits are reviewed here:
+  - section 334: `b52fb589`, `381ae7ad`;
+  - section 335: `89c27bac`, `deb318f9`, `11b71b39`, `fad83253`, `0dfd5f17`,
+    `7699f6b6`, `eb3a3d3a`, `cd3fd302`, `347c8dc3`, `108fce4e`, `26dfac6e`,
+    `372019d5`;
+  - section 336: `0b78b00c`, `af7ebb09`, `0d131ac9`, `3a3350dc`.
+
+The owner had waived Claude review of sections 335 and 336 before that work,
+so this is an after-the-fact review, not a gate those rounds waited on. Apart
+from the lane record, every change in the range adds new files.
+
+**Concurrent Codex work.** While this review ran, Codex began an
+owner-directed section-337 round in the same worktree. It left uncommitted
+record edits and new untracked quarantine files. This snapshot is therefore
+labelled R337, after the R323 and R333 precedent, so Codex keeps its
+planned section number. Claude did not touch any Codex work in progress. Its
+record additions were staged on top of the committed record only, and the
+push carries no Codex commit.
+
+**Method.** Four read-only reviewers each took one sub-range: FirstRate A/B,
+FirstRate C–F, the Sharadar actions G–J, and section 336. They ran no code,
+used no network and read nothing under `artifacts/`. Claude read section 334
+itself and checked every finding above P3 personally.
+
+No QC, Safari, provider, credential or Keychain access occurred. The
+artifacts census is metadata-only and reads `stat` information under
+`artifacts/` (see R337.4); no artifact content was read.
+
+### R337.2 Per-commit dispositions
+
+| Commit | Section | Disposition | Basis |
+|---|---|---|---|
+| `b52fb589` | 334 | Accepted | The recovered coverage Main regenerates byte-exactly (6892 B, `6f59864e…`) from unchanged pinned public sources, and its three tests pass. |
+| `381ae7ad` | 334 | Accepted with notes | The R333 counter-review and its five documentary corrections are reasonable. Codex read another lane's chat read-only to judge resource use and sent nothing; keep that bounded. |
+| `89c27bac` | 335 | Accepted with notes | The FirstRate v1 parser grammar and the REMX partition are correct for their scope. See `-002`, `-005` and `-009`. |
+| `deb318f9` | 335 | Accepted with notes | Pins verified. The member-pin wording overstates the check (`-005`). |
+| `11b71b39` | 335 | Accepted with notes | The v2 change is minimal as declared. See `-005` and `-009`. |
+| `fad83253` | 335 | Accepted with notes | Pins verified. A truncated final field cannot always refuse (`-005`). |
+| `0dfd5f17` | 335 | Accepted with notes | The M3 per-record separator handling is correct. C differs from B in exactly twelve hunks. See `-002`. |
+| `7699f6b6` | 335 | Accepted after correction | D, E and the price format are sound apart from `-001` (corrected) and `-006`. |
+| `eb3a3d3a` | 335 | Accepted with notes | F's join, original-row hash and gap runs are correct. See `-008` and `-009`. |
+| `cd3fd302` | 335 | Accepted with notes | The G observer and caller match the freeze. See `-002`, `-003` and `-008`. |
+| `347c8dc3` | 335 | Accepted with notes | H's first-failure order matches the frozen parser. The 335.19 transport pin is reversible (`-004`). |
+| `108fce4e` | 335 | Accepted with notes | The v2 relaxation is exactly the one declared line. `-003` carries into the uninvoked v2 producer. |
+| `26dfac6e` | 335 | Accepted with notes | J's transport is a verbatim copy of G's. The I335-016 and I335-017 fixes are present. |
+| `372019d5` | 335 | Accepted | The results and barrier text agree with the code and pins. |
+| `0b78b00c` | 336 | Accepted with notes | K, L and M logic and bounds are sound. See `-004` and `-008`. |
+| `af7ebb09` | 336 | Accepted with notes | The N rule binding and count invariants are correct. See `-004`. |
+| `0d131ac9` | 336 | Accepted with notes | O's plan, schedule and parser are correct for the actual run. See `-007`. |
+| `3a3350dc` | 336 | Accepted with notes | Record only. The arithmetic reconciles: 28 leads, 98 probes, 219,534 member bytes. See `-004` and `-008`. |
+
+The reviewers verified these pins against the commits:
+
+- every recorded source and test byte count and SHA-256 in 335.3, 335.6,
+  335.8, 335.10, 335.12, 335.15, 335.18, 335.20–335.22, 335.24 and section 336;
+- the dependency `SOURCE_PINS`;
+- J's 204-byte plan pin and 336-byte transport pin, rebuilt from published
+  values.
+
+`I335-018` stands: the two section-335 test files that end with an extra
+blank line keep their pinned bytes. Rewriting them would repeat
+`ARV2CR325-002`.
+
+### R337.3 Findings ledger
+
+| ID | Severity | Finding and disposition |
+|---|---|---|
+| `ARV2R337-001` | P3 | **Corrected** in `134fbbc4`. In `research/analyst_revisions_v2_qc/newrule_firstrate_price_format.py`, `Refused` subclasses `ValueError`, so the generic handlers in `canonical()` and `loads()` relabelled the internal node- or depth-limit refusal `bound` as `json`. They now re-raise `Refused` unchanged. The module is prospective and uninvoked, and nothing pins its bytes in code. New `tests/analyst_revisions_v2/test_r337_review_firstrate_price_codes.py` asserts `bound` and keeps every `json` case. |
+| `ARV2R337-002` | P2 | **Documented; requirement for every successor caller.** The SIGALRM handlers raise each caller's own `Refused('deadline')`, a `ValueError`. Generic handlers then relabel a deadline as a data or transport code: `input`, `period`, `listing`, `member`, `price_parse`, `partition`, a parser `session`, `request_failed`, `response_identity` or `journal`. In the Sharadar observers `finite()` returns `unknown`, and a git `subprocess.TimeoutExpired` also becomes `unknown`. This affects the FirstRate callers A–F (`inspect_arv2_r335_firstrate_coverage{,_v2,_v3}.py`, `..._stock_coverage.py`, `..._remx_fields.py`) and the Sharadar G and J callers. Every actual run finished well inside its deadline, so no recorded code is affected, and every case fails closed. The lane does, however, design each next one-shot attempt from these codes; A's `line_ending` drove B. Successors should raise a deadline type that generic handlers cannot catch, or handle `TimeoutError` first. They should map it, together with `subprocess.TimeoutExpired`, to `deadline` in `finite()`, and test a deadline injected inside the parser and the transport. The callers are spent, so their bytes stay frozen. |
+| `ARV2R337-003` | P3 | **Documented; fix before any v2 dispatch.** The Sharadar transport (`arv2_r335_sharadar_actions{,_v2}.py`, `arv2_r335_action_types.py`) calls `requests.Session.get`. In the pinned requests 2.34.2, `allow_redirects=False` still calls `resolve_redirects(..., yield_requests=True)` (`sessions.py:820`). That reads a 3xx-with-`Location` body in full (`:212`), outside `MAX_BODY` and the deadline check. `Session.send` also extracts cookies (`:799`), so a complete 200 response carrying `Set-Cookie` would be refused as `session`. The tests patch `Session.get` and cannot see either path. Actual G and J returned 200 with no cookie. Before the uninvoked v2 producer is used, dispatch through the adapter, or otherwise bypass redirect resolution and cookie extraction, and test at `HTTPAdapter.send`. |
+| `ARV2R337-004` | P3 | **Documented privacy limitation; history is not rewritten.** The 335.19 table and `inspect_arv2_r335_sharadar_scope.py` publish the `transport-00.json` pin (400 B, `5520e213…`). That file's only unpublished field is the nine-ticker `query_token`, so the pin is a plain SHA-256 of a low-entropy ticker list and confirms a candidate set offline. Separately, the `at_first_required`/`at_last_required` labels with the committed geometry, and L's `at_cutoff` count, reveal exact event and vendor-row dates. That contradicts 336.8's "No actual event date … is emitted". Sensitivity is low, but successors should salt private transport records with a per-run nonce, stop publishing pins whose only unknown preimage is identifiers, and fold boundary labels into "inside". |
+| `ARV2R337-005` | P3 | **Documented record qualification.** The FirstRate callers pass `expected_pin=pin(raw)`, so the member pin can never fail. Only the manifest MD5 and the ZIP CRC authenticate the bytes. Because v2 accepts an unterminated final record, a vendor-side truncation inside the last row's final field can still parse; volume plays no part in date coverage. The 335.3, 335.5 and 335.6 wording ("member SHA256 authenticate current bytes"; "truncated final fields must still refuse") overstates the check. The torn-source test relies on a whole-file pin that production never supplies. |
+| `ARV2R337-006` | P3 | **Documented; fix before first use.** In the same price-format module, `validate_context` and `object_keys` check only the shape of `book_pin`, `demand_pin` and `private_evidence_pin`. A well-shaped context naming another book yields that book's object keys unless the caller later validates the book against an expected pin. Before first use, add mandatory expected manifest and book pins and require equality. |
+| `ARV2R337-007` | P3 | **Documented for any future consumer of O.** O is spent and its actual result is unaffected. In `arv2_r336_historical_symbol_coverage.py`, the `original_binding` lead branch can never run, because `original_proof` forces the diagnostic ticker to equal the original. 336.11's "unsearched original symbols" class is therefore empty by construction. Three more items apply to a future consumer: the forged-row check compares Decimal values, not representations (`10.500` and `10.5` are equal); an E-priced member can be decompressed before its known pin is checked; and a lead excluded as another case's diagnostic symbol is never assessed against its own window, which the public matrix does not separate. |
+| `ARV2R337-008` | P3 | **Documented record and process wording.** (a) 336's micro-share-grid result restates "no more than six decimal places"; it is one fact, not two. (b) F looks up leads under exact tokens only, so 335.16's "no additional complete-window listing lead" covers exact tokens only. (c) The "sole native-denied validator" modes run in-process and are operator-invoked; code does not enforce that. (d) `output_authenticated` means a self-consistent envelope that is still bound to the observed exit. (e) F reports a retained E-record failure under stage `USB_listing`. (f) G's caller can overwrite an earlier failure code with `session` when `session.close()` fails; J guards this. (g) A failed FirstRate v2 stock-candidate packet can carry the previous candidate's lexical evidence. |
+| `ARV2R337-009` | P3 | **Documented test gaps.** The checks themselves are present in the code. No test covers a ZIP CRC mismatch or a duplicate member name, although `Archive` refuses both. F's sixteen-case test and several section-336 tests use a bare `pytest.raises(Refused)` without asserting which guard fired. |
+
+Overall: 0 P0, 0 P1, 1 P2 (documented), 8 P3 (one corrected). The
+open source, identity, price, PIT and formal gates, and the carried
+`ARV2R328-011` and `ARV2R328-012`, are unchanged.
+
+Implementation-quality rating for this snapshot: **8/10**. Strengths:
+
+- the one-use freezes are exact;
+- pins and the record arithmetic reconcile;
+- sandbox isolation is consistent;
+- each probe stops honestly at its barrier.
+
+Held back by:
+
+- timeout codes that can masquerade as data findings;
+- `requests` behavior that the tests cannot observe;
+- residual low-entropy fingerprints.
+
+This is not a strategy-efficacy or live-readiness rating.
+
+### R337.4 Validation
+
+All Python runs used `sandbox-exec`:
+
+- **Sandbox profile:** denies all network, `/usr/bin/security` and every
+  read or write under `artifacts/`.
+- **Python and pytest:** `env -i`, Python 3.13 venv, `-B`,
+  `--noconftest`, `--ignore=artifacts`, plugin autoload and cacheprovider
+  disabled.
+- **Scratch paths:** `TMPDIR`, `--basetemp` and the pycache prefix all
+  under `.pytest_cache/claude-review-337`.
+
+The owner directed that the complete lane suite not be run; it was not.
+
+| Stage | Result |
+|---|---|
+| The range's 27 new test files at the incoming head `3a3350dc` | **2,151 passed in 20.21 s.** |
+| Record gates at the incoming head | **86 passed in 1.20 s.** |
+| Section-330 regressions at the incoming head: resolver guard, post-merge pins, W5 cash bound, redactions | **48 passed in 14.16 s.** |
+| Correction: new code test, the price-format tests and the FirstRate common-price runtime tests | **189 passed in 7.83 s.** |
+| In-memory mutation restoring the old handlers (no file changed) | **Caught:** 2 of the 8 new tests fail (both `bound` cases); the 6 `json` cases pass, as intended. |
+| Record gates on the committed record version after this section | **86 passed in 1.09 s.** A copy with a broken ledger table fails, which shows the gates read that version. |
+
+Range hygiene: `git diff --check` reports only the two I335-018 blank lines. A
+scan of the 29,839 added lines found no credential, licensed price row, ticker
+list or identifier fingerprint beyond `ARV2R337-004`. The only 32-hex value is
+the booked rerun `5633b995…`.
+
+Artifacts metadata census by `stat` only, sorted: 9,128 entries before
+and after the review's test runs, identical in name, inode, size, mtime,
+ctime, mode and link count. Codex's concurrent round created no artifact
+entry in that window.
+
+### R337.5 Handoff
+
+This review adds two commits, which go out in one push:
+
+- `134fbbc4`, the correction;
+- this record commit.
+
+Codex's uncommitted section-337 work is untouched and not included. No
+result cell, look or booking was added: 338/259/54/699 stays. QC and Safari
+remain off limits as recorded in 336.
+
+The immediate next step is that Codex counter-reviews section R337 and its
+correction, alongside its owner-directed section-337 round.

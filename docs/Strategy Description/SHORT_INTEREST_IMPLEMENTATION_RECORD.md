@@ -31300,3 +31300,58 @@ looks0/0, exploratory0, alpha0, IDsnone and QCattempts0. No readiness or push
 is claimed; reserve the one matching-lane publication for the completed round
 or concrete terminal owner-required blocker.
 Main final post-record active-document checks69 passed1.16s; whitespace passed.
+
+## 142. Actual offline USB v3 code-directory refusal (2026-11-03)
+
+The complete140/141 preparation was committed clean as
+808df6378edfd0a71693b831c45a82cce1afbc4e. All authors froze. Main reverified
+physical/Git roots, branch/exact HEAD/status, matching actual origin2A6D and
+all four current/committed code bytes/mapping before the one registered v3
+dispatch. Its prebuilt observer clock began BEFORE automated preflight.
+
+Original CP22736 actually exited2/signalnull, stderr0. Raw projected stdout
+914 bytes/SHA256
+7d4feb2ff63ed23ab0927ff912382b239e90ba7041477130ebf58ba6f2b2c456.
+Original reader-report stdout SHA256
+459c08dde52fe65259a8e8fd77e428b319fdda1cd26e8e5cdf84b9a67f6535ec.
+Original automatic close52386.64470800012ms and final validation
+52387.62625000067ms both passed the whole180000ms bound; wrapper elapsed
+51774693250ns. The observer has no framing/deadline/seam failure and labels
+this only observed_original_reader_refusal, never successful qualification.
+
+The genuine final original_comparison was code ordinal2 / close_audit /
+chain ordinal3 / directory_descriptor_vs_original, differing FIELD NAMES
+[mtime_ns,ctime_ns]. For fixed ROOT/data/hashing.py, chain3 is the Documents
+directory. This is an ORIGINAL held descriptor comparison, not a fresh-stat
+guess or a changed byte/flag inferred from a label. Its actor remains UNKNOWN.
+The earlier observed FileProvider subject flag writer is not automatically
+assigned this separate directory timestamp transition.
+
+This was the final dominating cleanup exception. It may override an earlier
+exception during unwinding; the vanished process did not persist every earlier
+exception. Do not infer that the model or all USB inputs passed, that the USB
+changed, or that code bytes changed. The registered whole observation is
+REFUSED. All four denied seam counters0; no Python write/mutation/socket,
+nonlane subprocess, source request/key/claim/START/charge/output namespace
+occurred. Original USB files, native evidence and budgets remain unchanged.
+No actor attribution, source admission, budget release or successful archive/
+input/readiness result follows from it. Preserve all v1/v2/v3 negatives.
+
+Next perform a code-only safety review of lifetime isolation: an INITIAL
+finite original code-read window that closes with all existing checks,
+factory-issued immutable executed bytes, unchanged full USB source contexts,
+and a SEPARATE terminal original code-read window requiring identical bytes/
+Git/head/remote. Such a distinct profile would explicitly make no continuous
+shared-parent timestamp claim. The old profile and every source protection
+must remain intact; no raw caller code/payload, rebaseline, weaker comparison,
+new filesystem namespace or another checkout may substitute. This is a design
+question, not an accepted fix or permission to invoke again. A verified
+bounded implementation, causal tests, committed preparation and fresh explicit
+registration must precede any prospective read. No repeated invocation to
+guess is authorized.
+
+The conservative archive/Main preflight in141 has not been actually invoked.
+Production storage/lease/checkpoint and source/input/rights/cash gates remain;
+SourceAUTH is still unconditionally blocked. No QC/Safari, purchase, outcomes,
+new monitor or push. Count84005/4GiB, separate DAILY budget and permanent
+8START/16MiB remain unchanged, looks0/0, exploratory0, alpha0, IDsnone, QC0.

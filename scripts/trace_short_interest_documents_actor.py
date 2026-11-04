@@ -5,6 +5,7 @@ RAM. Unrelated records/child names are never projected, persisted or logged.
 Native notifications are candidates, not successful syscalls or causation.
 """
 import argparse
+import errno
 import hashlib
 import json
 import os
@@ -16,7 +17,7 @@ import stat
 import subprocess
 import sys
 import time
-from types import ModuleType
+from types import FunctionType, ModuleType
 
 ROOT = Path('/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest')
 SCRIPT = 'scripts/trace_short_interest_documents_actor.py'
@@ -31,7 +32,9 @@ COMMAND = ('/usr/bin/eslogger', '--format', 'json', *EVENTS)
 ENV = {'PATH':'/usr/bin:/bin', 'LC_ALL':'C', 'GIT_OPTIONAL_LOCKS':'0'}
 PASSIVE_NS, WHOLE_NS, SHUTDOWN_NS = 30_000_000_000, 120_000_000_000, 8_000_000_000
 SAMPLE_NS, MAX_SAMPLES = 100_000_000, 400
-MAX_INPUT, MAX_RECORD, MAX_MATCHES, MAX_OUTPUT, MAX_STDERR = 8*1024**2, 65536, 256, 1024**2, 4096
+ORIGINAL_FRAMER_INPUT, MAX_INPUT = 8*1024**2, 64*1024**2
+ORIGINAL_FRAMER_SHA256 = 'ed462f3b0552d3f74c468c6a51e47ef215b90d9f7e38a372364aaec5c7fcdf63'
+MAX_RECORD, MAX_MATCHES, MAX_OUTPUT, MAX_STDERR = 65536, 256, 1024**2, 4096
 SCHEMA = 'si-documents-passive-actor-trace-v1'
 FIELDS = ('dev','ino','uid','gid','mode','nlink','size','mtime_ns','ctime_ns','flags')
 _CODES = frozenset('arguments clock platform code lane directory target_identity target_protection output_exists output_changed output_bound output_close framer native_schema event_schema target_schema actor_schema path_schema result_schema stream_limit shutdown_unknown cleanup'.split())
@@ -39,29 +42,55 @@ _PHASES = frozenset('bootstrap guard target output_create native_observation shu
 _SYSTEM_PATHS = frozenset(('/usr/libexec/fileproviderd', '/System/Library/Frameworks/FileProvider.framework/Support/fileproviderd'))
 _SIGNING_IDS = frozenset(('com.apple.fileproviderd','com.apple.finder','com.apple.bird','com.apple.cloudd','com.apple.mdworker','com.apple.mdworker.shared','com.apple.mds','com.apple.mds_stores'))
 _TERMINAL_CLOCK = None
+_FRAMER_DIAGNOSTIC = None
+_ERRNOS = {getattr(errno,name):name for name in ('EACCES','EPERM','ENOENT','EIO','ENOSPC','EROFS','EINTR','EBADF','EINVAL','ESTALE') if hasattr(errno,name)}
 
 # Both exact, held, owner-reviewed public files are authenticated BEFORE exec.
-BOOTSTRAP = '''import hashlib,os,re,stat,sys,time
+BOOTSTRAP = '''import errno,hashlib,json,os,re,stat,sys,time
 started=time.monotonic_ns()
-head,tracking,newsha,oldsha=sys.argv[1:]
 root=%r
 paths=(%r,%r)
-if os.geteuid()!=0 or any(re.fullmatch('[0-9a-f]{40}',x) is None for x in (head,tracking)) or any(re.fullmatch('[0-9a-f]{64}',x) is None for x in (newsha,oldsha)):raise SystemExit(2)
-owner=os.stat(root,follow_symlinks=False).st_uid
-held=[]
+codes=frozenset(('arguments','privilege','owner','code_shape','code_hash','code_stamp','clock'))
+errnos={getattr(errno,n):n for n in ('EACCES','EPERM','ENOENT','EIO','ENOSPC','EROFS','EINTR','EBADF','EINVAL','ESTALE') if hasattr(errno,n)}
+class Refusal(Exception):pass
+def need(ok,code):
+ if not ok:raise Refusal(code)
+def bounded():
+ now=time.monotonic_ns();need(type(now) is int and 0<=started<=now and now-started<=120000000000,'clock')
+def detail(error,stage,role):
+ args=BaseException.args.__get__(error,BaseException)
+ code=args[0] if type(error) is Refusal and len(args)==1 and type(args[0]) is str and args[0] in codes else None
+ number=OSError.errno.__get__(error,OSError) if isinstance(error,OSError) else None
+ return {'stage':stage,'role':role,'code':code,'errno_name':errnos.get(number) if type(number) is int else None,'category':'local_contract_refusal' if code else 'local_os_refusal' if isinstance(error,OSError) else 'unknown_local_failure'}
+held=[];first=None;cleanup=[];stage='arguments';role='bootstrap';fd=None
 pin=lambda q:(q.st_dev,q.st_ino,q.st_uid,q.st_gid,q.st_mode,q.st_nlink,q.st_size,q.st_mtime_ns,q.st_ctime_ns,getattr(q,'st_flags',0))
-for path,wanted in zip(paths,(newsha,oldsha)):
- fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC)
- try:
-  info=os.fstat(fd)
-  if owner==0 or info.st_uid!=owner or not stat.S_ISREG(info.st_mode) or info.st_nlink!=1 or info.st_mode&0o022 or not 0<info.st_size<=65536:raise SystemExit(2)
-  raw=os.read(fd,65537)
-  if len(raw)!=info.st_size or hashlib.sha256(raw).hexdigest()!=wanted or pin(os.fstat(fd))!=pin(info) or pin(os.stat(path,follow_symlinks=False))!=pin(info):raise SystemExit(2)
-  held.append((path,raw,pin(info)))
- finally:os.close(fd)
- if pin(os.stat(path,follow_symlinks=False))!=held[-1][2]:raise SystemExit(2)
+try:
+ need(len(sys.argv)==5,'arguments');head,tracking,newsha,oldsha=sys.argv[1:]
+ need(all(re.fullmatch('[0-9a-f]{40}',x) for x in (head,tracking)) and all(re.fullmatch('[0-9a-f]{64}',x) for x in (newsha,oldsha)),'arguments')
+ need(os.geteuid()==0,'privilege');bounded();stage='owner';role='lane_root'
+ owner=os.stat(root,follow_symlinks=False).st_uid;need(owner!=0,'owner')
+ for path,wanted,role in zip(paths,(newsha,oldsha),('driver','framer')):
+  stage='code_open';bounded();fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC|os.O_NONBLOCK)
+  stage='code_read';info=os.fstat(fd)
+  need(info.st_uid==owner and stat.S_ISREG(info.st_mode) and info.st_nlink==1 and not info.st_mode&0o022 and 0<info.st_size<=65536,'code_shape')
+  raw=os.read(fd,65537);need(len(raw)==info.st_size,'code_shape')
+  need(hashlib.sha256(raw).hexdigest()==wanted,'code_hash')
+  need(pin(os.fstat(fd))==pin(info) and pin(os.stat(path,follow_symlinks=False))==pin(info),'code_stamp')
+  held.append((path,raw,pin(info)));stage='code_close';os.close(fd);fd=None
+  stage='code_postclose';need(pin(os.stat(path,follow_symlinks=False))==held[-1][2],'code_stamp');bounded()
+ stage='driver_compile';role='driver';compiled=compile(held[0][1],paths[0],'exec');bounded()
+except BaseException as error:first=detail(error,stage,role)
+finally:
+ if fd is not None:
+  try:os.close(fd)
+  except BaseException as error:cleanup.append(detail(error,'code_close',role))
+if first is not None or cleanup:
+ packet={'schema':'si-documents-bootstrap-refusal-v1','status':'incomplete','source_authority':False,'first_failure':first or cleanup.pop(0),'cleanup_failures':cleanup,'new_source_requests':0,'new_claims':0,'new_STARTs':0,'new_charged_bytes':0}
+ print(json.dumps(packet,sort_keys=True,separators=(',',':'),allow_nan=False),flush=True)
+ raise SystemExit(2)
 sys.argv=[paths[0],'root-trace','--head',head,'--matching-tracking',tracking,'--code-sha256',newsha,'--framer-sha256',oldsha]
-exec(compile(held[0][1],paths[0],'exec'),{'__name__':'__main__','__file__':paths[0],'_BOOTSTRAP_START':started,'_HELD_CODE':tuple(held)})
+# The authenticated program owns its own terminal result, outside this prefix catch.
+exec(compiled,{'__name__':'__main__','__file__':paths[0],'_BOOTSTRAP_START':started,'_HELD_CODE':tuple(held)})
 ''' % (str(ROOT), str(ROOT / SCRIPT), str(ROOT / FRAMER))
 
 
@@ -123,9 +152,16 @@ def code_guard(head,tracking,newsha,oldsha,clock):
 
 
 def load_framer(raw):
+    global _FRAMER_DIAGNOSTIC
+    require(type(raw) is bytes and sha(raw)==ORIGINAL_FRAMER_SHA256,'framer')
     module=ModuleType('_si_documents_original_framer_v1');module.__file__=str(ROOT/FRAMER)
     exec(compile(raw,module.__file__,'exec'),module.__dict__)
-    require(module.MAX_INPUT==MAX_INPUT and module.MAX_RECORD==MAX_RECORD,'framer')
+    require(module.MAX_INPUT==ORIGINAL_FRAMER_INPUT and module.MAX_RECORD==MAX_RECORD
+        and module.MAX_MATCHES==MAX_MATCHES and module.MAX_OUTPUT==MAX_OUTPUT,'framer')
+    # Only this private, held-byte module gets the prospective Documents cap.
+    # This is a finite stream budget, not evidence of empirical sufficiency.
+    _FRAMER_DIAGNOSTIC=(module,module.TraceRefusal,module.fixed_failure,module.fixed_failure.__code__,module._CONTRACTS)
+    module.MAX_INPUT=MAX_INPUT
     return module
 
 
@@ -178,7 +214,9 @@ def make_consumer(framer,watch):
                 and type(obj.get('version')) is int and obj['version']>=5
                 and type(obj.get('action_type')) is int and obj['action_type']==1,'native_schema')
             sequence=framer.uint(obj.get('global_seq_num'))
-            if self.first_seq is None:self.first_seq=sequence
+            if self.first_seq is None:
+                self.first_seq=sequence
+                if sequence!=0:self.issue('coverage_start_unverified')
             if self.last_seq is not None and sequence!=self.last_seq+1:self.issue('global_sequence_gap_or_reorder')
             self.last_seq=sequence;self.records+=1
             if self.first_record_ns is None:self.first_record_ns=watch.clock.check()
@@ -299,12 +337,13 @@ def observe(consumer,watch,clock):
                 os.set_blocking(stream.fileno(),False);selector.register(stream,selectors.EVENT_READ,role)
             while selector.get_map():
                 now=clock.check(SHUTDOWN_NS)
-                if now-last_sample>=SAMPLE_NS:watch.sample('native_active');last_sample=now
                 if now>=deadline and not stop_sent:
                     stop_sent=True
                     if child.poll() is None:
                         planned=True;child.terminate()
                     else:consumer.issue('ended_before_owned_shutdown')
+                if now-last_sample>=SAMPLE_NS:
+                    watch.sample('shutdown_draining' if stop_sent else 'before_first_record' if consumer.first_record_ns is None else 'observing');last_sample=now
                 if stop_sent and now>=deadline+4_000_000_000:
                     if child.poll() is None:child.kill();consumer.issue('tracer_required_kill')
                     break
@@ -355,7 +394,20 @@ def observe(consumer,watch,clock):
 def diagnostic(error,stage):
     args=BaseException.args.__get__(error,BaseException)
     code=args[0] if type(error) is DocumentsTraceRefusal and len(args)==1 and type(args[0]) is str and args[0] in _CODES else None
-    return {'stage':stage if stage in _PHASES else 'bootstrap','code':code,'category':'local_contract_refusal' if code else 'unknown_local_failure'}
+    role='documents_trace' if code else 'unknown';category='local_contract_refusal' if code else 'unknown_local_failure'
+    binding=_FRAMER_DIAGNOSTIC
+    if type(binding) is tuple and len(binding)==5:
+        module,kind,function,original_code,contracts=binding
+        if (type(error) is kind and getattr(module,'TraceRefusal',None) is kind and getattr(module,'fixed_failure',None) is function
+                and type(function) is FunctionType
+                and function.__code__ is original_code and function.__globals__ is module.__dict__
+                and getattr(module,'_CONTRACTS',None) is contracts and type(contracts) is frozenset
+                and len(args)==1 and type(args[0]) is str and args[0] in contracts):
+            code=args[0];role='framer';category='local_contract_refusal'
+    number=OSError.errno.__get__(error,OSError) if isinstance(error,OSError) else None
+    if isinstance(error,OSError):role='operating_system';category='local_os_refusal'
+    return {'stage':stage if stage in _PHASES else 'bootstrap','role':role,'code':code,
+        'errno_name':_ERRNOS.get(number) if type(number) is int else None,'category':category}
 
 
 def root_trace(head,tracking,newsha,oldsha):
@@ -406,6 +458,9 @@ def root_trace(head,tracking,newsha,oldsha):
                 'target_transition_unattributed' if watch is not None and any(row['name_changed_fields'] for row in watch.samples) else 'no_target_transition_observed',
             'source_authority':False,'new_source_requests':0,'new_claims':0,'new_STARTs':0,'new_charged_bytes':0,
             'passive_seconds':30,'maximum_whole_seconds':120,'native':native,'issues':issues,
+            'stream_limits':{'total_input_bytes':MAX_INPUT,'record_bytes':MAX_RECORD,'read_chunk_bytes':8192,
+                'matched_events':MAX_MATCHES,'output_bytes':MAX_OUTPUT,'native_stderr_bytes':MAX_STDERR},
+            'stream_cap_scope':'prospective_finite_Documents_budget_not_empirical_sufficiency_no_automatic_retry_or_bump',
             'first_failure':failures[0] if failures else None,'cleanup_failures':failures[1:],
             'matched_events':[] if consumer is None else list(consumer.matches),
             'records_seen':0 if consumer is None else consumer.records,'input_bytes':0 if consumer is None else consumer.total,
@@ -475,6 +530,8 @@ def plan(head,tracking,newsha,oldsha):
         'root_authentication_required':True,'responsible_Terminal_Full_Disk_Access_required':True,
         'prepared_private_directory_required':str(DIRECTORY),'exclusive_output':str(OUTPUT),
         'target_role':'Documents','passive_seconds':30,'whole_seconds':120,
+        'total_input_bytes':MAX_INPUT,'record_bytes':MAX_RECORD,'read_chunk_bytes':8192,
+        'stream_cap_scope':'prospective_finite_Documents_budget_not_empirical_sufficiency_no_automatic_retry_or_bump',
         'window_scope':'after_sudo_auth_before_bootstrap_first_code_open_through_final_context_close_format_before_stdout_delivery',
         'source_authority':False}
 

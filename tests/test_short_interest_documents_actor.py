@@ -1,5 +1,6 @@
 """Passive trace framing/metadata tests; no sudo/eslogger or real Documents."""
 import io
+import errno
 import json
 import os
 from pathlib import Path
@@ -271,7 +272,7 @@ def test_plan_is_bound_to_four_identifiers_and_bootstrap_precedes_code_open():
     assert tokens.count('/usr/bin/sudo')==1 and 'sudo' not in tokens and tokens[-4:]==[HEAD,TRACKING,NEW,OLD]
     assert plan['shell_command'].startswith('cd ') and tokens[tokens.index('&&')+1]=='/usr/bin/sudo'
     assert d.BOOTSTRAP.index('started=time.monotonic_ns()')<d.BOOTSTRAP.index('os.open(path')
-    assert d.BOOTSTRAP.index('hashlib.sha256(raw)')<d.BOOTSTRAP.index('exec(compile')
+    assert d.BOOTSTRAP.index('hashlib.sha256(raw)')<d.BOOTSTRAP.index('compiled=compile')<d.BOOTSTRAP.index('exec(compiled')
     assert plan['whole_seconds']==120 and plan['passive_seconds']==30
 
 
@@ -421,3 +422,193 @@ def test_actual_main_terminal_serialization_is_inside_original_clock(monkeypatch
     assert d.main(['root-trace','--head',HEAD,'--matching-tracking',TRACKING,'--code-sha256',NEW,'--framer-sha256',OLD])==2
     result=json.loads(capsys.readouterr().out)
     assert result['status']=='incomplete' and result['first_failure']['stage']=='format'
+
+
+def bootstrap_fixture(h,monkeypatch,args=None):
+    """Execute only a fabricated two-file prefix; never sudo/native commands."""
+    bodies=(b"print('AUTHENTICATED_MAIN_ONLY');raise SystemExit(7)\n",b'# fabricated private framer\n')
+    for name,raw in zip((d.SCRIPT,d.FRAMER),bodies):
+        path=h.root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(raw);path.chmod(0o600)
+    arguments=[HEAD,TRACKING,*map(d.sha,bodies)] if args is None else args
+    monkeypatch.setattr(sys,'argv',['-c',*arguments]);monkeypatch.setattr(os,'geteuid',lambda:0)
+    return d.BOOTSTRAP.replace(str(REPO),str(h.root))
+
+
+@pytest.mark.parametrize('args',[[],[HEAD,TRACKING,NEW],['PRIVATE',TRACKING,NEW,OLD]])
+def test_bootstrap_bad_arguments_emit_one_fixed_private_free_refusal(context,monkeypatch,capsys,args):
+    text=bootstrap_fixture(context,monkeypatch,args)
+    with pytest.raises(SystemExit) as error:exec(compile(text,'<fabricated-bootstrap>','exec'),{})
+    assert error.value.code==2
+    packet=json.loads(capsys.readouterr().out)
+    assert packet['first_failure']=={'stage':'arguments','role':'bootstrap','code':'arguments','errno_name':None,'category':'local_contract_refusal'}
+    assert packet['source_authority'] is False and 'PRIVATE' not in json.dumps(packet)
+
+
+def test_stale_bootstrap_hash_refuses_before_unverified_exec_and_closes_original_fd(context,monkeypatch,capsys):
+    text=bootstrap_fixture(context,monkeypatch,[HEAD,TRACKING,NEW,OLD]);opened=[];closed=[];op=os.open;close=os.close
+    monkeypatch.setattr(os,'open',lambda *a,**kw:(opened.append(op(*a,**kw)) or opened[-1]))
+    monkeypatch.setattr(os,'close',lambda fd:(closed.append(fd),close(fd))[1])
+    with pytest.raises(SystemExit) as error:exec(compile(text,'<fabricated-bootstrap>','exec'),{})
+    assert error.value.code==2 and closed==opened and len(opened)==1
+    packet=json.loads(capsys.readouterr().out)
+    assert packet['first_failure']['code']=='code_hash' and packet['first_failure']['role']=='driver'
+    assert 'AUTHENTICATED_MAIN_ONLY' not in json.dumps(packet)
+
+
+@pytest.mark.parametrize('boundary,number',[('open',errno.EPERM),('read',errno.EIO)])
+def test_bootstrap_bounded_OS_diagnostics_never_format_private_exception(context,monkeypatch,capsys,boundary,number):
+    text=bootstrap_fixture(context,monkeypatch);opened=[];closed=[];op=os.open;close=os.close
+    def opening(*args,**kwargs):
+        if boundary=='open':raise OSError(number,'PRIVATE /Users/PRIVATE/SECRET')
+        fd=op(*args,**kwargs);opened.append(fd);return fd
+    monkeypatch.setattr(os,'open',opening);monkeypatch.setattr(os,'close',lambda fd:(closed.append(fd),close(fd))[1])
+    if boundary=='read':monkeypatch.setattr(os,'read',lambda *a:(_ for _ in ()).throw(OSError(number,'PRIVATE')))
+    with pytest.raises(SystemExit):exec(compile(text,'<fabricated-bootstrap>','exec'),{})
+    packet=json.loads(capsys.readouterr().out)
+    assert packet['first_failure']['errno_name']==errno.errorcode[number] and packet['first_failure']['role']=='driver'
+    assert 'PRIVATE' not in json.dumps(packet) and closed==opened
+
+
+def test_bootstrap_authenticated_main_exec_is_outside_prefix_catch(context,monkeypatch,capsys):
+    text=bootstrap_fixture(context,monkeypatch)
+    with pytest.raises(SystemExit) as error:exec(compile(text,'<fabricated-bootstrap>','exec'),{})
+    assert error.value.code==7 and capsys.readouterr().out=='AUTHENTICATED_MAIN_ONLY\n'
+
+
+def test_private_framer_contract_diagnostic_uses_exact_original_class_callable_and_catalogue(context,monkeypatch):
+    h=context;error=h.framer.TraceRefusal('input_limit')
+    assert d.diagnostic(error,'native_observation')=={'stage':'native_observation','role':'framer','code':'input_limit','errno_name':None,'category':'local_contract_refusal'}
+    class TraceRefusal(Exception):pass
+    assert d.diagnostic(TraceRefusal('input_limit'),'native_observation')['code'] is None
+    monkeypatch.setattr(h.framer,'fixed_failure',lambda *a:pytest.fail('replacement classifier must not execute'))
+    assert d.diagnostic(error,'native_observation')['category']=='unknown_local_failure'
+
+
+@pytest.mark.parametrize('number',[errno.EPERM,errno.EACCES,99999])
+def test_runtime_errno_projection_is_allowlisted_and_exception_text_free(context,number):
+    class Secret(OSError):
+        def __str__(self):raise AssertionError('exception formatting forbidden')
+    error=Secret(number,'PRIVATE account/path')
+    result=d.diagnostic(error,'publication')
+    assert result['errno_name']==({errno.EPERM:'EPERM',errno.EACCES:'EACCES'}.get(number))
+    assert result['category']=='local_os_refusal' and 'PRIVATE' not in json.dumps(result)
+
+
+def test_private_64MiB_cap_boundaries_preserve_original_shared_8MiB_module(context):
+    from scripts import trace_short_interest_journal_actor as shared
+    h=context;raw=(REPO/d.FRAMER).read_bytes();before=d.sha(raw)
+    assert shared.MAX_INPUT==8*1024**2 and h.framer.MAX_INPUT==d.MAX_INPUT==64*1024**2
+    h.consumer.total=8*1024**2;h.consumer.feed(b' ');assert h.consumer.total==8*1024**2+1
+    h.consumer.total=d.MAX_INPUT-1;h.consumer.feed(b' ');assert h.consumer.total==d.MAX_INPUT
+    with pytest.raises(h.framer.TraceRefusal,match='input_limit'):h.consumer.feed(b' ')
+    assert shared.MAX_INPUT==8*1024**2 and d.sha((REPO/d.FRAMER).read_bytes())==before
+    assert (d.MAX_RECORD,d.MAX_MATCHES,d.MAX_OUTPUT,d.PASSIVE_NS,d.WHOLE_NS)==(65536,256,1048576,30000000000,120000000000)
+
+
+def test_private_framer_validates_original_cap_before_override(context,monkeypatch):
+    raw=(REPO/d.FRAMER).read_bytes();variant=raw.replace(b'MAX_INPUT = 8 * 1024 * 1024',b'MAX_INPUT = 64 * 1024 * 1024',1)
+    assert variant!=raw
+    # Explicit fabricated held-byte seam to reach the independent cap check.
+    monkeypatch.setattr(d,'ORIGINAL_FRAMER_SHA256',d.sha(variant))
+    with pytest.raises(d.DocumentsTraceRefusal,match='framer'):d.load_framer(variant)
+
+
+@pytest.mark.parametrize('raw',[b"raise AssertionError('PRIVATE_UNVERIFIED_EXEC')\n",bytearray(b'PRIVATE')])
+def test_untrusted_private_framer_bytes_refuse_before_module_creation_or_exec(context,monkeypatch,raw):
+    monkeypatch.setattr(d,'ModuleType',lambda *a:pytest.fail('Unverified module must not be created'))
+    original=d._FRAMER_DIAGNOSTIC
+    with pytest.raises(d.DocumentsTraceRefusal,match='framer'):d.load_framer(raw)
+    assert d._FRAMER_DIAGNOSTIC is original
+
+
+def test_record_bound_remains_64KiB_after_private_stream_cap_change(context):
+    h=context
+    with pytest.raises(h.framer.TraceRefusal,match='record_limit'):h.consumer.feed(b'{"x":"'+b'a'*65536)
+    assert d.diagnostic(h.framer.TraceRefusal('record_limit'),'native_observation')['code']=='record_limit'
+
+
+def test_initial_nonzero_sequence_is_unverified_coverage_not_invented_drops(context):
+    h=context;h.consumer.consume(event(h,'setflags',9));h.consumer.consume(event(h,'setflags',11))
+    assert h.consumer.first_seq==9 and h.consumer.last_seq==11
+    assert h.consumer.issues==['coverage_start_unverified','global_sequence_gap_or_reorder']
+    assert not any('drop' in key for key in h.consumer.issues)
+
+
+def test_no_records_is_incomplete_but_valid_unrelated_records_with_zero_candidates_can_close(context):
+    h=context;h.consumer.finish();assert 'no_valid_native_records' in h.consumer.issues
+    value=d.make_consumer(h.framer,h.watch);obj=event(h,'unlink');obj['event']['unlink']['parent_dir']=file('/unrelated')
+    value.consume(obj);value.finish();assert value.records==1 and not value.matches and not value.issues
+
+
+@pytest.mark.parametrize('mode',['planned','kill','stderr'])
+def test_original_lifecycle_TERM_EOF_kill_stderr_bounds_and_sampling_intervals(context,monkeypatch,mode):
+    h=context;actions=[];now=[0];reads={111:[d.canonical(event(h,'setflags')),b''],222:[b'']}
+    class Timer(Clock):
+        def check(self,reserve=0):now[0]+=100000000;self.last=now[0];return self.last
+    class Stream:
+        def __init__(self,fd):self.fd=fd
+        def fileno(self):return self.fd
+        def close(self):actions.append(('close',self.fd))
+    class Child:
+        pid=80;stdout=Stream(111);stderr=Stream(222);exit=None
+        def poll(self):return self.exit
+        def terminate(self):
+            actions.append('terminate')
+            if mode!='kill':self.exit=-15
+        def kill(self):actions.append('kill');self.exit=-9
+        def wait(self,timeout):actions.append(('wait',timeout));return self.exit
+    child=Child()
+    class Selector:
+        def __init__(self):self.map={};self.calls=0
+        def __enter__(self):return self
+        def __exit__(self,*args):pass
+        def register(self,stream,events,role):self.map[stream]=SimpleNamespace(fileobj=stream,data=role)
+        def get_map(self):return self.map
+        def unregister(self,stream):del self.map[stream]
+        def select(self,timeout):
+            self.calls+=1
+            if self.calls==1:
+                return [(self.map[child.stderr if mode=='stderr' else child.stdout],None)]
+            if self.calls==2:now[0]=31000000000;return []
+            if mode=='kill':now[0]=35000000000;return []
+            return [(key,None) for key in tuple(self.map.values())]
+    real_read=os.read
+    def read(fd,size):
+        assert size==8192
+        if fd not in reads:return real_read(fd,size)
+        if mode=='stderr' and fd==222:return b'x'*(d.MAX_STDERR+1)
+        return reads[fd].pop(0)
+    monkeypatch.setattr(subprocess,'Popen',lambda *a,**kw:child)
+    monkeypatch.setattr(d.selectors,'DefaultSelector',Selector);monkeypatch.setattr(os,'set_blocking',lambda *a:None)
+    monkeypatch.setattr(os,'read',read)
+    result=d.observe(h.consumer,h.watch,Timer())
+    assert actions[-3:]==[('wait',2),('close',111),('close',222)]
+    if mode=='planned':
+        assert result['actual_native_exit']==-15 and result['native_stdout_stderr_EOF'] is True
+        assert result['planned_original_handle_shutdown'] is True and not h.consumer.issues
+        labels={row['interval'] for row in h.watch.samples}
+        assert {'before_first_record','observing','shutdown_draining'}<=labels
+    elif mode=='kill':
+        assert 'kill' in actions and result['actual_native_exit']==-9
+        assert result['native_stdout_stderr_EOF'] is False and 'tracer_required_kill' in h.consumer.issues
+    else:
+        assert result['first_failure']['code']=='stream_limit' and result['stderr_bytes_discarded']==d.MAX_STDERR+1
+        assert result['planned_original_handle_shutdown'] is False and result['native_stdout_stderr_EOF'] is False
+
+
+def test_own_unknown_exception_remains_unknown_without_formatting(context):
+    class Unknown(Exception):
+        def __str__(self):raise AssertionError('private exception formatting forbidden')
+    assert d.diagnostic(Unknown('PRIVATE'),'native_observation')=={'stage':'native_observation','role':'unknown','code':None,'errno_name':None,'category':'unknown_local_failure'}
+
+
+def test_expired_publication_reserve_never_writes_or_extends_whole_clock(root_run,monkeypatch):
+    h=root_run;now=[0];monkeypatch.setattr(d.time,'monotonic_ns',lambda:now[0]);monkeypatch.setattr(d,'_BOOTSTRAP_START',0)
+    original=d.observe;writes=[];write=os.write
+    def observing(*args):
+        value=original(*args);now[0]=d.WHOLE_NS-d.SHUTDOWN_NS+1;return value
+    monkeypatch.setattr(d,'observe',observing)
+    monkeypatch.setattr(os,'write',lambda fd,raw:(writes.append((fd,len(raw))),write(fd,raw))[1])
+    result=h.run()
+    assert result['status']=='incomplete' and result['first_failure']['code']=='clock'
+    assert not writes and d.OUTPUT.stat().st_size==0 and d.WHOLE_NS==120000000000

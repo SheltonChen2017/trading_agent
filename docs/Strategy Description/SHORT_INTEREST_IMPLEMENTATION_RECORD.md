@@ -32001,3 +32001,138 @@ This round made no provider or key request, created no claim, START or charged
 byte, made no QC or Safari access or purchase, and did no outcome join. Looks
 remain 0/0 canonical and 0 exploratory, alpha 0, permanent look IDs none, and
 QC attempts 0. Codex's counter-review of this round is next.
+
+## 148. Codex counter-review and visible Documents startup refusals (2026-11-04)
+
+### 148.1 Owner-authorized reconciliation and observed command state
+
+The owner replied that nothing happened when using the146.1 command and
+explicitly authorized reconciling the new commits. Main first stopped on
+unexpected clean HEAD219B rather than changing the pinned expectation
+silently. It then verified physical/Git roots, the designated lane branch,
+clean219b701c09631e31a895b29c3f0a18536ad0b0ea, matching tracking/actual origin
+and ancestry from publisheda184a414c00cea327ef80d29837e3a8a2a3b4abe.
+No fetch, switch, extra worktree, reset, rebase or history rewrite.
+
+The fixed AppSupport report.private.json is ABSENT and no named lane trace,
+eslogger or durable-count process was active at the guarded check. The owner
+supplied no terminal JSON or exit status. This does not reconstruct their
+historical invocation, prove a successful closure or justify a source claim.
+The old command's driver hashc4343dd9 differs from the current Claude-corrected
+driver: IF executed against219B, its bootstrap necessarily exits2 silently
+before the exclusive report/native trace. Section147.6 correctly describes
+that stale-command condition. Never rerun, overwrite or delete the old
+command or treat absence alone as success.
+
+### 148.2 Per-commit dispositions
+
+| Commit | Disposition | Independent evidence and limits |
+| --- | --- | --- |
+| 3a8f39211bb3e0ec2b68603e5ee91492a0265885 | Accepted after the prospective trace correction below; all Claude corrections accepted | SI-CR27-001 correctly binds the checkpoint loader's actual eager/preflight closure.002 clears the stale pre-start kernel row before ack1 so unknown post-start state holds endpoints.003 uses absolute /usr/bin/sudo.004 demotes every root Git child to the lane owner's UID/GID with no supplementary groups and removes safe.directory.005/006/007 strengthen Main-receipt, committed RAM-runtime and first-chunk-repeat tests without changing economics or source authority.009 remains a real pre-owner-trace defect and is corrected in this unit.008 remains an operational gate-replacement precondition, not fixed by this review. |
+| 219b701c09631e31a895b29c3f0a18536ad0b0ea | Accepted | Section147 accurately limits its claims, keeps008/009 and source/readiness gates open, preserves historical rows and adds the three missing publication rows. Its replacement of the current status paragraph is distinguished from historical evidence. The stale owner command is correctly retired. No independent Claude review of this new local correction is implied. |
+
+Main's relevant loader/Main receipt/USB RAM/two-budget/startup regression
+selection340 passed16.47s, OS networking denied. Advisory author independently
+340 passed17.16s and restored12 regressions1.65s. Twelve causal failures
+verified loader1, startup1, Main receipt6, RAM-runtime2 and repeat caps2.
+One first startup reversal selected the older initialization and passed;
+it was discarded as an invalid mutation before the exact ack-adjacent
+reversal failed. A copied-tree USB reversal had a pytest temporary-directory
+cleanup warning; no cleanup or unrelated deletion was performed.
+Trace peer independently48/.48s on219B, with003/004 reversal2 failures/.57s
+and restored2/.03s. These are fabricated checks, not actual source/native
+operations or a full lane suite.
+
+### 148.3 SI-CR27-009 correction and explicit collection bound
+
+The prefix now emits si-documents-bootstrap-refusal-v1 JSON for invalid
+arguments, privilege/owner checks, file shape/hash/stamp, bounded OS errors
+or code compilation BEFORE importing/executing the unverified driver.
+Only fixed entered stage/role/code/category and allowlisted errno names,
+separate cleanup failures and zero source-authority/counters are printed.
+No path, supplied hash, exception text or dynamic type name is formatted.
+The verified program executes OUTSIDE that prefix catch and owns its own
+terminal packet; no duplicate synthetic bootstrap result masks it.
+The original120s clock still begins before first public-code access.
+
+Runtime diagnostics preserve genuine private-framer TraceRefusal contracts
+and bounded OSError errno names. Exact retained module/class/callable/code/
+catalogue identities distinguish them from same-name errors or substituted
+classifiers. Unknown errors remain unknown. A prospective P3 hardening pins
+the old framer's exact SHA before ModuleType creation/exec: the actual
+root_trace already supplies held/Git-verified bytes, so the external forged
+SPI thought experiment is NOT reported as an exploitable P2 route.
+
+The DISTINCT Documents profile now declares a finite64MiB TOTAL stream
+counter after validating the private framer's original8MiB and other original
+bounds. The shared old framer file/default remains BYTE-IDENTICAL. The buffer/
+record64KiB, reads8192B, matches256, report1MiB, stderr4096B, samples400,
+passive30s and whole120s stay unchanged. No unrelated raw message/name is
+persisted. This is a prospective collection budget, not an empirical promise
+that every busy Mac fits; exhaustion is incomplete with its real input_limit,
+never an automatic bump, replay, source-budget change or weaker custody rule.
+
+SI-CR27-010(a/b/c) gains fabricated bootstrap, planned TERM+actual EOF,
+deadline kill, stderr bounds, sequence/no-records and phase tests. First
+nonzero sequence means coverage_start_unverified, not proven drops. Samples
+distinguish before_first_record, observing and shutdown_draining.
+The valid NEW_PATH fixture preference in010(d) is retained.010(e) remains
+explicit: an expired publication reserve does not guarantee durable
+projection preservation. Its regression proves NO report write and no120s
+extension; no late publication, deadline bypass or namespace retry is added.
+
+### 148.4 Frozen validation and safe next action
+
+Final driver38520 bytes/SHA256
+4fa266113c4ad23c4c8747a30bcea04f02fdc25fde22a109262eea31bf73c01d;
+tests34155 bytes/SHA256
+a269cb3f70b5f7a3ef29a5c93977c7763ea2694ccc5c0166292eb559d3d34ed7.
+Old framer35527 bytes/SHA256
+ed462f3b0552d3f74c468c6a51e47ef215b90d9f7e38a372364aaec5c7fcdf63
+remains exact. Python3.9 AST/in-memory compile and standalone bootstrap
+compile passed. No pinned supervisor/process-manifest/source protocol,
+source gate, budget arithmetic or capture code changed in this unit.
+
+Main final new-trace/old-framer/import-boundary/active-document selection240
+passed1.49s, OS networking denied. Author final71/.64s and peer71/.61s passed;
+ten separate memory-only causal failures covered diagnostic4, bootstrap4 and
+pre-exec framer pin2, followed by restoration. Main's earlier239/1.83s and
+peer70/.70s preceded one intentional expired-reserve test addition after the
+declared test freeze; they are NOT attributed to the final test hash.
+The author acknowledged that freeze-notification mistake. Final exact hashes
+were independently reverified; no further authoring or actual operation.
+
+The new preparation will remain LOCAL and clean while its one-shot trace is
+pending: section147.1 establishes that the previous publication triggered
+Claude's watcher and invalidated the owner command. Prepare the new
+command-only immutable artifact against the exact LOCAL committed HEAD and
+matching actual/tracking219B; syntax-check without executing it. No push,
+edit, test or commit overlaps an active one-shot trace. Do not change or
+message the other review monitor/chat. Reserve this round's ONE final push
+until terminal trace/result documentation and the completed round's honest
+readiness or concrete blocker are established.
+
+A fresh command is a causally corrected registration after the verified
+silent-refusal/diagnostic defects, not a restart of a spent source claim.
+Before any invocation reverify the unchanged fixed report namespace is
+absent/empty, exact roots/branch/HEAD/clean status and matching origin.
+An existing report, unknown active operation or unexpected advancement stops;
+no removal, reset or adoption is allowed. Actual child termination, EOF,
+original report/terminal/file10/directory5 and negative dominance remain
+mandatory. Even a positive observation does not identify a writer by
+correlation alone, fix custody or qualify USB/source/input data.
+
+No new trace/native/USB/source-provider/key/claim/START/charged byte/outcome/QC/Safari/
+purchase occurred in this round. SourceAUTH and052 remain blocked;
+SI-CR27-008 must be resolved under a new finite operational protocol before
+any gate replacement. Count84005/4GiB, permanent8START/16MiB and separate
+DAILY36837/3327988047/71468572 remain. Initial upper-bound arithmetic is not
+a newly verified current source balance. Canonical looks0/0, exploratory0,
+alpha0, IDsnone and QCattempts0. Preserve all original data/claims/negatives/
+receipts/proof images. Last-step-before-QC readiness remains FALSE.
+
+Main post-record status/active-document selection98 passed/.97s. The bounded
+noninteractive administrator capability check is FALSE; no password prompt
+or native trace was requested and raw stderr was discarded. The next step
+therefore needs the already-authorized owner authentication in Terminal.
+The entire219B record prefix remains byte-exact; owned whitespace passed.

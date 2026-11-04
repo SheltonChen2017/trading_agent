@@ -1,17 +1,23 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Provider-field follow-up recorded in section 61, 2026-11-03.
-EODHD website sign-in is verified; the token-free bounded SPY API request returns Unauthenticated.
-Paid-account data access remains unverified, rather than disproved by that authentication result.
-Public-demo AAPL payment dates and four exact raw-cash USB matches are format/sample evidence only.
-Owned news/press-release routes may support exploratory guidance reconstruction; history is unverified.
-Historical stock/SPY NBBO remains unestablished. No new purchase is recommended.
+Status: **Authenticated EODHD historical field checks recorded in section 62, 2026-11-03.
+Owner-authorized key use succeeded through an in-memory Bearer header; no key was displayed or saved.
+AAPL and SPY each return 24 dividend records for 2020--2025 with all payment-date fields populated.
+Two 2025 SPY raw-cash records conflict with the USB; four-decimal rounding does not reconcile them.
+JNJ news access is verified for 198 sampled 2025 articles; comparable guidance pairs remain unverified.
+January 2020 returns empty; April 2020 fails the symbol gate and is not accepted or financially analyzed.
+Historical stock/SPY NBBO remains unestablished. The lane is not backtesting ready.
 This follow-up is local-only; section 60 was published once as `3e144031`.
+Provider-field follow-up recorded in section 61, 2026-11-03.
+The prior token-free SPY authentication blocker is resolved only for the scoped EODHD checks in section 62.
+Public-demo AAPL payment dates and four exact raw-cash USB matches are format/sample evidence only.
+Owned news/press-release routes may support exploratory guidance reconstruction; full history is unverified.
+No new purchase is recommended.
 FirstRate raw adapter and conservative USB reconciliation recorded in section 60,
 2026-11-03. The adapter and final virtual source reconciliation are complete as offline software.
 No QC navigation, query or launch; no purchases or strategy evaluation.
 Existing Massive/EODHD/FMP/Sharadar plan metadata refreshed. Guidance and historical NBBO remain unestablished.
-Paid-account stock/SPY action-field coverage remains unverified; native provider-control failures are recorded below.
+Full-universe stock/SPY action-history coverage remains unverified; section 62 samples two symbols over six years.
 Virtual reconciliation accepts 23,585,624 structural keys and quarantines 58,586 keys.
 USB coverage and quality audit recorded in section 59, 2026-11-03.
 The owner reports these FirstRate files were purchased under their licence.
@@ -104,7 +110,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 61. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 62. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -9058,3 +9064,182 @@ public-sample action coverage and the Massive suspension clause. It is not
 independent Claude review or empirical/native acceptance. Final header/diff/
 status checks precede the local-only commit; no additional push is authorized
 or performed in this follow-up.
+
+## 62. Authorized EODHD key use and measured historical fields, 2026-11-03
+
+### 62.1 Owner direction and secret-free request custody
+
+Owner: **"yes, use the existing EODHD key for the historical coverage checks.
+don't display or save it, and don't access QC or buy anything."** This
+specifically resolves section 61's manual API-authentication handoff for the
+existing EODHD key. Do not ask for that same permission again. It does not
+authorize another provider's credentials, copied browser sessions, key
+reconfiguration, purchase, QC, outcomes/returns, research allocation or trading.
+The key is held in memory only, supplied to EODHD in a Bearer header, excluded
+from URLs/files/output, then its temporary reference is cleared. No clipboard,
+cookie copying, key generation/rotation or credential file is used. Three
+exact-label Keychain metadata lookups found no item; no password was read.
+The working key comes from the authorized EODHD dashboard's displayed token
+control through the isolated browser. Credential-bearing temporary snapshot
+text is cleared and extra dashboard tabs are closed. No secret is committed.
+
+The [provider authentication guide](https://raw.githubusercontent.com/EodHistoricalData/eodhd-claude-skills/main/skills/eodhd-api/references/general/api-authentication-demo-access.md),
+linked by EODHD's quickstart, documents Bearer authentication. Its older
+publication date and the [OpenAPI query-only scheme](https://raw.githubusercontent.com/EodHistoricalData/EODHD-openapi/main/components/securitySchemes.yaml)
+are retained as a documentation discrepancy. Actual bounded HTTP 200 responses
+below establish that the header worked for these requests. They do not
+establish every product grant or original historical availability. The
+section-61 token-free Unauthenticated result remains valid historical evidence.
+
+Start clean local `2ba55cf5a81122399cd6fd6dbf861f626e7efe8b`, one known local
+notes commit ahead of unchanged matching remote
+`3e14403190504f0dfc33e7b542965a935e2fc496`; mandatory root/branch/origin verified.
+Only this lane record and its existing status pins change in tracked Git.
+No new push is requested or performed. Prior section-60 publication is finished,
+all consumed reviews remain consumed, and the monitor remains PAUSED.
+
+### 62.2 Actual requests, accepted samples and limits
+
+Sixteen bounded GET requests use only `/api/div/{SPY.US,AAPL.US}` and
+`/api/news` on `https://eodhd.com`, with no redirects followed, one MiB maximum
+per response and no automatic retries. No QC, Massive, FMP or Sharadar API
+request occurs. Every request is within the existing unprotected date fence;
+records must pass complete date/ticker checks before financial conversion or
+article analysis. JSON numeric lexemes remain strings until the private
+Decimal boundary. Licensed response data is retained only in ignored private
+artifacts, separately from the secret-free request context. No key is included.
+
+| Request scope | Measured result | What it establishes / does not establish |
+| --- | --- | --- |
+| SPY, calendar 2025 | HTTP 200, four dividend rows, 745 bytes | All four payment/declaration/record dates, currency and raw cash fields populated; no sampled chronology flag. Not full-universe action coverage or PIT. |
+| AAPL, calendar 2025 | HTTP 200, four rows, 721 bytes | Same field result; raw response SHA is byte-exact to section 61's public-demo sample, now independently retrieved using the account key. |
+| JNJ, January 2025 | Five HTTP 200 pages, offsets 0/20/40/60/80, 98 rows; final page has 18 | Account news access and full content in this delivered window. Pagination end is not an issuer-disclosure completeness certificate. |
+| JNJ, April 2025 | Five HTTP 200 pages, same offsets, 100 rows | Explicit audit cap reached. April remains partial; no absence or complete-history claim. |
+| SPY and AAPL, 2020--2025 | Two HTTP 200 responses, 24 dividend rows each; four ex-dates per year per symbol | All 48 payment/declaration/record dates and currency/raw-cash fields populated and valid; raw and adjusted cash finite; no sampled date-order flags. Establishes six-calendar-year depth for these two returned series, not every issuer/action, permanent-ID mapping, original announcement availability or confirmation rights. |
+| JNJ, January 2020 | HTTP 200, empty array, two bytes | Valid empty response; not evidence of usable guidance or an entitlement denial. |
+| JNJ, April 2020 | HTTP 200 path reaches `news_record_symbol_mismatch` | Rejected before financial/content analysis. Exact payload/row count/hash were not retained by that client error path. Identity/filter diagnosis remains unresolved; no inferred coverage or attempted numeric repair. |
+
+The first 12 requests were captured around `2026-11-03T23:57--23:59Z`;
+four older-history requests followed around `2026-11-04T00:05Z`, still November
+3 in America/Los_Angeles. Fifteen verified responses are retained, including
+the empty January 2020 result; the failed April 2020 response has only a
+qualified metadata/refusal record. The initial post-exception tool summary
+incorrectly said April 2020 was unexecuted. Three retained earlier successes
+and the actual loop/exception path establish that it was the fourth executed
+older-history request. The corrected receipt explicitly preserves this
+correction, with no fabricated payload hash or row count. No further older-
+news request is made after the symbol refusal.
+
+The 2025 dividend responses overlap the six-year responses: **48 unique
+returned dividend action-date keys**, not 56 independent actions. Eight 2025
+response occurrences are repeated across requests. No cash is posted or
+strategy result calculated from any of them. Payment dates are current-vintage
+fields, not proof of what was announced or receivable at a past cutoff.
+
+### 62.3 USB cash conflicts and guidance-source shape
+
+The named USB `ETF_Dividends.zip` archive hash matches the retained section-59
+audit. Read only `SPY_divs.txt`, applying the 2025 date gate before cash
+conversion through the FirstRate parser; no USB write or full audit occurs.
+All four ex-dates join, but only two raw cash amounts match exactly. March 21
+and June 20, 2025 conflict; September 19 and December 19 match. The two
+conflicts persist after both amounts are independently rounded to four decimal
+places. EODHD raw and split-adjusted fields are equal on all four sampled SPY
+rows. This does not identify which vendor is correct or justify adopting a
+tolerance. Preserve both sources; reconcile against an authoritative
+distribution/correction record before a cash join. No value is replaced and
+no financial amount is emitted. AAPL's four 2025 raw-cash matches from 61.3
+remain applicable because the new account response is byte-exact to that sample.
+
+All 198 accepted 2025 news records pass the requested JNJ/date gates, have
+publication/title/content/link/symbol fields, and have 198 unique exact
+link/date/title identities. No duplicate or conflicting version key is observed
+in this sample. Syndicated publisher links and commentary dominate; marker
+co-occurrence alone is not management guidance. After HTML entity decoding,
+two titles match an issuer-report-shaped prefix, dated January 22 and April 1.
+Four records have FY2025/adjusted-EPS/revenue-or-sales/guidance markers, dated
+January 14, April 1, April 2 and April 15. No numeric guidance range,
+accounting-basis compatibility, immediate comparable predecessor, issuer
+authorship or immutable original delivery is verified by that heuristic.
+
+Author QA corrected a source-shape scanner that initially missed title matches
+because it examined HTML entities literally. Preserve raw-v1 and corrected-v2
+receipts; only v2's HTML-decoded counts are current. Do not convert a title
+scanner limitation into a substantive missing-release claim. These owned news
+samples justify further targeted original-disclosure reconstruction before
+buying Corporate Guidance, while the empty/refused 2020 probes leave six-year
+usable guidance history unestablished. Historical reconstruction remains
+PIT-false unless original availability is proved.
+
+### 62.4 Validation, retained identities and remaining blockers
+
+The new ignored `inspect_response_v2.py` preserves v1 byte-exact and adds
+documented News `direction=1`/limit/offset checks plus a conservative local
+31-inclusive-day audit bound. The provider says a window must not exceed
+31 days without defining inclusive-day counting; the actual requests satisfy
+either interpretation. Twenty-two
+invented controls pass, including invalid dates, wrong direction and paging
+ceilings. Its offline inspection of 12 account-sample pairs verifies all 24
+raw/context hashes, with zero refusals or field/date disagreement. Three
+older-history pairs verify all six hashes; the empty January result remains
+empty, and failed April has no fabricated inspection. This author/subagent
+inspection cannot independently authenticate an externally supplied context;
+the root's observed key/header/HTTP transaction is separate evidence. Neither
+provides PIT or empirical/native acceptance. No full lane/repository suite runs.
+
+Major ignored anchors under
+`artifacts/guidance_revision_drift/provider-field-audit-20261103/`:
+
+| File | SHA-256 |
+| --- | --- |
+| `owned-account-v1/receipt-v1.json` | `35ae58ede81a5f95f172eb8c57452030fb0b946d5afc2ca7f7632229e4f59db1` |
+| `owned-account-v1/inspection-receipt-v2.json` | `c58c2509e0018d503ed2be7fbbb0f095eb98c72009b1627dd2b3c4fbc95601e2` |
+| `owned-account-v1/SPY-USB-crosscheck-v1.json` | `d5fd0591b952f387adea8ae1695944d43b965811d521b9a0e2e2a2ae54acf326` |
+| `owned-account-v1/SPY-precision-diagnostic-v1.json` | `e907bfd8e78f8aa860deb76c61994302e5e796892084e84441d551f267051fdc` |
+| `owned-account-v1/issuer-release-shape-v2.json` | `d7cfb730564fc92a2ce3e346fe4b246a8aefe54471b0b67e02b1808771334f35` |
+| `owned-history-v1/receipt-v1.json` | `085d4d883ed8143ff5fed955cdf474b4ab472f34bf348029e15ac1327c9462ed` |
+| `owned-history-v1/inspection-receipt-v2.json` | `0764451801c640ce0b6235c5266e3bceb90edec445328d17b0f03289193b139b` |
+| `inspect_response_v2.py` | `0f045e411dc7cabe1a6420b29f857f9cb96879eed513aff97001150934580e5b` |
+| `invented-controls-inspector-v2.json` | `e7c8f67c4058582cb4fa63e416eb3756d9578783fcde4d9451d2bfdcbf56a547` |
+
+The remaining data blockers are now more precise: usable issuer-guidance
+ranges/pairs/history and identity/filter resolution; historical consolidated
+stock **and SPY** bid/ask; the two SPY cash conflicts plus action/reference/
+terminal-event coverage outside these samples. Existing EODHD payment-date
+fields for these two six-year series are measured, so do not continue calling
+all stock/SPY payment dates wholly unavailable or recommend another dividend
+subscription on that premise. Ordinary EODHD private local processing is
+permitted by the inspected terms; intended cloud processing/upload and other
+providers' actual applicable rights still need resolution before their use.
+
+Next bounded actions: inspect the identified original-disclosure candidates and
+comparable predecessors under a declared exploratory reconstruction; diagnose
+the older news symbol refusal; resolve the two SPY action conflicts from
+authoritative evidence; verify remaining existing Massive/FMP grants and
+rights before any purchase recommendation. Section 60.5's canonical identity/
+minute/service-calendar/terminal-action/settlement/integration and frozen
+research/economic/date/look gates remain. No strategy rule, input acceptance
+tolerance or financial value is changed. The lane is not at the QC-ready step.
+
+Production source remains
+`f570bb044504ec12439d74d49e27408337705286a7ca5d1ac46bb91526e1b11b`
+(60 members), FirstRate source remains
+`7889276ed58bd8f24c25c3fb6db4d81c2a3c463ae14b13d5bfb2c38ddc34631e`
+and native audit remains
+`fa562a43d49f59e5e3305c3d99cb2d3537bf0045a494504c3f5e5711fd8ae3e6`.
+Original candidate/fixture/economic/null/false permissions remain unchanged.
+Original cycle remains CLOSED FAILED 3/3; separate Mia recovery stays zero
+attempts/intents under its maximum three unsuccessful attempts. No QC access,
+new review consumption, native run, purchase or monitor rearm occurs.
+
+Closing focused verification: the existing active-document method passes
+in 0.015 s, zero failures/errors/skips; nine major artifact anchors and all
+30 raw/context hashes for 15 retained responses match. Saved contexts contain
+neither an API-token query parameter nor request headers. Response byte counts
+match the captured files. Two Python files compile in memory. Sections 1
+through 61 below the header are byte-exact to `2ba55cf5`; the production source
+SHA/member count is unchanged and `git diff --check` passes. Read-only author
+QA qualified the 31-inclusive-day bound as local and conservative. This is not
+independent Claude review, a full suite or native/empirical validation. Final
+root/branch/HEAD/status and staged-file checks precede a local-only notes commit;
+no new publication is authorized by the key-use instruction.

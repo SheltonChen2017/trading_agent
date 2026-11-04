@@ -192,8 +192,12 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         # Review-state phrase: rotate it in the same commit as each new review
         # or counter-review section so the status block cannot go stale.
         header = record.split("## 1.", 1)[0]
+        self.assertIn("Authenticated EODHD historical field checks recorded in section 62", header)
+        self.assertIn("no key was displayed or saved", header)
+        self.assertIn("Two 2025 SPY raw-cash records conflict with the USB", header)
+        self.assertIn("The lane is not backtesting ready", header)
         self.assertIn("Provider-field follow-up recorded in section 61", header)
-        self.assertIn("Paid-account data access remains unverified", header)
+        self.assertIn("The prior token-free SPY authentication blocker is resolved only", header)
         self.assertIn("Public-demo AAPL payment dates and four exact raw-cash USB matches", header)
         self.assertIn("This follow-up is local-only; section 60 was published once as `3e144031`", header)
         self.assertIn("FirstRate raw adapter and conservative USB reconciliation recorded in section 60", header)
@@ -264,6 +268,7 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertGreater(record.index("\n## 59."), record.index("\n## 58."))
         self.assertGreater(record.index("\n## 60."), record.index("\n## 59."))
         self.assertGreater(record.index("\n## 61."), record.index("\n## 60."))
+        self.assertGreater(record.index("\n## 62."), record.index("\n## 61."))
         self.assertIn("research/__init__.py`, remains unobserved", header)
         self.assertIn("paused pending platform preflight", header)
         self.assertIn("GDR-RP33 is accepted in section 34", header)

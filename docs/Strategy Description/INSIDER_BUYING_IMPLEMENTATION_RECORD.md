@@ -43755,3 +43755,210 @@ root, authenticate old failed claims, independently rederive the12 original
 controls and publish fresh bindings/plan before any credential/GET. Any
 failure preserves the new claim and stops; no automatic retry or namespace
 substitution. All readiness/source/PIT/rights authorities remain FALSE.
+
+### 366.8 Observed existing-plan qualification and independent readback
+
+Correction `7f650b0814010c84a512145d72d6cb4aa6dcdcc0` existed clean BEFORE
+the single provider operation. No source/test/record edit occurred while it
+ran. It completed the new immutable audit in637.180110 seconds, stdout828/
+stderr0 bytes, exit2 under the CLI's strict all-planned-clean gate. This is
+a completed PARTIAL qualification with an authenticated complete receipt,
+not the old failure-before-input and not full provider qualification.
+
+Complete70,190 bytes/SHA-256
+`f52646ad80a2a7497f9eb56d471987d8041ac744600b194e5e9ea99c6684a552`.
+Independent native read-only readback authenticated all63 files/242,733 bytes
+from this external complete pin, all referenced leaf pins, exact inventory,
+original/current execution lineages, physical-root binding, zero-access old
+snapshot and12 freshly rederived controls. It exited0/stderr0, with effective
+network/fork/write/security denial and live memory guard. No new claim, source
+request or credential read was made by this readback.
+
+| Family | Planned / GET invocations | Observed disposition |
+|---|---:|---|
+| FMP SEC CIK/day search |12 /12|12 HTTP200 scoped/clean results,71 metadata rows; all12 retained controls have exact accession+issuer-CIK and filing/form matches.14 joint matching rows and57 other same-issuer/day rows; no ambiguous control matches. |
+| FMP insider latest/day |5 /1|HTTP200 returned100 rows; all100 filing AND transaction dates disagreed with the requested day and were outside the frozen window. Scope REFUSED; no body pin/case checks. Remaining4 requests unattempted under the family stop; no retry/fallback. |
+| EODHD current CIK mapping |11 /11|11 HTTP200 scoped/clean results,33 current mapping rows; all12 controls have current CIK and US-namespace symbol agreement. Five per-query issuer cases have multiple current symbols; none supplies historical share-class identity. |
+
+Total28 deduplicated requests planned (max36),24 transport invocations,
+24 projected responses,23 scoped/clean,4 explicitly unattempted. One current
+Keychain read attempt/success per provider, two total; no secret retained or
+hashed. Client invocation counts are observed; REMOTE request counts remain
+unmeasured. Non200/error bodies, raw/normalized rows and financial values were
+not retained. No proxy, retry, paging, alternate account, purchase or upgrade.
+
+FMP's71 exact-midnight filingDate normalizations exercised the corrected SEC
+parser against real responses. All12 controls have at least one naive
+acceptedDate lexical agreement, but timezone/public-delivery/body-version
+equivalence remain UNVERIFIED. Current symbol equality appears for11 controls
+in FMP and all12 with the EOD US suffix; current labels are not historical
+listing/share-class validity. No all-six-form admission/full-population proof
+follows from twelve Form4/4-A controls. The FMP insider observation establishes
+this ONE profile's date-scope failure, not a provider-wide history refusal.
+
+New stable custody is technically accepted for this observed route:637s of
+production execution and independent complete readback preserved all hashes,
+privacy, full file-version checks and physical-root binding. The original
+Documents-folder failures/claims are unchanged and their cause remains
+unestablished; IBFMPEOD-OBS36401 and the original PUB36402 scope remain OPEN.
+SCOPE36601/DATE36602 and IPC36603 corrections are validated only within their
+stated technical scopes. Fifteen carried P2s remain OPEN, no P0/P1; passing
+API checks do not close source/PIT/rights/canonical/population/readiness gates.
+
+The real remaining external fact is a genuine accession/body/version-linked
+historical availability archive for2020-10-01–2025-12-31, with authenticated
+available-by upper bounds, clock meaning, correction/deletion/backfill lineage,
+coverage/gaps and applicable use. These current endpoints supplied none of
+that evidence. There is no finding that another purchase is required or that
+the suppliers cannot provide an archive; existing correspondence stays held,
+monitor disarmed, and no vendor reply/QC/Safari access occurs.
+
+## 367. Additive protected required21 planner integration (2026-11-03)
+
+### 367.1 Owner-directed scope and actual-input prerequisite
+
+**IBDEC-367-01:** apply the latest "keep building toward pre-QC readiness"
+authorization to one still-required, input-complete engineering step after
+366's actual qualification: integrate the genuine20,052-accession consumed
+chain with protected full25-source required21 planning. Sections342.2/343.3
+require that integration before a future original-parent batch;357–358
+completed the chain/selection prerequisite, not this protected assembly.
+This is not another pure adapter, a favorable exclusion, a source request,
+historical admission or a substitute for missing archive facts. The owner
+delegated routine engineering judgment; no new purchase/QC/Claude checkpoint
+or routine approval is introduced.
+
+Use a NEW additive runner and fresh data-only
+`ib-required21-chained-plan-v2-20261103-once` epoch. Preserve all old planners,
+their unchained-later-capture refusal, collectors, source bytes, claimed/spent
+namespaces and failed operations. Never invoke prepare_actual_batch,
+run_actual_batch, a required21 collector or the spent358 observation entry.
+The only result is a private NON-DISPATCH plan, at most8 requests, restricted
+to2020Q4–2025Q4 after complete25-quarter/all-six-form interpretation and
+conflict/repeat/quarantine accounting. It authorizes ZERO source requests.
+
+### 367.2 Prospective retained inputs, custody and evidence contract
+
+Read the exact five chain controls with two selected-source locks through
+read_actual_chain; expected consumed list SHA-256
+`9be3ca7b6999e0d4d0e6d2506b7a752915e000c7aa690fbf1188581356fe6a0f`,
+sealed chain
+`9a77f2b2130bce5b0ebcaa4ae90843bc7475811741cb9d6be63108646932d8e9`.
+Use existing required21_selection_builder(limit8), not the old all25-prefix
+CampaignBatchBuilder. Recreate the genuine roster and parent-audit factories
+with default compiler semantics and complete ordered emit_row stream;
+compare to section339's external roster
+`801661a5285ec79b02f1ce57e921eb3ff5116f23d671fcc64a64f0a896a364be`
+and audit
+`ce6a0a0eb678e0f90e9821efc1a0460808c5536202c1bb5407d9ec89b044f056`.
+Source manifest34,381 bytes/SHA-256
+`dc254e4e023bf9990028e085450fc4a5c1c2ae22e1d562f2efc4ada532f9f76d`.
+Require accepted selector d1dd4e09 with genuine successful semantic observer
+evidence, never the equal-byte failed predecessor. Count/hash assertions or a
+detached historical plan cannot mint a genuine factory seal.
+
+Actual retained reads are broader than five chain controls: authenticate all
+84 fixed intake leaves (manifest,opaque .gitattributes,82 ZIPs) while
+interpreting only25 quarterly SUBMISSION tables, exact selected master/intake/
+selector/prior controls, existing operational exposure journals and opaque
+candidate-original hashes. No ownership financial XML decoding, source-body
+acquisition or admission. Fixed exposure.actual_roots() includes legacy
+sibling/recent roots READ-ONLY for inventory/hash observation; do not reuse
+the provider worker's blanket recent-root denial or silently allow caller
+paths. Conserve the old observed exposure/accession set within the genuine
+chain; refuse unexpected growth/drift. Full25 includes context outside the
+required21 selection, preserving late cross-quarter repeat/conflict effects.
+
+Native worker: effective process-tree network/fork/all-write/security/Keychain/
+USB denial, exact fixed source-root allowlists, isolated minimal environment,
+no bytecode, real VM/RSS monitor through serialization/final sample, bounded
+IPC/wall time. Parent: only new fixed private data epoch, independent exact
+source/test identity, original/current storage-proof lineage and same physical
+root. Stable receiver limits stay2MiB/leaf and16MiB/epoch; do not embed the
+large old STRUCTURE completion wrapper or relax custody checks to fit it.
+The historical73,723,173-byte wrapper is distinct from the pure canonical
+parent-audit factory payload; an earlier advisory conflated them. Measure
+the new actual envelopes, including IPC/readback overhead, rather than infer
+their size from the old wrapper. New qualified code and prospective scope
+must exist clean before ONE actual observation.
+Any partial claim/failure is preserved with no retry, namespace alias or
+fabricated completion. All acquisition/admission/known-by/PIT/rights/look/QC/
+backtest/execution authorities remain FALSE.
+
+The new parent ALSO enforces effective process-tree network denial; its Git
+identity checks require fork but only designated-root Git commands, with
+read-only access to the common Git administrative .git subtree. This is not
+permission to read or use sibling checkout source. The planner worker adds
+fork/all-write denial; the separate proof role retains its exact old data
+allowlist. Durable observation-start precedes the sole full25 planning call.
+
+Preactivation QA identified dynamic loaded-module closure: invoking the old
+storage identity builder after importing the new planner includes new source
+names, so it is not an unchanged164-name proof identity. A separately isolated
+source-only interpreter must build the current storage identity with only
+the unchanged storage frontend loaded; all returned pins must be an exact
+current subset of the planner's complete identity. The planner independently
+binds its own expanded closure plus all direct helper/test paths. Historical
+proof keyset/dependency checks remain unchanged; this is not a blanket
+exception for newly added files or a rerun of the storage experiment.
+
+### 367.3 Qualified implementation before retained-input observation
+
+New runner33,805 bytes/SHA-256
+`c4c1089f9eb9ae980fca6f0981cce8b7a73c874fb2f6b1c35882813978ac7099`;
+test32,883 bytes/SHA-256
+`7473480c6c4826cacc76819eeed0da44158c01b9c83008105e0c8012b53aa04a`.
+No old planner/compiler/chain/selection/stable/frozen source image changed.
+The actual parent and fresh storage-identity bootstrap allow only necessary
+artifact METADATA for Git and /dev/null writes; artifact DATA remains within
+fixed role scopes, and the full25 worker retains stricter read fences.
+Its own source identity includes the complete dynamic closure plus20 direct
+helper/test paths; proof identity is built fresh and verified as an exact
+current common-pin subset. Both paths retain native controls and live guards.
+
+**IBPLAN-CONS36701, P2, RESOLVED before activation:** eight genuine REDs
+exposed acceptance of altered consumed-summary schema, counts, privileges
+and custody/unknown flags. Exact schema, typed zeros/booleans, prior+added
+conservation and reconstruction of the genuine chain hash now refuse them.
+Two additional genuine REDs showed Python numeric equality accepting wrapper
+count-map type aliases while the real selected plan remained unchanged;
+canonical typed JSON comparison fixes both. No input/readiness gate closes.
+
+Main201 focused checks PASS19.54s (new planner, existing chain/required21
+selection and EXACT package guard),2 expected denied-fork warnings, no skips.
+Main129 boundary/record/import checks PASS7.21s before this validation note;
+32 relevant Python images compile and four frozen custody images still
+equal exact historical aa0d635d Git bytes. No complete lane/repository suite.
+Attributed agent76 checks (75new +EXACT) PASS6.52s on final images, same2
+warnings. Earlier74/6.20s preceded the two count-type regressions.
+
+Tests genuinely derive the complete25-quarter factories from invented82ZIP
+intake, reject missing/changed late context and forged factories, exclude the
+new eight claims through the genuine chain, and exercise an actual-sized
+20,052-accession fixture chain. Result AND five-file readback roundtrip the
+REAL unchanged integer-only IPC decoder under2MiB, using the real memory
+guard and real private fixture receiver/readback. Controller tests prove the
+start marker precedes exactly one planning call, all cleanup drains and a
+close error cannot overwrite a primary failure or claim success. Four
+faithful in-memory omissions on the preceding tested image yield8 expected
+REDs (chain1,start4,post-flush guard1,cleanup2); final count-map corrections
+have their separately observed genuine RED/GREEN evidence. Physical source
+images were never left mutated.
+
+Main harness deviations are retained separately from production findings:
+two runs gave52PASS/147 fixture-setup errors in5.32s/5.04s because native
+test fences denied real-root METADATA needed by the existing alias/same-inode
+fixture exclusion. The second still inherited the old recent-root read*
+denial. Correcting ONLY test metadata permissions preserves all actual source
+DATA denials. The next maxfail1 run then reached the newly added real count-
+alias regression (1FAIL/38PASS4.19s); final201 above covers the corrected
+source and full selected group. No fixture fence or production guard weakened.
+
+Independent read-only source QA found no remaining confirmed blocker on the
+preceding b00288af image after identity/start/Git-profile corrections. The
+final delta is only two canonical count comparisons, reviewed and proved by
+the final native tests. This is attributed advisory QA, not Claude review,
+actual source execution or factual readiness. After a clean qualified commit,
+run source-only native identity/health preflight BEFORE creating any new
+namespace, then at most ONE registered full25 retained-input observation.
+At this point no new planner claim or actual retained source read occurred.

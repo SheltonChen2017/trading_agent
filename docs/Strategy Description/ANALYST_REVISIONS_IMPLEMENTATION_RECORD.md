@@ -4413,7 +4413,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-03 | Owner-waived offline identity, historical-symbol coverage and REMX recovery under QC/Safari hold | `372019d5e275248fe41bad000e638479f8cb7a0b` -> `0b78b00c7cf6a75cf21044a8aaaffee852c59a21` -> `af7ebb09941f6d64df60310505645ea2a6241b25` -> `0d131ac9d662ba5942ea9b67c16d108e2da3c627` -> this final section336 handoff commit; FOUR total | No incoming Claude range; current owner review waiver, no independent acceptance | K definitions, L fractional timing, M original ownership, N normative roles and O new historical-symbol coverage each passed once and are spent. Four new files retained; none completes its required window. Original UNIT and acquired-security hypotheses refined rather than assumed | Root592distinct focused passes across stages; latest149passes2.03s,16changed-source/test memory compiles across stages, exact source/profile/native pins. Record repeats nonadditive; no full suite or operational replay | I336-001..009 corrected pre-use, I336-010 qualified/corrected; five identity stops and RAW/session/payoff/coverage gates remain. No QC/Safari/provider data API/Keychain;338/259/54/699 unchanged | ONE matching nonforce final push at the concrete dated-identity/common-price evidence barrier. All controls/readers stay spent; no automatic source-splice, source-stop bypass, QC release, strategy cell or readiness clearance |
 | 2026-11-03 | Claude review snapshot R337 of `10b05cca..3a3350dc`: the eighteen Codex commits of sections 334–336 reviewed after the fact | `3a3350dc` -> `134fbbc4` (correction) -> this record commit | All eighteen accepted, `7699f6b6` after correction; section R337 | FirstRate price-format JSON helpers keep the `bound` refusal code; deadline-taxonomy, `requests` redirect/cookie, reversible transport-pin and record-wording findings documented | 27 range test files 2,151 passed; 86 record gates; 48 section-330 regressions; 189 correction-affected passed; 1/1 mutation caught; no full suite, no QC/Safari/provider access; 0 looks, 338/259/54/699 unchanged | 0 P0, 0 P1, 1 P2 documented, 8 P3 (one corrected) | Codex counter-reviews section R337; Codex's owner-directed section-337 round continues |
 | 2026-11-04 | Completed owner-directed exact-five quarantine for matched six/eight exploratory cells; section337 | `18e6d567` -> `864c9b97` -> this final record commit | Incoming two Claude commits accepted/qualified in337.3; new variant review expressly waived | Final post-tilt denied weight to own sleeve ETF; genuine vendor-only monetary/runtime/source chain; sole local preparation/validator both exit0 and spent | 727 distinct focused passes24.37s; 17 memory compiles; exact5bindings/73ranges authenticate; no full suite or QC/Safari contact; one final push | 0 new P0/P1; seven pre-use P2 corrected; historical open P2 retained | Hold QC/Safari; future genuine project/input/source/run binding and demanded coverage pending; 338/259/54/699 unchanged |
-| 2026-11-04 | Local full-input, conservative RAW coverage and six-cell source binding; section338 | `94c2030d` -> `754563a4` -> `c73c52d2` -> `ea6a7d90` -> this C freeze; final pending | Current owner review waiver; no incoming review replay | A input_shape/B environment refusals retained; B2 metadata0 identifies exact container0755; C uses exact versioned role contract | C476focused30.75s; earlier selections overlap as338 records; no full suite/QC/Safari | Exact authored container role corrected prospectively; no physical permission/pin change or historical-cause claim | Sole C fresh preparation/validator then documented endpoint;338/259/54/699 unchanged; one final push |
+| 2026-11-04 | Local full-input, conservative RAW coverage and six-cell source binding; section338 | `94c2030d` -> `754563a4` -> `c73c52d2` -> `ea6a7d90` -> `86b40aac` -> this D freeze; final pending | Current owner review waiver; no incoming review replay | A/B/C refusals retained; B2 metadata0 identifies exact container0755; D corrects verified25-vs24caller/helper path binding before claim | D480focused35.02s; C476 and earlier selections overlap; initial323passes/157setup errors qualified in338.13; no full suite/QC/Safari | Exact authored container role corrected prospectively; no physical permission/pin change or historical-cause claim | Sole D fresh preparation/isolated stdin validator then documented endpoint;338/259/54/699 unchanged; one final push |
 
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
@@ -75706,3 +75706,143 @@ No actual C has run at this freeze. A/B/B2 retained, no backwards acceptance.
 No QC/Safari/provider/credential/USB/compile/backtest/result/trading operation
 or look/cell; all source/PIT/master/readiness/paper flags and338/259/54/699
 unchanged. Actual C evidence and the final combined single-push handoff follow.
+
+
+### 338.12 Actual C refusal and verified caller/helper path mismatch
+
+At clean freeze86b40aac852b6994135372efbab609819ab7b01f, root/branch/
+HEAD/status and live matching remote94c2030d were checked. Sole C parent
+dispatched18:36:18UTC, completion observed18:36:33UTC, ACTUAL exit2,
+child actual2, stderr0, finite input_path_open at retained_DATA,
+claim_state=consumed. The parent envelope reports output_authenticated=true;
+no coverage/private-source/report success pins were returned. Original
+parent stdout1841B/
+1857589dca806474eddac74ce5632a3679c311c4392cba9bb577bc0c93b4f86e.
+
+The once-only external C validator was mistakenly invoked with -B but
+WITHOUT mandatory -I. It dispatched18:36:33UTC, completion observed
+18:36:44UTC, ACTUAL2/host/preflight/unallocated. Its1195B stdout pin is
+1a898740132dbe6b2bf5fc46ba69d44880f0cd30c3b956797823e88793911f29.
+It failed before reading/authenticating supplied stdin; do NOT call this
+independently authenticated C failure evidence. No corrective rerun, control/
+report/private reread or retrospective acceptance follows. Both C operations
+are SPENT; source/tests frozen. Times are external brackets, not source
+timestamps, precise runtimes or first-byte observations.
+
+I338-009(P2) CONFIRMED public-source binding defect: the A/C caller's literal
+INPUT_PACKAGE suffix has25 hash characters ending4cb3d; the genuine input
+helper and B2 scope derive PACKAGE_SHA256[:24], ending4cb3. The native
+allowlist therefore names the wrong directory. The real helper package is
+outside that subtree and literal ancestry, so this exact traversal cannot
+succeed under that policy. This mandatory static incompatibility is verified
+without inspecting artifacts. C's finite packet omitted path/errno, so its
+exact historical failing syscall/path is not separately proven. No source
+bytes/metadata/security state or pins are changed to accommodate it.
+
+I338-010(P2) external-validator invocation error: copy of the pytest -B
+prefix omitted the caller's isolated-host -I requirement. The preflight
+correctly refused; this is an orchestration error, not a reason to weaken
+host checks. A fresh prospective D invocation/validator will explicitly
+bind -I -B. C's lost validator acceptance cannot be fabricated.
+
+D is a separately versioned, substantively corrected LOCAL preparation
+contract, not unchanged retry/renaming or another QC attempt. Correct the
+caller to the SAME already-pinned true24 package, add mandatory preclaim
+helper/caller equality of package, activation and lineage, and retain all
+131 source pins, V2 exact-container policy, full metadata/native security/
+held descriptors, source bytes and data/scientific/quarantine semantics.
+Other artifact scope is denied. A/B/B2/C and every old control stay spent.
+No QC/Safari/provider/credentials/USB/backtest action or look/cell;
+338/259/54/699 unchanged.
+
+
+### 338.13 D exact path binding and separately frozen one-use local decision
+
+NEW scripts/prepare_arv2_r338_quarantine_v3.py corrects ONLY C's caller/
+native scope to the actual genuine24hex package, uses NEW control
+quarantine/R338-20261104-D and schema
+arv2-r338-offline-quarantine-input-coverage-binding-v3, and checks helper
+package_directory/source_activation/lineage_file equality against the
+caller's exact constants. Parent bootstrap performs these equalities BEFORE
+worker dispatch; worker repeats BEFORE Store/claim. A wrong caller/helper
+scope fails before consumption rather than authorizing another path. Native
+scope remains the exact genuine package subtree/exact lineage/fixed2DATA/
+own-control; no sibling controls, census, extra source, USB or network scope.
+
+Selected131dependencies and their source inventory16683B/
+9dc8c26bcdebccae44cb3ee47d19a8328412710e482c94286c099616bb9a467c
+are unchanged. Input_v2e83c36ee with exact INPUT_ROOT0755, unchanged coverage/
+materialization/fixedDATA guard profiles, whole full original input and RAW
+archive pins, private nonce rules, proposed38522505 six-source bundles,
+900/840/300/30/5s and output bounds remain exactly C's scientific/technical
+contract. No physical permissions, source rows, date axis, deny set, scores,
+fund books, economics or pin changes. This corrects a path reference to an
+already-authenticated source role, not source admission or fresh QC authority.
+
+D public caller58375B/
+0a8a1b23dfebcdf0191928c3ef14a780cfd5e49eab9d142b3ace31fd1e72cd84;
+canonical profile20944B/
+95f0492890599b635139eaf46515f0657d8179991acd1ba45f32e3f48eed1780;
+native worker policy3717B/
+b54f00143aa5e499f75172a3a63fcc03c82d67cb970faf73d579bedb296f1215.
+Public code-only exact-D-native bootstrap PLUS ALL-artifact denial passes;
+no control/data/genuine input is opened. Same-round source audits verify
+24character helper equality, unchanged131pins/guards and before-claim checks;
+these are not independent Claude review, currently owner-waived.
+
+Root FINAL480distinctpasses35.02s =95Dcaller+66V2input+51coverage+
+87materialization+79fixedDATAguard+102record/redaction; no failures/skips/
+warnings, no full suite. Earlier C476/B2/author counts overlap and are not
+summed. Both new D files compile in memory/single EOF; dependency source/
+component-profile/DATA maps byte-identical to C. New D tests39375B/
+f8a0b281816518580c825758a11d0eba2f5426b036422d1cfd10475956bc8221.
+Author95passes11.52s repeated95 is overlap. One separate native synthetic
+scope proof passed: derive expected24path independently from frozen helper,
+open it, deny wrong25/sibling and network, additionally deny production
+artifacts. It is not a nested-sandbox fallback or an extra pytest pass.
+Fresh package/lineage scope mutants are refused before claim; a real
+non-isolated child is refused at host check before Git/claim.
+
+The first root combined selection had323passes/157 fixture SETUP errors
+27.91s because its pre-existing .pytest_cache/r337-root parent was absent.
+No cause is established; the author used separate D-author support paths
+and reports no removal of this parent. No tracked Git/source state changed.
+No source/guard change or relaxed isolation addressed this. A fresh exclusive
+root-specific .pytest_cache/r338-root-isolated-D parent with tmp/pycache as
+siblings of pytest basetemp was created; the complete focused selection
+then passed as above. The failed setup remains disclosed, not erased or
+added to final distinct totals. All tests/mutations retain native remote/
+production-artifact/USB/BOTH-Keychain/securityCLI denial/noautoload/
+noconftest/-B/no-cache and in-root support. New D launch external support uses
+this fresh parent; own worker support remains .pytest_cache/r338-runtime.
+Code-only native bootstrap and all three independent source-scope audits
+grant no operation/data-read authority by themselves.
+
+D4 decision at THIS separately committed clean exact D freeze: invoke ONLY
+NEW D launch ONCE, expected-head THIS commit, caller-sha256
+0a8a1b23dfebcdf0191928c3ef14a780cfd5e49eab9d142b3ace31fd1e72cd84,
+profile-sha256
+95f0492890599b635139eaf46515f0657d8179991acd1ba45f32e3f48eed1780.
+Exact designated Mac root/branch/binary Python3.13, sanitized -I -B process,
+current clean Git/blob/pins, unchanged matching remote94c2030d mandatory.
+NEW D control is UNINSPECTED/UNALLOCATED before this freeze. Claim+marker
+and two independent private nonces precede all source/data work. Full normal
+guard returns precede derived output publication. Actual parent0 AND child0
+AND matching authenticated finite stdout mandatory; incomplete coverage is
+an admissible observation only, not readiness.
+
+ONE NEW D stdin-only validator receives ORIGINAL captured stdout and observed
+actual-parent-exit0or2, same exact expected-head/caller/profile under external
+native ALL-network/ALL-artifact/USB/BOTH-Keychains/securityCLI denial and
+explicit -I -B. It reopens NO control/output/DATA/source artifact. Its30s
+alarm/host limitation remains. No lost-C-validator repair or spent replay.
+Any failure/unknown/ambiguous/noise/trailing/nonzero/timeout consumes D,
+including late publication failure. No unchanged retry or own-result pin
+refresh. Remaining genuine input/coverage errors must be recorded honestly;
+there is no authority to fabricate callbacks, drop securities or fill prices.
+
+No D operation has occurred at this freeze. A/B/B2/C original evidence stays
+retained/spent; C validator host refusal stays unauthenticated. No QC/Safari/
+capacity/project/object/compile/backtest/result/provider/USB/credentials/
+trading operation. All false formal/PIT/master/paper flags and338/259/54/699
+stay unchanged. Final actual evidence and one combined push follow.

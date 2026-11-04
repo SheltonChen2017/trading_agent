@@ -608,6 +608,102 @@ def test_invented_slow_publication_does_not_consume_required_post_publication_ob
     assert captured["observed_seconds"] >= m.PROBE_SECONDS + 80
     assert len([t for t in checked if t >= last_file[0]]) >= 70
     assert captured["source_data_reads"] == captured["credential_reads"] == captured["provider_invocations"] == 0
+    # Use the actual frozen launcher decoder, not a mocked _launch return.
+    # Private receipt seconds remain measured values; the wire summary must
+    # use exact integer nanosecond units that this protocol can carry.
+    wire_value = {"passed": True, "data": result}
+    assert m.legacy.ipc._ipc_result(m._raw({"ok": True, "value": wire_value}) + b"\n", b"", 0) == wire_value
+    assert type(result["observed_nanoseconds"]) is type(result["post_publication_observed_nanoseconds"]) is int
+    assert result["observed_nanoseconds"] >= (m.PROBE_SECONDS + 80) * 1_000_000_000
+
+
+def test_bound_proof_summary_roundtrips_real_frozen_ipc_without_floating_fields(monkeypatch):
+    readback = _storage_readback(IDENTITY)
+    readback["controls"]["complete.json"]["observed_seconds"] = 117.222362
+    readback["controls"]["complete.json"]["post_publication_observed_seconds"] = 71.648182541
+    monkeypatch.setattr(m.stable, "read_epoch_controls", lambda *_a, **_k: deepcopy(readback))
+    result = m._proof(IDENTITY, {"sha256": STORAGE_SHA}, object())
+    wire_value = {"passed": True, "data": result}
+    assert m.legacy.ipc._ipc_result(m._raw({"ok": True, "value": wire_value}) + b"\n", b"", 0) == wire_value
+    assert type(result["observed_nanoseconds"]) is type(result["post_publication_observed_nanoseconds"]) is int
+    assert result["observed_nanoseconds"] >= m.PROBE_SECONDS * 1_000_000_000
+    assert result["post_publication_observed_nanoseconds"] >= m.PROBE_SECONDS * 1_000_000_000
+
+
+def test_child_launcher_refusal_preserves_role_without_echoing_exception_text(monkeypatch):
+    def refused(*_args, **_kwargs): raise RuntimeError(SECRET)
+    monkeypatch.setattr(m.legacy.ipc, "_launch", refused)
+    with pytest.raises(m.QualificationError) as caught:
+        m._child("probe", IDENTITY)
+    detail = m.failure_info(caught.value, "arguments")
+    assert detail == {"code": "worker_refused", "artifact_role": "unknown", "changed_fields": [], "stage": "probe"}
+    assert SECRET.encode() not in m._raw(detail)
+
+
+def _historical_probe_pair(monkeypatch):
+    editable = {"invented/producer.py": "a" * 64, "invented/tests.py": "b" * 64}
+    sources = {**editable, "invented/guard.py": "c" * 64}
+    recorded = {**deepcopy(IDENTITY), "head": "3" * 40, "source_sha256": sources,
+        "source_inventory_sha256": m._sha(m._raw(sources))}
+    current = deepcopy(recorded); current["head"] = "4" * 40
+    current["source_sha256"].update({"invented/producer.py": "d" * 64, "invented/tests.py": "e" * 64})
+    current["source_inventory_sha256"] = m._sha(m._raw(current["source_sha256"]))
+    monkeypatch.setattr(m, "_RECORDED_PROBE_HEAD", recorded["head"])
+    monkeypatch.setattr(m, "_RECORDED_PROBE_INVENTORY", recorded["source_inventory_sha256"])
+    monkeypatch.setattr(m, "_RECORDED_PROBE_RECEIPT", STORAGE_SHA)
+    monkeypatch.setattr(m, "_RECORDED_PROBE_EDITABLE", editable)
+    return recorded, current
+
+
+def test_storage_identity_reader_accepts_same_typed_identity_and_only_exact_bound_historical_probe(monkeypatch):
+    recorded, current = _historical_probe_pair(monkeypatch)
+    assert m._probe_identity_matches(current, deepcopy(current), "7" * 64) is True
+    assert m._probe_identity_matches(recorded, current, STORAGE_SHA) is True
+    assert m._probe_identity_matches(None, current, STORAGE_SHA) is False
+    assert m._probe_identity_matches(recorded, None, STORAGE_SHA) is False
+
+
+@pytest.mark.parametrize("fault", ("receipt", "recorded_head", "recorded_inventory", "current_inventory",
+    "recorded_producer", "common_drift", "missing_common", "extra_common", "missing_editable",
+    "unclean", "boolean_alias", "branch", "root", "extra_identity_key", "invalid_current_head",
+    "invalid_pin", "pin_type"))
+def test_historical_probe_binding_cannot_expand_to_other_receipts_sources_or_execution_roots(monkeypatch, fault):
+    recorded, current = _historical_probe_pair(monkeypatch); receipt = STORAGE_SHA
+    if fault == "receipt": receipt = "7" * 64
+    elif fault == "recorded_head": recorded["head"] = "5" * 40
+    elif fault == "recorded_inventory": recorded["source_inventory_sha256"] = "6" * 64
+    elif fault == "current_inventory": current["source_inventory_sha256"] = "6" * 64
+    elif fault == "recorded_producer": recorded["source_sha256"]["invented/producer.py"] = "f" * 64
+    elif fault == "common_drift": current["source_sha256"]["invented/guard.py"] = "f" * 64
+    elif fault == "missing_common": del current["source_sha256"]["invented/guard.py"]
+    elif fault == "extra_common": current["source_sha256"]["invented/foreign.py"] = "f" * 64
+    elif fault == "missing_editable": del current["source_sha256"]["invented/tests.py"]
+    elif fault == "unclean": current["clean"] = False
+    elif fault == "boolean_alias": current["clean"] = 1
+    elif fault == "branch": current["branch"] = "codex/foreign"
+    elif fault == "root": current["root"] = "/private/tmp/invented-foreign-lane"
+    elif fault == "extra_identity_key": current["unregistered"] = True
+    elif fault == "invalid_current_head": current["head"] = "not-a-commit"
+    elif fault == "invalid_pin": current["source_sha256"]["invented/guard.py"] = "not-a-sha"
+    elif fault == "pin_type": current["source_sha256"]["invented/guard.py"] = False
+    # Keep changed maps internally hashed: failure must be the historical
+    # binding, not merely stale inventory bookkeeping.
+    if fault not in {"recorded_inventory", "current_inventory"}:
+        for identity in (recorded, current):
+            identity["source_inventory_sha256"] = m._sha(m._raw(identity["source_sha256"]))
+    assert m._probe_identity_matches(recorded, current, receipt) is False
+
+
+def test_historical_proof_keeps_executed_and_qualifying_code_lineage_distinct(monkeypatch):
+    recorded, current = _historical_probe_pair(monkeypatch)
+    readback = _storage_readback(recorded)
+    monkeypatch.setattr(m.stable, "read_epoch_controls", lambda *_a, **_k: deepcopy(readback))
+    result = m._proof(current, {"sha256": STORAGE_SHA}, object())
+    assert result["historical_probe_bound"] is True
+    assert result["receipt_head"] == recorded["head"] != result["qualification_head"] == current["head"]
+    assert result["source_inventory_sha256"] == recorded["source_inventory_sha256"]
+    assert result["qualification_source_inventory_sha256"] == current["source_inventory_sha256"]
+    assert result["authority"] == m.authority()
 
 
 @pytest.mark.parametrize("field", ("code", "artifact_role", "changed_fields", "stage"))

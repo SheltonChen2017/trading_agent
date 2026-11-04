@@ -43668,3 +43668,90 @@ in-memory reversals with15 intended REDs, including the final complete-receipt
 external-anchor omission1. No disk images changed;97 positive/1.15s/zero
 warnings and exact hashes remain. This supersedes only the earlier eight-guard
 count, not its separately attributed preactivation evidence.
+
+### 366.6 Actual storage experiment, failed CLI and authenticated recovery
+
+Implementation `dfdf9ee5d0ce35f134e2de0dc60b6d6782bdea4e` existed clean
+BEFORE the host operation. Source-only health completed exit0 in9.782337s,
+stderr0,164 source images, source inventory SHA-256
+`7f4ed5917237b8e3f372de1e890ef48713d0b5722d1653a2d5358de8b81d6ff3`.
+One prospectively registered synthetic storage operation then ran once,
+returning exit2 after138.605499s, stdout416/stderr0 bytes and generic
+qualification_stopped/arguments. It is FAILED as a CLI; its consumed claim
+and all files remain preserved. No provider epoch, credential read or API
+invocation occurred. No rerun, resumed claim or replacement probe is made.
+
+The independent native read-only diagnosis found its genuine complete.json:
+23,187 bytes, SHA-256
+`e801524572f54c9c7415798386b5c579f66b35fcc46eb7a9b9e57aa977ad81b3`.
+An externally hash-bound second read authenticated the exact ten-leaf set,
+all nine referenced pins and eight known synthetic payloads before decoding;
+the existing full proof validator passed against actual dfdf9ee5 identity.
+Physical private-root identity also matched. Its actual observed duration is
+117.222362 seconds, including71.648182541 seconds AFTER final synthetic
+publication, with native network denial/live memory guard and zero source,
+credential and provider operations. Both read-only diagnostics exited0,
+stderr0; they did not create/reclaim a namespace or access source datasets.
+
+**IBFMPEOD-IPC36603, P2, confirmed:** borrowed qualified `_ipc_result`
+intentionally rejects decimal JSON numbers. New probe AND proof summaries
+returned measured seconds as floats, causing their otherwise valid envelopes
+to be rejected. Test doubles for `_launch` missed this integration boundary.
+The unchanged decoder is correct; new v2 summaries must use integer
+nanoseconds and sanitize launcher failures through their finite role/stage
+channel. Private authenticated historical receipt seconds stay unchanged.
+This diagnosed return-format defect does not establish the cause of ANY old
+Documents-folder failure or alter their dispositions.
+
+**IBDEC-366-04:** permit a separately qualified read-only recovery of this
+ONE exact dfdf9ee5 experiment, not retroactive CLI success. The correction
+must bind its exact complete hash, head, source-inventory digest, exact typed
+six-key identity and every dependency pin shared with the new committed
+identity. Only the two v2 producer/test images may differ for the return-
+format/recovery correction; their original pins are fixed. The storage
+module, test, native sandbox, memory controls, seal and other dependencies
+must remain identical. Require the same physical data root at readback and
+provider epoch. Retain original execution lineage separately from current
+qualification lineage. The unused provider epoch still cannot start until
+the corrected interface and this narrow binding are qualified and committed.
+
+### 366.7 Qualified IPC/recovery correction before provider activation
+
+Three genuine RED regressions independently reproduced: actual-shaped probe
+and proof messages each failed the REAL unchanged `_ipc_result` decoder,
+and a launcher exception escaped instead of producing the finite probe-stage
+refusal. All three now GREEN. Integer-nanosecond summaries retain original
+floating-second receipt bytes; launcher diagnostics preserve only fixed
+role/code names. Nineteen further focused cases cover exact invented history,
+seventeen altered pin/head/inventory/dependency/key/type/root/clean cases and
+separate original-execution/current-qualification lineage. Wrong evidence
+does not activate a provider epoch. IBFMPEOD-IPC36603 is RESOLVED at this
+specific interface/recovery scope, not at the old unknown-cause scope.
+
+Main483 focused checks PASS10.61s,18 expected native-denied-fork warnings;
+main129 boundary/record/import checks PASS8.00s. All12 relevant images compile
+and four frozen custody files still equal exact historical Git bytes.
+Attributed agent118 checks (117 v2 +EXACT package guard) PASS1.24s, no warnings
+or skips. Native process-tree network denial, required isolation, real memory
+guard, private-store/Keychain/USB/input denials and fresh TMP-only writes
+apply. No full suite. A preceding464-check run passed before the19 additional
+history cases were added; this483 run covers the final images.
+
+Corrected producer35,889 bytes/SHA-256
+`67960a4c288a738aa5cfd2e7aeab5ad15fa5129c286b1576d909474dbf455242`;
+test45,711 bytes/SHA-256
+`dfc0da150c78a6090bda4ea23caf9ca85b6d806feb46e0ea597eafc40ead1762`.
+Storage module/tests and all other source dependencies remain unchanged from
+dfdf9ee5. Read-only source QA independently confirmed original producer/test
+pins against exact dfdf9ee5 Git blobs and found no confirmed blocking defect;
+that advisory is not Claude review or a new real source operation. Exact-
+identity fast-path relies on the native worker's preceding current-source
+validation; the historical path additionally checks its narrow fixed binding.
+
+The sole new provider epoch remains UNUSED at this qualification point.
+After this correction is committed clean, its FIRST activation must perform
+the real read-only proof through unchanged IPC, bind its unchanged physical
+root, authenticate old failed claims, independently rederive the12 original
+controls and publish fresh bindings/plan before any credential/GET. Any
+failure preserves the new claim and stops; no automatic retry or namespace
+substitution. All readiness/source/PIT/rights authorities remain FALSE.

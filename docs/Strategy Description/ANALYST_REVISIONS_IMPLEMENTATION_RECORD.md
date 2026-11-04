@@ -4413,7 +4413,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-03 | Owner-waived offline identity, historical-symbol coverage and REMX recovery under QC/Safari hold | `372019d5e275248fe41bad000e638479f8cb7a0b` -> `0b78b00c7cf6a75cf21044a8aaaffee852c59a21` -> `af7ebb09941f6d64df60310505645ea2a6241b25` -> `0d131ac9d662ba5942ea9b67c16d108e2da3c627` -> this final section336 handoff commit; FOUR total | No incoming Claude range; current owner review waiver, no independent acceptance | K definitions, L fractional timing, M original ownership, N normative roles and O new historical-symbol coverage each passed once and are spent. Four new files retained; none completes its required window. Original UNIT and acquired-security hypotheses refined rather than assumed | Root592distinct focused passes across stages; latest149passes2.03s,16changed-source/test memory compiles across stages, exact source/profile/native pins. Record repeats nonadditive; no full suite or operational replay | I336-001..009 corrected pre-use, I336-010 qualified/corrected; five identity stops and RAW/session/payoff/coverage gates remain. No QC/Safari/provider data API/Keychain;338/259/54/699 unchanged | ONE matching nonforce final push at the concrete dated-identity/common-price evidence barrier. All controls/readers stay spent; no automatic source-splice, source-stop bypass, QC release, strategy cell or readiness clearance |
 | 2026-11-03 | Claude review snapshot R337 of `10b05cca..3a3350dc`: the eighteen Codex commits of sections 334–336 reviewed after the fact | `3a3350dc` -> `134fbbc4` (correction) -> this record commit | All eighteen accepted, `7699f6b6` after correction; section R337 | FirstRate price-format JSON helpers keep the `bound` refusal code; deadline-taxonomy, `requests` redirect/cookie, reversible transport-pin and record-wording findings documented | 27 range test files 2,151 passed; 86 record gates; 48 section-330 regressions; 189 correction-affected passed; 1/1 mutation caught; no full suite, no QC/Safari/provider access; 0 looks, 338/259/54/699 unchanged | 0 P0, 0 P1, 1 P2 documented, 8 P3 (one corrected) | Codex counter-reviews section R337; Codex's owner-directed section-337 round continues |
 | 2026-11-04 | Completed owner-directed exact-five quarantine for matched six/eight exploratory cells; section337 | `18e6d567` -> `864c9b97` -> this final record commit | Incoming two Claude commits accepted/qualified in337.3; new variant review expressly waived | Final post-tilt denied weight to own sleeve ETF; genuine vendor-only monetary/runtime/source chain; sole local preparation/validator both exit0 and spent | 727 distinct focused passes24.37s; 17 memory compiles; exact5bindings/73ranges authenticate; no full suite or QC/Safari contact; one final push | 0 new P0/P1; seven pre-use P2 corrected; historical open P2 retained | Hold QC/Safari; future genuine project/input/source/run binding and demanded coverage pending; 338/259/54/699 unchanged |
-| 2026-11-04 | Local full-input, conservative RAW coverage and six-cell source binding; section338 | `94c2030d` -> `754563a4` -> `c73c52d2` -> `ea6a7d90` -> `86b40aac` -> this D freeze; final pending | Current owner review waiver; no incoming review replay | A/B/C refusals retained; B2 metadata0 identifies exact container0755; D corrects verified25-vs24caller/helper path binding before claim | D480focused35.02s; C476 and earlier selections overlap; initial323passes/157setup errors qualified in338.13; no full suite/QC/Safari | Exact authored container role corrected prospectively; no physical permission/pin change or historical-cause claim | Sole D fresh preparation/isolated stdin validator then documented endpoint;338/259/54/699 unchanged; one final push |
+| 2026-11-04 | Local full-input, conservative RAW coverage and six-cell source binding; section338 | `94c2030d` -> `754563a4` -> `c73c52d2` -> `ea6a7d90` -> `86b40aac` -> `0bff7256` -> this E freeze; final pending | Current owner review waiver; no incoming review replay | A/B/C/D failures retained; B2 exact container0755; D corrects25-vs24scope; E corrects full-frame header pin semantics | E487focused35.34s; D480/C476/earlier overlap; initial323passes/157setup errors remain338.13; no full suite/QC/Safari | Exact authored container role corrected prospectively; no physical permission/pin change or historical-cause claim | Sole E fresh preparation/isolated stdin validator then documented endpoint;338/259/54/699 unchanged; one final push |
 
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
@@ -75846,3 +75846,154 @@ retained/spent; C validator host refusal stays unauthenticated. No QC/Safari/
 capacity/project/object/compile/backtest/result/provider/USB/credentials/
 trading operation. All false formal/PIT/master/paper flags and338/259/54/699
 stay unchanged. Final actual evidence and one combined push follow.
+
+
+### 338.14 Actual D authenticated failure and full-frame header correction
+
+At clean0bff7256afdd8dd4e3f2260d743e8412cca0f495, exact root/branch/HEAD/
+status/live remote94c2030d checked. Sole D parent dispatched18:48:18UTC,
+completion observed18:49:07UTC, ACTUAL exit2, child2/stderr0,
+materialization_header_pin/stage materialization/claim consumed.
+Original parent1854B/
+357fa5d3dba3b25bd475236bcb4003592012bdfd7549a87f3764fddb91bfd133.
+Sole D stdin validator with explicit -I -B dispatched18:49:07UTC,
+completion observed18:49:34UTC, ACTUAL2, output_authenticated=true,
+accepted=false and same finite failure. External brackets, not measured
+stage durations. D parent/validator/source/tests are SPENT/frozen, original
+control retained; no output/control reread or unchanged retry.
+
+The verified path correction allowed progress to materialization after the
+input/coverage calls. No final input/DATA/public-code guard normal return or
+coverage/materialization success receipt was returned; do not infer a valid
+completed coverage or source bundle from this intermediate stage. No QC/
+Safari/provider/USB/credentials/backtest operation, look or cell.
+
+I338-011(P2) CONFIRMED header-framing semantic bug in the new materializer.
+The normative original payload builder's _header_bytes() returns MAGIC
+(30B) + length(8B) + canonical header JSON. READY and verifier pin that FULL
+framed prefix. The externally recorded K HEADER_PIN11650B/
+2cda5157e4b305592568d71239ba613f8e452a43ac1507c8ee33b7ead2bd65fe
+is that full frame. Used materialization.parse_archive instead compared
+JSON-only archive_raw[start:start+size] (11612B) against this11650B pin.
+Its synthetic fixture also patched expected HEADER_PIN to JSON-only bytes,
+masking the mismatch. Correctness requires the same unchanged external pin
+compared to archive_raw[:start+size]; never expected_pin=pin(current_data),
+a new JSON-body pin or source/header rewriting.
+
+Root reproduced the ORIGINAL pure public builder's header frame under native
+ALL-artifact/network/USB/BOTH-Keychain/securityCLI denial: full11650B exactly
+matches the recorded pin, framing38B/body11612B and old comparison necessarily
+refuses. This composes public literal source descriptors only; no private DATA
+or spent controls/readers/operators were invoked. Same-round generalized
+source audit found no second occurrence: R337/coverage parse the JSON body
+while authenticating the full external archive/ranges consistently; new
+private bundle uses full externally pinned bytes and nonce-bearing JSON
+header consistently. Normative original builder lines297–299,341,360/378,
+404–405 and K receipt comparison preserve the full-frame convention.
+
+Prospective E uses a separately versioned pure materialization_v2 and caller
+with explicit full-frame meaning and independent regression fixture. Same
+HEADER_PIN/catalog/archive/range/full input/scientific/project commitments
+remain; no old used module/test edits or silent pin refresh. Every5case/fund/
+score/axis/allocation rule stays. Only a separately committed exact E run
+decision may consume the new role.338/259/54/699 unchanged; QC/Safari stay
+prohibited and no successful price coverage/bundle is claimed yet.
+
+
+### 338.15 E full-frame materialization and exact one-shot preparation freeze
+
+NEW scripts/arv2_r338_quarantine_materialization_v2.py changes only the
+new materialization schema/profile and comparison to the full archive prefix
+archive_raw[:start+size]. HEADER_PIN remains11650B/2cda5157...65fe,
+ALL archive/catalog/manifest/73range pins, full6151 original bindings/3466axis,
+five denials, projection sources, six cells, proposed38522505 and allocation/
+cost/price/nonce semantics unchanged. The private container encoding is the
+same MAGIC+8length+JSON+file payload layout; its new schema identifies this
+corrected materializer. It is pure supplied-buffer computation, not an old
+operator, a source admission or independent physical authentication.
+
+Source28812B/
+0dd3e11b339438c36702b3ddb446fb6cf870a42aefbf91269df104a17838ba58;
+profile10168B/
+aa2b326c2c27a06d0da3d65c38315c07b9e063fc5225b3429dd5931a8ba6e08c.
+NEW scripts/prepare_arv2_r338_quarantine_v4.py E imports ONLY this new
+materialization role, retains old b9c5c84b source as held PROVENANCE without
+importing it, and adds the new source for132selected dependencies. No old
+used source/test is edited. Exact source inventory16803B/
+0bced17b9358ebe9473a92ae4d8a5c3986941fc71f0c90cb34cf73f86a2fc4f3.
+Input_v2/coverage/fixedDATA guard, exact24path preclaim equality, private
+normal-return publication and actual-exit checks remain unchanged.
+
+E caller58660B/
+7efee1808ee62c9044a96d676b276660b2b9ac67f39c06f4609d435d51ee2618;
+canonical profile21215B/
+366e1813cb32c20c2690f45d7b1335a2bf2f0e93a2a5f15352b814ee5165ab03;
+native worker policy3717B/
+efe247d53ae78faf7787ac8d7d3c21aa45a951a1f12002fa2e9b2fbf673ad04d.
+Exact E CODE-only worker bootstrap with ALL-production-artifact denial
+passes; imported materialization_v2 and absent old materialization verified,
+132literal current source pins/selected profiles and true24paths match.
+No control, private source or DATA has been inspected/allocated by this probe.
+
+Root FINAL487distinctpasses35.34s =96Ecaller+93V2materialization+
+66V2input+51coverage+79fixedDATAguard+102record/redaction; no failures/
+skips/warnings, no full suite. D480/C476/author and earlier selections
+overlap and are not summed. Four new E files compile in memory/singleEOF;
+22 prior SPENT public source/test files retain all exact earlier pins.
+All132current public source literals match, D131 is a strict unchanged
+subset, component role/profile checked and exact native CODE-only probe
+passes. Same-round AST/source audits find only the intended v2 schema/
+full-frame slice/profile and E role/source-binding deltas.
+
+V2 materializer author93passes15.84s; initial93passes15.89s overlap. Strong
+regression independently reproduces frozen genuine producer's11650B frame,
+38Bframing/11612BJSON; old JSON-only slice restored IN MEMORY causes
+1expectedfailure0.13s/92deselected, finally restored. JSON-only expected pin,
+magic and short/long length mutations refuse before retained parsing.
+E caller author96passes12.36s includes fresh worker/validate SourceLoader
+proof: NEWmaterialization_v2 present, old materializer/oldinputV1 absent,
+132pins and profile exact, true24path preclaim checks retained. Injecting
+old materialization role IN MEMORY causes1expectedfailure2.43s, interceptor
+restored/no disk mutation. New tests: Ecaller40804B/
+6eab4a4c4b04e67d989392d813e2b6e2024091ad71c2780f1b8b00339b31c462;
+V2materializer27105B/
+a080359165a8ba2705940bdaacc25097041f19aea5039b375f7f721da8351cfb.
+All focused tests/mutations retain native network/artifact/USB/BOTH-Keychain/
+securityCLI denial, unique inroot temp/cache/log/plugin support, noautoload/
+noconftest/-B/no-cache; initial D support-parent setup failure remains338.13.
+
+D4 decision at THIS separately committed clean exact E freeze: ONLY E launch
+ONCE, expected-head THIS commit, caller7efee1808ee62c9044a96d676b276660b2b9ac67f39c06f4609d435d51ee2618,
+profile366e1813cb32c20c2690f45d7b1335a2bf2f0e93a2a5f15352b814ee5165ab03.
+Fixed NEW control quarantine/R338-20261104-E remains UNINSPECTED/UNALLOCATED.
+Exact Code root/branch/cleanHEAD/Gitblob/binaryDarwinPython3.13/-I/-B/
+current132pins/profiles/unchanged live matching remote94c2030d mandatory.
+Original scientific purpose unchanged, but the verified framed-header defect
+is substantively corrected before this new contract. It is not renaming an
+unchanged failed request or renewing D/A/B/B2/C. Soft FD floor4736 and free
+256MiB checked without setting changes.
+
+Same bounded protocol: parent900s/child840s, pure stages<=300s never extend
+parent, ownreap5s, validator30s; private coverage64MiB/sourcebundle3MiB/
+public131072B. Host-suspension/uninterruptible-IO qualification persists.
+Exclusive claim/fsync/marker and TWO independent PRIVATE256bit nonce draws
+precede DATA/genuine input, all original native/fullmetadata/held/byte guards
+must normal-return before output. Full frame and all73range pins precede
+retained interpretation, every71shard row is validated for conservative
+demand before source construction. A report alone cannot accept; actual
+parent0+child0 and authenticated exact original stdout are mandatory.
+
+ONE E stdin-only validator under external native ALLnetwork/ALLartifact/
+USB/BOTHKeychain/securityCLI denial and explicit -I -B receives ORIGINAL
+finite stdout and observed actual-parent-exit0or2 with the SAME frozen
+bindings. No output/control/DATA reinspection. Alltemp/cache/log/plugin
+support stays inroot (root-specific D support and own r338-runtime worker).
+Nonzero/unknown/timeout/noisy/trailing/malformed/ambiguous result spends E,
+including late output failure. No pin refresh, unchanged retry, backfill,
+stock dropping, fallback quotes or fabricated callbacks/targets/holds.
+Incomplete conservative coverage remains an observation, not readiness.
+
+Current owner explicitly waives Claude review; same-round audits/tests are
+not independent acceptance. No actual E has run at this freeze, no provider/
+USB/credential/QC/Safari/project/capacity/compile/job/result/trading action,
+and338/259/54/699 remains. Actual E evidence and final one-push handoff follow.

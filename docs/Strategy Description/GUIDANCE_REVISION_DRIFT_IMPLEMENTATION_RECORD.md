@@ -7,7 +7,8 @@ Two 2025 SPY raw-cash records conflict with the USB; four-decimal rounding does 
 JNJ news access is verified for 198 sampled 2025 articles; comparable guidance pairs remain unverified.
 January 2020 returns empty; April 2020 fails the symbol gate and is not accepted or financially analyzed.
 Historical stock/SPY NBBO remains unestablished. The lane is not backtesting ready.
-This follow-up is local-only; section 60 was published once as `3e144031`.
+Owner-directed publication of sections 61/62 is recorded in 62.5; monitor stays PAUSED.
+Section 60 was already published once as `3e144031`.
 Provider-field follow-up recorded in section 61, 2026-11-03.
 The prior token-free SPY authentication blocker is resolved only for the scoped EODHD checks in section 62.
 Public-demo AAPL payment dates and four exact raw-cash USB matches are format/sample evidence only.
@@ -9243,3 +9244,25 @@ QA qualified the 31-inclusive-day bound as local and conservative. This is not
 independent Claude review, a full suite or native/empirical validation. Final
 root/branch/HEAD/status and staged-file checks precede a local-only notes commit;
 no new publication is authorized by the key-use instruction.
+
+### 62.5 Later owner-directed publication
+
+After the authenticated-check summary, the owner explicitly directed:
+**"push"**. This later instruction authorizes exactly one successful final
+non-force push from the mandatory worktree to only its matching lane branch,
+including local audit-note commits `2ba55cf5` and `392f020d` plus this closing
+publication note. The earlier local-only/no-push statements describe the state
+before this separate direction; the key-use instruction itself did not grant
+publication. The section-60 round is already published and is not repeated.
+
+The complete round begins at matching remote
+`3e14403190504f0dfc33e7b542965a935e2fc496`. Before the closing commit and push,
+verify mandatory root/branch, expected HEAD, clean or exactly owned status,
+origin/push URL, matching remote ancestry and only the two authorized tracked
+files. The existing focused active-document check and diff checks apply; no
+full suite, provider/QC access or new data acquisition is started for a push.
+The final commit identity and observed push/remote result are retained in the
+automation checkpoint after verification. No private data or key is included.
+No PR, merge, other ref, force push or monitor rearm is authorized. The next
+independent review must identify the complete newly published range rather
+than treat this publication as a Claude trigger or empirical acceptance.

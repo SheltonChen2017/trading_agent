@@ -139,6 +139,20 @@ def workspace(tmp_path, monkeypatch):
     return root, private, calls
 
 
+def test_main_propagates_keyboard_interrupt_instead_of_printing_a_refusal(monkeypatch, capsys):
+    """TPR-CR34-006: an operator interrupt is not a refusal and must not become exit 1."""
+    def interrupted(operation_id):
+        raise KeyboardInterrupt()
+    monkeypatch.setattr(p, "prepare_workspace", interrupted)
+    with pytest.raises(KeyboardInterrupt):
+        p.main(["TPR-PREBACKTEST-20261103-SYNTHETIC-001"])
+    assert capsys.readouterr().out == ""
+    monkeypatch.setattr(p, "prepare_workspace", lambda operation_id: (_ for _ in ()).throw(RuntimeError("PRIVATE-PATH")))
+    assert p.main(["TPR-PREBACKTEST-20261103-SYNTHETIC-002"]) == 1
+    out = capsys.readouterr().out
+    assert "PRIVATE-PATH" not in out and '"status": "refused"' in out
+
+
 def test_claim_precedes_all_seven_reads_and_exports_remain_local(workspace, monkeypatch):
     root, originals, calls = workspace
     reader = p._private_read

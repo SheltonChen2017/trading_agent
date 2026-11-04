@@ -16,6 +16,20 @@ def _synthetic_root(tmp_path, monkeypatch):
         os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW))
 
 
+def test_main_propagates_keyboard_interrupt_instead_of_printing_a_refusal(monkeypatch, capsys):
+    """TPR-CR34-006: an operator interrupt is not a refusal and must not become exit 1."""
+    def interrupted(operation_id):
+        raise KeyboardInterrupt()
+    monkeypatch.setattr(p, "prepare_workspace", interrupted)
+    with pytest.raises(KeyboardInterrupt):
+        p.main(["TPR-OFFLINE-20261103-SYNTHETIC-001"])
+    assert capsys.readouterr().out == ""
+    monkeypatch.setattr(p, "prepare_workspace", lambda operation_id: (_ for _ in ()).throw(RuntimeError("PRIVATE-PATH")))
+    assert p.main(["TPR-OFFLINE-20261103-SYNTHETIC-002"]) == 1
+    out = capsys.readouterr().out
+    assert "PRIVATE-PATH" not in out and '"status": "refused"' in out
+
+
 def test_retain_is_exclusive_and_hashes_exact_bytes(tmp_path):
     target = tmp_path / 'receipt.json'
     descriptor = p._retain(target, b'{}\n')

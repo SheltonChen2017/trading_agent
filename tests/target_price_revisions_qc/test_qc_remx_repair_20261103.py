@@ -169,6 +169,22 @@ def test_source_and_result_integrity_tampering_refuses_without_echo():
         m.export_blobs(replace(result, source_raw="not bytes"))
 
 
+def test_dispositions_partition_every_source_row_and_blobs_reconstruct_the_count():
+    """TPR-CR34: candidate + every quarantine + invalid rows must equal the source rows."""
+    raw = (line("2005-01-04", "123") + line("2021-02-10", "123.0") + line("2021-02-11", "123.25")
+        + line("2021-02-12", "456") + line("2021-02-12", "456") + line("2021-02-15", "-1")
+        + line("2021-02-16", "1,234") + line("2021-02-17", "789"))
+    result = repair(raw)
+    blobs, summary = m.export_blobs(result), manifest(result)
+    assert summary["source_rows"] == 8
+    assert sum(summary["disposition_counts"].values()) == summary["source_rows"]
+    assert summary["candidate_rows"] == result.candidate_bytes.count(b"\n") == 2  # duplicate dates are quarantined
+    quarantined = sum(blobs[name].count(b"\n") for name in blobs
+        if name.startswith("quarantine_") and name.endswith(".csv"))
+    assert summary["candidate_rows"] + quarantined == summary["source_rows"]
+    assert len([row for row in blobs["row_ledger.jsonl"].splitlines() if row]) == summary["source_rows"]
+
+
 def test_counterpart_rounding_or_admission_caller_flags_do_not_exist():
     raw = line(volume="123.25")
     for override in ({"counterpart_volume": 123}, {"allow_fractional": True},

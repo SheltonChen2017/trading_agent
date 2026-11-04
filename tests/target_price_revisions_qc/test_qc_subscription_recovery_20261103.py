@@ -16,6 +16,17 @@ def proof(sid="SYNTHETIC-SID"):
     return {"security_id": sid, **{key: True for key in recovery.PROOF_FIELDS}}
 
 
+@pytest.mark.parametrize("value,expected", [
+    (Fraction(0), True), (0, True), ("0", True), ("0.000", True), (Fraction(1), False), (1, False),
+    (0.0, False), (-0.0, False), (True, False), (False, False), (None, False), (float("nan"), False),
+    ("", False), ("zero", False), ([], False),
+])
+def test_zero_quantity_proof_accepts_only_exact_nonfloat_zero(value, expected):
+    """TPR-CR34-003: the zero-quantity predicate is fail-closed; a native float
+    quantity never proves zero, so the release path depends on the native type."""
+    assert recovery._zero(value) is expected
+
+
 def test_supplied_plans_never_issue_native_or_economic_authority():
     row = proof()
     before = deepcopy(row)

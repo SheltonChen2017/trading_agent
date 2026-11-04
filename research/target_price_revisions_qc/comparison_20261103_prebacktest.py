@@ -427,7 +427,9 @@ def main(argv=None):
     parser.add_argument("operation_id")
     try:
         result = prepare_workspace(parser.parse_args(argv).operation_id)
-    except (Exception, KeyboardInterrupt):
+    except KeyboardInterrupt:
+        raise
+    except Exception:
         result = {"status": "refused", "local_preparation_complete": False,
             "qc_requests": 0, "safari_requests": 0, "backtests": 0, "backtesting_ready": False}
     print(json.dumps(result, sort_keys=True))

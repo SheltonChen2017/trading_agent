@@ -321,7 +321,7 @@ def test_claim_precedes_each_compile_proof_read_and_only_then_dispatches(tmp_pat
     assert result['private_bytes_read'] == action['private_bytes_max']
     assert len(result['dependency_claims']) == 8 and len(calls) == 1
     assert result['native_origin_authenticated'] is result['economics_accepted'] is False
-    with pytest.raises(Exception):
+    with pytest.raises(m.ActionRefusal):
         m._execute_fixture(action, root, native_root, public_sources=sources,
             api_execute=execute, clock=lambda: NOW)
     assert len(reads) == 8 and len(calls) == 1  # spent action never reopens proof

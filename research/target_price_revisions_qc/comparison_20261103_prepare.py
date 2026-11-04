@@ -300,7 +300,9 @@ def main(argv=None):
     try:
         args = parser.parse_args(argv)
         result = prepare_workspace(args.operation_id)
-    except (Exception, KeyboardInterrupt):
+    except KeyboardInterrupt:
+        raise
+    except Exception:
         print(json.dumps({'status': 'refused', 'automatic_retry': False,
             'qc_contacts': 0, 'safari_contacts': 0,
             'backtests': 0, 'backtesting_ready': False}, sort_keys=True))

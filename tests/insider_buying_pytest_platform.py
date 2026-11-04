@@ -51,6 +51,15 @@ def _validate_contract(pins):
             raise pytest.UsageError("Insider frozen POSIX test contract malformed")
 
 
+def _pinned_image(raw, digest):
+    # The pins are LF Git blobs. On the fcntl-less Windows host this helper
+    # exists for, core.autocrlf=true checks the same blobs out as CRLF, and no
+    # attribute keeps tests/ at LF. Accept that conversion only: collapsing
+    # CRLF to LF must reproduce the pinned blob exactly.
+    return (hashlib.sha256(raw).hexdigest() == digest
+            or hashlib.sha256(raw.replace(b"\r\n", b"\n")).hexdigest() == digest)
+
+
 def _validate_frozen_images(root=ROOT, pins=FROZEN_POSIX_TEST_SHA256):
     _validate_contract(pins)
     root = Path(root).resolve()
@@ -58,7 +67,7 @@ def _validate_frozen_images(root=ROOT, pins=FROZEN_POSIX_TEST_SHA256):
         path = root / relative
         try:
             valid = (not path.is_symlink() and path.resolve() == root / relative
-                     and path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest() == digest)
+                     and path.is_file() and _pinned_image(path.read_bytes(), digest))
         except OSError:
             valid = False
         if not valid:

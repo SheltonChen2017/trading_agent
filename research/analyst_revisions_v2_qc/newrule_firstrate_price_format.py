@@ -97,6 +97,8 @@ def canonical(value):
                 require(kind in (str, bool, int, type(None)), 'json')
         return json.dumps(value, sort_keys=True, separators=(',', ':'),
             ensure_ascii=True, allow_nan=False).encode('ascii')
+    except Refused:
+        raise  # Keep the finite code (e.g. 'bound'); Refused is a ValueError.
     except (TypeError, ValueError, UnicodeError, RecursionError):
         raise Refused('json') from None
 
@@ -138,6 +140,8 @@ def loads(raw, maximum):
             parse_constant=lambda _: (_ for _ in ()).throw(Refused('json')))
         require(canonical(value) == raw, 'json')
         return value
+    except Refused:
+        raise
     except (ValueError, UnicodeError, RecursionError):
         raise Refused('json') from None
 

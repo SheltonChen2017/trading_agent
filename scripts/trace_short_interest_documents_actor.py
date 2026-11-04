@@ -98,10 +98,14 @@ class Clock:
 def code_guard(head,tracking,newsha,oldsha,clock):
     require(all(re.fullmatch('[0-9a-f]{40}',x) for x in (head,tracking)) and all(re.fullmatch('[0-9a-f]{64}',x) for x in (newsha,oldsha)),'arguments')
     require(Path.cwd().resolve()==ROOT and ROOT.resolve()==ROOT,'lane')
+    owner=os.stat(ROOT,follow_symlinks=False);require(owner.st_uid!=0,'lane')
     def git(*args):
         clock.check(SHUTDOWN_NS)
-        result=subprocess.run(['/usr/bin/git','-c','safe.directory='+str(ROOT),'-c','core.fsmonitor=false','-c','core.hooksPath=/dev/null','-C',str(ROOT),*args],
-            env=ENV,stdin=None,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=min(20,clock.remaining()),check=False)
+        # Git honours owner-writable repository config (filters, attributes),
+        # so it runs as the lane owner, never as root and never via safe.directory.
+        result=subprocess.run(['/usr/bin/git','-c','core.fsmonitor=false','-c','core.hooksPath=/dev/null','-C',str(ROOT),*args],
+            env=ENV,stdin=None,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=min(20,clock.remaining()),check=False,
+            user=owner.st_uid,group=owner.st_gid,extra_groups=[])
         require(type(result.returncode) is int and result.returncode==0,'lane');clock.check(SHUTDOWN_NS);return result.stdout
     require(git('rev-parse','--show-toplevel').decode().strip()==str(ROOT)
         and git('branch','--show-current').decode().strip()=='codex/strategy-short-interest'
@@ -465,7 +469,8 @@ def root_trace(head,tracking,newsha,oldsha):
 
 def plan(head,tracking,newsha,oldsha):
     require(all(re.fullmatch('[0-9a-f]{40}',value) for value in (head,tracking)) and all(re.fullmatch('[0-9a-f]{64}',value) for value in (newsha,oldsha)),'arguments')
-    command=['sudo','/usr/bin/python3','-I','-S','-B','-c',BOOTSTRAP,head,tracking,newsha,oldsha]
+    # Absolute: the owner's PATH may put a user-writable directory before /usr/bin.
+    command=['/usr/bin/sudo','/usr/bin/python3','-I','-S','-B','-c',BOOTSTRAP,head,tracking,newsha,oldsha]
     return {'shell_command':'cd '+shlex.quote(str(ROOT))+' && '+shlex.join(command),
         'root_authentication_required':True,'responsible_Terminal_Full_Disk_Access_required':True,
         'prepared_private_directory_required':str(DIRECTORY),'exclusive_output':str(OUTPUT),

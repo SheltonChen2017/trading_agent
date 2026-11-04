@@ -615,8 +615,28 @@ def test_durable_loader_never_adopts_copied_changed_or_wrong_epoch_evidence(dura
         with m.load_registered(HEAD, REMOTE): pytest.fail("changed original admitted")
 
 
+def test_well_formed_but_uncommitted_anchor_is_never_admitted(durable, monkeypatch):
+    """SI-CR27-005: the held anchor must equal the committed bytes, not just parse."""
+    committed = {**durable.anchor, "outer_elapsed_ns": durable.anchor["outer_elapsed_ns"] + 1}
+    original = p._git
+    monkeypatch.setattr(p, "_git", lambda args: (canonical_json(committed) + "\n").encode()
+        if args[1].endswith(":" + m.ANCHOR.as_posix()) else original(args))
+    with pytest.raises(m.NativeMainReceiptRefusal, match="main_anchor_changed"):
+        with m.load_registered(HEAD, REMOTE): pytest.fail("uncommitted anchor admitted")
+
+
+def test_anchor_runtime_head_must_be_an_ancestor_of_the_loading_head(durable, monkeypatch):
+    """SI-CR27-005: a failed merge-base ancestry check refuses the anchor."""
+    monkeypatch.setattr(m.subprocess, "run", lambda *args, **kwargs: SimpleNamespace(returncode=1))
+    with pytest.raises(m.NativeMainReceiptRefusal, match="main_anchor_changed"):
+        with m.load_registered(HEAD, REMOTE): pytest.fail("non-ancestor runtime head admitted")
+
+
 @pytest.mark.parametrize("mutation", ["root_flags", "anchor", "clock", "association"])
 def test_held_durable_getter_permanently_latches_late_mutation(durable, monkeypatch, mutation):
+    # SI-CR27-005: record each getter refusal inside the context; a close-time
+    # refusal must not stand in for a getter that stopped rechecking.
+    codes = []
     with pytest.raises((m.NativeMainReceiptRefusal, AssertionError)):
         with m.load_registered(HEAD, REMOTE) as receipt:
             held = m._AUTHENTICATED[id(receipt)][2]
@@ -627,8 +647,10 @@ def test_held_durable_getter_permanently_latches_late_mutation(durable, monkeypa
                 monkeypatch.setattr(held.clock, "check", lambda: m.require(False, "main_deadline"))
             else:
                 monkeypatch.setattr(held.reader, "current_association", lambda *args: m.require(False, "main_original"))
-            with pytest.raises(m.NativeMainReceiptRefusal): receipt.public_summary()
-            with pytest.raises(m.NativeMainReceiptRefusal, match="main_latched"): receipt.public_summary()
+            for unused in range(2):
+                try: receipt.public_summary()
+                except m.NativeMainReceiptRefusal as error: codes.append(str(error))
+    assert len(codes) == 2 and "main_latched" not in codes[0] and "main_latched" in codes[1]
 
 
 def test_anchor_is_closed_when_current_code_constructor_fails(durable, monkeypatch):

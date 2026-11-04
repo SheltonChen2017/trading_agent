@@ -402,6 +402,20 @@ def test_snapshot_runtime_function_substitution_is_permanently_vetoed(fixture):
     assert report["first_failure"]["code"]=="runtime_changed"
 
 
+@pytest.mark.parametrize("change",["function","constant"])
+def test_committed_fifth_file_differing_from_running_bootstrap_refuses(fixture,change):
+    """SI-CR27-006: the running orchestrator must equal the committed reference."""
+    h=fixture;old=h.committed[DRIVER];lines=old.split(b"\n")
+    if change=="function":variant=old.replace(b"'git_refused')",b"'git_refused_variant')",1)
+    else:
+        index=next(i for i,line in enumerate(lines) if line.startswith(b"MAX_SECONDS, MAX_CODE_BYTES, MAX_FAILURES = "))
+        lines[index]=lines[index].replace(b", 32)",b", 33)");variant=b"\n".join(lines)
+    assert variant!=old and variant.count(b"\n")==old.count(b"\n")  # Same line numbers.
+    h.committed[DRIVER]=variant;(h.root/DRIVER).write_bytes(variant)
+    report=negative(h)
+    assert (report["first_failure"]["code"],report["first_failure"]["phase"])==("runtime_changed","bootstrap")
+
+
 def test_original_bootstrap_module_binding_cannot_be_replaced_midrun(fixture):
     h=fixture
     def action(h):sys.modules[h.module.__name__]=ModuleType("replacement_bootstrap")

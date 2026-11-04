@@ -84,6 +84,16 @@ def test_new_first_chunk_limit_rejects_old_sixteen_extra_allowance(monkeypatch):
     assert len(value._state[1]) == 24
 
 
+def test_first_chunk_repeat_cap_is_the_plan_limit_before_the_chunk_START_cap(monkeypatch):
+    """SI-CR27-007: the ninth first-chunk repeat refuses on the plan's +8, not global +16."""
+    ledger, exposed, plan = support.genuine_exposure_plan(monkeypatch, maximum_bytes=72 * 1024 ** 2, chunk_size=16)
+    monkeypatch.setattr(budget, "_EXPECTED_SOURCE_PROFILE", budget._source_profile())
+    value = budget.open_durable_count_budget(plan)
+    for position in (13, 13, 13, 14, 14, 14, 15, 15, 15, 16, 16, 16, 17): value.reserve_start_slot(position)
+    assert plan.chunk_extra_limit(1) == 8 and len(value._state[2]) == 13
+    with pytest.raises(budget.DurableCountBudgetRefusal, match="current_chunk_extra_cap"): value.reserve_start_slot(17)
+
+
 def test_byte_capacity_counts_permanent_negative_pages_before_new_slot(monkeypatch):
     ledger, exposed, plan = support.genuine_exposure_plan(monkeypatch, maximum_bytes=24 * 1024 ** 2)
     monkeypatch.setattr(budget, "_EXPECTED_SOURCE_PROFILE", budget._source_profile())

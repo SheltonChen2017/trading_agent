@@ -267,11 +267,36 @@ def test_plan_is_bound_to_four_identifiers_and_bootstrap_precedes_code_open():
     plan=d.plan(HEAD,TRACKING,NEW,OLD)
     assert plan['source_authority'] is False
     tokens=shlex.split(plan['shell_command'])
-    assert tokens.count('sudo')==1 and tokens[-4:]==[HEAD,TRACKING,NEW,OLD]
-    assert plan['shell_command'].startswith('cd ') and 'sudo' in plan['shell_command']
+    # SI-CR27-003: never resolve sudo through the owner's PATH.
+    assert tokens.count('/usr/bin/sudo')==1 and 'sudo' not in tokens and tokens[-4:]==[HEAD,TRACKING,NEW,OLD]
+    assert plan['shell_command'].startswith('cd ') and tokens[tokens.index('&&')+1]=='/usr/bin/sudo'
     assert d.BOOTSTRAP.index('started=time.monotonic_ns()')<d.BOOTSTRAP.index('os.open(path')
     assert d.BOOTSTRAP.index('hashlib.sha256(raw)')<d.BOOTSTRAP.index('exec(compile')
     assert plan['whole_seconds']==120 and plan['passive_seconds']==30
+
+
+def test_root_code_guard_runs_every_Git_read_as_the_lane_owner(tmp_path,monkeypatch):
+    """SI-CR27-004: root never parses owner-writable repository config itself."""
+    raw={d.SCRIPT:b'# fabricated driver\n',d.FRAMER:b'# fabricated framer\n'};held=[]
+    for name,body in raw.items():
+        path=tmp_path/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(body)
+        held.append((str(path),body,d.stamp(os.stat(path,follow_symlinks=False))))
+    monkeypatch.setattr(d,'ROOT',tmp_path);monkeypatch.chdir(tmp_path)
+    monkeypatch.setitem(d.__dict__,'_HELD_CODE',tuple(held))
+    owner=os.stat(tmp_path,follow_symlinks=False);calls=[]
+    replies={('rev-parse','--show-toplevel'):str(tmp_path).encode()+b'\n',('branch','--show-current'):b'codex/strategy-short-interest\n',
+        ('rev-parse','HEAD'):HEAD.encode()+b'\n',('status','--porcelain=v1','-z','--untracked-files=all'):b'',
+        ('rev-parse','refs/remotes/origin/codex/strategy-short-interest'):TRACKING.encode()+b'\n',
+        ('show',HEAD+':'+d.SCRIPT):raw[d.SCRIPT],('show',HEAD+':'+d.FRAMER):raw[d.FRAMER]}
+    def run(argv,**kwargs):
+        calls.append((argv,kwargs));args=tuple(argv[argv.index('-C')+2:])
+        return SimpleNamespace(returncode=0,stdout=replies[args],stderr=b'')
+    monkeypatch.setattr(d.subprocess,'run',run)
+    assert d.code_guard(HEAD,TRACKING,d.sha(raw[d.SCRIPT]),d.sha(raw[d.FRAMER]),Clock())==raw[d.FRAMER]
+    assert len(calls)==7
+    for argv,kwargs in calls:
+        assert argv[0]=='/usr/bin/git' and not any('safe.directory' in token for token in argv)
+        assert (kwargs['user'],kwargs['group'],kwargs['extra_groups'])==(owner.st_uid,owner.st_gid,[])
 
 
 def test_unknown_exception_diagnostic_never_formats_private_text():

@@ -159,6 +159,15 @@ def test_negative_exposure_possible_try_cannot_be_reused_or_refunded_in_pure_bud
     assert len(value._state) == 1 and value._state[0][2] == 3
 
 
+def test_first_chunk_repeat_cap_is_the_plan_limit_not_global_sixteen(monkeypatch):
+    """SI-CR27-007: the ninth first-chunk repeat refuses on the plan's +8."""
+    ledger, exposed, plan = genuine_exposure_plan(monkeypatch, maximum_bytes=72 * 1024 ** 2, chunk_size=16)
+    value = budget.open_conservative_count_budget(plan)
+    for position in (13, 13, 13, 14, 14, 14, 15, 15, 15, 16, 16, 16, 17): value.reserve_start_slot(position)
+    with pytest.raises(budget.CountRecoveryBudgetRefusal, match="chunk_extra_allowance_exhausted"):
+        value.reserve_start_slot(17)
+
+
 def test_new_plan_factory_does_not_occupy_or_modify_old_plan_scope(monkeypatch):
     ledger, exposed, new = genuine_exposure_plan(monkeypatch)
     old = budget.freeze_count_recovery_plan(ledger)

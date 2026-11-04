@@ -98,8 +98,11 @@ def _head(value): return type(value) is str and re.fullmatch(r"[0-9a-f]{40}", va
 def code_paths():
     # Storage has fixed lazy transport/outer/checkpoint validators. Bind that
     # complete executable closure, including the explicitly retained original
-    # wrappers, rather than only this module's eager import statements.
-    return tuple(sorted(set((*producer.code_paths(), *negative_resolution.code_paths(), DRIVER))))
+    # wrappers, rather than only this module's eager import statements. The
+    # producer's operational catalogue is historical since its source-free
+    # preflight imports (section 141.2); the preflight catalogue is the full
+    # closure this loader executes when it imports the producer.
+    return tuple(sorted(set((*producer.conservative_preflight_code_paths(), *negative_resolution.code_paths(), DRIVER))))
 
 
 def protocol():

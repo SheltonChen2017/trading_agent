@@ -1002,6 +1002,23 @@ def test_postterminal_device_path_drift_is_negative_without_restart(root_control
     assert not any("-k" in str(action) or "debug" == action for action in root_controller.actions)
 
 
+def test_controller_death_after_initial_start_without_receipt_holds_endpoints(root_controller, monkeypatch):
+    """SI-CR27-002: the pre-start kernel row cannot release a possibly running target."""
+    inner = diag.subprocess.Popen
+    def popen(args, **kwargs):
+        child = inner(args, **kwargs); original = child.poll
+        def poll():
+            if child.step == 15:  # Started; the controller dies before its terminal receipt.
+                child.exit = -9
+                for fd in child.fds: os.close(fd)
+                child.fds.clear(); child.step = 3; return child.exit
+            return original()
+        child.poll = poll; return child
+    monkeypatch.setattr(diag.subprocess, "Popen", popen)
+    with pytest.raises(diag.StartupRefusal): diag.observe_readonly(HEAD, diag.REMOTE)
+    assert root_controller.actions.count("initial_start") == 1 and len(root_controller.held) == 1
+
+
 def test_endpoint_drift_in_last_prestart_query_prevents_the_initial_start(controller_child, monkeypatch):
     original_run, queries, changed = diag.subprocess.run, [], []
     def run(args, **kwargs):

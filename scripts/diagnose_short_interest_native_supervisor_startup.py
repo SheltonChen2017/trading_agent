@@ -1075,6 +1075,9 @@ def _observe_readonly(head, remote):
                     kernel = _query(head); _never_started(kernel)
                     raw = _drain_to_eagain(master, raw)  # No initial start is possible before acknowledgment.
                     kernel = _query(head); _never_started(kernel); raw = b""; _tty_check(slave, observer)
+                    # Once ack1 may reach the controller the target may start;
+                    # until a fresh post-start query, unknown state must hold.
+                    kernel = None
                     require(os.write(ack_write, b"1") == 1, "startup_control"); acknowledged = True
                 else:
                     receipt = _control_receipt(first_value, observer, digest, process.pid)

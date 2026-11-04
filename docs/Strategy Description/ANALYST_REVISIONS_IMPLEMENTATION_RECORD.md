@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–337 retain the milestone, review, preregistration, QC
+strategy. Sections 1–338 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -1297,7 +1297,7 @@ claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
 
-Section 337 completes the owner's explicit exact-five exploratory quarantine for both6/8universes and allAR0/100/200arms. The owner explicitly waives Claude review of section 337. QC and Safari remain entirely off limits. Full original census and selection/tilt are preserved, then exact five denied final per-sleeve weights go to their own ETFs without replacement promotion or survivor renormalization. New catalog/vendor/monetary/runtime/profile/result and six-cell source builder pass727distinct focused checks. Sole local preparation and stdin validation at864c9b97 exit0: exact5bindings/73archive ranges authenticate; both are now spent. Original five identity stops and section336 controls/readers remain unresolved/spent for the original strategy; complete held/target price coverage and actual project-specific source/input/run binding remain pending. Preserve all evidence and QC/Safari hold.337.7 owns the exact next bounded consumer/project/source/rights/attempt gates; no original source/price/formal/live gate is cleared by quarantine.
+Section 338 continues LOCAL price coverage and input/source binding for the separate R337 exact-five six/eight x AR0/100/200 exploratory family. The owner explicitly waives Claude review of section 338. QC/Safari remain entirely off limits. Fresh genuine full input, all71 price shards, conservative membership-based demand and privately materialized proposed-project source bindings are the current bounded work; original source/price/formal/live gates stay intact. The input lacks historical ETF/fundamental callbacks, so exact targets/actual held/quote path cannot be fabricated offline. R337's successful sole catalog preparation/validator and all original operations stay spent.338 owns the new protocol, evidence, limitations and one-push handoff.
 
 
 Sections 137–142 retain the owner-assisted cloud diagnoses, project cleanup,
@@ -4413,6 +4413,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-03 | Owner-waived offline identity, historical-symbol coverage and REMX recovery under QC/Safari hold | `372019d5e275248fe41bad000e638479f8cb7a0b` -> `0b78b00c7cf6a75cf21044a8aaaffee852c59a21` -> `af7ebb09941f6d64df60310505645ea2a6241b25` -> `0d131ac9d662ba5942ea9b67c16d108e2da3c627` -> this final section336 handoff commit; FOUR total | No incoming Claude range; current owner review waiver, no independent acceptance | K definitions, L fractional timing, M original ownership, N normative roles and O new historical-symbol coverage each passed once and are spent. Four new files retained; none completes its required window. Original UNIT and acquired-security hypotheses refined rather than assumed | Root592distinct focused passes across stages; latest149passes2.03s,16changed-source/test memory compiles across stages, exact source/profile/native pins. Record repeats nonadditive; no full suite or operational replay | I336-001..009 corrected pre-use, I336-010 qualified/corrected; five identity stops and RAW/session/payoff/coverage gates remain. No QC/Safari/provider data API/Keychain;338/259/54/699 unchanged | ONE matching nonforce final push at the concrete dated-identity/common-price evidence barrier. All controls/readers stay spent; no automatic source-splice, source-stop bypass, QC release, strategy cell or readiness clearance |
 | 2026-11-03 | Claude review snapshot R337 of `10b05cca..3a3350dc`: the eighteen Codex commits of sections 334–336 reviewed after the fact | `3a3350dc` -> `134fbbc4` (correction) -> this record commit | All eighteen accepted, `7699f6b6` after correction; section R337 | FirstRate price-format JSON helpers keep the `bound` refusal code; deadline-taxonomy, `requests` redirect/cookie, reversible transport-pin and record-wording findings documented | 27 range test files 2,151 passed; 86 record gates; 48 section-330 regressions; 189 correction-affected passed; 1/1 mutation caught; no full suite, no QC/Safari/provider access; 0 looks, 338/259/54/699 unchanged | 0 P0, 0 P1, 1 P2 documented, 8 P3 (one corrected) | Codex counter-reviews section R337; Codex's owner-directed section-337 round continues |
 | 2026-11-04 | Completed owner-directed exact-five quarantine for matched six/eight exploratory cells; section337 | `18e6d567` -> `864c9b97` -> this final record commit | Incoming two Claude commits accepted/qualified in337.3; new variant review expressly waived | Final post-tilt denied weight to own sleeve ETF; genuine vendor-only monetary/runtime/source chain; sole local preparation/validator both exit0 and spent | 727 distinct focused passes24.37s; 17 memory compiles; exact5bindings/73ranges authenticate; no full suite or QC/Safari contact; one final push | 0 new P0/P1; seven pre-use P2 corrected; historical open P2 retained | Hold QC/Safari; future genuine project/input/source/run binding and demanded coverage pending; 338/259/54/699 unchanged |
+| 2026-11-04 | Local full-input, conservative RAW coverage and six-cell source binding; section338 | `94c2030d` -> this D1 implementation/run freeze; final result record pending | Owner expressly waives current Claude review; no new incoming review range | Fresh sealed full6151/3466 input, all71price shards, retained missing pairs and private proposed-project20file/six-cell bundle | 456 distinct focused passes29.12s; 10memorycompiles; 130held source pins/4profiles; no full suite or QC/Safari | One pre-use P2 serializer defect corrected; loader-policy composition/held-path limits and nonce privacy recorded | Sole new offline preparation/validator after exact freeze; 338/259/54/699 unchanged; one final push |
+
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -74922,3 +74924,319 @@ is permitted. No old W5 generator, R337 parent/worker/stdin validator, source
 assessment/capture/control/job/result or spent attempt is revived. Current
 review waiver is not a source/security/financial/live permit. Do not turn
 this preparation success into a price-coverage or backtesting-ready claim.
+
+## 338. Local price coverage and six-cell input/source bindings, 2026-11-04
+
+### 338.1 Owner scope, baseline and unchanged boundaries
+
+Owner: "Continue resolving the remaining price coverage and input/source
+bindings for the 6 and 8 universe backtests. Keep QC and Safari off limits,
+skip Claude review, document progress, and push once when done."
+The owner explicitly waives Claude review of section 338. This is continued
+LOCAL research preparation for the separately declared R337 exact-five
+quarantine, not another strategy design, source capture, performance run,
+QC submission or paper/live action.
+
+Initial local HEAD, tracking ref and live matching remote all equal
+94c2030d3ebdd02f792f097b69d3591030ef2ccb; worktree clean. All commands, edits,
+focused checks, local commits and one final nonforce push stay ONLY at
+/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2 on
+codex/strategy-analyst-revisions-v2. Recheck exact root/branch/HEAD/status
+before edits/commits/final push. Preserve concurrent work and stop unexplained
+change/divergence; no side branch/worktree, reset/rebase/overwrite/force.
+Shared/root/other-lane documents are frozen; only this lane record changes.
+
+QC/Safari remain entirely off limits: no current-project/access/privacy,
+capacity, source/object readback/upload, compile/job/result or Mia contact.
+No provider/USB/Keychain/credentials/new paid rights/funded/broker/real-order/
+paper/live action. Booked floor338shared/259development/54infrastructure/
+699cells is unchanged unless an actual accountable event occurs. No complete
+Codex lane/repository suite; focused native-denied synthetic checks only.
+Source/readiness/PIT/permanent-identity/financial gates stay intact.
+
+### 338.2 Concrete remaining gap and bounded local approach
+
+R337 preparation authenticated the five denial bodies and73 archive byte
+ranges, but did not load the genuine full input or parse individual prices.
+The unchanged rating input has only evaluator manifest, sessions,
+memberships, contributions and runtime bindings. It does NOT contain
+historical ETF-constituent weights, fundamental market-cap callbacks, actual
+cloud symbols, fills, quantities or bid/ask quotes. Exact per-sleeve targets
+and the actual held/order/NAV path cannot be invented from these inputs.
+Frozen _books uses actual all-eight ETF/fundamental callbacks at09:20.
+
+New coherent diagnostic:
+1. Under a NEW claim, authenticate the original genuine October package and
+   lineage through their actual sealed loaders and a separate full10field
+   held/named/native-security guard. Pin source activation BEFORE parsing
+   its bounded flat payload inventory, and every payload before reload.
+   Build/exhaust genuine sealed plain transport in memory; authenticate full
+   6151 binding stream,3466 axis, manifest, memberships and all contribution
+   payload bytes/compact evaluator checks. This is current endpoint
+   authentication, not historical/continuous integrity or independent master.
+2. Read ONLY exact prepared R337 catalog DATA and original R327-K archive
+   DATA under a new fixed-two-leaf guard. Rejoin the genuine original full
+   catalog, exact5 denials and6159 original stock/fund assignments. Check
+   every price row in all71 monthly shards with the unchanged real codec,
+   including nonrequired rows; malformed source refuses rather than becoming
+   missing. Preserve original5636vendor/5quarantine/510conditional roles.
+3. Build a CONSERVATIVE necessary-condition demand shared by all six cells:
+   for every nonquarantined stock eligible by membership at a W5 decision,
+   require prior-first-potential close through final close, never end at
+   membership/binding expiry. Include reference prior dates for every eligible
+   decision and all8funds'1243 dates; six-cell funds use their declared six.
+   A demanded conditional row is a source stop. Explicit null required cells
+   stay private missing triples with aggregate public counts; no drop/fill/
+   stale/quote substitution, early stop at first gap or truncation. Complete
+   authenticated observation can be INCOMPLETE coverage, never run readiness.
+4. Bind actual generated six-cell sources/profiles/family locally to the
+   authentic axis/catalog/input and vendor manifest. Proposed existing Analyst
+   project38522505 is selected explicitly for prospective source reuse only.
+   It was a diagnostic project, NOT current proof of ownership/privacy/files/
+   objects/capacity/processing rights. Derive its proposed context from actual
+   authenticated vendor manifest/catalog pins; no made-up fixture project or
+   claim that the payload is already stored there. Shared19 modules + each
+   Main/profile/projection, full family/vendor/input/catalog/private manifest
+   are protected private buffers; logical20 source files per cell.
+
+All original R337/326/327 operators, source assessments, captures, control
+readers and QC jobs remain SPENT/frozen. This new consumer may read the two
+explicit DATA leaves and genuine original package/lineage ONLY after a
+separately committed exact one-shot freeze. It reads no old claim/report/
+journal/failure/output reader. Ancestor metadata needed to reach an exact
+DATA file is not a claim of old control-content reading or corpus census.
+No actual new control allocation/DATA read has occurred at this design stage.
+
+Exact two fixed DATA:
+- quarantine/R337-20261103-A/quarantine-catalog-private.json:
+  6924B/bebe830cba48c6eafb0c99c8feb4251c59871bb7a52f054327076d946d81bc94;
+- newrule_available_history_archive/R327-20261028-K/vendor-payload-private.bin:
+  148543046B/2a2815b543c41728b441b0b300a9d269f282778ef1915923fd68f61993f9ca1f.
+Both relative to artifacts/analyst_revisions_v2. Original package/lineage
+scope is the separately frozen genuine helper declaration, not a blanket
+permission to inspect other private captures.
+
+New preparation is an outcome-free source/coverage diagnostic, so no orders
+are appropriate here; it computes no performance/NAV path or trading result.
+Future strategy evaluations remain order-based. Same-round advisory agents
+are not independent reviewers and no independent acceptance is claimed.
+
+### 338.3 Implementation, verified findings and focused validation
+
+NEW modules implement genuine input/native guard, conservative coverage,
+private six-cell materialization, exact two-DATA guard and bounded caller.
+All old337 and earlier used sources remain byte-frozen. No source pin is
+silently refreshed: the NEW130-file held public inventory is declared
+prospectively for this new caller and matching changed source bytes.
+
+Genuine input guard first authenticates source activation4631B/
+70f64450a44bedfa8ea371ac74a00e2134045fb79b433b93f0114be652bc6147 and
+lineage SHAe4518e06a68a18a3151fe36e5926699624fc68b97c31a8e06917d44103831fd9.
+Only then may it parse the bounded flat package payload descriptors, require
+exact package/lineage inventory and authenticate every named/held source leaf.
+Original source package411c2734... has2776584payload bytes. The genuine
+October/compact loaders mint the actual in-process capability; plain transport
+is separately1ab48d0b..., activation5901B/ffdc80e1..., parent95405d1b....
+These source/plain identities are not conflated. All five source/plain byte
+inventories and genuine compact contribution evaluation are checked. Only
+manifest/axis/membership/binding roles are locally JSON-expanded again; the
+helper does not falsely claim a second contribution-row parse.
+
+Coverage authenticates whole K archive and73 range/header joins before
+all71 real-codec monthly row parses. Every source row, including nonrequired
+rows, is structurally checked and observed valid/null totals must match the
+manifest. Private missing triples [source_slot, vendor_price_session_index,
+demand_mask] retain ALL required explicit null pairs; masks distinguish dense
+possible-holding from prior-reference needs. Max2654048pairs,64MiB private
+evidence, no truncation. Source corruption/actually demanded conditional role
+refuses; a valid incomplete observation returns coveragefalse and preserves
+all gaps. All six share the same conservative stock superset; six/eight fund
+scope differs exactly as the unchanged cohort rule declares.
+
+Materializer compares the complete genuine1302B input-binding record and full
+6151/3466 streams, whole/semantic source assignments and same exact5catalog.
+It constructs actual source bytes/profiles for proposed38522505 using the
+CURRENT frozen337 projection21host pins, not the broken old W5 pin chain.
+42 private files:19shared sources,6x(Main/profile/projection), family, context,
+input binding, original quarantine catalog and private manifest. Each cell
+has20 logical source files, each <=64000B; total private source bundle<=3MiB.
+Canonical descriptor+concatenated-byte container reauthenticates every range,
+all profiles and rebuilt Main/family bytes. No file is uploaded or new project
+created; all current-cloud/access/privacy/capacity/object/rights flagsfalse.
+
+Caller claims/fsyncs/marks before either new DATA guard or GenuineInput entry.
+It waits for genuine normal return, fixed DATA normal return and ALL130 held
+public-source normal returns before first bundle/evidence/report publication.
+Source importer compiles the exact held raw public code, not repository pyc.
+The source guard separately pins its complete selected public inventory;
+this is not whole-interpreter/third-party/same-user integrity. Validator role
+loads inert public modules/profiles only and reads original output from stdin.
+Crossjoins bind fresh input receipt to coverage/materialization commitments,
+all four archive/catalog/manifest pins, and actual private-evidence bytes.
+
+|Finding|Severity/status|Verified correction or qualification|
+|---|---|---|
+|I338-001 materializer binding stream omitted LF|P2 corrected BEFORE use|Canonical whole-row JSON was fed to a genuine JSONL stream digest without LF. Initial synthetic fixture repeated the same error and masked it. Independent test using actual frozen FIGI serializer failed1case2.55s on the first implementation. New materializer uses figi._canonical(normalized), including LF; fixed full selection73passes12.02s. Restoring omission fails1case0.58s; finally restored with source bytes unchanged. Source-map inventory entry was explicitly rebound prospectively before first commit/run freeze; no old used pin changed.|
+|I338-002 genuine loader alone lacks full native security policy|P2 addressed in new composition|Existing compact reader enforces its own nofollow/8-field/file-byte predicates, not new full10field/native ACL+xattr policy. New independent held package/lineage guard supplies the missing CURRENT-use predicates and normal return; no old metadata/device/ctime rule is relaxed.|
+|I338-003 source data cannot determine actual target/holding path|P2 retained concrete limitation|No historical ETF/fundamental callback inputs or actual cloud symbol/fill/quote state exist in these retained rating/price sources. Dense conservative coverage is an explicit superset, not fabricated exact selection/holdings or proof that every observed null is an actual-run failure.|
+|I338-004 source protocol support paths/resources|P3 addressed/qualified|No pytest shared conftest/dispatch_fence. Public source closure130held files plus <=97 genuine leaves, ancestors/output/process descriptors fit declared softlimit floor32*sourcecount+512 (4672); observed host soft1048575, no setting changed.256MiB in-root free-space floor before claim; all support/temp/cache paths inroot.|
+|I338-005 initial fixture/static-audit overreach|P3 corrected/qualified|Input39pass/1false positive mistook dict.get forHTTPget; coverage35pass/1test failure forbade legitimate separately pinned quarantine-catalog parse before archive parse. Fixtures/audit corrected, no production gate weakened. A first price-omission harness had one fixture setup ERROR and is not counted as sensitivity proof.|
+
+Initial pre-nonce root selection: **429 distinct passes in25.63s**, no failures,
+skips or warnings:89caller+39coverage+79fixedguard+47input+73materialization
++86active-document/record+16redaction. No full lane/repository suite. All10new
+source/test files compile in memory and have exactly one terminal LF. All130
+selected public pins and all4 component profiles match actual held source.
+No assistant.dispatch_fence/AlgorithmImports/QC SDK module enters the root
+bootstrap. Native remote/production-artifact/USB/BOTH-Keychain/securityCLI
+denial, inroot support paths, noautoload/--noconftest/--ignore=artifacts/-B/
+no cacheprovider used for all pytest/mutations/private parser fixtures.
+
+A separate CODE-only fresh bootstrap under the ACTUAL worker filesystem
+write restrictions PLUS ALL-production-artifact read/write denial passes.
+It loads all130 selected code/profile bindings and21 raw projection sources,
+enters no GenuineInput/DATA/control/worker/producer operation and observes no
+private data. This is an import/support-path rehearsal, not D1 invocation.
+
+Author selections/subsets overlap429 and are not additive. Caller89passes5.03s;
+input47passes8.67s; coverage39passes0.17s; corrected materializer73passes12.02s;
+rootguard79passes0.37s. Prior deficient materializer72passes11.46s remains
+qualified by I338-001. New tests meaningfully reached: actual inherited guard/
+stream semantics; genuine sealed plain mint with synthetic substitutions ONLY
+at compact/October library seams; all monthly codec rows; expiry-tail and
+same-count membership hash; exact full assignment/header pins; actual zero
+exit/private crossjoin; real intent FD/tiny-child/noise/kill/reap/alarms/JSON
+timer. Restored in-memory omissions each catch1expectedfailure: input all-leaf
+hash0.24s/security0.12s/normalreturn0.20s; coverage membership0.07s/expiry0.08s/
+all-row-price0.07s; materializer full-assignment4.92s/header4.71s/LF0.58s;
+caller crossjoin0.09s/actualexit0.09s. No source mutation survives. Same-round
+advice is not independent review; current owner waiver controls.
+
+
+Pre-use privacy correction I338-006(P3): accepted R337-004 successor rule
+requires a per-use nonce for new private transports. A deterministic private
+slot/date demand evidence pin could confirm candidate hypotheses when other
+input geometry is known. BEFORE first commit/D1, coverage now requires a
+64-lowerhex PRIVATE transport_nonce and incorporates it before evidence hash;
+new source container requires an independent private nonce in its header.
+Caller obtains TWO separate os.urandom(32) values ONLY after exclusive claim/
+marker, refuses a duplicate and passes one to each distinct private payload.
+Neither nonce is printed, serialized publicly or derived from time/head/runID.
+The legitimate individual Main/profile/source hashes stay deterministic: they
+bind code plus the entire already-pinned original five-row catalog, not a new
+query-only/one-date preimage. Original input, source files/economics, evidence
+epoch and all42 file buffers are unchanged; only new private transport framing
+and new source/protocol bindings change prospectively. No used pin is renewed.
+
+POST-correction FINAL root selection: **456 distinct passes in29.12s**,
+no failures/skips/warnings:90caller+51coverage+79fixedguard+47input+
+87materialization+86record/active-document+16redaction. All10new files compile
+in memory/single-EOF, all130 public pins and4profiles match current finalbytes.
+Earlier429 and all author subsets overlap456, not additive. Final authors:
+coverage51passes0.19s, materializer87passes14.80s, caller90passes5.28s.
+New nonce omission sensitivity1expectedfailure0.07s, container nonce guard
+1expectedfailure4.64s and preclaim-generation order1expectedfailure0.09s,
+memory-only/finally restored. One caller88pass/1fixturefail used an invented
+nonce identical to the fixture's invented public hash placeholder; corrected
+only that synthetic value. Final public output tests exclude the raw nonces.
+
+Selected NEW file pins:
+
+|Path|Bytes|SHA256|
+|---|---|---|
+|scripts/arv2_r338_quarantine_coverage.py|25885|9901e912c19d7348822c7d19d554213034ab23798dddd26d9abdadad9d588208|
+|scripts/arv2_r338_quarantine_data_guard.py|12932|98f10fe2a65331980a1f23cd284fa9d695643a3502f5c5f236a44edfdb52f691|
+|scripts/arv2_r338_quarantine_input.py|31092|a7e56ca57bd54b4743c18f04f5287119b91c82a9bf7165692ad2cb457b8d7ce8|
+|scripts/arv2_r338_quarantine_materialization.py|28684|b9c5c84bee710f2e4c1b2ce062d8ec56d7293193c7b00fcc8113d3d94ca2016f|
+|scripts/prepare_arv2_r338_quarantine.py|57689|1aff50fb499ba086e94d0862ab5cee198393c6fbe12a47fd654c55e19c26020f|
+|tests/analyst_revisions_v2/test_r338_quarantine_caller.py|32279|9fde02a2001549bc73ee0cef7d4831732f74203148a3e46312c16b05a51568dc|
+|tests/analyst_revisions_v2/test_r338_quarantine_coverage.py|25170|cef27d0a5cb1384fc8bb218fca72caa874e440f58360c74466a03a1a95402f65|
+|tests/analyst_revisions_v2/test_r338_quarantine_data_guard.py|18846|911f74a1cdd082bc73c4b80e0c32740bd642102f73b9f8be5bcdbadf6857e099|
+|tests/analyst_revisions_v2/test_r338_quarantine_input.py|17779|231d9a5a8441e65cd19e384c4b5801a7e6d39a2753dd1fce5aa9113d0d4ce14e|
+|tests/analyst_revisions_v2/test_r338_quarantine_materialization.py|22238|52c8a924ef8f6d9c46919e382b46a0d1da585c9f8aa602441bd9486ed6a9f623|
+
+Canonical component profile pins:
+
+|Profile|Bytes|SHA256|
+|---|---|---|
+|coverage|3221|5f1fa2505d4acf4fe99679f3f05c4743161dbec6612311aa35d00ec58202662d|
+|guard|1566|bc257b3773032e016152abdb6ae4090b7f88808a25d4ebd8954c6e49f8c5338e|
+|input|3564|e45b26f969a5c03904bf23a56e9ff2f22d28a0bce0c3559ac81f1283e994b80e|
+|materialization|10045|c85d706477df422c9d8713af8f3fa84ef4edfbfe151eb9aa0859c18d02f62833|
+
+### 338.4 D1 exact one-use local input/coverage/source preparation freeze
+
+Decision: after THIS committed clean exact freeze, invoke ONLY
+scripts/prepare_arv2_r338_quarantine.py launch ONCE with --expected-head equal
+to this freeze commit, caller57689B/
+1aff50fb499ba086e94d0862ab5cee198393c6fbe12a47fd654c55e19c26020f and
+--profile-sha2567b4361d844e9606d8c615fbf8ce67c37b296e261b2d3f92cefd62b936e4cb806
+(canonical caller profile20560B). Exact selected130source inventory16573B/
+f10312f7484afdbea164875c1320d509fa996f7f979aa553289152643a65b74a
+is literal in that source, with component profiles/file pins above.
+All must match; no actual-run pin refresh. Designated root/branch only,
+Darwin/POSIX Python3.13 at /Users/sheltonchen/.venvs/trading_agent-py313/bin/python,
+isolated -I -B and clean exact Git blob/self/HEAD/status preflight.
+
+NEW fixed control:
+artifacts/analyst_revisions_v2/quarantine/R338-20261104-A,
+NOT inspected/allocated before this freeze. Exclusive mkdir/fsync+claim and
+worker-start marker precede any retained/genuine source read. Existing,
+partial/unknown claim is spent/ambiguous, never safely unspent or repaired.
+Only after claim and marker, generate two independent private256bit nonces
+for coverage evidence and source-container transport; never publish them.
+Fixed source DATA are exactly338.2; genuine source directory is
+artifacts/analyst_revisions_v2/massive_ratings_delta/R297-20261013-D5/package/
+arv2-preliminary-qc-package-411c2734da61c7d4172c4cb3d and exact sibling
+arv2-october-lineage-e4518e06a68a18a3151fe36e5926699624fc68b97c31a8e06917d44103831fd9/lineage.json.
+Only authenticated activation-listed flat files may be consumed. No old
+claim/report/journal/control/capture/source assessment or operator is invoked.
+Native package allowlist is not permission for an unbounded artifact census.
+
+Parent900s, child840s; each pure coverage/materialization stage <=300s and
+never extends parent; validator30s; own-child kill/reap5s only. Startup,
+host suspension/uninterruptible IO remain qualifications. Public stdout bound
+131072B; private coverage64MiB/all2654048possible missingpairs maximum;
+private source bundle3MiB. Preclaim resource floors above, no resource limit
+or security setting changed. No source normalization, date/name retry,
+automatic fallback, grid fill, source repair or evidence cleanup. Genuine
+frozen compact library uses its own inroot ephemeral validation scratch;
+orchestration does not clean retained evidence.
+
+Normal success files ONLY claim.json, worker-started.json,
+prepared-sources-private.bin, coverage-private.json and report.json; optional
+finite failure file if applicable. Original output descriptors/full metadata/
+native security retained to output validation. All genuine/DATA/public-source
+guards must return normally BEFORE any derived private/report publication.
+Late failure may leave apparently complete files. ACTUAL parent0+child0 and
+strict original captured canonical stdout authentication are mandatory;
+report alone never accepts. Authenticated INCOMPLETE coverage still means
+source observation complete, not missing-data gate clearance.
+
+Native CHILD policy3719B/
+5162d60a1d6de11647d547557210934f5aeff7139f05d0cf6d36646db9deb7f9
+denies allnetwork, /Volumes, BOTH Keychains/securityCLI, unrelated artifacts
+and writes outside own control/parent or inroot support. Reads only exact two
+DATA leaves/metadata ancestry, exact genuine package subtree/lineage leaf and
+own control. The sanitized CODE-only parent is not an outer native sandbox.
+Selected held code pins are not whole-interpreter integrity. Network denial
+is not measured attempted-request accounting; no provider/QC function path
+exists in this new workflow.
+
+Root captures ORIGINAL finite parent stdout and externally observed actual
+exit/brackets in orchestration memory. Then ONE separate validate invocation,
+same exact HEAD/caller/profile and --actual-parent-exit equal to actual0or2,
+receives ONLY that stdout over stdin. It runs under native allnetwork and
+ALL-production-artifact/USB/BOTH-Keychain/securityCLI denial, with no control
+or DATA reread. Worker allowlist alone is not claimed to restrict validator
+DATA; the external ALL-artifact denial supplies that. Acceptance authenticates
+the self-consistent source/run-bound envelope, not independent market truth.
+The operator freeze, not stdin mode itself, makes this validation once-only.
+
+Any nonzero/unknown/malformed/trailing/noisy/timeout/partial outcome spends or
+ambiguously consumes this invocation; record the finite failure honestly and
+do not retry unchanged. No new operation occurs before exact clean freeze,
+selected pins and unchanged matching live remote94c2030d are rechecked.
+QC/Safari hold and all financial/source/readiness gates remain. This is NOT
+a strategy/QC attempt, return/efficacy look or new admitted result cell.
+Book338/259/54/699 unchanged. Actual result/handoff follow in338.5.

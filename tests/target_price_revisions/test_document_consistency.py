@@ -5869,8 +5869,9 @@ def _assert_section112_historical_hold_facts(text: str) -> None:
 
 
 SECTION116_NEXT_ROLE = (
-    "The next bounded action is owner-released QC preflight under fresh bounded source/HEAD/access/operation/attempt/look claims; "
-    "after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, "
+    "The next bounded action is owner-released QC preflight recovery, blocked on controllable genuine QC Mia input and verified same-session native RAW/SID recovery, "
+    "under fresh bounded source/HEAD/access/operation/attempt/look claims; after source, input and resource prerequisites pass, "
+    "Codex runs OFF then the remaining frozen arms serially, "
     "keeps the20REMXrows quarantined, skips Claude review, and makes exactly one final lane push."
 )
 SECTION116_RELEASE_SCOPE = (
@@ -5921,6 +5922,32 @@ def _assert_section116_current_facts(text: str) -> None:
     ):
         assert stale.casefold() not in folded, "contradictory current handoff: " + stale
     assert re.search(r"\b[1-9][0-9]*/5 accepted full-window results\b", folded) is None
+    _assert_section116_blocked_handoff_facts(text)
+
+
+def _assert_section116_blocked_handoff_facts(text: str) -> None:
+    """Completed ownership metadata is distinct from the unresolved native-input/Mia gates."""
+    folded = " ".join(text.replace("*", "").replace(chr(96), "").split()).casefold()
+    for required in (
+        r"ownership/collaborator\s+metadata\s+passed\s*5/5",
+        r"no\s+verified\s+mia\s+diagnosis\s+was\s+obtained\s+in\s+this\s+round",
+        r"(?:zero|0)\s+new\s+codex\s+financial\s+launches\s+occurred",
+        r"off\s*2021-02-10\s+same-session\s+native\s+raw/sid\s+input\s+remains\s+unresolved",
+        r"tpr100\s*8192\s*subscription\s+increase\s+is\s+rejected",
+    ):
+        assert re.search(required, folded) is not None, required
+    for contradiction in (
+        "a verified mia diagnosis was obtained in this round",
+        "off2021-02-10 same-session native raw/sid input is verified",
+        "tpr1008192subscription increase is accepted",
+        "ownership/collaborator metadata proves source custody and financial readiness",
+        "mia input control is available and verified",
+        "the native raw/sid blocker is resolved",
+    ):
+        assert contradiction not in folded, "contradictory blocked handoff: " + contradiction
+    assert re.search(r"(?<![0-9])[1-9][0-9]*\s*new\s+(?:codex\s+)?financial\s+launch(?:es)?\b",
+        folded) is None, "new financial launch claimed despite the blocked preflight"
+
 
 
 def _assert_section113_current_facts(text: str) -> None:
@@ -6877,6 +6904,8 @@ def test_section109_history_guard_refuses_retrospective_rewrite(monkeypatch) -> 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
 @pytest.mark.parametrize("before,after", (
     ("owner-released QC preflight", "automatic QC start whenever available"),
+    ("blocked on controllable genuine QC Mia input and verified same-session native RAW/SID recovery",
+     "ready without genuine QC Mia input or same-session native RAW/SID recovery"),
     ("after source, input and resource prerequisites pass", "before source, input and resource prerequisites pass"),
     ("OFF then the remaining frozen arms serially", "all frozen arms concurrently"),
     ("keeps the20REMXrows quarantined", "rounds the20REMXrows into financial inputs"),
@@ -7053,6 +7082,48 @@ def test_section113_current_repair_guard_refuses_false_complete_replacements(mon
     "Original rows are discarded.",
 ))
 def test_section113_current_repair_guard_refuses_appended_promotions(monkeypatch, surface, contradiction):
+    test_exact_next_step_names_the_current_artifacts()
+    _mutate_section112_current_surface(monkeypatch, surface,
+        lambda text: text + "\n" + contradiction + "\n")
+    with pytest.raises(AssertionError):
+        test_exact_next_step_names_the_current_artifacts()
+
+
+
+@pytest.mark.parametrize("surface", ("current", "preamble"))
+@pytest.mark.parametrize("pattern,replacement", (
+    (r"Ownership/collaborator\s+metadata\s+passed\s*5/5", "Ownership/collaborator metadata passed4/5"),
+    (r"No\s+verified\s+Mia\s+diagnosis\s+was\s+obtained\s+in\s+this\s+round",
+     "A verified Mia diagnosis was obtained in this round"),
+    (r"(?:Zero|0)\s+new\s+Codex\s+financial\s+launches\s+occurred",
+     "1 new Codex financial launch occurred"),
+    (r"OFF\s*2021-02-10\s+same-session\s+native\s+RAW/SID\s+input\s+remains\s+unresolved",
+     "OFF2021-02-10 same-session native RAW/SID input is verified"),
+    (r"TPR100\s*8192\s*subscription\s+increase\s+is\s+rejected",
+     "TPR1008192subscription increase is accepted"),
+))
+def test_section116_blocked_handoff_guard_refuses_concrete_fact_replacements(monkeypatch, surface, pattern, replacement):
+    test_exact_next_step_names_the_current_artifacts()
+    def mutate(text):
+        changed, count = re.subn(pattern, lambda _: replacement, text, count=1, flags=re.I)
+        assert count == 1
+        return changed
+    _mutate_section112_current_surface(monkeypatch, surface, mutate)
+    with pytest.raises(AssertionError):
+        test_exact_next_step_names_the_current_artifacts()
+
+
+@pytest.mark.parametrize("surface", ("current", "preamble"))
+@pytest.mark.parametrize("contradiction", (
+    "A verified Mia diagnosis was obtained in this round.",
+    "1 new Codex financial launch occurred.",
+    "OFF2021-02-10 same-session native RAW/SID input is verified.",
+    "The TPR1008192subscription increase is accepted.",
+    "Ownership/collaborator metadata proves source custody and financial readiness.",
+    "Mia input control is available and verified.",
+    "The native RAW/SID blocker is resolved.",
+))
+def test_section116_blocked_handoff_guard_refuses_appended_false_recovery(monkeypatch, surface, contradiction):
     test_exact_next_step_names_the_current_artifacts()
     _mutate_section112_current_surface(monkeypatch, surface,
         lambda text: text + "\n" + contradiction + "\n")

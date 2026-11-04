@@ -5,9 +5,7 @@ QC and Safari access are released for this bounded preflight and serialized back
 The owner directs QC preflight, then OFF and the remaining frozen arms when
 source, input and resource prerequisites pass. Keep the20REMXrows quarantined,
 skip Claude review and make exactly one final lane push. No additional routine
-review/owner checkpoint is introduced. No native effect in this round is
-claimed by this initial release note; actual effects are recorded under their
-own fresh bounded claims.
+review/owner checkpoint is introduced. Ownership/collaborator metadata passed5/5. No verified Mia diagnosis was obtained in this round. Zero new Codex financial launches occurred. OFF2021-02-10 same-session native RAW/SID input remains unresolved. The TPR1008192subscription increase is rejected.
 
 Section115's142file local build and290focused checks are retained. They prove
 local preparation only. Current cloud source/custody, native compilation,
@@ -35,7 +33,7 @@ owner release; every private read/processing and native effect needs fresh
 source/HEAD/owner/access/operation/attempt/look limits and fsynced durable claim.
 Former local-only hold hashes remain historical deferrals, not new authority.
 
-The next bounded action is owner-released QC preflight under fresh bounded source/HEAD/access/operation/attempt/look claims; after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, keeps the20REMXrows quarantined, skips Claude review, and makes exactly one final lane push.
+The next bounded action is owner-released QC preflight recovery, blocked on controllable genuine QC Mia input and verified same-session native RAW/SID recovery, under fresh bounded source/HEAD/access/operation/attempt/look claims; after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, keeps the20REMXrows quarantined, skips Claude review, and makes exactly one final lane push.
 
 **Retained published result, section107 (2026-10-29):** five separate lane-owned QC
 projects are created and source-verified; cleanup is complete with two older
@@ -88,7 +86,7 @@ owner-answer checkpoint is added by this factual blocked handoff.
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **SECTION116 QC PREFLIGHT AND SERIAL CONTINUATION AUTHORIZED;20REMXROWS REMAIN QUARANTINED; SKIP CLAUDE REVIEW; ONE FINAL PUSH. NATIVE SOURCE/INPUT/CAPACITY AND ACCOUNTING GATES REMAIN;0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
+Status: **SECTION116 QC PREFLIGHT CONCRETELY BLOCKED ON NATIVE INPUT/SOURCE RECOVERY AND CONTROLLABLE MIA INPUT;20REMXROWS REMAIN QUARANTINED; SKIP CLAUDE REVIEW; ONE FINAL PUSH. NATIVE SOURCE/INPUT/CAPACITY AND ACCOUNTING GATES REMAIN;0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
 in106 remains accepted after its document/current-routing correction.
 Historicalsection105 review/disposition/fullrange remains intact in105.
 
@@ -531,23 +529,24 @@ candidate has a separately pinned source epoch and is ineligible for that
 old route. No override flag or unreviewed Mia correction is admitted.
 
 Section115completed source/config/software verification and local artifact
-preparation; section116now proceeds to native preflight under the release. Original financial function ASTs,4096limit, frozen
+preparation; section116completed bounded readonly status/source/ownership preflight; native input/source/resource prerequisites remain blocked. Original financial function ASTs,4096limit, frozen
 dates/calendar/economics/inputs and six STOCK sleeves remain unchanged.
 No ordinary unheld/out-of-universe subscription pruning, stale/future marks,
 identity guess, missing-as-zero or financial acceptance is introduced.
 **0/5 accepted full-window results; all financial metrics NULL;
 financial acceptance remains FALSE.**
 
-The next bounded action is owner-released QC preflight under fresh bounded source/HEAD/access/operation/attempt/look claims; after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, keeps the20REMXrows quarantined, skips Claude review, and makes exactly one final lane push.
+The next bounded action is owner-released QC preflight recovery, blocked on controllable genuine QC Mia input and verified same-session native RAW/SID recovery, under fresh bounded source/HEAD/access/operation/attempt/look claims; after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, keeps the20REMXrows quarantined, skips Claude review, and makes exactly one final lane push.
 
-The last native TPR100 RuntimeError/4096observation,8distinct owner/Miajobs
-and paused heartbeat remain attributed toOctober30/section110. No current
-cloud state or availability is inferred. NativeSDK behavior, actual resource
+Ownership/collaborator metadata passed5/5. No verified Mia diagnosis was obtained in this round. Zero new Codex financial launches occurred. OFF2021-02-10 same-session native RAW/SID input remains unresolved. The TPR1008192subscription increase is rejected. The fresh100status isRuntimeError for
+21d48f35420052b3c20d2bf628b5a0ae. Nine current100jobs(7RuntimeError/2Completed)
+are observed metadata only, including distinct newunattributed08d15037a5eb8d1cc016dfd01ba0812b.
+The paused heartbeat was freshly verified; no new run is being monitored. NativeSDK behavior, actual resource
 capacity/relief, exact native RAW/SID/input correction, compiled-job source
 and complete accounting remain unverified. Supplied-source/fixture results
 do not grant PIT/rights/canonical/Windows ACL/signer or trading authority.
 Historical8deliberatefinancialjobs/8RuntimeErrors and all earlier looks remain
-separate from the8owner/Miajobs and this round's0financialruns.
+separate from the prior8owner/Miajobs, newunattributed ninthjob and this round's0financialruns.
 
 The latest owner permits bestjudgment/local work and waives routineClaude
 review; private custody, source rights and fresh per-effect claims remain.
@@ -32571,3 +32570,135 @@ unless genuine input/source recovery is verified. The20REMXrows remain
 quarantined and are not this six-STOCK-sleeve blocker.
 
 Root final pre-effect validation:167focused active-document checks/558deselected passed in2.92s, isolated49/52/syntheticDB and network denied; received sections9..115 remain exact. Final custody source/test pinned hashes and AST compilation passed; diff hygiene passed. The local implementation commit below precedes any new custody-native effect; no push occurs at this point.
+
+Fresh116outerclaim TPR-R116-CUSTODY-001; HEAD670f7cfd2cf7b13a8a6bde3f23aeab939cf82a2f; latestownerreleaseSHA8044d43a8446926ee9a7522966d04ce7f3e7f4b2617956c1af813d20ddf6660b; bounds{"native_endpoints": ["projects/read", "projects/collaboration/read"], "native_requests_max": 10, "native_seconds_each": 20, "private_output_bytes_max": 25165824, "processing": "ownership/collaborator metadata only; no metrics/source lease or capacity inference", "project_ids": [38609822, 38609834, 38609836, 38609837, 38609840], "registry": {"bytes": 3573, "reads_max": 1, "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, "response_bytes_each_max": 2097152, "source_closure": "all custody.REQUIRED_SOURCES included and committed at actual HEAD", "source_writes_compiles_backtests_cancels_account_effects": 0, "total_response_bytes_max": 20971520}; manifest6380B/SHAb6e9eaea86f9f65d9a2af1d661b3e6e5e147eb961520a48ea2fb0a29e0343d63 andrecordfsyncedBEFOREeffect. EA2Dcreationauthorityseparate;20REM Xrowsstayquarantined; nootherlane/broker/account/provider/canonicalauthority.
+
+Fresh116custody001 {"collaborator_projects_completed": [38609822, 38609834, 38609836, 38609837, 38609840], "financial_acceptance": false, "local_block_reason": null, "lock_cleanup_complete": true, "metadata_projects_completed": [38609822, 38609834, 38609836, 38609837, 38609840], "native_transport_calls_attempted": 10, "receipt": {"bytes": 7917, "name": "TPR-CUSTODY-20261103-R116-001.result.json", "sha256": "22e8323f189c8d3b19eb93ac2250478c963cd0f866985851f7bab7b92cc64128"}, "registered_custody_metadata_complete": true, "response_bytes": 11088, "source_custody_or_cloud_bytes_verified": false, "stages": [{"http_status": 200, "id": "0-metadata", "stage": "complete", "status": "succeeded"}, {"http_status": 200, "id": "0-collaborators", "stage": "complete", "status": "succeeded"}, {"http_status": 200, "id": "1-metadata", "stage": "complete", "status": "succeeded"}, {"http_status": 200, "id": "1-collaborators", "stage": "complete", "status": "succeeded"}, {"http_status": 200, "id": "2-metadata", "stage": "complete", "status": "succeeded"}, {"http_status": 200, "id": "2-collaborators", "stage": "complete", "status": "succeeded"}, {"http_status": 200, "id": "3-metadata", "stage": "complete", "status": "succeeded"}, {"http_status": 200, "id": "3-collaborators", "stage": "complete", "status": "succeeded"}, {"http_status": 200, "id": "4-metadata", "stage": "complete", "status": "succeeded"}, {"http_status": 200, "id": "4-collaborators", "stage": "complete", "status": "succeeded"}], "status": "completed"}; privateouterreceipt1385B/SHA2f77bf7854dfbac34f7757b89e28ccfff86a85cdec9cc4f0214fa54afe178bf2. Native metadata/collaboratorverificationonly; no sourcewrite/compile/backtest or financialacceptance.
+
+Fresh116outerclaim TPR-R116-POSTUI-001; HEAD670f7cfd2cf7b13a8a6bde3f23aeab939cf82a2f; latestownerreleaseSHA8044d43a8446926ee9a7522966d04ce7f3e7f4b2617956c1af813d20ddf6660b; bounds{"native_endpoints": ["files/read", "backtests/list"], "native_requests_max": 2, "native_response_total_max": 3145728, "native_seconds_each_max": 20, "private_registry_reads_max": 1, "processing": "source-inventory equality after unsuccessfulMiaUI input, IDs/status/completed only; candidate config/attempt is historical metadata lineage not new reservation", "project_id": 38609836, "registry_bytes": 3573, "returned_jobs_projection_bytes_max": 1048576, "returned_jobs_projection_reads_max": 1, "source_writes_compiles_jobs_or_financial_looks": 0}; manifest6257B/SHA0d9a601196b728a98204fa85e3f893ab2f6392018e8f0f85c689f4930b859bc3 andrecordfsyncedBEFOREeffect. EA2Dcreationauthorityseparate;20REM Xrowsstayquarantined; nootherlane/broker/account/provider/canonicalauthority.
+
+Fresh116postUI100source/job metadata {"financial_acceptance": false, "jobs": [{"backtest_id": "08d15037a5eb8d1cc016dfd01ba0812b", "completed": true, "financial_classification": "UNADMITTED_OBSERVED_METADATA", "status": "Completed."}, {"backtest_id": "21d48f35420052b3c20d2bf628b5a0ae", "completed": true, "financial_classification": "UNADMITTED_OBSERVED_METADATA", "status": "Runtime Error"}, {"backtest_id": "47c569ef9be3fdd5b2e2546dc8177458", "completed": true, "financial_classification": "UNADMITTED_OBSERVED_METADATA", "status": "Completed."}, {"backtest_id": "d0a57a99e5ef8c1ad36d602cbaaedcc1", "completed": true, "financial_classification": "UNADMITTED_OBSERVED_METADATA", "status": "Runtime Error"}, {"backtest_id": "234d605ebe38e8c92ef969de77e08add", "completed": true, "financial_classification": "UNADMITTED_OBSERVED_METADATA", "status": "Runtime Error"}, {"backtest_id": "cd16f76691f838f12624c994af3d4e6f", "completed": true, "financial_classification": "UNADMITTED_OBSERVED_METADATA", "status": "Runtime Error"}, {"backtest_id": "4330bbb0b9f3d696e477a48282d33ac3", "completed": true, "financial_classification": "UNADMITTED_OBSERVED_METADATA", "status": "Runtime Error"}, {"backtest_id": "7e58de31ac5fce86f1eff675435479a8", "completed": true, "financial_classification": "UNADMITTED_OBSERVED_METADATA", "status": "Runtime Error"}, {"backtest_id": "2191776f20175a29fadd1909fb9dda59", "completed": true, "financial_classification": "UNADMITTED_OBSERVED_METADATA", "status": "Runtime Error"}], "native_receipt": {"bytes": 4803, "name": "TPR-CMP29-API-R116-POSTUI-001.result.json", "sha256": "943903ae797f2ffb1750c328b8cf358dbcf402422962faa799d9c42c9216517c"}, "no_new_attempt": true, "request_status": "completed", "source_archive": {"bytes": 395439, "name": "TPR-CMP29-API-R116-POSTUI-001.source.response.raw", "sha256": "e29c0422edf693b43e78111a0aca9d90d77675333f63dc23764cd9b732cba846"}, "source_inventory_sha256": "ca34934adf2690addd8fd7ce1a9c21425d24a791d3880281e71e1d4b0d6d6c9e", "source_unchanged": true}; privateouterreceipt1889B/SHA6623ed6ecca1af9d916777c43119111779202329c7132fcd8a5b21a86cfc52dd. No performance/nativefinancialacceptance and no sourcewrite/compile/job request.
+
+Fresh116outerclaim TPR-R116-HEARTBEAT-VIEW-001; HEAD670f7cfd2cf7b13a8a6bde3f23aeab939cf82a2f; latestownerreleaseSHA8044d43a8446926ee9a7522966d04ce7f3e7f4b2617956c1af813d20ddf6660b; bounds{"QC_native_effects": 0, "app_tool": "automation_update mode=view", "automation_id": "target-price-qc-job-remaining-backtests", "mutations": 0, "purpose": "confirm existing heartbeat stays paused at concrete terminal/no-new-job handoff; do not create parallel controller", "reads_max": 1, "seconds_max": 60}; manifest6041B/SHA11d18b8746ae357429b8462cf3c3146a5a0450dbe129f63a7e35c0de399e4b9f andrecordfsyncedBEFOREeffect. EA2Dcreationauthorityseparate;20REM Xrowsstayquarantined; nootherlane/broker/account/provider/canonicalauthority.
+
+Fresh116outerclaim TPR-R116-HEARTBEAT-CARD-DISCOVERY-001; HEAD670f7cfd2cf7b13a8a6bde3f23aeab939cf82a2f; latestownerreleaseSHA8044d43a8446926ee9a7522966d04ce7f3e7f4b2617956c1af813d20ddf6660b; bounds{"automation_id": "target-price-qc-job-remaining-backtests", "browser_metadata_reads_max": 2, "mutations": 0, "purpose": "automation view rendered card only; inspect own automation control status without opening QC or other lane resources", "seconds_max": 60, "surface": "mcpapps", "ui_reads_max": 0}; manifest6054B/SHA6675b6cf31b091a0a78d00bb9ae79088e671bedd8e61ea519c41ef6bebd8aa21 andrecordfsyncedBEFOREeffect. EA2Dcreationauthorityseparate;20REM Xrowsstayquarantined; nootherlane/broker/account/provider/canonicalauthority.
+
+Fresh116outerclaim TPR-R116-HEARTBEAT-CONFIG-001; HEAD670f7cfd2cf7b13a8a6bde3f23aeab939cf82a2f; latestownerreleaseSHA8044d43a8446926ee9a7522966d04ce7f3e7f4b2617956c1af813d20ddf6660b; bounds{"QC_native_provider_UI_or_account_effects": 0, "path": "/Users/sheltonchen/.codex/automations/target-price-qc-job-remaining-backtests/automation.toml", "private_bytes_max": 65536, "private_reads_max": 1, "processing": "toml own existing heartbeat id/status only; no prompt output, no mutation", "purpose": "verify keep-paused terminal handoff because toolview provides no machine-readable status and card is inline-only", "seconds_max": 30}; manifest6179B/SHA84dc555a42b5f2dbb23253eb9ffcb38c4e810aeffa59bed76cfae52ad8714e42 andrecordfsyncedBEFOREeffect. EA2Dcreationauthorityseparate;20REM Xrowsstayquarantined; nootherlane/broker/account/provider/canonicalauthority.
+
+Fresh116sameheartbeatconfiguration {"config_bytes": 10701, "config_sha256": "a722e2d89adfb279f0505accdac1cb1778fada2587dfc169a45b892b003020e3", "id": "target-price-qc-job-remaining-backtests", "mutation": false, "no_new_job": true, "status": "PAUSED"}; privateproof206B/SHA524b7b333d36e5cf08da539e66e5a3982c374e07a7e372c8a42513e05327b98a. Appviewrenderedinlinecardonly andMCPAppslistwasempty; no newcontroller/automation or job created.
+
+### 116.5 Final factual preflight disposition and per-arm handoff
+
+Implementation670f7cfd2cf7b13a8a6bde3f23aeab939cf82a2f is local-only
+at this observation. Its final committed source closure was used for fresh
+custody operationTPR-CUSTODY-20261103-R116-001, after outerclaim001 and
+one fresh3573Bregistry read. All10genuine fixed TLS requests returnedHTTP200:
+projects/read and projects/collaboration/read for each registered project.
+Ownership/name/organization/collaborator/write metadata passed for5/5;
+no nonowner collaborator or sharing change was introduced. Responses total
+11088B. The shared API lock was acquired and its own lock removed normally;
+no actual contention occurred. No independent source lease/capacity/input/
+native-origin/financial acceptance is inferred.
+
+Native custody receipt7917B/SHA
+22e8323f189c8d3b19eb93ac2250478c963cd0f866985851f7bab7b92cc64128;
+sanitized outerreceipt1385B/SHA
+2f77bf7854dfbac34f7757b89e28ccfff86a85cdec9cc4f0214fa54afe178bf2.
+All source hashes were committed before this effect. The registry retains
+immutableEA2Dcreation authority; this owner's later release is recorded
+separately. No old create receipt or spent read scope was reused.
+
+Fresh post-UI operationTPR-R116-POSTUI-001 made exactly2readonly requests
+for100files/read and backtests/list plus a fresh registry read. The17file
+inventory remains exactlyca34934adf2690addd8fd7ce1a9c21425d24a791d3880281e71e1d4b0d6d6c9e;
+all9jobs remain terminal and no new job was observed. This verifies source
+inventory equality after the unsuccessful Mia input paths, not source or
+economic acceptance. Outerreceipt1889B/SHA
+6623ed6ecca1af9d916777c43119111779202329c7132fcd8a5b21a86cfc52dd.
+Every source file/notebook remains retained; no cloud restore/overwrite/
+generic mutation or financial relaunch was performed.
+
+This round deliberately dispatched23fixed-adapter readonly TLS requests:
+1exact-status+10source/job census+10custody+2post-UIsource/job. Browser-page
+automatic traffic is not counted as a fabricated fixed-adapter request.
+There were0deliberate source mutations,0deliberate native compile requests,
+0new backtest launches,0new financial attempt reservations and0accepted
+financial outcome looks. Observed external jobs retain their own distinct
+provenance, and all earlier failed/Completed history and spent claims remain.
+
+The same heartbeat target-price-qc-job-remaining-backtests remainsPAUSED,
+verified from one freshly claimed bounded exact local configuration read.
+The appview rendered an inline card without machine-readable status and its
+MCPApps tab inventory was empty; neither was treated as a status proof.
+Private status receipt206B/SHA
+524b7b333d36e5cf08da539e66e5a3982c374e07a7e372c8a42513e05327b98a.
+No monitor was created/rearmed because no new job exists.
+
+| Frozen arm | Protected project | Current bounded disposition | Accepted full-window metrics |
+|---|---|---|---|
+| OFF |38609822|Ownership/collaborators pass; two retained Completed diagnostics are not a financial run. Exact held SID2021-02-10nativeRAW input is unresolved; no unchanged relaunch.|NULL|
+|50%|38609834|Ownership/collaborators pass;0jobs. Remains queued after verified OFF recovery; native input/source/compile/resource preflight incomplete.|NULL|
+|100%|38609836|Ownership/collaborators pass;9terminal jobs(7RuntimeError/2Completed). Exact old job21d48f35420052b3c20d2bf628b5a0ae isRuntimeError; changed four-file/8192epoch and newCompleted08d15037a5eb8d1cc016dfd01ba0812b remain unadmitted.|NULL|
+|200%|38609837|Ownership/collaborators pass;0jobs. Remains queued in the frozen serialized sequence.|NULL|
+|PureTPR|38609840|Ownership/collaborators pass;0jobs. Remains queued in the frozen serialized sequence.|NULL|
+
+The100old-job identifier is the exact32hex value in the table and116.2;
+no attempt or look is added by the observed nine-job inventory. The0/5
+accepted full-window results and allNULLmetrics are honest limits, not
+zero returns. Independent native orders/fills/fees/cash/actions/NAV/
+exposure/clock and1449valuations/301weeklydecisions remain unproved.
+
+The concrete continuation blocker is verified native input/source recovery,
+with genuine Mia consultation unavailable through this control surface.
+Owner action, if continuing through this same surface, is to make genuine
+Mia input controllable or submit the read-only exact-job/nativeRAW diagnosis
+directly in QC. No renewed authorization or routine Claude checkpoint is
+requested. A verified correction must enter a newly reviewed fixed source-
+builder epoch with fresh full cloud-file/source comparison and native
+prerequisites; never an override,8192raise, stale/future mark or guessedSID.
+Then run OFF and remaining frozen arms serially with new actual native
+attempt/look claims and full accounting. Do not relaunch unchanged failures.
+
+The20REMXfractional rows and323pre-inception rows remain quarantined,
+originals and negative results retained. No USB/provider/280MBsignal packet,
+real operatorDB/stopflag, Windows signer/ACL, rights/PIT/canonical or
+broker/funded/paper/live/deploy/purchase/upgrade authority was consumed.
+Claude review was skipped as explicitly instructed. Exactly one successful
+nonforce final lane push remains to be made after final record/test/source/
+diff checks and actual remote recheck against83715aac39c7b452f2fdbff257cc74200324d4e9.
+The final record/document-guard commit follows670f7cfd; actual GitHEAD identifies the
+snapshot without a self-referential hash. Verify local/remote equality and
+clean status after that one push.
+
+Final root validation of the final blocked preflight current surfaces:
+193focused document checks/558deselected passed in3.27s independently,
+after193passed/558deselected in3.59s by the document-guard agent. The
+final guard file346232B/SHA
+28b7bfed9bc2b83e576dcd40c0feb4475c26871dcfd90aa2875c6abac2726abb
+retains release/serialization/quarantine/history guards and rejects false
+Mia/nativeRAW/8192/launch/readiness success claims. Together with root's
+40custody checks, final relevant coverage is233focused checks; no full lane
+or repository suite and no Claude review. Isolated49/52runtime+syntheticDB
+preceded imports, sockets/DNS were denied, and source/current surfaces
+remained stable during tests. All received historical sections9..115 and
+all private results remain retained. Actual Targetremote was rechecked equal
+to roundbase83715aac before final staging. Only this record and its
+document guards change after670f7cfd; custody implementation/tests remain
+exactly the committed verified bytes. Final diff/LF/added-secret-shape,
+history/source/AST checks and actual remote/clean verification accompany
+the one final nonforce matching-lane push.
+
+Fresh116outerclaim TPR-R116-MIA-IAB-FALLBACK-001; HEAD670f7cfd2cf7b13a8a6bde3f23aeab939cf82a2f; latestownerreleaseSHA8044d43a8446926ee9a7522966d04ce7f3e7f4b2617956c1af813d20ddf6660b; bounds{"browser": "iab", "credentials_auth_changes_permissions_source_writes_compiles_jobs_or_Mia_messages": 0, "initial_ui_reads_max": 1, "new_own_tabs_max": 1, "other_lane_tabs": 0, "purpose": "one alternate supported DOM-controllable own QC tab after Safari native message input unavailable; inspect existing authentication/Mia availability only", "seconds_max": 90, "url": "https://www.quantconnect.com/project/38609836"}; manifest6155B/SHA8149005cccf7041cf24a5df9d91cb307ef7ac0d3ac098c1dd1c14ce0b69041a3 andrecordfsyncedBEFOREeffect. EA2Dcreationauthorityseparate;20REM Xrowsstayquarantined; nootherlane/broker/account/provider/canonicalauthority.
+
+Final alternate control check: freshscopeTPR-R116-MIA-IAB-FALLBACK-001
+opened one own exact QC project URL in the supported in-app browser.
+Its initial UI explicitly reported not logged in/session expired and offered
+Sign In. No authenticated private source, Mia, credential, login submission,
+permission, compile or job effect was performed. This is a second concrete
+control limit, not a Mia diagnosis. No session/cookie/credential was copied
+from Safari. An authenticated controllable in-app QC session is an available
+owner recovery action; Safari's own QC session remains untouched after the
+recorded input-control failures. The temporary new in-app tab is not marked
+as a delivered result and closes normally with the turn. Fixed native TLS
+request counts, source inventory, financial counts and all current guards
+remain unchanged. Final public-doc review found no concrete inconsistency.

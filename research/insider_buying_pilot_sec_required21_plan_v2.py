@@ -8,11 +8,15 @@ Only new private controls use the separately qualified stable data receiver.
 from __future__ import annotations
 
 import argparse
+import ctypes
 import errno
 import json
 import os
 from pathlib import Path
 import re
+import selectors
+import signal
+import subprocess
 import sys
 import time
 import uuid
@@ -48,9 +52,12 @@ OWN_PATHS = (SELF_PATH, TEST_PATH,
 _raw, _sha = base._raw, base._sha
 _SHA = re.compile(r"[0-9a-f]{64}\Z")
 _CODES = frozenset({"arguments_refused", "identity_refused", "storage_unqualified", "native_refused",
-    "worker_refused", "input_refused", "chain_refused", "selection_refused", "output_refused", "cleanup_refused"})
-_PHASES = frozenset({"arguments", "identity", "health", "proof", "reservation", "plan", "readback", "final"})
+    "worker_refused", "input_refused", "chain_refused", "selection_refused", "output_refused", "cleanup_refused",
+    "activation_refused", "ready_refused", "parent_sandbox_refused"})
+_PHASES = frozenset({"arguments", "identity", "prepare", "parent_isolation", "health", "proof", "reservation", "plan", "readback", "final"})
 _NAMES = ("reservation.json", "storage-qualification.json", "observation-started.json", "plan.json", "complete.json")
+MAX_ACTIVATION, MAX_READY, MAX_STDERR = 256*1024, 4096, 4096
+_PARENT_SANDBOX_APPLIED = False
 
 
 class Required21PlanError(ValueError):
@@ -85,6 +92,9 @@ def registration(storage_receipt_sha256):
         "maximum_leaf_bytes": MAX_CONTROL, "maximum_epoch_bytes": MAX_EPOCH,
         "worker_seconds": WORKER_SECONDS, "maximum_planning_worker_invocations": 1,
         "diagnostic_worker_roles": ["source_identity", "health", "proof", "readback"],
+        "worker_activation_requires_explicit_frame": True,
+        "worker_prestart_before_parent_first_sandbox": True,
+        "parent_profile_application": "in_process_sandbox_init_once_no_nested_profiles",
         "old_campaign_refusal_preserved": True, "new_SEC_or_provider_requests_permitted": False,
         "no_original_admission_or_readiness_promotion": True, "authority": authority()}
 
@@ -96,7 +106,7 @@ def _current(identity):
         == {name: identity["source_sha256"][name] for name in OWN_PATHS}, "identity_refused")
 
 
-def _identity(head):
+def _loaded_identity(head):
     _need(Path(__file__).resolve() == LANE_ROOT/SELF_PATH and Path.cwd() == LANE_ROOT, "identity_refused")
     loaded_identity = storage._identity(head)
     own = base.custody._source_bytes(LANE_ROOT, OWN_PATHS)
@@ -105,9 +115,35 @@ def _identity(head):
     sources = {**loaded_identity["source_sha256"], **own}
     result = {**loaded_identity, "source_sha256": sources, "source_inventory_sha256": _sha(_raw(sources))}
     _current(result)
+    return result
+
+
+def _identity(head):
+    # These independent source-only children start before the controller's
+    # first sandbox. A sandboxed process cannot apply a nested Seatbelt profile.
+    _need(_PARENT_SANDBOX_APPLIED is False, "parent_sandbox_refused")
+    code = "import sys;sys.path.insert(0,"+repr(str(LANE_ROOT))+");from research import insider_buying_pilot_sec_required21_plan_v2 as m;m._source_identity_worker("+repr(head)+")"
+    command = ("/usr/bin/env", "-i", "PATH=/usr/bin:/bin:/usr/sbin:/sbin", "/usr/bin/sandbox-exec", "-p", _source_identity_policy(),
+        sys.executable, "-I", "-S", "-B", "-X", "pycache_prefix="+chain_source.producer.EMPTY_CACHE_PREFIX, "-c", code)
+    try: identity = storage.legacy.ipc._launch(command, b"", timeout=120)
+    except Exception: raise Required21PlanError("identity_refused") from None
     proof_identity = _proof_source_identity(head)
-    _proof_subset(proof_identity, result)
-    return result, proof_identity
+    _proof_subset(proof_identity, identity)
+    return identity, proof_identity
+
+
+def _source_identity_worker(head):
+    memory = None
+    try:
+        chain_source.producer.previous._isolated()
+        memory = chain_source.producer.previous._WorkerMemoryGuard()
+        _parent_native(memory)
+        value = _loaded_identity(head)
+        memory.check(); wire = _raw({"ok": True, "value": value})
+        _need(len(wire) <= MAX_CONTROL, "output_refused")
+        sys.stdout.buffer.write(wire+b"\n"); sys.stdout.buffer.flush(); memory.check()
+    finally:
+        if memory is not None: memory.close()
 
 
 def _proof_subset(proof_identity, identity):
@@ -133,6 +169,7 @@ def _proof_source_identity(head):
     # Source discovery includes loaded internal modules. A fresh interpreter
     # imports unchanged storage v2 alone so this proof keeps its own source
     # scope; the caller separately authenticates the complete planner union.
+    _need(_PARENT_SANDBOX_APPLIED is False, "parent_sandbox_refused")
     code = ("import sys;sys.path.insert(0,"+repr(str(LANE_ROOT))+");"
         "from research import insider_buying_pilot_fmp_eod_qualification_v2 as m;"
         "m.legacy.native._isolated();m.legacy.custody._effective_denial(require_fork=False);"
@@ -376,32 +413,57 @@ def _parent_native(memory):
     memory.check()
 
 
-def _worker(role, identity, supplied=None):
+def _perform(role, identity, supplied, memory):
+    _current(identity); memory.check()
+    _need(type(supplied) is dict, "input_refused")
+    if role == "health":
+        _need(supplied == {}, "input_refused")
+        value = {"passed": True, "source_only": True, "authority": authority()}
+    elif role == "proof":
+        _need(set(supplied) == {"proof_identity", "sha256"}, "input_refused")
+        _proof_subset(supplied["proof_identity"], identity)
+        value = storage._proof(supplied["proof_identity"], {"sha256": supplied["sha256"]}, memory)
+    elif role == "plan":
+        _need(supplied == {}, "input_refused")
+        value = _plan_actual(identity, memory)
+    elif role == "readback":
+        _need(set(supplied) == {"complete_sha256"}, "input_refused")
+        value = stable.read_epoch_controls(AUDIT_ID, list(_NAMES),
+            {"complete.json": {"bytes": None, "sha256": supplied["complete_sha256"]}}, memory=memory)
+    else: raise Required21PlanError("arguments_refused")
+    _current(identity); memory.check()
+    return value
+
+
+def _ready(role, identity):
+    _need(role in {"health", "proof", "plan", "readback"}, "arguments_refused")
+    return {"schema": SCHEMA+"/ready", "role": role, "identity_sha256": _sha(_raw(identity)),
+        "ready": True, "data_operations": 0}
+
+
+def _activation(raw, role, identity):
+    _need(type(raw) is bytes and 0 < len(raw) <= MAX_ACTIVATION and raw.endswith(b"\n"), "activation_refused")
+    try: value = base._decode(raw[:-1])
+    except Exception: raise Required21PlanError("activation_refused") from None
+    _need(set(value) == {"schema", "role", "identity_sha256", "payload"}
+        and value["schema"] == SCHEMA+"/activate" and value["role"] == role
+        and value["identity_sha256"] == _sha(_raw(identity)) and type(value["payload"]) is dict,
+        "activation_refused")
+    return json.loads(_raw(value["payload"]))
+
+
+def _prepared_worker(role, identity):
     memory = None
     try:
-        chain_source.producer.previous._isolated()
-        base._prove_isolation()
+        chain_source.producer.previous._isolated(); base._prove_isolation()
         memory = chain_source.producer.previous._WorkerMemoryGuard()
         _current(identity); memory.check()
-        _need(type(supplied) is dict, "input_refused")
-        if role == "health":
-            _need(supplied == {}, "input_refused")
-            value = {"passed": True, "source_only": True, "authority": authority()}
-        elif role == "proof":
-            # A separate unchanged 164-source identity qualifies the old probe.
-            _need(set(supplied) == {"proof_identity", "sha256"}, "input_refused")
-            _proof_subset(supplied["proof_identity"], identity)
-            value = storage._proof(supplied["proof_identity"], {"sha256": supplied["sha256"]}, memory)
-        elif role == "plan":
-            _need(supplied == {}, "input_refused")
-            value = _plan_actual(identity, memory)
-        elif role == "readback":
-            _need(set(supplied) == {"complete_sha256"}, "input_refused")
-            value = stable.read_epoch_controls(AUDIT_ID, list(_NAMES),
-                {"complete.json": {"bytes": None, "sha256": supplied["complete_sha256"]}}, memory=memory)
-        else: raise Required21PlanError("arguments_refused")
-        _current(identity); memory.check()
-        wire = {"passed": True, "value": value}
+        ready = _raw(_ready(role, identity))+b"\n"; _need(len(ready) <= MAX_READY, "ready_refused")
+        sys.stdout.buffer.write(ready); sys.stdout.buffer.flush(); memory.check()
+        # EOF is a refusal, never an implicit empty activation of a data role.
+        raw = sys.stdin.buffer.read(MAX_ACTIVATION+1)
+        supplied = _activation(raw, role, identity)
+        wire = {"passed": True, "value": _perform(role, identity, supplied, memory)}
     except Exception as error:
         code = str(error) if type(error) is Required21PlanError and str(error) in _CODES else "worker_refused"
         wire = {"passed": False, "code": code}
@@ -414,15 +476,147 @@ def _worker(role, identity, supplied=None):
         if memory is not None: memory.close()
 
 
-def _child(role, identity, supplied=None):
+def _command(role, identity):
     _need(role in {"health", "proof", "plan", "readback"}, "arguments_refused")
-    supplied = {} if supplied is None else supplied
-    code = "import sys,json;sys.path.insert(0,"+repr(str(LANE_ROOT))+");from research import insider_buying_pilot_sec_required21_plan_v2 as m;raw=sys.stdin.buffer.read(m.MAX_CONTROL+1);m._need(len(raw)<=m.MAX_CONTROL,'input_refused');m._worker("+repr(role)+",json.loads("+repr(_raw(identity).decode())+"),json.loads(raw.decode()))"
-    command = ("/usr/bin/env", "-i", "PATH=/usr/bin:/bin:/usr/sbin:/sbin", "/usr/bin/sandbox-exec", "-p", _policy(role),
+    code = "import sys,json;sys.path.insert(0,"+repr(str(LANE_ROOT))+");from research import insider_buying_pilot_sec_required21_plan_v2 as m;m._prepared_worker("+repr(role)+",json.loads("+repr(_raw(identity).decode())+"))"
+    return ("/usr/bin/env", "-i", "PATH=/usr/bin:/bin:/usr/sbin:/sbin", "/usr/bin/sandbox-exec", "-p", _policy(role),
         sys.executable, "-I", "-S", "-B", "-X", "pycache_prefix="+chain_source.producer.EMPTY_CACHE_PREFIX, "-c", code)
-    payload = _raw(supplied); _need(len(payload) <= MAX_CONTROL, "input_refused")
-    try: result = storage.legacy.ipc._launch(command, payload, timeout=WORKER_SECONDS if role == "plan" else 120)
-    except Exception: raise Required21PlanError("worker_refused") from None
+
+
+def _validate_ready(raw, role, identity):
+    _need(type(raw) is bytes and 0 < len(raw) <= MAX_READY and raw == _raw(_ready(role, identity))+b"\n", "ready_refused")
+
+
+class _PreparedWorker:
+    """Independently sandboxed fixed role, activated once after parent isolation."""
+    def __init__(self, role, identity):
+        self.role, self.identity = role, json.loads(_raw(identity))
+        self.activated, self.closed, self.process = False, False, None
+        _need(_PARENT_SANDBOX_APPLIED is False, "parent_sandbox_refused")
+        try:
+            self.process = subprocess.Popen(_command(role, identity), cwd=LANE_ROOT, stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
+            for stream in (self.process.stdin, self.process.stdout, self.process.stderr): os.set_blocking(stream.fileno(), False)
+            poll = selectors.DefaultSelector()
+            try:
+                poll.register(self.process.stdout, selectors.EVENT_READ, "out")
+                poll.register(self.process.stderr, selectors.EVENT_READ, "err")
+                out, errors, deadline = bytearray(), bytearray(), time.monotonic()+120
+                while b"\n" not in out:
+                    remaining = deadline-time.monotonic(); _need(remaining > 0, "ready_refused")
+                    events = poll.select(min(.2, remaining))
+                    for key, _ in events:
+                        cap = MAX_READY if key.data == "out" else MAX_STDERR
+                        target = out if key.data == "out" else errors
+                        try: chunk = os.read(key.fileobj.fileno(), min(65536, cap+1-len(target)))
+                        except BlockingIOError: continue
+                        _need(chunk and len(target)+len(chunk) <= cap, "ready_refused")
+                        target.extend(chunk)
+                        _need(not errors, "ready_refused")
+                _validate_ready(bytes(out), role, identity)
+            finally: poll.close()
+        except BaseException:
+            try: self.close()
+            except BaseException: pass
+            raise
+
+    def activate(self, supplied):
+        _need(not self.closed and not self.activated and type(supplied) is dict, "activation_refused")
+        self.activated = True  # A broken pipe consumes the prepared invocation.
+        frame = {"schema": SCHEMA+"/activate", "role": self.role,
+            "identity_sha256": _sha(_raw(self.identity)), "payload": supplied}
+        payload = _raw(frame)+b"\n"; _need(len(payload) <= MAX_ACTIVATION, "activation_refused")
+        process, poll = self.process, selectors.DefaultSelector()
+        out, errors, offset = bytearray(), bytearray(), 0
+        deadline = time.monotonic()+(WORKER_SECONDS if self.role == "plan" else 120)
+        try:
+            poll.register(process.stdin, selectors.EVENT_WRITE, "input")
+            poll.register(process.stdout, selectors.EVENT_READ, "out")
+            poll.register(process.stderr, selectors.EVENT_READ, "err")
+            while poll.get_map():
+                remaining = deadline-time.monotonic(); _need(remaining > 0, "worker_refused")
+                for key, _ in poll.select(min(.2, remaining)):
+                    if key.data == "input":
+                        try: count = os.write(key.fileobj.fileno(), memoryview(payload)[offset:offset+65536])
+                        except BlockingIOError: continue
+                        _need(type(count) is int and count > 0, "worker_refused"); offset += count
+                        if offset == len(payload): poll.unregister(key.fileobj); key.fileobj.close()
+                    else:
+                        target, cap = (out, MAX_CONTROL+1) if key.data == "out" else (errors, MAX_STDERR)
+                        try: chunk = os.read(key.fileobj.fileno(), min(65536, cap+1-len(target)))
+                        except BlockingIOError: continue
+                        if not chunk: poll.unregister(key.fileobj); continue
+                        target.extend(chunk); _need(len(target) <= cap, "worker_refused")
+            _need(offset == len(payload), "worker_refused")
+            remaining = deadline-time.monotonic(); _need(remaining > 0, "worker_refused")
+            code = process.wait(timeout=remaining)
+            _need(len(out) <= MAX_CONTROL+1 and len(errors) <= MAX_STDERR, "worker_refused")
+            return storage.legacy.ipc._ipc_result(bytes(out), bytes(errors), code)
+        except Exception: raise Required21PlanError("worker_refused") from None
+        finally: poll.close()
+
+    def close(self):
+        if self.closed: return
+        self.closed, failed = True, False
+        process = self.process
+        if process is None: return
+        if process.poll() is None:
+            try: os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError: pass
+            except BaseException: failed = True
+        try: process.wait(timeout=5)
+        except BaseException: failed = True
+        for stream in (process.stdout, process.stderr):
+            if stream is not None and not stream.closed:
+                remaining = MAX_CONTROL+1 if stream is process.stdout else MAX_STDERR+1
+                try:
+                    while remaining > 0:
+                        chunk = os.read(stream.fileno(), min(65536, remaining))
+                        if not chunk: break
+                        remaining -= len(chunk)
+                except (BlockingIOError, OSError): pass
+        for stream in (process.stdin, process.stdout, process.stderr):
+            if stream is not None:
+                try: stream.close()
+                except BaseException: failed = True
+        _need(not failed, "cleanup_refused")
+
+
+def _prepare_workers(identity):
+    workers = {}
+    try:
+        for role in ("health", "proof", "plan", "readback"): workers[role] = _PreparedWorker(role, identity)
+        return workers
+    except BaseException:
+        base.selector._close_all(tuple(reversed(tuple(workers.values()))), phase="prepared_worker_partial_cleanup")
+        raise
+
+
+def _sandbox_apply(policy):
+    library = ctypes.CDLL("/usr/lib/libsandbox.1.dylib", use_errno=True)
+    call = library.sandbox_init
+    call.argtypes = [ctypes.c_char_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_char_p)]
+    call.restype = ctypes.c_int
+    error = ctypes.c_char_p()
+    result = call(policy.encode(), 0, ctypes.byref(error))
+    if error.value:
+        release = library.sandbox_free_error; release.argtypes = [ctypes.c_void_p]; release.restype = None
+        release(ctypes.cast(error, ctypes.c_void_p))
+    _need(result == 0, "parent_sandbox_refused")
+
+
+def _apply_parent_policy():
+    global _PARENT_SANDBOX_APPLIED
+    _need(_PARENT_SANDBOX_APPLIED is False, "parent_sandbox_refused")
+    _PARENT_SANDBOX_APPLIED = True
+    _sandbox_apply(parent_native_policy())
+
+
+def _child(role, identity, supplied=None, *, workers=None):
+    _need(role in {"health", "proof", "plan", "readback"}, "arguments_refused")
+    _need(type(workers) is dict and set(workers) == {"health", "proof", "plan", "readback"}
+        and type(workers[role]) is _PreparedWorker and _raw(workers[role].identity) == _raw(identity), "worker_refused")
+    result = workers[role].activate({} if supplied is None else supplied)
     _need(type(result) is dict and type(result.get("passed")) is bool, "worker_refused")
     if result["passed"] is not True:
         _need(set(result) == {"passed", "code"} and result["code"] in _CODES, "worker_refused")
@@ -452,19 +646,20 @@ def run_invented(epoch, result):
 
 
 def run_actual(expected_head, storage_receipt_sha256):
-    phase, context, memory = "identity", None, None
+    phase, context, memory, workers = "identity", None, None, {}
     answer = {"passed": False, "phase": phase, "code": "worker_refused"}
     began = time.monotonic_ns()
     try:
         _need(storage_receipt_sha256 == STORAGE_RECEIPT_SHA256, "storage_unqualified")
-        memory = chain_source.producer.previous._WorkerMemoryGuard()
-        _parent_native(memory)
         identity, proof_identity = _identity(expected_head)
+        memory = chain_source.producer.previous._WorkerMemoryGuard()
+        phase = "prepare"; workers = _prepare_workers(identity)
+        phase = "parent_isolation"; _apply_parent_policy(); _parent_native(memory)
         stable.production_parent_current(identity)
-        phase = "health"; health = _child("health", identity)
+        phase = "health"; health = _child("health", identity, workers=workers)
         _need(health == {"passed": True, "source_only": True, "authority": authority()}, "native_refused")
         phase = "proof"; proof = _child("proof", identity,
-            {"proof_identity": proof_identity, "sha256": storage_receipt_sha256})
+            {"proof_identity": proof_identity, "sha256": storage_receipt_sha256}, workers=workers)
         _need(proof["passed"] is True and proof["fixture_only"] is False
             and proof["receipt_sha256"] == storage_receipt_sha256
             and proof["qualification_head"] == expected_head
@@ -477,10 +672,10 @@ def run_actual(expected_head, storage_receipt_sha256):
             "execution_identity": identity, "registration_sha256": _sha(_raw(context.registration)),
             "storage_qualification_sha256": context.pins["storage-qualification.json"]["sha256"],
             "maximum_planning_worker_invocations": 1, "started_monotonic_ns": time.monotonic_ns(), "authority": authority()})
-        phase = "plan"; result = _validate_result(_child("plan", identity), identity)
+        phase = "plan"; result = _validate_result(_child("plan", identity, workers=workers), identity)
         context.check(); _need(context.storage_identity == proof["storage_identity"], "storage_unqualified")
         complete_pin = _publish(context, result)
-        phase = "readback"; back = _child("readback", identity, {"complete_sha256": complete_pin})
+        phase = "readback"; back = _child("readback", identity, {"complete_sha256": complete_pin}, workers=workers)
         _need(set(back) == {"schema", "audit_id", "controls", "pins", "storage_identity"}
             and back["schema"] == stable.SCHEMA+"/readback" and back["audit_id"] == AUDIT_ID
             and set(back["controls"]) == set(_NAMES)
@@ -503,7 +698,38 @@ def run_actual(expected_head, storage_receipt_sha256):
             answer = {"passed": False, "phase": phase,
                 "code": str(error) if type(error) is Required21PlanError and str(error) in _CODES else "worker_refused"}
     finally:
-        try: base.selector._close_all((context, memory), phase="required21_parent_cleanup")
+        try: base.selector._close_all((context, *reversed(tuple(workers.values())), memory), phase="required21_parent_cleanup")
+        except BaseException:
+            if answer["passed"]: answer = {"passed": False, "phase": "final", "code": "cleanup_refused"}
+    return answer
+
+
+def preflight_actual(expected_head):
+    """Source-only native pipeline; no data-role activation or data namespace.
+
+    This consumes only this process's prepared workers. It cannot be followed
+    by run_actual in the same process because the first parent profile is final.
+    """
+    workers, memory, phase = {}, None, "identity"
+    answer = {"passed": False, "phase": phase, "code": "worker_refused"}
+    try:
+        identity, proof_identity = _identity(expected_head)
+        memory = chain_source.producer.previous._WorkerMemoryGuard()
+        phase = "prepare"; workers = _prepare_workers(identity)
+        phase = "parent_isolation"; _apply_parent_policy(); _parent_native(memory)
+        stable.production_parent_current(identity)
+        phase = "health"; health = _child("health", identity, workers=workers)
+        _need(health == {"passed": True, "source_only": True, "authority": authority()}, "native_refused")
+        memory.check(); stable.production_parent_current(identity)
+        answer = {"passed": True, "source_only": True, "planner_source_files": len(identity["source_sha256"]),
+            "proof_source_files": len(proof_identity["source_sha256"]), "strict_roles_prepared": 4,
+            "health_activations": 1, "data_role_activations": 0, "data_namespaces_created": 0,
+            "native_parent_applied_once": True, "authority": authority()}
+    except Exception as error:
+        answer = {"passed": False, "phase": phase,
+            "code": str(error) if type(error) is Required21PlanError and str(error) in _CODES else "worker_refused"}
+    finally:
+        try: base.selector._close_all((*reversed(tuple(workers.values())), memory), phase="required21_preflight_cleanup")
         except BaseException:
             if answer["passed"]: answer = {"passed": False, "phase": "final", "code": "cleanup_refused"}
     return answer
@@ -513,8 +739,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--expected-head", required=True)
     parser.add_argument("--storage-receipt-sha256", required=True)
+    parser.add_argument("--source-only-preflight", action="store_true")
     args = parser.parse_args()
-    result = run_actual(args.expected_head, args.storage_receipt_sha256)
+    result = preflight_actual(args.expected_head) if args.source_only_preflight else run_actual(args.expected_head, args.storage_receipt_sha256)
     print(_raw(result).decode())
     return 0 if result["passed"] else 2
 

@@ -1,15 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **366 REGISTERS FRESH DATA-ONLY CUSTODY UNDER LIBRARY/APPLICATION
-SUPPORT, WITH HARD REPOSITORY IDENTITY UNCHANGED. THREE FAILED364–365 CLAIMS
-ARE PRESERVED.462 FOCUSED CHECKS QUALIFY CODE ONLY; A GENUINE70-SECOND
-POST-PUBLICATION STORAGE PROOF MUST PASS BEFORE ANY PROVIDER CREDENTIAL
-READ/GET. FMP/EODHD API COVERAGE REMAINS UNVERIFIED AT THIS PROSPECTIVE POINT.
-SUBSCRIPTIONS REMAIN ACTIVE; CANCELLED RENEWAL IS NOT EXPIRED ACCESS.
-CURRENT MAPPINGS/NAIVE ACCEPTANCE ARE NOT HISTORICAL IDENTITY/PUBLIC-KNOWN-BY.
-FIFTEEN P2s AND THE HISTORICAL SOURCE/PIT/POPULATION FACTUAL GATES REMAIN
-OPEN. USB QUALIFICATION360–361 REMAINS COMPLETE AT ITS CANDIDATE SCOPE.
-NO QC/SAFARI, PURCHASE, UPGRADE, VENDOR REPLY OR MONITOR REARM THIS ROUND.**
+Status: **366 ACCEPTS THE NEW PRIVATE CUSTODY ROUTE AFTER AUTHENTICATED
+STORAGE PROOF AND637-SECOND OBSERVED API AUDIT. FAILED364–365 CLAIMS AND
+THE FAILED PROBE CLI ARE PRESERVED. FMP SEC CORROBORATES12 RETAINED
+CONTROLS; EODHD SUPPLIES CURRENT MAPPINGS FOR12. FMP INSIDER DATE SCOPE
+IS REFUSED, WITH4 REQUESTS UNATTEMPTED. CURRENT MAPPINGS/NAIVE ACCEPTANCE
+ARE NOT HISTORICAL IDENTITY/PUBLIC-KNOWN-BY.367'S PROTECTED CHAINED
+REQUIRED21 PLANNER IS IN IMPLEMENTATION; ITS SOURCE-ONLY PREFLIGHT FOUND
+A NESTED MACOS SANDBOX REFUSAL BEFORE ANY DATA NAMESPACE OR FULL25 RUN.
+THE LAUNCH CORRECTION RETAINS ALL NATIVE GATES. FIFTEEN CARRIED P2s,
+THE NEW NATIVE FINDING PENDING CORRECTION, AND HISTORICAL SOURCE/PIT/
+POPULATION FACTUAL GATES REMAIN OPEN. SUBSCRIPTIONS REMAIN ACTIVE;
+CANCELLED RENEWAL IS NOT EXPIRED ACCESS. NO QC/SAFARI, PURCHASE, UPGRADE,
+VENDOR REPLY OR MONITOR REARM THIS ROUND.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -43962,3 +43965,106 @@ actual source execution or factual readiness. After a clean qualified commit,
 run source-only native identity/health preflight BEFORE creating any new
 namespace, then at most ONE registered full25 retained-input observation.
 At this point no new planner claim or actual retained source read occurred.
+
+### 367.4 Source-only platform refusal and revised launch architecture
+
+Implementation `b851c3b39d14cbb425110fa684be0b74e50d1b68` existed clean
+BEFORE source-only preflight. It refused identity after7.655511s, exit2/
+stderr0. Granular source-only diagnostics then passed the loaded165-source
+identity and explicit174-source union/current check, but the fresh storage
+bootstrap refused. The bounded child had exit71, stdout0/stderr53 bytes.
+An independent minimal nested-sandbox canary matched EXACT system error
+`sandbox-exec: sandbox_apply: Operation not permitted`, exit71, in0.699194s.
+These controls created no planner namespace, invoked no full25 planner,
+read no retained dataset rows/bodies or credentials and made no source call.
+An intermediate diagnostic-generator syntax error occurred before any child
+or I/O and is excluded from execution evidence. No map/keyset/storage guard
+was relaxed and no failed source operation was retried.
+
+**IBPLAN-NATIVE36702, P2, confirmed:** macOS rejects installing another
+Seatbelt profile inside an already sandboxed process. The fresh identity
+and later role launches used nested sandbox-exec. Git permissions/source
+closure were not this observed refusal's cause. The same platform behavior
+is independently reported in the runtime maintainer's primary issue:
+https://github.com/anthropics/sandbox-runtime/issues/67 . Our actual native
+canary supplies the host evidence; the issue is not substituted for a run.
+
+**IBDEC-367-02:** correct ONLY this new runner's launch architecture. A
+source-only bootstrap prepares fixed role workers under their independent
+native profiles before the controller enters its own profile once through
+the native sandbox_init API. Source/Git identities may be derived during
+bootstrap, with no dataset/credential/provider operation. Before any data
+activation or new epoch, the controller proves effective process-tree network,
+security and outside-epoch write denial; workers retain their stronger
+network/fork/all-write/security restrictions and live guards. Do not weaken
+guards, run an unsandboxed data stage or attempt another nested installation.
+
+Each prepared worker requires an exact typed activation envelope bound to
+role/head/source identity. EOF, malformed input and cleanup are NOT an empty
+payload authorizing plan execution. Each role can activate once, claimed
+before the first write; errors/timeouts cannot trigger a second exchange.
+Bound every input/output/error stream and deadline, retain the unchanged IPC
+decoder, drain/terminate unused own process groups and preserve primary
+failures. No worker activation substitutes for the durable observation-start
+before the ONE actual full25 planning call. Native guards remain through
+serialization/stdout/final sample. Old source frontends/planners/claims and
+all frozen bytes stay unchanged.
+
+Attributed minimal native architecture canary PASS on the exact qualified
+Python3.13 path in1.230013458s, child exit0/stdout135/stderr0. The independently
+sandboxed child proved network/fork/all-write/security denial before readiness;
+the parent then installed its own profile once, proved its native denials,
+activated the child explicitly and decoded its reply through the unchanged
+IPC. Both used real guards/final samples; source/credential reads0, no data
+namespace. A preceding same-base /opt/homebrew3.13 canary passed1.355844084s;
+the first Apple3.9 harness failed at typing.TypeAlias import before any child,
+temporary root, sandbox or data I/O. These are platform controls, not an actual
+planner run or acceptance of refactored code. Revised code/tests must be
+qualified and committed, then source-only preflight must pass before any
+retained-input observation. The registered planner epoch remains UNUSED.
+
+### 367.5 Prepared-worker correction qualified before new preflight
+
+Corrected runner45,996 bytes/SHA-256
+`5ab04e06c6e3bc1bbd08d345d5ef2940719653c90557c25e89914582055d98d8`;
+test45,326 bytes/SHA-256
+`c22ecb4e8d60ed0d74eb1c606b8d2481244decbdc18851f06a3c9e5e0253c0d8`.
+Source-only identity workers are independently native-restricted, including
+their Git/metadata-only profile and live guards. The trusted bootstrap only
+orchestrates those source-code checks and fixed workers; no dataset or secret
+is consumed before controller self-isolation. All four data-role workers
+prove their stricter native/source/memory controls before canonical READY.
+The controller then installs/proves its own profile once. No subsequent
+sandbox-exec is used by the data controller; communication uses held pipes.
+
+Activation is canonical, newline-terminated, bounded256KiB and bound to fixed
+role+identity digest. EOF/extra line/unknown key/duplicate key/wrong role or
+identity cannot execute a data role. A failed first pipe write still consumes
+that role's activation. Output2MiB/error4KiB bounds, READY120s, activated
+plan900s/other120s deadlines, own process groups and bounded kill/wait/drain
+cleanup apply. Unused roles are killed/drained, not activated by cleanup.
+The historical decoder, exact storage-proof pins, full25 factories,20,052
+chain, required21/max8 and all false dispatch/admission/readiness flags remain
+unchanged. The wrapper-control and pure selection SHA names stay distinct.
+
+Main232 relevant focused checks PASS19.62s,3 expected deprecated-fork
+warnings, no skips; main129 boundary/document/import checks PASS6.94s.
+32 relevant images compile and four frozen custody images independently
+equal historical Git bytes. Attributed agent107 checks (106new +EXACT package
+guard) PASS6.60s; same3 warnings, compile/diff/source-test stability PASS.
+No complete lane/repository suite. Tests preserve original full25/20,052
+fixture/capacity/reconstruction evidence and add explicit READY/activation,
+EOF-before-perform, one-use/broken-pipe, caps/deadlines, partial preparation,
+unused worker cleanup, parent apply/prove ordering and no later Popen paths.
+The actual prepared entry's EOF refusal was executed under real isolation
+and guard; it emitted activation_refused after READY and never performed data.
+
+Independent source-only QA on exact5ab04e06 found no remaining confirmed
+blocker. It is advisory, not Claude review or an actual source run. Source-only
+preflight is a separate process that prepares four strict roles, activates
+ONLY health, proves parent restrictions and creates no data namespace. Its
+unused data roles are terminated/drained. A subsequent actual observation
+uses a NEW process because controller sandbox installation is final. This
+does not create a second plan namespace or second full25 budget. The original
+source-only refusal stays recorded; IBPLAN-NATIVE36702 remains pending actual
+qualified host evidence. Commit this correction clean before either stage.

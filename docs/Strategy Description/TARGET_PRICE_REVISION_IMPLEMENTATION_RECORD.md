@@ -1,26 +1,32 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Section 117 (2026-11-03) is the Claude review of the fifteen Codex commits after
-section 108:** the section-109 counter-review, the section-110 terminal TPR100 handoff, the
-section-111 USB assessment, the section-112 offline build, the section-113 and 114 REMX
-repair rounds, the section-115 prebacktest capsule and the section-116 owner-released QC
-preflight. QC and Safari access are released for this bounded preflight and serialized backtest continuation.
-The owner directs QC preflight, then OFF and the remaining frozen arms when
-source, input and resource prerequisites pass, with the 20 REMX rows left quarantined and
-Claude review treated as a skipped progress stop; the owner separately asked Claude, in the Claude chat,
-to review every unreviewed commit after each push. Ownership/collaborator metadata passed5/5. No verified Mia diagnosis was obtained in this round. Zero new Codex financial launches occurred. OFF2021-02-10 same-session native RAW/SID input remains unresolved. The TPR1008192subscription increase is rejected.
+**Current section118 owner-signed-in Mia continuation (2026-11-04):**
+QC and Safari access are released for this bounded preflight and serialized backtest continuation.
+The owner directs genuine built-in QC Mia to resolve OFF, then OFF and the
+remaining frozen arms when verified prerequisites pass; keep the20REMXrows
+quarantined, skip Claude review and make one final lane push when done.
+Authentication is a required input, not renewed task permission.
+The frozen same-session native RAW/SID policy is unchanged.
 
-Section 117 accepts all fifteen commits, four after correction: two offline command entry
-points swallowed an operator interrupt into a refusal, two spent-action tests accepted
-any exception, the REMX repair's row-partition invariant had no test, and the zero-quantity
-boundary of the subscription-recovery helper was undocumented. Three P2 design points are
-documented for Codex and the owner (`TPR-CR34-001` to `-003`): the QC hold was a deny-list of
-instruction hashes rather than an unconditional refusal while it stood (no request was made
-under it), the older prepare command sits outside the capsule's pinned closure, and the
-recovery helper's zero check refuses floats, so its release path depends on the native type.
+The tool-visible in-app QC session reported expired and its normal sign-in
+flow reached a chooser with two saved Google accounts. The own tab is shown
+and retained for the owner's account choice/sign-in; no account is guessed.
+Mia work depends on completing that authentication. No new credential,
+permission, source edit, compile or financial backtest was submitted.
+Fresh OFF source/job metadata shows unchanged diagnostic source and two
+Completed diagnostics, no active OFF run. These are not financial results.
+The17focused incoming-source checks passed under isolated runtime/DB and
+network denial. This is an interim local snapshot; the same round's sole
+final push remains reserved while required authentication is pending.
+
+Codex counter-reviewed the two incoming commits in `432205ad..3cf9636e`;
+dc9c67ad isaccepted and3cf9636e isacceptedafter the factual qualifications
+in118.1. Section117's fifteen-commit review and prior checks remain history,
+not a new routine Claude progress stop. No frozen builder, source pin or
+strategy economics changed by those local CLI corrections.
 **0/5 accepted full-window results; all financial metrics NULL;
-financial acceptance remains FALSE.** All historical failed/Completed jobs,
-source drift and distinct attempts/looks remain retained and unreset.
+financial acceptance remains FALSE.** Prior failed/Completed results and
+every attempt/look/reservation remain retained and unreset.
 
 The exact REMX diagnostic source has4339rows. The323pre-inception rows have
 unknown instrument identity. The local repair preserves original source bytes;
@@ -33,14 +39,14 @@ same-session marks or original overwrite is accepted. These diagnostic rows
 are unadmitted and are not substituted for the frozen six STOCK sleeves.
 The REMX gap is not a prerequisite for assembling those frozen source trees.
 
-The last accepted Claude counter-review remains section 109's review of section 108.
+The current incoming-source counter-review is118.1; section109's review of108 remains retained history.
 The waiver continues; source/economic validation remains required.
 The registry's immutable EA2Dcreation authority is separate from the latest
 owner release; every private read/processing and native effect needs fresh
 source/HEAD/owner/access/operation/attempt/look limits and fsynced durable claim.
 Former local-only hold hashes remain historical deferrals, not new authority.
 
-Codex next counter-reviews section 117 and this round's Claude commits; the owner-released QC preflight recovery continues, blocked on controllable genuine QC Mia input and verified same-session native RAW/SID recovery, under fresh bounded source/HEAD/access/operation/attempt/look claims; after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, keeps the20REMXrows quarantined, skips Claude review as a progress stop, and makes exactly one final lane push.
+The next bounded action is genuine QC Mia diagnosis in protected OFF project38609822 after the owner completes authentication in the tool-visible in-app tab, under fresh bounded source/HEAD/access/operation/attempt/look claims; verified source/input/resource recovery then permits OFF and the remaining frozen arms serially, while the20REMXrows remain quarantined, Claude review is skipped, and exactly one final lane push is reserved for the completed or concrete-blocked round.
 
 **Retained published result, section107 (2026-10-29):** five separate lane-owned QC
 projects are created and source-verified; cleanup is complete with two older
@@ -93,14 +99,7 @@ owner-answer checkpoint is added by this factual blocked handoff.
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
-`e2dac576..432205ad` IN SECTION 117: THE SECTION-109 COUNTER-REVIEW, THE
-SECTION-110 TERMINAL HANDOFF, THE USB, OFFLINE-BUILD, REMX AND PREBACKTEST ROUNDS
-AND THE SECTION-116 QC PREFLIGHT. CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION
-(TWO COMMAND ENTRY POINTS AND FOUR TESTS; NO FROZEN SOURCE CHANGED). THE PREFLIGHT
-IS CONCRETELY BLOCKED ON NATIVE INPUT/SOURCE RECOVERY AND CONTROLLABLE MIA INPUT;
-20REMXROWS REMAIN QUARANTINED; 0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL
-METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
+Status: **SECTION118 OWNER-AUTHORIZED GENUINE MIA/OFF CONTINUATION; TOOL-VISIBLE AUTHENTICATION PENDING;20REMXROWS QUARANTINED; SKIP CLAUDE REVIEW; SOLE FINAL PUSH RESERVED. NATIVE INPUT/SOURCE/RESOURCE AND ACCOUNTING PREREQUISITES REMAIN;0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
 in106 remains accepted after its document/current-routing correction.
 Historicalsection105 review/disposition/fullrange remains intact in105.
 
@@ -494,8 +493,11 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, owner-released QC preflight and serialized backtests (section116):**
+**Current qualification, owner-signed-in genuine Mia/OFF continuation (section118):**
 QC and Safari access are released for this bounded preflight and serialized backtest continuation.
+Authentication is a required input, not renewed task permission.
+The frozen same-session native RAW/SID policy is unchanged.
+
 Every private read/processing and native effect needs a fresh bounded
 source/HEAD/access/operation/attempt/look manifest and fsynced durable claim.
 Cloud source/custody, native compilation, capacity and exact native inputs
@@ -534,12 +536,13 @@ no admitted USB price input and does not change financial/economic source
 epochs. Known REMX gaps do not justify blocking unrelated local source
 preparation or silently changing a frozen financial comparison.
 
-Claude has independently reviewed the exact range
-`e2dac57607cf4ae068051a85dd2f0fa5f2f35a57..432205ad90741db3840abdedf016f4c17fabbf88`:
-fifteen Codex commits carrying sections 109 to 116. Section 117 accepts them all,
-four after correction, and documents three P2 design points; no frozen source,
-receipt or economics changed. Section 109 counter-reviewed section 108 (one Claude
-commit, accepted after the section109 current-record correction). CR33-007 is verified and future legacy cleanup retired.
+Codex has independently counter-reviewed the exact incoming Claude range
+`432205ad90741db3840abdedf016f4c17fabbf88..3cf9636ee523833d6dc7eacd866c37e5157ec258`:
+dc9c67ad isaccepted;3cf9636e isacceptedafter current-record qualifications
+in118.1. The CLI interruption corrections preserve frozen/native sources.
+Historical117 reviewed fifteen Codex commits; its old range and exact
+per-commit dispositions remain in117. CR33-007 stays verified and legacy
+cleanup retired; no new cleanup is authorized.
 CR33-008 is closed for the preserved frozen-financial route; the new resource
 candidate has a separately pinned source epoch and is ineligible for that
 old route. No override flag or unreviewed Mia correction is admitted.
@@ -552,23 +555,28 @@ identity guess, missing-as-zero or financial acceptance is introduced.
 **0/5 accepted full-window results; all financial metrics NULL;
 financial acceptance remains FALSE.**
 
-Codex next counter-reviews section 117 and this round's Claude commits; the owner-released QC preflight recovery continues, blocked on controllable genuine QC Mia input and verified same-session native RAW/SID recovery, under fresh bounded source/HEAD/access/operation/attempt/look claims; after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, keeps the20REMXrows quarantined, skips Claude review as a progress stop, and makes exactly one final lane push.
+The next bounded action is genuine QC Mia diagnosis in protected OFF project38609822 after the owner completes authentication in the tool-visible in-app tab, under fresh bounded source/HEAD/access/operation/attempt/look claims; verified source/input/resource recovery then permits OFF and the remaining frozen arms serially, while the20REMXrows remain quarantined, Claude review is skipped, and exactly one final lane push is reserved for the completed or concrete-blocked round.
 
-Ownership/collaborator metadata passed5/5. No verified Mia diagnosis was obtained in this round. Zero new Codex financial launches occurred. OFF2021-02-10 same-session native RAW/SID input remains unresolved. The TPR1008192subscription increase is rejected. The fresh100status isRuntimeError for
-21d48f35420052b3c20d2bf628b5a0ae. Nine current100jobs(7RuntimeError/2Completed)
-are observed metadata only, including distinct newunattributed08d15037a5eb8d1cc016dfd01ba0812b.
-The paused heartbeat was freshly verified; no new run is being monitored. NativeSDK behavior, actual resource
-capacity/relief, exact native RAW/SID/input correction, compiled-job source
-and complete accounting remain unverified. Supplied-source/fixture results
-do not grant PIT/rights/canonical/Windows ACL/signer or trading authority.
-Historical8deliberatefinancialjobs/8RuntimeErrors and all earlier looks remain
-separate from the prior8owner/Miajobs, newunattributed ninthjob and this round's0financialruns.
+Fresh OFF baseline118 has unchanged source inventory and the same two
+Completed native diagnostics, with no active OFF job. No genuine Mia response
+or new financial launch is claimed while exposed browser authentication is
+pending. A signed-in statement alone does not prove private source or
+financial readiness. Held OFF2021-02-10nativeRAW/SID input remains unresolved.
+Preserve the frozen4096limit; cloud1008192increase and identity/mark changes
+remain unaccepted. Section116's5/5ownership metadata, nine100terminal jobs
+and paused-heartbeat proof remain attributed toNov3; no fresh100orother-arm
+state is inferred this round. Full1449valuation/301decision native orders/
+fills/fees/cash/actions/NAV/exposure/clock/input accounting remains required.
+Canonical/rights/PIT/Windows custody and real operatorDB/stopflag/broker/
+funded/paper/live/deploy boundaries remain unclosed. Historical financial
+failures, owner/Mia jobs and the unattributed new100Completed job remain
+separate from this round; no counter resets occur.
 
 The latest owner permits bestjudgment/local work and waives routineClaude
 review; private custody, source rights and fresh per-effect claims remain.
 The standing earlier recovery sequence, subject now to fresh native prerequisites, is: Codex uses genuine QC Mia under fresh bounded scopes to diagnose and verify a native source/routing correction, then continues all five frozen arms; no routine Claude checkpoint or owner-answer gate is required by the latest continuation.
 
-Historical workflow context: the last completed counter-review before this round was section106. Section 94 reviewed the owner-skipped continuation of section 93. The direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY; sections106/107 retain that history; section116 governs the current released continuation.
+Historical workflow context: the last completed counter-review before the section107continuation was section106; section118.1 verifies the two later incoming commits. Section 94 reviewed the owner-skipped continuation of section 93. The direction "skip 1, proceed to 2 and 3 directly" applied to that round ONLY; sections106/107 retain that history; section118 governs the current owner-signed-in continuation.
 
 Historical source/attempt observations below remain attributed to their
 original rounds; they are not new currentIDE/operator/source inspections.
@@ -32858,3 +32866,164 @@ project; either stop them there or give Codex a fresh project, otherwise
 attempt and look accounting stays blurred. Third, the REMX disk data has 20
 volumes that only the vendor can confirm; the quarantine is correct and needs
 no further local work.
+
+## 118. Owner-signed-in genuine Mia recovery and serialized frozen arms —2026-11-04
+
+Owner: I’ve signed in to QC in the in-app browser. Use Mia to resolve the OFF issue, then run OFF and the remaining arms. Keep the 20 REMX rows quarantined, skip Claude review, and push only once when done.
+Starting actual local/remoteHEAD3cf9636ee523833d6dc7eacd866c37e5157ec258, clean. Two incoming documented commits dc9c67ad and3cf9636e after432205ad retained. This round has no push yet. Existing original source/economics/nativeRAW/SID/action/input/calendar and quarantine constraints remain; section117 stale-mark recommendation is not owner-authorized policy. Use genuine built-in Mia in owner signed-in in-app session and verify every proposed correction. Exactly one final matching-lane nonforce push at stable completed or concrete blocked handoff. Initial record append refused a public-file metadata snapshot before any claim/private/UI effect; exact metadata path then tested stable with unchanged HEAD/cleanstatus. No private scope was spent or reused.
+
+Fresh118claim TPR-R118-IAB-BIND-001; HEAD3cf9636ee523833d6dc7eacd866c37e5157ec258; latestownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; bounds{"browser": "iab", "exact_url": "https://www.quantconnect.com/project/38609836", "initial_UI_reads_max": 1, "purpose": "bind existing owner-signed-in protectedQC tab and identify genuine Mia/auth controls only", "seconds_max": 90, "source_edits_compiles_jobs_messages_credentials_or_account_changes": 0}; manifest5897B/SHAffdfc331040192f19efddadd28099895e2b4a699c3b813cf3f1da2fc51d40558 and sole-record claim fsynced BEFORE effect. ImmutableEA2Dcreation authority separate;20REMXrows stay quarantined; no changed policy/economics/otherlane/broker/account authority.
+
+Fresh118claim TPR-R118-IAB-DISCOVERY-001; HEAD3cf9636ee523833d6dc7eacd866c37e5157ec258; latestownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; bounds{"browser": "iab", "initial_UI_reads_max": 1, "purpose": "exact TPR100tab not found; locate owner-signed-in QC tab by bounded URL/title metadata then bind only protectedQC/login destination", "seconds_max": 90, "source_jobs_Mia_messages_account_or_credential_effects": 0, "tab_binds_max": 1, "tab_metadata_lists_max": 1}; manifest5922B/SHA3329502c3550f60cba79c4a3349dc0bb35a82d97bdfe72ae2ad90637bf8b8d87 and sole-record claim fsynced BEFORE effect. ImmutableEA2Dcreation authority separate;20REMXrows stay quarantined; no changed policy/economics/otherlane/broker/account authority.
+
+Fresh118claim TPR-R118-OFF-TAB-001; HEAD3cf9636ee523833d6dc7eacd866c37e5157ec258; latestownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; bounds{"browser": "iab", "initial_UI_reads_max": 1, "other_lane_tabs": 0, "purpose": "existing IAB tab inventory empty; open one own protectedOFF tab using newly owner-authenticated session cookies and inspect genuine Mia controls", "seconds_max": 90, "source_edits_compiles_jobs_Mia_messages_credentials_or_account_changes": 0, "tabs_created_max": 1, "url": "https://www.quantconnect.com/project/38609822"}; manifest5989B/SHAc9142f7e44c7fddb1bd82cf2394f68eb30d7c9e8bd39e28e99b1fc897bef19fb and sole-record claim fsynced BEFORE effect. ImmutableEA2Dcreation authority separate;20REMXrows stay quarantined; no changed policy/economics/otherlane/broker/account authority.
+
+118IAB exact100bind returnedTabNotFound; existingiabtablist wasempty. OwnOFFnavigation succeeded but initialUI reports notloggedin/sessionexpired; no Mia/source/job/account effect. The owner sign-in statement is retained; accessible browser/profile mismatch is investigated rather than assumed resolved.
+
+Fresh118claim TPR-R118-AUTH-SURFACE-001; HEAD3cf9636ee523833d6dc7eacd866c37e5157ec258; latestownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; bounds{"authentication_submissions_credentials_permissions_or_account_changes": 0, "browser_inventory_reads_max": 1, "owned_QC_UI_reads_max": 1, "owned_QC_login_navigation_max": 1, "purpose": "locate owner signed-in in-app profile after newly opened ownOFFtab reports sessionexpired; metadata only and inspect normal QC sign-in controls", "seconds_max": 120, "source_jobs_or_Mia_effects": 0}; manifest5985B/SHA53395ea272e0a4ea40ca81b32e621994ac8a2fcc137d575e5c64ee0e474310b6 and sole-record claim fsynced BEFORE effect. ImmutableEA2Dcreation authority separate;20REMXrows stay quarantined; no changed policy/economics/otherlane/broker/account authority.
+
+Fresh118claim TPR-R118-QC-EXISTING-AUTH-001; HEAD3cf9636ee523833d6dc7eacd866c37e5157ec258; latestownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; bounds{"UI_reads_max": 2, "credentials_entered_or_copied": 0, "new_permissions_consent_account_creation_purchases": 0, "observed_OAuth_link_clicks_max": 1, "owned_tab_url": "https://www.quantconnect.com/login", "purpose": "resume existing QC sign-in via observed official Google sign-in button; stop at credentials/account-selection/consent if no existing automatic session", "seconds_max": 120, "source_compiles_jobs_Mia_messages": 0}; manifest6035B/SHAac66b73dfbb0307e355acdedb1024bc15351b96d381bf341c318ca3e8005287a and sole-record claim fsynced BEFORE effect. ImmutableEA2Dcreation authority separate;20REMXrows stay quarantined; no changed policy/economics/otherlane/broker/account authority.
+
+Fresh118claim TPR-R118-OWNER-AUTH-HANDOFF-001; HEAD3cf9636ee523833d6dc7eacd866c37e5157ec258; latestownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; bounds{"browser": "iab", "browser_handle_binds_max": 1, "capability_documentation_reads_max": 1, "credential_entry_account_consent_source_compiles_jobs": 0, "purpose": "show the existing own QC sign-in tab for owner to choose their account; preserve it for resumed work", "seconds_max": 120, "tab_handoff_marks_max": 1, "visibility_changes_max": 1}; manifest5952B/SHAcbe43659974dc5954c40dc0c8d116e267656e8b120b22d3c41d177db7952eaf9 and sole-record claim fsynced BEFORE effect. ImmutableEA2Dcreation authority separate;20REMXrows stay quarantined; no changed policy/economics/otherlane/broker/account authority.
+
+Fresh118claim TPR-R118-OFF-BASELINE-001; HEAD3cf9636ee523833d6dc7eacd866c37e5157ec258; latestownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; bounds{"native_endpoints": ["files/read", "backtests/list"], "native_requests_max": 2, "native_seconds_each_max": 20, "native_wire_bytes_total_max": 3145728, "private_registry": {"bytes": 3573, "reads_max": 1, "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, "processing": "all cloud files retained opaque; only inventory IDs/status/completed projected, no performance; diagnostic010config/attempt fields metadata lineage only, never fresh financial reservations", "project_id": 38609822, "returned_jobs_projection_bytes_max": 1048576, "returned_jobs_projection_reads_max": 1, "source_edits_compiles_jobs_or_account_effects": 0}; manifest6240B/SHAf003bebe9951309b8a33fd577f6085bdf3f157f1eb311f269429375363d962ce and sole-record claim fsynced BEFORE effect. ImmutableEA2Dcreation authority separate;20REMXrows stay quarantined; no changed policy/economics/otherlane/broker/account authority.
+
+118freshOFF baseline {"attempt_metadata_only": true, "financial_acceptance": false, "jobs": [{"backtest_id": "4d401e93e4e23af30f6961b466394d9c", "classification": "OBSERVED_DIAGNOSTIC_METADATA_NOT_NEW_FINANCIAL_ATTEMPT", "completed": true, "status": "Completed."}, {"backtest_id": "7c76bcb94216e8e347a7662cc834fde8", "classification": "OBSERVED_DIAGNOSTIC_METADATA_NOT_NEW_FINANCIAL_ATTEMPT", "completed": true, "status": "Completed."}], "native_receipt": {"bytes": 4236, "name": "TPR-CMP29-API-R118-OFF-BASELINE-001.result.json", "sha256": "9490aa1a94e36d08c7a41a73133aa0342f733f33ea2037251d2e65d6e1fa2379"}, "request_status": "completed", "source_archive": {"bytes": 345980, "name": "TPR-CMP29-API-R118-OFF-BASELINE-001.source.response.raw", "sha256": "ad066b41584809aa11b2917837671b953a2e66f7e3831b32f015099c80d8e588"}, "source_inventory_sha256": "08c386c17a93d934d54f30715a407fef3b91c1ac841bd575b8a3d5ae081f6ae1"}; privateproof2263B/SHAbebab545fc071fdef902b36b3b5244a1eceaa703a29efb48b3e14c2dcaf9076f. Readonly exactsource/jobmetadata; no financial/source/compile/job/Mia acceptance or new reservation.
+
+
+### 118.1 Exact incoming-source verification and qualifications
+
+The actual matching local/remote snapshot is3cf9636ee523833d6dc7eacd866c37e5157ec258.
+Only two commits arrived after the prior final432205ad:dc9c67ad816b2369f7834b2af149627e366165fe
+and3cf9636ee523833d6dc7eacd866c37e5157ec258. No review checkpoint is introduced:
+the latest owner expressly directs skipping Claude review and proceeding
+with genuine Mia/eligible frozen-arm work.
+
+dc9c67ad isaccepted: production changes only propagate KeyboardInterrupt
+from the two local CLI entry points; narrower replay/partition/zero tests
+do not change frozen builders/native adapters/recovery economics. The
+relevant API/bundle/preflight/recovery pinned bytes remain unchanged.
+Root independently ran the two interrupt cases and15zero-quantity boundary
+cases:17passed in1.01s with isolated49/52runtime and syntheticDB before
+imports and sockets/DNS denied. These are software cases, not native
+quantity/configuration-capacity proof. Float0.0 remains refused by the
+pinned recovery helper; no unchanged financial retry relies on it.
+
+3cf9636e isacceptedafterthiscurrent-recordqualification. Historical117 is
+retained unchanged. Its117.7 recommendation overstates the retained native
+observations: the tested exact-session route returned no target bars, which
+does not prove globally nonexistent data, and there is no proof that a
+stale-mark policy would make every arm complete. The owner has not changed
+the frozen mark policy. Investigate a new concrete native request/feed/
+identity/source defect through genuine Mia; do not silently adopt carry,
+future prices, guessed SID, quote-as-trade orWARNING-as-settled-cash.
+
+CR34-002 ispartiallycorrect as documentation/parallel-producer hygiene,
+not a demonstrated unpinned-manifest admission path. The older prepare
+command includes its ownMODULE in required source bytes, verifies those
+bytes equalHEAD and records their hashes; the prebacktest producer imports
+no prepare module and regenerates manifests directly rather than accepting
+its exports. No code override or source-pin weakening is justified by that
+review claim. Actual current prepare12695B/SHA
+703d891348eb2b9c3fc4cc4b060907beef76aa6e211f74fec77dfa36d960a9f0;
+prebacktest22289B/SHA
+29a9dde2795c428e332349058ba01bbcc8cf38d9ad2b2ec66a193d797967d23d.
+Future custody reads must keep the adapter's exactNov3standingrelease hash
+separate from thisNov4owner authority or use a committed explicit successor;
+never relabel an old authority hash as this new instruction.
+
+The owner-reported browser sign-in is not rejected or assumed shared by the
+tools. The exposed IAB initially had no tabs, then one ownOFF tab reported
+sessionexpired. The normal QC sign-in flow reached a Google chooser with
+two existing accounts. No account was guessed, credential copied/entered,
+new permission accepted, or source/compile/job/Mia effect dispatched.
+The own tab was shown and retained for owner sign-in. The concise owner
+request is authentication/account selection, not renewed task permission;
+dependent Mia work stays pending while independent verification continues.
+
+FreshOFFbaseline001 used one exact3573Bregistry read and2fixed readonly
+native TLS requests under current committed source/HEAD/new owner claim.
+Source inventory isunchanged08c386c17a93d934d54f30715a407fef3b91c1ac841bd575b8a3d5ae081f6ae1.
+Only the two retained noneconomic diagnostic jobs4d401e93e4e23af30f6961b466394d9c
+and7c76bcb94216e8e347a7662cc834fde8 are observed, bothCompleted, no active
+job. Private safe proof2263B/SHA
+bebab545fc071fdef902b36b3b5244a1eceaa703a29efb48b3e14c2dcaf9076f.
+No financial metrics were interpreted; no new financial attempt/look/
+source mutation/compile/backtest was created. The20REMXrows remain quarantined.
+
+Fresh118claim TPR-R118-AUTH-STATUS-001; HEAD3cf9636ee523833d6dc7eacd866c37e5157ec258; latestownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; bounds{"UI_reads_max": 1, "owned_tab_id": "2", "purpose": "one bounded authentication-state observation after showing the login tab; only page title/host and sign-in or genuineOFF controls, omit all field values/queries", "seconds_max": 60, "source_compiles_jobs_Mia_effects": 0, "typing_clicks_credentials_or_account_effects": 0}; manifest5924B/SHA159a200a166a2240e129b2876b4143a97921882d3ed019322596b83082ef5357 and sole-record claim fsynced BEFORE effect. ImmutableEA2Dcreation authority separate;20REMXrows stay quarantined; no changed policy/economics/otherlane/broker/account authority.
+
+AUTH-STATUS001 used a diff-only UI observation; its allfalse control booleans are not a verified login state. No source/credential/Mia/native effect occurred; require one full-tree successor, no claimed session transition.
+
+Fresh118claim TPR-R118-AUTH-STATUS-002; HEAD3cf9636ee523833d6dc7eacd866c37e5157ec258; latestownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; bounds{"UI_reads_max": 1, "owned_tab_id": "2", "purpose": "previous diff-only auth observation had no usable full state and is UNKNOWN; obtain one full tree with auth controls only, omit field values/URL queries", "seconds_max": 60, "typing_clicks_credentials_source_jobs_Mia_or_account_effects": 0}; manifest5895B/SHAbb546d208a9518b5dec7ecc6b1683a69b128332b209b6e3f7fe9a9f52e01b2c5 and sole-record claim fsynced BEFORE effect. ImmutableEA2Dcreation authority separate;20REMXrows stay quarantined; no changed policy/economics/otherlane/broker/account authority.
+
+Fresh118claim TPR-R118-AUTH-STATUS-003; HEAD3cf9636ee523833d6dc7eacd866c37e5157ec258; latestownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; bounds{"UI_reads_max": 1, "credentials_typed_copied_account_permission_changes": 0, "owned_tab_id": "2", "purpose": "one final bounded authentication-state observation before deciding whether Mia can start or requires owner handoff; full tree sanitized to auth controls only", "seconds_max": 60, "source_compiles_jobs_or_Mia_effects": 0}; manifest5931B/SHA6e14adb2b6c79b76ba8ba2a5dea640f2c5fb0ff4fc67f53fa54d7a0ca672992c and sole-record claim fsynced BEFORE effect. ImmutableEA2Dcreation authority separate;20REMXrows stay quarantined; no changed policy/economics/otherlane/broker/account authority.
+
+
+### 118.2 Interim required-authentication handoff — same round, no push
+
+The final bounded full-tree auth observationAUTH-STATUS003 still shows
+Google's saved-account chooser in the own in-app tab, with no visible OFF
+workspace or genuine Mia controls. AUTH-STATUS001 was diff-only/UNKNOWN;
+002and003 are full-tree observations and are not confused with a completed
+login. The owner's task permission remains granted; completing account
+selection/sign-in in this exact exposed browser is the missing required
+input. The own tab is visible and markedhandoff for the owner. No credential
+was copied, entered or published, no account was guessed, and no OAuth
+permission consent/account creation/purchase/upgrade was accepted.
+
+Finish sign-in until protected OFF38609822 is visible, then resume genuine
+built-in Mia using a fresh actual-HEAD/source/owner/access/operation/attempt/
+look manifest and durable claim. A bounded read-only diagnostic prompt is
+prepared from exact public bindings: inspect only OFF Python source<=2MiB
+and existing logs009/010<=32KiB each, without edits/History/ObjectStore/
+provider/compile/job effects. It requests a NEW verified native request/
+feed/identity/source-routing defect preserving the exact private SID,
+nativeRAW/noFF/clock/action/economics and4096limit. It does not infer
+global absence or accept stale/future/quote-as-trade/WARNING-as-settlement.
+That prompt has NOT been submitted and no genuine Mia response is claimed.
+
+This round's direct QC native requests remain2readonly OFF source/jobs
+calls, no active OFF job observed, unchanged source inventory. There is
+no new source mutation, compile, backtest, financial attempt reservation
+or accepted financial outcome. The prior100source drift/job history and
+five-arm NULLs remain separate and unreset; no other protected project
+was touched by this round. The20REMXrows remain quarantined with all
+original/negative history. No USB/oldD0/provider/280MBsignal packet or real
+operatorDB/stopflag was reopened; no canonical/PIT/rights/Windows signer/
+ACL/broker/paper/live/funded/deploy/account-change authority was consumed.
+
+Document guard rotation moves prior116/117current-role and zero-launch
+facts into immutable received3cf history, preserving every body9..117.
+New118guards require actual incoming two-commit lineage, auth/input rather
+than renewed permission, fixed nativeRAW/SID policy, source/input/resource
+prerequisites, serialization/quarantine, skipped Claude review and one
+reserved final push. They permit future authorized observations; they reject
+sign-in or a Mia reply as automatic source/economic/financial acceptance.
+
+The first supported document run had188failed/53passed/558deselected
+in16.06s, cascading from a missing historical section93label and obsolete
+current-lineage/wording assumptions; these were repaired rather than erased.
+Earlier interpreter setup failures (ApplePython3.9slots and Homebrew3.13
+withoutpytest) occurred before collection, not as failed tests. No dependency
+was installed or changed. Final implementation-agent selection:
+241passed/558deselected in3.96s. Root's independent subset:
+231passed/568deselected in4.07s. Separately17incoming CLI/zero-boundary
+checks passed in1.01s. All used existingPython3.13.15 at the recorded venv,
+isolated49/52runtime+syntheticDB before imports and denied sockets/DNS.
+No full lane/repository suite or Claude review was requested or performed.
+Final guard359518B/SHA
+efa4f4ac17104d2be60068a991f3644796e5355b1a26da33285f0c86fa8b39eb.
+
+Only this sole record and its document guards enter an interim LOCAL-ONLY
+commit after3cf9636ee523833d6dc7eacd866c37e5157ec258 on the exact existing
+lane. ActualGitHEAD identifies that local interim snapshot. Native/frozen
+source bytes stay unchanged. No push is made now: the same owner-authorized
+Mia/serialized-backtest round remains pending this required authentication
+input, and its sole final matching-lane nonforce push remains reserved.
+Do not create a new round/push or reset accumulated history when the owner
+finishes this login. No new job exists to rearm a heartbeat or parallel
+controller. Do not cancel or overwrite another lane/resource while waiting.
+The last actual matching remote at entry was3cf9636e; recheck actual remote
+scope before future native mutation/final publication, and do not assume
+another computer can retrieve this unpushed interim commit.

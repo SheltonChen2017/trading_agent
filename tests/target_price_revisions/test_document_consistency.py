@@ -1226,11 +1226,11 @@ def _assert_section93_current_facts(text: str) -> None:
     normalized = " ".join(text.split()).lower()
     # TPR-CR34-010: the section-93 facts are checked first so a fact mutant is
     # refused with its own message before the later scope helpers run.
-    for required in (*SECTION93_CURRENT_FACTS, SECTION106_NEXT_ROLE, SECTION117_NEXT_ROLE,
+    for required in (*SECTION93_CURRENT_FACTS, SECTION106_NEXT_ROLE, SECTION118_NEXT_ROLE,
                      "last completed counter-review", "skip 1, proceed to 2 and 3 directly"):
         assert required.lower() in normalized, required
     _assert_section106_current_scope(text)
-    _assert_section116_current_facts(text)
+    _assert_section118_current_facts(text)
     _assert_section113_current_facts(text)
     assert SECTION92_NEXT_ROLE.lower() not in normalized, "section92-only routing is superseded for this round"
     assert SECTION93_NEXT_ROLE.lower() not in normalized, "section93 routing is reviewed, not current"
@@ -1297,14 +1297,15 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION117_RANGE]
+    ) == [SECTION118_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Claude has independently reviewed the exact range"
+        "Codex has independently counter-reviewed the exact incoming Claude range"
         in normalized_current
     )
-    assert SECTION117_NEXT_ROLE in normalized_current
+    assert SECTION118_NEXT_ROLE in normalized_current
+    assert SECTION117_NEXT_ROLE not in normalized_current
     assert SECTION116_NEXT_ROLE not in normalized_current
     assert SECTION110_NEXT_ROLE not in normalized_current
     assert SECTION109_NEXT_ROLE not in normalized_current
@@ -1415,9 +1416,10 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION117_SHORT_RANGE]
+        ) == [SECTION118_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert SECTION117_NEXT_ROLE.lower() in normalized_summary_lower
+        assert SECTION118_NEXT_ROLE.lower() in normalized_summary_lower
+        assert SECTION117_NEXT_ROLE.lower() not in normalized_summary_lower
         assert SECTION116_NEXT_ROLE.lower() not in normalized_summary_lower
         assert SECTION110_NEXT_ROLE.lower() not in normalized_summary_lower
         assert SECTION109_NEXT_ROLE.lower() not in normalized_summary_lower
@@ -2436,10 +2438,12 @@ def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
     next_actions = re.findall(SECTION8_NEXT_ACTION_STATEMENT, normalized)
     assert len(next_actions) == 1, f"section 8 must name one next action: {next_actions}"
     ranges = re.findall(r"`([0-9a-f]{40})\.{2}([0-9a-f]{40})`", normalized)
-    assert len(ranges) == 1, ranges
+    assert ranges == [(SECTION118_BASE, SECTION118_HEAD)], ranges
+    incoming = tuple(_git_lines("rev-list", "--reverse", SECTION118_RANGE))
+    assert incoming == SECTION118_COMMITS, "exact current incoming commit lineage"
     # This is the explicitly named current-round starting snapshot, not an
     # accepted source/strategy artifact or a second counter-review range.
-    allowed = {*ranges[0], *SECTION8_STABLE_COMMITS, SECTION93_BASE}
+    allowed = {*ranges[0], *SECTION8_STABLE_COMMITS, SECTION93_BASE, *incoming}
     full = set(re.findall(r"(?<![0-9a-f])([0-9a-f]{40})(?![0-9a-f])", normalized))
     assert full <= allowed, f"section 8 names a stale commit: {sorted(full - allowed)}"
     short = set(re.findall(r"\b([0-9a-f]{7,12})\b", normalized))
@@ -4695,16 +4699,18 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "current_reviewed105_role", "preamble_reviewed105_role",
     "current_reviewed108_role", "preamble_reviewed108_role",
     "current_released116_role", "preamble_released116_role",
+    "current_reviewed117_role", "preamble_reviewed117_role",
 ))
-def test_section117_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+def test_section118_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
     """Retain old routing mutants; reject routing only to the skipped checkpoint."""
     test_exact_next_step_names_the_current_artifacts()
-    current_next = SECTION117_NEXT_ROLE
-    stale_next = SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], "")
+    current_next = SECTION118_NEXT_ROLE
+    stale_next = (SECTION117_NEXT_ROLE if "reviewed117" in fault else
+        SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], ""))
     if fault.startswith("current_"):
         original_section = _record_section
         section = original_section("## 8. Exact next step")
-        old, new = (SECTION117_RANGE, SECTION109_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION118_RANGE, SECTION109_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, section) is not None
@@ -4713,7 +4719,7 @@ def test_section117_current_routing_refuses_stale_range_or_role(monkeypatch, fau
             lambda heading: mutated if heading.startswith("## 8.") else original_section(heading))
     else:
         preamble = _record_preamble()
-        old, new = (SECTION117_SHORT_RANGE, SECTION109_SHORT_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION118_SHORT_RANGE, SECTION109_SHORT_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, preamble, flags=re.I) is not None
@@ -5928,6 +5934,24 @@ SECTION117_DISPOSITIONS = (
 SECTION117_NEXT_ROLE = (
     "Codex next counter-reviews section 117 and this round's Claude commits; the owner-released QC preflight recovery continues, blocked on controllable genuine QC Mia input and verified same-session native RAW/SID recovery, under fresh bounded source/HEAD/access/operation/attempt/look claims; after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, keeps the20REMXrows quarantined, skips Claude review as a progress stop, and makes exactly one final lane push"
 )
+SECTION118_BASE = SECTION117_HEAD
+SECTION118_HEAD = "3cf9636ee523833d6dc7eacd866c37e5157ec258"
+SECTION118_RANGE = f"{SECTION118_BASE}..{SECTION118_HEAD}"
+SECTION118_SHORT_RANGE = "432205ad..3cf9636e"
+SECTION118_COMMITS = (
+    "dc9c67ad816b2369f7834b2af149627e366165fe",
+    SECTION118_HEAD,
+)
+SECTION118_NEXT_ROLE = (
+    "The next bounded action is genuine QC Mia diagnosis in protected OFF project38609822 after the owner completes authentication in the tool-visible in-app tab, "
+    "under fresh bounded source/HEAD/access/operation/attempt/look claims; verified source/input/resource recovery then permits OFF and the remaining frozen arms serially, "
+    "while the20REMXrows remain quarantined, Claude review is skipped, and exactly one final lane push is reserved for the completed or concrete-blocked round."
+)
+SECTION118_RECEIVED_HISTORY_SHA256 = {
+    116: "aed8415fb253fd0dfe8e0d19d9dc83e1d2d528757bba7b642b87560bcd8524f0",
+    117: "80c4eb8125e1a258c8e22f41ce0178f0792fd1b2e658a7711ea3e32bc1738ddf",
+}
+
 SECTION116_RECEIVED_HISTORY_SHA256 = {
     112: "7c26f1da3e76a42cc92c32308c49e2950d1dc8df09646fb0a92b6ebd5000ba18",
     113: "40653f181fe463f30c8a51d3a2fc0d6a5181159ea3f4ade47ad07d9d4c6392b9",
@@ -5936,7 +5960,7 @@ SECTION116_RECEIVED_HISTORY_SHA256 = {
 }
 
 
-def _assert_section116_current_facts(text: str) -> None:
+def _assert_section116_historical_review_facts(text: str) -> None:
     """Owner release supersedes the old access hold, not source or accounting gates."""
     folded = " ".join(text.replace("*", "").replace(chr(96), "").split()).casefold()
     assert SECTION117_NEXT_ROLE.casefold() in folded
@@ -5974,6 +5998,58 @@ def _assert_section116_current_facts(text: str) -> None:
         assert stale.casefold() not in folded, "contradictory current handoff: " + stale
     assert re.search(r"\b[1-9][0-9]*/5 accepted full-window results\b", folded) is None
     _assert_section116_blocked_handoff_facts(text)
+
+
+def _assert_section118_current_facts(text: str) -> None:
+    """Authentication enables the authorized Mia task; evidence gates remain separate."""
+    folded = " ".join(text.replace("*", "").replace(chr(96), "").split()).casefold()
+    assert SECTION118_NEXT_ROLE.casefold() in folded
+    assert SECTION117_NEXT_ROLE.casefold() not in folded, "section117 counter-review is completed history"
+    assert SECTION116_NEXT_ROLE.casefold() not in folded, "section116 preflight routing is reviewed, not current"
+    assert SECTION116_RELEASE_SCOPE.casefold() in folded
+    for required in (
+        "fresh bounded source/head/access/operation/attempt/look claims",
+        "after the owner completes authentication in the tool-visible in-app tab",
+        "verified source/input/resource recovery then permits",
+        "authentication is a required input, not renewed task permission",
+        "the frozen same-session native raw/sid policy is unchanged",
+        "off and the remaining frozen arms serially",
+        "while the20remxrows remain quarantined",
+        "0/5 accepted full-window results", "all financial metrics null",
+        "financial acceptance remains false", "claude review is skipped",
+        "exactly one final lane push is reserved for the completed or concrete-blocked round",
+    ):
+        assert required in folded, required
+    for stale in (
+        SECTION112_NEXT_ROLE, SECTION112_PRE_NOTICE_NEXT_ROLE,
+        SECTION109_NEXT_ROLE, SECTION110_NEXT_ROLE,
+        "qc access is deferred until further owner notice",
+        "safari access is deferred until further owner notice",
+        "qc and safari access are released without any source checks",
+        "start all five arms concurrently", "native preflight is optional",
+        "reuse expired claims", "skip source custody verification",
+        "preview attempt1 is a fresh reserved native attempt",
+        "automatically resume whenever qc is available",
+        "qc is available so resume",
+        "no source, input or resource prerequisites are required",
+        "claude review is required before continuation",
+        "multiple intermediate lane pushes",
+        "all five full-window results are accepted",
+        "all financial metrics available",
+        "financial acceptance remains true",
+        "completed proves accepted source/economics/accounting",
+        "the20remxrows are admitted to the frozen financial input",
+        "owner sign-in alone proves financial readiness",
+        "owner sign-in alone proves backtesting readiness",
+        "mia reply automatically admits source/economics",
+        "mia reply automatically accepts source and economics",
+        "stale or future marks are authorized",
+        "stale held marks are accepted by owner policy",
+        "delisting warning is settled terminal cash",
+        "guessed sid replacement is accepted",
+    ):
+        assert stale.casefold() not in folded, "contradictory current handoff: " + stale
+    assert re.search(r"\b[1-9][0-9]*/5 accepted full-window results\b", folded) is None
 
 
 def _assert_section116_blocked_handoff_facts(text: str) -> None:
@@ -6954,20 +7030,20 @@ def test_section109_history_guard_refuses_retrospective_rewrite(monkeypatch) -> 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
 @pytest.mark.parametrize("before,after", (
-    ("owner-released QC preflight", "automatic QC start whenever available"),
-    ("blocked on controllable genuine QC Mia input and verified same-session native RAW/SID recovery",
-     "ready without genuine QC Mia input or same-session native RAW/SID recovery"),
-    ("after source, input and resource prerequisites pass", "before source, input and resource prerequisites pass"),
-    ("OFF then the remaining frozen arms serially", "all frozen arms concurrently"),
-    ("keeps the20REMXrows quarantined", "rounds the20REMXrows into financial inputs"),
-    ("skips Claude review", "requires Claude review"),
+    ("genuine QC Mia diagnosis in protected OFF project38609822", "generic agent diagnosis in any project"),
+    ("after the owner completes authentication in the tool-visible in-app tab",
+     "without owner authentication in the tool-visible in-app tab"),
+    ("verified source/input/resource recovery then permits", "unverified source/input/resource recovery permits"),
+    ("OFF and the remaining frozen arms serially", "all frozen arms concurrently"),
+    ("while the20REMXrows remain quarantined", "rounds the20REMXrows into financial inputs"),
+    ("Claude review is skipped", "Claude review is required"),
     ("exactly one final lane push", "multiple intermediate lane pushes"),
 ))
-def test_section116_handoff_role_refuses_unsafe_serialization_or_scope_drift(monkeypatch, surface, before, after):
+def test_section118_handoff_role_refuses_unsafe_serialization_or_scope_drift(monkeypatch, surface, before, after):
     test_exact_next_step_names_the_current_artifacts()
-    changed_role = SECTION117_NEXT_ROLE.replace(before, after)
-    assert changed_role != SECTION117_NEXT_ROLE
-    pattern = r"\s+".join(re.escape(word) for word in SECTION117_NEXT_ROLE.split())
+    changed_role = SECTION118_NEXT_ROLE.replace(before, after)
+    assert changed_role != SECTION118_NEXT_ROLE
+    pattern = r"\s+".join(re.escape(word) for word in SECTION118_NEXT_ROLE.split())
     if surface == "current":
         original_section = _record_section
         section = original_section("## 8. Exact next step")
@@ -7008,9 +7084,9 @@ def _mutate_section112_current_surface(monkeypatch, surface, mutate):
 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
-def test_section116_current_released_handoff_facts_are_explicit(surface):
+def test_section118_current_released_handoff_facts_are_explicit(surface):
     text = _current_qualification(_record_section("## 8. Exact next step")) if surface == "current" else _record_preamble()
-    _assert_section116_current_facts(text)
+    _assert_section118_current_facts(text)
 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
@@ -7018,14 +7094,16 @@ def test_section116_current_released_handoff_facts_are_explicit(surface):
     ("QC and Safari access are released for this bounded preflight and serialized backtest continuation",
      "QC and Safari access remain deferred"),
     ("fresh bounded source/HEAD/access/operation/attempt/look claims", "reused expired claims"),
-    ("after source, input and resource prerequisites pass", "without source, input or resource prerequisites"),
-    ("OFF then the remaining frozen arms serially", "all frozen arms concurrently"),
-    ("keeps the20REMXrows quarantined", "uses rounded REMX rows"),
+    ("verified source/input/resource recovery then permits", "without source, input or resource prerequisites"),
+    ("Authentication is a required input, not renewed task permission", "Authentication is renewed task permission"),
+    ("The frozen same-session native RAW/SID policy is unchanged", "Stale or future marks are authorized"),
+    ("OFF and the remaining frozen arms serially", "all frozen arms concurrently"),
+    ("while the20REMXrows remain quarantined", "uses rounded REMX rows"),
     ("0/5 accepted full-window results", "5/5 accepted full-window results"),
     ("all financial metrics NULL", "all financial metrics available"),
     ("financial acceptance remains FALSE", "financial acceptance remains TRUE"),
 ))
-def test_section116_current_fact_guard_refuses_replacements(monkeypatch, surface, pattern, replacement):
+def test_section118_current_fact_guard_refuses_replacements(monkeypatch, surface, pattern, replacement):
     test_exact_next_step_names_the_current_artifacts()
     def mutate(text):
         whitespace_aware = r"\s+".join(re.escape(word) for word in pattern.split())
@@ -7057,12 +7135,22 @@ def test_section116_current_fact_guard_refuses_replacements(monkeypatch, surface
     "Claude review is required before continuation.",
     "Multiple intermediate lane pushes.",
     "The20REMXrows are admitted to the frozen financial input.",
+    "Owner sign-in alone proves financial readiness.",
+    "Owner sign-in alone proves backtesting readiness.",
+    "Mia reply automatically admits source/economics.",
+    "Mia reply automatically accepts source and economics.",
+    "Stale or future marks are authorized.",
+    "Stale held marks are accepted by owner policy.",
+    "Delisting WARNING is settled terminal cash.",
+    "Guessed SID replacement is accepted.",
+    SECTION117_NEXT_ROLE,
+    SECTION116_NEXT_ROLE,
     SECTION109_NEXT_ROLE,
     SECTION110_NEXT_ROLE,
     SECTION112_NEXT_ROLE,
     SECTION112_PRE_NOTICE_NEXT_ROLE,
 ))
-def test_section116_current_fact_guard_refuses_appended_contradictions(monkeypatch, surface, contradiction):
+def test_section118_current_fact_guard_refuses_appended_contradictions(monkeypatch, surface, contradiction):
     test_exact_next_step_names_the_current_artifacts()
     _mutate_section112_current_surface(monkeypatch, surface,
         lambda text: text + "\n" + contradiction + "\n")
@@ -7071,10 +7159,14 @@ def test_section116_current_fact_guard_refuses_appended_contradictions(monkeypat
 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
-@pytest.mark.parametrize("observation", ("1 QC request.", "1 Safari request.", "1 native compile.", "1 backtest."))
-def test_section116_release_does_not_permanently_freeze_native_observation_counts(surface, observation):
+@pytest.mark.parametrize("observation", (
+    "1 QC request.", "1 Safari request.", "1 native compile.", "1 backtest.",
+    "Owner authentication completed.", "A verified Mia diagnosis was obtained in this round.",
+    "1 new Codex financial launch occurred; full-window accounting remains unaccepted.",
+))
+def test_section118_release_does_not_permanently_freeze_native_observation_counts(surface, observation):
     text = _current_qualification(_record_section("## 8. Exact next step")) if surface == "current" else _record_preamble()
-    _assert_section116_current_facts(text + "\n" + observation)
+    _assert_section118_current_facts(text + "\n" + observation)
 
 
 @pytest.mark.parametrize("number", (112, 113, 114, 115))
@@ -7094,6 +7186,28 @@ def test_section116_retains_prior_hold_as_immutable_historical_semantics(surface
         section = historical[begin:historical.index("\n## 9.", begin)]
         text = _current_qualification(section)
     _assert_section112_historical_hold_facts(text)
+
+
+def _section118_received_current_surface(surface: str) -> str:
+    """Retain the exact section116/117 blocked snapshot without freezing later work."""
+    historical = "\n".join(_git_lines("show", SECTION118_HEAD + ":" +
+        "docs/Strategy Description/" + RECORD)) + "\n"
+    if surface == "preamble":
+        return historical[:historical.index("\n## 1.")]
+    begin = historical.index("## 8. Exact next step")
+    section = historical[begin:historical.index("\n## 9.", begin)]
+    return _current_qualification(section)
+
+
+@pytest.mark.parametrize("surface", ("current", "preamble"))
+def test_section118_retains_received_blocked_handoff_semantics(surface):
+    _assert_section116_historical_review_facts(_section118_received_current_surface(surface))
+
+
+@pytest.mark.parametrize("number", (116, 117))
+def test_section118_preserves_received_review_and_blocked_history(number):
+    received = _record_section("## " + str(number) + ".")
+    assert hashlib.sha256(received.encode()).hexdigest() == SECTION118_RECEIVED_HISTORY_SHA256[number]
 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
@@ -7153,15 +7267,13 @@ def test_section113_current_repair_guard_refuses_appended_promotions(monkeypatch
     (r"TPR100\s*8192\s*subscription\s+increase\s+is\s+rejected",
      "TPR1008192subscription increase is accepted"),
 ))
-def test_section116_blocked_handoff_guard_refuses_concrete_fact_replacements(monkeypatch, surface, pattern, replacement):
-    test_exact_next_step_names_the_current_artifacts()
-    def mutate(text):
-        changed, count = re.subn(pattern, lambda _: replacement, text, count=1, flags=re.I)
-        assert count == 1
-        return changed
-    _mutate_section112_current_surface(monkeypatch, surface, mutate)
+def test_section116_blocked_handoff_guard_refuses_concrete_fact_replacements(surface, pattern, replacement):
+    text = _section118_received_current_surface(surface)
+    _assert_section116_historical_review_facts(text)
+    changed, count = re.subn(pattern, lambda _: replacement, text, count=1, flags=re.I)
+    assert count == 1
     with pytest.raises(AssertionError):
-        test_exact_next_step_names_the_current_artifacts()
+        _assert_section116_historical_review_facts(changed)
 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
@@ -7174,12 +7286,11 @@ def test_section116_blocked_handoff_guard_refuses_concrete_fact_replacements(mon
     "Mia input control is available and verified.",
     "The native RAW/SID blocker is resolved.",
 ))
-def test_section116_blocked_handoff_guard_refuses_appended_false_recovery(monkeypatch, surface, contradiction):
-    test_exact_next_step_names_the_current_artifacts()
-    _mutate_section112_current_surface(monkeypatch, surface,
-        lambda text: text + "\n" + contradiction + "\n")
+def test_section116_blocked_handoff_guard_refuses_appended_false_recovery(surface, contradiction):
+    text = _section118_received_current_surface(surface)
+    _assert_section116_historical_review_facts(text)
     with pytest.raises(AssertionError):
-        test_exact_next_step_names_the_current_artifacts()
+        _assert_section116_historical_review_facts(text + "\n" + contradiction + "\n")
 
 
 def test_section_117_review_records_every_commit_and_grants_nothing() -> None:

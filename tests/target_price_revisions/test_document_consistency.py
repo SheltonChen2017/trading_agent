@@ -1225,9 +1225,9 @@ def _assert_section93_current_facts(text: str) -> None:
     """Positive, bounded current facts; never scan old sections for stale dates."""
     normalized = " ".join(text.split()).lower()
     _assert_section106_current_scope(text)
-    _assert_section112_current_facts(text)
+    _assert_section116_current_facts(text)
     _assert_section113_current_facts(text)
-    for required in (*SECTION93_CURRENT_FACTS, SECTION106_NEXT_ROLE, SECTION112_NEXT_ROLE,
+    for required in (*SECTION93_CURRENT_FACTS, SECTION106_NEXT_ROLE, SECTION116_NEXT_ROLE,
                      "last completed counter-review", "skip 1, proceed to 2 and 3 directly"):
         assert required.lower() in normalized, required
     assert SECTION92_NEXT_ROLE.lower() not in normalized, "section92-only routing is superseded for this round"
@@ -1302,7 +1302,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         "Codex has independently counter-reviewed the exact incoming Claude range"
         in normalized_current
     )
-    assert SECTION112_NEXT_ROLE in normalized_current
+    assert SECTION116_NEXT_ROLE in normalized_current
     assert SECTION110_NEXT_ROLE not in normalized_current
     assert SECTION109_NEXT_ROLE not in normalized_current
     assert SECTION108_NEXT_ROLE not in normalized_current
@@ -1414,7 +1414,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
         ) == [SECTION109_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert SECTION112_NEXT_ROLE.lower() in normalized_summary_lower
+        assert SECTION116_NEXT_ROLE.lower() in normalized_summary_lower
         assert SECTION110_NEXT_ROLE.lower() not in normalized_summary_lower
         assert SECTION109_NEXT_ROLE.lower() not in normalized_summary_lower
         assert SECTION108_NEXT_ROLE.lower() not in normalized_summary_lower
@@ -4687,10 +4687,10 @@ SECTION81_STALE_NEXT_ACTIONS = {
     "current_reviewed105_role", "preamble_reviewed105_role",
     "current_reviewed108_role", "preamble_reviewed108_role",
 ))
-def test_section112_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
+def test_section116_current_routing_refuses_stale_range_or_role(monkeypatch, fault: str) -> None:
     """Retain old routing mutants; reject routing only to the skipped checkpoint."""
     test_exact_next_step_names_the_current_artifacts()
-    current_next = SECTION112_NEXT_ROLE
+    current_next = SECTION116_NEXT_ROLE
     stale_next = SECTION81_STALE_NEXT_ACTIONS.get(fault.rsplit("_", 2)[-2], "")
     if fault.startswith("current_"):
         original_section = _record_section
@@ -5825,7 +5825,7 @@ SECTION112_NEXT_ROLE = (
 )
 
 
-def _assert_section112_current_facts(text: str) -> None:
+def _assert_section112_historical_hold_facts(text: str) -> None:
     """QC/Safari stay deferred until further owner notice; old effects remain history."""
     folded = " ".join(text.replace("*", "").replace(chr(96), "").split()).casefold()
     assert SECTION112_NEXT_ROLE.casefold() in folded
@@ -5865,6 +5865,62 @@ def _assert_section112_current_facts(text: str) -> None:
         r"\b[1-9][0-9]*/5 accepted full-window results\b",
     ):
         assert re.search(pattern, folded) is None, "contradictory current handoff count/status"
+
+
+
+SECTION116_NEXT_ROLE = (
+    "The next bounded action is owner-released QC preflight under fresh bounded source/HEAD/access/operation/attempt/look claims; "
+    "after source, input and resource prerequisites pass, Codex runs OFF then the remaining frozen arms serially, "
+    "keeps the20REMXrows quarantined, skips Claude review, and makes exactly one final lane push."
+)
+SECTION116_RELEASE_SCOPE = (
+    "QC and Safari access are released for this bounded preflight and serialized backtest continuation."
+)
+SECTION116_RECEIVED_HEAD = "83715aac39c7b452f2fdbff257cc74200324d4e9"
+SECTION116_RECEIVED_HISTORY_SHA256 = {
+    112: "7c26f1da3e76a42cc92c32308c49e2950d1dc8df09646fb0a92b6ebd5000ba18",
+    113: "40653f181fe463f30c8a51d3a2fc0d6a5181159ea3f4ade47ad07d9d4c6392b9",
+    114: "a69eeb41e4915ac02de39a8f1ddad717afe266b0a3323f31f7222a3da8814e3a",
+    115: "c5571a9a0aefa5715e73b8db10a7f9bbf185def05978637c768ca4aa14fa4f08",
+}
+
+
+def _assert_section116_current_facts(text: str) -> None:
+    """Owner release supersedes the old access hold, not source or accounting gates."""
+    folded = " ".join(text.replace("*", "").replace(chr(96), "").split()).casefold()
+    assert SECTION116_NEXT_ROLE.casefold() in folded
+    assert SECTION116_RELEASE_SCOPE.casefold() in folded
+    for required in (
+        "fresh bounded source/head/access/operation/attempt/look claims",
+        "after source, input and resource prerequisites pass",
+        "off then the remaining frozen arms serially",
+        "keeps the20remxrows quarantined",
+        "0/5 accepted full-window results", "all financial metrics null",
+        "financial acceptance remains false", "skips claude review", "exactly one final lane push",
+    ):
+        assert required in folded, required
+    for stale in (
+        SECTION112_NEXT_ROLE, SECTION112_PRE_NOTICE_NEXT_ROLE,
+        SECTION109_NEXT_ROLE, SECTION110_NEXT_ROLE,
+        "qc access is deferred until further owner notice",
+        "safari access is deferred until further owner notice",
+        "qc and safari access are released without any source checks",
+        "start all five arms concurrently", "native preflight is optional",
+        "reuse expired claims", "skip source custody verification",
+        "preview attempt1 is a fresh reserved native attempt",
+        "automatically resume whenever qc is available",
+        "qc is available so resume",
+        "no source, input or resource prerequisites are required",
+        "claude review is required before continuation",
+        "multiple intermediate lane pushes",
+        "all five full-window results are accepted",
+        "all financial metrics available",
+        "financial acceptance remains true",
+        "completed proves accepted source/economics/accounting",
+        "the20remxrows are admitted to the frozen financial input",
+    ):
+        assert stale.casefold() not in folded, "contradictory current handoff: " + stale
+    assert re.search(r"\b[1-9][0-9]*/5 accepted full-window results\b", folded) is None
 
 
 def _assert_section113_current_facts(text: str) -> None:
@@ -6820,16 +6876,18 @@ def test_section109_history_guard_refuses_retrospective_rewrite(monkeypatch) -> 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
 @pytest.mark.parametrize("before,after", (
-    ("only after further owner notice", "once QC is available again"),
-    ("before any QC or Safari access", "after accessing QC or Safari"),
+    ("owner-released QC preflight", "automatic QC start whenever available"),
+    ("after source, input and resource prerequisites pass", "before source, input and resource prerequisites pass"),
+    ("OFF then the remaining frozen arms serially", "all frozen arms concurrently"),
+    ("keeps the20REMXrows quarantined", "rounds the20REMXrows into financial inputs"),
     ("skips Claude review", "requires Claude review"),
     ("exactly one final lane push", "multiple intermediate lane pushes"),
 ))
-def test_section112_handoff_role_refuses_unsafe_serialization_or_scope_drift(monkeypatch, surface, before, after):
+def test_section116_handoff_role_refuses_unsafe_serialization_or_scope_drift(monkeypatch, surface, before, after):
     test_exact_next_step_names_the_current_artifacts()
-    changed_role = SECTION112_NEXT_ROLE.replace(before, after)
-    assert changed_role != SECTION112_NEXT_ROLE
-    pattern = r"\s+".join(re.escape(word) for word in SECTION112_NEXT_ROLE.split())
+    changed_role = SECTION116_NEXT_ROLE.replace(before, after)
+    assert changed_role != SECTION116_NEXT_ROLE
+    pattern = r"\s+".join(re.escape(word) for word in SECTION116_NEXT_ROLE.split())
     if surface == "current":
         original_section = _record_section
         section = original_section("## 8. Exact next step")
@@ -6870,26 +6928,24 @@ def _mutate_section112_current_surface(monkeypatch, surface, mutate):
 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
-def test_section112_current_offline_handoff_facts_are_explicit(surface):
+def test_section116_current_released_handoff_facts_are_explicit(surface):
     text = _current_qualification(_record_section("## 8. Exact next step")) if surface == "current" else _record_preamble()
-    _assert_section112_current_facts(text)
+    _assert_section116_current_facts(text)
 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
 @pytest.mark.parametrize("pattern,replacement", (
-    (r"QC access is deferred", "QC access is authorized now"),
-    (r"no QC access", "QC access now"),
-    (r"0 QC requests", "1 QC request"),
-    (r"Safari access is deferred", "Safari access is authorized now"),
-    (r"no Safari access", "Safari access now"),
-    (r"0 Safari requests", "1 Safari request"),
-    (r"0 native compiles", "1 native compile"),
-    (r"0 backtests", "1 backtest"),
-    (r"0/5 accepted full-window results", "5/5 accepted full-window results"),
-    (r"all financial metrics NULL", "all financial metrics available"),
-    (r"financial acceptance remains FALSE", "financial acceptance remains TRUE"),
+    ("QC and Safari access are released for this bounded preflight and serialized backtest continuation",
+     "QC and Safari access remain deferred"),
+    ("fresh bounded source/HEAD/access/operation/attempt/look claims", "reused expired claims"),
+    ("after source, input and resource prerequisites pass", "without source, input or resource prerequisites"),
+    ("OFF then the remaining frozen arms serially", "all frozen arms concurrently"),
+    ("keeps the20REMXrows quarantined", "uses rounded REMX rows"),
+    ("0/5 accepted full-window results", "5/5 accepted full-window results"),
+    ("all financial metrics NULL", "all financial metrics available"),
+    ("financial acceptance remains FALSE", "financial acceptance remains TRUE"),
 ))
-def test_section112_current_fact_guard_refuses_replacements(monkeypatch, surface, pattern, replacement):
+def test_section116_current_fact_guard_refuses_replacements(monkeypatch, surface, pattern, replacement):
     test_exact_next_step_names_the_current_artifacts()
     def mutate(text):
         whitespace_aware = r"\s+".join(re.escape(word) for word in pattern.split())
@@ -6903,36 +6959,61 @@ def test_section112_current_fact_guard_refuses_replacements(monkeypatch, surface
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
 @pytest.mark.parametrize("contradiction", (
-    "QC access is authorized now.",
-    "QC access has resumed.",
-    "Safari access is authorized now.",
-    "Safari access has resumed.",
-    "Start Safari now.",
-    "Start QC now.",
-    "Start QC/Safari now.",
-    "Resume automatically when QC is available.",
+    "QC access is deferred until further owner notice.",
+    "Safari access is deferred until further owner notice.",
+    "QC and Safari access are released without any source checks.",
+    "Start all five arms concurrently.",
+    "Native preflight is optional.",
+    "Reuse expired claims.",
+    "Skip source custody verification.",
+    "Preview attempt1 is a fresh reserved native attempt.",
+    "Automatically resume whenever QC is available.",
     "QC is available so resume.",
-    "No further owner notice is required.",
-    "Consult Mia now.",
-    "Fresh QC inspection performed.",
-    "1 QC request.",
-    "1 Safari request.",
-    "1 native compile.",
-    "1 backtest.",
+    "No source, input or resource prerequisites are required.",
     "5/5 accepted full-window results.",
     "Financial acceptance remains TRUE.",
+    "All financial metrics available.",
+    "Completed proves accepted source/economics/accounting.",
     "Claude review is required before continuation.",
     "Multiple intermediate lane pushes.",
+    "The20REMXrows are admitted to the frozen financial input.",
     SECTION109_NEXT_ROLE,
     SECTION110_NEXT_ROLE,
+    SECTION112_NEXT_ROLE,
     SECTION112_PRE_NOTICE_NEXT_ROLE,
 ))
-def test_section112_current_fact_guard_refuses_appended_contradictions(monkeypatch, surface, contradiction):
+def test_section116_current_fact_guard_refuses_appended_contradictions(monkeypatch, surface, contradiction):
     test_exact_next_step_names_the_current_artifacts()
     _mutate_section112_current_surface(monkeypatch, surface,
         lambda text: text + "\n" + contradiction + "\n")
     with pytest.raises(AssertionError):
         test_exact_next_step_names_the_current_artifacts()
+
+
+@pytest.mark.parametrize("surface", ("current", "preamble"))
+@pytest.mark.parametrize("observation", ("1 QC request.", "1 Safari request.", "1 native compile.", "1 backtest."))
+def test_section116_release_does_not_permanently_freeze_native_observation_counts(surface, observation):
+    text = _current_qualification(_record_section("## 8. Exact next step")) if surface == "current" else _record_preamble()
+    _assert_section116_current_facts(text + "\n" + observation)
+
+
+@pytest.mark.parametrize("number", (112, 113, 114, 115))
+def test_section116_preserves_received_hold_and_quarantine_history(number):
+    received = _record_section("## " + str(number) + ".")
+    assert hashlib.sha256(received.encode()).hexdigest() == SECTION116_RECEIVED_HISTORY_SHA256[number]
+
+
+@pytest.mark.parametrize("surface", ("current", "preamble"))
+def test_section116_retains_prior_hold_as_immutable_historical_semantics(surface):
+    historical = "\n".join(_git_lines("show", SECTION116_RECEIVED_HEAD + ":" +
+        "docs/Strategy Description/" + RECORD)) + "\n"
+    if surface == "preamble":
+        text = historical[:historical.index("\n## 1.")]
+    else:
+        begin = historical.index("## 8. Exact next step")
+        section = historical[begin:historical.index("\n## 9.", begin)]
+        text = _current_qualification(section)
+    _assert_section112_historical_hold_facts(text)
 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))

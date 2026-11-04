@@ -5,12 +5,14 @@ STORAGE PROOF AND637-SECOND OBSERVED API AUDIT. FAILED364–365 CLAIMS AND
 THE FAILED PROBE CLI ARE PRESERVED. FMP SEC CORROBORATES12 RETAINED
 CONTROLS; EODHD SUPPLIES CURRENT MAPPINGS FOR12. FMP INSIDER DATE SCOPE
 IS REFUSED, WITH4 REQUESTS UNATTEMPTED. CURRENT MAPPINGS/NAIVE ACCEPTANCE
-ARE NOT HISTORICAL IDENTITY/PUBLIC-KNOWN-BY.367'S PROTECTED CHAINED
-REQUIRED21 PLANNER IS IN IMPLEMENTATION; ITS SOURCE-ONLY PREFLIGHT FOUND
-A NESTED MACOS SANDBOX REFUSAL BEFORE ANY DATA NAMESPACE OR FULL25 RUN.
-THE LAUNCH CORRECTION RETAINS ALL NATIVE GATES. FIFTEEN CARRIED P2s,
-THE NEW NATIVE FINDING PENDING CORRECTION, AND HISTORICAL SOURCE/PIT/
-POPULATION FACTUAL GATES REMAIN OPEN. SUBSCRIPTIONS REMAIN ACTIVE;
+ARE NOT HISTORICAL IDENTITY/PUBLIC-KNOWN-BY.367'S CORRECTED NATIVE
+PREFLIGHT AND SINGLE363-SECOND PROTECTED FULL25 RUN PASSED. THE GENUINE
+20,052 CONSUMED CHAIN EXCLUDES ALL PRIOR CLAIMS FROM EIGHT FRESH2020Q4
+NON-DISPATCH CANDIDATES. FIVE-FILE INDEPENDENT READBACK PASSED. THIS IS
+PLANNING, NOT ORIGINAL ADMISSION, CORPUS COMPLETION OR BACKTEST READINESS.
+FIFTEEN CARRIED P2s AND HISTORICAL SOURCE/PIT/POPULATION FACTUAL GATES
+REMAIN OPEN; THE NEW NATIVE LAUNCH FINDING IS RESOLVED AT ITS EXACT SCOPE.
+SUBSCRIPTIONS REMAIN ACTIVE;
 CANCELLED RENEWAL IS NOT EXPIRED ACCESS. NO QC/SAFARI, PURCHASE, UPGRADE,
 VENDOR REPLY OR MONITOR REARM THIS ROUND.**
 
@@ -325,7 +327,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-03 | Codex owner-authorized pre-QC USB build | Clean32caf7a5521ef4fae21b504feac816c8e7f692ef -> implementation5493b95f48105510b77396ef7310161bae25086d -> correction51177f3e9dbad613de61b341e632b228d747fe71 -> this separate361 handoff | Qualify supplied FirstRate daily/action/earnings bytes without purchases or QC | Failed attempt1 preserved; ZIP-only underscore correction proved RED/GREEN; same-epoch attempt2 succeeded230.497046375s,68 data files+manifest/21,638 daily members/47,802,869 daily rows, private catalog37,210,827B hash-bound; no canonical/source/PIT/actual-release/rights/backtest promotion. | Main136 focused/EXACT1.52s,129 boundary6.67s and final checks below; author65 focused/compile; native no-USB health plus bounded metadata diagnosis and actual read-only scan; independent nine-leaf integrity/hash reconstruction, zero requests/credentials/looks/QC/backtests. | No P0/P1;13 carried P2s OPEN; IBUSB-FORMAT-36001 resolved narrowly, old-helper IBIPC-36001 P3 retained/open; prior closures/failed roots preserved. | Concrete missing historical SEC availability/version, original/PIT/identity/whole-population facts; no vendor reply, purchase/upgrade, QC/Safari, optional EOD comparison, monitor rearm or interim push. |
 | 2026-11-03 | Codex owner-requested subscription audit | Clean317ca265778f8df430fade5c212647b07f08b78a -> this documentation-only363 handoff; incoming EMPTY | Inspect QC/Sharadar/EODHD/FMP active plans and available dataset families | Current plans verified; renewal cancellation distinguished from active paid access. FMP Starter matrix6/6 insider and12/12 SEC endpoints available; QC Researcher/core-cloud license versus download distinction. No source request/row capture or job. | Public primary docs plus signed-in account/license metadata; focused record/active-document/EXACT checks below; zero source replays/provider queries/looks/backtests. |13 carried P2s unchanged; IBUI-SECRET-36201 P3 token-display/owner-rotation scope OPEN, no key in Git or further use. | Qualify existing-plan FMP/identifier sources under a new bounded source scope before purchase; historical archive/PIT/population facts remain missing; no QC research, vendor reply or monitor rearm. |
 | 2026-11-03 | Codex owner-authorized FMP/EOD qualification | Clean2948796a ->650cd9ba4569f6ef059246944a62fcd107d0de29 ->743aea5a6555a1a4c062f16e485751b7f6a7b6b1 ->d7b6c3cfba751c17b63c477a998bfa7f0b9ff699 -> this separate365 handoff; incoming EMPTY | Qualify existing-plan insider/SEC/current mappings against8 warmup+4 fixed recent originals, no purchases/QC | Three actual operations FAILED/preserved; third native worker produced12 candidate controls/16 metadata/56 body-stage pins, then output_changed before any Keychain/provider access. No API coverage or backtesting readiness claimed. | Main288 focused9.03s/129 boundary6.95s, eight images compile/four frozen historical equality; synthetic delayed RED/GREEN and immutable-flag probes364, guard reversals; no full suite. |15 P2s OPEN:13 carried plus IBFMPEOD-OBS36401 and reopened IBFMPEOD-PUB36402; owner-confirmed36201 rotation action satisfied without actual key inspection. | Stable private custody qualification/diagnosis before any newly scoped data operation; preserve all failed claims, no fourth attempt/reset, provider retry, purchase/QC/vendor reply or monitor rearm. |
-| 2026-11-03 | Codex fresh stable-data custody and provider qualification | Clean63d5665fe2eca484bc8d24d93cbd0d293d096756 -> qualified implementation and separate final handoff follow; incoming EMPTY | Fix custody, preserve all failed claims, then qualify existing FMP/EODHD without purchases/QC | Fresh fixed Library/Application Support DATA-only receiver; oldv1 entrypoints/claims intact; genuine70s post-publication host proof required before new operation/credentials. Verified SEC midnight and insider query-scope fixes. Actual results pending at this prospective point. | Main462 focused10.32s/18 native warnings,129 boundary7.07s,12 compiled images/four frozen historical-byte equality; agent targeted RED/GREEN/guard reversals366. |15 carried P2s pending factual/operational scopes; new verified parser fixes tested, no data-gate closure yet. | Actual committed host stability proof, then bounded36-unique/one-attempt provider qualification if all inputs pass; one final push, no old resume/reset, purchase/QC/vendor reply or monitor. |
+| 2026-11-03 | Codex custody repair, existing-plan audit and protected planner | Clean63d5665fe2eca484bc8d24d93cbd0d293d096756 ->dfdf9ee5 ->7f650b08 ->b851c3b3 ->ed2c738f -> separate368 handoff; incoming EMPTY | Fix custody, qualify FMP/EODHD, continue input-complete pre-QC engineering; no purchases/QC | Genuine storage experiment recovered without rewriting failed CLI;637s audit completes24/28 GETs, FMP SEC+EOD current mappings corroborate12 controls, insider date-scope refuses. Prepared native architecture then completes363s full25/20,052-chain assembly and independent five-leaf readback;8 warmup NON-DISPATCH candidates, no acquisition/admission/readiness. | Main483 provider/custody10.61s,232 planner19.62s,129 boundary6.94s;32 compiled images/four frozen equality; genuine RED/GREEN, real native preflight23.714s and source-only platform canaries. No full suite. |15 carried P2s OPEN; scoped new parser/IPC/typed-summary/native corrections resolved. Actual archive/PIT/population gates unchanged; all failed claims preserved. | Exact historical availability/version and identity/context facts remain the concrete pre-QC blocker. No ordinary current-row probe, optional comparison, purchase/QC/vendor reply, monitor rearm or interim push. One final matching-lane push after368. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -44068,3 +44070,193 @@ uses a NEW process because controller sandbox installation is final. This
 does not create a second plan namespace or second full25 budget. The original
 source-only refusal stays recorded; IBPLAN-NATIVE36702 remains pending actual
 qualified host evidence. Commit this correction clean before either stage.
+
+### 367.6 Observed preflight, protected assembly and independent readback
+
+Correction `ed2c738f5198e141ca05f02a0f59a312dd0a4eb7` existed clean
+BEFORE both stages. An initial outer CLI wrapper incorrectly passed argv to
+the zero-argument main; it stopped at TypeError before any worker/namespace
+or data stage, and the wrapper then failed to decode empty stdout. Correcting
+ONLY the outer invocation to sys.argv + main() is harness setup, not a source
+retry or production change. Source-only preflight then PASSED exit0 in
+23.713784542s, stdout576/stderr0:174 planner sources,164 storage-proof sources,
+four strict READY roles, one health activation, zero data-role activations
+and no data namespace. The outer read-only namespace check independently
+confirmed absence before/after this preflight. Unused data workers were
+killed/drained; the preflight process exited before actual execution.
+
+After rechecking exact root/branch/clean ed2c738f and unchanged matching
+origin63d5665f, ONE new-process actual observation PASSED exit0 in outer
+363.324594833s (producer elapsed362.545331s), stdout782/stderr0. No source,
+test or record edit occurred during execution. The controller and every
+activated worker retained effective native denials and real memory guards;
+the parent installed its profile once after workers were READY. No nested
+sandbox or unsandboxed DATA stage was substituted.
+
+| Actual artifact | Bytes | SHA-256 |
+|---|---:|---|
+| complete.json |23133|504aaa59144982c609e431ce724b1c1de5876cd9ff4cf1ce4a3c708749dcae8e|
+| plan.json control wrapper |541635|4373a2e2792a8860cb33cadfd18a7fa076005b4a4605f58ae3fa6a48a6127f03|
+| pure required21 selection | contained in wrapper |3bc83b4bfa5398049d37e16c2a876e322ce4bc5e438223f851ad2fea69c9e5eb|
+
+Actual execution identity174-source inventory SHA-256
+`abf3269c1f526e6ac909451927e998b8f955abdee0d53e2c654a05b6e9282afb`.
+Genuine full25 factories matched BOTH external anchors exactly: roster
+801661a5 and audit ce6a0a0e. This accounts1,281,147 context SUBMISSION rows,
+including1,163,648 Form4/4-A rows; the distinct20-quarter pilot accounts
+1,008,318 SUBMISSION rows including921,570 Form4/4-A. All82 ZIP identities
+were only opaque-hashed by intake custody; ONLY25 context quarters were
+interpreted. No strict-D23/82-quarter promotion digest follows.
+
+The genuine consumption chain remains20,052 =20,044 prior +8 already-started
+required21 originals, with chain9a77f2b2 and accession-list9be3ca7b unchanged.
+The new plan selects8 fresh2020Q4 candidates, underfilled FALSE, all outside
+that consumed set. Those NEW eight were NOT requested, globally claimed or
+added to a consumed index. The complete source audit's19,852 matching-body
+candidate counter has its own full25/exposure scope; it is neither canonical
+admission nor a replacement for frozen19,846/99,394 legacy custody accounting.
+The old ambiguous-consumption target remains present and excluded, not fixed.
+
+The controller performed its own strict five-file readback. A separate native
+read-only process then independently authenticated the external complete pin,
+all five files/612,837 bytes, every leaf pin, registration/start/plan/completion
+crosslink, original/current storage lineage and identical physical data root.
+It revalidated exact result schema, typed/reconstructed20,052 chain, source
+anchors and all selected/consumed exclusions; exit0/stderr0. No actual inputs
+were replayed, source requested or new namespace created by this readback.
+
+**IBPLAN-NATIVE36702 RESOLVED** only for this prepared-worker Mac/POSIX
+controller/worker route, supported by real preflight AND actual protected
+run/readbacks. This does not erase b851c3b3's source-only failure, authorize a
+Windows port, thaw/replace old callers or establish general perpetual host
+stability. The new epoch is now CONSUMED; never resume/reset/rewrite/alias it.
+All new-source/credential/QC/outcome/backtest counts are0 and all dispatch,
+original-admission, historical-known-by, PIT, rights, canonical/full-required21
+and backtesting-readiness flags remain FALSE. No collector or actual pilot
+population/engine handoff is activated by these eight planned candidates.
+
+## 368. Separate durable handoff — qualifications complete, pre-QC factual stop (2026-11-03)
+
+### 368.1 Exact lineage and review attribution
+
+Captured matching origin/base is
+`63d5665fe2eca484bc8d24d93cbd0d293d096756`; complete incoming range EMPTY.
+No new Claude review arrived or was counter-reviewed this round. The latest
+owner explicitly authorized custody repair, FMP/EOD qualification and continued
+pre-QC work without a Claude wait, while retaining NO purchases/QC and a single
+final push. Advisory peer source QA/tests remain attributed; they are not
+independent acceptance of Codex's own implementation.
+
+| Outgoing Codex commit | Implementation/observed disposition |
+|---|---|
+| dfdf9ee5d0ce35f134e2de0dc60b6d6782bdea4e | Qualified private receiver and pure parser corrections; actual synthetic experiment completed but its CLI FAILED on float IPC. Exact failed claim/receipt preserved; independently authenticated recovery366.6, not retroactive CLI success. |
+| 7f650b0814010c84a512145d72d6cb4aa6dcdcc0 | Corrected integer IPC/narrow historical-probe binding; qualified before the actual637s provider audit. Complete PARTIAL qualification and independent63-file readback as366.8, not full historical coverage. |
+| b851c3b39d14cbb425110fa684be0b74e50d1b68 | New protected required21 runner; source-only preflight FAILED on host nested-Seatbelt restriction before namespace/full25 activation. Failure retained and exact cause independently reproduced. |
+| ed2c738f5198e141ca05f02a0f59a312dd0a4eb7 | Corrected prepared-worker architecture; qualified before successful source-only preflight and single actual363s full25/20,052-chain assembly, then independent5-file readback. Planning only; no new source request/admission/readiness. |
+
+This separate documentation-only handoff follows those four exact existing
+hashes. It does not represent its later commit as already existing during any
+run. The final publication contains the whole base-to-handoff series in this
+one lane; no local-only unrelated commit, branch/worktree or shared-file change
+is silently bundled. Exactly one final matching-lane push is authorized after
+final record/diff/status/origin checks; no interim checkpoint was pushed.
+
+### 368.2 Findings, decisions, validation and preserved evidence
+
+No open P0/P1. Fifteen carried P2s remain OPEN at exact scopes:
+IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01, sharedIBSH-CR02,
+sharedIBQC-SHARED-META01, IBARCHIVE-OBS-01/02, IBPARENT-PLAN-OBS01,
+IBPUBLIC-KNOWNBY-01, IBQC-ACK-33001, partlyIBPILOT-COMP-33001,
+partlyIBWIN-CR02, IBFMPEOD-OBS36401 and originalIBFMPEOD-PUB36402.
+The old planner observation is an unresolved ORIGINAL FAILED operation;
+this successful different chained plan does not rewrite it. The old campaign
+unchained-later-capture stop and all previous scoped resolutions remain.
+
+New SCOPE36601/DATE36602/IPC36603 and CONS36701/NATIVE36702 corrections are
+resolved only at their described technical scopes, with genuine RED/GREEN,
+attributed reversals and observed native evidence. Original Documents-folder
+mutation cause remains unknown. P3s including old IPC36001, Massive34101 and
+sharedIBSH-CR01 keep their prior dispositions; token36201 owner rotation action
+was already satisfied by status, with no prior UI token inspected/hashed here.
+
+Owner-delegated choices and reasons are durable in IBDEC-366-01 through04 and
+IBDEC-367-01/02: data-only stable store; preserve strict old guards/claims;
+genuine70-second post-publication proof; first bounded current-provider audit;
+exact receipt recovery after IPC defect; mandatory input-complete planner
+integration; independently prepared strict workers before once-only native
+parent isolation. None changes data facts, frozen economics/windows or an
+explicit owner hold. No additional purchase/upgrade is established as needed.
+
+Main observed validation:483 provider/custody checks10.61s;232 final planner/
+chain/selection/EXACT checks19.62s;129 boundary/record/import checks6.94s on
+prepared implementation before final actual-result notes;32 images compile,
+four frozen current-byte hashes equal exact aa0d635d Git images. Attributed
+agent runs, earlier failed harnesses, real REDs, canaries and original/current
+execution provenance remain separately recorded in366–367. No full suite,
+historical-root replay, ordinary provider retry or re-execution of spent claims.
+Final document/diff/status/hash checks follow this handoff note.
+
+All original three364–365 claims remain untouched. The failed probe CLI and
+every consumed new epoch are preserved. Frozen IB1C v1/scale/pilot and all four
+v3 source images remain untouched. Stoppedv3 stays1,846/1,847 unresolved;
+separate7,373-byte diagnostic/report206e6db9 does not resolve its unmatched
+start. Required21's original eight and20,052 consumption chain remain intact.
+Legacy2022Q4–2023Q1 stays19,846 source-bound/99,394,79,548 originally
+unattempted; strictD23 keeps seven nonexact quarters/no82 promotion digest.
+Original82-quarter study and distinct2021–2025 pilot/warm-up windows, causal
+refusal accounting and both earnings diagnostics/economics remain unchanged.
+Both nonretroactive incident classifications stay distinct:372 earlier
+requests have historical authorization provenance not established; separate
+reviewer incident is reviewer-reported probable unintended SEC access with
+exact request count/transferred bytes not established. No estimated count is
+converted into a measured fact.
+
+### 368.3 Concrete remaining blocker and next action
+
+STOP before actual pilot population/engine handoff. Current FMP SEC search
+and EODHD mappings genuinely corroborate controls; neither supplies historical
+public-delivery/version facts. FMP insider's one ignored-date response is
+refused, not repaired by relaxing dates or requesting another page. No new
+ordinary current-row probe, another wrapper/fixture or optional EOD/USB
+agreement comparison can manufacture the missing archive evidence.
+
+The next substantive input is a genuine accession/body/version-linked archive
+for2020-10-01–2025-12-31 with authenticated public-available-by upper bounds
+before09:28/09:30US Eastern, clock/timezone meaning, correction/deletion/backfill
+lineage, gap/refusal accounting and applicable use. Exact first-public seconds
+are not mandatory. Existing-provider capability remains unconfirmed for that
+archive, not a universal refusal; this audit does not justify buying another
+price/earnings/general insider bundle. Already-held vendor conversations need
+a later explicit release before any reply/account disclosure or follow-up;
+no inbox check, correspondence, monitor rearm or new inquiry occurred here.
+
+Other real gates remain: full required21/all-six-form original admission,
+genuine older target-affecting lot history, historical issuer/share-class/
+listing/CIK/PIT identity and pre-entry contexts; bind actual price/volume,
+liquidity, factor/RF and maturity evidence to the genuine cohort; qualify
+issuer-complete actual earnings and BOTH prescribed diagnostics, applicable
+processing rights and permanent whole-population/look/engine-parity roots.
+The protected eight-request NON-DISPATCH plan may support a FUTURE separately
+qualified prospective acquisition scope; it is not authority to execute one
+now or resume a stopped collector. No presently established further mandatory
+actual population/engine integration has complete factual inputs at this stop.
+
+No purchase/upgrade/trial/paid export/provider-plan change, QC/Safari/API/SDK/
+job/upload/backtest/outcome look, scheduler/operator-database/broker change,
+paper/live deployment, capital, funded-account/order/trading action was taken.
+Credential presence and delegated judgment do not supply missing facts. Keep
+the monitors disarmed and the vendor-reply/QC holds intact. Resume substantive
+qualification when genuine archive/identity evidence and its actual gates
+permit, without inventing readiness or a new routine approval checkpoint.
+
+### 368.4 Final publication checks
+
+After the actual-result/handoff content, final129 boundary/active-document/
+record/import checks PASS6.69s. This validation tail changes no contract or
+code. Final diff check passes; exact designated root/branch and ed2c738f HEAD
+were reverified, with ONLY this lane record modified. Matching-only fetch
+still shows exact63d5665f origin and no incoming commits. The four outgoing
+implementation hashes are exactly368.1; the separate handoff commit follows.
+No successful push occurred before this handoff. Reverify clean exact final
+HEAD/unchanged origin before the sole final push, then independently confirm
+remote tip and clean/synced status; report that verification to the owner.

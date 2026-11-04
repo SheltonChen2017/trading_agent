@@ -55,6 +55,11 @@ def fresh_outer_registries(monkeypatch, tmp_path_factory):
         ("_CONSERVATIVE_FAILED", set()), ("_PREFLIGHTS", {}), ("_PREFLIGHT_FAILED", set()),
         ("_PREFLIGHT_ATTEMPTED", set()), ("_PREFLIGHT_ENDED", set()), ("_PREFLIGHT_CLOCKS", {})):
         monkeypatch.setattr(outer, name, value)
+    for name, value in (("_PREFLIGHT_TERMINALS", {}), ("_PREFLIGHT_TERMINAL_ISSUERS", {}),
+        ("_CLOSED_PREFLIGHTS", {}), ("_CLOSED_PREFLIGHT_BY_CANDIDATE", {}),
+        ("_CLOSED_PREFLIGHT_ATTEMPTED", set()), ("_CLOSED_PREFLIGHT_FAILED", set()),
+        ("_CLOSED_PREFLIGHT_CANDIDATE_FAILED", set())):
+        monkeypatch.setattr(outer, name, value)
     for name, value in (("_CHECKPOINT_FACTS", {}), ("_CHECKPOINT_FACTS_FAILED", set()),
         ("_CHECKPOINT_CAPS", {}), ("_CHECKPOINT_ROUND", {}), ("_WRITTEN_CHECKPOINTS", {})):
         monkeypatch.setattr(outer, name, value)
@@ -1394,6 +1399,304 @@ def test_conservative_preflight_nonexact_manifest_key_refuses_before_code_open(c
     with pytest.raises(outer.DurableCountCaptureRefusal, match="code_changed"):
         with h.context(manifest=bad): pytest.fail("nonexact code path key accepted")
     assert "Main_open" not in h.events and "source_committed_code_audit" not in h.events
+
+
+@pytest.fixture
+def closed_conservative_preflight(conservative_preflight, monkeypatch):
+    """Only the same explicit toy/code/native seams; genuine closure issuer."""
+    h = conservative_preflight
+    monkeypatch.setattr(outer, "CLOSED_CONSERVATIVE_PREFLIGHT_SHA256",
+        hash_payload(outer.closed_conservative_preflight_policy()))
+    return h
+
+
+def test_closed_preflight_has_distinct_policy_and_no_operational_authority():
+    outer._closed_preflight_registered()
+    assert outer.CONSERVATIVE_PREFLIGHT_SHA256 == "4edb2b0f6e04c3d2c99d43c84494dbe5c2c9039bd9d522ea8184272f9edf1829"
+    assert outer.RUN_PROTOCOL_SHA256 == "0eb57c3e1b7461df5e111709373215b51e913ebafd617da351d199df0b3c1815"
+    policy = outer.closed_conservative_preflight_policy()
+    assert hash_payload(policy) == outer.CLOSED_CONSERVATIVE_PREFLIGHT_SHA256
+    assert policy["maximum_seconds"] == 300 and policy["maximum_process_observations"] == 1
+    authority = policy["authority"]
+    assert authority["finite_source_free_observation_only"] is authority["pending_USB_qualification"] is True
+    assert all(value is False or type(value) is int and value == 0 for name, value in authority.items()
+        if name not in {"finite_source_free_observation_only", "pending_USB_qualification"})
+    with pytest.raises(outer.source_scope.CountSourceAuthorityRefusal): outer.source_scope.require_dispatch_allowed()
+
+
+def test_closed_preflight_retains_original_finite_lineage_after_Main_expiry(closed_conservative_preflight):
+    h = closed_conservative_preflight
+    with h.context() as candidate:
+        live = candidate._anchor
+        assert not outer._PREFLIGHT_TERMINALS
+    terminal = outer._PREFLIGHT_TERMINALS[id(candidate)]
+    assert terminal[1] is live and terminal[2] is live[15]
+    assert terminal[2].f_locals["terminal_witness"] is terminal[0]
+    observation = outer.freeze_closed_conservative_count_observation(candidate)
+    bound = outer.closed_conservative_count_observation_binding(observation)
+    assert bound[0] is observation and bound[1] is candidate and bound[2] is terminal and bound[3] is terminal[3]
+    assert bound[3][1] is outer.conservative.conservative_basis_binding(h.basis)
+    assert bound[3][2] is outer.conservative.conservative_basis_binding(h.basis)[4]
+    assert len(bound[3][2]._parts) == 9
+    h.tick += 3601; h.expired = True
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="not_live"): candidate.public_summary()
+    # Every old live Main validation would now fail and latch. The finite
+    # observation only reads retained original lineage, never those getters.
+    before = list(h.events)
+    report = observation.public_summary()
+    assert report["status"] == "closed_finite_source_free_observation"
+    assert report["context_closure"] == "Main_and_code_contexts_closed"
+    assert report["basis_sha256"] == h.basis.sha256 and report["plan_sha256"] == bound[3][2].sha256
+    assert report["Main_receipt_sha256"] == "a" * 64 and report["Main_projection_sha256"] == "b" * 64
+    assert report["runtime_head"] == "c" * 40 and report["actual_remote"] == "b" * 40
+    assert report["authority"] == outer.closed_conservative_preflight_authority()
+    assert h.events == before and not outer.native_main._AUTHENTICATED_FAILED
+    assert h.loaded.closed and not h.forbidden and not outer._LEASES
+
+
+def test_closed_preflight_before_context_end_refuses_and_latches_only_closed_namespace(closed_conservative_preflight):
+    h = closed_conservative_preflight
+    with h.context() as candidate:
+        with pytest.raises(outer.DurableCountCaptureRefusal, match="not_closed"):
+            outer.freeze_closed_conservative_count_observation(candidate)
+        assert candidate.public_summary()["authority"]["dispatch_authority"] is False
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="closed_preflight_failed"):
+        outer.freeze_closed_conservative_count_observation(candidate)
+    assert not outer._CLOSED_PREFLIGHTS
+
+
+@pytest.mark.parametrize("barrier", ["yield", "Main_close", "code_close", "fresh_code", "final_clock"])
+def test_closed_preflight_all_original_exit_and_final_barriers_veto_terminal(closed_conservative_preflight, monkeypatch, barrier):
+    h = closed_conservative_preflight; candidate = None
+    if barrier == "Main_close": h.fail_main_close = True
+    if barrier == "code_close":
+        old = outer.archive_loader.count.old.cache.HeldFiles.__exit__
+        def failing_exit(self, *args):
+            result = old(self, *args)
+            if "Main_close" in h.events: raise RuntimeError("FABRICATED_CODE_CLOSE")
+            return result
+        monkeypatch.setattr(outer.archive_loader.count.old.cache.HeldFiles, "__exit__", failing_exit)
+    if barrier in {"fresh_code", "final_clock"}:
+        audit = outer._audit_code
+        def final_audit(root, guard, manifest, held=None):
+            answer = audit(root, guard, manifest, held)
+            if held is None:
+                if barrier == "fresh_code": raise RuntimeError("FABRICATED_FINAL_CODE")
+                h.tick += 301
+            return answer
+        monkeypatch.setattr(outer, "_audit_code", final_audit)
+    with pytest.raises(Exception):
+        with h.context() as candidate:
+            if barrier == "yield": raise RuntimeError("FABRICATED_YIELD_FAILURE")
+    assert candidate is not None and id(candidate) not in outer._PREFLIGHT_TERMINALS
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer.freeze_closed_conservative_count_observation(candidate)
+    assert not outer._CLOSED_PREFLIGHTS and not h.forbidden and not outer._LEASES
+
+
+def test_closed_preflight_terminal_snapshot_is_inside_final_300_seconds(closed_conservative_preflight, monkeypatch):
+    import sys
+    h = closed_conservative_preflight; original = outer._preflight_finite_lineage
+    def slow_final_snapshot(record):
+        result = original(record)
+        if sys._getframe(1).f_code is outer._issue_preflight_terminal.__code__: h.tick += 301
+        return result
+    monkeypatch.setattr(outer, "_preflight_finite_lineage", slow_final_snapshot)
+    candidate = None
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="clock_refused"):
+        with h.context() as candidate: pass
+    assert id(candidate) not in outer._PREFLIGHT_TERMINALS and not outer._CLOSED_PREFLIGHTS
+
+
+def test_closed_preflight_exact_300_boundary_can_close_without_extending_Main(closed_conservative_preflight, monkeypatch):
+    h = closed_conservative_preflight
+    with h.context() as candidate:
+        close = h.loaded.close
+        def exact_boundary(): close(); h.tick += 300
+        monkeypatch.setattr(h.loaded, "close", exact_boundary)
+    assert outer._PREFLIGHT_TERMINALS[id(candidate)][4] == (100., 400.)
+    h.tick += 5000
+    value = outer.freeze_closed_conservative_count_observation(candidate)
+    assert value.public_summary()["authority"]["actual_future_process_EXIT0_attested"] is False
+
+
+@pytest.mark.parametrize("cls", [outer.ClosedConservativeCountObservation, outer._ConservativePreflightTerminal])
+def test_closed_preflight_observation_and_witness_have_no_public_constructor(cls):
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="factory_required"): cls()
+
+
+def test_closed_preflight_matching_payload_and_copied_candidate_cannot_replace_issuer(closed_conservative_preflight):
+    h = closed_conservative_preflight
+    with h.context() as candidate: pass
+    for supplied in ({"closed": True}, candidate._anchor, True, None):
+        with pytest.raises(outer.DurableCountCaptureRefusal): outer.freeze_closed_conservative_count_observation(supplied)
+    clone = object.__new__(outer.ConservativeCountPreflight)
+    clone._anchor = clone._identity = candidate._anchor
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer.freeze_closed_conservative_count_observation(clone)
+    with pytest.raises(TypeError): outer.freeze_closed_conservative_count_observation(candidate, closed=True)
+    assert not outer._CLOSED_PREFLIGHTS
+
+
+@pytest.mark.parametrize("forgery", ["copied_terminal", "reflected_witness", "caller_flags"])
+def test_closed_preflight_forged_terminal_or_flags_cannot_mint(closed_conservative_preflight, forgery):
+    h = closed_conservative_preflight
+    with h.context() as candidate: pass
+    original = outer._PREFLIGHT_TERMINALS[id(candidate)]
+    if forgery == "copied_terminal":
+        outer._PREFLIGHT_TERMINALS[id(candidate)] = tuple(list(original))
+    elif forgery == "reflected_witness":
+        copy = object.__new__(outer._ConservativePreflightTerminal)
+        reflected = (copy, *original[1:])
+        outer._PREFLIGHT_TERMINALS[id(candidate)] = reflected
+        outer._PREFLIGHT_TERMINAL_ISSUERS[id(copy)] = reflected
+    else:
+        outer._PREFLIGHT_TERMINALS[id(candidate)] = (True, candidate._anchor, True, {}, (), True, True, True)
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer.freeze_closed_conservative_count_observation(candidate)
+    outer._PREFLIGHT_TERMINALS[id(candidate)] = original
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="closed_preflight_failed"):
+        outer.freeze_closed_conservative_count_observation(candidate)
+    assert not outer._CLOSED_PREFLIGHTS
+
+
+def test_closed_preflight_private_issuer_cannot_be_called_outside_original_tail(closed_conservative_preflight):
+    h = closed_conservative_preflight
+    with h.context() as candidate: pass
+    terminal = outer._PREFLIGHT_TERMINALS[id(candidate)]
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="factory_required"):
+        outer._issue_preflight_terminal(candidate._anchor, terminal[3], object(), object())
+
+
+def test_closed_preflight_copied_observation_and_mutation_restore_never_revive(closed_conservative_preflight):
+    h = closed_conservative_preflight
+    with h.context() as candidate: pass
+    value = outer.freeze_closed_conservative_count_observation(candidate); row = value._anchor
+    clone = object.__new__(outer.ClosedConservativeCountObservation)
+    clone._anchor = clone._identity = row
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer.closed_conservative_count_observation_binding(clone)
+    value._anchor = value._identity = tuple(list(row))
+    with pytest.raises(outer.DurableCountCaptureRefusal): value.public_summary()
+    value._anchor = value._identity = row
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="closed_preflight_failed"): value.public_summary()
+
+
+def test_closed_preflight_wrong_basis_cannot_replace_completed_candidate(closed_conservative_preflight):
+    h = closed_conservative_preflight
+    with h.context() as candidate: pass
+    original = candidate._anchor
+    clone = object.__new__(outer.conservative.ConservativeCountRecoveryBasis)
+    object.__setattr__(clone, "_anchor", h.basis._anchor); object.__setattr__(clone, "_identity", h.basis._identity)
+    changed = (*original[:3], clone, *original[4:]); candidate._anchor = candidate._identity = changed
+    with pytest.raises(outer.DurableCountCaptureRefusal): outer.freeze_closed_conservative_count_observation(candidate)
+    candidate._anchor = candidate._identity = original
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="closed_preflight_failed"):
+        outer.freeze_closed_conservative_count_observation(candidate)
+
+
+@pytest.mark.parametrize("field", ["CLOSED_CONSERVATIVE_PREFLIGHT_SHA256", "CONSERVATIVE_PREFLIGHT_SHA256"])
+def test_closed_preflight_policy_namespace_change_latches_after_restoration(closed_conservative_preflight, monkeypatch, field):
+    h = closed_conservative_preflight
+    with h.context() as candidate: pass
+    value = outer.freeze_closed_conservative_count_observation(candidate); original = getattr(outer, field)
+    monkeypatch.setattr(outer, field, "0" * 64)
+    with pytest.raises(outer.DurableCountCaptureRefusal): value.public_summary()
+    monkeypatch.setattr(outer, field, original)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="closed_preflight_failed"): value.public_summary()
+
+
+def test_closed_preflight_duplicate_factory_refuses_without_second_value_or_reopening(closed_conservative_preflight):
+    h = closed_conservative_preflight
+    with h.context() as candidate: pass
+    value = outer.freeze_closed_conservative_count_observation(candidate); before = list(h.events)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="spent"):
+        outer.freeze_closed_conservative_count_observation(candidate)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="closed_preflight_failed"): value.public_summary()
+    assert len(outer._CLOSED_PREFLIGHTS) == 1 and h.events == before and not h.forbidden
+
+
+def test_closed_preflight_returned_report_cannot_assert_future_custody_or_exit(closed_conservative_preflight):
+    h = closed_conservative_preflight
+    with h.context() as candidate: pass
+    value = outer.freeze_closed_conservative_count_observation(candidate); public = value.public_summary()
+    public["authority"]["source_dispatch_authority"] = True
+    public["authority"]["actual_future_process_EXIT0_attested"] = True
+    public["authority"]["future_filesystem_custody_claimed"] = True
+    assert value.public_summary()["authority"] == outer.closed_conservative_preflight_authority()
+    assert not outer._LEASES and not h.forbidden
+
+
+def test_closed_preflight_reflected_value_and_private_tables_cannot_replace_factory_frame(closed_conservative_preflight):
+    h = closed_conservative_preflight
+    with h.context() as candidate: pass
+    original = outer.freeze_closed_conservative_count_observation(candidate)
+    row = original._anchor
+    clone = object.__new__(outer.ClosedConservativeCountObservation)
+    reflected = (clone, *row[1:])
+    clone._anchor = clone._identity = reflected
+    outer._CLOSED_PREFLIGHTS[id(clone)] = reflected
+    outer._CLOSED_PREFLIGHT_BY_CANDIDATE[id(candidate)] = reflected
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="factory_required"):
+        outer.closed_conservative_count_observation_binding(clone)
+
+
+def test_closed_preflight_reflected_terminal_tables_cannot_replace_original_issuer_row(closed_conservative_preflight):
+    h = closed_conservative_preflight
+    with h.context() as candidate: pass
+    original = outer._PREFLIGHT_TERMINALS[id(candidate)]
+    reflected = tuple(list(original))
+    outer._PREFLIGHT_TERMINALS[id(candidate)] = reflected
+    outer._PREFLIGHT_TERMINAL_ISSUERS[id(original[0])] = reflected
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="factory_required"):
+        outer.freeze_closed_conservative_count_observation(candidate)
+
+
+@pytest.mark.parametrize("name", ["ClosedConservativeCountObservation", "_ConservativePreflightTerminal", "ConservativeCountPreflight"])
+def test_closed_preflight_substituted_class_factory_failure_latches_original_candidate(closed_conservative_preflight, monkeypatch, name):
+    h = closed_conservative_preflight
+    with h.context() as candidate: pass
+    original = getattr(outer, name)
+    replacement = type("FabricatedReplacement", (original,), {})
+    monkeypatch.setattr(outer, name, replacement)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="factory_required"):
+        outer.freeze_closed_conservative_count_observation(candidate)
+    monkeypatch.setattr(outer, name, original)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="closed_preflight_failed"):
+        outer.freeze_closed_conservative_count_observation(candidate)
+    assert not outer._CLOSED_PREFLIGHTS and not h.forbidden
+
+
+@pytest.mark.parametrize("name", ["ClosedConservativeCountObservation", "_ConservativePreflightTerminal", "ConservativeCountPreflight"])
+def test_closed_preflight_substituted_class_getter_failure_never_revives_original(closed_conservative_preflight, monkeypatch, name):
+    h = closed_conservative_preflight
+    with h.context() as candidate: pass
+    value = outer.freeze_closed_conservative_count_observation(candidate)
+    original = getattr(outer, name)
+    replacement = type("FabricatedReplacement", (original,), {})
+    monkeypatch.setattr(outer, name, replacement)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="factory_required"):
+        outer.closed_conservative_count_observation_binding(value)
+    monkeypatch.setattr(outer, name, original)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="closed_preflight_failed"): value.public_summary()
+
+
+@pytest.mark.parametrize("target", ["closed_callable", "closed_code", "closed_descriptor", "candidate_callable"])
+def test_closed_preflight_substituted_public_getter_contract_latches_binding_consumer(closed_conservative_preflight, monkeypatch, target):
+    h = closed_conservative_preflight
+    with h.context() as candidate: pass
+    value = outer.freeze_closed_conservative_count_observation(candidate)
+    cls = outer.ConservativeCountPreflight if target == "candidate_callable" else outer.ClosedConservativeCountObservation
+    original = cls.public_summary
+    def replacement(self): return {"fabricated": True}
+    if target == "closed_code":
+        original_code = original.__code__
+        monkeypatch.setattr(original, "__code__", replacement.__code__)
+    elif target == "closed_descriptor": monkeypatch.setattr(cls, "public_summary", staticmethod(original))
+    else: monkeypatch.setattr(cls, "public_summary", replacement)
+    # The canonical binding consumer must validate the method contract even
+    # when the substituted method itself would bypass that consumer entirely.
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="factory_required"):
+        outer.closed_conservative_count_observation_binding(value)
+    if target == "closed_code": monkeypatch.setattr(original, "__code__", original_code)
+    else: monkeypatch.setattr(cls, "public_summary", original)
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="closed_preflight_failed"): value.public_summary()
 
 
 def test_all_frozen_registration_hashes_match_without_source_IO(monkeypatch):

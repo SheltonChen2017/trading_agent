@@ -71,7 +71,12 @@ _WORKER_RETAINED = {}
 _CONSERVATIVE_ARCHIVES, _CONSERVATIVE_ATTEMPTED, _CONSERVATIVE_FAILED = {}, set(), set()
 _PREFLIGHTS, _PREFLIGHT_FAILED, _PREFLIGHT_ATTEMPTED, _PREFLIGHT_ENDED = {}, set(), set(), set()
 _PREFLIGHT_CLOCKS = {}
+_PREFLIGHT_TERMINALS, _PREFLIGHT_TERMINAL_ISSUERS = {}, {}
+_CLOSED_PREFLIGHTS, _CLOSED_PREFLIGHT_BY_CANDIDATE = {}, {}
+_CLOSED_PREFLIGHT_ATTEMPTED, _CLOSED_PREFLIGHT_FAILED = set(), set()
+_CLOSED_PREFLIGHT_CANDIDATE_FAILED = set()
 CONSERVATIVE_PREFLIGHT_SHA256 = "4edb2b0f6e04c3d2c99d43c84494dbe5c2c9039bd9d522ea8184272f9edf1829"
+CLOSED_CONSERVATIVE_PREFLIGHT_SHA256 = "18994544eb253291b7b273a87f421139b4f1cf9af478caba293062ab6b9f8189"
 MAXIMUM_PREFLIGHT_SECONDS = 300
 _PREFLIGHT_MAIN_CLASS = native_main.AuthenticatedDurableMainReceipt
 _RLOCK_TYPE = type(_thread.RLock())
@@ -93,7 +98,9 @@ durable_capture_CLI_arguments_refused durable_capture_hold_report_refused
 durable_preflight_registration_pending durable_preflight_conservative_required
 durable_preflight_attempt_spent durable_preflight_binding_changed durable_preflight_factory_required
 durable_preflight_not_live durable_preflight_failed durable_preflight_Main_required
-durable_preflight_Main_changed durable_preflight_code_changed durable_preflight_clock_refused""".split())
+durable_preflight_Main_changed durable_preflight_code_changed durable_preflight_clock_refused
+durable_closed_preflight_pending durable_closed_preflight_factory_required durable_closed_preflight_changed
+durable_closed_preflight_not_closed durable_closed_preflight_failed durable_closed_preflight_spent""".split())
 _HOLD_CONTRACT_CODES = frozenset((*_CODES, *transport.diagnostics.LOCAL_CONTRACT_CODES,
     *(name for module in (transport, controls, responses, storage, reader, accounting, negative,
         transport_union, checkpoints, source_scope, negative.primitive, negative.immutable,
@@ -285,6 +292,54 @@ def conservative_preflight_policy():
         "maximum_process_preflights": 1, "authority": conservative_preflight_authority()}
 
 
+def closed_conservative_preflight_authority():
+    return {"finite_source_free_observation_only": True, "pending_USB_qualification": True,
+        "source_dispatch_authority": False, "credential_authority": False, "claim_authority": False,
+        "storage_creation_authority": False, "budget_reservation_authority": False,
+        "budget_release_authority": False, "future_filesystem_custody_claimed": False,
+        "actual_future_process_EXIT0_attested": False, "old_process_recreated": False,
+        "source_admitted": False, "denominator_admitted": False, "ready_for_backtest": False,
+        "provider_HTTP": 0, "credential_reads": 0, "new_claims": 0, "new_STARTs": 0,
+        "new_charged_bytes": 0, "outcome_looks": 0, "qc_attempts": 0, "QC_or_Safari": False}
+
+
+def closed_conservative_preflight_policy():
+    return {"schema": "si-closed-conservative-count-preflight-policy-v1",
+        "live_preflight_policy_sha256": CONSERVATIVE_PREFLIGHT_SHA256,
+        "basis_policy_sha256": conservative.POLICY_SHA256,
+        "Main_protocol_sha256": native_main.PROTOCOL_SHA256,
+        "code_paths": list(conservative_preflight_code_paths()),
+        "issuer": "exact_original_preflight_generator_after_Main_and_code_context_exits_fresh_final_code_and_original300s_checks",
+        "factory": "original_completed_candidate_and_independent_original_terminal_witness_only_no_caller_facts_or_JSON",
+        "lineage": "original_basis9_plan_Main_report_current_code_manifest_runtime_and_scope_nonce_immutable_snapshot",
+        "later_access": "pure_original_issued_lineage_only_no_expired_Main_code_guard_clock_or_filesystem_callbacks",
+        "live_candidate": "unchanged_ends_permanently_on_context_release_never_reopened_or_extended",
+        "scope": "finite_past_observation_not_perpetual_filesystem_custody_or_future_process_exit_or_source_permission",
+        "maximum_seconds": MAXIMUM_PREFLIGHT_SECONDS, "maximum_process_observations": 1,
+        "authority": closed_conservative_preflight_authority()}
+
+
+def _closed_preflight_registered():
+    _preflight_registered()
+    require(_digest(CLOSED_CONSERVATIVE_PREFLIGHT_SHA256)
+        and hash_payload(closed_conservative_preflight_policy()) == CLOSED_CONSERVATIVE_PREFLIGHT_SHA256,
+        "durable_closed_preflight_pending")
+    require(ClosedConservativeCountObservation is _CLOSED_PREFLIGHT_CLASS
+        and _ConservativePreflightTerminal is _PREFLIGHT_TERMINAL_CLASS
+        and ConservativeCountPreflight is _PREFLIGHT_CANDIDATE_CLASS,
+        "durable_closed_preflight_factory_required")
+    require(vars(_CLOSED_PREFLIGHT_CLASS).get("public_summary") is _CLOSED_PREFLIGHT_SUMMARY_FUNCTION
+        and _CLOSED_PREFLIGHT_SUMMARY_FUNCTION.__code__ is _CLOSED_PREFLIGHT_SUMMARY_CODE
+        and vars(_PREFLIGHT_CANDIDATE_CLASS).get("public_summary") is _PREFLIGHT_CANDIDATE_SUMMARY_FUNCTION
+        and _PREFLIGHT_CANDIDATE_SUMMARY_FUNCTION.__code__ is _PREFLIGHT_CANDIDATE_SUMMARY_CODE,
+        "durable_closed_preflight_factory_required")
+    require(_issue_preflight_terminal is _PREFLIGHT_TERMINAL_ISSUER_FUNCTION
+        and _issue_preflight_terminal.__code__ is _PREFLIGHT_TERMINAL_ISSUER_CODE
+        and freeze_closed_conservative_count_observation is _CLOSED_PREFLIGHT_FACTORY_FUNCTION
+        and freeze_closed_conservative_count_observation.__code__ is _CLOSED_PREFLIGHT_FACTORY_CODE,
+        "durable_closed_preflight_factory_required")
+
+
 def _preflight_producers():
     return (conservative.freeze_conservative_count_basis, conservative.conservative_basis_binding,
         native_main.load_registered, native_main.load_registered.__wrapped__,
@@ -358,6 +413,188 @@ class ConservativeCountPreflight:
     __slots__ = ("_anchor", "_identity")
     def __init__(self): raise DurableCountCaptureRefusal("REFUSED: durable_preflight_factory_required")
     def public_summary(self): return json.loads(conservative_count_preflight_binding(self)[11])
+
+
+_PREFLIGHT_CANDIDATE_CLASS = ConservativeCountPreflight
+_PREFLIGHT_CANDIDATE_SUMMARY_FUNCTION = ConservativeCountPreflight.public_summary
+_PREFLIGHT_CANDIDATE_SUMMARY_CODE = ConservativeCountPreflight.public_summary.__code__
+
+
+class _ConservativePreflightTerminal:
+    __slots__ = ()
+    def __init__(self): raise DurableCountCaptureRefusal("REFUSED: durable_closed_preflight_factory_required")
+
+
+_PREFLIGHT_TERMINAL_CLASS = _ConservativePreflightTerminal
+
+
+def _preflight_finite_lineage(record):
+    """Pure original facts; never consult the ended Main or source callbacks."""
+    archive = _conservative_archive_binding(record[1], record[3])
+    require(archive is record[2] and archive[3] is record[4]
+        and record[4][4] is _ARCHIVE_PLANS.get(record[1]), "durable_closed_preflight_changed")
+    live, main = json.loads(record[11]), json.loads(record[12])
+    manifest = record[9]
+    require(type(record[11]) is bytes and canonical_json(live).encode() == record[11]
+        and type(record[12]) is bytes and canonical_json(main).encode() == record[12]
+        and type(manifest) is tuple and manifest == tuple(sorted(manifest))
+        and tuple(name for name, unused in manifest) == conservative_preflight_code_paths()
+        and live["basis_sha256"] == record[3].sha256
+        and live["plan_sha256"] == record[4][4].sha256
+        and live["Main_receipt_sha256"] == main["receipt_sha256"]
+        and live["runtime_head"] == record[10]
+        and live["code_identity_sha256"] == _code_identity(record[10], manifest)
+        and live["policy_sha256"] == CONSERVATIVE_PREFLIGHT_SHA256,
+        "durable_closed_preflight_changed")
+    return (archive, record[4], record[4][4], manifest, record[10], live["actual_remote"], record[11], record[12])
+
+
+def _issue_preflight_terminal(record, finite_lineage, main_exit_witness, code_exit_witness):
+    """Only the original successful generator tail can issue this witness."""
+    frame = sys._getframe(1); local = frame.f_locals
+    require(type(frame) is FrameType and frame.f_code is _CONSERVATIVE_PREFLIGHT_CODE
+        and frame.f_globals is globals() and local.get("record") is record
+        and local.get("candidate") is record[0] and local.get("scope") is record[14]
+        and local.get("finite_lineage") is finite_lineage
+        and local.get("main_exit_witness") is main_exit_witness
+        and local.get("code_exit_witness") is code_exit_witness
+        and type(main_exit_witness) is object and type(code_exit_witness) is object
+        and main_exit_witness is not code_exit_witness,
+        "durable_closed_preflight_factory_required")
+    require(_PREFLIGHTS.get(id(record[0])) is record and record[0]._anchor is record[0]._identity is record
+        and record[14] in _PREFLIGHT_ENDED and id(record[0]) not in _PREFLIGHT_FAILED
+        and id(record[0]) not in _PREFLIGHT_TERMINALS, "durable_closed_preflight_not_closed")
+    current = _preflight_finite_lineage(record)
+    require(all(a is b for a, b in zip(current[:4], finite_lineage[:4]))
+        and current[4:] == finite_lineage[4:], "durable_closed_preflight_changed")
+    _preflight_window(record)  # Original 300s check follows every final snapshot operation.
+    witness = object.__new__(_PREFLIGHT_TERMINAL_CLASS)
+    terminal = (witness, record, frame, finite_lineage, tuple(record[13]),
+        main_exit_witness, code_exit_witness, object(), sys._getframe())
+    _PREFLIGHT_TERMINAL_ISSUERS[id(witness)] = terminal
+    _PREFLIGHT_TERMINALS[id(record[0])] = terminal
+    return witness
+
+
+_PREFLIGHT_TERMINAL_ISSUER_FUNCTION = _issue_preflight_terminal
+_PREFLIGHT_TERMINAL_ISSUER_CODE = _issue_preflight_terminal.__code__
+
+
+def _preflight_terminal_binding(candidate):
+    require(type(candidate) is _PREFLIGHT_CANDIDATE_CLASS, "durable_closed_preflight_factory_required")
+    record = _PREFLIGHTS.get(id(candidate)); terminal = _PREFLIGHT_TERMINALS.get(id(candidate))
+    require(type(record) is tuple and len(record) == 16 and record[0] is candidate
+        and candidate._anchor is candidate._identity is record
+        and type(terminal) is tuple and len(terminal) == 9 and terminal[1] is record,
+        "durable_closed_preflight_not_closed")
+    witness, unused_record, frame, finite_lineage, ticks, main_exit, code_exit, nonce, issuer = terminal
+    require(type(witness) is _PREFLIGHT_TERMINAL_CLASS
+        and _PREFLIGHT_TERMINAL_ISSUERS.get(id(witness)) is terminal
+        and type(frame) is FrameType and frame is record[15]
+        and frame.f_code is _CONSERVATIVE_PREFLIGHT_CODE and frame.f_globals is globals(),
+        "durable_closed_preflight_factory_required")
+    require(type(issuer) is FrameType and issuer.f_code is _PREFLIGHT_TERMINAL_ISSUER_CODE
+        and issuer.f_globals is globals() and issuer.f_locals.get("terminal") is terminal
+        and issuer.f_locals.get("witness") is witness and issuer.f_locals.get("record") is record
+        and issuer.f_locals.get("frame") is frame and issuer.f_locals.get("finite_lineage") is finite_lineage
+        and issuer.f_locals.get("main_exit_witness") is main_exit
+        and issuer.f_locals.get("code_exit_witness") is code_exit,
+        "durable_closed_preflight_factory_required")
+    local = frame.f_locals
+    require(local.get("candidate") is candidate and local.get("record") is record
+        and local.get("terminal_witness") is witness and local.get("finite_lineage") is finite_lineage
+        and local.get("main_exit_witness") is main_exit and local.get("code_exit_witness") is code_exit
+        and local.get("scope") is record[14] and record[14] in _PREFLIGHT_ENDED
+        and type(main_exit) is object and type(code_exit) is object and main_exit is not code_exit
+        and type(nonce) is object and type(ticks) is tuple and len(ticks) == 2
+        and all(type(tick) in (int, float) for tick in ticks)
+        and 0 <= ticks[0] <= ticks[1] <= 2 ** 53 and ticks[1] - ticks[0] <= MAXIMUM_PREFLIGHT_SECONDS
+        and tuple(record[13]) == ticks, "durable_closed_preflight_changed")
+    current = _preflight_finite_lineage(record)
+    require(all(a is b for a, b in zip(current[:4], finite_lineage[:4]))
+        and current[4:] == finite_lineage[4:], "durable_closed_preflight_changed")
+    return terminal
+
+
+class ClosedConservativeCountObservation:
+    """Finite completed lineage, never a live Main getter or source authority."""
+    __slots__ = ("_anchor", "_identity")
+    def __init__(self): raise DurableCountCaptureRefusal("REFUSED: durable_closed_preflight_factory_required")
+    def public_summary(self): return json.loads(closed_conservative_count_observation_binding(self)[4])
+
+
+_CLOSED_PREFLIGHT_CLASS = ClosedConservativeCountObservation
+_CLOSED_PREFLIGHT_SUMMARY_FUNCTION = ClosedConservativeCountObservation.public_summary
+_CLOSED_PREFLIGHT_SUMMARY_CODE = ClosedConservativeCountObservation.public_summary.__code__
+
+
+def _closed_preflight_summary(terminal):
+    lineage = terminal[3]; live, main = json.loads(lineage[6]), json.loads(lineage[7])
+    return {"schema": "si-closed-conservative-count-preflight-observation-v1",
+        "status": "closed_finite_source_free_observation", "context_closure": "Main_and_code_contexts_closed",
+        "policy_sha256": CLOSED_CONSERVATIVE_PREFLIGHT_SHA256,
+        "live_preflight_policy_sha256": CONSERVATIVE_PREFLIGHT_SHA256,
+        "basis_sha256": live["basis_sha256"], "plan_sha256": live["plan_sha256"],
+        "Main_receipt_sha256": main["receipt_sha256"], "Main_projection_sha256": main["projection_sha256"],
+        "Main_report_sha256": hash_bytes(lineage[7]), "code_identity_sha256": live["code_identity_sha256"],
+        "code_manifest_sha256": hash_payload(lineage[3]), "runtime_head": lineage[4], "actual_remote": lineage[5],
+        "authority": closed_conservative_preflight_authority()}
+
+
+def closed_conservative_count_observation_binding(value):
+    try:
+        _closed_preflight_registered()
+        require(type(value) is _CLOSED_PREFLIGHT_CLASS, "durable_closed_preflight_factory_required")
+        row = _CLOSED_PREFLIGHTS.get(id(value))
+        require(type(row) is tuple and len(row) == 8 and row[0] is value
+            and value._anchor is value._identity is row, "durable_closed_preflight_changed")
+        require(id(value) not in _CLOSED_PREFLIGHT_FAILED
+            and id(row[1]) not in _CLOSED_PREFLIGHT_CANDIDATE_FAILED, "durable_closed_preflight_failed")
+        require(_CLOSED_PREFLIGHT_BY_CANDIDATE.get(id(row[1])) is row
+            and id(row[1]) in _CLOSED_PREFLIGHT_ATTEMPTED
+            and _preflight_terminal_binding(row[1]) is row[2]
+            and row[3] is row[2][3], "durable_closed_preflight_changed")
+        frame = row[7]
+        require(type(frame) is FrameType and frame.f_code is _CLOSED_PREFLIGHT_FACTORY_CODE
+            and frame.f_globals is globals() and frame.f_locals.get("value") is value
+            and frame.f_locals.get("row") is row and frame.f_locals.get("candidate") is row[1]
+            and frame.f_locals.get("terminal") is row[2], "durable_closed_preflight_factory_required")
+        raw = canonical_json(_closed_preflight_summary(row[2])).encode()
+        require(type(row[4]) is bytes and row[4] == raw and hash_bytes(raw) == row[5],
+            "durable_closed_preflight_changed")
+        return row
+    except BaseException:
+        original = _CLOSED_PREFLIGHTS.get(id(value))
+        if type(original) is tuple and len(original) == 8 and original[0] is value:
+            _CLOSED_PREFLIGHT_FAILED.add(id(value))
+        raise
+
+
+def freeze_closed_conservative_count_observation(candidate):
+    """Consume only an original completed candidate; no caller closure facts."""
+    try:
+        _closed_preflight_registered()
+        require(type(candidate) is _PREFLIGHT_CANDIDATE_CLASS, "durable_closed_preflight_factory_required")
+        require(id(candidate) not in _CLOSED_PREFLIGHT_CANDIDATE_FAILED, "durable_closed_preflight_failed")
+        terminal = _preflight_terminal_binding(candidate)
+        require(id(candidate) not in _CLOSED_PREFLIGHT_ATTEMPTED and not _CLOSED_PREFLIGHTS,
+            "durable_closed_preflight_spent")
+        _CLOSED_PREFLIGHT_ATTEMPTED.add(id(candidate))
+        raw = canonical_json(_closed_preflight_summary(terminal)).encode()
+        value = object.__new__(_CLOSED_PREFLIGHT_CLASS)
+        row = value, candidate, terminal, terminal[3], raw, hash_bytes(raw), object(), sys._getframe()
+        value._anchor = value._identity = row
+        _CLOSED_PREFLIGHTS[id(value)] = row; _CLOSED_PREFLIGHT_BY_CANDIDATE[id(candidate)] = row
+        closed_conservative_count_observation_binding(value); return value
+    except BaseException:
+        original = _PREFLIGHTS.get(id(candidate))
+        if type(original) is tuple and len(original) == 16 and original[0] is candidate:
+            _CLOSED_PREFLIGHT_CANDIDATE_FAILED.add(id(candidate))
+        raise
+
+
+_CLOSED_PREFLIGHT_FACTORY_FUNCTION = freeze_closed_conservative_count_observation
+_CLOSED_PREFLIGHT_FACTORY_CODE = freeze_closed_conservative_count_observation.__code__
 
 
 def _preflight_window(record):
@@ -466,11 +703,15 @@ def prepare_conservative_count_preflight(token, basis, *, root, runtime_head, ac
                 try:
                     yield candidate
                     conservative_count_preflight_binding(candidate)
+                    finite_lineage = _preflight_finite_lineage(record)
                 finally:
                     _PREFLIGHT_ENDED.add(scope)
                 code.check(); guard.refresh(); _preflight_window(record)
+            main_exit_witness = object()
             code.check(); guard.refresh(); _preflight_window(record)
+        code_exit_witness = object()
         _audit_code(root, guard, manifest); _preflight_window(record)
+        terminal_witness = _issue_preflight_terminal(record, finite_lineage, main_exit_witness, code_exit_witness)
     except BaseException:
         _PREFLIGHT_ENDED.add(scope)
         if candidate is not None: _PREFLIGHT_FAILED.add(id(candidate))

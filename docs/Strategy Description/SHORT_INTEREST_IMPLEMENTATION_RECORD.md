@@ -31355,3 +31355,204 @@ Production storage/lease/checkpoint and source/input/rights/cash gates remain;
 SourceAUTH is still unconditionally blocked. No QC/Safari, purchase, outcomes,
 new monitor or push. Count84005/4GiB, separate DAILY budget and permanent
 8START/16MiB remain unchanged, looks0/0, exploratory0, alpha0, IDsnone, QC0.
+
+## 143. Closed finite conservative preflight lineage (2026-11-03)
+
+SI-DEC-20261103-08, under continuing SI-AUTH-20261103-02, adds a DISTINCT
+closed source-free observation after the successful lifetime boundary in141.
+The old LIVE candidate still refuses after context exit or300s; it is never
+extended, reopened or used as a3600s source-lease getter. No actual archive/
+Main/source replay is performed by this software unit.
+
+The original preflight generator issues its separate terminal witness only
+AFTER Main and code context exits, fresh final committed-code audit, finite
+lineage snapshot and the LAST original300s check. The terminal's original9
+retains exact generator AND issuer-helper frames, witness/record/row identity
+and immutable past ticks. freeze_closed_conservative_count_observation takes
+only that original completed candidate; no closure booleans, caller rows or
+JSON can substitute. Its original8 retains the exact freeze-factory frame,
+value/row/candidate/terminal identity. No public constructor or second mint.
+
+ClosedConservativeCountObservation retains pure original ledger/basis9/plan,
+code/runtime, Main-report and scope lineage. Later access uses no expired
+Main, code, guard, clock or filesystem callbacks. A future clock advanced3601s
+fixture confirms old LIVE access refuses while genuine past closed lineage
+remains usable. Its own public failure permanently latches. This is finite
+past observation, not perpetual filesystem custody, old actuals resolution,
+a recreated process, source permission or attestation of any future EXIT0.
+
+The separate closed policy is
+18994544eb253291b7b273a87f421139b4f1cf9af478caba293062ab6b9f8189.
+LIVE4EDB and historical blocked operational0EB5 remain exact. All budget,
+dispatch/key/claim/storage/source/denominator/input/readiness/QC authority
+remains false, pending_USB_qualification remains true, and no actual budget,
+ticket, source lease or storage is opened.
+
+Verified pre-release findings remain explicit:
+
+| ID | Priority | Disposition |
+| --- | --- | --- |
+| SI-CLOSED-20261103-001 | P2 | Corrected: a reflected second value plus replacement closed tables could pass without original freeze issuance. Root review requested the counterexample; author reproduced it RED, then bound exact original freeze frame/value/row/candidate/terminal. |
+| SI-CLOSED-20261103-002 | P2 | Corrected: replacing both terminal tables with a copied tuple could reuse a genuine witness/generator. The terminal now retains/checks the issuer-helper's own original frame and exact terminal/witness/record/generator locals. The two provenance counterexamples ran2 failures before correction. |
+| SI-CLOSED-20261103-003 | P2 | Corrected: substituted opaque classes/getter descriptors could be accepted or revive after restoration. Peer verified the inherited-class counterexample; original closed/terminal/candidate classes and raw getter descriptor/callable/CodeType are now pinned. Failure latches identify original issued rows independently of substituted globals. Six expanded cases failed before correction; restored9 passed. |
+
+Author final capture/import-boundary184 passed11.60s with OS networking denied;
+independent reviewer184 passed12.41s. Peer original-class omission yielded
+3 expected failures, restored3 passed. Independently, Main184 passed11.70s
+on the final revised tree. Main's earlier174/10.19s was on the preceding
+revision and is not attributed to the final class correction. Separate
+terminal final-clock omission failed as expected and was restored. No full
+suite, actual source/native/USB/private artifact replay or Claude review.
+
+Final coordinator134226 bytes/SHA256
+6ef5cf55a1fea4bf2cf70baa71c589f1581d5d71f34d81c6f428c82431f8dd57;
+tests138202 bytes/SHA256
+a9dffca1f861d7947acfb6ae2aa8c5ee8b10b31a0aaa78bdc6831abbea5550ed.
+Registration, Python3.9 AST/in-memory compile and owned whitespace checks pass.
+Actual closed-preflight replay remains prospective and must follow USB
+qualification, complete current code/HEAD/remote guards and its own finite
+source-free registration. Production storage/lease/checkpoint/source/input/
+rights/cash gates remain; never unlock SourceAUTH from this observation alone.
+
+Count84005/4GiB, separate DAILY36837/3327988047/71468572 and permanent
+8START/16MiB remain unchanged; looks0/0, exploratory0, alpha0, IDsnone, QC0.
+No QC/Safari, purchase, credential/provider/claim/START/charge/outcome, new
+monitor or push. The last step before QC has not been reached.
+
+## 144. Distinct finite-code-window RAM USB profile (2026-11-03)
+
+### 144.1 Scope-preserving isolation after the actual Documents veto
+
+SI-DEC-20261103-09, under continuing SI-AUTH-20261103-02, registers a DISTINCT
+five-code finite-window profile after142's observed Documents directory
+timestamp veto. The original four-file reader/model remain BYTE-IDENTICAL,
+including every full10 comparison, close/after-close rule and all v1/v2/v3
+negatives. This is not retroactive admission or identification of the unknown
+Documents writer. No source check or old held stamp is weakened or rebased.
+
+The stdlib-only new orchestrator obtains five exact committed code blobs:
+old four plus itself. A provisional private import graph contains the
+verified data initializer, hashing, reader and model; it can only perform
+initial code observation. ALL five working bytes must equal Git, and their
+unchanged original full10 code contexts/audits/close/after_close must succeed
+before the original factory issues an immutable RAM snapshot. The executing
+orchestrator's own original functions/classes/globals are compared with its
+committed fifth-file CodeTypes. Canonical module identities and a fixed private
+resolver prevent live data.hashing, deferred repository imports, mutable
+namespace/callable/class substitution or caller-supplied code/graphs/flags.
+No extra checkout, filesystem snapshot/copy/staging namespace or source claim.
+
+The long USB phase executes that verified RAM graph. Its four source roles,
+exact pins/bounds, full10 descriptor/name/chain audits and all close/after-close
+checks remain continuous and unchanged. Only AFTER every source context and
+post-close audit succeeds does a SEPARATE terminal five-code window run.
+Terminal current bytes must equal initial RAM AND same Git; each CODE FILE's
+entire original10 must equal its initial file10. Both windows independently
+enforce all ancestor fields. Shared ancestor timestamp observations are
+truthfully separate: continuous_shared_ancestor_timestamp_custody=false.
+No claim is made that the Documents directory stayed timestamp-stable during
+the gap. Executed immutable code bytes are verified throughout that gap.
+
+Original physical worktree identity, fixed root/branch/HEAD/clean/matching
+actual remote and one original180s clock cover initialization, both windows,
+USB reads, namespace cleanup, final guard and formatting. Context/clock/
+code/source/cleanup failure vetoes success. Private aliases are in-memory
+only, ownership-checked and removed before the final clock/report. Constructor,
+copied snapshot, forged closure, import/global/callable drift, per-file metadata
+change and any USB change still refuse. No caller payload creates admission.
+
+### 144.2 Verified implementation/test corrections
+
+| ID | Priority | Disposition |
+| --- | --- | --- |
+| SI-WINDOW-20261103-001 | P2 | Corrected before execution: DEVNULL and then anonymous stdin PIPE each caused Python write-open audit events. Verified isolated Git regression now uses inherited stdin for exact read-only commands; no null/pipe/write exception is added to the USB audit. This is a new adapter defect, not the old v3 cause. |
+| SI-WINDOW-20261103-002 | P2 | Corrected before execution: graph/bootstrap cleanup could mask its first caught failure. The first failure at an OWNED boundary is retained before cleanup; bounded later failures remain separate. Opaque-reader exception contexts are labelled observations with unknown outer phase/role, never promoted into a claimed first cause. |
+| SI-WINDOW-20261103-003 | P3 | Corrected test isolation: combined collection preloaded the live pure-model module. The original assertion incorrectly required it to have never existed. The stronger test poisons preexisting live hash/model callables and requires no new/replaced live module while actual execution remains verified RAM. Production/fresh-process live-module exclusion is unchanged. |
+
+New negative failure_ordering is explicitly
+first_caught_at_owned_boundary_contexts_are_observations. Safe facts contain
+only fixed phase/role/code ordinal/code-or-null/original comparison/unknown
+actor; captured context facts additionally carry exception_context_observation.
+Original mismatching field names remain genuine-frame projections. No source
+values, paths, arbitrary exception formatting or dynamic type names escape.
+An unknown cause remains unknown; a cleanup comparison does not imply earlier
+model/USB success.
+
+Main's FIRST combined five-file selection252 passed/1 FAILED12.70s on the
+collection-only assertion above. Runtime RAM and poisoned-hash checks had
+passed. The corrected final selection253 passed12.83s with OS networking
+denied, original reader/model/import-boundary/active-document cases included.
+Author frozen47/11.20s and independent reviewer47/12.14s are separately
+attributed; author corrected combined reader/model/new selection175/12.24s
+passed, peer corrected isolation case1/.82s with pure-model collection.
+One earlier author command had a mistyped test path and ran0 tests; it is not
+a successful execution. No full lane/repository suite or Claude review.
+
+Real temporary files in fabricated tests exposed unrelated shared /private/tmp
+ancestor churn from concurrent tests. ONLY those shared system ancestor
+observations are explicitly simulated; owned fixture code/source/ancestor
+drift remains strict and real, as do all production full10 checks. This does
+not explain any historical unpreserved flaky test or the actual Documents
+actor. The source/profile model tests remain fabricated, not real qualification.
+
+Causal namespace/code-auditor omissions produced4 expected failures plus2
+unchanged passes; restored9 passed. Omitting only terminal per-file comparison
+produced2 expected PHASE failures plus1 pass: the independent final-format
+file-equality backstop still refused. This is not falsely described as an
+unsafe successful admission. Initial/terminal close, all source fields,
+last-fresh-close drift, import/copy/HEAD/remote/clock and failure-ordering
+cases passed. Python3.9 AST/in-memory compile, registration and whitespace pass.
+
+### 144.3 Frozen identities and actual-operation boundary
+
+New orchestrator34416 bytes/SHA256
+2b416ca11cd7a7538ed427f02684d1c5cde00531ae3b086fe40663b282af2d47;
+tests23413 bytes/SHA256
+b538799f9551c4a2c7f9d108743143dbb578fc29310d0b17fe4f450abc9b3972.
+Profile SHA256
+592c05adc1691030eb5aa3d93660f060248aaa25909bd3503781a446f292c43f;
+five-code mapping
+a3ba4d7b88fac03e02c60339caabdb529a8e2e1e7846cb89ce12a922395dfe9d.
+Old reader d57745 and model54e158 remain exact. The final closed-preflight
+92-code mapping after143 is
+5b4190f3c51d41ab238f19593360c71e6e68a7c7cc51a7c8fe1a78fcca12813c.
+
+Main's PREBUILT stdlib-only wrapper3650 bytes/SHA256
+943fa8a24b0480cf5cda66087dd6e677f82ee471b84d3bd25229b56c0113a098
+verifies the new driver's own current/Git bytes BEFORE executing a registered
+canonical ModuleType. It uses no -m scripts import outside the five-code
+catalogue. Every Python write-open/mutation/socket and nonexact subprocess is
+denied; exact Git arguments/environment only, all four seam counters0.
+Private data.hashing/research package imports must remain absent. No file,
+journal, probe, source request or claim is created.
+
+The automatic outer observer owns original CP/stdout/stderr/actual close,
+whole180s and final-validation clocks. It binds exact head/remote/profile/
+five-code mapping/model policy, hashes/booleans, all closed contexts, false
+authority, exact canonical packets and no extra/stderr/signal. Its body SHA256
+is7d8f2c561dc460525680bcaf33113e8c6661ffe18da974947d9f4ca06c3acf2c.
+Main42 simulated checks passed, including safe code:null unknowns and honest
+failure-ordering. Removing final-validation deadline enforcement caused the
+specific expected failure; the exact42 passed after restoration. No actual
+USB/native/source operation was run by these simulations or static checks.
+
+After BOTH software units/records are committed clean and all authors freeze,
+reverify physical/Git root, branch/HEAD/status, actual matching remote and all
+five current/committed code hashes. Invoke ONLY this fresh registered profile
+ONCE with the full prebuilt observer; no edit/test/commit/push while active.
+Old v3 is never repeated. An actual refusal remains negative; do not make
+another invocation, weaken a field, adopt a stamp or silently enlarge a window
+to guess. Actual exit0 and all original contexts/clock/observer conditions
+are required for finite external-byte observation.
+
+Even success grants ONLY external-byte inspection. Protected source custody,
+upstream authentication, local processing rights, exact date/native/class/
+CIK/USD/own-class denominator, publication/revision/availability, reported DTC/
+volume semantics, coverage/cash and actual-input admission remain separate.
+Assess USB offline before more downloads. SourceAUTH remains locked, and no
+production source lease/checkpoint is implied by143's closed finite lineage.
+No QC/Safari/purchases/outcomes, Source0, looks0/0, exploratory0, alpha0,
+IDsnone and QC0; all ceilings and permanent8START/16MiB unchanged.
+No successful push has occurred in this continuation. Reserve the one final
+matching-lane publication for the completed round or concrete owner blocker.
+Main final post-record active-document checks69 passed/.93s; whitespace passed.

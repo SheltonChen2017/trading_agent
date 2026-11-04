@@ -116,6 +116,14 @@ def _day(value):
         return None
 
 
+def _sec_filing_day(value):
+    """FMP's exact midnight representation is a civil date, never a zone."""
+    if type(value) is str and len(value) == 19 and value[10:] == " 00:00:00":
+        day = _day(value[:10])
+        return day, day is not None
+    return _day(value), False
+
+
 def _acceptance(value):
     """Lexical naive wall-clock equality; no timezone/publication inference."""
     if type(value) is not str or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}", value):
@@ -238,6 +246,7 @@ def _fmp(raw, cases, *, family, cik=None, from_date=None, to_date=None, requeste
     fields = _SEC_FIELDS if family == "fmp_sec_search" else _INSIDER_FIELDS
     stats = Counter(response_rows=len(rows), metadata_valid_rows=0, metadata_quarantined_rows=0,
         filing_date_missing_rows=0, filing_date_invalid_rows=0, filing_date_outside_window_rows=0,
+        filing_midnight_normalized_rows=0, requested_date_disagreement_rows=0,
         requested_interval_outside_rows=0, cik_missing_rows=0, cik_invalid_rows=0,
         queried_cik_disagreement_rows=0, transaction_date_missing_rows=0, transaction_date_invalid_rows=0,
         transaction_date_outside_window_rows=0, requested_date_filing_matches=0, requested_date_transaction_matches=0,
@@ -256,7 +265,11 @@ def _fmp(raw, cases, *, family, cik=None, from_date=None, to_date=None, requeste
             invalid = True; scoped = False
         if cik is not None and company is not None and company != cik:
             stats["queried_cik_disagreement_rows"] += 1; scoped = False
-        filing = _day(row.get("filingDate"))
+        if family == "fmp_sec_search":
+            filing, midnight_normalized = _sec_filing_day(row.get("filingDate"))
+            stats["filing_midnight_normalized_rows"] += int(midnight_normalized)
+        else:
+            filing = _day(row.get("filingDate"))
         if filing is None:
             stats["filing_date_missing_rows" if _missing(row.get("filingDate")) else "filing_date_invalid_rows"] += 1
             scoped = False
@@ -274,6 +287,10 @@ def _fmp(raw, cases, *, family, cik=None, from_date=None, to_date=None, requeste
                 stats["transaction_date_outside_window_rows"] += 1  # Legitimate older trade on an in-scope filing.
             stats["requested_date_filing_matches"] += int(filing == requested_date)
             stats["requested_date_transaction_matches"] += int(transaction == requested_date)
+            # The documented date parameter's field meaning is unknown. A
+            # row matching neither possible field cannot satisfy this query.
+            if filing != requested_date and transaction != requested_date:
+                stats["requested_date_disagreement_rows"] += 1; scoped = False
         accessions = set()
         for key in (("link", "finalLink") if family == "fmp_sec_search" else ("url",)):
             found, code = _accessions(row.get(key)); accessions.update(found); urls[code] += 1

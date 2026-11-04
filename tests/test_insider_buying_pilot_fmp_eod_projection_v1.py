@@ -93,6 +93,79 @@ def test_latest_date_semantics_compare_both_fields_and_keep_older_transaction():
     assert value["counts"]["requested_date_transaction_matches"] == 1
 
 
+def test_latest_requested_date_is_binding_when_neither_field_matches_inside_window():
+    row = _insider(); row["filingDate"] = "2020-10-04"; row["transactionDate"] = "2020-10-03"
+    value = _payload(m.project_insider_latest(_raw([row]), _cases(), requested_date="2020-10-02"))
+    assert value["scoped"] is False
+    assert value["body_pin"] is None and value["case_checks"] == {} and value["filing_date_bounds"] is None
+    assert value["counts"]["requested_date_disagreement_rows"] == 1
+    assert value["counts"]["metadata_valid_rows"] == 1
+    assert value["latest_date_filter_semantics_verified"] is False
+
+
+def test_latest_one_wrong_day_row_refuses_the_whole_scope_without_selecting_favorable_match():
+    correct = _insider(); wrong = _insider()
+    wrong.update(filingDate="2020-10-05", transactionDate="2020-10-04")
+    value = _payload(m.project_insider_latest(_raw([correct, wrong]), _cases(), requested_date="2020-10-02"))
+    assert value["scoped"] is False and value["body_pin"] is None and value["case_checks"] == {}
+    assert value["counts"]["requested_date_disagreement_rows"] == 1
+    assert value["counts"]["requested_date_filing_matches"] == 1
+    assert value["latest_date_filter_semantics_verified"] is False
+
+
+def test_empty_latest_response_is_empty_capability_not_a_date_scope_refusal_or_coverage_proof():
+    value = _payload(m.project_insider_latest(b"[]", _cases(), requested_date="2020-10-02"))
+    assert value["scoped"] is True and value["body_pin"] is not None
+    assert value["counts"]["response_rows"] == value["counts"]["requested_date_disagreement_rows"] == 0
+    assert value["latest_date_filter_semantics_verified"] is False
+    assert value["authority"]["full_population_complete"] is False
+
+
+def test_sec_documented_midnight_filing_day_is_civil_date_without_timezone_inference():
+    # Official SEC CIK response shape: the filing date is emitted at midnight.
+    # https://site.financialmodelingprep.com/developer/docs/stable/search-by-cik
+    row = _sec(); row["filingDate"] = "2020-10-02 00:00:00"
+    value = _payload(_sec_project(_raw([row])))
+    assert value["scoped"] is True and value["metadata_clean"] is True
+    assert value["counts"]["filing_midnight_normalized_rows"] == 1
+    assert value["filing_date_bounds"] == ["2020-10-02", "2020-10-02"]
+    assert value["case_checks"]["control-1"]["filing_date_equal_rows"] == 1
+    assert value["case_checks"]["control-1"]["naive_acceptance_lexical_equal_rows"] == 1
+    assert value["case_checks"]["control-1"]["acceptance_timezone_verified"] is False
+    assert value["case_checks"]["control-1"]["public_known_by_verified"] is False
+    assert value["naive_acceptance_is_publication_or_timezone_evidence"] is False
+
+
+@pytest.mark.parametrize("filing", ("2020-10-02 00:00:01", "2020-10-02T00:00:00",
+    "2020-10-02 00:00:00Z", "2020-10-02 00:00:00-04:00", "2020-10-02 00:00:00.000",
+    "2020-10-02 00:00:00 ", "2020-10-02\t00:00:00", "2020-02-30 00:00:00"))
+def test_sec_nonexact_midnight_timestamps_are_not_silently_normalized(filing):
+    row = _sec(); row["filingDate"] = filing
+    value = _payload(_sec_project(_raw([row])))
+    assert value["scoped"] is False and value["body_pin"] is None and value["case_checks"] == {}
+    assert value["counts"]["filing_midnight_normalized_rows"] == 0
+    assert value["counts"]["filing_date_invalid_rows"] == 1
+
+
+def test_sec_midnight_normalization_preserves_exact_query_and_global_window_gates():
+    for day, counter in (("2020-09-30", "filing_date_outside_window_rows"),
+                         ("2020-11-01", "requested_interval_outside_rows")):
+        row = _sec(); row["filingDate"] = day + " 00:00:00"
+        value = _payload(_sec_project(_raw([row])))
+        assert value["scoped"] is False and value["body_pin"] is None and value["case_checks"] == {}
+        assert value["counts"]["filing_midnight_normalized_rows"] == value["counts"][counter] == 1
+
+
+def test_midnight_filing_normalization_is_sec_only_and_date_only_remains_unchanged():
+    value = _payload(_sec_project())
+    assert value["scoped"] is True and value["counts"]["filing_midnight_normalized_rows"] == 0
+    row = _insider(); row["filingDate"] = "2020-10-02 00:00:00"; row["transactionDate"] = "2020-10-02"
+    value = _payload(m.project_insider_latest(_raw([row]), _cases(), requested_date="2020-10-02"))
+    assert value["scoped"] is False and value["body_pin"] is None and value["case_checks"] == {}
+    assert value["counts"]["filing_midnight_normalized_rows"] == 0
+    assert value["counts"]["filing_date_invalid_rows"] == 1
+
+
 @pytest.mark.parametrize("field,value", (("filingDate", "2020-09-30"), ("filingDate", None),
     ("filingDate", "2020-02-30"), ("filingDate", ["2020-10-02"]), ("cik", "999"), ("cik", [])))
 def test_unscoped_sec_response_suppresses_case_metadata_and_body_pin(field, value):

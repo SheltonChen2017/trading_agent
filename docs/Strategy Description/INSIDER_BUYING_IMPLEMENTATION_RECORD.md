@@ -1,11 +1,10 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **364–365 RECORD THREE FAILED QUALIFICATION OPERATIONS, ALL PRESERVED.
-THE THIRD NATIVE RUN PRODUCED12 RETAINED-CONTROL CANDIDATES, THEN REFUSED
-OUTPUT CUSTODY BEFORE ANY CREDENTIAL READ, REQUEST PLAN OR PROVIDER GET.
-FMP/EODHD API COVERAGE REMAINS UNVERIFIED. SYNTHETIC CTIME CHANGES AND LOSS
-OF SYNTHETIC IMMUTABLE FLAGS ARE OBSERVED; NO ACTOR OR EXACT LIVE LEAF IS
-INFERRED.288 FOCUSED/129 BOUNDARY PASSES DO NOT ESTABLISH PRODUCTION SUCCESS.
+Status: **366 REGISTERS FRESH DATA-ONLY CUSTODY UNDER LIBRARY/APPLICATION
+SUPPORT, WITH HARD REPOSITORY IDENTITY UNCHANGED. THREE FAILED364–365 CLAIMS
+ARE PRESERVED.462 FOCUSED CHECKS QUALIFY CODE ONLY; A GENUINE70-SECOND
+POST-PUBLICATION STORAGE PROOF MUST PASS BEFORE ANY PROVIDER CREDENTIAL
+READ/GET. FMP/EODHD API COVERAGE REMAINS UNVERIFIED AT THIS PROSPECTIVE POINT.
 SUBSCRIPTIONS REMAIN ACTIVE; CANCELLED RENEWAL IS NOT EXPIRED ACCESS.
 CURRENT MAPPINGS/NAIVE ACCEPTANCE ARE NOT HISTORICAL IDENTITY/PUBLIC-KNOWN-BY.
 FIFTEEN P2s AND THE HISTORICAL SOURCE/PIT/POPULATION FACTUAL GATES REMAIN
@@ -323,6 +322,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-03 | Codex owner-authorized pre-QC USB build | Clean32caf7a5521ef4fae21b504feac816c8e7f692ef -> implementation5493b95f48105510b77396ef7310161bae25086d -> correction51177f3e9dbad613de61b341e632b228d747fe71 -> this separate361 handoff | Qualify supplied FirstRate daily/action/earnings bytes without purchases or QC | Failed attempt1 preserved; ZIP-only underscore correction proved RED/GREEN; same-epoch attempt2 succeeded230.497046375s,68 data files+manifest/21,638 daily members/47,802,869 daily rows, private catalog37,210,827B hash-bound; no canonical/source/PIT/actual-release/rights/backtest promotion. | Main136 focused/EXACT1.52s,129 boundary6.67s and final checks below; author65 focused/compile; native no-USB health plus bounded metadata diagnosis and actual read-only scan; independent nine-leaf integrity/hash reconstruction, zero requests/credentials/looks/QC/backtests. | No P0/P1;13 carried P2s OPEN; IBUSB-FORMAT-36001 resolved narrowly, old-helper IBIPC-36001 P3 retained/open; prior closures/failed roots preserved. | Concrete missing historical SEC availability/version, original/PIT/identity/whole-population facts; no vendor reply, purchase/upgrade, QC/Safari, optional EOD comparison, monitor rearm or interim push. |
 | 2026-11-03 | Codex owner-requested subscription audit | Clean317ca265778f8df430fade5c212647b07f08b78a -> this documentation-only363 handoff; incoming EMPTY | Inspect QC/Sharadar/EODHD/FMP active plans and available dataset families | Current plans verified; renewal cancellation distinguished from active paid access. FMP Starter matrix6/6 insider and12/12 SEC endpoints available; QC Researcher/core-cloud license versus download distinction. No source request/row capture or job. | Public primary docs plus signed-in account/license metadata; focused record/active-document/EXACT checks below; zero source replays/provider queries/looks/backtests. |13 carried P2s unchanged; IBUI-SECRET-36201 P3 token-display/owner-rotation scope OPEN, no key in Git or further use. | Qualify existing-plan FMP/identifier sources under a new bounded source scope before purchase; historical archive/PIT/population facts remain missing; no QC research, vendor reply or monitor rearm. |
 | 2026-11-03 | Codex owner-authorized FMP/EOD qualification | Clean2948796a ->650cd9ba4569f6ef059246944a62fcd107d0de29 ->743aea5a6555a1a4c062f16e485751b7f6a7b6b1 ->d7b6c3cfba751c17b63c477a998bfa7f0b9ff699 -> this separate365 handoff; incoming EMPTY | Qualify existing-plan insider/SEC/current mappings against8 warmup+4 fixed recent originals, no purchases/QC | Three actual operations FAILED/preserved; third native worker produced12 candidate controls/16 metadata/56 body-stage pins, then output_changed before any Keychain/provider access. No API coverage or backtesting readiness claimed. | Main288 focused9.03s/129 boundary6.95s, eight images compile/four frozen historical equality; synthetic delayed RED/GREEN and immutable-flag probes364, guard reversals; no full suite. |15 P2s OPEN:13 carried plus IBFMPEOD-OBS36401 and reopened IBFMPEOD-PUB36402; owner-confirmed36201 rotation action satisfied without actual key inspection. | Stable private custody qualification/diagnosis before any newly scoped data operation; preserve all failed claims, no fourth attempt/reset, provider retry, purchase/QC/vendor reply or monitor rearm. |
+| 2026-11-03 | Codex fresh stable-data custody and provider qualification | Clean63d5665fe2eca484bc8d24d93cbd0d293d096756 -> qualified implementation and separate final handoff follow; incoming EMPTY | Fix custody, preserve all failed claims, then qualify existing FMP/EODHD without purchases/QC | Fresh fixed Library/Application Support DATA-only receiver; oldv1 entrypoints/claims intact; genuine70s post-publication host proof required before new operation/credentials. Verified SEC midnight and insider query-scope fixes. Actual results pending at this prospective point. | Main462 focused10.32s/18 native warnings,129 boundary7.07s,12 compiled images/four frozen historical-byte equality; agent targeted RED/GREEN/guard reversals366. |15 carried P2s pending factual/operational scopes; new verified parser fixes tested, no data-gate closure yet. | Actual committed host stability proof, then bounded36-unique/one-attempt provider qualification if all inputs pass; one final push, no old resume/reset, purchase/QC/vendor reply or monitor. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -43423,3 +43423,248 @@ credential read, purchase/QC/Safari/vendor message or monitor rearm. Final
 root/branch/exact HEAD/expected record-only status and matching-origin checks
 must pass before this handoff commit and the ONE final push, followed by
 independent exact remote-tip and clean/synced readback.
+
+
+## 366. Fresh stable-custody repair and existing-plan qualification (2026-11-03)
+
+### 366.1 Later owner direction and fresh-operation boundary
+
+Start exact clean local/origin
+`63d5665fe2eca484bc8d24d93cbd0d293d096756`; matching-only fetch and ordered
+incoming range EMPTY. Owner now explicitly directs: fix artifact custody,
+then qualify FMP/EODHD, preserve failed claims, keep building toward pre-QC,
+NO purchases/QC and ONE final push. This is a later fresh work authorization,
+not retroactive success of364–365 or permission to re-enter their three claims.
+Claude waiting remains waived by the standing owner direction; no new
+independent review is claimed. Source/test/commit/Git commands stay ONLY in
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`
+on `codex/strategy-insider-buying`. No alternate checkout/branch/worktree.
+
+**IBDEC-366-01:** use a separate fixed PRIVATE DATA-ONLY receiver at
+`/Users/sheltonchen/Library/Application Support/trading_agent/insider_buying/custody`.
+This directory contains no Git checkout or code. The hard repository identity
+and command cwd remain the lane worktree. Secure no-follow ancestry, owner/
+permission/link/type/content and FULL seven-field post-publication version
+checks (including ctime) remain required. Preserve existing ancestor modes;
+validate managed ancestors before creating descendants; require private
+insider/custody/epoch directories0700 and regular owner0600/nlink1 leaves.
+Actual paths cannot be overridden by environment/caller parameters. Fixtures
+must be separate, marked and incapable of actual transport. No chmod/chown,
+immutable-flag workaround, timestamp rewrite, reset or source guard weakening.
+The new location is NOT assumed stable: genuine storage proof comes first.
+
+**IBDEC-366-02:** leave v1 entrypoints/caps and all seven old leaves/six root
+entries intact. A native read-only snapshot must authenticate exact364.10
+external byte/SHA pins (seven files,total108,811B), require first/second audits
+EMPTY and the third's exact four control leaves, verify inventories before/
+after reads and refuse ANY extra leaf—including plan/credential/request/
+complete/failure evidence. Validate historical producer heads650cd9ba,
+743aea5a,d7b6c3cf, without executing their old operations. Copy only the
+verified pin/inventory/zero-prior-use disposition into the new stable epoch.
+Bind the receiver's copied snapshot thereafter, rather than inheriting the
+volatile old Documents ctime as a live dependency. This is an explicitly new
+storage/input binding; old bytes/names are untouched and old attempts stay
+FAILED. The c48c892c candidate is NOT itself authorization or canonical input.
+Fresh native16-leaf metadata/56-leaf body stages rederive all12 controls.
+
+### 366.2 Prospective synthetic store qualification, before real access
+
+One exclusive fixed storage-proof epoch
+`ib-local-custody-v2-20261103-once` under the data root. Code/tests/scope must
+be qualified and exist in a clean committed HEAD before this actual host
+operation. Parent source-only preparation creates only fixed private data
+directories, then a native process-tree network-denied child publishes eight
+synthetic own JSON records (20,800 X-byte payloads; no market/account values).
+Use the actual receiver/writer, full content/hash/identity/mode/owner/link/
+size/mtime/ctime checks and four-second quiet/ten-second sampled pre-seal
+policy. After the LAST synthetic publication, hold and repeatedly verify ALL
+files for at least70 seconds, beyond the previous50-second failure. Bound
+worker wall time240 seconds and preserve any partial claim on failure.
+No source/credential/provider/QC operation occurs in this qualifier.
+
+Probe can fork ONLY for read-only Git checks with `--no-optional-locks`;
+network/security execution/Keychain/USB/recent source reads are denied.
+Repository artifact data reads are denied, while Git may stat tracked ZIP
+pointers. Writes are limited to the new proof epoch/fixed private parent and
+/dev/null (required Git sink), with minimal environment, isolated Python,
+no bytecode and real VM/RSS guard through serialization/stdout/final sample.
+An initial source-only native Git permission diagnostic refused because the
+sink was denied; adding ONLY /dev/null yielded exit0/stderr0 and no artifact
+status changes. It neither read source bodies nor created a proof claim.
+Source-control metadata access is not confused with source dataset decoding.
+
+The successful synthetic receipt must bind exact committed code identity,
+fixed purpose/audit ID, measured post-publication duration>=70, eight known
+synthetic payloads, every immutable leaf pin, native controls, zero input/
+credential/provider counts and false readiness authorities. Independently
+authenticate its externally observed complete SHA before parsing; derive the
+other nine pins only from that authenticated receipt, require exact ten-file
+inventory and validate every pin before decoding its body. Bind the SAME
+physical data-root device/inode/private mode/owner/group between proof reader
+and new provider epoch; same pathname alone is insufficient. Host IDs stay
+private, outside Git. There is no fixture/metadata-asserted storage acceptance.
+If proof fails, NO provider epoch/credential/network operation is permitted.
+
+### 366.3 Separately bounded first provider qualification
+
+**IBDEC-366-03:** after genuine storage proof, activate exactly ONE fresh
+`ib-fmp-eod-stable-qualification-v2-20261103-once` data epoch. This is not a
+fourth v1 flag/continuation or a renamed HTTP retry: previous exact producers
+reached ZERO credential/provider operations, proved by authenticated old
+inventories and their source ordering. New reservation binds the successful
+storage receipt; snapshot, native source stages and input-bindings manifest
+must be durable before the request plan, Keychain read or transport. No
+actual context is made by flipping a fixture flag or replacing old guards.
+New transport recognizes only the qualified production receiver, fixed data
+root, exact purpose/registration, genuine native input marker, hash-bound
+plan/controls/snapshot/storage proof and durable one-attempt started journal.
+An internal pure binding validator grants no live capability to fixtures.
+
+Retain12 fixed controls (all eight2020Q4 originals plus exact16 positions
+0/5/8/14 from2022–2023), no source replacement or new SEC acquisition. Max36
+deduplicated GETs across both providers, ONE attempt/fingerprint and ONE
+current Keychain read attempt/provider. Rows100/page0, body128KiB, HTTP
+open/read15s plus close rearmed1s, finish-to-next-start>=1s; no proxy, redirect,
+retry, paging, fallback, HEAD/Range or resume. Recent FMP controls precede
+warm-up across both families. 401/429/transport/5xx stop provider;
+402/403/other family-specific refusals stop that family. Preserve every
+refused/unattempted disposition without a silent replacement or universal
+plan/history inference. Existing configured FMP/EOD items only; no prior UI
+literal or environment secret. Raw/normalized provider rows remain ephemeral;
+credential literal/encoded/decoded screens precede response hashing/projection.
+Non200 bodies are not read/hashed/retained. Own safe counts/pins/control-match
+facts cannot independently reparse an unretained response or establish rights.
+
+Parent networking is permitted only through fixed FMP SEC-CIK/day, insider
+latest/day and EOD CIK-mapping profiles. Native source/snapshot/proof/project
+workers deny network/fork/all writes/security/Keychain/USB/unselected inputs,
+including the NEW private store except exact proof-role leaves. Source
+identity retains the unchanged exact six-key schema; storage identity is a
+separate envelope. Failures expose only allowlisted finite stage/artifact-role/
+changed-field names through an independent stdout channel; a broken custody
+check is not re-entered merely to write failure.json. Foreign values, private
+paths, timestamps, account details, bodies and credentials cannot be reflected
+in that channel. Exhaustive FD cleanup preserves the primary refusal.
+
+### 366.4 Verified preactivation corrections and evidence limits
+
+**IBFMPEOD-SCOPE36601, P2, confirmed/corrected candidate:** insider latest
+previously counted date agreement but accepted rows whose filing AND
+transaction dates both differed from requested day while within the pilot.
+Any such row now refuses query scope, suppresses case checks/body pin and
+stops that family; the filter's actual meaning remains unestablished. Empty
+results remain explicitly empty capability observations, not an expiry/refusal.
+
+**IBFMPEOD-DATE36602, P2, confirmed/corrected candidate:** FMP's official SEC
+example uses a civil filingDate `YYYY-MM-DD 00:00:00`. The parser now accepts
+only exact valid date OR that exact midnight representation for SEC filing
+metadata; non-midnight, timezone/trailing/malformed forms refuse. Insider
+fields do not inherit that relaxation. No timezone/publication fact follows.
+Both had genuine pre-fix native RED failures on c766f31f. Agent final83 focused
+checks PASS0.36s (82+EXACT); two images compile, three faithful reversals
+produce11 intended REDs plus one unaffected PASS. Frozen pure source
+`3d9e90df254ac09d60d503f814f3401052391836820d3f50bc6a34a55da03389`,
+test `5cbc45ddf52d6175f1281cf8740a3f332d44a298c053eb77d1abe6acc91b03a2`.
+These are code tests, no actual provider behavior has been observed yet.
+
+New-receiver QA also found and corrected before activation: wrong top-level
+storage-proof audit/purpose (two genuine REDs), arbitrary IPC failure-value
+echo (four genuine REDs), numeric booleans masquerading in six binding/plan/
+registration/attempt positions (six genuine REDs), and missing exact empty-
+audit directory literals in snapshot native policy (source-verified before
+I/O). Canonical typed equality/exact integers now refuse those schema aliases.
+A storage external-size precheck now refuses before source open/hash (one
+genuine RED before correction). Physical root replacement, independent
+cleanup, all seven prior leaves/inventories and first-use credential/network
+ordering receive meaningful focused tests/reversals before committed use.
+No complete lane/repository suite. Agent runs remain attributed, distinct
+from main observed checks and later real operations.
+
+Primary docs rechecked for these exact profiles/limitations:
+https://site.financialmodelingprep.com/developer/docs/stable/search-by-cik ;
+https://site.financialmodelingprep.com/developer/docs/stable/latest-insider-trade ;
+https://eodhd.com/financial-apis/id-mapping-api-cusip-isin-figi-lei-cik-%E2%86%94-symbol ;
+https://site.financialmodelingprep.com/insights/data/model-builds/detect-filing-timeliness-deterioration-with-claude-and-fmp-mcp .
+Today's retrieval may include later additions/corrections; normal endpoint
+access/current mapping is not a historical delivery/version archive. No new
+FMP permission-letter gate or vendor-rights approval is invented; bounded
+private ephemeral analysis remains as364.1, with rights_verified FALSE.
+
+No production store preparation/probe, predecessor read, new body replay,
+provider credential read or API call has occurred at this prospective point.
+15 carried P2s remain OPEN pending actual scopes/evidence; verified new fixes
+are candidate technical corrections, not factual source-gate closures. All
+P0/P1/dispositions/previous scoped resolutions stay as365. Missing actual
+historical source/PIT/identity/rights/full-population/context/earnings/look/
+engine-parity facts remain binding; no window/economics/causal-order change,
+source proxy, fabricated completion, outcome look or backtest. Preserve frozen
+v1/scale/pilot/four v3 files and stopped1,846/1,847 state, both nonretroactive
+incident classifications, legacy19,846/99,394 and strictD23 seven nonexact/no82
+digest. No purchase/upgrade/trial/QC/Safari/vendor reply/account change, old
+SDK activation, monitor rearm, other-chat message or trading operation. Only
+one successful final matching-lane push after completed/blocked work plus a
+separate durable handoff naming exact implementation hashes.
+
+
+### 366.5 Qualified code snapshot before host proof or credential access
+
+Main final462 focused checks PASS10.32s,18 DeprecationWarnings from the
+intentional native-denied fork probes with the real memory-monitor thread;
+no skips/failures. Selection is six relevant custody/projection/capture test
+files plus the EXACT package guard, not the full lane/repository suite.
+Main129 boundary/record/active-document/import/platform/frozen-pin/old-stop
+checks PASS7.07s on prospective content before this validation note. All12
+relevant Python images compile; four current frozen v3 custody source bytes
+independently equal exact aa0d635d historical Git blobs, NOT historical replay.
+
+The initial main combined harness left fork enabled for Git and therefore17
+snapshot/proof tests correctly refused effective-fork-isolation before data
+paths (444 passed,17 failed,17 warnings). The focused harness was corrected
+to native fork denial, with no production-code/test weakening; first corrected
+run461PASS9.81s and final462 above includes the added receipt-pin controller
+test. Boundary/Git compilation harnesses deliberately permit Git subprocesses
+while denying network throughout the tree. All tests deny actual old/new
+private stores, artifact data, USB and Keychain access; writes only fresh TMP
+and /dev/null; live VM/RSS guard stays active. No actual host proof/input/
+credential/provider operation has occurred at this code-qualification point.
+
+| New or corrected image | Bytes | SHA-256 |
+|---|---:|---|
+| research/insider_buying_pilot_fmp_eod_projection_v1.py |23569|3d9e90df254ac09d60d503f814f3401052391836820d3f50bc6a34a55da03389|
+| tests/test_insider_buying_pilot_fmp_eod_projection_v1.py |22474|5cbc45ddf52d6175f1281cf8740a3f332d44a298c053eb77d1abe6acc91b03a2|
+| research/insider_buying_pilot_stable_custody_v2.py |32981|cf57394f7b33008b4cbf643c496ce1c9446eb720cffaf333a05d2ee6692670a0|
+| tests/test_insider_buying_pilot_stable_custody_v2.py |18009|f2fa6d1a34ab53681364d0f0c2a12e461c45f80d356b623c160754fae5ead4b1|
+| research/insider_buying_pilot_fmp_eod_qualification_v2.py |33040|205d5c30afe11483285f7fdd3c7690ff890aec6c7193be05b2cc9e44bcb3b546|
+| tests/test_insider_buying_pilot_fmp_eod_qualification_v2.py |39324|14f4d709e6ea92c022634bfcb7b370b73c80984c6603331fbbbeb787c2d791a5|
+
+Agent stable-custody65 checks PASS0.50s/18 native warnings, code/tests compile;
+nine faithful in-memory reversals produced14 intended REDs plus2 unaffected
+PASS controls: content3, fullctime1, privacy-before-read1, oldempty-audit1,
+physical-root proof1, exhaustiveclose1, auditnamespace4, read-onlyGit1,
+ancestor-validation-before-create1. Initial mutant collection/setup errors
+were excluded; corrected full group alone supplies those14. Agent v2capture
+97 checks PASS1.15s/zero warnings, compile; includes controller-only final
+receipt-SHA return/cleanup with scripted outputs and NO actual transport.
+Its earlier96/1.11s run had eight faithful reversals14 expected REDs (binding1,
+registration2, fullplan2, dispatch1, finiteIPC4, holdclock1, postageproof2,
+snapshot-directoryliterals1); final image receipt omission proof follows if
+reported before activation. These are attributed tests, not observed market
+or provider evidence. Genuine pre-fix REDs and fixture/setup deviations remain
+as366.4, with storage size-before-open/hash1 RED then correction. No source
+byte was physically left mutated by guard experiments.
+
+Independent read-only source QA on the final205d5c30/cf57394f pair finds no
+confirmed blocking defect in requested data-root, snapshot, native-role,
+plan, keychain, HTTP or stop paths. Source QA is not Claude acceptance or a
+successful real operation. Its important limit remains: readback authenticates
+the observed stability experiment, not perpetual future metadata immutability;
+actual receiver continues full checks. Existing v1 code/claims and all frozen
+sources remain unchanged; only pure metadata parser receives the two verified
+corrections. A successful actual storage receipt and actual API dispositions
+must still be observed/recorded after the clean implementation commit exists.
+
+Final capture-image guard group on205d5c30/14f4d709 contains nine faithful
+in-memory reversals with15 intended REDs, including the final complete-receipt
+external-anchor omission1. No disk images changed;97 positive/1.15s/zero
+warnings and exact hashes remain. This supersedes only the earlier eight-guard
+count, not its separately attributed preactivation evidence.

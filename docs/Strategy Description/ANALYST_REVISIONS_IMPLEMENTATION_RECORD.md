@@ -4413,7 +4413,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-03 | Owner-waived offline identity, historical-symbol coverage and REMX recovery under QC/Safari hold | `372019d5e275248fe41bad000e638479f8cb7a0b` -> `0b78b00c7cf6a75cf21044a8aaaffee852c59a21` -> `af7ebb09941f6d64df60310505645ea2a6241b25` -> `0d131ac9d662ba5942ea9b67c16d108e2da3c627` -> this final section336 handoff commit; FOUR total | No incoming Claude range; current owner review waiver, no independent acceptance | K definitions, L fractional timing, M original ownership, N normative roles and O new historical-symbol coverage each passed once and are spent. Four new files retained; none completes its required window. Original UNIT and acquired-security hypotheses refined rather than assumed | Root592distinct focused passes across stages; latest149passes2.03s,16changed-source/test memory compiles across stages, exact source/profile/native pins. Record repeats nonadditive; no full suite or operational replay | I336-001..009 corrected pre-use, I336-010 qualified/corrected; five identity stops and RAW/session/payoff/coverage gates remain. No QC/Safari/provider data API/Keychain;338/259/54/699 unchanged | ONE matching nonforce final push at the concrete dated-identity/common-price evidence barrier. All controls/readers stay spent; no automatic source-splice, source-stop bypass, QC release, strategy cell or readiness clearance |
 | 2026-11-03 | Claude review snapshot R337 of `10b05cca..3a3350dc`: the eighteen Codex commits of sections 334–336 reviewed after the fact | `3a3350dc` -> `134fbbc4` (correction) -> this record commit | All eighteen accepted, `7699f6b6` after correction; section R337 | FirstRate price-format JSON helpers keep the `bound` refusal code; deadline-taxonomy, `requests` redirect/cookie, reversible transport-pin and record-wording findings documented | 27 range test files 2,151 passed; 86 record gates; 48 section-330 regressions; 189 correction-affected passed; 1/1 mutation caught; no full suite, no QC/Safari/provider access; 0 looks, 338/259/54/699 unchanged | 0 P0, 0 P1, 1 P2 documented, 8 P3 (one corrected) | Codex counter-reviews section R337; Codex's owner-directed section-337 round continues |
 | 2026-11-04 | Completed owner-directed exact-five quarantine for matched six/eight exploratory cells; section337 | `18e6d567` -> `864c9b97` -> this final record commit | Incoming two Claude commits accepted/qualified in337.3; new variant review expressly waived | Final post-tilt denied weight to own sleeve ETF; genuine vendor-only monetary/runtime/source chain; sole local preparation/validator both exit0 and spent | 727 distinct focused passes24.37s; 17 memory compiles; exact5bindings/73ranges authenticate; no full suite or QC/Safari contact; one final push | 0 new P0/P1; seven pre-use P2 corrected; historical open P2 retained | Hold QC/Safari; future genuine project/input/source/run binding and demanded coverage pending; 338/259/54/699 unchanged |
-| 2026-11-04 | Local full-input, conservative RAW coverage and six-cell source binding; section338 | `94c2030d` -> `754563a4` -> `c73c52d2` -> this B2 environment freeze; continuation pending | Owner current review waiver; no new incoming review | A input_shape failure; B preclaim environment refusal, both spent; B2 exact OS encoding compatibility fix/metadata-only | A456focused; B301focused; B2 320focused4.98s overlap as recorded; no full suite or QC/Safari | Serializer/privacy and environment corrections; actual source shape not yet observed; no permission changes | Sole new B2 metadata observation/validator at exact freeze; no old retry;338/259/54/699 unchanged; one final push |
+| 2026-11-04 | Local full-input, conservative RAW coverage and six-cell source binding; section338 | `94c2030d` -> `754563a4` -> `c73c52d2` -> `ea6a7d90` -> this C freeze; final pending | Current owner review waiver; no incoming review replay | A input_shape/B environment refusals retained; B2 metadata0 identifies exact container0755; C uses exact versioned role contract | C476focused30.75s; earlier selections overlap as338 records; no full suite/QC/Safari | Exact authored container role corrected prospectively; no physical permission/pin change or historical-cause claim | Sole C fresh preparation/validator then documented endpoint;338/259/54/699 unchanged; one final push |
 
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
@@ -75550,3 +75550,159 @@ source admission, reinterpretation of A or B success, silent retry/fallback
 or new lease. Any failure/ambiguity spends B2; preserve evidence and actual
 facts without another unchanged invocation.
 QC/Safari/provider/USB/credential/financial holds and338/259/54/699 unchanged.
+
+### 338.10 Actual B2 metadata authenticated: one exact container-mode mismatch
+
+At clean ea6a7d90fa89adf8fe7458352750948e9f5679f8, exact root/branch/HEAD/
+status/source/helper/profile and unchanged live remote94c2030d checked.
+Sole B2 observe dispatched18:24:55UTC, completion observed18:25:15UTC,
+ACTUAL exit0. Sole B2 stdin validator dispatched18:25:15UTC, completion
+observed18:26:29UTC, ACTUAL exit0, output_authenticated=true and
+accepted_observation=true. These external brackets are not source change
+timestamps or measured runtime. Original observe12216B/
+91f72330d12877c24229772847c419a662914a969f8f533e6997b1050fd19b7d.
+
+B2 report12105B/
+c6fe967a9fb08324df87eeb9a3ef76c729fb4623c184133d94dc92ce64284d5b;
+private metadata6395B/
+5ed0c42916152a6c04909f93a61a594fa83bbd88fc9f232dcca28c17b0acdc2d.
+Pins/rows are from ORIGINAL captured authenticated envelope, not a control/
+report/private evidence reread. Observe and validator are now SPENT; all
+B2 code/tests frozen. No source contents/ACL/xattr/listing/genuine loader,
+permission change, A/B replay, provider/QC/Safari/credentials/USB action.
+No strategy/infra look/cell;338/259/54/699 unchanged.
+
+All14 exact known paths were observed; ZERO unavailable, ZERO changed
+endpoints, all ten-field pairs equal. ONE failing path, ordinal9:
+the D5/package intermediate INPUT_ROOT directory, mode0755 at BOTH endpoints,
+actual directory, owner matches process UID, ordinary flags. Its ONLY failed
+used-policy predicate is mode (used A requires0700). All other13 known
+paths and every other observed predicate pass, including private package/
+lineage child directories0700 and known files0600/exact activation size.
+The metadata-only result is endpoint evidence, not all-component nofollow,
+native ACL/xattr/byte authentication or proof of A's exact past failing leaf.
+Historical A cause remains unproven; this identifies a verified CURRENT
+policy/layout incompatibility consistent with authoring-code evidence338.5.
+
+I338-008(P2) prospective correction: the first new full native guard conflated
+the authored intermediate package CONTAINER role with private package/lineage
+leaves. The writer default-mkdir container has no explicit0700 guarantee;
+its private children and payloads do. Correct ONLY a separately versioned
+future input contract to expect0755 at the EXACT fixed INPUT_ROOT container,
+ROOT0755, EVERY other below-root directory0700 and ALL files0600/singlelink.
+Owner/flags/ten-field/named-held/whole-byte/native ACL/xattr/no-follow/
+inventory/normal-return checks remain; no blanket700or755 alternative.
+No physical chmod, ownership/attribute/umask/security change and no old
+metadata/device/ctime or byte-pin refresh. Group/world writes remain denied.
+The exact future role/mode contract is not a generic metadata waiver.
+
+A new C caller/input version will preserve the original raw bytes, genuine
+sealed library authority and SAME data/scientific demand/source family.
+Its local preparation is a genuinely changed technical protocol justified by
+current authenticated B2 metadata plus the writer role, not relabelled A.
+A/B/B2 remain spent and are not accepted retroactively. New C sources/
+profiles/current pins/regression/one-shot authority must be committed
+separately before any fresh private-byte access. Current owner review waiver
+permits this lane-owned fix; it does not clear source/price/financial gates.
+
+### 338.11 D4 version C input-role correction and exact preparation freeze
+
+NEW scripts/arv2_r338_quarantine_input_v2.py is an exact bounded inverse of
+frozen A inputa7e56ca5 after restoring ONLY schema/profile provenance and
+the one exact-container0755 predicate. ROOT still0755, every other in-root
+directory0700, file0600/single-link, expected byte pins, current owner/
+ordinary flags, nofollow original FDs, full ten fields/native ACL/xattr,
+exact inventory/hash and genuine sealed library/normal-return rules unchanged.
+The role is the exact INPUT_ROOT constant, not arbitrary directories or a
+choice between700and755; group/world-write modes and other private dirs755
+still refuse. No source permissions, owner/attributes/umask/settings or old
+source/history/device/ctime pins are changed. Metadata provenance is B2's
+current finite observation only, explicitly not A historical cause or source
+byte/read/admission authority.
+
+NEW scripts/prepare_arv2_r338_quarantine_v2.py (C) composes that exact V2
+input role with unchanged pure coverage9901e912/materializationb9c5c84b and
+fixed DATA guard98f10fe2. All original source/RAW data, dates,5casepolicy,
+six-cell economics/assignment, private nonce blinding and proposed38522505
+source semantics stay unchanged. Frozen A/B/B2 operations/readers/claims
+remain spent; pure library reuse under THIS new protocol is not renewal.
+131 selected public code pins include the old input bytes as PROVENANCE only;
+actual input role imports ONLY the new V2 module. No old A caller/module or
+input instance is invoked or monkeypatched.
+
+Root FINAL476distinctpasses30.75s =91Ccaller+66V2input+51coverage+
+87materialization+79fixedDATAguard+102record/redaction; no failures/skips/
+warnings, no full suite. These overlap earlier456/301/320/author selections
+and are NOT summed.4new files compile/single-EOF; all131literal pins/
+4profiles match. Fresh BOTH-role bootstrap reaches new V2 ABI/profile with
+21 raw projection sources. Exact worker CODE-only bootstrap under C's
+native write restrictions PLUS ALL-production-artifact denial exits0,
+enters no control/GenuineInput/DATA operation. Old V1 input module is absent
+from imported roles even though its public bytes remain held as provenance.
+
+V2 author66passes9.77s (47carried+19new), Ccaller91passes5.06s (90carried+
+1C-specific). Reached oldpolicy red/newpolicy green at exact synthetic0755
+container; restoring old700 catches1expectedfailure0.15s, broad-any-dir755
+waiver catches1expectedfailure0.20s; restored safely. Raw inverse reproduces
+old31,092B/a7e56ca5 exactly. Initial65pass/1fixtureTypeError omitted copied
+FunctionType defaults; corrected fixture before final pass, no production
+change. Same-round source/ABI advice is not independent review; current
+owner explicitly waives Claude review of this338 recovery.
+
+|New file|Bytes|SHA256|
+|---|---|---|
+|scripts/prepare_arv2_r338_quarantine_v2.py|57967|0287c3d1fafabb3d9b2fefc1c68bccd5ae257b7f9e2799ef15a650e61b074fd6|
+|scripts/arv2_r338_quarantine_input_v2.py|32318|e83c36ee449a00f2cf98b78eefe3be13e04f851bb1de9f6209a2002b80211b8d|
+|tests/analyst_revisions_v2/test_r338_quarantine_caller_v2.py|33240|132d391bb4647f5563c5c6501831c05387e1a9245f0b7b397c6927578291f902|
+|tests/analyst_revisions_v2/test_r338_quarantine_input_v2.py|22002|8cb7937a373526d7a243cea5530dfc2952bb06f3dcba5e225a7a9b3e70a0f470|
+
+V2 input profile4639B/
+97c11e23a6a79203f7c88f6ef66cb9772ef8a4bbe20bda3a8f69c6ec24e06496.
+Canonical C caller profile20821B/
+7e3279a62cc83c793cf3809daff112e4b2f10b83fde3618815a29878cf3351de.
+Exact131source inventory16683B/
+9dc8c26bcdebccae44cb3ee47d19a8328412710e482c94286c099616bb9a467c,
+literal in NEW C source. Unchanged coverage/guard/materialization profile
+pins are338.4/current nonce correction; no old used pin is refreshed.
+
+D4 decision: at THIS separately committed clean exact freeze invoke ONLY
+C launch ONCE, followed by ONE C stdin validate of ORIGINAL captured finite
+stdout and OBSERVED parent actual0or2. Fixed NEW control
+artifacts/analyst_revisions_v2/quarantine/R338-20261104-C remains
+UNINSPECTED/UNALLOCATED before freeze. Expected-head THIS commit;
+caller-sha2560287c3d1fafabb3d9b2fefc1c68bccd5ae257b7f9e2799ef15a650e61b074fd6;
+profile-sha2567e3279a62cc83c793cf3809daff112e4b2f10b83fde3618815a29878cf3351de.
+Designated Code root/branch/Darwin/POSIX Python3.13 exact binary/-I/-B and
+clean exact Git/self/blob/current131pins/profiles mandatory. Matching live
+remote94c2030d rechecked unchanged before actual. No pin auto-refresh.
+
+All D1 protocol bounds/claim/actual-exit/normal-return/guard/nonce/output rules
+remain338.4 with C control/schema and V2 input role. Parent900s/child840s,
+each pure stage<=300s never extends parent, own reap5s, validator30s, private
+coverage64MiB/source bundle3MiB, public131072B; host-suspension/uninterruptible
+IO qualification. Soft FD floor32*131+512=4704,256MiB inroot free space,
+no resource-limit/security setting changes. Claim+marker BEFORE all retained
+DATA/genuine input; two independent private nonces only after claim/marker.
+Observe no old reports/claims/readers or raw source outside exact DATA/package/
+lineage scope. Source MODE correction is enacted in the new guard only;
+genuine source bytes still must fully authenticate before outputs.
+
+Native C worker policy3719B/
+ebccc1236ae9bfae3260fa6d8edf7afbc21253a4cca32f71b4e4393bb6a12c19,
+allnetwork/Volumes/BOTH-Keychains/securityCLI denied and exact artifacts only.
+Sanitized CODE parent is not outer native sandbox; no native/whole-interpreter
+or continuous-source overclaim. C's known-safe process environment rules are
+unchanged A rules; it does not reuse B's incompatible strict environment
+check or any B/B2 metadata collection.
+ONE stdin-only C validator under external allnetwork/ALL-artifact/USB/BOTH-
+Keychain/securityCLI denial receives original parent stdout, same exact run
+bindings and actual-parent-exit equal observed0or2. No output/control/DATA
+reinspection. Actual0+authenticated matching envelope mandatory; late report/
+nonzero/unknown/timeout/noise/trailing/ambiguous state is failure/spent, no
+unchanged retry. Authenticated INCOMPLETE conservative coverage is explicitly
+not strategy coverage/run readiness.
+
+No actual C has run at this freeze. A/B/B2 retained, no backwards acceptance.
+No QC/Safari/provider/credential/USB/compile/backtest/result/trading operation
+or look/cell; all source/PIT/master/readiness/paper flags and338/259/54/699
+unchanged. Actual C evidence and the final combined single-push handoff follow.

@@ -1,9 +1,15 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Authenticated EODHD historical field checks recorded in section 62, 2026-11-03.
+Status: **Original guidance and SPY source reconciliation recorded in section 63, 2026-11-04.
+Both SPY conflicts are resolved to exact six-decimal issuer gross-rate evidence in a separate private overlay.
+Vendor files and production input acceptance remain unchanged; no cash posting or historical receipt is inferred.
+JNJ January/April original ranges are verified, including all four predecessor-column bounds.
+The acquisition-affected pair remains unaccepted without verified comparable figures and canonical field binding.
+No strategy arithmetic, QC access, purchase or empirical evaluation occurs. One final lane push is authorized.
+Authenticated EODHD historical field checks recorded in section 62, 2026-11-03.
 Owner-authorized key use succeeded through an in-memory Bearer header; no key was displayed or saved.
 AAPL and SPY each return 24 dividend records for 2020--2025 with all payment-date fields populated.
-Two 2025 SPY raw-cash records conflict with the USB; four-decimal rounding does not reconcile them.
+Section 62's two SPY raw-cash conflicts are reconciled at the source-fact level in section 63.
 JNJ news access is verified for 198 sampled 2025 articles; comparable guidance pairs remain unverified.
 January 2020 returns empty; April 2020 fails the symbol gate and is not accepted or financially analyzed.
 Historical stock/SPY NBBO remains unestablished. The lane is not backtesting ready.
@@ -111,7 +117,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 62. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 63. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -9266,3 +9272,201 @@ automation checkpoint after verification. No private data or key is included.
 No PR, merge, other ref, force push or monitor rearm is authorized. The next
 independent review must identify the complete newly published range rather
 than treat this publication as a Claude trigger or empirical acceptance.
+
+## 63. Original guidance and SPY issuer reconciliation, 2026-11-04
+
+### 63.1 Scope and lane custody
+
+Owner: **"Proceed with validating the original guidance disclosures and
+reconciling the two SPY dividend conflicts. Use my existing subscriptions,
+don't access QC or buy anything, and push once when done."** This authorizes
+the bounded source/field audit and one final matching-lane non-force push.
+It does not authorize signal/threshold arithmetic, returns, a portfolio
+evaluation, research allocation, cash posting, a source-policy tolerance or
+changed strategy rules. The evidence remains current-vintage historical
+reconstruction with `point_in_time_data=false`.
+
+Start clean local and matching live remote
+`3b04814a2d94c5b921a3c13ca999be29ab5ccced`, mandatory worktree/branch/origin
+verified. The previous `3e144031..3b04814a` publication is complete, not another
+trigger. No new Claude commit is consumed; prior review dispositions remain.
+Monitor stays PAUSED. Only this lane record and its existing active-status
+pins change in tracked Git. Root/shared documents and source inputs stay frozen.
+Existing owned EODHD/FirstRate captures are reused alongside primary issuer
+documents. No new provider key, account, QC page/docs/API/quota/job or purchase
+is accessed. The existing EODHD key permission persists but no key is needed
+or read for this round.
+
+The retained scope limits JNJ to the identified January--April 2025 disclosure
+chain and SPY to the US ex-dates March 21 and June 20, 2025. This is not a
+complete issuer/archive census or a new frozen research universe.
+
+### 63.2 Original JNJ disclosures: fields verified, pair unaccepted
+
+Four dated original-issuer sources are retained as retrieved now:
+
+| Source | Verified disposition |
+| --- | --- |
+| [January 22 results](https://www.investor.jnj.com/investor-news/news-details/2025/Johnson--Johnson-Reports-Q4-and-Full-Year-2024-Results/default.aspx) | Contains FY2025 finite, ordered reported-sales and adjusted diluted-EPS bounds. The results headline refers to FY2024; it must not be mistaken for the guidance fiscal year. Operational measures are distinct rows. |
+| [April 1 expected closing/correction](https://s203.q4cdn.com/636242992/files/doc_news/Johnson--Johnson-Announces-Expected-Closing-Date-for-Intra-Cellular-Acquisition-2025.pdf) | Explicitly corrects an earlier statement that closing had occurred. Gives incremental transaction-impact estimates and defers their incorporation into full-year outlook to April 15; it is not a complete replacement range table. The prior incorrect version and correction timing are not recovered. |
+| [April 2 actual closing](https://www.investor.jnj.com/investor-news/news-details/2025/Johnson--Johnson-Closes-Landmark-Intra-Cellular-Therapies-Inc--Acquisition-to-Solidify-Neuroscience-Leadership/default.aspx) | Confirms closing and repeats the April 1 incremental sales/EPS-impact estimates exactly. It contains outlook language, so it must not be described as having no guidance content. It likewise defers the full outlook to April 15. |
+| [April 15 results](https://www.investor.jnj.com/investor-news/news-details/2025/Johnson--Johnson-Reports-Q1-2025-Results/default.aspx) | Contains current reported-sales and adjusted diluted-EPS ranges; all four bounds in its prior January column exactly match the January original. The outlook includes the acquisition. |
+
+The source tables distinguish reported sales from operational/FX-excluded
+measures. FY2025, issuer name/NYSE ticker, dollar presentation, sales in
+billions and the adjusted diluted-EPS label are verified. Exact FY-end date,
+ISO currency, permanent issuer/security identifiers and share/split basis are
+not independently bound by this sample; a dollar sign is not minted into a
+verified ISO currency field. Detailed accounting/scope compatibility is not
+inferred from matching labels.
+
+The April document's January reference is verified. The intervening April
+1/2 disclosures remain in the correction/event chain. The acquisition changes
+scope without verified comparable figures, so this sample pair receives
+`acquisition_scope_changed_without_verified_comparable_figures` and remains
+**unaccepted**. The plan's existing rules are preserved. No percentage revision,
+signal threshold, trade eligibility, return or portfolio is calculated.
+Refusing this affected pair does not assert that all guidance is unusable or
+that another subscription would make the pair comparable.
+
+All 198 previously captured 2025 EODHD articles are checked against these
+original bounds after date/ticker gating and HTML/minus/unit normalization.
+The January 22 and April 1 issuer-title-shaped copies contain none of the four
+original bounds. Other articles do contain bounds: one April 15 record has all
+four current bounds and the relevant labels. Complete normalized field binding,
+authenticity, comparable predecessor coverage and usable six-year history
+remain unverified. Do not claim either that news contains no guidance or that
+these keyword/token matches constitute an accepted guidance input.
+
+Author QA retained v1/v2/v3 corrections: April 2's outlook wording was initially
+understated, and exact-number token matching needed to admit a billions unit
+suffix without accepting numeric substrings. Eight invented controls pass.
+The final v3 is frozen; original source bytes and private original-field profile
+remain unchanged. Current retrieval plus a dated issuer page does not prove
+an immutable original version or first historical subscriber receipt.
+
+### 63.3 Both SPY amount conflicts resolved to issuer evidence
+
+The [official US historical-distribution workbook](https://www.ssga.com/library-content/products/fund-data/etfs/us/spdr-etf-historical-distributions.xlsx)
+identifies the US trust as SPY, CUSIP `78462F103`. Selected rows 9197 and 9196
+bind the two US ex/record/pay dates. Only those rows, their shared strings and
+headers are retained; the mixed-date workbook is processed in memory and is
+not saved. Identity/date gates precede financial numeric conversion. Its
+opaque transport hash identifies the downloaded bytes, not a financial-row
+analysis or a claim that all workbook rows are authorized.
+
+The issuer-filed [March SGX announcement](https://links.sgx.com/1.0.0/corporate-announcements/R5L1NKNJXM61L6ZK/)
+and [June SGX announcement](https://links.sgx.com/1.0.0/corporate-announcements/1JOMS95M1I0WLP86/)
+identify the same US trust, ISIN `US78462F1030`, and explicitly provide actual
+gross USD per-share rates. These main announcements resolve the amount/basis
+question; their preliminary TBA attachments do not. US dates come from the
+US workbook, never a guessed shift from the different SGX local ex-dates.
+Record/pay dates agree. Workbook capital-gain dashes remain missing, not
+invented zeros; the direct actual gross rate is used without a component sum.
+
+Root re-verifies the retained USB archive hash and reads only the named
+`SPY_divs.txt` with the 2025 gate before Decimal conversion. Both dates join
+the issuer sources and unchanged owned EODHD capture. Exact results:
+
+| US ex-date | Issuer gross rate precision | EODHD precision | USB precision | Disposition |
+| --- | --- | --- | --- | --- |
+| March 21, 2025 | Six decimal places; US workbook and actual SGX rate match exactly | Five places, not exact to issuer | One place, not exact to issuer | Both vendor values match the issuer rate rounded to their own observed precision. Retain the exact issuer rate in the separate evidence overlay. |
+| June 20, 2025 | Six decimal places; US workbook and actual SGX rate match exactly | Five places, not exact to issuer | Three places, not exact to issuer | Same result and resolution. |
+
+This explains compatibility at the observed source precisions; it does not
+establish a vendor's internal rounding process. The old four-decimal comparison
+correctly failed and is preserved. No blanket tolerance or global source
+precedence is changed, and neither lower-precision vendor value is called an
+exact match. The two action facts are resolved to the full issuer precision
+in a new immutable private overlay, preserving every raw vendor value and
+source-line hash. No USB/EOD file or production acceptance ledger is rewritten.
+
+The evidence overlay is not a synthetic `CorporateAction`, a cash journal or
+an executable historical input. `cash_posting_permitted`, execution authority,
+historical delivery/receipt proof and PIT remain false. A November 2026 capture
+is never backdated to 2025. A later declared exploratory adapter must bind
+source availability, calendar/identity and accounting semantics before use.
+
+### 63.4 Evidence custody, output limitations and validation
+
+All evidence is ignored under
+`artifacts/guidance_revision_drift/disclosure-action-validation-20261104/`:
+
+| Major anchor | SHA-256 |
+| --- | --- |
+| `scope-v1.json` | `ca395508c00ba1d941a7af8a94941aab16e21abe67e204eac68370f8edad9337` |
+| `guidance/guidance-manifest-v1.json` (18 retained files) | `8ac5cbd95ccf61bb81c8b61298a6f77552634dfe905b8ee2939068516b31faca` |
+| `guidance/guidance-disposition-v1.json` | `4b2c74402300a51559a548aa0f966c15c82ed00aa341c448cbb4c3ec05e0aebe` |
+| `guidance/original-guidance-validation-v3.json` | `ac7ed5217a67ab1a8ae61ad90e9428ed626553aa64e375d355b7f0f5e34c349a` |
+| `guidance/original-guidance-private-fields-v1.json` | `e9bb9e1725bfc9f989b8db35825e8bbb5dbc5cd44e8552dc9a5fa7b1a9b81d4c` |
+| `spy/issuer-evidence-receipt-v1.json` (11 retained files) | `c4563998670cda34692c3ee6be99d4d838d8d0b6c3ecea1a80b530fdc0681b6d` |
+| `spy/ssga-us-selected-distributions-v1.json` | `fcf5adcf5cdf58241726615182dda83f100c61efe63bf79de0608e032fba5c86` |
+| `spy/root-action-resolution-private-v1.json` | `219878867d4304fb7fff6918edb24fe3578218f8b4a23da176530ac3de5a53cc` |
+| `spy/root-action-resolution-summary-v1.json` | `e6151daae4e0d5a3d0bf8ccc2073f27f7b216391a963b904c656b6b520f75efc` |
+| `offline-author-custody-qa-v1.json` | `7e5e62047549631809e2f5c73c126038fa1329f1fe650e9ffe9c231948c8d76b` |
+
+Source capture receipts bind the exact four JNJ URLs/bytes/publication labels
+and the two SGX HTML documents. The moving workbook's transport hash is
+`4add18439e505ba6c114bea5d352ac68b1ea5420bc99abdf2e21500dd6f1faa2`;
+retained US XML rows reconstruct exactly. All 11 issuer-receipt artifacts and
+both root SPY-overlay hashes pass separate read-only author QA. Gross rates,
+US/SGX identity, source-specific dates and precision comparisons agree; missing
+gain components are not summed. This is author/subagent QA, not independent
+Claude acceptance or native integration proof.
+
+Retain actual output limits: searches, including a domain-filtered search,
+returned incidental 2026 financial snippets that were not opened or used.
+An early web extract displayed dated public 2025 source text; a later author-QA
+print of a nested validation object also emitted two dated public acquisition-
+impact figures. Neither was a key or protected/current financial value in an
+accepted input. Broad printing stopped and aggregate whitelists are used.
+Do not claim round-wide zero financial-content display or silently erase the
+incidents. No key or private financial rows are committed. A TLS-client trust-
+chain failure was handled by the system curl client with normal certificate
+verification, not by disabling certificate validation or changing security.
+
+No production change is needed for this scoped validation. The unchanged
+source manifest remains
+`f570bb044504ec12439d74d49e27408337705286a7ca5d1ac46bb91526e1b11b`
+(60 members); FirstRate source remains
+`7889276ed58bd8f24c25c3fb6db4d81c2a3c463ae14b13d5bfb2c38ddc34631e`,
+native audit remains
+`fa562a43d49f59e5e3305c3d99cb2d3537bf0045a494504c3f5e5711fd8ae3e6`.
+Original draft/fixture/economic/null/false permissions and native custody are
+unchanged. Original cycle stays CLOSED FAILED 3/3; separate Mia recovery stays
+zero attempts/intents, maximum three unsuccessful attempts. No QC or native
+attempt, source-changing milestone, research look or return is consumed here.
+
+### 63.5 Scoped outcome and one-push handoff
+
+The requested source validation and two SPY evidence reconciliations are
+complete with the qualifications above. Original guidance fields are available;
+the sample acquisition pair is not accepted. Exact issuer SPY facts now resolve
+the two precision conflicts, without activating cash posting or changing raw
+data. The lane remains **not backtesting ready**: broader usable guidance/
+correction history and canonical binding, historical consolidated stock/SPY
+NBBO, remaining identity/minute/action/terminal/settlement/calendar inputs,
+real-input integration and the existing research/evaluation scope gates remain.
+No extra subscription is recommended merely to fix these two dividend facts.
+
+Accumulate the record/status-pin commit and publish exactly once from the
+mandatory root to only the matching lane, after focused document/import-scope,
+in-memory compilation, source/history/hash, staged-diff and ownership/ref checks.
+No full lane/repository suite or new provider/QC round is started. The exact
+final commit and verified push/remote result are retained in the automation
+checkpoint. Monitor stays PAUSED; no further loop rearms automatically.
+
+Closing focused verification: one existing active-document method passes in
+0.016 s, zero failures/errors/skips. Eighteen guidance-manifest files and 11
+issuer-receipt files match their hashes; the ten major anchors bind both root
+SPY resolution files and the final separate author-QA receipt. Four primary
+guidance hashes, retained table fields, the April 1 PDF locator, correction/
+interim chain, SPY XML rows and actual gross-rate semantics also pass separate
+read-only author checks. Eight invented numeric-token controls pass; three
+private guidance helpers and the changed boundary test compile in memory.
+Sections 1 through 62 below the header remain byte-exact to `3b04814a`, the
+production source SHA/member count is unchanged, and diff checks pass. No
+full lane/repository suite, dependency installation, strategy calculation or
+native/empirical test is run. Final header, staged-file and ownership/ref checks
+precede the sole end-of-round matching-lane push. This is a source-audit handoff,
+not independent Claude acceptance or backtest readiness.

@@ -4413,7 +4413,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-03 | Owner-waived offline identity, historical-symbol coverage and REMX recovery under QC/Safari hold | `372019d5e275248fe41bad000e638479f8cb7a0b` -> `0b78b00c7cf6a75cf21044a8aaaffee852c59a21` -> `af7ebb09941f6d64df60310505645ea2a6241b25` -> `0d131ac9d662ba5942ea9b67c16d108e2da3c627` -> this final section336 handoff commit; FOUR total | No incoming Claude range; current owner review waiver, no independent acceptance | K definitions, L fractional timing, M original ownership, N normative roles and O new historical-symbol coverage each passed once and are spent. Four new files retained; none completes its required window. Original UNIT and acquired-security hypotheses refined rather than assumed | Root592distinct focused passes across stages; latest149passes2.03s,16changed-source/test memory compiles across stages, exact source/profile/native pins. Record repeats nonadditive; no full suite or operational replay | I336-001..009 corrected pre-use, I336-010 qualified/corrected; five identity stops and RAW/session/payoff/coverage gates remain. No QC/Safari/provider data API/Keychain;338/259/54/699 unchanged | ONE matching nonforce final push at the concrete dated-identity/common-price evidence barrier. All controls/readers stay spent; no automatic source-splice, source-stop bypass, QC release, strategy cell or readiness clearance |
 | 2026-11-03 | Claude review snapshot R337 of `10b05cca..3a3350dc`: the eighteen Codex commits of sections 334–336 reviewed after the fact | `3a3350dc` -> `134fbbc4` (correction) -> this record commit | All eighteen accepted, `7699f6b6` after correction; section R337 | FirstRate price-format JSON helpers keep the `bound` refusal code; deadline-taxonomy, `requests` redirect/cookie, reversible transport-pin and record-wording findings documented | 27 range test files 2,151 passed; 86 record gates; 48 section-330 regressions; 189 correction-affected passed; 1/1 mutation caught; no full suite, no QC/Safari/provider access; 0 looks, 338/259/54/699 unchanged | 0 P0, 0 P1, 1 P2 documented, 8 P3 (one corrected) | Codex counter-reviews section R337; Codex's owner-directed section-337 round continues |
 | 2026-11-04 | Completed owner-directed exact-five quarantine for matched six/eight exploratory cells; section337 | `18e6d567` -> `864c9b97` -> this final record commit | Incoming two Claude commits accepted/qualified in337.3; new variant review expressly waived | Final post-tilt denied weight to own sleeve ETF; genuine vendor-only monetary/runtime/source chain; sole local preparation/validator both exit0 and spent | 727 distinct focused passes24.37s; 17 memory compiles; exact5bindings/73ranges authenticate; no full suite or QC/Safari contact; one final push | 0 new P0/P1; seven pre-use P2 corrected; historical open P2 retained | Hold QC/Safari; future genuine project/input/source/run binding and demanded coverage pending; 338/259/54/699 unchanged |
-| 2026-11-04 | Local full-input, conservative RAW coverage and six-cell source binding; section338 | `94c2030d` -> `754563a4` -> this B metadata freeze; continuation pending | Owner expressly waives current Claude review; no new incoming review range | A authenticated input_shape failure/spent; exact new B metadata-only diagnosis before any prospective policy correction | A456focused passes29.12s; B301focused passes4.81s; no full suite or QC/Safari | Corrected serializer/privacy; current genuine input shape boundary remains unresolved until B evidence; no source mode changes | Sole B metadata observe/validator under exact new freeze; A never rerun; 338/259/54/699 unchanged; one final push |
+| 2026-11-04 | Local full-input, conservative RAW coverage and six-cell source binding; section338 | `94c2030d` -> `754563a4` -> `c73c52d2` -> this B2 environment freeze; continuation pending | Owner current review waiver; no new incoming review | A input_shape failure; B preclaim environment refusal, both spent; B2 exact OS encoding compatibility fix/metadata-only | A456focused; B301focused; B2 320focused4.98s overlap as recorded; no full suite or QC/Safari | Serializer/privacy and environment corrections; actual source shape not yet observed; no permission changes | Sole new B2 metadata observation/validator at exact freeze; no old retry;338/259/54/699 unchanged; one final push |
 
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
@@ -75434,3 +75434,119 @@ claim spends this B invocation. Record actual process facts, not a fabricated0
 or no-read/root-cause inference. No current source permissions, owner/flags/
 ACL/xattrs, old control/evidence or source policy is changed. QC/Safari/
 provider/credential/USB/financial holds and338/259/54/699 stay unchanged.
+
+### 338.8 Actual B preclaim environment refusal; no source metadata accepted
+
+Sole B observe at clean c73c52d20b5812d606fbaa4cdee0de5f60fb1bfb:
+external dispatch18:16:04UTC, completion observed18:16:16UTC, ACTUAL exit2,
+failure_code=environment, claim_state=unallocated and bound B run arguments.
+The ONE planned B stdin validator dispatched18:16:16UTC and completion
+observed18:17:10UTC also exited2 at the SAME environment preflight.
+Both output1265B/
+3e02dc622e21fca8a5aa59771220511fc3390ea9f11cb19d7ea892ea3286150d.
+These are external orchestration brackets/pins of original captured stdout,
+not measured processing times or a reread of a B control.
+
+No accepted metadata observation/report/private pin was returned.
+The validator failed BEFORE its original-stdout validation, so B output is
+NOT described as authenticated by that failed validator. Its observed finite
+refusal and actual exits are retained honestly. Code order places this exact
+environment predicate before claim/source observation; the program reported
+unallocated, not proof that no preexisting control existed. B observe and
+validator invocations remain SPENT under their freeze even though preclaim.
+All4 B source/test files now frozen; no unchanged B retry, control read/
+repair/cleanup, A replay or source permission change.
+
+I338-007(P2) verified CURRENT host-compatibility defect: the strict B check
+permits only safe_env's seven configured environment keys. A separate
+CODE-ONLY probe under B's EXACT all-artifact-denied native validator policy,
+with the exact env-i prefix, observes:
+unexpected key ONLY __CF_USER_TEXT_ENCODING, no missing or mismatched
+configured keys, and support.resolve exactly equal. A second code-only shape
+probe (no raw value/UID emitted) confirms bounded string format
+0x<hexUID>:0x0:0x0, decoded UID equals os.getuid and EXACT uppercase
+f'0x{os.getuid():X}:0x0:0x0' equality. Lowercase rendering differs.
+This is the platform-added process encoding entry, not a credential.
+No provider/source/old-control operation or source metadata observation was
+performed in these code/environment probes.
+
+The first B fixtures supplied synthetic safe_env dictionaries without this
+real OS-added key. Inert profile mode does not execute environment preflight;
+therefore its earlier native profile startup did NOT cover this compatibility
+predicate. Preserve that limitation; no claim that37/301tests exercised actual
+B source access or complete environment compatibility.
+
+Prospective B2 is a separately named versioned metadata-only caller with the
+SAME fixed14path/no-source-byte purpose and own new control, correcting this
+one verified environment predicate. It may allow ONLY an OPTIONAL
+__CF_USER_TEXT_ENCODING whose value EXACTLY equals the current process UID's
+uppercase-hex zero-field string. Every other unexpected/configured key/value
+retains refusal. No arbitrary environment omission, authorization boolean,
+credential pass-through or persistent OS/environment/security change.
+A real native code-only environment/preflight regression must reach this
+predicate before any B2 freeze. Same pure helper and output-security library
+may be reused under new pins; neither B nor A operation/control is renewed.
+Exact new code/profile/policies/one-shot freeze follows before observation.
+
+### 338.9 D3 exact corrected-environment B2 metadata freeze
+
+NEW scripts/inspect_arv2_r338_input_shape_v2.py corrects ONLY the verified
+B environment contract, with new schema/control/runtime names. All original
+B/A code and uses remain frozen/spent. Metadata helper1446e661 and output
+security3435bc07 are unchanged pure/technical libraries, not renewed
+operations. Optional __CF_USER_TEXT_ENCODING is accepted only if EXACT
+f'0x{os.getuid():X}:0x0:0x0'; wrong UID/case/fields or other unexpected keys/
+configured values still refuse. This does not change privileges, credentials,
+OS settings, source modes or source/authentication/financial gates.
+
+Final root320distinctpasses4.98s =56newcaller+162classifier+102record/
+redaction, no failures/skips/warnings.162+102 overlap earlier B selections;
+the19 additional newcaller scenarios overlap37 predecessor scenarios.
+No aggregate claim that456+301+320 are all distinct. New2files compile in
+memory/single-EOF. Author56passes0.38s; exact UID omission catches1expected
+failure0.12s, restored/source unchanged.
+CODE-ONLY proof under exact native validator policy with real OS key present
+exits0, environmentaccepted=true and wrongUIDrefused=true; source lstat/
+collect/observe paths were blocked. Proof stdout142B/
+d1090757f7794b158269417b1a24bb0e18f1389afb339c63b1b0a5387c9e6196,
+stderr0. Initial proof harness had a placeholder-replacement SyntaxError
+before execution; corrected with no source/private effect. Original B caller/
+tests9a148bf3/15b2dcc1 explicitly unchanged. No actual B2 metadata/control
+operation has occurred at this freeze.
+
+|New file|Bytes|SHA256|
+|---|---|---|
+|scripts/inspect_arv2_r338_input_shape_v2.py|24380|fe76793eef362c618a0b80675c86aa4584b594f39e2a32c2320506c0161a6604|
+|tests/analyst_revisions_v2/test_r338_input_shape_caller_v2.py|18988|23ccb833cf1f2d0febdc9c16cb321060724720f90fea85f932773110a8f2c912|
+
+Canonical caller profile2526B/
+8d96f35c4de426a3cedf4b0511e3b4baf668eb837afc99d2274062c134580e5c.
+Helper profile5082B/61d08e4df669aba66b9eae412a1a44089eed405dee9c9cf5c980fdad098d0e2f
+and helper/source-security pins338.7 unchanged.
+Exact observe policy3312B/
+e1c39a58140cd9b489b224d503efc77751cd41959b91275cfcc56242b83701bb;
+validate policy599B/
+ca65d9fbc597a407d9492be2da03d9160df02da625bc9a35d7556f390b9af61f.
+
+D3 decision: at THIS committed clean exact new freeze invoke B2 observe ONCE
+then one B2 stdin validate of ORIGINAL observed output and actualexit0or2.
+Fixed NEW leaf quarantine/R338-20261104-B2 under lane artifacts remains
+UNINSPECTED/UNALLOCATED. No old B/A control operation or source byte read.
+Arguments: expected-head THIS commit,
+caller-sha256fe76793eef362c618a0b80675c86aa4584b594f39e2a32c2320506c0161a6604,
+helper-sha2561446e661446934114044f788a9c8702cd50d5004f51243ac358562bbfbe0dd27,
+profile-sha2568d96f35c4de426a3cedf4b0511e3b4baf668eb837afc99d2274062c134580e5c.
+Validator also actual-exit equal EXTERNALLY OBSERVED0or2. No pin refresh.
+
+Exactly same designated root/branch/Darwin/POSIX Python3.13/-I/-B,7 configured
+env-i keys as338.7, now TMPDIR/.pytest_cache/r338-B2-runtime and pycache
+beneath it; optional actual OS-added CF field exact current UID only.
+No pytest-only env variable. Externally apply exact observe/validator policies.
+14 fixed path two-pass lstat scope, metadata-only/ancestor/symlink/ACL/content/
+durability qualifications, fresh private nonce, protected output, bounds,
+30s alarms and actualexit/strict-envelope acceptance all remain338.7.
+Native source read-data remains DENIED. No mode/owner/flag/ACL/xattr change,
+source admission, reinterpretation of A or B success, silent retry/fallback
+or new lease. Any failure/ambiguity spends B2; preserve evidence and actual
+facts without another unchanged invocation.
+QC/Safari/provider/USB/credential/financial holds and338/259/54/699 unchanged.

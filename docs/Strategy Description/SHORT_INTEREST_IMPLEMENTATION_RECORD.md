@@ -32136,3 +32136,137 @@ noninteractive administrator capability check is FALSE; no password prompt
 or native trace was requested and raw stderr was discarded. The next step
 therefore needs the already-authorized owner authentication in Terminal.
 The entire219B record prefix remains byte-exact; owned whitespace passed.
+
+## 149. Authenticated passive Documents trace; custody hold retained (2026-11-04)
+
+### 149.1 Original terminal receipt and independent authentication
+
+The owner returned the terminal schema
+si-documents-passive-actor-trace-v1-terminal with status
+closed_passive_observation, source_authority=false, first_failure=null and
+cleanup_failures=[]. This supersedes ONLY the pending-owner-return state in 148,
+not its historical absence observation or any earlier negative.
+
+Main first verified the physical/Git roots, codex/strategy-short-interest,
+clean local c2931abfa772290d908fedc69ef2ae1ace17bcb8 and matching tracking/actual
+origin 219b701c09631e31a895b29c3f0a18536ad0b0ea. The original fixed AppSupport
+report was opened read-only through an anchored nofollow directory-FD chain.
+Owner/group, private 0700 directories, regular 0600/single-link report, exact
+membership, bounded bytes, strict duplicate-free/canonical JSON and FD/name
+comparisons through final close all passed. No old artifact was copied,
+reflagged, adopted, overwritten or deleted.
+
+| Original owner-terminal binding | Independently matched value |
+| --- | --- |
+| Report bytes | 115551 |
+| Report raw SHA256 | 3707d7d216e9982326244ad791208e4d6d6111a43c87e13b767e55bc9427a94f |
+| Original report full10 stamp SHA256 | 6fb8032a7687820ab22f52cc19d065ea010e6979905978b111a401d04f797132 |
+| Original output-directory identity5 SHA256 | 898ab514904625ce4f8ed53a979ad4fe310fc30bc51112f2cb2873dec03fbe88 |
+| Runtime HEAD / matching tracking | C293 / 219B, full IDs above |
+| Driver / unchanged original framer | Exact 4fa266113c4ad23c4c8747a30bcea04f02fdc25fde22a109262eea31bf73c01d / ed462f3b0552d3f74c468c6a51e47ef215b90d9f7e38a372364aaec5c7fcdf63; current bytes also equal committed C293 |
+
+The full10 schema is dev/ino/uid/gid/fullmode/nlink/size/mtime_ns/ctime_ns/flags.
+The identity5 schema is dev/ino/uid/gid/fullmode of the ORIGINAL OUTPUT LEAF
+DIRECTORY, not a digest of every historical ancestor. Main separately checked
+current original FD/name ancestry. No immutable flag is invented: the current
+entire report stamp matches its original terminal hash. Hash-list canonical
+encoding has no trailing LF; the canonical report has exactly its producer LF.
+These finite checks do not claim perpetual or continuous ancestry stability.
+
+The on-disk report remains honestly provisional_until_terminal_context_close.
+It is the separate matching CLOSED owner-terminal packet, with its final
+post-output-context observation, that supplies the final producer result.
+Main did not own the owner's shell and does not invent a Python OS exit code.
+The authenticated report retains the original tracer's actual owned wait:
+PID/PGID 16663, exit -15 after planned original-handle shutdown, both native pipes
+EOF, no stderr, no first/cleanup failure and no issues. The native interval
+was 30,035,169,792 ns; final owner-terminal observation offset 30,275,884,042 ns
+stays inside the original 120 s whole limit. No exact driver Python or eslogger process
+was active in the subsequent read-only check; absence alone was not used as
+historical closure evidence.
+
+### 149.2 Actual result and attribution limits
+
+The original report contains 167 valid native records, consecutive global
+sequence 0..166, 392,601 input bytes and 292 target samples. Matched target/parent
+events=0. Every sampled descriptor/name changed-field list is EMPTY; no target
+protection change was observed. The final separate terminal sample 292 likewise
+has no named changed fields. All available paired descriptor/name observations
+are concordant. Report attribution is no_target_transition_observed.
+
+This is a genuine closed bounded passive observation, NOT an identified
+Documents timestamp writer, proof that no writer exists, a reproduced repair,
+USB qualification or source/readiness admission. Equal sampled endpoints do
+not exclude an intervening change/restoration, and the nine subscribed native
+notifications do not cover every possible mutation. The old reproduced signed
+FileProvider flag transitions in 137 remain valid for their DIFFERENT original
+subject; they do not identify 145's directory timestamp actor.
+
+SI-DEC-20261104-01 records the disposition under continuing
+SI-AUTH-20261103-02: preserve this completed observation and retain
+SI-WINDOW-20261103-004 as an OPEN concrete environmental custody blocker.
+Historical Documents mtime/ctime actor remains UNKNOWN. No new trace, namespace,
+longer window, source claim, USB invocation, rebaseline or weaker comparison is
+authorized merely because the passive interval was quiet.
+
+### 149.3 Safe continuation boundary and final publication handoff
+
+Main and two read-only advisory agents examined the proposed AppSupport-copy
+route. Existing controls outside Documents do NOT repair the failed boundary:
+profile 144 still needs the ORIGINAL working-tree full10 ancestry window,
+which 145 refused BEFORE a RAM snapshot or USB open. A copy admitted only after
+that same source window also cannot bypass it. The existing native proof's
+different identity/protection contract cannot be relabelled as that full10
+guarantee. In addition, adding a sibling beneath the existing native proof
+base would violate its exact membership; no such artifact was created.
+
+A Git-only/public-code bundle could be designed as a DISTINCT prospective
+provenance contract, but is not silently substituted for the promised original
+working-tree checks. No speculative staging code/copy, repeated canary or
+environment/security/daemon change is made in this unit. Further actual USB
+work remains gated on a demonstrated correction of the original environment
+problem or a deliberately approved, separately frozen provenance contract
+that does not weaken custody. The next causal investigation needs evidence
+covering the actual failing read interval; this quiet passive result alone
+cannot supply it. No follow-up native attempt or new monitor is armed here.
+
+The current round includes accepted local correction
+c2931abfa772290d908fedc69ef2ae1ace17bcb8 plus this append-only evidence/handoff
+commit, based on reviewed actual origin 219B. The full C293 record prefix and
+all historical rows are preserved. All authors and actual operations are
+terminal/frozen. Before the round's ONE final nonforce matching-lane push,
+Main must reverify exact physical/Git roots, branch/HEAD/status and actual
+origin 219B; stop on advancement. Follow-tags and submodule pushes stay disabled.
+No interim push occurred. Final full publication hash and verified
+clean local/tracking/actual-remote equality will be reported from Git after
+the single successful publication, rather than inventing this entry's self hash.
+
+Readiness for the last step before QC/Safari remains FALSE. SourceAUTH/052 and
+SI-CR27-008 remain blocked; USB is not qualified, and native/date/class/CIK/USD,
+own-class denominators, availability/revision/rights, coverage, daily union,
+market eligibility/corporate-action/factual cash and actual-input gates remain.
+No provider/key/claim/START/charged byte/outcome/QC/Safari/purchase was performed.
+Count 84,005 START / 4,294,967,296 bytes and separate DAILY residual
+36,837 attempts / 3,327,988,047 bytes / 71,468,572 rows stay unchanged.
+Permanent unknown 8 START / 16,777,216 bytes is never refunded; the historical
+initial upper bound 14,000 START / 40,229,897 bytes is NOT a newly verified
+current balance. Canonical looks 0/0, exploratory 0, alpha 0, IDs none and
+QC launches 0.
+
+This entry reports actual operational evidence and no implementation change.
+Prior C293 focused 240/1.49s and post-record 98/.97s remain PRIOR executions.
+Only relevant record/active-document and append-only/diff/status checks are
+run for this evidence append; no full lane/repository suite or native/source
+operation is rerun. The successful passive trace does not complete the lane.
+
+Main's new record/active-document selection passed 98 tests in 1.10 s with
+OS networking denied. Original report authentication and append-only C293
+prefix checks passed; the initial trailing blank EOF was removed before the
+final whitespace check. No production code or tests changed for this append.
+The advisory peer accepted this entry read-only with no material correction;
+the peer did not reopen private evidence or rerun tests. This is not a new
+independent Claude review.
+
+Main's final repeat of the same record/active-document selection passed
+98 tests in 0.97 s after the prose/peer update; append scope and whitespace
+passed. This result line adds no implementation or authority change.

@@ -31556,3 +31556,221 @@ IDsnone and QC0; all ceilings and permanent8START/16MiB unchanged.
 No successful push has occurred in this continuation. Reserve the one final
 matching-lane publication for the completed round or concrete owner blocker.
 Main final post-record active-document checks69 passed/.93s; whitespace passed.
+
+## 145. Actual finite-code-window refusal before USB access (2026-11-03)
+
+The144 preparation was committed clean as
+aa060e3a131c0bc66b0c82a5e2786fc74df8854d. All authors froze. Main reverified
+physical/Git roots, exact branch/HEAD/clean status, matching tracking and
+actual origin2a6d34c063da17dadeb98874344b628dcd6594a7, and the five
+current/committed code bytes before the ONE registered dispatch.
+
+Original CP56912 actually exited2/signalnull, stderr0. Raw projected stdout
+3184 bytes/SHA256
+43daa06f1edc7f7df5ce6d2ef2242d94f88a2b723cb8cacf54961ca87143719d.
+Original reader-report stdout SHA256
+afab44c074bc88385597d0c8966e4bd00014fec87da17ea4ca49a720ac4a1796.
+The outer original automatic close1488.0540420003235ms and final validation
+1488.5584999993443ms passed180000ms; inner wrapper963436083ns.
+The observer's own failure list is empty; it labels this only
+observed_original_code_window_refusal, never qualification.
+
+The FIRST failure caught at an owned boundary is initial_code / code ordinal5 /
+original_directory_changed. Its genuine original comparison is initial_audit /
+chain3 / directory_descriptor_vs_original / FIELD NAMES[mtime_ns,ctime_ns].
+Chain3 is Documents. The inner reader supports only its original four code
+labels, so that inner projection honestly says roleunknown/code_ordinalnull;
+the new orchestrator's outer owned boundary identifies ordinal5 separately.
+Cleanup of original ordinals1..4 independently observed the same Documents
+field-name differences at held_audit. A following window_failed is a wrapper
+veto, not another actor or inferred initial cause.
+
+This initial window failed BEFORE a RAM snapshot was issued or a USB input
+was opened. It proves neither model/USB success nor USB mutation. Actor
+UNKNOWN; the earlier signed FileProvider flag events on a different subject
+do not identify this directory timestamp writer. Native/Main custody proofs
+retain their limited genuine positives; none resolves this separate veto.
+All four denied seams0. No source/key/claim/START/charge/write/mutation,
+output namespace, USB qualification, new budget or outcome/QC/Safari action.
+
+SI-WINDOW-20261103-004, P2, OPEN environmental custody blocker: even the short
+initial five-code window could not preserve full original ancestry timestamps.
+A read-only advisory check under the exact minimal Git environment found no
+configured core.fsmonitor or core.hooksPath (local/global/system and effective
+includes). The interleaved git show calls are observable boundary activity,
+not a verified metadata writer. Moving them or disabling unconfigured hooks
+would be preventive hardening, not an authenticated cure or permission for
+another actual read. No repeated USB invocation, longer window, field
+omission, rebaseline or old negative promotion is authorized.
+
+The next causal step is bounded native attribution for the exact Documents
+directory inode, including direct-entry creation/removal/rename/link and
+direct metadata events. The old three-event fixed-subject trace cannot
+observe that complete scope and remains unchanged/spent. Any prospective
+trace must project only matching metadata actors/relations, retain no
+unrelated paths/arguments/environment/source contents, create no watched
+entry, preserve the original target identity, and explicitly distinguish
+native actor notifications from mere timestamp correlation. Administrator
+authentication and responsible-Terminal Full Disk Access are macOS
+requirements, not a new source authorization.
+
+All prior negatives and data remain. SourceAUTH is unconditionally blocked.
+Count84005/4294967296 bytes, permanent8START/16777216 bytes and separate DAILY
+36837/3327988047/71468572 stay exact. Canonical looks0/0, exploratory0, alpha0,
+IDsnone, QC0. Last-step-before-QC readiness has NOT been reached. No push yet
+in this continuation; reserve its one matching-lane publication for the valid
+completed round or a concrete terminal owner/external blocker.
+
+## 146. Prepared passive Documents actor attribution (2026-11-03)
+
+SI-DEC-20261103-10, under continuing SI-AUTH-20261103-02, freezes a separate
+SOURCE-FREE, passive Documents metadata observer after145. It is not another
+USB read, source claim, custody seal, namespace retry, source admission or
+repair of an old negative. The original journal actor trace, USB readers,
+conservative basis, Main/native proof and every source/budget gate remain
+byte-identical.
+
+The existing Documents directory is opened once RO/DIRECTORY/NOFOLLOW/CLOEXEC.
+Its ORIGINAL dev/ino/type remain required by descriptor AND name; metadata
+samples compare with the immutable original10, never adopt a later baseline.
+Timestamp/size/nlink transitions are observations for attribution, not source
+custody or newly admitted state. Owner/group/mode/flag protection changes are
+negative. Both FD and name deltas are explicit; samples after native shutdown
+are labelled outside the active native interval. No Documents enumeration,
+probe entry, byte read, write, flag/time change, daemon or privacy-setting
+change is performed.
+
+The fixed eslogger subscriptions are CREATE13, LINK19, RENAME25,
+SETATTRLIST26, SETFLAGS28, UNLINK32, UTIMES59, CLONE61 and COPYFILE110,
+checked against installed ESTypes.h SHA256
+b25c5f75474afd1dba841e7cbb8510a64077806175a29187395e81023c55f51a.
+ESMessage.h defines the corresponding existing/new destination unions.
+Unknown real JSON shapes must refuse: fixtures establish software behavior,
+not proof of every installed eslogger serialization.
+
+Exact target/parent inode relations and path-only parent relations are
+separate. Native notifications may include denied requests or VFS retries;
+they are not successful syscall counts or automatic actor causality. A
+valid unrelated stream with zero matching events is only a passive no-actor
+observation, never proof that no writer exists or a reason to repeat. No
+records, global sequence gaps, truncation/limits, target replacement,
+unknown/nonzero shutdown, protection or context/deadline failure veto closure.
+
+eslogger has no target-path filter. Its nine subscribed systemwide JSON
+types necessarily pass through bounded transient application RAM; only exact
+matching target relations and safe actor identities are projected. No raw
+unrelated path/name, child filename, argv, environment or source contents
+are logged or persisted. No --oslog/tee. Fixed known system signing IDs/
+executable identities may be readable; all other identifiers are hashes.
+This does not promise that operating-system swap/crash dumps never exist.
+
+The fixed diagnostic output is outside Documents AND outside the existing
+custody proof base:
+Library/Application Support/CodexShortInterestAttribution/documents-20261103-v1.
+Prepared owner-private directories are opened through anchored nofollow
+descriptor ancestry. One O_EXCL0600 single-link original report is never
+overwritten or reused. Its on-disk observations are PROVISIONAL until the
+matching terminal receipt, original file/parent/target checks and actual
+owned eslogger shutdown/EOF are verified. A negative terminal receipt
+dominates any provisional report.
+
+One original root-bootstrap clock begins before held code access; sudo
+authentication precedes that clock. The passive interval is30s, whole bound
+120s including guards, shutdown, publication, context closes and final
+formatting. Cleanup independently reaps ONLY the original native child
+and attempts all owned descriptor closes even when the main deadline fails.
+First owned-boundary failure and later cleanup diagnostics stay separate.
+Terminal delivery is not a perpetual custody assertion.
+
+The command binds exact committed HEAD, expected matching tracking hash and
+both held public-code SHA256s. Root executes only those held bytes and
+checks current bytes/committed Git/local branch/HEAD/clean state. This
+source-free observer makes no network/credential request: Main verifies
+actual matching origin independently before issuing the command and after
+the terminal result. Expected tracking is explicitly bound so the one
+matching-lane publication cannot silently stale a hard-coded old remote.
+
+No administrator trace has yet run. Terminal administrator authentication
+and responsible-process Full Disk Access are actual macOS requirements.
+The owner has already authorized the diagnostic work; a password is entered
+only in Terminal, never Codex/chat. A command-only immutable private file is
+prepared after the exact committed snapshot is fixed and syntax checked
+without executing it. The old spent commands/outputs are preserved. No
+automatic replay, new monitor, USB qualification or provider dispatch follows.
+
+Verified pre-release findings are retained rather than erased:
+
+| ID | Priority | Disposition and reason |
+| --- | --- | --- |
+| SI-DOCS-20261103-001 | P2 | Corrected: post-Popen clock/setup errors could escape owned-child cleanup; independent terminate/kill/wait attempts and both stream closes now occur without requiring a working main clock. Unknown termination stays negative with original PID/PGID basis. An already-dead child at the deadline cannot be labelled planned live shutdown. |
+| SI-DOCS-20261103-002 | P2 | Corrected: constructor cleanup errors could replace the first target/directory refusal. Exact own constructor failures now preserve primary and separate cleanup diagnostics; no generic exception-context chronology is invented. |
+| SI-DOCS-20261103-003 | P2 | Corrected: a newly opened OutputDirectory FD was not yet cleanup-owned when fstat/pin could refuse. Peer reproduced RED1/.32s and explicitly closed the fabricated test FD. Author expanded first/later fstat/pin cases RED4/43 deselected/.57s, then fixed immediate independent ownership before validation. |
+| SI-DOCS-20261103-004 | P2 | Corrected: late target protection changes and ancestry replacement after the LAST fresh report-read handle closed could escape terminal checks. Original named ancestry is checked after that final close; final target delta, original report10 and directory5 digests bind the terminal packet. On-disk observations remain provisional. |
+| SI-DOCS-20261103-005 | P2 | Corrected: destination enum/union disagreement, exact inode matches gated by path text, and missing direct Documents-object roles could misdescribe or drop relevant native candidates. Strict variants, exact target versus parent identity, separately weaker path-only relations and direct original-object coverage are explicit. |
+| SI-DOCS-20261103-006 | P2 | Corrected: syntax-valid arbitrary signing identifiers were retained raw, and absolute root output opening had an intermediate-ancestor race. Fixed identity allowlists/hash fallback and retained relative-nofollow output ancestry prevent those distinct privacy/creation gaps. |
+| SI-DOCS-20261103-007 | P3 | Corrected prospectively: root-context network Git checks could use the wrong credential context, and hard-coded old tracking would stale the command after this publication. Root now uses only local Git and explicit exact expected tracking; Main checks actual matching origin separately. Tool-side read guards also disable optional Git writes as preventive hardening, not a claimed writer diagnosis. |
+| SI-DOCS-20261103-008 | P3 | Corrected: inherited old-subject finish semantics rejected a valid zero-target passive interval. The distinct observer now requires valid native records but permits zero candidates with unknown actor; final actual CLI serialization remains inside the SAME original deadline. |
+
+Author final focused47 passed/.59s, OS network denied. Earlier author fixture
+execution30 passed/3 failures plus one fixture teardown error was corrected:
+shared temporary ancestry assumptions, sample-mock restoration and multiline
+shell-command expectations were test-harness defects, not actual native
+results. Production constraints were not relaxed. Peer independently47
+passed/.74s and accepted the corrected unit; no remaining material finding.
+Peer's earlier43/.48s and Main's earlier212/1.66s were on the preceding6d769
+revision, not attributed to the final FD correction.
+
+Main independently ran the exact final trace/old-framer/import-boundary/
+active-document selection:216 passed1.43s with OS networking denied.
+Author memory-only removal of the LAST post-fresh-read-close ancestry audit
+gave1 expected failure/46 deselected/.28s; restored1/.29s. These fabricated
+reversals never invoked eslogger, touched Documents/USB or spent source
+budget. No full lane/repository suite or independent Claude review.
+
+Final new driver33537 bytes/SHA256
+c4343dd9c6c21dee7f813170c3b36ae7a35aebebc23c08e3d083920bb9bcdc1e;
+tests20716 bytes/SHA256
+9c9c275eef1a33b75a577bf4e2c7735611832f8cbd3ef6e163d517550c5df931.
+Exact reused original framer35527 bytes/SHA256
+ed462f3b0552d3f74c468c6a51e47ef215b90d9f7e38a372364aaec5c7fcdf63.
+Main verified Python3.9 AST/in-memory compile for both new files and the
+unchanged framer. All old production code remains exact.
+
+Main prepared ONLY the two fixed owner-private0700 AppSupport attribution
+directories; the prospective report directory is empty. No native dispatch,
+Documents entry or source claim was created by that preparation.
+
+The continuing round started at published
+2a6d34c063da17dadeb98874344b628dcd6594a7. Its11 prior local checkpoints
+95c72ca85d7b3e082901a5ad3f6f0f0a6ccff07d,
+33f8413c60742127310e3641b404b046ef7ac4bc,
+07ca0ea90439cda2622a5e825d7cd1ee80ef1d8f,
+ca11659f8ce28dbd7a87d4aa4d48746f4a696480,
+f8cb9833bb4460ef57fd70bcc3c76849338c10a0,
+a71d21b6a64b2a558ac32f93928dac35cb7e2d87,
+d3b7fd4127431607bd101a154c678362dd8f6bc0,
+df51ed1d918e23c0ccd51cc0f7b58d89e67f06b3,
+808df6378edfd0a71693b831c45a82cce1afbc4e,
+9582cdd9195fd0715740f9a4692548eb0d1e31ab and
+aa060e3a131c0bc66b0c82a5e2786fc74df8854d retain their exact earlier scope,
+validation and failures in136..145. They are implementation checkpoints,
+not independent Claude-reviewed snapshots; Claude review remains waived.
+
+The concrete next-action blocker is safe native attribution of the Documents
+metadata transition; it requires the owner-operated macOS administrator
+observer. Do not infer a FileProvider timestamp cause from the earlier
+different-subject flag evidence. Even an identified actor still needs an
+evidence-backed remedy and genuine offline qualification before source
+authority can change. Production storage/lease/checkpoint integration,
+USB/source rights and identity/availability/denominator/coverage/cash/input
+gates remain. The lane is NOT at the last step before QC.
+
+Count84005/4GiB, permanent8START/16MiB and separate DAILY residual
+36837/3327988047/71468572 remain unchanged. This round consumed no
+provider/key/source claim/START/charged byte/outcome/QC/Safari/purchase,
+canonical looks0/0, exploratory0, alpha0, IDsnone and QCattempts0.
+No new monitor or other chat is contacted. Preserve all old data, mounted
+proof evidence, spent claims, negative controls and historical records.
+
+Main post-record active-document checks69 passed/.86s. Historical record
+prefix through AA060 remains byte-exact; owned whitespace checks passed.

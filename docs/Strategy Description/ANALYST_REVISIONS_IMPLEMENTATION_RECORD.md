@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–343 retain the milestone, review, preregistration, QC
+strategy. Sections 1–344 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -537,7 +537,11 @@ fourteen owner-waived Codex commits of sections 329, 331 and 332 reviewed
 after the fact, the thirteen-project cleanup confirmed by census, one
 unbooked R298 rerun booked to **338 / 259 / 54 / 699**, three whitespace
 defects corrected in place, and the W5 source project found without its
-`main.py` (R333.3).**
+`main.py` (R333.3).
+Section 344 is the Windows-host Claude session's independent review of
+`4daba8b7..65dca9f3` (0 P0, 0 P1, 1 P2, 1 P3): both commits accepted and one
+generated end-hook defect corrected, so a fresh R343 preparation at leaf B must
+precede any submission.**
 
 Current continuation, 2026-10-13: section 292 accepts Claude's two-commit
 section-291 review after documentary qualifications and reproduces both new
@@ -1305,6 +1309,14 @@ formula, while observed provider availability/history governs factual data
 claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
+
+Section 344 is the Windows-host Claude session's independent review of the exact
+pushed range `4daba8b7..65dca9f3`, reviewed after the fact under the waiver below.
+It corrects the generated R343 end hook, so package leaf `R343-20261105-A` must not
+be uploaded and the statement below that its package is ready is superseded.
+The immediate next step is that Codex must counter-review section 344 and its two
+commits, then run the caller tests on the Mac and freeze one prepare at leaf
+`R343-20261105-B`.
 
 The owner explicitly waives Claude review of section 343 and activates only
 the QCOM-restored SIX-universe old-rule extension through2026-10-13. Both
@@ -2575,7 +2587,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 341 (sections 328, 330, 340 and 342, and the
+the pushed range through section 343 (sections 328, 330, 340, 342 and 344, and the
 snapshots R333 and R337); for section 250 the owner
 directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
@@ -2619,7 +2631,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–336
+findings, outcomes, and per-run accounting remain in numbered sections 1–344
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -4445,8 +4457,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-05 | Codex counter-review of Claude340, limited to review correction and handoff | `96b5ecd8` -> this section341 commit | Exact incoming `20b485ae..96b5ecd8`: `c2bca9ba` and `96b5ecd8` accepted after test/documentary correction | Missing-quote assertions reject unrelated crashes; all eleven findings disposed; spent sources preserved, no successor or operation | Focused native-denied results and expected-red memory proofs in341.4; no full suite or private evidence read | CR341-001 P2 test gap corrected; two frozen quarantine blockers retained; permission-renewal demand rejected under existing authority | ONE matching final push; no QC/Safari/provider/credential/USB action, launch or look;338/259/54/699 unchanged |
 | 2026-11-04 PST /05 UTC | Claude independent review of Codex's section-341 counter-review | `cd00b12b` -> `db0313ef` (tests) -> this record commit | `cd00b12b` accepted with notes; section 342 | New test audits all 20 generated quarantine files of all six cells against every lane audit clause; Claude withdraws `ARV2R340-011` and narrows `-001` and `-010` | 204 focused tests passed with 2 expected failures; 86 record gates; 6/6 mutations caught; no full suite, no QC/Safari/provider access; 0 looks, 338/259/54/699 unchanged | 0 P0, 0 P1, 0 P2, 3 P3 (one corrected for coverage, two documented) | Codex counter-reviews section 342; `ARV2R340-001` and `-002` still need a new freeze before any QC upload |
 | 2026-11-05 | Completed offline old-six QCOM-restored October submission package and342counter-review; section343 | `4daba8b7` -> `2d8eafc8` freeze -> this final result/handoff; TWO commits | Both342commits accepted after exact-count test correction/qualification; current new implementation review waived | Sole local prepare/stdin validator actual0/0 and SPENT; seven18-file profiles/sources plus six genuine input uploads,6813640Bprivate package; no upload/launch | Root300distinctpasses31.68s; eight memory compiles; native scope/source/write/omission checks and overlapping doc repeats; no full suite | Quarantine remains frozen/blocked; all source/PIT/formal/current-cloud flags false; new offline output pins343.6 | Exactly ONE matching nonforce final push, no intermediate push; WAIT for QC/Safari release and fresh launch gates;338/259/54/699 unchanged |
-
-
+| 2026-11-05 | Claude (Windows host) review of `4daba8b7..65dca9f3`: R343 old-six October extension code | `65dca9f3` -> `51666ff0` -> this record commit | Both Codex commits accepted, `2d8eafc8` after correction; section 343.6's seven profile and source-vector pins reproduced from public code | Generated end hook no longer turns a run_valid=false run into a Runtime Error; projection, inventory and caller repinned, caller moved to fresh leaf `R343-20261105-B`; leaf A stays spent and must not be uploaded | Focused only, by owner direction: projection and reporting 171 passed, quarantine audit **9 passed**, closure file **75 passed, 1 failed**, caller tests unchanged at 16 host-class failures and 73 passed, record gates **86 passed**; no complete suite | 0 P0, 0 P1. `ARV2R344-001` (P2, corrected). `ARV2R344-002` (P3, open): R343 keeps the gzip reader that QC's source policy refused in a sibling form for R298. Floor 338/259/54/699 unchanged | Codex counter-reviews section 344, runs the caller tests on the Mac and freezes one prepare at leaf B; QC and Safari hold remains; no launch, paper, live, broker, funded or real-order action |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -77409,3 +77420,141 @@ agreement and clean status afterward. This own push is not a review trigger.
 Final result-record/redaction selection33passes0.60s overlaps the300 distinct
 pre-freeze tests. Diff/source/status checks confirm ONLY this record changed
 after the successful operation; no operational source/test or pin was edited.
+
+## 344. Independent Claude review of `4daba8b7..65dca9f3`: the R343 old-six October extension code, 2026-11-05
+
+### 344.1 Scope and method
+
+The owner directed: "sync the lane, and review all unreviewed commits. Review
+code only. if you find a bug, fix it instead of just documenting it. do not do
+full lane suite." The lane clone fast-forwarded from `10b05cca` to `65dca9f3` on
+the Windows host. Section 342 reviewed through `cd00b12b` and section 343
+disposed Claude's two commits, so two Codex commits remained. Section 343.1
+records the owner's waiver of Claude's pre-use review, so this review comes
+after the fact.
+
+Claude read the reporting module, the projection, the caller and their tests in
+full, and generated all seven arms locally from public code with a synthetic
+QCOM identity. No QC, Safari, provider, credential, private artifact or Mac
+control was accessed. The owner's QC and Safari hold of 343.1 stands.
+
+### 344.2 Commit disposition
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `2d8eafc8` | Accepted after correction | The generated end hook had one defect (`ARV2R344-001`). Everything else listed in 344.5 holds. |
+| `65dca9f3` | Accepted, one statement superseded | Record only. Its statement that the offline submission package is complete no longer holds for leaf A's seven `main.py` files (344.4). Its receipts stay true of that spent run. |
+
+### 344.3 `ARV2R344-001` (P2, corrected): an invalid run lost its statistics
+
+`_extend_cell` generated an end hook that called `build_report` unconditionally
+after the driver's end callback. `build_report` correctly refuses an aggregate
+with `run_valid` false. That refusal escaped `on_end_of_algorithm`, and an
+exception there ends the job as `Runtime Error`, as R-167's end-clock refusal
+showed. The driver had
+already emitted its three statistics, but `read_result_once` opens only a
+`Completed.` job. So a run the old contract would report as Completed and
+invalid, with the cash, exposure, tracking and execution gates readable, became
+an unreadable Runtime Error. The retry rule in `six_universe_relaxed_submission`
+has a separate branch for a Completed run with `run_valid` false.
+
+The real reporting module and the hook generated at `2d8eafc8` reproduce it:
+`Refused(legacy_aggregate)`. The corrected hook returns normally, emits nothing
+further, and leaves the three legacy statistics as the run's result. A valid
+aggregate takes the same path as before. A valid aggregate whose metrics
+disagree with the same-job NAV still refuses, by design.
+
+Two new tests pin this. One executes the actual generated hook for all seven
+arms with `run_valid` false. The other compares the caller's inventory pin and
+the projection and reporting bytes as text, because the caller cannot import off
+Darwin and a stale pin would otherwise surface only at the one-use prepare.
+Removing the guard fails all 7 hook cases, and restoring the old inventory pin
+fails the second test. Both trials ran in a scratch worktree and were restored.
+
+### 344.4 Consequence: leaf A is superseded for submission
+
+Only `main.py` changes, in all seven arms. The other seventeen files and every
+candidate profile are byte-identical to the pre-fix generation, and the reporting
+source keeps its pin. Leaf `R343-20261105-A` stays spent and untouched, and its
+receipts remain true of its run, but its `main.py` files lack the guard and must
+not be uploaded.
+
+| Arm | New `main.py` bytes | New `main.py` SHA-256 |
+|---|---:|---|
+| R343-AR080 | 8128 | `d90fe4fd69801dc639bfadec2f2b52be4de7a3d6a9f8f0ab49f84c1c48b81e2e` |
+| R343-AR100 | 8133 | `8d9d8230534bd4ff2fe9d35b26852191239687499dea7bc3f5ba7f8fd7755b21` |
+| R343-AR120 | 8133 | `49dd4804a9f29c9b6b9856964f87cbac0cee91295f4c932df576a9f2e4fce597` |
+| R343-AR140 | 8133 | `4247b5dcb3b7bebc9a2f4db5fabfe6aa2039a65ffe567d95125fc932b1eb7583` |
+| R343-AR160 | 8133 | `adf53cfef5bce0d8f63846f449677abc25e692493f83af88320c306d404aa9c1` |
+| R343-AR180 | 8133 | `ed7f946def57d7742a40fb0ddf1cae94c2f4e50eac632d92e4d9e512ba575b43` |
+| R343-AR200 | 8133 | `871bb4aae6373c2745355a4b67766ec90964122f10ff1b0dc55dff0fa1fec396` |
+
+The caller now targets the fresh leaf `R343-20261105-B`, and its result protocol
+names the three-statistic invalid case. These edits replace pins section 343
+froze, at the owner's direction to fix defects. They are not an automatic refresh,
+and the prepare must still be frozen and run once on the Mac.
+
+| Source | Bytes | SHA-256 |
+|---|---:|---|
+| `scripts/arv2_r343_legacy_six_projection.py` | 44849 | `1f84fd41080e7ee2cba0ba6cce50541428f7e7b666995c531cef05d5cc20e972` |
+| `scripts/arv2_r343_legacy_six_source_pins.json` | 25033 | `433dfb7adb661e418e81852995c0ea439552edd61eefd31f002fe4e83f9fb011` |
+| `scripts/prepare_arv2_r343_legacy_six.py` | 34448 | `adeaacf677e97aff0dc9938b82b6022cdf98a044af09b2f586d5211459b6e29f` |
+| `tests/analyst_revisions_v2/test_r343_legacy_six_projection.py` | 16212 | `706efab46c64c1b5bc252f5f6d656fcf8984f10ce2d91cb4518a3aa7ed61bf97` |
+
+### 344.5 Checked and found correct
+
+- **Section 343.6's public pins reproduce.** The seven canonical profile digests,
+  source-vector digests and total byte counts all match, generated here from
+  public code alone at `2d8eafc8`.
+- **The valid path holds.** The driver's account dictionary is checked against the
+  evaluation axis, so the report's exact census cannot refuse a valid run. The
+  driver returns the aggregate it hashes into META. The report measures 5,570 bytes
+  with 28-digit NAVs, inside its 8,192-byte bound.
+- **Period constants are complete.** A census of every integer constant of 200 or
+  more in the generated sources finds no unscaled decision or session count. The
+  source-row cap of 20,000,000 has room: the six-universe 2021-2025 count in 173.3,
+  10,562,898 callback rows, scales to about 12.2 million over the longer axis.
+- **The 2025 windows in the rating policy do not clip 2026 scores.** They reach only
+  the IC evaluator. `SequentialR055ScoreRuntime` skips the parent initializer and
+  scores any axis position.
+- **The action surface is unchanged.** The generated hook sets one statistic, and the
+  caller holds no QC client or credential reader.
+
+### 344.6 `ARV2R344-002` (P3, open): the upload may meet the source-policy refusal
+
+R343 keeps the gzip input reader, while R298 only passed QC's source policy after
+moving to plain data (`ARV2E321-001`, 322.13). Section 343 does not mention this.
+The evidence is mixed: QC refused a sibling gzip reader (`c34e42d8…`, 23,055 bytes)
+for R298 A7 and A10 on October 25, yet this session's October 5 inventory of project
+37165262 shows R343's exact reader (`ebd509b8…`, 22,747 bytes) saved there on
+September 30, and that project ran. The classifier's trigger is unknown, and a
+refused upload would spend a booked attempt.
+
+This cannot be settled offline, and the hold forbids a QC probe. The run freeze
+should therefore treat a refusal as terminal for the reader, not as retry evidence.
+The tested fallback is the R298 method: deploy `newrule_plain_input_runtime.py` at
+that path, since it provides the same `load_accepted_risk_preliminary_package` and
+`collection_rows`, and bind `main.py` to the plain activation pinned in 322.10. It
+needs a separate freeze, because the tilt profile binds the October package identity.
+
+### 344.7 Validation on this host
+
+| Check | Scope | Result |
+|---|---|---|
+| Projection and reporting tests | guarded LF scratch worktree, fix bytes | **171 passed** (58 projection, 113 reporting) |
+| Quarantine audit | same worktree | **9 passed** |
+| Whole-package closure file | same worktree | **75 passed, 1 failed**; the failure is this host's guard moving `fcntl` out of top-level imports (`ARV2R165-001`) |
+| Caller tests | same worktree, stub `resource` module | **16 failed, 73 passed**, the same counts before and after the fix; the failures are POSIX host class, so the Mac must run this file before the prepare |
+| Record gates | real lane tree, final record bytes | **86 passed** |
+| `git diff --check` | this round's commits | clean |
+
+The complete lane suite was not run, by the owner's direction. The host run started
+on October 29 at `57bd3213` did not finish, so no counts exist for it. No look,
+evaluation or cell was added: **338 / 259 / 54 / 699** stands.
+
+### 344.8 Next gate
+
+Codex must counter-review section 344 and its two commits, then run the caller tests
+on the Mac and freeze one prepare at leaf `R343-20261105-B` before any submission.
+The owner's QC and Safari hold remains. No launch, paper or live deployment, broker,
+funded-account, real-order or trading action is authorised by this review.

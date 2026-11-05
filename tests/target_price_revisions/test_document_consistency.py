@@ -5943,7 +5943,7 @@ SECTION118_COMMITS = (
     SECTION118_HEAD,
 )
 SECTION118_NEXT_ROLE = (
-    "The next bounded action is genuine QC Mia diagnosis in protected OFF project38609822 after the owner completes authentication in the tool-visible in-app tab, "
+    "The next bounded action is genuine QC Mia diagnosis and verification in protected OFF project38609822 using the owner's signed-in Safari session, "
     "under fresh bounded source/HEAD/access/operation/attempt/look claims; verified source/input/resource recovery then permits OFF and the remaining frozen arms serially, "
     "while the20REMXrows remain quarantined, Claude review is skipped, and exactly one final lane push is reserved for the completed or concrete-blocked round."
 )
@@ -6009,7 +6009,8 @@ def _assert_section118_current_facts(text: str) -> None:
     assert SECTION116_RELEASE_SCOPE.casefold() in folded
     for required in (
         "fresh bounded source/head/access/operation/attempt/look claims",
-        "after the owner completes authentication in the tool-visible in-app tab",
+        "genuine qc mia diagnosis and verification in protected off project38609822",
+        "using the owner's signed-in safari session",
         "verified source/input/resource recovery then permits",
         "authentication is a required input, not renewed task permission",
         "the frozen same-session native raw/sid policy is unchanged",
@@ -6039,6 +6040,7 @@ def _assert_section118_current_facts(text: str) -> None:
         "financial acceptance remains true",
         "completed proves accepted source/economics/accounting",
         "the20remxrows are admitted to the frozen financial input",
+        "after the owner completes authentication in the tool-visible in-app tab",
         "owner sign-in alone proves financial readiness",
         "owner sign-in alone proves backtesting readiness",
         "mia reply automatically admits source/economics",
@@ -7030,9 +7032,9 @@ def test_section109_history_guard_refuses_retrospective_rewrite(monkeypatch) -> 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
 @pytest.mark.parametrize("before,after", (
-    ("genuine QC Mia diagnosis in protected OFF project38609822", "generic agent diagnosis in any project"),
-    ("after the owner completes authentication in the tool-visible in-app tab",
-     "without owner authentication in the tool-visible in-app tab"),
+    ("genuine QC Mia diagnosis and verification in protected OFF project38609822", "generic agent diagnosis in any project"),
+    ("using the owner's signed-in Safari session",
+     "using an unauthenticated generic browser session"),
     ("verified source/input/resource recovery then permits", "unverified source/input/resource recovery permits"),
     ("OFF and the remaining frozen arms serially", "all frozen arms concurrently"),
     ("while the20REMXrows remain quarantined", "rounds the20REMXrows into financial inputs"),
@@ -7135,6 +7137,7 @@ def test_section118_current_fact_guard_refuses_replacements(monkeypatch, surface
     "Claude review is required before continuation.",
     "Multiple intermediate lane pushes.",
     "The20REMXrows are admitted to the frozen financial input.",
+    "After the owner completes authentication in the tool-visible in-app tab.",
     "Owner sign-in alone proves financial readiness.",
     "Owner sign-in alone proves backtesting readiness.",
     "Mia reply automatically admits source/economics.",

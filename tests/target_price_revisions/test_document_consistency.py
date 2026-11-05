@@ -5943,11 +5943,9 @@ SECTION118_COMMITS = (
     SECTION118_HEAD,
 )
 SECTION118_NEXT_ROLE = (
-    "The next bounded action is to complete and verify the fixed prospective native-cache diagnostic in OFF project38609822 "
-    "under fresh bounded source/HEAD/access/operation/attempt/look claims; genuine Mia has supplied no verified code fix, "
-    "so OFF and the remaining frozen arms proceed serially only after verified source/input/resource recovery, "
-    "while the20REMXrows remain quarantined, Claude review is skipped, and exactly one final lane push is reserved for the completed or concrete-blocked round."
+    'The fixed prospective native-cache diagnostic in OFF project38609822 is complete; the2021-02-10 same-session RAW/SID input blocker remains. The next bounded action is genuine QC/Mia or authoritative native-input diagnosis under fresh bounded source/HEAD/access/operation/attempt/look claims; genuine Mia has supplied no verified code fix, so OFF and the remaining frozen arms proceed serially only after verified source/input/resource recovery, while the20REMXrows remain quarantined, Claude review is skipped, and exactly one final lane push is the publication boundary for this concrete-blocked round.'
 )
+
 SECTION118_RECEIVED_HISTORY_SHA256 = {
     116: "aed8415fb253fd0dfe8e0d19d9dc83e1d2d528757bba7b642b87560bcd8524f0",
     117: "80c4eb8125e1a258c8e22f41ce0178f0792fd1b2e658a7711ea3e32bc1738ddf",
@@ -6011,6 +6009,11 @@ def _assert_section118_current_facts(text: str) -> None:
     for required in (
         "fresh bounded source/head/access/operation/attempt/look claims",
         "fixed prospective native-cache diagnostic in off project38609822",
+        'prospective diagnostic complete',
+        'control freshness passed5/5; target freshness passed4/5',
+        'the2021-02-10 target cache remains prior-day',
+        'no unchanged financial relaunch is authorized',
+        'remaining financial arms were not launched this round',
         "genuine mia has supplied no verified code fix",
         "safari is authenticated in protected off38609822",
         "historical history results do not rule out prospective native-cache/feed routing",
@@ -6023,7 +6026,7 @@ def _assert_section118_current_facts(text: str) -> None:
         "while the20remxrows remain quarantined",
         "0/5 accepted full-window results", "all financial metrics null",
         "financial acceptance remains false", "claude review is skipped",
-        "exactly one final lane push is reserved for the completed or concrete-blocked round",
+        "exactly one final lane push is the publication boundary for this concrete-blocked round",
     ):
         assert required in folded, required
     for stale in (
@@ -7137,6 +7140,11 @@ def test_section118_current_released_handoff_facts_are_explicit(surface):
     ("0/5 accepted full-window results", "5/5 accepted full-window results"),
     ("all financial metrics NULL", "all financial metrics available"),
     ("financial acceptance remains FALSE", "financial acceptance remains TRUE"),
+    ('Prospective diagnostic complete', 'Prospective diagnostic still pending'),
+    ('Control freshness passed5/5; target freshness passed4/5', 'Both target and control passed5/5 exact-close checks'),
+    ('The2021-02-10 target cache remains prior-day', 'The2021-02-10 target cache is same-session verified'),
+    ('No unchanged financial relaunch is authorized', 'Relaunch the unchanged frozen financial failure'),
+    ('Remaining financial arms were not launched this round', 'All remaining financial arms completed this round'),
 ))
 def test_section118_current_fact_guard_refuses_replacements(monkeypatch, surface, pattern, replacement):
     test_exact_next_step_names_the_current_artifacts()

@@ -2,6 +2,8 @@
 
 Status: **Guidance corpus/compiler and quote-rights audit recorded in section 64, 2026-11-04.
 Structural exploratory pairs do not certify complete history or execution readiness.
+Authenticated Massive follow-up in 64.7 confirms Stocks Starter, cancellation pending November 6, 2026;
+no Advanced or Corporate Guidance product is displayed. The sign-in obstacle is resolved, not quote coverage.
 The Adobe FY2024/FY2025 source audit preserves missing ranges, incompatible definitions and intervening reaffirmations.
 The dataset remains current-vintage, PIT-false and disconnected from strategy arithmetic and execution.
 Massive's November 3 public terms expressly permit personal research/storage and conditional on-behalf processing;
@@ -9714,3 +9716,44 @@ strategy run or empirical evaluation is performed. The closing receipt is
 `e16d417c6acb38c2ac13c3800eba217497bd862a0407ccb83ab73250687d7c6f`.
 After recording these results, the final active-document/diff/status and exact
 staged-file/ref guards precede the one authorized matching-lane publication.
+
+### 64.7 Authenticated Massive follow-up after the completed publication
+
+Owner replies **"Massive signed in"** to the pending account-verification
+question after `88a35c0c99abb27cd86fa4ebd0493a85b77086e5` was published in
+exactly one successful non-force push. Clean local/live matching `88a35c0c`,
+mandatory root/branch/origin verified before this follow-up. The reply allows
+the pending read-only account check; it does not reopen the publication ledger
+or authorize another push, QC, a purchase or an agreement change.
+
+The authenticated subscriptions page displays Currencies Basic, Futures Basic,
+Indices Basic, Options Basic and **Stocks Starter**. Its stock row explicitly
+says **Cancellation pending on Nov 6, 2026**. No Stocks Advanced or Corporate
+Guidance product is displayed. These fresh facts supersede the signed-out
+observation in 64.4; no hidden or grandfathered grant is inferred. The visible
+Legal Agreements page says no agreements / none to fill out at this time.
+That page does not prove which operative version was accepted or confer
+additional retention, processing or exchange rights; no agreement is submitted.
+
+The retained, hash-verified official quote documentation excludes Starter from
+historical stock quotes and places SPY in the same Stocks product. The account
+plus documentation now identifies a concrete existing-plan coverage blocker,
+rather than only an authentication obstacle. An unsupported-plan quote call
+would add little without evidence of a separate entitlement, so no quote API
+request, denial test or historical-row acquisition is made. Do not report an
+observed API denial or measured common coverage. Advanced remains a documented
+coverage route, not an owned grant, purchase recommendation or proof of usable
+stock/SPY rows. Guidance still uses the bounded current-vintage corpus in 64.3.
+
+No API key is read/used, current quote viewed, provider account changed, QC
+accessed or purchase made. The complete source/candidate/fixture/economics and
+all attempt/permission fields remain unchanged. This documentation-only
+follow-up is retained locally for the next authorized handoff; the original
+`5c2bcdcc..88a35c0c` one-push publication stays complete and is not repeated.
+Monitor remains PAUSED; no next round is armed.
+
+The ignored `account-verification-followup-v1.json` receipt is SHA256
+`31bb302437e6fd37605c060d2a928b2fe3413220c3995a73478a880b3a500f9f`.
+Only this record's header and 64.7 change. Closing validation uses the existing
+active-document method plus diff/source/status/ref checks; no full suite or
+implementation/native work is repeated.

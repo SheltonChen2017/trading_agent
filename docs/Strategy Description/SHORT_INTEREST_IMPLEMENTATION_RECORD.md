@@ -32718,3 +32718,288 @@ No new monitor or automatic retry is armed.
 
 Main final isolated sandbox checks passed 2/.65s. Post-record checks passed
 98/1.15s with OS networking denied; the full CE027 record prefix is preserved.
+
+## 152. Actual synchronized v2 code-read closure and prospective offline USB inspection (2026-11-04)
+
+### 152.1 Original v2 result authenticated; v1 negative preserved
+
+Under continuing SI-AUTH-20261104-01, the owner ran the separately frozen
+189836052570ec5bdba9e80106b15a7eb701cc7b command ONCE and supplied the original
+si-code-read-actor-trace-v2-terminal. Main independently authenticated the
+original AppSupport report using anchored nofollow directory/file descriptors,
+private ownership/mode/membership, exact original bytes, canonical duplicate-free
+JSON, full file10 and leaf-directory5 stamp encodings, FD/name checks and
+post-close checks. It matched the ORIGINAL owner-terminal pins:
+
+| Original v2 binding | Independently matched value |
+| --- | --- |
+| Report bytes | 118264 |
+| Report SHA256 | 391fcd8f5b69528affa42fe7bbb23d90f81dfc64ce4d6469d19e78afae7c2b5d |
+| Original file10 SHA256 | 9e5eb9649420a2ff0c211a545819721f5eb4e820fd4097e61b4f3a4bfa282cca |
+| Original output leaf identity5 SHA256 | 2ef95e9354a715eff71e6847ae209c6d0540c05f99b44176648926cb40baa1ae |
+| Coordinator nine-code mapping SHA256 | a33f14bcf06238a7ddadd1286ecc8d47d340cf17a1025d9486bbd1a4286d8cb0 |
+| Worker six-code mapping SHA256 | 3eba6b92542775deaef77c6ed3f012a9e6e543e56d03d5ca2ea97744271d0693 |
+
+Runtime HEAD189836 and actual/tracking originAF1 matched. Original worker66347
+actually exited0 with both stdio EOF at parent offset5481325250ns. Its genuine
+original five-file code window entered and closed in2747558750ns, from
+monotonic125339998242041 to125342745800791. All five denial counters are zero.
+The registered StopBeforeSnapshot was reached: snapshot/source/model-inspection
+bodies were NOT entered. Its expected controlled-stop negative is not a
+custody failure. Main verified original issuing provenance and the complete
+worker packet rather than treating its status string as success.
+
+Original native66344 remained live over that window, observed30021907417ns,
+then received the planned TERM and actually exited-15 with EOF. It supplied70
+records, sequence0..69,168396 input bytes, zero matches/stderr and no first or
+cleanup failure. All290 report samples and the final outer coordinator sample291
+showed no sampled Documents mtime/ctime/protection change. Final outer offset
+30635250000ns and exact frozen code/runtime controls passed. No currently named
+trace/worker/eslogger remained; absence was not used to invent historical closure.
+
+This is one actual finite original code-custody prerequisite closure with the
+unchanged full10 checks. It is NOT durable environmental repair, proof that
+FileProvider never writes, a reusable historical capability, USB inspection,
+source admission, input admission or readiness. Section151's incomplete v1,
+reported FileProvider association and qualified historical causality remain
+unchanged. The v2 namespace/command is now spent and closed; never rerun/reset
+it. No existing source, data, claim, budget, negative or receipt was modified.
+
+### 152.2 Separately registered full offline USB observation; no old retry
+
+Continuing the owner's direction to qualify the supplied USB archive OFFLINE
+before more downloads, SI-DEC-20261104-04 registers ONE prospective invocation
+si-usb-offline-once-20261104-v1. This is a new full source-only inspection purpose
+after the verified diagnostic adapters and actual initial-window closure; no old
+capture, failed USB invocation, native trace, claim or namespace is restarted.
+It grants no provider, credential, claim, budget enlargement, source admission,
+outcome or QC/Safari authority. No actual invocation of this new operation has
+occurred at this preparation checkpoint.
+
+New qualify_short_interest_usb_once.py calls the unchanged genuine original
+five-code inspect_registered transaction, WITHOUT StopBeforeSnapshot or a
+replacement source/model factory. It authenticates seven committed/current
+files, retaining original read-only FDs, leaf full10 stamps and bytes. The
+extra two are the already-corrected exact pipe helper and new envelope itself.
+Initial Git equality for all seven plus unchanged original-five terminal Git
+checks, retained extra-file FD/name/byte audits, closes and post-close checks
+bind the execution. It does not claim continuous extra-file ancestor timestamps.
+The original five full10 code windows, four continuously held source contexts,
+model, original terminal file10 equality, namespace exits and180s checks remain
+unchanged. No post-audit Git show(self) broadens the retained helper permit.
+
+The private aggregate comes ONLY from the exact original completed source frame
+and original model's issued report; no new scan, source rows, caller report or
+model substitution. Original class/guard/getter/module/witness identities,
+canonical bytes<=16384, original report/policy digests and exact typed false
+authority must agree. It remains private within bounded original stdout and
+independent owned observer memory. Public summaries expose only hashes/byte
+lengths and fixed custody diagnostics, never private source counts/dates/reasons
+or usability conclusions. This addresses access to the original report behind
+SI-CR27-017e; even a valid retained report is NOT a structural fitness verdict,
+upstream authentication, historical availability, native/class/CIK/USD binding,
+same-class denominator, processing right, protected-source custody, actual-input
+or backtest admission. No latest-revised descriptive candidate is relabelled PIT.
+
+New observe_short_interest_usb_once.mjs accepts only canonical JSON with exact
+HEAD/remote/invocation/seven-code pins; it constructs the fixed existing
+Python3.13.15 bootstrap. Main imports authenticated immutable observer bytes,
+retains the ORIGINAL ChildProcess/raw stdout and requires actual exit0, close,
+both stdio EOF, no stderr, strict original packet/proof/hash/private-aggregate
+validation and the SAME original180s monotonic deadline through final formatting
+and getters. Every negative/nonzero/unknown closure vetoes success. Bounded
+owned shutdown never signals a remembered process group after its original
+child has exited. Unknown terminal wait/EOF remains an explicit owner-action
+blocker, not success or permission to rerun. Private byte access returns a copy;
+it cannot mutate the observer's original evidence or grant source authority.
+
+The OS profile denies persistent file writes except verified typed /dev/null
+file-write-data needed by native Git; Python write opens, INCLUDING null, remain
+denied. Original /dev parent identity5 and root-owned character-device
+identity7/rdev3:2 are verified before and after; shared device timestamps are
+not adopted as authority. Exact four USB inputs and necessary literal ancestor
+DIRECTORY read/metadata access are allowed; unrelated /Volumes paths and named
+Keychain/security/shell/credential-helper routes are denied. This does not
+claim ancestor access is metadata-only, all native networking is denied or
+ambient original Git credential behavior is proved absent. The unchanged
+original guard must perform its actual matching-origin-ref Git check; Python
+sockets and unexpected subprocesses remain denied. Outer environment flags do
+not replace the original Git function's own two-key environment.
+
+The fixed original four file sizes/hashes and original five-code/profile/model
+policies remain those registered in the unchanged inspection. No USB file is
+opened writable or deliberately rewritten; bytes, flags and the original
+stamped fields remain checked. Read-induced access-time changes are outside
+that ten-field contract. The launcher SHA256
+fdae91cd6e017f2053cd4e10457b6130e545597b12512ee4180c433ab9ba7dab
+binds the existing34640-byte Python3.13.15 launcher only, not its complete
+stdlib/dylib closure. No installation, provider request or new credential.
+
+### 152.3 Pre-release corrections, retained with their limits
+
+These findings concern the NEW envelope/observer/copier before actual USB
+execution. They are not new historical actor claims or old-source repairs.
+All corrections are lane-specific; the original five files and corrected
+shared pipe helper remain byte-identical.
+
+| ID (SI-USBONCE-20261104-) | Priority | Verified issue and correction |
+| --- | --- | --- |
+| 001 | P2, closed | Initial authentication cleanup swallowed FD-close errors. Own each FD immediately and retain every bounded close veto; fabricated suppression reversal fails. |
+| 002 | P2, closed | Comparing against the CURRENT inspect callable could accept a replacement factory frame. Capture original callable/code, require its issuing frame and exact original source/report identity. Copy/registry/getter/digest substitutions refuse. A separate aggregate barrier also vetoed the causal replacement; this is not a claimed complete source-authority exploit. |
+| 003 | P2, closed | A post-spawn observer catch could clear shutdown timers before actual wait/EOF, abandoning automatic reaping. Preserve the original owned timers/close path until actual close or bounded terminal unknown; a TERM-ignoring fake child exercises KILL retention. |
+| 004 | P3, closed | Strict consumer compatibility needed original bootstrap arguments phase, complete literal diagnostics, nonnull positive clock fields, nested typed false authority and the genuine paired-member UNION bound (up to100000, bounded by both member counts). Corrected against public producer rules, with fabricated/counterfactual cases; no actual archive verdict is inferred. |
+| 005 | P2, closed | The permanent hook consulted CURRENT helper._git_allowed. Replacing only that predicate admitted a synthetic Git-fetch callback. Retain predicate/code/policy/global identities, helper and own ENV identities/immutable contents before BOTH pipe and subprocess permits; call the retained predicate. No real fetch/child/source occurred in the reproduction. |
+| 006 | P2, closed | The historical copier checked its local clock before a SECOND actual CLI serialization. Retain the SAME clock, serialize terminal bytes once and check afterward before emitting them. Forced serialization expiry refuses in author/Main/independent checks; outer supervision remains independently required. |
+
+The private report is additionally bound to all four genuine original _Read
+constructor frames, their common original _inspect_sources frame/report and
+the original immutable inspected tuple. No registry copy or recomputed digest
+substitutes for that exact report. This is provenance hardening, not an
+assertion that a hostile Python interpreter has been completely attested.
+
+An initial concern about lack of OS-wide network denial was corrected without
+changing the original guard: blanket denial would break its required actual
+matching-ref check. The narrower documented native/Python boundaries remain.
+Outer Git environment settings are not misrepresented as changing the original
+Git function's environment. No unverified syscall/actor cause was invented.
+
+### 152.4 Durable PRIVATE historical copy, separate from source authority
+
+The source worker remains write-denied. A separately pinned owner-side
+persist_short_interest_usb_observation.py receives only the retained original
+stdout COPY and owned observer summary, through bounded canonical stdin.
+It writes exactly producer.stdout.private and observation.private.json in the
+fresh fixed AppSupport base CodexShortInterestUSBObservation, child
+si-usb-offline-once-20261104-v1, OUTSIDE every native-proof/profile base.
+Existing run entries refuse; no adoption, reset, removal, overwrite or retry.
+
+Complete raw bytes<=65537, caller summary<=16384 and input<=196608 must agree
+in original byte count/hash, invocation/HEAD/remote and false source/test
+flags. The artifact explicitly says process claims are CALLER-ATTESTED
+HISTORICAL COPIES, not independently observed by this copier. Only the original
+Node owned-process witness can establish observed exit/EOF. Copied JSON,
+a successful file copy or a later reread cannot mint that witness or source
+custody/admission.
+
+Nofollow anchored original ancestry, owner0700 directories, O_EXCL0600 outputs,
+immediate FD ownership, bounded exact writes/fsync, one original post-write
+full10 seal, FD/name/byte/hash checks, independent close continuation and final
+post-close audits apply. Receipt hashes bind both full10 file stamps, leaf5 and
+ancestry5. On macOS the creator contract binds new directory GID to its
+ORIGINAL held parent's GID and file GID to the ORIGINAL held leaf GID; owner,
+mode and every subsequent identity/protection comparison remain exact.
+SI-USBONCE-20261104-007, P2, closed: the initial process-GID assumption caused
+10 fabricated failures/15 passes before valid writes; the corrected contract
+and causal reversal are separately validated. No actual destination/source
+was touched by that development run.
+
+The copier has a10-second local bound. Main must additionally own its actual
+process exit0, both stdio EOF, original receipt bytes and file bindings within
+the REMAINING original observer180s, followed automatically by the original
+acceptance getter AFTER publication/close/audits. No fresh clock, chat pause,
+late initial acceptance or publisher marker extends that deadline. Failed
+publication preserves any partial observational prefix plus original private
+memory; it never causes a source rerun. A timely captured immutable copy may
+later be analysed as historical evidence, not as newly observed live custody.
+No actual publication has occurred at this preparation checkpoint.
+
+### 152.5 Final frozen software and attributed validation
+
+| New file | Bytes | SHA256 |
+| --- | --- | --- |
+| scripts/qualify_short_interest_usb_once.py | 21627 | ad217abcd02277c4a71a72d139b316e798b27b9df5f50bdff2742e8642424002 |
+| scripts/observe_short_interest_usb_once.mjs | 35418 | a2eb9fb6040718112c6d6f11cf40e907983716c783a3fd388353b772132bb906 |
+| scripts/persist_short_interest_usb_observation.py | 16642 | 2ce8bb533a463ef73036e1728c2c553ce56af4d5427f4ab73c813261897ef88c |
+| tests/test_short_interest_usb_once.py | 18126 | 563a5aaf2477280cf467519782361aed9942170fcc4ea952286151bc03d1e2f1 |
+| tests/test_short_interest_usb_once_observer.py | 21922 | 768393e6316b09935531795f2290d598c66ca4dc0baaf639bd7ea23f6531fb08 |
+| tests/test_short_interest_usb_observation_persistence.py | 17145 | 3522e5f8eddac15264e80d105a8f9b08f4eccfbdead89a4df9bb60e038e21585 |
+
+Worker seven-source mapping SHA256
+3cbe45cf52f9374521e4cc630486f0d5d136270d1ff16e8feb4190b296a1620c; complete
+execution nine-source mapping SHA256
+22ecc36a6fd666844af17b5379ab2a56017cc5b4e212cb3325b2c80906dddda6; exact ordered
+nine-path list SHA256
+3ce721006f50354be8974f1b23226524371e318857a974f46bba0da6d94540e7.
+The latter adds the independent JS observer and historical copier to worker7;
+it does not silently enlarge the worker's Git/source permits. Original5 plus
+shared corrected helper remain EXACT current/committed bytes at189836.
+
+Main FINAL five-file focused selection (new producer, observer, copier,
+import boundary, active documents) passed202/16.05s with OS networking denied.
+Earlier Main156/16.65s preceded the final nine-reader-code conformance fix;
+Main114/1.54s covered final copier/boundary/documents. Main81/20.20s preceded005.
+These prior executions retain their snapshots and are not claimed as fresh
+reruns. Final AST/system3.9 memory compile, Node syntax, fixed diagnostic
+catalogue conformance, original6 equality, historical record-prefix preservation
+and whitespace checks passed before commitment. An initial Main newline checker
+incorrectly demanded LF on unchanged EMPTY data/__init__.py; the checker was
+corrected, not that file. Complete catalogue checking then caught the genuine
+nine-reader-code omission, corrected prospectively under004 with negative cases.
+
+Author producer34/13.16s, observer54/3.40s and copier36/.67s are SEPARATE fabricated
+executions; no source proof. Producer callable/cleanup/original aggregate pointer/
+inspected-digest RAM reversals failed as expected and passed restored;005's
+predicate/policy reversal produced9 expected failures/4.25s then9passes/3.43s;
+own ENV reversal2failures/1.37s then2passes/.90s. Observer lifecycle/bootstrap/
+union-bound/catalogue reversals failed as expected, then restored pass.
+Copier006/007 RAM reversals each produced1 expected failure/.38s, restored pair
+2passes/.28s. Independent copier reviewer36/.39s and own006 reversal1failure/.56s,
+restored1pass/.04s are not Main reruns. Peer source review accepted final
+producer/observer; its later role was copier AUTHOR, independently reviewed by
+the producer author. No independent Claude review or full lane/repository suite.
+All reversals were memory-only, restored in finally; repository bytes were not
+reverted during them.
+
+Main also exercised the REAL OS sandbox's required matching-ref Git metadata
+capability: actual exit0, both EOF, stderr0 and exactAF1, without starting the
+worker or opening USB data. That preflight used the identical OS profile before
+the final004 diagnostic-only revision; it is not source inspection or global
+native-network attestation. Synthetic observer tests are not actual process/source
+closure. The later source operation must prove its own complete genuine result.
+
+### 152.6 Local checkpoint, immutable budgets and next authorized action
+
+Starting clean head189836052570ec5bdba9e80106b15a7eb701cc7b and matching
+actual/tracking origin af1d00f66a8d611997749c164a04c48e4eb635e4 were reverified.
+Existing three LOCAL commits2bf26233f7719f8c42bd03277fe142ff8d4584e9,
+ce027c842cd742fe898faa7422a972d792d8a1d2 and
+189836052570ec5bdba9e80106b15a7eb701cc7b remain accumulated. This new bounded
+software/record checkpoint is LOCAL; ZERO pushes this round.
+
+Before the one actual invocation: finish the frozen checkpoint commit; reverify
+physical/Git roots, branch, exact clean HEAD/status and actual matchingAF1;
+authenticate current/committed9 sources, exact worker7 and existing launcher;
+confirm no pinned operation and no fixed publication-run entry; import the
+observer from authenticated immutable dataURL bytes and retain its original
+owned process/private raw output. Keep all agents frozen and do not edit/test/
+commit/push while it or its terminal copier is active. Automatically capture
+private bytes and final accepted witness inside the original deadline, never
+print the private aggregate. Authenticate actual terminal result and all
+negatives before appending the next actual-result section or any admission
+implementation. No ad hoc source replay or new probe namespace is armed.
+
+SourceAUTH/052 and SI-CR27-008, upstream/rights/availability/native/class/CIK/USD/
+denominator/market/corporate-action/terminal-cash/actual-input gates remain.
+This checkpoint is not the last step before QC/Safari. No new provider request,
+source credential read/issuance, claim, START, charged byte, outcome join,
+S1/rank/order/strategy evaluation/backtest, QC/Safari access, purchase/new term,
+broker/operator DB, deployment or order. Count84005 cumulative START /
+4294967296 bytes, permanent unknown8START/16777216bytes and separate DAILY
+36837attempts/3327988047bytes/71468572rows remain unchanged. Historical initial
+14000START/40229897byte upper bound is not a current re-audit. Looks0/0,
+exploratory0, alpha0, permanent IDsnone, QCattempts0.
+
+The owner waived Claude review; leave the other chat's push watcher unchanged
+and never automatically message it. Continue the authorized lane after genuine
+closure, preserving all data and old negatives. Reserve ONE final matching-lane
+nonforce push for the valid completed round or concrete final owner/external
+blocker, with follow-tags/submodule pushes disabled and full concurrency guards.
+No new monitor or old-monitor reactivation.
+
+Main post-record active-document/counter-review-record checks passed89/.91s;
+exact historical prefix, six file/hash bindings and final single LF passed.
+
+Staged whitespace checking caught one extra final blank line in the new producer
+test; Main removed only that blank line and verified identical parsed AST.
+The202 execution above preceded this whitespace-only test-file trim; source
+bytes and execution manifests are unchanged.

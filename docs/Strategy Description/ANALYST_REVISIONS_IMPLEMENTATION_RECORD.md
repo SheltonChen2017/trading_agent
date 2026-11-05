@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–338 retain the milestone, review, preregistration, QC
+strategy. Sections 1–339 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -1297,7 +1297,7 @@ claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
 
-The owner explicitly waives Claude review of section 338. Section 338 completed one LOCAL preparation and isolated stdin authentication at exact freeze8d913778, both actual exit0; E and every prior operation are now SPENT. Genuine full October input and six exact-five quarantine source variants are authenticated locally, with all8ETF demanded prices complete. Conservative stock coverage remains INCOMPLETE:836277unique potential holding-date gaps including5369potential-reference gaps; these are not an actual selected/held path. The retained input lacks historical ETF/fundamental callbacks, so no exact targets/holds/quotes or run readiness can be fabricated offline. Keep QC/Safari entirely prohibited, preserve all private gap/source/input bindings and original formal/PIT/master/paper false flags. Section338.16–17 owns actual evidence, per-commit dispositions, concrete offline barrier and one-push handoff; no new cloud/attempt/read authority follows. Owner waived current Claude review, not technical gates.
+The owner explicitly waives Claude review of section 339. Find historical constituent/holdings inputs under the QC/Safari hold; all prior R338 operations remain SPENT. Public primary-source research identifies Massive ETF Global daily history as a candidate requiring separate entitlement, FMP/SEC quarterly disclosures as partial crosschecks, and missing historical issuer caps/callback/actual strategy holdings inputs. Section339 defines one bounded existing-account capability observation with no acquisition, source substitution, paid rights or QC/Safari action. Exact local source/input bindings and conservative5369reference/836277dense gaps remain338.16; no readiness flag is cleared.
 
 
 Sections 137–142 retain the owner-assisted cloud diagnoses, project cleanup,
@@ -4414,6 +4414,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-03 | Claude review snapshot R337 of `10b05cca..3a3350dc`: the eighteen Codex commits of sections 334–336 reviewed after the fact | `3a3350dc` -> `134fbbc4` (correction) -> this record commit | All eighteen accepted, `7699f6b6` after correction; section R337 | FirstRate price-format JSON helpers keep the `bound` refusal code; deadline-taxonomy, `requests` redirect/cookie, reversible transport-pin and record-wording findings documented | 27 range test files 2,151 passed; 86 record gates; 48 section-330 regressions; 189 correction-affected passed; 1/1 mutation caught; no full suite, no QC/Safari/provider access; 0 looks, 338/259/54/699 unchanged | 0 P0, 0 P1, 1 P2 documented, 8 P3 (one corrected) | Codex counter-reviews section R337; Codex's owner-directed section-337 round continues |
 | 2026-11-04 | Completed owner-directed exact-five quarantine for matched six/eight exploratory cells; section337 | `18e6d567` -> `864c9b97` -> this final record commit | Incoming two Claude commits accepted/qualified in337.3; new variant review expressly waived | Final post-tilt denied weight to own sleeve ETF; genuine vendor-only monetary/runtime/source chain; sole local preparation/validator both exit0 and spent | 727 distinct focused passes24.37s; 17 memory compiles; exact5bindings/73ranges authenticate; no full suite or QC/Safari contact; one final push | 0 new P0/P1; seven pre-use P2 corrected; historical open P2 retained | Hold QC/Safari; future genuine project/input/source/run binding and demanded coverage pending; 338/259/54/699 unchanged |
 | 2026-11-04 | Completed local full-input, conservative RAW coverage and six-cell source binding; section338 | `94c2030d` -> `754563a4` -> `c73c52d2` -> `ea6a7d90` -> `86b40aac` -> `0bff7256` -> `8d913778` -> this final handoff; SEVEN commits | Current owner waiver; no incoming review or independent acceptance claimed | A/B/C/D failures retained; B2 metadata and E sole local preparation/stdin validation accepted with actual0. Full input/73ranges/all71shards and6source variants bound | Final487distinctfocused35.34s; earlier passes and doc reruns overlap; initial323pass/157setup errors qualified. No full suite/QC/Safari | Technical serializer/container/path/framing/privacy fixes prospective;5369potential-reference/836277unique dense stock gaps remain, no actual callback/holding path | ONE matching nonforce final push. QC/Safari hold and source/formal/attempt gates retained;338/259/54/699 unchanged |
+| 2026-11-04 | Historical constituent/holdings source discovery and bounded existing-account capability observation; section339 | `76c16160` -> this exact implementation/run freeze; final pending | Current owner explicit Claude waiver; no incoming review or independent acceptance | Eight-fund data/timing needs, verified primary candidate sources and SEC examples; new closed24request metadata-only diagnostic, no acquisition/substitution/QC | Final415distinctfocused1.95s;4memorycompiles/native codeTLS/synthetic scope proof; initial fixture123pass1failure qualified; no full suite | Seven pre-use issues corrected/qualified; actual account/product/date coverage remains unobserved before freeze, stock gaps unchanged | Sole parent/original-stdin validator then honest evidence and ONE final matching push;338/259/54/699 unchanged |
+
 
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
@@ -76170,3 +76172,299 @@ agreement and status. Do not treat own push as a review/monitor trigger.
 Final record check initially101passed/1failed1.28s: the rewritten live next-step paragraph named section338 and the owner waiver in separate sentences, so the exact-section review/waiver gate correctly refused. Added the explicit section338 owner-waiver sentence; no rule/test/technical gate was weakened. This documentary failure remains disclosed; final focused counts are nonadditive.
 
 Final corrected record/redaction selection102passed1.25s; this repeats the102 within487 and is not additive. Final26held public source/test pins unchanged, four new E files memory-compiled with single EOF, diff/status checks clean apart from this intended record edit. No actual/private output was reread. Final handoff commit follows from exact8d913778 with only this lane record staged, then the one matching nonforce push after unchanged remote94c2030d recheck.
+
+
+
+## 339. Historical constituent/holdings source discovery, 2026-11-04
+
+### 339.1 Owner scope and exact baseline
+
+Owner: "Find the historical constituent and holdings data needed to resolve
+the remaining stock price gaps. Keep QC and Safari off limits, skip Claude
+review, document progress, and push once when done."
+
+Initial local HEAD/tracking/live matching remote equal
+76c16160ec652cdb8756d916e7525a6c55fb4bed; clean worktree. All commands,
+edits, validation, commits and ONE final nonforce push stay ONLY at
+/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2 on
+codex/strategy-analyst-revisions-v2. Root/branch/HEAD/status checked before
+edits/commits/final push; preserve concurrent work, no reset/rebase/force,
+side branch/worktree or other-lane/shared-file changes. This record replaces
+root handoff for this lane. No new Claude range is being reviewed; current
+owner explicitly waives Claude review of section339, not technical gates.
+
+QC and Safari are entirely prohibited, including QC public documentation,
+API/project/access/privacy/capacity/object/source/compile/job/result/Mia.
+No source/control/reader/capture replay, USB access, full artifact census,
+new paid rights, broker/funded/real-order/paper/live action or efficacy claim.
+All R338 operations/data production are spent. Existing source DATA may be
+named from public records, not reopened by inference. Booked floor remains
+338shared/259development/54infrastructure/699cells. Source discovery computes
+no outcomes, orders, prices, returns or strategy holdings; no look/cell added.
+
+The current task authorizes finding sources using public primary documents
+and a separately frozen bounded EXISTING-account access observation. It does
+not purchase or renew an add-on, capture a historical corpus, substitute a new
+data source into the frozen strategy or silently refresh any used source pin.
+Public issuer/provider/SEC pages were read with the web tool; Safari and QC
+were not used. Before the exact freeze below, no authenticated provider API,
+credential lookup or private artifact content was accessed this round.
+
+### 339.2 Exact required data, and what holdings means here
+
+Frozen all-eight census: SPY,QQQ,SOXX,XLV,REMX,XLE,XLI,XLF. Six selects the
+first6 but authenticates all8 callback books. Public source audit:
+newrule_available_history_comparison_runtime._books/_capture and the R337
+quarantine targets/contract retain these requirements:
+- COMPLETE ETF books: exact security identity/display label and constituent
+  weight, including unknown, zero-weight and quarantined rows. Removing
+  unmapped/unselected rows changes coverage denominators and top-cap ranks.
+- Same-security historical fundamentals: display label and positive ISSUER
+  market capitalization, not the ETF's dollar position value, average cap,
+  AUM, a ticker-size bucket or sparse corporate-action event value.
+- Actual callback arrival and EndTime. Latest arrival strictly BEFORE09:20NY;
+  EndTime also before cutoff. Holdings no older than10calendar days,
+  fundamentals no older than4. Same-EndTime conflicts/late updates/stale or
+  degenerate collections cannot be replaced with invented clean snapshots.
+- Sequence covering September2021 warmup,259weekly decisions2021-11-01..
+  2026-10-12, first prior-close2021-10-29, valuations through2026-10-13.
+  Complete original6151binding catalog/3466axis and exact5POST-tilt
+  own-sleeve-ETF quarantine semantics remain.
+
+ETF PORTFOLIO holdings are selection inputs. The STRATEGY's quantities,
+fills, orders, cash, NAV and carried positions are derived execution state,
+not another vendor's ETF portfolio. External holdings alone cannot identify
+which of R338's836277potential stock/date gaps are actually held, or replace
+actual quote/fill/terminal-payoff evidence. No selector, revised economics,
+freshness waiver, date backfill or extra quarantine is constructed here.
+
+Retained candidate evidence, from PUBLIC records/code only:
+|Candidate|Known evidence|Limit|
+|---|---|---|
+|R338 E private gap DATA|quarantine/R338-20261104-E/coverage-private.json17489087B/3140098e220d8fa8a2b1d21077d3579c1788dcc4ac7a6aaa1fa6fce223ff3cc7|Conservative gaps, not actual strategy holdings; no read/replay in339.|
+|Original Sharadar fundamentals archive|sharadar_capture/arv2-sharadar-source-20260914T003329843989Z/03-fundamentals-years-full.zip660340539B/ac432104db2af7139c9b7a82f871b46b2b335a62e9ab4ac7ec57ddc430f1ab30; manifest94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b, record260|Potential reporting-date cap evidence only. Required public schema does not prove optional marketcap exists. Separately justified manifest-only inventory could establish fields; no ZIP/manifest is opened now. Not daily cap/callback history.|
+|R279 A2 snapshot|Remote QC only; one2026-09-28six-ETF snapshot, canonical190633B/compressed83011B, records219.2/224.4|Never locally downloaded, missingXLI/XLF/history, inaccessible under QC hold.|
+|R2672021–2025 receipt|Record215.1 count/digests only|No retained callback constituent/cap rows.|
+|AP/AR/K price sources|Public acquisition schema selects ticker,date,closeunadj,lastupdated only|No hidden daily marketcap column in retained selected price archive; TICKERS scalemarketcap is a bucket, ACTIONS values are sparse events.|
+
+No implemented/retained Sharadar DAILY or FMP historical-marketcap capture
+was found in the public source/receipt audit. This is not a private-file
+census or a proof that no unrelated files exist elsewhere on the machine.
+
+### 339.3 Primary-source findings, not dataset admission
+
+Official sources checked2026-11-04:
+|Source|Verified advertised capability|Scope/limitation|
+|---|---|---|
+|[Massive ETF Global Constituents](https://massive.com/docs/rest/partners/etf-global/constituents)|Daily updates; history advertised from2017-04-03; effective and processed dates, constituent weights/shares/identifiers; exact fund/date filters and pagination.|Separate ETF Global Constituents add-on, currently advertised$99/month. Existing stock/Benzinga access does NOT prove this entitlement. Date-only processing is not exact publication/callback time, immutable versions or proof all8dates are complete. This is the clearest documented daily historical candidate, not an already admitted source.|
+|[FMP disclosure dates](https://site.financialmodelingprep.com/developer/docs/stable/disclosures-dates), [dated fund disclosures](https://site.financialmodelingprep.com/developer/docs/stable/mutual-fund-disclosures)|Fund-indexed date inventory and year/quarter disclosure route; holdings disclosures include report/acceptance metadata, identifiers, units/value/portfolio percentage.|Filings, not documented daily issuer books. [FMP plan matrix](https://site.financialmodelingprep.com/developer/docs/pricing) includes holdings/disclosure routes in Ultimate, excludes lower tiers; actual account tier remains unverified. One FAQ mentions a date argument for current holdings, but current endpoint docs/legacy redirects do not authenticate historical snapshots. No date-query success is treated as history.|
+|[EODHD Fundamentals](https://eodhd.com/financial-apis/stock-etfs-fundamental-data-feeds), [plans](https://eodhd.com/pricing)|ETF fundamentals describes holdings and weights.|AllWorld EOD and Calendar do not establish Fundamentals rights. No documented historical ETF-holdings snapshot route verified. Index historical-membership features are not ETF portfolio history.|
+|[Sharadar funds](https://sharadar.com/docs/funds), [S&P500 membership](https://sharadar.com/docs/sp500), [holdings](https://sharadar.com/docs/holdings)|Fund OHLCV; S&P500 membership; institutional-manager holdings.|Price access cannot establish ETF constituent history. Manager13F is not a particular ETF portfolio, and S&P500 membership is neither SPY's actual book nor eight-fund weights.|
+|[SEC N-PORT archive](https://www.sec.gov/data-research/sec-markets-data/form-n-port-data-sets), [data dictionary](https://www.sec.gov/files/nport_readme.pdf)|Public historical structured portfolio filings, archive2019Q4–2026Q3. Fund/series/report/filing identity plus security identifiers, quantities, currency, position value and portfolio percentage.|Quarterly public snapshots during this requested window, not259weekly books; dataset ZIPs omit some filing metadata and do not replace originals. Do not confuse monthly reporting form with monthly publicly available snapshots.|
+|[SEC2025delay rule](https://www.sec.gov/files/rules/final/2025/ic-35538.pdf)|2024N-PORT monthly-publication amendments postponed to2027/2028.|Cannot infer monthly public coverage in2021–2026 from the earlier rule announcement. Current [2026proposal](https://www.govinfo.gov/content/pkg/FR-2026-02-23/html/2026-03460.htm) is a proposal, not a source to upgrade historical coverage.|
+
+Source/price claims above are current public documentation, not current
+account authentication, immutable source history or purchased rights.
+No recommendation/purchase is inferred solely from advertised coverage.
+
+Concrete primary historical examples (NOT completeness census):
+|Fund|Official dated filing example|
+|---|---|
+|SPY|[2021-09-30 portfolio /2021-11-26 filing](https://www.sec.gov/Archives/edgar/data/884394/000175272421258706/0001752724-21-258706-index.htm)|
+|QQQ|[2021-09-30 XML](https://www.sec.gov/Archives/edgar/data/1067839/000175272421250330/primary_doc.xml)|
+|SOXX|[2021-09-30 portfolio /2021-11-24 filing](https://www.sec.gov/Archives/edgar/data/1100663/0001752724-21-255817-index.htm)|
+|XLV|[2021-09-30 XML](https://www.sec.gov/Archives/edgar/data/1064641/000175272421258720/primary_doc.xml)|
+|REMX|[2021-06-30 XML](https://www.sec.gov/Archives/edgar/data/1137360/000175272421190462/primary_doc.xml)|
+|XLE|[2022-03-31 XML](https://www.sec.gov/Archives/edgar/data/1064641/000175272422127613/primary_doc.xml)|
+|XLI|[2021-06-30 XML](https://www.sec.gov/Archives/edgar/data/1064641/000175272421189816/primary_doc.xml)|
+|XLF|[2025-06-30 XML](https://www.sec.gov/Archives/edgar/data/1064641/000175272425211084/primary_doc.xml)|
+
+Using the SPY/SOXX September2021 reports at the October29 cutoff would use
+filings not yet published. Quarterly snapshots also exceed10day/4day
+freshness; carrying them forward does not preserve the current contract.
+A lagged-disclosure strategy would require an explicit different design/
+epoch, not a silent substitute for this six/eight comparison.
+
+Issuer checks found current access, not a verified all-eight date archive:
+- [iShares SOXX CSV](https://www.ishares.com/us/products/239705/ishares-semiconductor-etf/latest-holdings.csv)
+  was dated2026-11-03, with weights/quantities/values/exchange/currency but no
+  CUSIP/ISIN columns. Two historical asOfDate=20211029 views (legacy AJAX,
+  current CSV query) were web-tool-inaccessible and returned no body. This
+  establishes neither historical availability nor silent-current behavior,
+  and no provider HTTP/root cause is assigned to a tool error.
+- [State Street SPY](https://www.ssga.com/us/en/individual/etfs/state-street-spdr-sp-500-etf-trust-spy)
+  and sector pages expose current daily files; [SPY XLSX](https://www.ssga.com/library-content/products/fund-data/etfs/us/holdings-daily-us-en-spy.xlsx)
+  has no verified dated selector in the inspected links. Web could not decode
+  the XLSX; absence of decoded rows is a tooling limit, not a source refusal.
+- [Invesco QQQ](https://www.invesco.com/qqq-etf/en/about.html) and
+  [US VanEck REMX](https://www.vaneck.com/us/en/investments/rare-earth-strategic-metals-etf-remx/holdings/)
+  expose current holdings. No complete dated US archive was verified.
+  A separate UCITS product/index must not replace the US ETF.
+- [Nasdaq GIW](https://www.nasdaq.com/products/global-indexes/data) advertises
+  historical index components/weights; [S&P DJI licensing](https://www.spglobal.com/spdji/en/about-us/data-index-licensing/)
+  offers index datasets. Neither establishes existing rights, and index
+  components/weights are not automatically the fund's actual holdings.
+
+
+
+Additional primary cap candidate:
+[FMP Historical Market Cap](https://site.financialmodelingprep.com/developer/docs/stable/historical-market-cap)
+documents /stable/historical-market-capitalization with symbol/date-range/
+limit filters and company-date marketCap values; the plan matrix lists
+US coverage from Starter upward. This is advertised issuer-cap history,
+not an authenticated current account/data/currency/share-class mapping.
+The [FMP changelog](https://site.financialmodelingprep.com/developer/docs/changelog)
+notes a five-year default cap-history window; explicit old from/to and
+actual returned bounds must be checked. No cap API call/capture or daily
+callback equivalence is established in this holdings-access probe.
+
+### 339.4 New bounded existing-account capability observation
+
+NEW pure scripts/arv2_r339_holdings_discovery.py owns a closed24request
+plan and strict supplied-HTTP200 schema summaries, no I/O/Keychain/network.
+16Massive requests: each8fund's exact2021-10-29 and2026-10-12,
+GET /etf-global/v1/constituents with composite_ticker/effective_date/limit1/
+sort=constituent_ticker.asc.8FMP requests: GET /stable/funds/disclosure-dates
+with exact fund symbol only. No ambiguous current-holdings date trick,
+quarterly DATA acquisition, fallback endpoint, pagination or full capture.
+
+NEW scripts/probe_arv2_r339_holdings_access.py owns a fresh exclusive
+holdings_discovery/R339-20261104-A lifecycle. It uses ONLY fixed two TLS
+origins api.massive.com and financialmodelingprep.com. Fresh standard-library
+HTTPSConnection per query, checked hostname/certificate/default CA context,
+no tunnel/proxy/session/redirect/cookie or HTTP retry logic. Native parent
+denies inbound network, USB, unrelated artifacts, user-Keychain writes and
+system-Keychain reads/writes; it permits needed existing login-Keychain reads
+and outbound TLS. This is NOT native domain isolation or a sandbox against
+arbitrary same-user tampering. Fixed source code provides endpoint binding.
+Original native/public source pins are selected dependencies, not whole
+interpreter/stdlib/CA integrity or continuous historical stability.
+
+Four original public source descriptors (caller+3modules) use nofollow
+ancestors, all10metadata fields/current named-held/whole-byte pins. Modules
+are compiled from held bytes into unique namespaces: new pure core, existing
+credential helper and native security helper. No old operational caller is
+imported/invoked. Store/HeldFile primitives are prospectively copied from
+frozen338E into the NEW caller, with its own names/claim/control; no old
+module globals/controls are patched. Native security applies to own private
+control/output; public-source guard is metadata/hash, not a new native
+public-source ACL/xattr policy. Source guards normal-return before report.
+
+Claim/fsync/observation and per-provider credential marker BEFORE exactly
+one existing lookup/provider, at most20s, using the unchanged known login
+Keychain helper/services. Lookup stdout is captured privately; no secret
+value reaches parent/user stdout, command arguments, disk or environment;
+there is no token-file fallback. Loader shapes and new core512char limit checked before
+send intent. Each request gets its own exclusive fsynced marker BEFORE its
+one dispatch. Application send-intent count is known; physical provider
+request count remains null/UNKNOWN (DNS/TCP/buffering are not measured).
+First credential/transport/non200/schema refusal stops SAME provider's
+remaining plan rows, marking them unobserved/skipped; the other provider
+may proceed independently. No retry/renewal/add-on purchase or settings change.
+
+Non200 responses retain ONLY validated numeric status and finite category;
+the program never explicitly reads their bodies. Socket/library buffering is
+not proof of zero earlier network bytes. HTTP200 uses explicit identity
+encoding/JSON media/declared and streamed1MiB bounds, strict nesting/numeric/
+duplicate-key/credential-echo validation, and discards bodies in memory.
+No response/body/row hash, raw identity/weight/row/error text or next URL is
+retained. Query dates/shape/count/presence only; processed dates are date-only
+metadata, not publication/callback evidence. FMP filing date inventory is not
+holdings DATA or daily equivalence. Limit1 samples never establish complete
+fund/window coverage; optional unavailable fields count0 without dropping the
+dated sample, a stated diagnostic policy rather than identity admission.
+
+Parent360s covers source/preflight/claim/keys/contact/publication, each
+request<=10s, stdin validator30s; no host-suspension/uninterruptibleIO bound.
+Deadline type lives OUTSIDE Exception and preserves its finite cause.
+Own connections always close even if response close fails. Exact observed
+status and original finite parser/transport code are retained. Partial
+progress survives late deadline/publication/guard failure as FAILURE, never
+accepted complete data; pending/unattempted rows remain distinct. Send count
+on failure is derived from already recorded row flags, not invented network
+accounting. Valid source/HTTP access refusal observations may complete with
+actual0 by this NEW diagnostic purpose, while capture/history/coverage/PIT/
+callback/stock-gap/backtest readiness remain literally FALSE.
+
+Acceptance requires observed actual parent0 AND strict matching ORIGINAL
+stdout under a separate stdin-only native allnetwork/ALLartifact/USB/BOTH-
+Keychain/securityCLI-denied validator at the SAME clean frozen HEAD/self/
+profile/3module pins. Any late actual2/unknown/trailing/noisy/malformed result
+is not accepted even if report exists. No output/control reread. Unknown or
+partial claim is consumed/ambiguous; no unchanged retry. This observation
+cannot create data admission or a later capture/processing/run permit.
+
+### 339.5 Pre-use findings, tests and exact one-shot freeze
+
+Pre-use findings/corrections (no actual API/credential invocation):
+|ID|Priority/status|Verified issue/correction|
+|---|---|---|
+|I339-001|P2 corrected|Caller initially used row_count while core ABI uses result_count; real populated/empty core responses now exercise both branches before actual contact.|
+|I339-002|P2 corrected|Generic schema labels would lose exact finite refusal cause, and late failures would erase prior measured statuses. Rows retain closed original failure_code and bounded partial progress; FAILURE never promotes it to accepted data.|
+|I339-003|P2 corrected|Response close raising could skip connection.close; nestedfinally now always closes the own connection. Known numeric status remains retained.|
+|I339-004|P2 corrected|A deadline after numeric status left dispatch_pending that its validator rejected. Exact in-flight known status is permitted only with recorded send; atomic updates preserve terminal/cause/summary state, failure counts derive from already recorded flags.|
+|I339-005|P3 corrected prospectively|Official Massive request_id type/sample disagree; support string/positive-int, not bool. Optional unavailable metadata counts0 without dropping dated rows; this is diagnostic policy, not a provider null/schema guarantee or identity admission.|
+|I339-006|P2 corrected|Preflight checked caller bytes via an earlier FD; the held caller descriptor spanning actual contact had not been read. Same held FD now authenticates its expected byte pin BEFORE claim; omission reaches a regression failure before any actual.|
+|I339-007|P3 fixture qualification|Initial caller123passes/1failure0.53s used mismatched synthetic caller binding in late-failure fixture; fixed only fixture. Earlier132 and core142 selections overlap final counts and are not additive.|
+
+Root FINAL415distinctpasses1.95s =180purecore+133caller+102record/redaction;
+no failures/skips/warnings, no full suite. Final4files compile in memory/
+singleEOF; source-level import boundary is stdlib only, with exactly3explicit
+compiled project modules; no assistant.dispatch_fence/engine/oldoperator import.
+Author core180passes0.17s and caller133passes0.60s overlap root. Response-
+body-read and finite-cause-erasure memory omissions each caught1expected
+failure0.12s; same-held-caller-read omission caught1expectedfailure0.14s.
+Functions restored in finally; no source bytes or DATA changed.
+
+All pytest/mutations use native ALLnetwork/ALL-production-artifact/USB/BOTH-
+Keychain/securityCLI denial, inroot unique temp/cache/log/plugin paths,
+noautoload/noconftest/ignore-artifacts/-B/no-cache. One separate top-level
+single native synthetic Store proof passed for creating the initially absent
+topic parent and claim/marker/report under remapped exact parent policy,
+with ALLreal-artifact/network/Keychain/securityCLI additionally denied;
+it is not another pytest pass or actual control allocation. Exact native
+CODE-only bootstrap/TLS-default-CA context also passed under denied network/
+ALLartifacts/Keychains; no credentials/contact/control was attempted.
+Same-round source audits found the above defects and no additional material
+issue after correction; they are not independent review.
+
+|New file|Bytes|SHA256|
+|---|---:|---|
+|scripts/arv2_r339_holdings_discovery.py|17009|ac23cea52e749d1400cf2d52654b8f593a81dd6b0add42d006284d7360057600|
+|scripts/probe_arv2_r339_holdings_access.py|30657|c81f4abde82ea60b51f34f0d7aa3eb5fe65e00f7be04c5b90d95ed2b7fdbacd6|
+|tests/analyst_revisions_v2/test_r339_holdings_discovery.py|19506|28c0af5ff59c43cc85e96c872103b3f50edacb1d37370e480f4fed314688144e|
+|tests/analyst_revisions_v2/test_r339_holdings_access_caller.py|39424|d76edc877fee5c6f08d460be0670f7b3532cf65a65c95e835b1b60c6f14e16f1|
+
+Core profile7804B/
+5bdf06835bafac283ffbcb707c99fac4863de851144b34eab1723c55ae4dd2b3.
+Caller profile2689B/
+b5ae2f90a490f34cc8c7da5488f89017841db8e1eead858cf2c654ad02f199a8.
+Native parent policy1288B/
+2e09572a460b80720fbe165d7d1fd2316c95082bdb9b9c5c36e2cbe2847b2418.
+Additional unchanged selected public source pins:
+credentials bd9c0863c484810b8cf7a02e46551ed63f99ecec7bb4f322b91270fad7a28227;
+security3435bc07573697d682f25ea15fd2bfd10c5baf8220c184f73ae877016bae4a30.
+Expected caller-sha256c81f4abde82ea60b51f34f0d7aa3eb5fe65e00f7be04c5b90d95ed2b7fdbacd6;
+profile-sha256b5ae2f90a490f34cc8c7da5488f89017841db8e1eead858cf2c654ad02f199a8.
+Sanitized env-i, exact designated binary -I -B, own inroot r339-root/r339-runtime
+support and explicit exact native parent policy are the run environment.
+The once-only validator uses external native ALLnetwork/ALLartifact/USB/
+BOTH-Keychain/securityCLI denial and -I -B; stdin is original captured bytes,
+not reserialized JSON or an artifact reread.
+
+D1 decision at THIS separately committed clean exact freeze: invoke NEW A
+capability parent ONCE with expected-head THIS commit and the exact caller/
+profile pins above, then ONE original-stdout-only validator with observed
+actual-parent-exit0or2 under the native denied policy. Fixed new control
+artifacts/analyst_revisions_v2/holdings_discovery/R339-20261104-A remains
+UNINSPECTED/UNALLOCATED before this freeze. No credentials/API/private bytes
+were accessed in preparation. Current owner waives this task's Claude review;
+same-round audit/testing is not independent final acceptance.
+
+Before dispatch verify exact Code root/branch/HEAD/clean state/source/profile
+pins and matching live remote76c16160 unchanged. All current/source/permanent-
+identity/PIT/financial/attempt/rights gates stay intact. R338's six variants,
+five-case policy and exact inputs/sources remain unchanged and spent; no
+strategy/price source is switched, new paid right acquired, QC/Safari/Mia/
+broker/paper/live action or look/cell follows. Actual observation and final
+combined one-push handoff will be recorded below.

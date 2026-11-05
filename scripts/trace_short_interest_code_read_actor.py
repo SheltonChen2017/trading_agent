@@ -42,12 +42,16 @@ WORKER_PYTHON = '/Users/sheltonchen/.venvs/trading_agent-py313/bin/python'
 WORKER_REAL = '/opt/homebrew/Cellar/python@3.13/3.13.15/Frameworks/Python.framework/Versions/3.13/bin/python3.13'
 WORKER_SHA256 = 'fdae91cd6e017f2053cd4e10457b6130e545597b12512ee4180c433ab9ba7dab'
 WORKER_VERSION = (3,13,15)
+NULL_PARENT = Path('/dev')
+NULL_DEVICE = NULL_PARENT/'null'
+NULL_RDEV, NULL_MAJOR, NULL_MINOR = 50331650, 3, 2
 ENV = {'PATH':'/usr/bin:/bin', 'LC_ALL':'C', 'GIT_OPTIONAL_LOCKS':'0',
     'GIT_TERMINAL_PROMPT':'0', 'GIT_CONFIG_NOSYSTEM':'1'}
 SANDBOX = '''(version 1)
 (allow default)
 (deny file-read* (subpath "/Volumes"))
 (deny file-write*)
+(allow file-write-data (literal "/dev/null"))
 (deny file-read* (subpath "/Users/sheltonchen/Library/Keychains"))
 (deny file-read* (subpath "/Library/Keychains"))
 (deny mach-lookup (global-name "com.apple.securityd"))
@@ -60,7 +64,7 @@ SANDBOX = '''(version 1)
 (deny process-exec (literal "/usr/bin/osascript"))
 (deny process-exec (regex #"/git-credential-[^/]+$"))
 '''
-_CODES = frozenset('arguments platform code_map bootstrap code_shape code_hash code_stamp code_git code_context lane worker_packet worker_bound worker_exit worker_stderr worker_EOF worker_overlap readiness native clock bindings cleanup control'.split())
+_CODES = frozenset('arguments platform code_map bootstrap code_shape code_hash code_stamp code_git code_context lane worker_packet worker_bound worker_exit worker_stderr worker_EOF worker_overlap readiness native clock bindings cleanup control null_device'.split())
 _ERRNOS = {getattr(errno,name):name for name in ('EACCES','EPERM','ENOENT','EIO','ENOSPC','EROFS','EINTR','EBADF','EINVAL','ESTALE') if hasattr(errno,name)}
 _TERMINAL_CLOCK = None
 
@@ -274,6 +278,47 @@ def worker_command(head, tracking, helper_sha):
     return ['/usr/bin/sandbox-exec','-p',SANDBOX,WORKER_REAL,'-I','-S','-B','-c',WORKER_BOOTSTRAP,head,tracking,helper_sha]
 
 
+def capture_null_device(clock, original=None):
+    """Typed, root-owned Darwin null sink; never a source/control stamp rule.
+
+    Device identity/protection/rdev is stable across this invocation. Global
+    device timestamps are deliberately not asserted: other processes use it.
+    The source reader and report/control full10 comparisons stay unchanged.
+    """
+    clock.check(8_000_000_000)
+    require(NULL_PARENT==Path('/dev') and NULL_DEVICE==Path('/dev/null'),'null_device')
+    def parent_pin(info):
+        require(stat.S_ISDIR(info.st_mode) and info.st_uid==0 and info.st_gid==0
+            and not stat.S_IMODE(info.st_mode)&0o022,'null_device')
+        return info.st_dev,info.st_ino,info.st_uid,info.st_gid,info.st_mode
+    def device_pin(info):
+        require(stat.S_ISCHR(info.st_mode) and info.st_uid==0 and info.st_gid==0
+            and info.st_mode==0o020666 and info.st_nlink==1 and info.st_rdev==NULL_RDEV
+            and os.major(info.st_rdev)==NULL_MAJOR and os.minor(info.st_rdev)==NULL_MINOR,'null_device')
+        return info.st_dev,info.st_ino,info.st_uid,info.st_gid,info.st_mode,info.st_nlink,info.st_rdev
+    owned=[];first=None;value=None
+    try:
+        parent=os.open(NULL_PARENT,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC);owned.append(parent)
+        parent_original=parent_pin(os.fstat(parent))
+        descriptor=os.open('null',os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC|os.O_NONBLOCK,dir_fd=parent);owned.append(descriptor)
+        device_original=device_pin(os.fstat(descriptor));value=(parent_original,device_original)
+        require(device_original[0]==parent_original[0]
+            and parent_pin(os.stat(NULL_PARENT,follow_symlinks=False))==parent_original
+            and device_pin(os.stat('null',dir_fd=parent,follow_symlinks=False))==device_original,'null_device')
+        if original is not None:require(type(original) is tuple and value==original,'null_device')
+    except BaseException as error:first=error
+    finally:
+        for descriptor in reversed(owned):
+            try:os.close(descriptor)
+            except BaseException as error:
+                if first is None:first=error
+    if first is not None:raise first
+    require(parent_pin(os.stat(NULL_PARENT,follow_symlinks=False))==value[0]
+        and device_pin(os.stat(NULL_DEVICE,follow_symlinks=False))==value[1],'null_device')
+    clock.check(8_000_000_000)
+    return value
+
+
 def worker_packet(raw, head, tracking, mapping, allow_incomplete=False):
     require(type(raw) is bytes and 0<len(raw)<=MAX_HELPER,'worker_bound')
     value=json.loads(raw,object_pairs_hook=pairs,parse_constant=lambda unused:require(False,'worker_packet'))
@@ -366,7 +411,7 @@ def _stop(child, failures, diagnostic, group=False):
         except BaseException as error:failures.append(diagnostic(error,'shutdown'));return None
 
 
-def observe(consumer, watch, clock, documents, head, tracking, mapping, runtime):
+def observe(consumer, watch, clock, documents, head, tracking, mapping, runtime, null_device):
     native=worker=None;native_wait=worker_wait=None;first=None;cleanup=[]
     native_eof=set();worker_eof=set();worker_raw=bytearray();worker_stderr=native_stderr=0
     ready=launch_before=launch_after=worker_closed=stop_time=None
@@ -387,6 +432,7 @@ def observe(consumer, watch, clock, documents, head, tracking, mapping, runtime)
                 if worker is None and ready is None and now-start<READINESS_NS and consumer.records>0 and consumer.first_seq==0 and not consumer.issues and native_stderr==0 and native.poll() is None:
                     ready=now;owner=ROOT.stat();launch_before=clock.check(documents.SHUTDOWN_NS)
                     capture_runtime(clock,runtime)
+                    capture_null_device(clock,null_device)
                     worker=subprocess.Popen(worker_command(head,tracking,mapping[HELPER]),stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
                         cwd=ROOT,env=ENV,user=owner.st_uid,group=owner.st_gid,extra_groups=[],close_fds=True,start_new_session=True)
                     launch_after=clock.check(documents.SHUTDOWN_NS);register(worker,'worker')
@@ -396,6 +442,7 @@ def observe(consumer, watch, clock, documents, head, tracking, mapping, runtime)
                     try:
                         parsed=worker_packet(bytes(worker_raw),head,tracking,mapping,allow_incomplete=True)
                         capture_runtime(clock,runtime)
+                        capture_null_device(clock,null_device)
                         require(type(worker_wait) is int and worker_wait==0,'worker_exit')
                         require(worker_stderr==0,'worker_stderr')
                         require(parsed.get('status')!='incomplete' and not worker_cancelled,'worker_packet')
@@ -478,10 +525,12 @@ def observe(consumer, watch, clock, documents, head, tracking, mapping, runtime)
             'owned_wait_EOF_close_offset_ns':offset(worker_closed),'native_shutdown_offset_ns':offset(stop_time),
             'complete_lifetime_inside_native_interval':bool(worker_validated and parsed is not None and stop_time is not None and worker_closed<stop_time),
             'clock_scope':'parent_process_envelope_worker_own_monotonic_not_cross_process_epoch_compared',
-            'sandbox':'Volumes_read_metadata_and_all_file_writes_Keychain_routes_denied',
+            'sandbox':'Volumes_read_metadata_all_persistent_file_writes_Keychain_routes_denied_only_typed_null_data_sink_allowed',
             'git_scope':'unchanged_original_matching_lane_Git_metadata_exception_not_market_provider_HTTP_or_universal_credential_zero_claim',
             'runtime_launcher_sha256':WORKER_SHA256,'runtime_original_stamp10_sha256':digest(canonical(list(runtime))[:-1]),
             'runtime_version':list(WORKER_VERSION),'runtime_scope':'fixed_launcher_binary_not_full_stdlib_or_dylib_closure',
+            'null_device_original_contract_sha256':digest(canonical([list(pin) for pin in null_device])[:-1]),
+            'null_device_contract':'root_owned_nofollow_parent_identity5_character_identity7_rdev_3_2_no_timestamp_stability_claim',
             'interpretation_scope':'parent_native_candidates_and_sampled_deltas_separate_from_child_original_failed_comparisons_no_global_no_transition_inference',
             'report':parsed}}
 
@@ -571,6 +620,7 @@ def root_trace(head, tracking, mapping):
     documents=load_documents(raw[DOCUMENTS])
     clock=documents.Clock(globals().get('_BOOTSTRAP_START_NS'));_TERMINAL_CLOCK=clock
     runtime=capture_runtime(clock)
+    null_device=capture_null_device(clock)
     captured=[];outputs=[];original_guard=documents.code_guard;original_consumer=documents.make_consumer
     original_output=documents.OutputDirectory
     output_contract=(original_output,original_output.audit,original_output.pin)
@@ -580,7 +630,7 @@ def root_trace(head, tracking, mapping):
     def guarded(h,t,newsha,oldsha,inner_clock):
         audit_code(inner_clock,h,t,mapping,held)
         return original_guard(h,t,newsha,oldsha,inner_clock)
-    def observed(consumer,watch,inner_clock):return observe(consumer,watch,inner_clock,documents,head,tracking,mapping,runtime)
+    def observed(consumer,watch,inner_clock):return observe(consumer,watch,inner_clock,documents,head,tracking,mapping,runtime,null_device)
     factory=_consumer_factory(original_consumer,documents,captured)
     def output_factory(owner):
         require(not outputs,'bindings')
@@ -598,6 +648,7 @@ def root_trace(head, tracking, mapping):
         require(expected==(documents.code_guard,documents.observe,documents.make_consumer,documents.OutputDirectory,documents.BASE,documents.DIRECTORY,documents.OUTPUT,documents.SCHEMA),'bindings')
         audit_code(clock,head,tracking,mapping,held)
         capture_runtime(clock,runtime)
+        capture_null_device(clock,null_device)
         if result.get('status')=='closed_passive_observation':
             require(len(outputs)==1,'bindings')
             final_control_audit(outputs[0],result,clock,output_contract,result['cleanup_failures'])
@@ -629,6 +680,7 @@ def plan(head, tracking, mapping):
         'root_authentication_required':True,'responsible_Terminal_Full_Disk_Access_required':True,
         'source_authority':False,'native_seconds':30,'maximum_whole_seconds':120,'readiness_seconds':10,
         'source_scope':'only_original_initial_five_code_window_no_snapshot_or_USB_admission',
+        'null_device_scope':'only_file_write_data_exact_dev_null_after_root_owned_character_identity_and_rdev_3_2_validation_persistent_writes_denied',
         'preload_scope':'root_bootstrap_code_and_runtime_preloads_precede_native_coverage_only_original_owner_read_window_is_synchronized',
         'code_mapping_sha256':digest(canonical(mapping)[:-1])}
 

@@ -21,6 +21,7 @@ HEAD,REMOTE='a'*40,'b'*40
 MAPPING={name:'c'*64 for name in t.CODE_FILES}
 MAPPING[t.DOCUMENTS]=t.DOCUMENTS_SHA;MAPPING[t.FRAMER]=t.FRAMER_SHA
 REPO=Path(__file__).resolve().parents[1]
+NULL_CONTRACT=((1,2,0,0,0o40755),(1,3,0,0,0o20666,1,50331650))
 ORIGINAL_CONTROL_AUDIT=t.final_control_audit
 _support_spec=importlib.util.spec_from_file_location('code_read_coordinator_helper_support',Path(__file__).with_name('test_short_interest_code_read_interval.py'))
 _support=importlib.util.module_from_spec(_support_spec);sys.modules[_support_spec.name]=_support;_support_spec.loader.exec_module(_support)
@@ -152,11 +153,12 @@ def world(monkeypatch):
         (child.terminate if kind==t.signal.SIGTERM else child.kill)()
     monkeypatch.setattr(t.os,'killpg',killpg)
     monkeypatch.setattr(t,'capture_runtime',lambda clock,original=None:tuple(range(10)))
+    monkeypatch.setattr(t,'capture_null_device',lambda clock,original=None:NULL_CONTRACT)
     monkeypatch.setattr(t,'ROOT',SimpleNamespace(stat=lambda:SimpleNamespace(st_uid=501,st_gid=20)))
     return w
 
 
-def observe(w):return t.observe(w.consumer,w.watch,w.clock,w.docs,HEAD,REMOTE,MAPPING,tuple(range(10)))
+def observe(w):return t.observe(w.consumer,w.watch,w.clock,w.docs,HEAD,REMOTE,MAPPING,tuple(range(10)),NULL_CONTRACT)
 
 
 def test_original_refusal_is_closed_diagnostic_not_observer_failure(world):
@@ -454,6 +456,7 @@ def root_world(monkeypatch):
     monkeypatch.setattr(t,'_BOOTSTRAP_START_NS',0,raising=False)
     monkeypatch.setattr(t.os,'geteuid',lambda:0)
     monkeypatch.setattr(t,'capture_runtime',lambda clock,original=None:tuple(range(10)))
+    monkeypatch.setattr(t,'capture_null_device',lambda clock,original=None:NULL_CONTRACT)
     monkeypatch.setattr(t,'audit_code',lambda *a:events.append('final_code_audit'))
     monkeypatch.setattr(t,'final_control_audit',lambda *a:events.append('original_controls_after_final_code'))
     return SimpleNamespace(mapping=mapping,documents=documents,watch=watch,events=events)
@@ -620,13 +623,117 @@ def test_real_owner_sandbox_denies_fabricated_volume_read_stat_write_but_allows_
     if sys.platform!='darwin':pytest.skip('macOS sandbox profile')
     path=tmp_path/'fabricated-volume';path.mkdir();literal=path/'literal';literal.write_text('fabricated')
     # Explicit test-only literal replacement: production has no USB-root option.
+    outside=tmp_path/'persistent-outside.literal';outside.write_text('fabricated-outside')
     profile=t.SANDBOX.replace('(subpath "/Volumes")','(subpath '+json.dumps(str(path))+')')+'\n(deny network*)\n'
-    code='''import json,os,sys\np=sys.argv[1];r={}\nfor name,operation in (("read",lambda:open(p,"rb").read()),("stat",lambda:os.stat(p)),("write",lambda:open(p,"wb"))):\n try:operation();r[name]="ALLOWED"\n except OSError:r[name]="DENIED"\nprint(json.dumps(r,sort_keys=True))\n'''
-    run=subprocess.run(['/usr/bin/sandbox-exec','-p',profile,t.WORKER_PYTHON,'-I','-S','-B','-c',code,str(literal)],
+    code='''import json,os,sys\np,q=sys.argv[1:];r={}\nfor name,operation in (("read",lambda:open(p,"rb").read()),("stat",lambda:os.stat(p)),("write",lambda:open(p,"wb")),("outside_write",lambda:open(q,"wb"))):\n try:operation();r[name]="ALLOWED"\n except OSError:r[name]="DENIED"\nprint(json.dumps(r,sort_keys=True))\n'''
+    run=subprocess.run(['/usr/bin/sandbox-exec','-p',profile,t.WORKER_PYTHON,'-I','-S','-B','-c',code,str(literal),str(outside)],
         stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env={'PATH':'/usr/bin:/bin'},check=False,timeout=10)
     assert run.returncode==0 and run.stderr==b''
-    assert json.loads(run.stdout)=={'read':'DENIED','stat':'DENIED','write':'DENIED'}
+    assert json.loads(run.stdout)=={'read':'DENIED','stat':'DENIED','write':'DENIED','outside_write':'DENIED'}
     assert literal.read_text()=='fabricated'
+    assert outside.read_text()=='fabricated-outside'
+
+
+def test_real_sandbox_native_Git_metadata_requires_only_typed_null_data_exception():
+    if sys.platform!='darwin':pytest.skip('macOS sandbox profile')
+    # Run this one capability test outside an enclosing sandbox. The child
+    # itself denies networking; this command has no source/read-window entry.
+    profile=t.SANDBOX+'\n(deny network*)\n'
+    command=['/usr/bin/git','-c','credential.helper=','-c','core.fsmonitor=false','-c','core.hooksPath=/dev/null',
+        '-C',str(REPO),'rev-parse','HEAD']
+    env={'PATH':'/usr/bin:/bin','GIT_OPTIONAL_LOCKS':'0','GIT_CONFIG_NOSYSTEM':'1','GIT_TERMINAL_PROMPT':'0'}
+    expected=subprocess.check_output(command,env=env,timeout=10)
+    allowed=subprocess.run(['/usr/bin/sandbox-exec','-p',profile,*command],stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env,check=False,timeout=10)
+    assert allowed.returncode==0 and allowed.stdout==expected and allowed.stderr==b''
+    clause='(allow file-write-data (literal "/dev/null"))\n'
+    assert clause in profile
+    refused=subprocess.run(['/usr/bin/sandbox-exec','-p',profile.replace(clause,''),*command],stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=env,check=False,timeout=10)
+    assert refused.returncode!=0
+    assert all(token in refused.stderr for token in (b'/dev/null',b'reading and writing',b'Operation not permitted'))
+
+
+def test_real_null_device_contract_is_character_identity_not_timestamps():
+    if sys.platform!='darwin':pytest.skip('Darwin device registration')
+    clock=Clock();value=t.capture_null_device(clock)
+    assert value[1][2:]==(0,0,0o20666,1,50331650)
+    assert os.major(value[1][-1])==3 and os.minor(value[1][-1])==2
+    assert t.capture_null_device(clock,value)==value
+    assert 'allow file-write*' not in t.SANDBOX
+    assert t.SANDBOX.count('(allow file-write-data (literal "/dev/null"))')==1
+
+
+@pytest.fixture
+def null_world(monkeypatch):
+    parent=SimpleNamespace(st_dev=1,st_ino=2,st_uid=0,st_gid=0,st_mode=0o40755)
+    device=SimpleNamespace(st_dev=1,st_ino=3,st_uid=0,st_gid=0,st_mode=0o20666,st_nlink=1,st_rdev=50331650,
+        st_mtime_ns=1,st_ctime_ns=2)
+    opened=[];closed=[];after_close=[]
+    original_open,original_fstat,original_stat,original_close=os.open,os.fstat,os.stat,os.close
+    def opened_fd(path,flags,*args,**kw):
+        if str(path)=='/dev':
+            assert flags&os.O_NOFOLLOW and flags&os.O_DIRECTORY
+            opened.append(9871);return 9871
+        if str(path)=='null' and kw.get('dir_fd')==9871:
+            assert flags&os.O_NOFOLLOW and not flags&(os.O_WRONLY|os.O_RDWR)
+            opened.append(9872);return 9872
+        return original_open(path,flags,*args,**kw)
+    def fstat(fd):return parent if fd==9871 else device if fd==9872 else original_fstat(fd)
+    def named(path,*args,**kw):
+        if str(path)=='/dev':return parent
+        if str(path)=='/dev/null' or str(path)=='null' and kw.get('dir_fd')==9871:return device
+        return original_stat(path,*args,**kw)
+    def close(fd):
+        if fd in (9871,9872):
+            closed.append(fd)
+            if fd==9872:
+                for hook in after_close:hook()
+        else:original_close(fd)
+    monkeypatch.setattr(os,'open',opened_fd);monkeypatch.setattr(os,'fstat',fstat)
+    monkeypatch.setattr(os,'stat',named);monkeypatch.setattr(os,'close',close)
+    return SimpleNamespace(parent=parent,device=device,opened=opened,closed=closed,after_close=after_close)
+
+
+@pytest.mark.parametrize('subject,field,value',[
+    ('device','st_mode',0o100666),('device','st_mode',0o120777),('device','st_mode',0o20660),
+    ('device','st_uid',501),('device','st_gid',20),('device','st_rdev',50331651),
+    ('device','st_nlink',2),('device','st_dev',5),('parent','st_uid',501),('parent','st_mode',0o40777),
+])
+def test_null_exception_never_adopts_regular_symlink_unowned_other_device_or_unprotected_parent(null_world,subject,field,value):
+    w=null_world;setattr(getattr(w,subject),field,value)
+    with pytest.raises(t.CodeReadTraceRefusal,match='null_device'):t.capture_null_device(Clock())
+    assert set(w.opened)==set(w.closed)
+
+
+def test_null_device_identity_is_never_rebaselined_after_worker(null_world):
+    w=null_world;clock=Clock();original=t.capture_null_device(clock)
+    w.device.st_ino+=1
+    with pytest.raises(t.CodeReadTraceRefusal,match='null_device'):t.capture_null_device(clock,original)
+    assert set(w.opened)==set(w.closed)
+
+
+def test_null_global_timestamp_churn_does_not_change_its_distinct_device_contract(null_world):
+    w=null_world;clock=Clock();original=t.capture_null_device(clock)
+    w.device.st_mtime_ns+=1;w.device.st_ctime_ns+=1
+    assert t.capture_null_device(clock,original)==original
+    assert len(original[0])==5 and len(original[1])==7
+
+
+def test_null_postclose_replacement_is_refused_against_original_identity(null_world):
+    w=null_world;w.after_close.append(lambda:setattr(w.device,'st_ino',4))
+    with pytest.raises(t.CodeReadTraceRefusal,match='null_device'):t.capture_null_device(Clock())
+    assert w.closed==[9872,9871]
+
+
+def test_native_null_data_exception_does_not_allow_any_Python_null_write_open(monkeypatch):
+    hooks=[];state={'failed':False,'denials':{name:0 for name in helper._DENIAL_KEYS}}
+    monkeypatch.setattr(helper,'_ADD_AUDIT',hooks.append)
+    helper._install_denials(HEAD,state)
+    assert len(hooks)==1
+    with pytest.raises(helper.IntervalRefusal,match='forbidden_write'):
+        hooks[0]('open',('/dev/null',None,os.O_RDWR))
+    assert state['failed'] is True and state['denials']['python_write_attempts']==1
 
 
 def test_python39_syntax_and_no_runtime_repository_imports():

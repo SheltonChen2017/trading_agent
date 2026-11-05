@@ -32461,3 +32461,78 @@ monitor, automatic retry, other-chat message or QC release is armed.
 
 Main post-record selection passed 98 tests in 0.93s, OS networking denied;
 the entire AF1 record prefix remains byte-exact. Owned whitespace passed.
+
+### 150.6 Verified native Git null-device adapter correction BEFORE invocation
+
+The first preparation committed as
+2bf26233f7719f8c42bd03277fe142ff8d4584e9, still LOCAL above actual/tracking
+AF1. Main prepared, but never issued or executed, the command-only artifact
+admin-command-2bf26233f771.private.txt: 5890 bytes, raw SHA256
+9f344512430fdc545d8a05cdcea3fff37114fe8f2e64f244a99611777c94be70.
+It is preserved unchanged and is now STALE; do not run it. The new AppSupport
+output directory was created private0700 and remains empty; no eslogger,
+initial _Read window, USB reader, claim or source request ran.
+
+A final Main capability check invoked ONLY local Git rev-parse HEAD under
+the prospective worker sandbox. It exited128, with83 stderr bytes discarded.
+Fixed literal recognition identified /dev/null, reading-and-writing and
+Operation-not-permitted. This is SI-READ-20261104-011, P2, a VERIFIED NEW
+SANDBOX ADAPTER DEFECT: native Git needs O_RDWR on the null device, which the
+blanket write denial prevented. It does not identify any historical Documents,
+FileProvider or count-custody cause. Main caught it BEFORE consuming the
+actual synchronized diagnostic; no failed source claim is retried or reset.
+
+The sole OS allowance is file-write-data on literal /dev/null. All persistent
+file writes, /Volumes reads/metadata, Keychain/helper/shell routes and the
+helper's independent Python write-open denials remain. Python O_RDWR on
+/dev/null is still denied by that unchanged audit hook. Before fork, after
+the owned worker wait and after final code/runtime checks, the parent checks
+the SAME nofollow /dev identity5 and root-owned /dev/null character identity7:
+fullmode020666, nlink1, rdev50331650 (Darwin major3/minor2). Regular files,
+symlinks, unowned/replaced/wrong devices or protection drift refuse. This
+separate NONPERSISTENT PLATFORM DEVICE contract makes no assumption about
+global device timestamps; no source/control full10 field is omitted or rebased.
+
+The old-profile regression failed with native Git128; the corrected profile
+passes. Removing ONLY the literal data allowance reproduces the refusal.
+Persistent writes outside the fabricated Volume and fabricated Volume
+read/stat/write remain denied. Main also verified the exact matching origin
+ref under the final sandbox, existing pinned interpreter and original Git
+environment: exit0, exact AF1 ref and stderr0. That was a named Git metadata
+request, not market-provider HTTP or a code-read-window replay.
+
+Final coordinator46154 bytes/SHA256
+8e52597b846c66f1a6e1ca8094a5d2d576808117be217f6ccb5649eb372e3ed7;
+tests40498 bytes/SHA256
+9dca313b1c8b1e8957f0db5153d5afcea7b0c5208c58bca7cc7339d2d0b21cef.
+Original seven files AND helper production/test remain byte-exact to2BF.
+The unchanged nine-path list remains f7739593…; COMPLETE NEW mapping SHA256
+a1624ef1649f4830e2ab3d93224c5d28eb8a0cc641f1cf60782bd01ad09621d8;
+new sandbox literal SHA256
+f29a363fa5450d8906e36ef9a971e6e191b74073ec45bf0cff392525fdbbab79.
+These supersede ONLY the prospective coordinator/mapping/sandbox identities
+in150.5; prior validations keep their original attribution.
+
+Main final relevant coordinator selection passed93 tests,2 deselected,1.41s
+under OS network denial. The two isolated sandbox capability regressions are
+run separately with child-internal network denial. Author93/1.11s plus
+isolated2/.37s are separate executions. The peer accepted the narrow011 code
+and exact hashes read-only, with no additional probes/tests. AST/Python3.9
+in-memory compile and shell syntax passed without executing the root command.
+No complete lane/repository suite or actual diagnostic was run.
+
+The existing UNUSED empty output namespace is retained, never cleared or
+adopted from a failed invocation. Before issuing a NEW immutable command
+filename, commit this correction clean and reverify exact roots/branch/HEAD,
+matching actual/tracking AF1, all nine current/committed hashes and absent
+report/no active named operation. Bind the new command to that new local
+HEAD; preserve the earlier command. The owner still needs administrator
+authentication in responsible Terminal. No task permission is re-requested.
+The ONE final push stays reserved; no code edit/test/commit/push may overlap
+the actual one-shot. All existing budgets, old data/claims/unknown debits,
+source/input gates and no-QC/Safari/purchases constraints in150.5 remain intact.
+
+Main's two isolated final sandbox tests passed 2/.66s; final record/active-doc
+checks passed 98/.98s. The entire 2BF record prefix is preserved; whitespace
+passed. These capability and fabricated checks did not invoke the actual
+initial code window or eslogger.

@@ -1,32 +1,35 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE (MACOS SESSION) HAS REVIEWED THE NINE CODEX COMMITS
-`219b701..97cc10e` (SECTION 157), WHICH COVER SECTIONS 148-156: THE SI-CR27-009
-FIX, THE PASSIVE DOCUMENTS TRACE, THE SYNCHRONIZED CODE-READ TRACE, ONE ACTUAL
-OFFLINE USB BYTE INSPECTION AND ONE RETAINED METADATA BRIDGE. NO P0/P1 AND NO
-PRODUCTION CODE CHANGE. CORRECTION COMMIT `f52a18a78e1842bf100f581e8c9c54018b6b98ee` ADDS TESTS ONLY
-(SI-CR28-001..006 AND -011..019); SI-CR28-007, -008, -010 AND -020..023 ARE P3
-AND OPEN. THE LANE STOPS ON AN OWNER QUESTION: WHERE EXISTING FIRSTRATE LICENCE,
+Status: **CLAUDE (WINDOWS SESSION) HAS READ THE CODE OF THE 48 COMMITS
+`4be7c1e..7e5f079` (SECTION 158). NO P0/P1. CORRECTION COMMIT `36ef4fd1` FIXES
+BUGS THE EARLIER REVIEWS LEFT OPEN OR MISSED: THE SOURCE LEASE NOW REFUSES THE
+FLOORLESS EIGHT-PART PLAN (SI-CR27-008 NARROWED: WIRING THE NINE-PART PLAN AND
+A COMPLETE OPERATIONAL CATALOGUE STILL NEED THE NEWLY FROZEN PROTOCOL OF
+SECTION 141.2), THE CHECKPOINT LOADER NOW REFUSES A RETAINED START NO ATTEMPT
+CHARGES AND TAKES RETRY LEGALITY FROM THE SEALED RECEIVED RECORD, THE MAIN
+RECEIPT KEEPS ITS PRIMARY REFUSAL, STALLED GIT CALLS ARE BOUNDED, AND THE WINDOWS
+LANE COLLECTS AND NO LONGER HANGS. THESE PRODUCTION CHANGES RAN ON THIS HOST ONLY
+UNDER LOCAL STUBS FOR resource AND fcntl: THEIR TEST FILES STILL NEED A MACOS RUN.
+THE LANE STOPS ON AN OWNER QUESTION: WHERE EXISTING FIRSTRATE LICENCE,
 ENTITLEMENT, PURCHASE OR DOWNLOAD EVIDENCE FOR THIS ARCHIVE IS SAVED. UNTIL A
 LOCATION IS SUPPLIED AND AUTHENTICATED, SOURCE-ROW EXTRACTION AND ADMISSION,
 PROVIDER RECOVERY AND ANY EMPIRICAL RUN STAY STOPPED. THE USB EVIDENCE IS
 HISTORICAL METADATA ONLY AND ADMITS NO SOURCE, ROW, INPUT OR BACKTEST.
-SI-CR27-008 (THE OLD OPERATIONAL RUN PATH STILL MINTS THE FLOORLESS EIGHT-PART
-PLAN) IS A PRECONDITION OF ANY GATE REPLACEMENT. PRIOR COUNT RUN 13448
-UNRESOLVED (SI-BUILD-20261028-052 OPEN). SOURCE DISPATCH BLOCKED IN CODE ON ALL
-THREE DURABLE-COUNT ENTRY ROUTES, WITH NO CALLER RELEASE. 84005 CUMULATIVE COUNT
-STARTS / UNCHANGED 4GiB CEILINGS; THE PERMANENT UNKNOWN-RUN DEBIT 8 START /
-16777216 BYTES STAYS CHARGED; THE PRIOR BASELINE 13992 START / 23452681 CHARGED
-BYTES IS NOT A VERIFIED CURRENT BALANCE, AND PERMANENT FULL-PAGE ACCOUNTING
-WOULD ALLOW AT MOST 2036 NEW SLOTS FROM THAT BASELINE, NOT A RELEASE. ALL OLD
-CLAIMS, NEGATIVES, RECEIPTS AND CHARGES REMAIN SPENT/IMMUTABLE; NO OLD FILE IS
-ADOPTED. LOCAL BACKTEST READINESS FALSE; NOT PRE-QC READY. QUANTCONNECT PAUSED
-BY OWNER. NO QC/SAFARI/MIA, INCLUDING CAPACITY/METADATA, SETUP, UPLOAD, COMPILE
-OR JOB. TWO HISTORICAL QC METADATA REQUESTS REMAIN ACCOUNTED FOR. NO PURCHASE,
-NEW TERMS/CREDENTIAL, BROKER/OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL,
-ORDER OR TRADING ACTION. NO OUTCOME JOIN OR BACKTEST. CANONICAL ACTUAL LOOKS
-0/0, EXPLORATORY ACTUAL LOOKS 0, ALPHA 0, PERMANENT LOOK IDS NONE, QC LAUNCH
-ATTEMPTS0. CODEX COUNTER-REVIEW OF THIS ROUND IS NEXT.**
+PRIOR COUNT RUN 13448 UNRESOLVED (SI-BUILD-20261028-052 OPEN). SOURCE DISPATCH
+BLOCKED IN CODE ON ALL THREE DURABLE-COUNT ENTRY ROUTES, WITH NO CALLER RELEASE.
+84005 CUMULATIVE COUNT STARTS / UNCHANGED 4GiB CEILINGS; THE PERMANENT
+UNKNOWN-RUN DEBIT 8 START / 16777216 BYTES STAYS CHARGED; THE PRIOR BASELINE
+13992 START / 23452681 CHARGED BYTES IS NOT A VERIFIED CURRENT BALANCE, AND
+PERMANENT FULL-PAGE ACCOUNTING WOULD ALLOW AT MOST 2036 NEW SLOTS FROM THAT
+BASELINE, NOT A RELEASE. ALL OLD CLAIMS, NEGATIVES, RECEIPTS AND CHARGES REMAIN
+SPENT/IMMUTABLE; NO OLD FILE IS ADOPTED. LOCAL BACKTEST READINESS FALSE; NOT
+PRE-QC READY. QUANTCONNECT PAUSED BY OWNER. NO QC/SAFARI/MIA, INCLUDING
+CAPACITY/METADATA, SETUP, UPLOAD, COMPILE OR JOB. TWO HISTORICAL QC METADATA
+REQUESTS REMAIN ACCOUNTED FOR. NO PURCHASE, NEW TERMS/CREDENTIAL, BROKER/
+OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDER OR TRADING ACTION. NO
+OUTCOME JOIN OR BACKTEST. CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS
+0, ALPHA 0, PERMANENT LOOK IDS NONE, QC LAUNCH ATTEMPTS0. CODEX COUNTER-REVIEW
+OF THIS ROUND, INCLUDING A MACOS RUN OF ITS CHANGED TEST FILES, IS NEXT.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -271,6 +274,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-04 | Codex trace publication (row added by Claude review, `SI-CR28-009`) | `c2931abfa772290d908fedc69ef2ae1ace17bcb8` .. `af1d00f66a8d611997749c164a04c48e4eb635e4`, two commits, one non-force push at 23:45 UTC | Sections 148-149: counter-review, SI-CR27-009 fix and one authenticated passive Documents trace | Documents startup refusals made visible; custody hold retained | Codex's own attributed counts in sections 148-149. **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | SI-CR27-009 closed; `SI-BUILD-20261028-052` unchanged | Continue the attribution |
 | 2026-11-05 | Codex USB inspection publication (row added by Claude review, `SI-CR28-009`) | `2bf26233f7719f8c42bd03277fe142ff8d4584e9` .. `97cc10e7c421923fe9d57035f36b9729da59c6e5`, seven commits, one non-force push first seen at 06:48:09 UTC | Sections 150-156: synchronized code-read trace, one offline USB byte inspection, one retained metadata bridge and the owner-input gate | Historical metadata only; no source, row, input or backtest admission | Codex's own attributed counts in sections 150-156. **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | `SI-USBONCE-20261104-001`..`-007` and `SI-USBRETAIN-20261104-001`..`-005` per Codex; `SI-BUILD-20261028-052` unchanged | Owner evidence location |
 | 2026-11-05 | Claude review + test corrections (macOS session) | `219b701` -> `97cc10e` reviewed after the push watcher fired; **correction commit `f52a18a78e1842bf100f581e8c9c54018b6b98ee`**; this record commit follows, so the round has two Claude commits, published in one push | Independent review of Codex sections 148-156 | 9 dispositions; recorded hashes and anchor relationships recomputed from Git; no production defect; test-only corrections, each mutation-verified (new scripts: 32 of 157 mutants caught before, 129 after) | Final tree: 629 + 91 + 2 focused tests passed; 98 passed after this record; network and private paths denied, 2 real-sandbox tests under their own denial. No full lane suite (owner direction). **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | No P0/P1. `SI-CR28-001` P2 and `-002`..`-006`, `-009`, `-011`..`-019` P3 fixed; `-007`, `-008`, `-010`, `-020`..`-023` P3 open. `SI-CR27-008` and `SI-BUILD-20261028-052` unchanged. | Codex counter-reviews this round; the owner answers the evidence-location question |
+| 2026-11-05 | Claude review + corrections (Windows session) | `4be7c1e` -> `7e5f079` reviewed after a fast-forward; **correction commit `36ef4fd116ee022c8ee474a65b9028ee50374b04`**; this record commit follows, so the round has two Claude commits | Independent code read of everything since section 132: the 44 Codex commits and the macOS session's four | Three read-only reviewers and the lead read the production code; every reported finding was checked against the code before any fix; each production fix has a regression that fails without it | Windows, on the corrected tree: 32 test files 599 passed, 1,080 skipped, 0 failed, no hangs; lane collection 6,561 tests, 0 errors; 27 of 27 mutations caught; **95 passed, 3 skipped** after this record. The loader, receipt and driver test files ran only under local stubs for `resource` and `fcntl`, so their macOS run is owed. No full lane suite (owner direction). **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | No P0/P1. `SI-CR29-001`..`-004` P2 fixed; `-005`..`-008` P3 fixed; `-009` P3 open (spent, pinned code). `SI-CR27-008` narrowed; `SI-BUILD-20261028-052` unchanged. | Codex counter-reviews this round and runs the changed test files on macOS; the owner answers the evidence-location question |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -33608,3 +33612,140 @@ backtest. This review made no provider or key request, created no claim, START o
 charged byte, made no QC or Safari access or purchase, and did no outcome join.
 Looks remain 0/0 canonical and 0 exploratory, alpha 0, permanent look IDs none,
 and QC attempts 0.
+
+## 158. Claude independent review and corrections — 2026-11-05 UTC (Windows session: `4be7c1e..7e5f079`, code only)
+
+### 158.1 Scope and method
+
+The owner's direction, verbatim: "sync the lane, and review all unreviewed commits. Review code only. if you find a bug, fix it
+instead of just documenting it. do not do full lane suite." So this section reviews code. It does not audit the record's claims or
+the private evidence behind them, and no full lane suite ran.
+
+After a lane-only fetch the worktree fast-forwarded from `4be7c1ea` to `7e5f0799` with a clean tree. The range is 48 commits. Sections
+147 and 157 (macOS session) already give 44 of them dispositions, and Codex's section 148 counter-reviewed `3a8f3921` and `219b701c`, so only `f52a18a7` and `7e5f0799` had no second reader. This session
+had read none of them, so all 48 got an independent read of the production code: the lead read the budget, exposure, readmission,
+FirstRate and durable-driver changes, and three read-only reviewers read the USB pipeline, the receipt and supervisors, and the trace and
+proof harnesses. Every reported finding was checked against the code before any fix.
+
+This host has no provider, credential, private artifact or Darwin kernel, and none was touched. The runtime imports `resource` and `fcntl`
+at import time, so tests of those modules ran here under a local stub of those two modules that is not committed. That exercises their
+logic, not their POSIX behaviour.
+
+### 158.2 Commit dispositions
+
+| Commit | Disposition |
+| --- | --- |
+| `b1b5fd6f` | **Corrected:** `SI-CR29-002` (`SI-CR27-008`). |
+| `edbd13a0` | Accepted. |
+| `60baad81` | Accepted. |
+| `e1ed26a1` | Accepted. |
+| `5ceea3bc` | Accepted. |
+| `b58f992a` | Accepted. |
+| `2a8410f5` | Accepted. |
+| `08f334ba` | Accepted. |
+| `77d551bc` | Accepted. |
+| `5f96cbcd` | Accepted. |
+| `64c5ece4` | Accepted. |
+| `b05d30dd` | Accepted. |
+| `5416d095` | Accepted. |
+| `9fa0ade3` | Accepted. |
+| `572ed522` | Accepted. |
+| `58d00461` | Accepted. |
+| `67351775` | Accepted. |
+| `b556bee6` | Accepted. |
+| `33ab4da4` | Accepted as spent. The undrained deadline stop is in `SI-CR29-009`. |
+| `d10a9b2a` | Accepted. |
+| `b30201d4` | Accepted. |
+| `2a6d34c0` | Accepted. |
+| `95c72ca8` | Accepted as spent. Same note as `33ab4da4`. |
+| `33f8413c` | Accepted. |
+| `07ca0ea9` | Accepted. |
+| `ca11659f` | Accepted. |
+| `f8cb9833` | Accepted. |
+| `a71d21b6` | **Corrected:** `SI-CR29-006` and the receipt's unbounded `merge-base` in `SI-CR29-007`, both in `short_interest_native_main_receipt.py`. |
+| `d3b7fd41` | Accepted. |
+| `df51ed1d` | Accepted. |
+| `808df637` | Accepted. |
+| `9582cdd9` | Accepted. |
+| `aa060e3a` | Accepted. The snapshot refusal label is in `SI-CR29-009`. |
+| `4a6c9256` | Accepted as spent. The `native_result` and `executable_sha256` notes are in `SI-CR29-009`. |
+| `a184a414` | Accepted. |
+| `3a8f3921` | Accepted. |
+| `219b701c` | Accepted. |
+| `c2931abf` | Accepted. |
+| `af1d00f6` | Accepted. |
+| `2bf26233` | **Corrected:** `SI-CR29-008`. New test modules needed `SI-CR29-001`. |
+| `ce027c84` | Accepted. |
+| `18983605` | Accepted as spent v2 code, apart from `SI-CR29-008`. |
+| `3a0951e2` | Accepted as spent. The copier note is in `SI-CR29-009`. New test modules needed `SI-CR29-001`. |
+| `0dbe4aec` | Accepted. |
+| `8cec0877` | Accepted. New test modules needed `SI-CR29-001`. |
+| `97cc10e7` | Accepted. |
+| `f52a18a7` | **Accepted.** Read in full, as it had no second reader. It is test-only and its tests assert what they name. |
+| `7e5f0799` | Accepted. Record only, so read for its findings ledger and not audited, per the owner's code-only direction. |
+
+### 158.3 Findings ledger
+
+No P0 or P1. Nothing here changes a registered protocol hash, policy hash, budget constant, source gate or `TARGET_MANIFEST` pin.
+
+| ID | Priority | Status | Finding and correction |
+| --- | --- | --- | --- |
+| `SI-CR29-001` | P2 | Fixed (test) | The Windows lane broke again. Two new modules aborted collection (`fcntl`). Eleven others failed for host reasons, and one test hung the host for good: a 4,097-byte `os.write` blocks on a Windows pipe. The two modules got the collection guard, and 268 functions (552 cases) got the section-114 marker, which does nothing where `os.getuid` exists. A new static test, `test_short_interest_windows_collection_guard.py`, walks the import graph and fails on macOS too, because this has now recurred twice from Mac-authored rounds. |
+| `SI-CR29-002` | P2 | Fixed; narrows `SI-CR27-008` | `_prepare_registered_source_lease` accepted the eight-part plan. That plan budgets from 13,992 with no floor and +16 first-chunk extras, so with the eight unknown STARTs it could pass 84,005 if the 052 gate were replaced alone. The lease now refuses a plan with no negative exposure, before any code context, storage, claim or key. Wiring the nine-part plan into `run_registered` and completing the operational catalogue stay reserved for the newly frozen protocol of 141.2, so `run_registered` now refuses at its first lease instead of budgeting wrongly. |
+| `SI-CR29-003` | P2 | Fixed | The checkpoint loader authenticated each catalogued file's bytes but never compared the catalogue to the attempts. A retained START with no `attempts` row was accepted and never charged, so `new_retained_STARTs` and the operative bounds undercounted. `_exact_members` now requires the catalogue to equal the claim, the four final controls and the files each attempt names. |
+| `SI-CR29-004` | P2 | Fixed | Retry legality and backoff read `fixed_diagnostic` and `received_at` from the descriptor, and never compared them to the sealed `received.private.json` or recomputed `observation_sha256`. A sealed non-retryable failure could therefore justify a retry. The sealed record is now required field by field and its hash recomputed. The retry rule also gains the dispatch gate's two conditions it lacked: `http_invoked` true and exactly six diagnostic keys. |
+| `SI-CR29-005` | P3 | Fixed | The loader bound the claim only by schema, chunk and plan. It accepted a claim path inside `capture/`, a foreign registration or head, and `dispatch_authority` or `source_admitted` true. It now fixes the path, compares the claim to the descriptor's producer and requires both flags false. |
+| `SI-CR29-006` | P3 | Fixed | In the Main receipt, a primary refusal such as `main_bytes` was replaced at close by `main_latched`, because close rereads latched items. A cleanup failure could also replace an in-flight refusal, and `_config` could leak its directory if `_Inputs` refused. All of these failed closed but lost the diagnosis. Close now skips latched items and keeps the receipt failed, and the primary survives. Its `policy()` is unchanged, so the anchor still validates. |
+| `SI-CR29-007` | P3 | Fixed | Lane guard, cache and receipt Git calls had no timeout. A stalled `git ls-remote` blocked past every deadline, because those checks run only after the call returns. All three now use 30 s and refuse, matching the process supervisor. A slow remote now stops a run instead of hanging it; no accounting changes. |
+| `SI-CR29-008` | P3 | Fixed | The code-read coordinator's Root accepted a closed worker packet carrying `cleanup_failures`, ending as closed with `first_failure` null. Root now refuses it. **Ask for Codex:** v2 is spent and 152.1 does not say its list was empty. Read that one field from the private report; this host cannot. |
+| `SI-CR29-009` | P3 | Open by design: spent, pinned code | Confirmed but not changed, because each file is a spent one-shot whose bytes are pinned by its evidence (`FRAMER_SHA`, `DOCUMENTS_SHA`, the USB anchor). A rerun refuses. Carry into any successor: (a) `trace_short_interest_journal_actor.py` stops at its deadline without draining the pipe, so a record still in the pipe is lost with no gap and status closed; section 137's tail is therefore unobserved, while its five retained FileProvider events stand. (b) `persist_short_interest_usb_observation.py`'s closed branch omits `first_failure`, `cleanup_failures` and `denials`; the loader refuses those states, so retained evidence is unaffected. (c) `inspect_short_interest_usb_code_snapshot.py` and the qualifier can report `code: null` for a real refusal. (d) `trace_short_interest_documents_actor.py` probably reads `result` at the wrong level, unverified because eslogger cannot run here, and its `executable_sha256` hashes the path, not the binary. |
+| `SI-CR27-008` remainder, `SI-BUILD-20261028-052`, `SI-CR24-002` residual, `SI-CR24-007`, `SI-CR28-007`, `-008`, `-010`, `-020`..`-023`, `SI-CR26-005`, `-006`, `SI-CR17-002` | P2-P3 | Unchanged | No fix belongs here: each needs the new protocol, an owner or Codex decision, or spent code. `SI-CR28-022` is why the USB observer tests stay macOS-only. |
+
+### 158.4 Validation
+
+All runs used CPython 3.13.14 and pytest 9.1.1 on this Windows worktree, on the corrected tree.
+
+| Check | Result |
+| --- | --- |
+| Changed test files plus the two import-boundary files: 32 files, one process each, 200 s limit | **599 passed, 1,080 skipped, 0 failed, 0 errors, 0 hangs** |
+| Lane collection, all `tests/test_short_interest_*.py` | **6,561 tests, 0 errors** (2 errors before) |
+| Host-bound tests now skipped by the new markers, in eleven files | 268 functions, 552 cases |
+| Mutations of the production fixes, each restored and verified byte-exact | **27 of 27 caught** |
+| Compile of `research/short_interest_etf`, `scripts`, `tests`; `git diff --check` | Exit 0; clean |
+| Record and document tests after this record | **95 passed, 3 skipped** |
+
+Under the local stub of `resource` and `fcntl`, which is not committed, the changed POSIX-only test files gave these results:
+
+| File | Result under stubs |
+| --- | --- |
+| `test_short_interest_count_checkpoints.py` | 107 passed, 19 failed, 6 errors |
+| `test_short_interest_native_main_receipt.py` | 20 passed, 63 skipped |
+| `test_short_interest_durable_count_capture.py` | 71 passed, 95 failed, 11 errors |
+| `test_short_interest_code_read_actor.py` | 39 passed, 42 failed, 42 errors, 7 skipped |
+
+Those failures come from calls this host lacks, such as `os.getuid`, `O_DIRECTORY` and `getpgid`. None names a check added here. They are
+not a pass: every test that needs real POSIX behaviour remains unverified on this host.
+
+Three mutations survived the first pass: `received_protocol`, `claim_registration` and `claim_authority`. The cause was my test helper,
+which re-saved a received record without re-signing its response receipt, so those cases refused at the receipt check and never reached
+the guard they name. The helper now re-signs it, and all three are caught. Four further removals on the received and claim checks are also
+caught, which makes the 27. My first insertion of the lease helper also split `@contextmanager` from the lease; the tests showed it, I fixed
+it before any commit, and I discarded the mutation result taken during that state.
+
+Not run: the complete lane or repository suite (owner direction), anything on macOS, any actual proof, trace, USB or provider
+operation. **The three production files most changed, the checkpoint loader, the Main receipt and the durable driver, have not run
+under real POSIX here, so the first macOS run of their test files is still owed.** These tests prove the behaviour they assert on
+fabricated inputs; they say nothing about the USB data or any source.
+
+### 158.5 Unchanged state and next steps
+
+`require_dispatch_allowed()` still refuses unconditionally and `scripts/short_interest_count_source_authority.py` is unchanged.
+`SI-BUILD-20261028-052` stays open. This round made no provider or key request, created no claim, START or charged byte, made no QC or
+Safari access or purchase, and did no outcome join. Looks remain 0/0 canonical and 0 exploratory, alpha 0, permanent look IDs none, and
+QC attempts 0.
+
+1. Codex counter-reviews `36ef4fd1` and this record commit, and runs on macOS the test files it changes.
+2. Codex reads `cleanup_failures` from the spent v2 report (`SI-CR29-008`).
+3. The owner's section-156 question still stands: where is the FirstRate licence, entitlement, purchase or download evidence saved?
+
+This push moves the head, so no earlier exact-HEAD binding carries over; none is pending.

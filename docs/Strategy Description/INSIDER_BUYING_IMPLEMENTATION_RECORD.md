@@ -1,14 +1,15 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **373 STARTS THE OWNER-AUTHORIZED SHARADAR ARCHIVE FOLLOW-UP AND
-RETAINED-METADATA PIT IDENTITY AUDIT. ONE SHARADAR REPLY SENT/READ BACK;
-REGISTERED SUBSCRIBER EMAIL REMAINS UNCONFIRMED AND IS NOT GUESSED. NEW
-READ-ONLY AUDIT WILL JOIN THE12 RETAINED SEC CONTROLS TO THE ALREADY-HELD
-FULL SHARADAR REFERENCE PROJECTIONS, WITHOUT NEW PROVIDER REQUESTS OR
-HISTORICAL IDENTITY/PUBLIC-AVAILABILITY PROMOTION. EXISTING15 OPEN P2s AND
-SEVEN369 P3 GROUPS REMAIN AT THEIR EXACT SCOPES. NO PURCHASE/UPGRADE,
-QC/SAFARI, FROZEN SOURCE CHANGE, CLAIM RESET OR MONITOR REARM. NOT
-BACKTEST-READY; OBSERVED AUDIT RESULTS AND FINAL HANDOFF FOLLOW BELOW.**
+Status: **373 COMPLETES THE RETAINED-METADATA PIT GAP AUDIT ON CLEAN
+ab7eb151: ALL74,150 TICKER/698,455 ACTION ROWS ACCOUNTED,12 CONTROLS/
+11 ISSUERS. EIGHT CONTROLS HAVE ONE CURRENT CANDIDATE, THREE MULTIPLE,
+ONE NONE;309 ACTION ROWS ARE DISCOVERY ONLY. ALL HISTORICAL/PIT/RIGHTS/
+READINESS GATES STAY FALSE. TWO EARLIER READ-ONLY FAILURES ARE PRESERVED.
+ONE SHARADAR REPLY SENT; ITS NEW ANSWER AGAIN REQUIRES THE REGISTERED
+SUBSCRIBER EMAIL, STILL UNCONFIRMED. NO ARCHIVE SAMPLE/CAPABILITY ANSWER.
+EXISTING15 OPEN P2s/SEVEN369 P3 GROUPS RETAINED. NO PURCHASE/UPGRADE,
+QC/SAFARI, NEW PROVIDER REQUEST, FROZEN SOURCE CHANGE, CLAIM RESET OR
+MONITOR REARM. NOT BACKTEST-READY; EXACT HANDOFF IS374.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -333,6 +334,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-04 | Claude review (macOS session) and corrections | `2d0972d6` -> `249dcb9d` -> this review record | Review of `1635900d..2d0972d6`: 19 Codex commits (sections 351-368), zero merges; the two Windows-session Claude commits and four record commits keep their section 350/351 dispositions | All 19 accepted, two with corrections: the 366.8 control-match overclaim corrected from the kept counters, and the platform helper accepts autocrlf images (`IBWIN-CR36901`). 24 FMP/EODHD GETs and 2 credential reads match the journals; no new SEC request; no email or key shape in receipts or diff. | 915 new-file tests pass under the strict native harness (20 need it; 895 pass in the plain sandbox); helper 99 passed, 2 of 2 mutants caught; guards 179 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. No backtest. | IBFMPEOD-CR36901 closed by correction, IBWIN-CR36901 fixed; P3 IBTEST-OBS36901, IBFMPEOD-OBS36902, IBFENCE-OBS36903, IBCUSTODY-OBS36904, IBMASSIVE2-OBS36905, IBFIRST-OBS36906, IBPLAN-OBS36907 open | Codex counter-reviews 369; the next SEC capture must carry the 36907 rules |
 | 2026-11-04 | Claude correction of section 369 (macOS session) | `ee818ad6` -> this record | No Codex commit since `ee818ad6`, so no new review range. Rechecks section 369's own statements after that round ended under a usage limit. | Two statements corrected: 94 custody-platform tests never passed under the strict harness, and three P3 groups had been recorded from agent reports without the verification 369.1 claimed. All of those findings now hold. | 14 of 14 finding mutants survive as recorded and 3 of 3 controls are caught; 5 probes confirm the rest; network and Keychain exec denied. No complete suite. No backtest. | No new finding; P2 count unchanged at fifteen | Codex counter-reviews 369 and 370 |
 | 2026-11-04 | Codex counter-review only | `2d0972d690ba7fe22e537628a561ba7977e056ff..f99c66eb1f7f428190e7cf1b868f4f015bdc03f2`; correction `cf82f573e4d3a76fcaa44ecf7fa0b6d4c6ae4c90`, separate372 handoff | Review249dcb9d, ee818ad6 and f99c66eb individually; no next milestone | Accepted after CRLF fixture correction and append-only qualifications371. All12 accession+CIK/6 form/4 naive timestamp guarantees independently confirmed from hash-authenticated receipt; original failed claims and source images unchanged. | Observed536 focused PASS/1 skip/21 warnings under strict denial;102 platform/EXACT PASS with inherited network/security denial and fork allowed. Genuine fixture RED1/GREEN, two helper mutants caught; final record/import checks below. No full suite or historical replay. |15 carried P2s OPEN; new IBWIN-CCR37101 P3 RESOLVED in cf82f573; all seven369 P3 groups retained with precise dispositions | Genuine historical archive/PIT/population evidence remains missing. Vendor-reply, purchase and QC holds stay active; monitors disarmed. Exactly one final matching-lane push after372. |
+| 2026-11-04 | Codex Sharadar archive follow-up and retained PIT evidence audit | Clean9b12e0eb ->9aa1a4fe ->c2d34967 ->ab7eb151; separate374 handoff, incoming EMPTY | Existing-thread Sharadar reply and source-bound read-only audit; existing inputs only, no QC/purchases | One reply sent/read back; supplier again asks subscriber email, no sample. First two read-only observations FAILED/preserved; corrected15.439s audit PASS accounts74,150/698,455 metadata rows,12 controls/11 issuers, current candidates8 single/3 multiple/1 none and309 action discovery rows. No PIT/source/public-known-by/rights/population promotion. | Final181 focused PASS1.41s; preactivation229 boundary/platform PASS25.53s; native exact-leaf/alias canary, RED/GREEN and physical/CJA reversals, compiled/frozen hash checks. Final document checks below; no full suite. |15 carried P2s and seven369 P3 groups OPEN at exact scopes; IBPIT-READ-37301 correctedab7eb151, diagnostic observability37302 correctedc2d34967. Historical facts remain missing. | Owner's registered Sharadar email is required to unblock supplier verification; qualify a genuine historical sample if supplied. No inferred purchase, QC, extra provider query, alias capture retry or monitor rearm. One final matching-lane push after374. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -44968,3 +44970,150 @@ an unchanged control name: RED2 failures/1 control pass1.07s before the fix.
 All earlier failed observations are retained, no source request is repeated
 and no original capture/claim is reset. Further retained-only inspection uses
 only the next already-created clean, qualified code image.
+
+### 373.6 Successful corrected retained audit and evidence limits
+
+**IBPIT-READ-37301 RESOLVED in already-existing clean
+`ab7eb15156d8c8fb4243e5a6bb5073b5a2404e99`.** Its181 focused checks
+PASS1.41s (outer2.336s), zero skips/warnings, before actual inspection;
+changed runner/test images compile. Runner22,785B/SHA-256
+`94be5ace0e4884a15b5f5e1df5d4823c78f0cf2522289a935fb49e4ccafd222e`;
+runner test10,464B/SHA-256
+`8de1d0bc41935d31d309a421f9d87da445ad850d0de349df6ec3bdcc06ac6701`.
+Pure/test images retain373.4's exact31171e61/dcdf591b hashes.
+**IBPIT-DIAG-37302, P3, RESOLVED in c2d34967:** finite refusal provenance and
+semantic-failure reporting are verified by seven added regressions and the
+actually observed negative diagnostic; no acquisition or guard was relaxed.
+
+The corrected actual audit PASSes exit0 in15.439s, stdout2,847B, stderr0.
+Execution head is exactab7eb151, NOT the later handoff commit. Source closure
+is122 images, inventory SHA-256
+`e587791a1ca21b9912e444da800fd9c5455e563fb342ac6b48164984d9805f9f`.
+Genuine complete-result SHA-256 is
+`cb4354e693d9f3dba53f916b8e36378710b47b4cdaee6dc03b1b2c8fe84b7bfe`.
+This is an observed read-only audit, not an acquisition, historical replay,
+persisted new private-result namespace or independent Claude acceptance.
+The parent rechecks exact clean HEAD/source after the worker result.
+
+| Observed unit | Result | Precise limit |
+|---|---|---|
+| Selected retained DATA | Seven exact leaves, all externally pinned and held/rehashed; current physical storage identity agrees with both authenticated historical proof/qualification | No whole epoch/corpus or vendor-source authenticity claim; no source bodies, raw provider responses, ZIPs/fundamentals/USB or credentials opened. |
+| SEC controls |12 controls/11 issuer CIKs, all conserved | Fixed corroboration controls, not complete required21/pilot admission or a new favorable population selection. |
+| TICKERS |74,150 accounted;13,861 reference-quality quarantines;33 rows with current candidate CIK relations | Quarantines remain counted, not exclusions from a strategy evaluation. Current canonical URL CIK is only a provider reference claim. |
+| Per-control current candidates |8 controls with one permaticker candidate,3 with multiple,1 with none;9 controls have a literal source-symbol agreement | Single current candidate is not exact historical share-class, listing, validity or public-known-by evidence. Preserve ambiguity and absence. |
+| Snapshot conflicts |0 exact duplicate rows,0 conflicting primary-key groups,0 current permaticker-CIK conflicts,0 current label-multiplicity groups in this observed projection | These are snapshot observations; they do not prove that ticker reuse, mergers, share-class changes or historic conflicts never occurred. |
+| ACTIONS |698,455 accounted;5 metadata quarantines;0 exact duplicates;309 distinct discovery rows/376 action-control relations | Discovery uses retained SEC labels plus current CIK-candidate labels on both primary/counterparty sides, not names or alias identity. All rows outside the pilot window remain retrospective context, not features. |
+| Discovery sides/dates |352 primary-label relations,54 counterparty-label relations,30 overlapping relations deduplicated;296 relations dated strictly before their control's filing day | Date-only retrospective ordering is not authenticated known-by before09:28/09:30; same-day rows are not called pre-entry. Category zeroes do not establish absence of acquisitions/mergers hidden under other source action labels. |
+| Prior FMP/EOD evidence |12 accession+CIK controls;6 form/4 naive acceptance exact-row guarantees;12 current EOD mapping-agreement controls | Same existing aggregate evidence, not new provider data or reconstructed raw crosswalk identifiers.28 plans/24 invocations/23 clean/4 unattempted/1 refusal are HISTORICAL counts, not current I/O. |
+| Historical conclusions |Every per-control effective interval/public-known-by remains null; historical/PIT/rights/canonical/population/readiness flags false, looks/QC/backtests zero | The selected inputs do not supply contemporaneous version/delivery or dated identity proof. Current candidates and a passing audit do not close a factual evidence gate. |
+
+The two derived provider metadata pins, authenticated through f52646ad before
+use, are controls.json18,297B/
+`c48c892c83ac241246663cbeb2e5c68199342e4063899a22c50cbe2b9f69b658`
+and storage-qualification.json1,145B/
+`2335d59e1cfa5961139d37950633951e9c3921f344a2a005355599edec908f5d`.
+Together with the five373.3 fixed pins they identify the complete selected
+seven-leaf evidence scope. Only safe counts/digests travel through stdout;
+no new private evidence file is created or claimed to have independent
+file readback. The two prior failed observations remain FAILED with their
+exact code/time/output lineage; corrected success does not rewrite them.
+
+### 373.7 Sharadar's new answer and concrete remaining blocker
+
+Final existing-thread readback contains a new inbound answer asking again
+for the subscriber email. It supplies NO archive capability answer, sample,
+attachment, entitlement, coverage, rights statement or refusal of archive
+existence. It is classified as account verification still required. No
+second reply is sent with an unverified address, no sender address is guessed,
+and no account/credential value or private mail/message ID is put in Git.
+The earlier owner question for the registered email is still pending.
+
+The precise next external input is the owner's confirmed registered Sharadar
+subscription email for this authorized support thread. After verification,
+seek the existing-plan, no-additional-charge version/delivery and dated
+identity sample requested373.2, then qualify exact accession/body/version,
+authenticated historical available-by upper bounds/clock/timezone, correction/
+deletion/backfill and full2020-10-01–2025-12-31 coverage/gaps/use. Do not buy
+another dataset because the current reference audit is incomplete; no new
+purchase has been established as necessary. No ordinary current-row probe,
+arbitrary lag, favorable exclusion, fabricated interval or zero-event proxy
+can create the missing historical fact. Remaining actual whole-population,
+original-parent/older-lot/context/both-earnings/rights/registered-look/engine-
+parity gates remain as372. No QC access is released.
+
+## 374. Separate durable handoff — archive follow-up and PIT gap audit
+
+Prepared2026-11-04 local owner date. Exact incoming range is EMPTY from
+`9b12e0ebe8108f107b2481d9fd22907f85b53108`. The complete ordered outgoing
+implementation/correction series exists before this separate handoff:
+
+| Existing commit | Completed/failed scope and disposition |
+|---|---|
+| `9aa1a4feac5271efd871f14c86b540c030366b84` | New pure/isolated retained audit, tests, prospective373 scope and actually sent Sharadar reply. Source-only identity passes; first actual observer FAILED/generic2.634s, preserved. No accepted actual audit is attributed to this image. |
+| `c2d34967b2b8597d95a7660ea81a4c22d3c8422e` | Qualified finite phase/class/code diagnostics,178 focused checks; actual retained-only diagnostic FAILED3.838s at derive/input_name_refused. Failure is semantic despite successful negative IPC transfer. No old result is rewritten. |
+| `ab7eb15156d8c8fb4243e5a6bb5073b5a2404e99` | Minimal underscore basename compatibility fix, real held-reader RED/GREEN,181 focused checks and compilation; actual15.439s retained-metadata audit PASS with the exact scope/results373.6. No new API/SEC/credential/QC call or positive historical gate. |
+
+The owner authorizes this implementation without waiting for another Claude
+checkpoint. Read-only advisory peer QA and root-observed tests/results are
+distinct; none is relabelled new independent Claude acceptance. All repository
+commands/tests/edits/commits/publication remain in the designated one Insider
+worktree/branch. No default sibling checkout source, side branch/worktree,
+reset/force/overwritten concurrent work, shared behavior, Action Plan/root
+Session Handoff or other lane record changes. Git's shared administration is
+metadata only. No interim push occurred; accumulate this exact series plus
+this separate handoff for the owner's ONE final matching-lane push.
+
+No open P0/P1. All15 carried P2s remain at371.4's exact scopes, including
+the old failed planner observation, physical custody failures, shared metadata/
+SEP-2 issues, Windows/default invocation and historical archive/public-known-by/
+source/PIT/population blockers. Seven369 P3 groups retain their successor/
+spent-route conditions. The two new373 read/diagnostic P3 corrections resolve
+only the new observer's technical defects; no old finding or failed claim is
+silently closed. Before any future capture apply36907's complete intervening
+capture/archive-exposure/census requirements and36902–04's applicable safety
+rules. This retained-only audit grants no new acquisition authority.
+
+Frozen IB1C v1/scale/pilot and four current-byte-hashed v3 sources remain
+untouched; historical validatoraa0d635d is not replayed here. Stoppedv3 remains
+1,846 completed/1,847 starts unresolved. Separate7,373-byte diagnostic/report
+206e6db9677fb169455f62357ce966384926080b6eba582094e9536e88d705b7 does
+not resolve the original unmatched start/authenticity/PIT/rights. Required21's
+original eight and20,052 consumption chain, unexecuted8 NON-DISPATCH
+candidates, legacy19,846/99,394 and79,548 unattempted remain unchanged.
+StrictD23 retains seven nonexact/no82-quarter promotion digest. Frozen study/
+pilot/warm-up windows, economics, both prescribed earnings diagnostics and
+causal/refusal accounting remain unchanged. Both final nonretroactive
+incident classifications remain distinct:372 earlier requests have historical
+authorization provenance not established; separate reviewer incident is
+reviewer-reported probable unintended SEC access with exact requests/bytes
+not established. No conditional estimate becomes a measurement.
+
+One authorized Sharadar reply, independently read back, is the only external
+write. No new provider/SEC request, Keychain/credential value read, licensed-row
+download, original filing-body/financial/USB interpretation, purchase/upgrade/
+trial/paid export, QC/Safari/API/SDK/history/upload/job/look/backtest, operational
+scheduler/database/broker change, deployment/capital/funded/paper/live/order/
+trading action. Other vendor replies remain held; monitors remain disarmed.
+Do not infer periodic monitoring or automatic follow-ups from this task.
+
+Next action is the concrete subscriber-email verification and genuine archive/
+identity evidence qualification373.7. Current mappings alone do not establish
+pre-QC readiness. Final record/active-document/import/platform/EXACT, compile/
+frozen/hash/diff/status checks follow; reverify exact root/branch/HEAD/expected
+status and fetch ONLY matching origin before handoff commit/final push. Stop
+on unexpected advancement. Independently verify the exact final remote tip
+and clean/synced status after the sole publication. No additional engineering
+checkpoint, purchase or QC action substitutes for the missing supplier facts.
+
+Final validation after the complete373 actual-results/374 handoff content:
+229 record/active-document/lane-import/ML-import/custody-platform/EXACT guard
+checks PASS25.98s (outer26.959s), zero skips/warnings, native process-tree
+network/security denial and actual DATA/TMP-write isolation; required Git/
+import children inherit it. The final source image's181 focused checks were
+already PASS1.41s before the successful actual audit and no code changed
+after that run. Four final images compile; all four frozen v3 and17 frozen
+test hashes are exact. No full lane/repository suite, Windows execution,
+historical root replay or outcome run. This final validation note changes
+no contract/source. Final diff/narrow secret/mail-ID scan and designated
+root/branch/HEAD/expected status/matching-origin checks precede this separate
+record commit and the sole matching-lane push; exact remote readback follows.

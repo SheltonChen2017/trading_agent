@@ -33275,3 +33275,158 @@ finding in this bounded unit. No actual artifact/source access in review.
 Main post-record active-document/counter-review selection passed89/.66s;
 complete0dbe historical prefix, five final file/hash bindings and whitespace
 passed. No actual new metadata/private/USB operation preceded this checkpoint.
+
+## 155. Actual retained metadata report; original operator negative preserved (2026-11-04)
+
+Main invoked154's registered read-only qualification ONCE at clean
+8cec08771e1edc25107c1eb89ffc84ee3d3dba60 / matching actual/tracking origin
+af1d00f66a8d611997749c164a04c48e4eb635e4. No USB file, old inspection model,
+provider/credential, source capture/claim/START/charge, outcome or QC/Safari
+was accessed. Original process27686 actually exited0, signalnull, both stdio
+EOF, stderr0; captured packet7267 bytes/SHA256
+2a4cbcbcb1a87bc793171cbf24aee24d1160c21e797a9609a734693e94510278.
+
+The ORIGINAL Main supervisor result is INCOMPLETE and stays unchanged:
+closeSeen=false, failure=closure. SI-USBRETAIN-20261104-005, P2, is Main's
+verified operational bookkeeping error: its once('close', finish) callback
+omitted setting closeSeen=true. This is not a producer/source refusal and not
+permission to patch a flag, relabel the receipt or rerun the operation.
+
+Main separately inspected the SAME retained original ChildProcess: PID identity
+matched27686, exitCode0/signalnull, native handle null, original close counters
+3/3, both original streams ended/closed and close-listener count0. Original
+finish executed at1627ms. Under the exact captured operator code, its only
+callers are the original close event and the hard30s branch; the latter sets
+failure=deadline FIRST. A1627ms closure failure therefore identifies the
+original close-callback path, corroborated by native process/stream state.
+This is retrospective physical closure evidence, not a new wait event or live
+process capability. Independent peer accepted that limited reasoning and
+required the initial negative to remain INCOMPLETE.
+
+Without reopening files or rerunning the producer, Main strictly validated the
+SAME complete captured canonical packet, exact runtime/remote/anchor/policy/
+aggregate relationships and private-report digest. The genuine producer's
+public summary is closed_authenticated_historical_metadata_only, with no
+first/cleanup failure; maximum_local_seconds30. Its own source/code exits,
+final original controls, factory and clock checks completed. All authority
+remains false except the expressly historical-observation-only label.
+
+| Binding | Actual historical value |
+| --- | --- |
+| Anchor SHA256 | dc8518ff48d574dab0b0ac798ae09624784a54ee94ef90138de8e1064f1c7cb9 |
+| Private report SHA256 | 044f0078bf3af59a0e79400d32cbe8c16271c239f1b3ed9e182c974dd54ebd00 |
+| Private assessment SHA256 | c50a1de9755af8ce5f002738196dc7e4f58c4d73513d6ede6996c209d5243295 |
+| Pure qualification policy SHA256 | 9408f0c4c4f2edca105c9f710670ed34d3fef507bdf0bb6b44bce0e266063230 |
+| Original owned-observer SUMMARY SHA256 | 2e2de6950797e5c08e5cbd68d1cb5e7f056aa2c5ceabfce939988d9c1f27076d |
+| Original aggregate SHA256 | 3bad39e192d6a2ce81f8f18238201b84b7f3791a563de158bccd11a9eaeef0c8 |
+
+The owned-observer summary hash above is distinct from153's original
+source-profile observation hash; neither is substituted for the other.
+Detailed assessment/dispositions remain private. Main accepts the producer's
+historical metadata evidence conditional on that strict captured-packet
+authentication and retrospective closure facts; it does NOT upgrade the
+original supervisor result to success or grant fresh custody/source/input
+authority. Both the negative and diagnostic receipt are retained.
+
+005's FUTURE operator callback was corrected to set its close flag before
+finish; the already-used original was not redefined/restarted. A source-free
+actual-child causal pair verified that the old omission rejects despite real
+closure and the prospective correction accepts exit0/EOF/close concordance.
+Both native handles closed. No metadata/USB/source producer was repeated,
+no artifact namespace/reset/adoption occurred, and no new evidence was passed
+off as the missing original bookkeeping flag. This is an operational-procedure
+correction, not a change to the frozen loader, pure model or original data.
+
+This bounded bridge now authenticates Main-attested historical evidence and
+privately assesses aggregate structure. It exposes no source rows, member/
+native/class/CIK/USD identities, own-class denominator or compiler input.
+SourceAUTH, source/rights/upstream/companion/cash/actual-input/backtest gates
+remain closed; no source-usability conclusion is published. Original2 private
+files, all archives/old claims/debits/negatives and permanent8START/16MiB
+reservations remain intact. Count84005START/4GiB and separate DAILY residual
+budgets/look accounting remain exact. No active source/metadata process or
+unknown handle remains, and neither actual invocation is restarted.
+
+The next factual intake requires a fixed existing rights/provenance document
+or receipt linked to this archive; Main's concise path question remains
+pending. Public capture types, enum/approval flags, source possession and
+internal manifest hashes do not establish that contractual scope. Local
+retention/computation and QC third-party representation/processing remain
+separate. No broad disk/mail/credential search, terms acceptance, contact,
+purchase, external source request or QC/Safari access has been performed.
+
+## 156. Owner-input evidence gate and single-publication handoff (2026-11-04)
+
+The round has reached a concrete OWNER-INPUT gate before real-input admission,
+not pre-QC readiness. Main's public-code/record intake review identified no
+fixed registered FirstRate licence/entitlement or acquisition/provenance
+receipt path. That does NOT assert such private evidence does not exist.
+The pending owner question asks only where EXISTING evidence is saved.
+Acquisition, retention/local non-display computation and derived local outputs
+must be linked to this exact archive/vendor/delivery; QC raw/normalized/derived
+third-party processing is a separate later scope. USB possession, successful
+byte checks, a self-manifest, an entitlement enum or broad preauthorization
+cannot manufacture those facts. No broad private disk/mail/credential search,
+purchase/new terms/contact or external lookup was used to fill the gap.
+
+Until a fixed evidence location is supplied and authenticated, stop before
+new source-row extraction/admission, provider recovery or an empirical/QC run.
+More fabricated plumbing cannot clear this factual intake gate. The next
+authorized action is a bounded protected review of the owner's identified
+EXISTING documents, preserving all private contractual/account/contact content,
+then the exact dated FirstRate row/native/class/CIK/USD and own-class denominator
+binder within a newly frozen original-byte context. Do not reconstruct rows
+from the retained aggregate, relabel vendor pages, unlock old count claims or
+treat missing canonical PIT vintages as an automatic veto of the separate
+descriptive latest-revised route. No QC/Safari until further notice.
+
+Completed bounded work/evidence this round: verified diagnostic adapter fixes;
+actual synchronized original code-window closure; actual full offline USB
+inspection with original code/source checks; private original report publication
+and independent audit; a committed historical anchor and sealed metadata-only
+qualification bridge; actual producer metadata evidence authenticated with
+the original supervisor negative and retrospective close diagnostic retained.
+This does not admit source rows, actual inputs or backtests. Private structural
+dispositions/source-usability conclusions remain private.
+
+| Exact accumulated commit | Role/disposition in this handoff |
+| --- | --- |
+| 2bf26233f7719f8c42bd03277fe142ff8d4584e9 | Codex synchronized-trace preparation; preserved with subsequent verified adapter corrections, no source admission. |
+| ce027c842cd742fe898faa7422a972d792d8a1d2 | Codex typed native Git null adapter; actual incomplete v1 and its causality limits retained. |
+| 189836052570ec5bdba9e80106b15a7eb701cc7b | Codex pipe/native-attrlist corrections; actual separately frozen v2 code-window closure authenticated. |
+| 3a0951e2c3a72c92c9af575eeb871943bb608d57 | Codex bounded full USB observation/private copier; actual original closure/bytes/stamps authenticated in153. |
+| 0dbe4aeca2e7c5677a9f6869a5b34258698596be | Codex actual153 record; historical rows and zero-access limits preserved. |
+| 8cec08771e1edc25107c1eb89ffc84ee3d3dba60 | Codex retained historical qualification bridge; accepted after001–004 corrections and focused review; actual producer report/005 operator negative remain distinct. |
+| This documentation-only handoff | Records155–156 actual result,005 retrospective evidence and exact owner-input gate; self hash reported after commit/publication, no recursive record rewrite. |
+
+No independent Claude review is claimed; the owner waived it. Focused final
+software validation and each author's/peer's causal counts remain attributed
+in151–155, including Main202/16.05s for the USB unit, Main181/2.50s for the
+retained bridge, and their post-record checks. No full lane/repository suite or
+actual strategy/outcome/backtest evaluation. Original code/data/claims and
+all negative markers remain; the incomplete operator receipt was never
+silently promoted, reset or overwritten.
+
+Before the one authorized final nonforce push, verify no pinned operation,
+physical/Git roots, branch, exact HEAD/status and actual/tracking matchingAF1
+immediately before this commit and publication. Stop on concurrency; never
+overwrite Claude or another agent. Push ONLY
+HEAD:refs/heads/codex/strategy-short-interest, follow-tags/submodules disabled.
+Verify clean local/tracking/actual-remote equality afterward. No interim push
+has occurred. Leave every other automation/review watcher unchanged; retire
+only this round's own continuation monitor after publication or terminal
+safe-publication blocker. No new monitor is armed.
+
+Count84005 cumulative START/4294967296bytes, permanent unknown8START/16777216bytes,
+and separate DAILY36837attempts/3327988047bytes/71468572rows remain fixed.
+Historical14000START/40229897bytes is not a fresh audit. Canonical looks0/0,
+exploratory0, allocatedalpha0, permanent IDsnone, current QCattempts0.
+No QC/Safari, provider/market-row retrieval, purchases/renewals/new terms/new
+credentials, email, other lane, broker/operator DB, deployment/paper/live/order
+action. All future factual processing/admission gates remain explicit.
+
+Main final handoff validation: active-document/counter-review record selection
+passed89/.86s with OS network denied; complete8cec historical prefix, finalLF
+and whitespace passed. Independent read-only peer found no material
+inconsistency in154–156; it performed no edits/tests or private/source access.
+All software/anchor bytes stayed frozen; only this lane record changed.

@@ -19,7 +19,7 @@ from . import comparison_20261028_mark_read as reader
 from . import native_cache_probe_20261104 as base
 
 MODULE = "research/target_price_revisions_qc/native_cache_parent_probe_20261104.py"
-EPOCH = "TPR-NATIVE-PARENT-PREOPEN-CACHE-20261104-v3"
+EPOCH = "TPR-NATIVE-PARENT-PREOPEN-CACHE-20261104-v4"
 PROJECT_ID = base.PROJECT_ID
 TARGET_SID_SHA256 = base.TARGET_SID_SHA256
 SESSIONS = base.SESSIONS
@@ -46,8 +46,17 @@ STAGES = ("initialize_configuration", "initialize_custody", "initialize_control"
 BOUND_CODES = ("custody_algorithm", "custody_live_mode", "custody_warming_up", "custody_current_slice",
     "custody_project_type", "custody_project_id", "custody_locked", "custody_job_type",
     "custody_job_format", "custody_job_changed")
+CONFIG_SPLITS = {
+    "registered security unproved": ("cfg_sec_count", "cfg_sec_type", "cfg_sec_symbol", "cfg_sec_ref"),
+    "configuration fields unproved": ("cfg_row_type", "cfg_row_symbol", "cfg_resolution", "cfg_fill_forward",
+        "cfg_normalization", "cfg_extended", "cfg_internal", "cfg_custom", "cfg_exchange_tz", "cfg_data_tz"),
+    "trade configuration unproved": ("cfg_trade_count", "cfg_quote_count")}
+CONFIG_RAISES = {"configuration count unproved": ("cfg_no_rows", "cfg_extra_rows"),
+    "configuration type unproved": "cfg_kind_tick"}
+CONFIG_CODES = tuple(code for codes in CONFIG_SPLITS.values() for code in codes) + tuple(
+    code for value in CONFIG_RAISES.values() for code in (value if type(value) is tuple else (value,)))
 FAILURE_CODES = ("stage_failed", "entry_budget_exceeded", "bootstrap_incomplete",
-    "inherited_data_unproved", "inherited_close_unproved", "coverage_incomplete", "invalid_stage") + BOUND_CODES
+    "inherited_data_unproved", "inherited_close_unproved", "coverage_incomplete", "invalid_stage") + BOUND_CODES + CONFIG_CODES
 FAILURE_CATEGORIES = ("value_error", "type_error", "attribute_error", "key_error", "runtime_error",
     "overflow_error", "other_exception", "guard", "state", "budget", "inherited", "internal")
 ON_DATA_ENTRY_MAX = 6400  # original400 bootstrap waits plus6000 delivered-slice budget
@@ -139,7 +148,7 @@ class Main(CacheProbeBase):
         self._job, self._disabled, self._target_ready, self._bootstrap_attempted = None, False, False, False
         self._waiting_previous_now = None
         self._seen, self._slices, self._bars = set(), 0, 0
-        self._report = {"schema": "tpr-native-parent-cache-observations-v3", "source_epoch": SOURCE_EPOCH,
+        self._report = {"schema": "tpr-native-parent-cache-observations-v4", "source_epoch": SOURCE_EPOCH,
             "operation_id": None, "root_head": None, "status": "setup_unproved", "sessions": {},
             "input_canary_only": True, "non_order_diagnostic_exception": True,
             "hindsight_identity_diagnostic_only": True, "initialize_private_effects": False,
@@ -452,6 +461,53 @@ class Main(CacheProbeBase):
 '''
 
 
+def _config_observability(node):
+    """Instrument only fixed program raises in the SHA-pinned AST copy."""
+    def message(body):
+        if (len(body) == 1 and isinstance(body[0], ast.Raise) and isinstance(body[0].exc, ast.Call)
+                and isinstance(body[0].exc.func, ast.Name) and body[0].exc.func.id == "ValueError"
+                and len(body[0].exc.args) == 1 and isinstance(body[0].exc.args[0], ast.Constant)):
+            return body[0].exc.args[0].value
+        return None
+    def refusal(code):
+        return ast.Raise(exc=ast.Call(func=ast.Name(id="DiagnosticGuardRefusal", ctx=ast.Load()),
+            args=[ast.Constant(code)], keywords=[]), cause=None)
+    seen = []
+    class Instrument(ast.NodeTransformer):
+        def visit_If(self, item):
+            text = message(item.body)
+            if text in CONFIG_SPLITS:
+                codes = CONFIG_SPLITS[text]
+                if (item.orelse or not isinstance(item.test, ast.BoolOp) or not isinstance(item.test.op, ast.Or)
+                        or len(item.test.values) != len(codes)):
+                    _fail()
+                seen.append(text)
+                return [ast.If(test=copy.deepcopy(test), body=[refusal(code)], orelse=[])
+                    for test, code in zip(item.test.values, codes)]
+            return self.generic_visit(item)
+        def visit_Raise(self, item):
+            text = message([item])
+            if text in CONFIG_RAISES:
+                seen.append(text)
+                code = CONFIG_RAISES[text]
+                if type(code) is tuple:
+                    # The original negative predicate is unchanged. Only its
+                    # local Python list selects empty versus capped excess.
+                    selected = ast.IfExp(test=ast.Compare(left=ast.Call(func=ast.Name(id="len", ctx=ast.Load()),
+                        args=[ast.Name(id="rows", ctx=ast.Load())], keywords=[]), ops=[ast.Eq()],
+                        comparators=[ast.Constant(0)]), body=ast.Constant(code[0]), orelse=ast.Constant(code[1]))
+                    return ast.Raise(exc=ast.Call(func=ast.Name(id="DiagnosticGuardRefusal", ctx=ast.Load()),
+                        args=[selected], keywords=[]), cause=None)
+                return refusal(code)
+            if text is not None:
+                _fail()
+            return item
+    transformed = Instrument().visit(node)
+    if sorted(seen) != sorted(tuple(CONFIG_SPLITS) + tuple(CONFIG_RAISES)):
+        _fail()
+    return transformed
+
+
 def _base_source():
     if _sha(base.RUNTIME.encode("utf-8")) != BASE_RUNTIME_SHA256:
         _fail()
@@ -468,7 +524,9 @@ def _base_source():
         func=ast.Name(id="DiagnosticGuardRefusal", ctx=ast.Load()), args=[ast.Constant(code)], keywords=[]),
         cause=None)], orelse=[]) for test, code in zip(bound.body[2].test.values, BOUND_CODES)]
     bound.body = bound.body[:2] + guards + bound.body[3:]
-    bootstrap = copy.deepcopy(next(n for n in node.body if isinstance(n, ast.FunctionDef) and n.name == "_configs"))
+    configs = next(n for n in node.body if isinstance(n, ast.FunctionDef) and n.name == "_configs")
+    _config_observability(configs)
+    bootstrap = copy.deepcopy(configs)
     bootstrap.name = "_bootstrap_configs"
     count = 0
     for item in ast.walk(bootstrap):
@@ -480,7 +538,13 @@ def _base_source():
     if count != 1:
         _fail()
     node.name = "CacheProbeBase"
-    node.body = [n for n in node.body if not isinstance(n, ast.FunctionDef) or n.name not in ("initialize", "_configuration")]
+    # Main defines its own terminal summary. This is the only newly pruned
+    # base method; its unused body is omitted to retain the60000-byte API cap.
+    own_main = next(n for n in ast.parse(RUNTIME).body if isinstance(n, ast.ClassDef) and n.name == "Main")
+    if not any(isinstance(n, ast.FunctionDef) and n.name == "on_end_of_algorithm" for n in own_main.body):
+        _fail()
+    node.body = [n for n in node.body if not isinstance(n, ast.FunctionDef)
+        or n.name not in ("initialize", "_configuration", "on_end_of_algorithm")]
     node.body.append(bootstrap)
     result = ast.unparse(ast.fix_missing_locations(tree))
     return result.replace("TPR_CACHE_PROBE_RESULT ", "TPR_PARENT_CACHE_PROBE_RESULT ")
@@ -493,7 +557,7 @@ def _render(parent, helper_source, operation_id, git_head, target_sha):
         _fail()
     binding = reader._binding_v2(parent["binding"])
     reader.validate_pointer_v2(parent["pointer"], binding=binding)
-    config = {"schema": "tpr-native-parent-cache-config-v3", "source_epoch": EPOCH, "operation_id": operation_id,
+    config = {"schema": "tpr-native-parent-cache-config-v4", "source_epoch": EPOCH, "operation_id": operation_id,
         "git_head": git_head, "project_id": PROJECT_ID, "target_sid_sha256": target_sha,
         "parent_binding": binding, "parent_pointer": parent["pointer"], "sessions": list(SESSIONS)}
     raw = _wire(config)
@@ -508,11 +572,17 @@ def _render(parent, helper_source, operation_id, git_head, target_sha):
         +"import hashlib as _parent_source_hash\n"
         +"if _parent_source_hash.sha256(PARENT_HELPER_SOURCE.encode('utf-8')).hexdigest() != HELPER_SHA256: raise ValueError('fixed parent helper refused')\n"
         +"exec(compile(PARENT_HELPER_SOURCE, '<fixed_parent_validator>', 'exec'), PARENT_VALIDATOR)\n")
-    source = (prefix+_base_source()+"\n"+RUNTIME).encode("utf-8")
+    # Formatting removes no AST node; it avoids spending the fixed payload
+    # budget on comments/indentation in the newly instrumented runtime.
+    runtime_tree = ast.parse(RUNTIME)
+    runtime = ast.unparse(runtime_tree)
+    if ast.dump(ast.parse(runtime), include_attributes=False) != ast.dump(runtime_tree, include_attributes=False):
+        _fail()
+    source = (prefix+_base_source()+"\n"+runtime).encode("utf-8")
     if not 0 < len(source) <= MAX_SOURCE_BYTES:
         _fail()
     compile(ast.parse(source), "main.py", "exec")
-    report = {"schema": "tpr-native-parent-cache-build-v3", "source_epoch": EPOCH, "project_id": PROJECT_ID,
+    report = {"schema": "tpr-native-parent-cache-build-v4", "source_epoch": EPOCH, "project_id": PROJECT_ID,
         "operation_id": operation_id, "git_head": git_head, "main_bytes": len(source), "main_sha256": _sha(source),
         "config_sha256": _sha(raw), "helper_sha256": HELPER_SHA256, "base_sha256": BASE_SHA256,
         "sessions": list(SESSIONS), "local_raw_sid_supplied": False, "raw_witness_export_authorized": False,

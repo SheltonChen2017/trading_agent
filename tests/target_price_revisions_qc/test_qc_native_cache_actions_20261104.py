@@ -708,7 +708,7 @@ def test_native_parent_interface_closes_all_sources_and_has_no_local_sid_or_body
     assert sha(helper_source()) == m.builder.HELPER_SHA256 == a["api_plan"]["source_hashes"][m.builder.reader.MODULE]
     expected = m.api.REQUIRED_SOURCES | m.builder.REQUIRED_SOURCES | {m.MODULE, m.custody.MODULE}
     assert m.REQUIRED_SOURCES == expected == set(a["api_plan"]["source_hashes"])
-    assert m.PINS[m.builder.MODULE] == "da295c0249b17afe45d2310a72fa1b876ba201c3f9e697646c6662b598da4a31"
+    assert m.PINS[m.builder.MODULE] == "e45e5eb3364f0986573476d4158f9e3370140462c7c9cbf73e1dbca0cbb41603"
     assert all(sha((ROOT/name).read_bytes()) == digest for name, digest in m.PINS.items())
     assert 0 < len(fixture_main()) <= 60000  # the unchanged API payload bound
 
@@ -748,6 +748,28 @@ def test_prior_v3_compile_chain_cannot_mix_with_observability_v4(tmp_path, key):
     prior = json.loads(raw[key])
     prior["schema"] = ("tpr-fixed-parent-cache-action-result-v3" if key.endswith("result")
         else "tpr-fixed-parent-cache-action-v3")
+    changed = wire(prior)
+    descriptor = descriptors[key]
+    (root/descriptor["name"]).write_bytes(changed)
+    descriptor.update(bytes=len(changed), sha256=sha(changed))
+    launch, effects = action("launch", compile_evidence=descriptors), []
+    result = execute(tmp_path, launch, root=root, transport=backend(launch, effects=effects))
+    assert result["status"] == "failed_or_uncertain" and effects == []
+    assert result["transport_calls_attempted"] == 0
+
+
+def test_prior_v4_action_is_refused_by_configuration_diagnostic_v5():
+    prior = action()
+    prior["schema"] = "tpr-fixed-parent-cache-action-v4"
+    with pytest.raises(m.ActionRefusal): m._validated(prior)
+
+
+@pytest.mark.parametrize("key", ("compile_plan", "compile_result", "build_plan", "build_result"))
+def test_prior_v4_compile_chain_cannot_mix_with_configuration_diagnostic_v5(tmp_path, key):
+    root, descriptors, raw = compile_evidence(tmp_path)
+    prior = json.loads(raw[key])
+    prior["schema"] = ("tpr-fixed-parent-cache-action-result-v4" if key.endswith("result")
+        else "tpr-fixed-parent-cache-action-v4")
     changed = wire(prior)
     descriptor = descriptors[key]
     (root/descriptor["name"]).write_bytes(changed)

@@ -327,10 +327,10 @@ def test_close_summary_preserves_the_first_failed_guard_context(native):
     assert n.algo._report.get("first_failure_stage", n.algo._report["status"]) == first
 
 
-def test_v3_distinguishes_no_callback_from_failed_callback_and_disabled_skips(native):
+def test_current_epoch_distinguishes_no_callback_from_failed_callback_and_disabled_skips(native):
     untouched = native();untouched.state.callback();untouched.algo.on_end_of_algorithm()
     no_entry = untouched.algo._report
-    assert no_entry["schema"] == "tpr-native-parent-cache-observations-v3"
+    assert no_entry["schema"] == "tpr-native-parent-cache-observations-v4"
     assert no_entry["on_data_entries"] == no_entry["on_data_disabled_skips"] == 0
     assert no_entry["first_failure_stage"] == "close_without_bootstrap"
     assert no_entry["first_failure_code"] == "bootstrap_incomplete"
@@ -444,4 +444,182 @@ def test_bound_differential_trace_preserves_lazy_evaluation_and_native_call_coun
         try: method(obj)
         except ValueError: refused = True
         return refused, list(active), obj.__dict__["_job"]
+    assert execute(original) == execute(rewritten)
+
+
+def test_config_field_refusal_has_a_closed_program_code_instead_of_broad_stage_failure(native):
+    n = native()
+    n.algo._registered["control"].configs[0].data_normalization_mode = "adjusted"
+    n.algo.on_data(n.algo.current_slice)
+    assert n.algo._report["first_failure_stage"] == "preopen_configs"
+    assert n.algo._report["first_failure_code"] == "cfg_normalization"
+    assert not n.state.contains and not n.state.reads
+
+
+@pytest.mark.parametrize("fault,code", [("rows", "cfg_no_rows"), ("extra_rows", "cfg_extra_rows"), ("row_type", "cfg_row_type"),
+    ("symbol", "cfg_row_symbol"), ("resolution", "cfg_resolution"), ("ff", "cfg_fill_forward"),
+    ("normalization", "cfg_normalization"), ("extended", "cfg_extended"), ("internal", "cfg_internal"),
+    ("custom", "cfg_custom"), ("exchange_tz", "cfg_exchange_tz"), ("data_tz", "cfg_data_tz"),
+    ("kind", "cfg_kind_tick"), ("tick", "cfg_kind_tick"), ("trade_count", "cfg_trade_count")])
+def test_native_config_refusal_codes_are_closed_and_read_no_parent(native, fault, code):
+    n = native();security = n.algo._registered["control"];row = security.configs[0]
+    if fault == "rows": security.configs = []
+    elif fault == "extra_rows": security.configs.append(row)
+    elif fault == "row_type": security.configs[0] = NS()
+    elif fault == "symbol": row.symbol = object()
+    elif fault == "resolution": row.resolution = "daily"
+    elif fault == "ff": row.fill_data_forward = True
+    elif fault == "normalization": row.data_normalization_mode = "adjusted"
+    elif fault == "extended": row.extended_market_hours = False
+    elif fault == "internal": row.is_internal_feed = True
+    elif fault == "custom": row.is_custom_data = True
+    elif fault == "exchange_tz": row.exchange_time_zone.id = "UTC"
+    elif fault == "data_tz": row.data_time_zone.id = "UTC"
+    elif fault == "kind": row.type.FullName = "PRIVATE CONFIGURATION TYPE"
+    elif fault == "tick": row.tick_type = "quote"
+    elif fault == "trade_count": row.type.FullName = "QuantConnect.Data.Market.QuoteBar";row.tick_type = "quote"
+    n.algo.on_data(n.algo.current_slice)
+    report = n.algo._report
+    assert report["first_failure_stage"] == "preopen_configs"
+    assert report["first_failure_code"] == code and code in p.CONFIG_CODES
+    assert report["first_failure_category"] == "guard"
+    assert not n.state.contains and not n.state.reads
+    n.state.callback();n.algo.on_end_of_algorithm()
+    assert report["first_failure_code"] == code and "PRIVATE" not in n.state.logs[-1]
+
+
+@pytest.mark.parametrize("fault,code", [("count", "cfg_sec_count"), ("type", "cfg_sec_type"),
+    ("symbol", "cfg_sec_symbol"), ("reference", "cfg_sec_ref")])
+def test_registered_security_component_guards_keep_their_exact_codes(native, fault, code):
+    n = native();security = n.algo._registered["control"];symbol = security.symbol;provided = security
+    if fault == "count": n.algo.securities[object()] = NS()
+    elif fault == "type": provided = NS()
+    elif fault == "symbol": security.symbol = object()
+    elif fault == "reference": n.algo.securities[symbol] = NS()
+    with pytest.raises(n.namespace["DiagnosticGuardRefusal"]) as captured:
+        n.algo._bootstrap_configs("control", symbol, provided)
+    assert captured.value.code == code
+    assert not n.state.contains and not n.state.reads
+
+
+def test_config_ast_split_preserves_every_original_guard_predicate():
+    original = next(n for c in ast.parse(p.base.RUNTIME).body if isinstance(c, ast.ClassDef)
+        for n in c.body if isinstance(n, ast.FunctionDef) and n.name == "_configs")
+    rewritten = next(n for c in ast.parse(p._base_source()).body if isinstance(c, ast.ClassDef)
+        for n in c.body if isinstance(n, ast.FunctionDef) and n.name == "_configs")
+    def old_message(body):
+        if (len(body) == 1 and isinstance(body[0], ast.Raise) and isinstance(body[0].exc, ast.Call)
+                and isinstance(body[0].exc.func, ast.Name) and body[0].exc.func.id == "ValueError"):
+            return body[0].exc.args[0].value
+    actual, count_checked = {}, False
+    for node in ast.walk(rewritten):
+        if (isinstance(node, ast.If) and len(node.body) == 1 and isinstance(node.body[0], ast.Raise)
+                and isinstance(node.body[0].exc, ast.Call) and isinstance(node.body[0].exc.func, ast.Name)
+                and node.body[0].exc.func.id == "DiagnosticGuardRefusal"):
+            selected = node.body[0].exc.args[0]
+            if isinstance(selected, ast.Constant):
+                actual[selected.value] = ast.dump(node.test, include_attributes=False)
+            else:
+                assert isinstance(selected, ast.IfExp)
+                assert (selected.body.value, selected.orelse.value) == ("cfg_no_rows", "cfg_extra_rows")
+                assert ast.dump(selected.test, include_attributes=False) == ast.dump(
+                    ast.parse("len(rows) == 0", mode="eval").body, include_attributes=False)
+                original_count = next(item for item in ast.walk(original)
+                    if isinstance(item, ast.If) and old_message(item.body) == "configuration count unproved")
+                assert ast.dump(node.test, include_attributes=False) == ast.dump(original_count.test, include_attributes=False)
+                count_checked = True
+    for node in ast.walk(original):
+        if isinstance(node, ast.If) and old_message(node.body) in p.CONFIG_SPLITS:
+            for code, predicate in zip(p.CONFIG_SPLITS[old_message(node.body)], node.test.values):
+                assert actual[code] == ast.dump(predicate, include_attributes=False)
+    assert count_checked
+
+
+def test_only_the_unused_base_terminal_method_is_newly_pruned(native):
+    n = native();raw, _ = render()
+    original = next(c for c in ast.parse(p.base.RUNTIME).body if isinstance(c, ast.ClassDef))
+    rewritten = next(c for c in ast.parse(p._base_source()).body if isinstance(c, ast.ClassDef))
+    source_main = next(c for c in ast.parse(p.RUNTIME).body if isinstance(c, ast.ClassDef) and c.name == "Main")
+    rendered_main = next(c for c in ast.parse(raw).body if isinstance(c, ast.ClassDef) and c.name == "Main")
+    old = {m.name: m for m in original.body if isinstance(m, ast.FunctionDef)}
+    new = {m.name: m for m in rewritten.body if isinstance(m, ast.FunctionDef)}
+    assert set(new) == set(old)-{"initialize", "_configuration", "on_end_of_algorithm"}|{"_bootstrap_configs"}
+    for name in set(new)-{"_bound", "_configs", "_bootstrap_configs"}:
+        assert ast.dump(new[name], include_attributes=False) == ast.dump(old[name], include_attributes=False)
+    assert ast.dump(source_main, include_attributes=False) == ast.dump(rendered_main, include_attributes=False)
+    assert "on_end_of_algorithm" in n.namespace["Main"].__dict__
+    assert "on_end_of_algorithm" not in n.namespace["CacheProbeBase"].__dict__
+    assert n.algo.on_end_of_algorithm.__func__ is n.namespace["Main"].__dict__["on_end_of_algorithm"]
+    assert len(raw) <= 59900 < p.MAX_SOURCE_BYTES == 60000
+
+
+@pytest.mark.parametrize("fault", ["valid", "security_count", "security_type", "security_symbol", "security_reference",
+    "row_count", "row_excess", "row_type", "row_symbol", "resolution", "ff", "normalization", "extended", "internal", "custom",
+    "exchange_tz", "data_tz", "kind", "tick", "trade_count"])
+def test_config_differential_trace_preserves_lazy_fields_and_sdk_call_counts(native, fault):
+    n = native();original_node = next(m for c in ast.parse(p.base.RUNTIME).body if isinstance(c, ast.ClassDef)
+        for m in c.body if isinstance(m, ast.FunctionDef) and m.name == "_configs")
+    scopes = dict(n.namespace)
+    exec(compile(ast.fix_missing_locations(ast.Module(body=[original_node], type_ignores=[])), "original_configs.py", "exec"), scopes)
+    original, rewritten = scopes["_configs"], n.namespace["CacheProbeBase"]._configs
+    active = []
+    def reference(a, b): active.append("reference_call");return a is b
+    scopes["NetObject"] = n.namespace["NetObject"] = NS(ReferenceEquals=reference)
+    class TraceSecurity(n.namespace["Security"]):
+        def __getattribute__(self, name):
+            if name == "symbol": active.append("security.symbol")
+            return object.__getattribute__(self, name)
+    class TraceConfig(n.namespace["SubscriptionDataConfig"]):
+        def __getattribute__(self, name):
+            if name in ("symbol", "resolution", "fill_data_forward", "data_normalization_mode", "extended_market_hours",
+                    "is_internal_feed", "is_custom_data", "exchange_time_zone", "data_time_zone", "type", "tick_type"):
+                active.append("row."+name)
+            return object.__getattribute__(self, name)
+    class TraceDict(dict):
+        def __len__(self): active.append("security_count");return super().__len__()
+        def __getitem__(self, key): active.append("security_lookup");return super().__getitem__(key)
+    class Context:
+        _config_values = n.namespace["CacheProbeBase"]._config_values
+    def execute(method):
+        source = n.algo._registered["control"];symbol = source.symbol
+        security = object.__new__(TraceSecurity);security.__dict__.update(source.__dict__)
+        rows = []
+        for old in source.configs:
+            row = object.__new__(TraceConfig);row.__dict__.update(old.__dict__)
+            row.type = NS(FullName=old.type.FullName)
+            row.exchange_time_zone, row.data_time_zone = NS(id=old.exchange_time_zone.id), NS(id=old.data_time_zone.id)
+            rows.append(row)
+        provided = security;ctx = Context();ctx.securities = TraceDict({symbol: security, object(): NS()})
+        row = rows[0]
+        if fault == "security_count": ctx.securities.pop(next(key for key in ctx.securities if key != symbol))
+        elif fault == "security_type": provided = NS()
+        elif fault == "security_symbol": security.symbol = object()
+        elif fault == "security_reference": ctx.securities[symbol] = NS()
+        elif fault == "row_count": rows = []
+        elif fault == "row_excess": rows.append(rows[0])
+        elif fault == "row_type": rows[0] = NS()
+        elif fault == "row_symbol": row.symbol = object()
+        elif fault == "resolution": row.resolution = "daily"
+        elif fault == "ff": row.fill_data_forward = True
+        elif fault == "normalization": row.data_normalization_mode = "adjusted"
+        elif fault == "extended": row.extended_market_hours = False
+        elif fault == "internal": row.is_internal_feed = True
+        elif fault == "custom": row.is_custom_data = True
+        elif fault == "exchange_tz": row.exchange_time_zone.id = "UTC"
+        elif fault == "data_tz": row.data_time_zone.id = "UTC"
+        elif fault == "kind": row.type.FullName = "Unknown"
+        elif fault == "tick": row.tick_type = "quote"
+        elif fault == "trade_count": row.type.FullName = "QuantConnect.Data.Market.QuoteBar";row.tick_type = "quote"
+        class Stream:
+            def __init__(self): self.iterator = iter(rows)
+            def __iter__(self): active.append("stream_iter");return self
+            def __next__(self): active.append("stream_next");return next(self.iterator)
+        def query(*args): active.append("config_service");return Stream()
+        ctx.subscription_manager = NS(subscription_data_config_service=NS(get_subscription_data_configs=query))
+        active.clear();accepted, frames = True, None
+        try:
+            actual_rows, frames = method(ctx, "control", symbol, provided)
+            assert len(actual_rows) == len(rows)
+        except ValueError: accepted = False
+        return accepted, list(active), frames
     assert execute(original) == execute(rewritten)

@@ -505,6 +505,148 @@ def test_lock_close_failure_preserves_cancellation_and_retains_body_free_receipt
     with pytest.raises(OSError): os.fstat(lock_fd[0])
 
 
+SYNTHETIC_MIA_PUBLIC_ID = "A-" + "d" * 32
+
+
+def authorized_mia_rows():
+    return [{"uid": OWNER, "owner": True, "permission": "write", "liveControl": True},
+        {"uid": None, "owner": False, "name": "Mia", "permission": "write", "liveControl": True,
+            "publicId": SYNTHETIC_MIA_PUBLIC_ID}]
+
+
+def with_authorized_mia(value, request):
+    if request["endpoint"] == "projects/read":
+        value["projects"][0]["collaborators"] = authorized_mia_rows()
+    elif request["endpoint"] == "projects/collaboration/read":
+        value["collaborators"] = authorized_mia_rows()
+    return value
+
+
+def test_exact_owner_authorized_mia_component_is_distinct_from_an_unknown_human(tmp_path, monkeypatch):
+    # A fake identifier only: no actual publicId, email, credential, or person is
+    # stored in the fixture. The narrow production matcher remains hash-bound.
+    monkeypatch.setattr(m, "MIA_PUBLIC_ID_SHA256", sha(SYNTHETIC_MIA_PUBLIC_ID.encode("ascii")), raising=False)
+    a = action()
+    result = execute(tmp_path, a, transport=backend(a, transform=with_authorized_mia))
+    assert result["status"] == "completed" and result["receipt_published"] is True
+    for row in result["requests"]:
+        if row["id"] not in ("metadata", "collaborators"):
+            continue
+        projection = row["projection"]
+        assert projection["collaborator_count"] == 2
+        assert projection["nonowner_collaborator_count"] == projection["recognized_mia_count"] == 1
+        assert projection["unknown_other_count"] == 0 and projection["owner_only"] is False
+        assert projection["independent_agent_identity_attested"] is False
+        assert projection["privacy_basis"] == m.MIA_PRIVACY_BASIS
+    assert all(result[key] is False for key in m.builder.FLAGS)
+
+
+MIA_COMPONENT_FAULTS = (
+    "changed_id", "malformed_id", "changed_name", "name_case", "name_whitespace", "uid_missing", "uid_bool",
+    "uid_false", "uid_zero", "uid_string", "uid_foreign", "owner_missing", "owner_true", "owner_nonbool", "owner_string",
+    "role_read", "role_missing", "role_unknown", "live_false", "live_missing", "live_nonbool",
+    "duplicate_mia", "duplicate_owner", "unknown_human", "extra_actor", "wrong_owner_row_uid",
+    "public_project", "shared_project", "wrong_org", "wrong_owner", "wrong_project")
+
+
+@pytest.mark.parametrize("fault", MIA_COMPONENT_FAULTS)
+@pytest.mark.parametrize("location", ("metadata", "collaborators"))
+def test_mia_component_compatibility_cannot_admit_any_other_actor_or_project(tmp_path, monkeypatch, fault, location):
+    monkeypatch.setattr(m, "MIA_PUBLIC_ID_SHA256", sha(SYNTHETIC_MIA_PUBLIC_ID.encode("ascii")), raising=False)
+    a, effects = action(), []
+    def mutate(value, request):
+        value = with_authorized_mia(value, request)
+        if request["id"] != location:
+            return value
+        context = value["projects"][0] if location == "metadata" else value
+        rows = context["collaborators"]
+        owner, mia = rows
+        if fault == "changed_id": mia["publicId"] = "A-" + "e" * 32
+        elif fault == "malformed_id": mia["publicId"] = "A-" + "d" * 31
+        elif fault == "changed_name": mia["name"] = "Other"
+        elif fault == "name_case": mia["name"] = "MIA"
+        elif fault == "name_whitespace": mia["name"] = "Mia "
+        elif fault == "uid_missing": del mia["uid"]
+        elif fault == "uid_bool": mia["uid"] = True
+        elif fault == "uid_false": mia["uid"] = False
+        elif fault == "uid_zero": mia["uid"] = 0
+        elif fault == "uid_string": mia["uid"] = str(OWNER)
+        elif fault == "uid_foreign": mia["uid"] = OWNER + 1
+        elif fault == "owner_missing": del mia["owner"]
+        elif fault == "owner_true": mia["owner"] = True
+        elif fault == "owner_nonbool": mia["owner"] = 0
+        elif fault == "owner_string": mia["owner"] = "false"
+        elif fault == "role_read": mia["permission"] = "read"
+        elif fault == "role_missing": del mia["permission"]
+        elif fault == "role_unknown": mia["permission"] = "admin"
+        elif fault == "live_false": mia["liveControl"] = False
+        elif fault == "live_missing": del mia["liveControl"]
+        elif fault == "live_nonbool": mia["liveControl"] = 1
+        elif fault == "duplicate_mia": rows.append(deepcopy(mia))
+        elif fault == "duplicate_owner": rows.append(deepcopy(owner))
+        elif fault == "unknown_human": rows.append({"uid": OWNER + 1, "owner": False,
+            "permission": "write", "liveControl": True, "name": "Other"})
+        elif fault == "extra_actor": rows.append({"uid": None, "owner": False, "name": "Other",
+            "permission": "write", "liveControl": True, "publicId": "A-" + "e" * 32})
+        elif fault == "wrong_owner_row_uid": owner["uid"] = OWNER + 1
+        elif fault == "public_project": context["isPublic"] = True
+        elif fault == "shared_project": context["shared"] = True
+        elif fault == "wrong_org": context["organizationId"] = "e" * 32
+        elif fault == "wrong_owner": context["ownerId"] = OWNER + 1
+        elif fault == "wrong_project": context["projectId"] = 42
+        return value
+    result = execute(tmp_path, a, transport=backend(a, effects=effects, transform=mutate))
+    assert result["status"] == "failed_or_uncertain" and result["receipt_published"] is True
+    assert result["transport_calls_attempted"] <= (1 if location == "metadata" else 2)
+    assert not {"files/update", "compile/create", "backtests/create"} & set(effects)
+
+
+def test_mia_hash_is_production_bound_without_public_identifier_or_allow_flag():
+    import re
+    raw = Path(m.__file__).read_bytes()
+    assert m.MIA_PUBLIC_ID_SHA256 == "790fd84f9177e87e0c5bc385f8bef44e107330b3d2ff329d9b59f26298704ee1"
+    assert re.search(rb"A-[a-f0-9]{32}", raw) is None
+    assert not {"allow_mia", "allow_component", "mia_public_id", "noneconomic_override"} & set(inspect.signature(m.prepare_action).parameters)
+    parameter = inspect.signature(m._projection).parameters["latest_owner_instruction_sha256"]
+    assert parameter.kind is inspect.Parameter.KEYWORD_ONLY and parameter.default is inspect.Parameter.empty
+
+
+@pytest.mark.parametrize("owner_hash", ("f" * 64, None, m.CREATION_OWNER_SHA256))
+def test_component_recognition_requires_the_actual_latest_owner_authority(owner_hash, monkeypatch):
+    monkeypatch.setattr(m, "MIA_PUBLIC_ID_SHA256", sha(SYNTHETIC_MIA_PUBLIC_ID.encode("ascii")), raising=False)
+    a = action()
+    request = m._requests(a)[0]
+    value = with_authorized_mia(body(request, files()), request)
+    with pytest.raises(m.ActionRefusal):
+        m._projection(value, request, registry(), latest_owner_instruction_sha256=owner_hash)
+
+
+def test_old_v2_action_cannot_be_promoted_to_the_new_collaborator_policy(tmp_path):
+    a = action()
+    assert a["schema"] != "tpr-fixed-parent-cache-action-v2"
+    a["schema"] = "tpr-fixed-parent-cache-action-v2"
+    with pytest.raises(m.ActionRefusal):
+        execute(tmp_path, a, transport=lambda *_: pytest.fail("old component policy reached transport"))
+
+
+@pytest.mark.parametrize("key,old_schema", (("compile_plan", "tpr-fixed-parent-cache-action-v2"),
+    ("compile_result", "tpr-fixed-parent-cache-action-result-v2"),
+    ("build_plan", "tpr-fixed-parent-cache-action-v2"), ("build_result", "tpr-fixed-parent-cache-action-result-v2")))
+def test_old_v2_compile_custody_cannot_mix_with_the_new_component_policy(tmp_path, key, old_schema):
+    root, descriptors, raw = compile_evidence(tmp_path)
+    value = json.loads(raw[key])
+    assert value["schema"] != old_schema
+    value["schema"] = old_schema
+    changed = wire(value)
+    descriptor = descriptors[key]
+    (root / descriptor["name"]).write_bytes(changed)
+    descriptor.update(bytes=len(changed), sha256=sha(changed))
+    launch, effects = action("launch", compile_evidence=descriptors), []
+    result = execute(tmp_path, launch, root=root, transport=backend(launch, effects=effects))
+    assert result["status"] == "failed_or_uncertain" and result["receipt_published"] is True
+    assert effects == [] and result["transport_calls_attempted"] == 0
+
+
 @pytest.mark.parametrize("value", [38609822, m.evidence.JsonNumber("38609822")])
 def test_standard_native_integer_lexeme_and_plain_fixture_integer_are_both_accepted(value):
     assert m._native_integer(value) == 38609822

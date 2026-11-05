@@ -30,6 +30,8 @@ PINS = {api.MODULE: "680f31f17447e240f919435ee1d56a9a48526f5197e37ac97332b4b70ee
     builder.MODULE: "e097664fbc34f62b7184fc6d0c65d6bcd8a2c06d25490e210c0cbb12ce9ba63e",
     **builder.PINNED}
 OWNER_SHA256 = "1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa"
+MIA_PUBLIC_ID_SHA256 = "790fd84f9177e87e0c5bc385f8bef44e107330b3d2ff329d9b59f26298704ee1"
+MIA_PRIVACY_BASIS = "owner_and_authorized_mia_component"
 CREATION_OWNER_SHA256 = custody.CREATION_OWNER_SHA256
 REGISTRY_SHA256 = custody.REGISTRY_SHA256
 PRIVATE_ROOT = api.PRIVATE_ROOT.parent / "native-cache-actions-20261104"
@@ -209,7 +211,7 @@ def _prepare(*, phase, parent_probe_config_json, helper_source, project_bindings
         attempt_id=None if phase == "build" else attempt_id,
         reserved_look_id=None if phase == "build" else diagnostic_look_id,
         mode="offline-fixture" if fixture else "production")
-    action = {"schema": "tpr-fixed-parent-cache-action-v2", "phase": phase,
+    action = {"schema": "tpr-fixed-parent-cache-action-v3", "phase": phase,
         "parent_probe_config_json": parent_probe_config_json, "helper_source_utf8": helper_source.decode("utf-8"),
         "probe_operation_id": probe_operation_id, "diagnostic_attempt": diagnostic_attempt,
         "attempt_id": attempt_id, "diagnostic_look_id": diagnostic_look_id,
@@ -282,18 +284,89 @@ def _file_inventory(body):
     return _inventory(result)
 
 
-def _projection(body, request, registry):
+def _component_context(context, registry):
+    # Check present documented context fields; absence is not invented evidence.
+    for key, expected in (("projectId", builder.PROJECT_ID), ("ownerId", registry["owner_id"])):
+        if key in context and _native_integer(context[key]) != expected:
+            _fail()
+    if "organizationId" in context and context["organizationId"] != registry["organization_id"]:
+        _fail()
+    for key, private_value in (("isPublic", False), ("public", False),
+            ("isPrivate", True), ("private", True), ("shared", False)):
+        if key in context and context[key] is not private_value:
+            _fail()
+
+
+def _component_collaborators(rows, registry, latest_owner_instruction_sha256):
+    """This OFF component uses owner direction plus an exact instance hash.
+
+    Nullable UID or a display name alone proves nothing. This recognition is
+    deliberately not independent platform/agent identity attestation, and it
+    changes no permission or live authority. Unknown and duplicate actors fail.
+    """
+    if (latest_owner_instruction_sha256 != OWNER_SHA256 or type(rows) is not list or len(rows) > 2
+            or registry["projects"]["OFF"]["project_id"] != builder.PROJECT_ID
+            or type(registry["organization_id"]) is not str
+            or re.fullmatch("[a-f0-9]{32}", registry["organization_id"]) is None):
+        _fail()
+    owner, owners, safe, mia = _native_integer(registry["owner_id"]), [], [], 0
+    for row in rows:
+        if type(row) is not dict or not {"uid", "owner", "permission", "liveControl"} <= set(row):
+            _fail()
+        if row["uid"] is None:
+            public_id = row.get("publicId")
+            if (mia or row["owner"] is not False or row.get("name") != "Mia"
+                    or row["permission"] != "write" or row["liveControl"] is not True
+                    or type(public_id) is not str or re.fullmatch("A-[a-f0-9]{32}", public_id) is None
+                    or _sha(public_id.encode("ascii")) != MIA_PUBLIC_ID_SHA256):
+                _fail()
+            mia = 1
+            safe.append({"role": "owner_authorized_mia", "public_id_sha256": MIA_PUBLIC_ID_SHA256,
+                "uid_is_null": True, "owner": False, "permission": "write", "liveControl": True})
+        else:
+            if (owners or _native_integer(row["uid"]) != owner or row["owner"] is not True
+                    or row["permission"] not in ("read", "write") or type(row["liveControl"]) is not bool
+                    or type(row.get("publicId")) is str and row["publicId"].startswith("A-")):
+                _fail()
+            owners.append(row)
+            safe.append({"role": "owner", "uid": owner, "owner": True,
+                "permission": row["permission"], "liveControl": row["liveControl"]})
+    stats = {"collaborator_count": len(rows), "nonowner_collaborator_count": mia,
+        "recognized_mia_count": mia, "unknown_other_count": 0, "owner_only": mia == 0,
+        "collaborators_sha256": _sha(_wire(sorted(safe, key=lambda row: row["role"]))),
+        "privacy_basis": MIA_PRIVACY_BASIS if mia else custody.PRIVACY_BASIS,
+        "independent_agent_identity_attested": False}
+    return stats, owners
+
+
+def _projection(body, request, registry, *, latest_owner_instruction_sha256):
     if type(body) is not dict or body.get("success") is not True:
         _fail()
     if "projectId" in body and _native_integer(body["projectId"]) != builder.PROJECT_ID:
         _fail()
     identity, payload = request["id"], request["payload"]
     if identity in ("metadata", "collaborators"):
+        if body.get("errors") not in (None, []):
+            _fail()
+        _component_context(body, registry)
         if identity == "metadata":
             rows = body.get("projects")
             if type(rows) is not list or len(rows) != 1 or type(rows[0]) is not dict or _native_integer(rows[0].get("projectId")) != builder.PROJECT_ID:
                 _fail()
-        return custody._projection(body, {"project_id": builder.PROJECT_ID, "phase": identity, "arm": "cap_off"}, registry)
+            _component_context(rows[0], registry)
+            stats, owner_rows = _component_collaborators(rows[0].get("collaborators"), registry, latest_owner_instruction_sha256)
+            # Legacy core validation sees owner rows only. Its owner-only counts
+            # are replaced below with the UNFILTERED, fully classified actors.
+            core_body = {**body, "projects": [{**rows[0], "collaborators": owner_rows}]}
+            core = custody._projection(core_body, {"project_id": builder.PROJECT_ID, "phase": identity, "arm": "cap_off"}, registry)
+            core_hash = core.pop("normalized_metadata_sha256")
+            return {**core, **stats, "owner_core_metadata_sha256": core_hash,
+                "normalized_metadata_sha256": _sha(_wire({"owner_core": core_hash, "actual_collaborators": stats}))}
+        if body.get("userPermissions") != "write":
+            _fail()
+        stats, _ = _component_collaborators(body.get("collaborators"), registry, latest_owner_instruction_sha256)
+        return {"phase": "collaborators", "project_id": builder.PROJECT_ID, "user_permissions": "write",
+            "independent_native_origin_attested": False, **stats}
     if identity == "jobs":
         jobs = body.get("backtests")
         if type(jobs) is not list or len(jobs) > 1000:
@@ -355,7 +428,7 @@ def _proof(action, raws):
         _fail()
     results = [_parse(raws[key]) for key in ("compile_result", "build_result")]
     for other, result in zip((compiled, built), results):
-        if (result.get("schema") != "tpr-fixed-parent-cache-action-result-v2" or result.get("status") != "completed"
+        if (result.get("schema") != "tpr-fixed-parent-cache-action-result-v3" or result.get("status") != "completed"
                 or result.get("action_sha256") != _sha(_wire(other)) or result.get("receipt_published") is not True
                 or result.get("lock_cleanup_complete") is not True or result.get("automatic_retry") is not False
                 or result.get("observed_job_ids") != []
@@ -389,7 +462,8 @@ def _proof(action, raws):
         names[key] = other["api_plan"]["operation_id"]+"."+identity+".response.raw"
         if row.get("raw_response") != action["compile_evidence"][key]:
             _fail()
-        projected = _projection(_parse(raws[key]), request, registry)
+        projected = _projection(_parse(raws[key]), request, registry,
+            latest_owner_instruction_sha256=other["latest_owner_instruction_sha256"])
         if projected != row.get("projection"):
             _fail()
         if identity in ("compile", "build") and projected["compile_id"] != action["compile_id"]:
@@ -485,7 +559,7 @@ def _execute(action, root, lock_root, *, transport, guard, clock, monotonic, fix
         path.mkdir(mode=0o700, exist_ok=True)
         ops._custody(path.lstat(), True)
     operation, lock, stop, written = plan["operation_id"], None, None, 0
-    result = {"schema": "tpr-fixed-parent-cache-action-result-v2", "phase": action["phase"],
+    result = {"schema": "tpr-fixed-parent-cache-action-result-v3", "phase": action["phase"],
         "operation_id": operation, "action_sha256": _sha(frozen), "git_head": plan["git_head"],
         "project_id": builder.PROJECT_ID, "candidate_config_sha256": plan["candidate_config_sha256"],
         "status": "failed_or_uncertain", "requests": [], "transport_calls_attempted": 0,
@@ -578,7 +652,8 @@ def _execute(action, root, lock_root, *, transport, guard, clock, monotonic, fix
             row["raw_response"] = publish(operation+"."+request["id"]+".response.raw", raw)
             if status != 200:
                 _fail()
-            row["projection"] = _projection(evidence.parse_json(raw), request, registry)
+            row["projection"] = _projection(evidence.parse_json(raw), request, registry,
+                latest_owner_instruction_sha256=action["latest_owner_instruction_sha256"])
             if request["id"] == "launch":
                 result["observed_job_ids"].append(row["projection"]["backtest_id"])
                 result["actual_new_diagnostic_jobs"] = 1

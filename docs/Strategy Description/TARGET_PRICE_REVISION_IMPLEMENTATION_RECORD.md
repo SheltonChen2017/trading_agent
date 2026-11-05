@@ -18,9 +18,10 @@ Historical History results do not rule out prospective native-cache/feed routing
 Provider-wide absence remains unproved.
 A positive cache canary does not establish full financial repair or atomicity.
 Raw SID and parent witness remain inside QC; local SID export is not authorized.
-Initial postMia002 full-source/job reads verified EVERY file unchanged and
-the then-same two Completed diagnostics. Latest postMiaCanary003 verifies
-all12 current files at55805... and all3diagnosticsCompleted,0activeOFFjobs.
+Initial postMia002 verified the then-same two Completed diagnostics.
+PostMiaCanary003 verified all12files at55805.../3Completed/0active before
+the next launch. Latest v3terminal source matches3f5c... across all12files;
+both newly launched canaries areCompleted but bootstrap/input proof is absent.
 No source/economic/financial acceptance follows from Mia's reply.
 The authentication/manual-focus observations in118.2–118.4 remain history.
 Login and the second Mia diagnosis are complete. The later owner correction
@@ -30,21 +31,23 @@ unsent question, then freshly verified ALL saved files match08c386....
 The first upload preflight had stopped on nullable UID before any write.
 A new guarded upload and BuildSuccess compile succeeded at HEADdd0e57c0;
 every other cloud file stayed exact and terminal inventory is55805a68....
-One nonfinancial native-cache diagnostic5b8cc1a48cefff60ff82422996258ca0
-reached nativeCompletedTRUE. Its tagged report is bootstrap-unproved with
-0parentreads and0closechecks; zero delivered-slice counts do not prove no
-OnData callbacks because those counters begin only after bootstrap.
-A local reporting defect overwrites the earlier failure at scheduled close.
-A new diagnostic-only observability epoch is committed locally with107parent
-and177action checks and all guards preserved; no verified SDK or financial
-correction is established. The owner supplied manual Mia focus. The004
+The v2canary5b8cc1a48cefff60ff82422996258ca0 isCompleted but bootstrap-unproved.
+Its earlier reporting defect hid the first failure. The reviewed v3canary
+664c85be6c226aeac0faa178f0d29ab4 isalsoCompleted and now records4790callbacks,
+preopen_bar passed and first refusal preopen_configs/value_error, before
+any parent read. Zero old delivered counters did not prove no OnData.
+No particular failed configuration predicate or SDK correction is proved.
+The earlier v3observability epoch passed107parent/177action checks. The new
+v4configuration-reason epoch is committed locally with149parent/182action
+checks and all guards preserved; no SDK or financial correction is established. The owner supplied manual Mia focus. The004
 message was visible, but no verifiable reply persisted after same-chat
 refresh;005send is unconfirmed. Only the initial2answered Mia turns are
-admitted diagnoses. No new manual-focus input is pending. The reviewed
-first-failure diagnostic continues independently under owner bestjudgment;
+admitted diagnoses. No new manual-focus input is pending. The next diagnostic-only epoch adds closed configuration refusal codes
+under owner bestjudgment, preserving every guard and the60000Bcap;
 no SDK/input fix or financial retry is inferred from unconfirmed UI sends.
 No rawSID/parent-witness export or financial job occurred.
-Local1041,3082,f66f545f,44687221,54328aca,c7471730,dd0e57c0 andc055db5a
+Local1041,3082,f66f545f,44687221,54328aca,c7471730,dd0e57c0,c055db5a,
+7231de0a andd7f9e860
 implementation/handoff commits remain unpushed;
 this same round still has no successful push.
 
@@ -586,9 +589,10 @@ financial acceptance remains FALSE.**
 
 The next bounded action is to complete and verify the fixed prospective native-cache diagnostic in OFF project38609822 under fresh bounded source/HEAD/access/operation/attempt/look claims; genuine Mia has supplied no verified code fix, so OFF and the remaining frozen arms proceed serially only after verified source/input/resource recovery, while the20REMXrows remain quarantined, Claude review is skipped, and exactly one final lane push is reserved for the completed or concrete-blocked round.
 
-Initial OFF baselines001/002 andpostMia002 had the same complete source
-inventory and two Completed diagnostics. Latest postMiaCanary003 verifies
-all12currentfiles at55805... and all3diagnosticsCompleted,0activeOFFjobs.
+Initial OFF baselines001/002 andpostMia002 had the same complete source and
+two Completed diagnostics. PostMiaCanary003 verified55805.../3Completed/0active
+before the next launch. Latest v3terminal source verifies all12files at3f5c...;
+both newly launched canaries areCompleted, without input/bootstrap acceptance.
 Safari is authenticated in protected OFF38609822.
 The initial two genuineMia turns areCompleted and the final reply offers no verified
 code fix. Reopening exact OFF verified the loaded editor has no own unsent
@@ -597,12 +601,14 @@ Historical History results do not rule out prospective native-cache/feed routing
 Provider-wide absence remains unproved.
 A positive cache canary does not establish full financial repair or atomicity.
 Raw SID and parent witness remain inside QC; local SID export is not authorized.
-The guarded diagnostic upload/compile and one native job succeeded technically;
-terminal source inventory55805a68... matches launch. The diagnostic's own
-bootstrap is unproved:0parentreads/0closechecks. Delivered-slice counters start
-after bootstrap, so zeros do not establish no OnData. Scheduled close overwrites
-the first failure; the new locally committed diagnostic epoch preserves it
-without relaxing guards (107parent/177action checks). The owner supplied Mia
+Two guarded diagnostic uploads/compiles/jobs completed technically. Latest
+v3source inventory3f5c... matches launch. Its report now identifies first failure
+preopen_configs/value_error after preopen_bar passes, with4790OnData entries
+and0parentreads/closechecks. The original reporting defect is corrected, but
+no actual configuration predicate, target availability or SDK fix is proved.
+The next diagnostic-only epoch preserves all guards and adds closed config
+refusal codes. Reviewed v3software passed107parent/177action checks; the new v4reason epoch
+is locally committed after149parent/182action checks. Owner supplied Mia
 focus;004was visible but its reply is unverified after same-chat refresh,
 and005send remains unconfirmed. Initial2answered Mia turns remain the only
 admitted diagnoses. No new manual-focus input is pending; the reviewed
@@ -33906,3 +33912,229 @@ Fresh118Safari claim TPR-R118-POSTMIA-CANARY-003; HEADc055db5acaf9080d850fec55f7
 118.10 later Mia qualification: same-conversation BrowseChats/current-row refresh produced no004/005nonce or markedfinalfacts in the loadedaccessibleview. Preserve the earlier actual004message observation, but classify model-turn/reply persistence asUNVERIFIED;005send remainsUNCONFIRMED. There are2verifiedansweredMiaturns,1additionalUI-observedrequest and1additionalunconfirmedsend, not4answeredMiaturns. No explicitSend/Enter is replayed. A fresh readonly source/job census then verified all12files unchanged55805..., exactly the three known Completed diagnostics5b8cc1...,4d401e...,7c76bc...,0nonterminal and no newjob/sourcechange observed: safe2480B/SHAfe4fb18deeb0b4b5a27a15f4aa482d57b7f223deb1e092be17933d36f8f5eab4; archive336189B/9aa769d7.... DirectQCAPIcount34. The new reviewed observability epoch addresses the verified reporting defect independently; it does not rely on an unverified Mia recommendation or relaunch unchanged financial bytes. No new owner-approval checkpoint is added. This record handoff must be committed before freshv3preparation/effects.
 
 118.10 root final current-document verification:303passed/558deselected6.35s (earlier same-current-facts check6.13s), unchanged guard363888B/SHA5b79ff5e813c472ae68908f7300319a96c00cedfe372aa7ee49fa1135e5cefb1. Root parent107passed2.29s and actions177passed11.09s exact committed c055db5a bytes; no full suite. Before this handoff commit, AST/LF/diff/narrow privacy checks pass and received9..117 stay byte-preserved. No final push is spent. Following actual HEAD is the new authority for fresh v3 manifest/preparation; cloud remains previous canary55805..., not silently promoted to new source.
+
+Fresh118Safari claim TPR-R118-TARGET-REMOTE-VERIFY-002; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"native_QC_UI_source_jobs_accounts": 0, "provider": "configuredTargetGitremote", "purpose": "fresh exactTargetremote check before nextdiagnostic productioneffect; expectedpublished3cf9636ee523833d6dc7eacd866c37e5157ec258, no otherrefs/push", "remote_ref": "refs/heads/codex/strategy-target-price-revisions", "requests_max": 1, "response_bytes_max": 512, "seconds_max": 20}; manifest6071B/SHAe2da47c1136c8ba084de0185f6283e094c79d8c793e18e0bf3ca4b9744150b1e andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118freshTargetremote {"actual_remote_head": "3cf9636ee523833d6dc7eacd866c37e5157ec258", "expected_remote_head": "3cf9636ee523833d6dc7eacd866c37e5157ec258", "local_head": "7231de0a1aad45d298b21fc5f8e85919a201f300", "matches_expected": true, "pushes": 0, "schema": "tpr-exact-target-remote-check-v1"}; proof267B/SHA1646c80034e0c0f3958a9646ba9a2166cc8695bcfa199c39782235db38d8ef4b. No otherref/fetch/push orQCeffect; unexpectedadvance requiresstop.
+
+Fresh118Safari claim TPR-R118-PARENT-UPLOAD-003; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"attempt_id": "TPR-CACHE-ATTEMPT-PARENT-V3-OFF-003", "compile_jobs_ObjectStore_parent_witness_rawSID_reads": 0, "diagnostic_attempt": 3, "diagnostic_look_id": "TPR-CACHE-LOOK-PARENT-V3-OFF-003", "later_owner_correction": "was not able to find the file", "native_requests_max": 6, "native_response_bytes_total_max": 8388608, "native_seconds_each_max": 20, "owner_continuation": "Removed the text without saving. Verify the source, then continue OFF and the remaining arms. Keep the 20 REMX rows quarantined, skip Claude review, and push only once when done.", "phase": "upload", "private_inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 6703, "name": "own source-only parent configuration", "sha256": "8292239f62e01d20a221fe49f76b3c29a23e9089eed3d6468f0a0953cbbb02b3"}, {"bytes": 2480, "name": "own latest postMia003 complete source/census proof", "sha256": "fe4fb18deeb0b4b5a27a15f4aa482d57b7f223deb1e092be17933d36f8f5eab4"}], "private_reads_max": 3, "project_id": 38609822, "purpose": "new reviewedparentv3/actionv4 firstfailureobservability; frozenallnativeguards unchanged; freshowner/collabs/noactivejob/all12source verification; noMiaSDKfix/financialadmission", "recovery_proof": "actualreopeneditorrestored, latestnativepostMia003all12files55805match/3Completed/0active; newepochaddressesverifiedreportingdefect independently", "source_write_max": 1, "source_write_only": "regenerated main.py; preserve ALL11other files including1notebook"}; manifest7741B/SHA4a6441b4193a99564b7aa55a083b803da4dbfca250217169fe84eecbf62a2255 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualparentupload003 {"action_schema": "tpr-fixed-parent-cache-action-v4", "actual_sid_local": false, "financial_acceptance": false, "git_head": "7231de0a1aad45d298b21fc5f8e85919a201f300", "new_diagnostic_jobs": 0, "observed_inventory_sha256": "3f5c939a98127b7ae9aacd6f29ae2fed0acb9200ac9f7ca41180c4484527bf20", "parent_epoch": "TPR-NATIVE-PARENT-PREOPEN-CACHE-20261104-v3", "parent_witness_local": false, "phase": "upload", "plan": {"bytes": 97467, "name": "TPR-R118-PARENT-UPLOAD-003.plan.json", "sha256": "eb08c09c9d9d056207408e1a94b966169c65ceb87386c9a4ed99e16cad45705e"}, "planned_candidate_config_sha256": "8f94e59fd81997d6d79f6e70bb1dc81771114006bae4cac33d5ec443a380e758", "planned_inventory_sha256": "3f5c939a98127b7ae9aacd6f29ae2fed0acb9200ac9f7ca41180c4484527bf20", "planned_new_main": {"bytes": 59693, "sha256": "2fbcc69fff7c283dea4ed59bbf0b43f14f0c68e9455ea2e50491165970c195c4"}, "project_id": 38609822, "receipt": {"bytes": 8441, "name": "TPR-CMP29-API-CACHE-R118-PARENT-UPLOAD-003.result.json", "sha256": "1374a43ccf3a474c2be831005e824e388e07a4389b1ee08da595143fc85850c3"}, "requests": [{"collaborator_count": 2, "http_status": 200, "id": "metadata", "owner_only": false, "recognized_mia_count": 1, "status": "succeeded"}, {"collaborator_count": 1, "http_status": 200, "id": "collaborators", "owner_only": true, "recognized_mia_count": 0, "status": "succeeded"}, {"collaborator_count": null, "http_status": 200, "id": "jobs", "owner_only": null, "recognized_mia_count": null, "status": "succeeded"}, {"collaborator_count": null, "http_status": 200, "id": "before", "owner_only": null, "recognized_mia_count": null, "status": "succeeded"}, {"collaborator_count": null, "http_status": 200, "id": "write", "owner_only": null, "recognized_mia_count": null, "status": "succeeded"}, {"collaborator_count": null, "http_status": 200, "id": "after", "owner_only": null, "recognized_mia_count": null, "status": "succeeded"}], "schema": "tpr-parent-upload-safe-v3", "status": "completed", "transport_calls_attempted": 6}; privateproof4722B/SHA149c6c9c4bce463d998264291f1d0f1b3782794ec43a79e46c38b6e7d993bd75. Planned fields remainplanned unless afterresponse verifies. No financialcode/economicadmission, no compile/newjob or parent/SIDlocalread; failed001andunproved002historypreserved; reviewedchangedobservabilityepoch, noSDKorfinancialfix.
+
+Fresh118Safari claim TPR-R118-PARENT-COMPILE-003; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"compile_create_max": 1, "native_requests_max": 6, "native_response_bytes_total_max": 8388608, "native_seconds_each_max": 20, "phase": "compile", "private_inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 97467, "name": "own upload003 action plan", "sha256": "eb08c09c9d9d056207408e1a94b966169c65ceb87386c9a4ed99e16cad45705e"}, {"bytes": 4722, "name": "own verified upload003 result", "sha256": "149c6c9c4bce463d998264291f1d0f1b3782794ec43a79e46c38b6e7d993bd75"}], "private_reads_max": 3, "project_id": 38609822, "purpose": "compile exactobserved59693B/2fbcc69fmain only after fresh owner/collabs/noactivejobs/allsource verification; preserveHEAD7231/source/config/economicFALSE", "source_writes_jobs_ObjectStore_parent_rawSID_reads": 0}; manifest7047B/SHA61f1277da33c401944c3cae167f118a88ee61851312bf13a189cd4f1e7d11989 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualparentcompile003 {"compile_id": "a24963087211c38a59ba145721a52048-ebe0748b9d0939f155d13e24543935cb", "compile_requests_attempted": 1, "compile_state": "InQueue", "financial_acceptance": false, "git_head": "7231de0a1aad45d298b21fc5f8e85919a201f300", "new_diagnostic_jobs": 0, "plan": {"bytes": 33905, "name": "TPR-R118-PARENT-COMPILE-003.plan.json", "sha256": "1de1293f4921119b4f72bb7c03cefeb4bc9e61bbdde9738f6cadb3a083c01aec"}, "project_id": 38609822, "proofs": {"compile_plan": {"bytes": 33904, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-003.action.spent.json", "sha256": "fb7e54344d5d6eba2b93dacf34c7605b196b9e388a203e28e29d55d172c9e106"}, "compile_response": {"bytes": 583, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-003.compile.response.raw", "sha256": "003a0c14995124d045e005113053ab1d4b46f036600d7b5d49550f77bf5d9b79"}, "compile_result": {"bytes": 8535, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-003.result.json", "sha256": "0f7edc0391f56bc0589ad1516df99f87eba601df4bef48b7ba88487eec6f794a"}, "source_after": {"bytes": 346948, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-003.after.response.raw", "sha256": "1cd200f5039e440bc9ea9f90dc24e354b0f3f021bfd0de3a976bb056b1f2d27c"}, "source_before": {"bytes": 346948, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-003.before.response.raw", "sha256": "1cd200f5039e440bc9ea9f90dc24e354b0f3f021bfd0de3a976bb056b1f2d27c"}}, "receipt": {"bytes": 8535, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-003.result.json", "sha256": "0f7edc0391f56bc0589ad1516df99f87eba601df4bef48b7ba88487eec6f794a"}, "requests": [{"http_status": 200, "id": "metadata", "status": "succeeded"}, {"http_status": 200, "id": "collaborators", "status": "succeeded"}, {"http_status": 200, "id": "jobs", "status": "succeeded"}, {"http_status": 200, "id": "before", "status": "succeeded"}, {"http_status": 200, "id": "compile", "status": "succeeded"}, {"http_status": 200, "id": "after", "status": "succeeded"}], "schema": "tpr-parent-compile-safe-v1", "status": "completed", "transport_calls_attempted": 6}; safeprivateproof1927B/SHAd7830cd708ca0c917829f6d985a597b98a6250533b42ae7a814d882a542a9329. Fixedexactsource/nativecompile only; no sourceupdate/newjob/financialattempt or parent/SIDlocalread. HEAD frozen acrosscompile/build/launch; no push.
+
+Fresh118Safari claim TPR-R118-PARENT-BUILD-003; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"endpoint": "compile/read", "native_requests_max": 1, "native_response_bytes_max": 131072, "native_seconds_max": 20, "phase": "build", "private_inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 33905, "name": "own compile003 plan", "sha256": "1de1293f4921119b4f72bb7c03cefeb4bc9e61bbdde9738f6cadb3a083c01aec"}, {"bytes": 1927, "name": "own compile003 safe result", "sha256": "d7830cd708ca0c917829f6d985a597b98a6250533b42ae7a814d882a542a9329"}], "private_reads_max": 3, "project_id": 38609822, "purpose": "one exactsourceboundcompile status read; require BuildSuccess before diagnostic launch, not requeststatuscompleted", "source_writes_compile_create_jobs_ObjectStore_parent_SID_reads": 0}; manifest6996B/SHA53633286458c8ba165a785c90254f75076622cb3defb46e20f06f2b7e9a4e1de andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualparentbuild003 {"build_state": "BuildSuccess", "compile_id": "a24963087211c38a59ba145721a52048-ebe0748b9d0939f155d13e24543935cb", "financial_acceptance": false, "git_head": "7231de0a1aad45d298b21fc5f8e85919a201f300", "new_jobs": 0, "plan": {"bytes": 33354, "name": "TPR-R118-PARENT-BUILD-003.plan.json", "sha256": "3fd9c8724f98ec61f5e2c49c2d6779388e314bb32acd7218123f4c030c919052"}, "project_id": 38609822, "proofs": {"build_plan": {"bytes": 33353, "name": "TPR-CMP29-API-CACHE-R118-PARENT-BUILD-003.action.spent.json", "sha256": "6457d389ec0402a3d58d26fe3a1b370c2f04d9ae17fef60db330f41349fedbb1"}, "build_response": {"bytes": 2409, "name": "TPR-CMP29-API-CACHE-R118-PARENT-BUILD-003.build.response.raw", "sha256": "bd5797360338a5dd17903942c448d28410a9e8d2bd2fe30bfab3fa8c2fad8579"}, "build_result": {"bytes": 1917, "name": "TPR-CMP29-API-CACHE-R118-PARENT-BUILD-003.result.json", "sha256": "79a3a7101d0efaa135bd496257d9855f6921580c3a8b0d59ae0dceadaaf6d3d2"}, "compile_plan": {"bytes": 33904, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-003.action.spent.json", "sha256": "fb7e54344d5d6eba2b93dacf34c7605b196b9e388a203e28e29d55d172c9e106"}, "compile_response": {"bytes": 583, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-003.compile.response.raw", "sha256": "003a0c14995124d045e005113053ab1d4b46f036600d7b5d49550f77bf5d9b79"}, "compile_result": {"bytes": 8535, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-003.result.json", "sha256": "0f7edc0391f56bc0589ad1516df99f87eba601df4bef48b7ba88487eec6f794a"}, "source_after": {"bytes": 346948, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-003.after.response.raw", "sha256": "1cd200f5039e440bc9ea9f90dc24e354b0f3f021bfd0de3a976bb056b1f2d27c"}, "source_before": {"bytes": 346948, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-003.before.response.raw", "sha256": "1cd200f5039e440bc9ea9f90dc24e354b0f3f021bfd0de3a976bb056b1f2d27c"}}, "receipt": {"bytes": 1917, "name": "TPR-CMP29-API-CACHE-R118-PARENT-BUILD-003.result.json", "sha256": "79a3a7101d0efaa135bd496257d9855f6921580c3a8b0d59ae0dceadaaf6d3d2"}, "schema": "tpr-parent-build-safe-v1", "status": "completed", "transport_calls_attempted": 1}; safeprivateproof2053B/SHAf41fe6b3d1e3769697a0542689b1264b79468c4398df4bd795118e19fcb56ba8. Exactcompile binding observed, no newcompile/sourcewrite/job or financialresult. All8retainedproof descriptors subject to independent fixedlaunchvalidation; no override.
+
+Fresh118Safari claim TPR-R118-PARENT-LAUNCH-003; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"attempt_id": "TPR-CACHE-ATTEMPT-PARENT-V3-OFF-003", "candidate": "TPR-CACHE-20261104-PARENT-V3-OFF-003", "close_observations_max": 5, "dependency_bytes_max": 1048576, "diagnostic_attempt": 3, "diagnostic_look_id": "TPR-CACHE-LOOK-PARENT-V3-OFF-003", "executor_retained_dependency_reads_max": 8, "native_requests_max": 6, "native_response_bytes_total_max": 8388608, "native_seconds_each_max": 20, "native_window": "2021-02-08..2021-02-12", "new_diagnostic_jobs_max": 1, "non_order_diagnostic_reason": "inputtype/cachetiming availability only, no strategyperformance orfinancialevaluation; orders would not prove missingnativebar repair", "orders_History_price_volume_cachewrites_providerHTTP_exports": 0, "phase": "launch", "private_inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 33354, "name": "own Build003 plan", "sha256": "3fd9c8724f98ec61f5e2c49c2d6779388e314bb32acd7218123f4c030c919052"}, {"bytes": 2053, "name": "own BuildSuccess003 safe result", "sha256": "f41fe6b3d1e3769697a0542689b1264b79468c4398df4bd795118e19fcb56ba8"}], "private_native_parent_scope": {"bytes": 1343, "contains_max": 1, "effect_clock": "only firstlockedgenuineSPYtradebar 2021-02-08 04:00<=NY<09:30 afterendpointchecks; Initializeprivateeffects0", "identity_selection": "hindsightdiagnostic/PITFALSE", "parent_attempt": 4, "parent_job": "12dd4732ba5d9d8f57950beb2a371c79", "parent_project": 37650980, "provider": "existing QC ObjectStore in exactauthorizedparent source-boundnamespace", "raw_SID_or_parent_export": false, "read_max": 1, "sha256": "eef08aca32b99056dee0ce00389c53a8ee6a1628c29188afd8bebd362fe183dd"}, "private_outer_reads_max": 3, "project_id": 38609822, "purpose": "validate all8nativecompileproofs/currentHEAD then freshowner/collabs/jobs/allsource conditions, create exactlyone nonfinancialnativecachecanary; never replay unchanged financialfailure", "securities_max": 2, "source_writes_compilecreates_financialjobs": 0}; manifest8184B/SHA68082b791517a02c851f2d5ccfbd412c2f7eb420ec26f3826f47ee90953fd48b andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualparentlaunch003 {"actual_new_diagnostic_jobs": 1, "candidate_config_sha256": "8f94e59fd81997d6d79f6e70bb1dc81771114006bae4cac33d5ec443a380e758", "financial_acceptance": false, "financial_attempts_created": 0, "financial_outcome_looks": 0, "git_head": "7231de0a1aad45d298b21fc5f8e85919a201f300", "main": {"bytes": 59693, "sha256": "2fbcc69fff7c283dea4ed59bbf0b43f14f0c68e9455ea2e50491165970c195c4"}, "observed_job_ids": ["664c85be6c226aeac0faa178f0d29ab4"], "observed_source_after_sha256": "3f5c939a98127b7ae9aacd6f29ae2fed0acb9200ac9f7ca41180c4484527bf20", "parent_or_rawSID_export": false, "plan": {"bytes": 35506, "name": "TPR-R118-PARENT-LAUNCH-003.plan.json", "sha256": "1863cc18ebaeef4206ac6dd1ae64fc6a7fbafbbfb0117f5ade086f4bd073076a"}, "project_id": 38609822, "proof_dependency_bytes": 774597, "proof_dependency_reads": 8, "receipt": {"bytes": 10454, "name": "TPR-CMP29-API-CACHE-R118-PARENT-LAUNCH-003.result.json", "sha256": "562a595f5b6d9dc87ee31134f5f8850e4360c5043552ba819b53be532805d782"}, "requests": [{"http_status": 200, "id": "metadata", "status": "succeeded"}, {"http_status": 200, "id": "collaborators", "status": "succeeded"}, {"http_status": 200, "id": "jobs", "status": "succeeded"}, {"http_status": 200, "id": "before", "status": "succeeded"}, {"http_status": 200, "id": "launch", "status": "succeeded"}, {"http_status": 200, "id": "after", "status": "succeeded"}], "schema": "tpr-parent-launch-safe-v1", "source_inventory_sha256": "3f5c939a98127b7ae9aacd6f29ae2fed0acb9200ac9f7ca41180c4484527bf20", "status": "completed", "transport_calls_attempted": 6}; safeprivateproof1475B/SHAff7711657374bfb7dccd534e0ca15ebaffda7e898c7b156aaebcee9db8d0d495. Distinct nonfinancial attempt/look/candidate reservations consumed; allfinancial outcomes remainNULL, no nativeparentlocalread/export and no strategy/readiness acceptance. Terminalstatus must be observed through fixed4MiB statusroute then pause sameheartbeat before transition; no sourcechanges/cancel whilewaiting.
+
+Fresh118Safari claim TPR-R118-PARENT-V3-STATUS-001; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"backtest_id": "664c85be6c226aeac0faa178f0d29ab4", "endpoint": "backtests/read", "financial_projection": false, "inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 1475, "name": "own actual launch002 result", "sha256": "ff7711657374bfb7dccd534e0ca15ebaffda7e898c7b156aaebcee9db8d0d495"}], "native_requests_max": 1, "native_response_bytes_max": 4194304, "native_seconds_max": 30, "private_reads_max": 2, "project_id": 38609822, "purpose": "onefresh fixed4MiB exactnewcanaryjob status observation; no performance/rawbody interpretation; onterminalpause SAMEheartbeat before consumingtransition"}; manifest6361B/SHAdc181bd483573e0d2810a68dc6a846ee72852d75be00a7dc8b9bd67d068e48d6 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118canaryv3status001 {"financial_acceptance": false, "http_status": 200, "job_source_head": "7231de0a1aad45d298b21fc5f8e85919a201f300", "metadata": {"backtest_completed": true, "backtest_id": "664c85be6c226aeac0faa178f0d29ab4", "backtest_status": "Completed.", "credential_echo_refused_before_retention": true, "economics_accepted": false, "entire_wire_validated": true, "financial_fields_projected": false, "json_value_nodes": 463, "max_json_depth": 32, "max_json_nodes": 4194304, "native_origin_independently_attested": false, "original_wire_bytes": 11953, "original_wire_sha256": "5efa3fa21dfb04b5597e6c71b888b939c02bbe602f670285ec1c19745a925257", "project_id": 38609822, "schema": "tpr-cmp30-job-status-projection-v1"}, "receipt": {"bytes": 1726, "name": "TPR-CMP29-API-R118-PARENT-V3-STATUS-001.result.json", "sha256": "8c1afd5b66c14108f7e642879ec826deb309e4249ec9c513d034d265726a98b8"}, "request_status": "completed", "source_inventory_sha256": "3f5c939a98127b7ae9aacd6f29ae2fed0acb9200ac9f7ca41180c4484527bf20"}; privateproof951B/SHA06f010f7102aed631ceb53c6185a75e73b808b1257759ce9e7aefd2120a83a14. Metadata observation only; requestcompleted is not jobcompleted; no transition/nativecontinuation until sameheartbeatpause ifterminal.
+
+Fresh118Safari claim TPR-R118-V3-TERMINAL-PAUSE-001; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"app_update_max": 1, "automation_id": "target-price-qc-job-remaining-backtests", "native_QC_source_jobs_accounts": 0, "purpose": "pause SAMEheartbeat throughapp BEFORE consuming newv3CompletedTRUE transition/result; preserveallotherautomationfields", "status": "PAUSED", "terminal_job": "664c85be6c226aeac0faa178f0d29ab4", "terminal_project": 38609822}; manifest6045B/SHAcd567326f2e41e2aabece5256d882d55e68ea6861c871e3894e3440e5898aa87 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-V3-PAUSE-VERIFY-001; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"bytes_max": 65536, "native_QC_UI_jobs": 0, "private_exact_file": "/Users/sheltonchen/.codex/automations/target-price-qc-job-remaining-backtests/automation.toml", "purpose": "verify actualsameheartbeatPAUSED afterv3terminal apppause BEFOREresult/source consumption", "reads_max": 1}; manifest5975B/SHA05faf56bb19fbbd78b52e7a57efbcc04fcfaed203ee4c6eb7a002259a471b39f andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118v3terminal sameheartbeatPAUSED verified {"actual_status": "PAUSED", "automation_id": "target-price-qc-job-remaining-backtests", "config_bytes": 10701, "config_sha256": "25ca93b716450cab7b743bef3fa964e9ccc8d26766d8a3c46c50aa0efb361589", "native_requests": 0, "terminal_job": "664c85be6c226aeac0faa178f0d29ab4"}; proof259B/SHA00f0fd6ed64afccbfa9d1c629f1af2785c9af8453c25dd88365cc4e84695a2fa. ApppauseBEFOREtransition.
+
+Fresh118Safari claim TPR-R118-V3-CANARY-TERMINAL-RESULT-001; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"backtest_id": "664c85be6c226aeac0faa178f0d29ab4", "endpoints": ["files/read", "backtests/read/log"], "log_projection_bytes_max": 262144, "log_projection_reads_max": 1, "logs_query": "TPR_PARENT_CACHE_PROBE_RESULT", "logs_range": [0, 20], "native_requests_max": 2, "native_seconds_each_max": 20, "private_registry_reads_max": 1, "project_id": 38609822, "purpose": "afteractualappPAUSED verify EVERYterminalsourcefile and retrieve only exactnewpricefreecache diagnostic taggedlog; no financial fields/oldjobs/parentbody/SIDreads", "response_bytes_total_max": 2228224, "result_tag_json_bytes_max": 16384, "source_writes_compiles_jobs_Mia_accounts": 0}; manifest6756B/SHA8d281045965f9146b0661ed5e65b183059c5b432727a43024f67855af6f3bb25 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118freshreturnedcanaryprojection readclaim BEFOREopen {"git_head": "7231de0a1aad45d298b21fc5f8e85919a201f300", "input": {"bytes": 2665, "name": "TPR-CMP29-API-R118-V3-CANARY-RESULT-001.logs.projection.json", "sha256": "939fd1e265235eb6e9a545b0bec7aa4b370d28ba51633d36bce3b5de259f1662"}, "job": "664c85be6c226aeac0faa178f0d29ab4", "max_bytes": 262144, "operation_id": "TPR-R118-V3-CANARY-LOG-PROCESS-001", "purpose": "find exactpricefreeprobetag, emitonlyfieldnames/count; nofinance/identityvalues", "schema": "tpr-returned-own-diagnostic-projection-read-v1", "source_hashes": {"research/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "research/target_price_revisions_qc/__init__.py": "3bc79e69bc0c775d8ef0ec154551436011cba407f37690c27ccbeb9000153c59", "research/target_price_revisions_qc/comparison_20261028_api.py": "a2a160ac951a8a9f96b9531e5b51a5bf6b4e7b116b7873f77515780f059ebc5a", "research/target_price_revisions_qc/comparison_20261029_project_api.py": "680f31f17447e240f919435ee1d56a9a48526f5197e37ac97332b4b70ee42b87", "research/target_price_revisions_qc/comparison_20261029_projects.py": "6dc87f33105de9d80e7a267a6cc737bb4262f47e49c43b65247592927a5788d7", "research/target_price_revisions_qc/extended_evidence.py": "a816b1ddca5a8428f07e9029bc3a7f7db3c5e1a1f50521664992dabf556aa2d7", "research/target_price_revisions_qc/extended_operations.py": "824b3f0c180f1aeb7038d8f280c44507b5c39687fcccc87c539f242d9256d167"}}; claim1369B/SHA2aac9cf35e1d0e32310bee9fc3495c17b7e19a7cc15adb4c4481b1213bc7e2c6
+
+118nativev3canaryterminalresult {"backtest_id": "664c85be6c226aeac0faa178f0d29ab4", "financial_acceptance": false, "log_body_container_type": "dict", "log_body_fields": ["length", "logs", "success"], "log_projection": {"bytes": 2665, "name": "TPR-CMP29-API-R118-V3-CANARY-RESULT-001.logs.projection.json", "sha256": "939fd1e265235eb6e9a545b0bec7aa4b370d28ba51633d36bce3b5de259f1662"}, "logs_archive": {"bytes": 2356, "name": "TPR-CMP29-API-R118-V3-CANARY-RESULT-001.logs.response.raw", "sha256": "d96d73b09f70045423636a5f43c703a0116ec5d0a25d2b86a759bdf4c9c32d77"}, "native_scope_result": {"bootstrap_attempted": true, "cache_updates": 0, "close_checks": 0, "close_summary": "bootstrap_unproved", "current_stage": "end_without_bootstrap", "delivered_bar_rows": 0, "delivered_slices": 0, "direct_order_calls": 0, "direct_provider_calls": 0, "first_failure_category": "value_error", "first_failure_code": "stage_failed", "first_failure_stage": "preopen_configs", "history_calls": 0, "last_completed_stage": "preopen_bar", "object_store_calls": 0, "on_data_disabled_skip_cap_reached": false, "on_data_disabled_skips": 4789, "on_data_entries": 4790, "on_data_entry_cap_reached": false, "on_data_entry_max": 6400, "parent_contains_calls": 0, "parent_hash_verified": false, "parent_read_calls": 0, "parent_schema_verified": false, "parent_sid_hash_verified": false, "preopen_empty_slices": 0, "registration_before_open": false, "resource_cap_changes": 0, "sessions": {}, "status": "diagnostic_failed", "subscription_removals": 0, "target_close_canary_days": 0, "terminal_custody_passed": true, "terminal_summary": "incomplete_cache_observations"}, "observations_proof": {"bytes": 2112, "name": "TPR-R118-V3-CANARY-OBSERVATIONS-001.json", "sha256": "eb9f704cdcfda73b1182ac86c55258de3f6f95c3f0dc81a001e5a5eacc0adbac"}, "project_id": 38609822, "receipt": {"bytes": 4271, "name": "TPR-CMP29-API-R118-V3-CANARY-RESULT-001.result.json", "sha256": "946ea23ba778cabf82840cde9cb5f30186fc4f3c6e91cb1297c120e3b033f29a"}, "requests": [{"http_status": 200, "id": "source", "status": "succeeded"}, {"http_status": 200, "id": "logs", "status": "succeeded"}], "schema": "tpr-canary-terminal-safe-v1", "source_archive": {"bytes": 346948, "name": "TPR-CMP29-API-R118-V3-CANARY-RESULT-001.source.response.raw", "sha256": "1cd200f5039e440bc9ea9f90dc24e354b0f3f021bfd0de3a976bb056b1f2d27c"}, "source_inventory_sha256": "3f5c939a98127b7ae9aacd6f29ae2fed0acb9200ac9f7ca41180c4484527bf20", "status": "completed", "tagged_strings_found": 1}; safeproof2341B/SHA4dfaaefc44cb6dd5305a4b7a5abc0899ae57e11a6d16696213f93b09c30b2289. Completedalone isnotfinancial/source/economicacceptance; pricefreeobservations only; parent/rawSIDstayedINQC; nofinancialjob launched.
+
+
+### 118.11 Native v3 callback evidence; refusal narrowed to configuration
+
+After c055db5a plus handoff7231de0a1aad45d298b21fc5f8e85919a201f300,
+a fresh exact Target remote check still matched3cf9636ee523833d6dc7eacd866c37e5157ec258;
+no push/fetch/other-ref action. Fresh v4 action upload003 verified all12
+before-files, fresh owner/collaborators/no-active-jobs and main-only after:
+main59693B/SHA2fbcc69fff7c283dea4ed59bbf0b43f14f0c68e9455ea2e50491165970c195c4,
+config8f94e59fd81997d6d79f6e70bb1dc81771114006bae4cac33d5ec443a380e758,
+inventory3f5c939a98127b7ae9aacd6f29ae2fed0acb9200ac9f7ca41180c4484527bf20.
+The other11files including1notebook stayed exact. Metadata observed owner+
+the exact pinned Mia instance (owner_onlyFALSE/Mia1), while the dedicated
+collaboration read observed owner-only/Mia0. Both complete actor lists were
+validated and reported truthfully; no cross-read atomicity or independent
+agent identity is claimed. This is the first actual native exercise of that
+specific Mia predicate. Safe upload4722B/
+SHA149c6c9c4bce463d998264291f1d0f1b3782794ec43a79e46c38b6e7d993bd75.
+
+Fresh compile003 created
+a24963087211c38a59ba145721a52048-ebe0748b9d0939f155d13e24543935cb
+(InQueue), then a separate exact read observed BuildSuccess. Safe compile
+1927B/SHAd7830cd708ca0c917829f6d985a597b98a6250533b42ae7a814d882a542a9329;
+safe build2053B/SHAf41fe6b3d1e3769697a0542689b1264b79468c4398df4bd795118e19fcb56ba8.
+The fixed launch freshly read8proofs/774597bytes and verified all current
+source/custody/job prerequisites before exactly one new diagnostic:
+664c85be6c226aeac0faa178f0d29ab4, TPR-CACHE-20261104-OFF-D3, OFF38609822.
+CandidateTPR-CACHE-20261104-PARENT-V3-OFF-003/diagnostic_attempt3,
+attemptTPR-CACHE-ATTEMPT-PARENT-V3-OFF-003,
+lookTPR-CACHE-LOOK-PARENT-V3-OFF-003. Safe launch1475B/
+SHAff7711657374bfb7dccd534e0ca15ebaffda7e898c7b156aaebcee9db8d0d495.
+HEAD7231 stayed fixed through upload/compile/build/launch. Every earlier
+attempt/look/result and v2source/job remain distinct and retained.
+
+One new fixed4MiB status read observed nativeCompleted./completedTRUE;
+safe951B/SHA06f010f7102aed631ceb53c6185a75e73b808b1257759ce9e7aefd2120a83a14.
+Before transition, the same heartbeat was paused through the app and actual
+owned/TOMLPAUSED verified:259B/SHA00f0fd6ed64afccbfa9d1c629f1af2785c9af8453c25dd88365cc4e84695a2fa.
+Fresh terminal source plus this exact job's tagged log verified all12files
+unchanged3f5c.... Source346948B/
+SHA1cd200f5039e440bc9ea9f90dc24e354b0f3f021bfd0de3a976bb056b1f2d27c;
+logs2356B/SHAd96d73b09f70045423636a5f43c703a0116ec5d0a25d2b86a759bdf4c9c32d77;
+own report2112B/SHAeb9f704cdcfda73b1182ac86c55258de3f6f95c3f0dc81a001e5a5eacc0adbac;
+safe result2341B/SHA4dfaaefc44cb6dd5305a4b7a5abc0899ae57e11a6d16696213f93b09c30b2289.
+
+The v3 source/job/operation/HEAD-bound report records diagnostic_failed,
+first_failure_stage=preopen_configs, code=stage_failed/category=value_error,
+last_completed_stage=preopen_bar, bootstrap_attemptedTRUE. It records4790
+OnData entries,4789disabled skips, no entry/skip cap reached,0empty preopen
+Slices,0parentcontains/read/ObjectStore effects,0closechecks/sessions and
+EODcustodyTRUE. Close_summarybootstrap_unproved and terminal_summaryincomplete
+do not overwrite that first failure. Thus a pre-open control TradeBar passed
+the existing identity/minute/clock checks; zero v2delivered counters did not
+prove no callbacks. The first observed refusal is inside the exact pinned
+configuration-validation code, before any parent access. No specific failed
+configuration predicate, SDK defect, target availability, provider-wide
+absence or financial repair is established. Native self-report is not
+independent source-origin attestation.
+
+The next bounded correction is diagnostic-only closed configuration refusal
+codes, preserving original predicate order/getter counts and all RAW/noFF/
+identity/clock/privacy/effect guards. A bounded official-public SDK contract
+audit runs separately; it must not turn speculation into a fix. No private
+configuration values/raw SID/parent body/price is exported. The new source
+epoch and dispatcher pin/proof schemas must be reviewed/tested/committed
+before another native effect; no override flag or unchanged financial rerun.
+
+Current direct native QC API count56 (prior34 +6upload+6compile+1build+
+6launch+1status+2terminalsource/log). This round sourceuploads2/compiles2/
+newdiagnosticjobs2; financial jobs/attempts/outcome looks0; pushes0.
+Both diagnostics ended nativeCompleted with input/bootstrap proof absent;
+they are not accepted financial outcomes. All5financial metrics remainNULL,
+20REMX+323pre-inception quarantine stays, and the heartbeat remainsPAUSED.
+
+Fresh118 official-public SDK claim TPR-R118-SDK-CONFIG-001; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; ownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; committed source snapshots parentda295/base481602/actions5bb; dirty actual status retained in manifest; {"domains":["github.com"],"kind":"public_search","max_effects":1,"operation_id":"TPR-R118-SDK-CONFIG-001","query":"site:github.com/QuantConnect/Lean \"GetSubscriptionDataConfigs\" \"includeInternalConfigs\""}; manifest2053B/SHA6e564e269d72d5aa444189e973dea83b2ddf62b5eb4fbce6aad741fc22df1961 and sole record fsynced BEFORE one public request; expires 2026-11-05T05:14:01.379132+00:00; nonfinancial SDK look only; no private/nativeQC/UI/provider-market-data/rawSID/operator/account authority.
+
+Fresh118 official-public SDK claim TPR-R118-SDK-CONFIG-002; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; ownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; committed source snapshots parentda295/base481602/actions5bb; dirty actual status retained in manifest; {"domains":["github.com"],"kind":"public_search","max_effects":1,"operation_id":"TPR-R118-SDK-CONFIG-002","query":"site:github.com/QuantConnect/Lean \"Benchmark\" \"IsInternalFeed\" \"SetBenchmark\""}; manifest2046B/SHAd68b5a26bd38f716053ccd06a4fada8129102a81f7547af627df2827ed6f4662 and sole record fsynced BEFORE one public request; expires 2026-11-05T05:14:11.312542+00:00; nonfinancial SDK look only; no private/nativeQC/UI/provider-market-data/rawSID/operator/account authority.
+
+Fresh118 official-public SDK claim TPR-R118-SDK-CONFIG-003; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; ownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; committed source snapshots parentda295/base481602/actions5bb; dirty actual status retained in manifest; {"kind":"public_open","max_effects":1,"operation_id":"TPR-R118-SDK-CONFIG-003","url":"https://raw.githubusercontent.com/QuantConnect/Lean/master/Algorithm/QCAlgorithm.cs"}; manifest2093B/SHA72f00b527a9ab129cf54a781d1c9c061b156892ab4ae9020197c9d69701c417e and sole record fsynced BEFORE one public request; expires 2026-11-05T05:14:30.608644+00:00; nonfinancial SDK look only; no private/nativeQC/UI/provider-market-data/rawSID/operator/account authority.
+
+Fresh118 official-public SDK claim TPR-R118-SDK-CONFIG-004; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; ownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; committed source snapshots parentda295/base481602/actions5bb; dirty actual status retained in manifest; {"kind":"public_open","lineno":758,"max_effects":1,"operation_id":"TPR-R118-SDK-CONFIG-004","url":"https://raw.githubusercontent.com/QuantConnect/Lean/master/Algorithm/QCAlgorithm.cs"}; manifest2106B/SHA63f6a2725b793e25833300f4c869cb6bf11acea48b9e1d9ed5bec8ba8eda3db6 and sole record fsynced BEFORE one public request; expires 2026-11-05T05:14:47.820591+00:00; nonfinancial SDK look only; no private/nativeQC/UI/provider-market-data/rawSID/operator/account authority.
+
+Fresh118 official-public SDK claim TPR-R118-SDK-CONFIG-005; HEAD7231de0a1aad45d298b21fc5f8e85919a201f300; ownerSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; committed source snapshots parentda295/base481602/actions5bb; dirty actual status retained in manifest; {"kind":"public_open","max_effects":1,"operation_id":"TPR-R118-SDK-CONFIG-005","url":"https://raw.githubusercontent.com/QuantConnect/Lean/master/Algorithm/QCAlgorithm.Plotting.cs"}; manifest2102B/SHAef72f00dbc0ff4e27880995d15b06d4a20fc103cdfdf37e40175f84069fbb1f8 and sole record fsynced BEFORE one public request; expires 2026-11-05T05:15:06.028779+00:00; nonfinancial SDK look only; no private/nativeQC/UI/provider-market-data/rawSID/operator/account authority.
+
+
+118.11 official-public SDK contract audit: Codex sub-agent used exactly2
+searches and3opens under separately fsynced TPR-R118-SDK-CONFIG-001..005
+claims; those appends finished before current-surface rewrites. All reads
+were public primary sources, not authenticated QC/private/data-provider API
+effects. Current public DataManager.GetSubscriptionDataConfigs(symbol,true)
+includes internal rows, matches Symbol.ID, orders external before internal
+and materializes a list. It promises neither1–2rows nor TradeBar-only.
+Subscription creation passes explicit resolution/fillForward/extended/internal/
+custom/normalization fields to SubscriptionDataConfig, and can reuse an
+equal existing config. The canary's all-external/1–2/trade+optionalquote
+requirements are therefore stricter than this service contract. This does
+NOT establish which actual guard failed or justify ignoring any native row.
+[Official DataManager](https://github.com/QuantConnect/Lean/blob/master/Engine/DataFeeds/DataManager.cs).
+
+Public QCAlgorithm.PostInitialize obtains a brokerage benchmark when
+Benchmark isnull. The bounded audit did not establish whether the explicit
+SetBenchmark(control.symbol) call adds or reuses an internal config.
+[Official QCAlgorithm](https://github.com/QuantConnect/Lean/blob/master/Algorithm/QCAlgorithm.cs).
+These current-public-source observations are not attestation of the exact
+cloud engine build. Internal-config inclusion is a candidate distinction
+to diagnose, not a verified SDK bug or economic-preserving fix.
+
+The next v4 local full render initially refused the existing60000B payload
+cap before tests/native/private effects. Only the unused inherited terminal
+method had been pruned; the new AST-split closed codes increased source
+size. The author is applying only AST-equivalent comment/whitespace
+formatting to fit. The API/source cap is not raised or bypassed, no guard
+or getter is removed, and base/helper bytes remain pinned. That unsuccessful
+software render is retained as software history, not a cloud attempt.
+
+
+### 118.12 Reviewed configuration-reason epoch; native activation pending
+
+Parent epoch/config/build/observation schemas advance to v4. The fixed
+SHA-pinned _configs AST is copied with only program-owned refusal changes:
+registered-security, native-row-field and trade-count OR predicates are
+split lazily in the original order; count/kind raises gain closed cfg_*
+codes. Empty versus capped excess uses cfg_no_rows/cfg_extra_rows ONLY
+inside the unchanged original negative count branch, selecting by len(rows)
+on the already-created ordinary Python list. It adds no SDK getter, service
+query, iterator step or private field read. It reports excess, not an exact
+native subscription census. No failed predicate or normalizer is guessed.
+
+The only newly pruned base method is the unused CacheProbeBase.on_end;
+Main defines and directly runs its own terminal method (also observed in
+the v3 native result), with no super/base-end invocation. Other base methods
+and all predicates/getters are preserved. Runtime comment/whitespace
+formatting checks full AST equality; no runtime node is removed by that
+formatting. The initial oversized local render refused60000 before native/
+private effects. The cap was never raised or bypassed. Initial149candidate
+testing exposed1failed/148passed from an obsolete constant-argument AST
+test; the final assertion is stronger, proving the unchanged outer count
+predicate and exact local IfExp. Both empty/excess runtime branches and
+differential traces remain covered.
+
+Final parent source38704B/
+SHAe45e5eb3364f0986573476d4158f9e3370140462c7c9cbf73e1dbca0cbb41603;
+tests37921B/SHA2aa817553a47a93e56fd7350ab9c8dc51f74d51fdb353a816f06217315fe76af.
+Author149passed4.06s; root149passed5.43s, stable before/after hashes.
+The initial normalization-reason regression was RED1failed/107deselected0.09s;
+intermediate147passed/907e96... is superseded by this final snapshot.
+All107earlier guard cases stay, with field-specific config refusals,
+19differential query/iterator/reference/field traces, immutable first
+failure, zero private-error echo, exact remaining-base-method and handler
+dispatch proofs. Fixture main59882B<=59900, unchanged60000B cap; actual
+production rendering is still unperformed for this new epoch. Frozen
+base481602.../helper6539... bytes and all original economic/input sources stay.
+
+Actions advance to v5 and pin only the final parent e45.... Source39340B/
+SHAc2f4778240898d9fc4ae563a06e8df2c8ec93ae51e5c9aec7a98948e9cf012be;
+tests41897B/SHA3846d78deccd809af5e024ca3d3c2548dc55ff4f1200c1b3d38227493b1cfa13.
+All other API/custody/base/helper/owner pins and execution/claim/proof bodies
+are byte-identical. Five prior-v4 action/compile/build mix regressions were
+RED5failed/177deselected1.70s before advancement. Intermediate907pin source
+394c4a8d... passed182/20.42s but is superseded. Final author182passed21.24s;
+root182passed21.31s, stable hashes, all177earlier cases retained. Independent
+Codex static review accepted final parent and actions, no concrete finding.
+All checks used isolated49/52runtime+syntheticDB before dispatch/config
+imports and socket+DNS denial. AST/LF/diff/narrow privacy checks passed;
+no full suite or Windows/native SDK proof is claimed.
+
+Exact four-file implementation committed LOCAL ONLY at
+d7f9e860d72ae60b2b8b4201780e8b6e21d19de1. This remains diagnostic-only
+observability, not an SDK/input/financial repair. No private read/SDK
+experiment, source upload, compile or job was performed by these software
+authors. The earlier v3job/source/result at7231/3f5c/664c85... remain intact
+and unaccepted; all failed/Completed and software-negative history stays.
+
+Before activation this record handoff must be committed, then a fresh
+actual-HEAD/source/owner/access/operation/attempt/look manifest must read
+only registry3573, pinned source-only parent config6703 and this round's
+own already verified upload003 inventory proof4722/
+149c6c9c4bce463d998264291f1d0f1b3782794ec43a79e46c38b6e7d993bd75.
+That observed3f5c... inventory is merely the next before-state, not an old
+compile/source-acceptance promotion. New candidate/attempt/look004 and
+separate fixed upload/compile/build/8-proof launch scopes must regenerate
+the reviewed v4code, verify all12cloudfiles/currentcustody/noactivejobs,
+and preserve60000B/1contains+1read/0privateInitialize/0financial admission.
+No generic mutation route, arbitrary source or override flag may enter.
+Mia's additional UI attempts remain unverified; no recommendation from them
+is ported. Native actual job terminal status stays separate from whether
+these guards pass. All financial outcomes remainNULL/0of5; quarantines,
+4096guard, source/calendar/economics/input hashes, and final-push reserve stay.
+
+118.12 root final current-document checks303passed/558deselected6.38s, guard363888B/SHA5b79ff5e813c472ae68908f7300319a96c00cedfe372aa7ee49fa1135e5cefb1. Exact code atd7f9e860: parent149passed5.43s/actions182passed21.31s; no full suite. All source/test final hashes remain stable, priorbase/helper/API/custody bytes unchanged, AST/LF/narrow privacy/diff checks pass, and received9..117 are byte-preserved. This record-only following commit establishes the actual HEAD for future freshmanifest/nativeguard; no final push yet.

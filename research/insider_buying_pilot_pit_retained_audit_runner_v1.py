@@ -141,7 +141,7 @@ class Held:
             raise
 
     def read(self, name, pin, *, check):
-        need(type(name) is str and re.fullmatch(r"[a-z][a-z0-9.-]{0,99}", name), "input_name_refused")
+        need(type(name) is str and re.fullmatch(r"[a-z][a-z0-9_.-]{0,99}", name), "input_name_refused")
         need(type(pin) is dict and set(pin) == {"bytes", "sha256"}
              and type(pin["bytes"]) is int and 0 < pin["bytes"] <= MAX_INPUT
              and type(pin["sha256"]) is str and re.fullmatch(r"[0-9a-f]{64}", pin["sha256"]), "input_pin_refused")

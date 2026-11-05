@@ -44946,3 +44946,25 @@ metadata leaves again. This is an authorized read-only diagnostic, not an
 aliased acquisition retry, new source request, plan/corpus admission or
 resumption of any frozen/consumed operation. The failed9aa1a4fe result above
 and its execution-time lineage remain preserved.
+
+The diagnostic correction exists in clean
+`c2d34967b2b8597d95a7660ea81a4c22d3c8422e` before its read-only observation.
+Its178 focused checks PASS1.61s, zero skips/warnings; changed images compile.
+That observation also FAILED: exit2 after3.838s, stdout179B, stderr0,
+completed=false, phase=derive, failure_class=audit_control,
+refusal_code=input_name_refused. This directly identifies the new reader's
+filename grammar: it excludes underscores in the fixed
+`tickers_projection.json`/`actions_projection.json` leaves. It is not an
+entitlement, data-hash, historical-availability or provider-response failure.
+The original9aa1a4fe failure keeps its directly unmeasured cause; the later
+diagnostic is not retroactively substituted for it.
+
+**IBPIT-READ-37301, P3, corrected in the following new runner image:** accept
+underscores in a single safe basename. No slash/traversal, allowed native
+DATA leaf, byte/hash, permissions, physical identity or source/memory rule
+changes. Unlike the earlier mocked projection reader, a new test reaches
+the REAL held-file reader for both actual projection basename shapes and
+an unchanged control name: RED2 failures/1 control pass1.07s before the fix.
+All earlier failed observations are retained, no source request is repeated
+and no original capture/claim is reset. Further retained-only inspection uses
+only the next already-created clean, qualified code image.

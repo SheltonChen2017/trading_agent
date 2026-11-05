@@ -49,6 +49,18 @@ def test_private_fixture_reader_hashes_and_rechecks_retained_bytes(tmp_path):
         held.close()
 
 
+@pytest.mark.parametrize("name", ("tickers_projection.json", "actions_projection.json", "storage-qualification.json"))
+def test_real_held_reader_accepts_the_fixed_retained_projection_leaf_names(tmp_path, name):
+    root = tmp_path / "invented"; root.mkdir(mode=0o700)
+    data = m.raw({"invented": True})
+    leaf = root / name; leaf.write_bytes(data); leaf.chmod(0o600)
+    held = m.Held(root, fixture=True)
+    try:
+        assert held.read(name, pin(data), check=lambda: None) == data
+    finally:
+        held.close()
+
+
 @pytest.mark.parametrize("fault", ("symlink", "hardlink", "permissions", "hash"))
 def test_private_fixture_reader_refuses_unsafe_or_unbound_leaf(tmp_path, fault):
     root = tmp_path / "invented"; root.mkdir(mode=0o700)

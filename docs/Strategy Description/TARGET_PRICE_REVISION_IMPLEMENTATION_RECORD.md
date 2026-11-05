@@ -26,23 +26,23 @@ all fail or leave bootstrap/input proof absent. The reviewed v4 report
 identifies preopen_configs/cfg_extra_rows after preopen_bar passes,
 4790OnDataentries and0parentreads/closechecks. The capped enumeration proves
 more than2configuration rows, not their exact count, kind or origin.
-The separate control-only censusv1 completed with3rows: externalminute RAW
-TradeBar/QuoteBar plus one internal adjusted TradeBar. Exact internal
-resolution and benchmark origin remain unproved; censusv2 adds only a closed
-resolution label before any SDK fix or parent retry. Existing admission guards and60000Bcap remain unchanged.
+Both control-only census epochs completed. Censusv2 identifies external
+minuteRAW TradeBar/QuoteBar plus one exact internal HOUR ADJUSTED TradeBar.
+Benchmark origin remains unproved. A separate versioned parentv5 diagnostic
+will validate every knowncontrolrow explicitly; targetRAWguards remain strict. Existing admission guards and60000Bcap remain unchanged.
 
 Latest all12terminal source files match inventory
-b7ecf41311265f8828c2f1026216c4e1e167ab621afebfcd96cde0a10bde61aa,
-main17727B/4745ce06... at sourceHEAD45fb75a1e2a6309d37f16fc500290675f179d546.
-Censusjob62cfa6461b3eb61b1404846751f6c774 is nativeCompleted and its own
-predeclared metadata census is complete, without parent/input admission.
+671d89997a5b6acd60b595a469253990a0daaeafadf1346c0dedf976615c2ba7,
+main18507B/87106e99... at sourceHEAD4ef85b7f018f5a11ea56307dd59f71d0b22fd58b.
+Censusv2jobbaee3a357711417e325bca469e02a128 is nativeCompleted and its own
+closed metadata census is complete, without parent/input admission.
 Earlier known-own-v2 source reversion was unattributed. After closing only
 the own OFF Safari tab and two separately claimed quiet captures124.64sapart,
 one bounded fresh-guarded recovery succeeded; renewed drift stops without
 another restore loop. Other Safari tabs stayed untouched; own OFF tab
 remains closed. Complete source/actor/job checks remain mandatory.
 The same heartbeat is verifiedPAUSED before the latest terminal transition.
-Current direct QC APIrequests106; actualuploads4/compiles4/newdiagnosticjobs4;
+Current direct QC APIrequests128; actualuploads5/compiles5/newdiagnosticjobs5;
 financialjobs/attempts/outcomelooks0 and successfulpushes0.
 No source/economic/financial acceptance follows from Mia's reply orCompleted.
 
@@ -603,8 +603,9 @@ Initial OFF baselines001/002 andpostMia002 had the same complete source and
 two Completed diagnostics. Three distinct later root diagnostic jobs are
 nativeCompleted:5b8cc1a48cefff60ff82422996258ca0,
 664c85be6c226aeac0faa178f0d29ab4 and3b4fad591e267da9c256e2be3b0e43a6.
-A fourth new diagnostic, census62cfa6461b3eb61b1404846751f6c774, isalso
-nativeCompleted. Latest all12files matchb7ec...; current censusmain17727B; exact sourceHEAD/fullSHA256 are in118.16.
+Fourth andfifth new diagnostics, census62cfa6461b3eb61b1404846751f6c774
+andbaee3a357711417e325bca469e02a128, arealso nativeCompleted. Latest all12files
+match671d...; current censusmain18507B; exactsourceHEAD/fullSHA256 are in118.18.
 Safari is authenticated in protected OFF38609822.
 That sign-in observation is historical; own OFF tab was later closed to
 isolate an unattributed reversion to known-own-v2 source. Two fresh quiet
@@ -623,11 +624,12 @@ The latest own report is diagnostic_failed:preopen_configs/cfg_extra_rows,
 after preopen_bar passes,4790OnDataentries and0parentreads/closechecks.
 More than2rows is proved by capped enumeration; exact count/type/origin and
 an SDK correction remain unproved. The existing parent admission guard stays
-closed. Censusv1 observed exactly3rows, including one internal adjusted
-TradeBar whose exactresolution and benchmarkorigin remain unproved.
-Censusv2 adds only a closed resolution label under118.16, without a parent
-override or financialsource change. All4diagnosticuploads/compiles/jobs remain
-separately classified. Current direct QC APIrequests106; financialjobs/attempts/outcomelooks0.
+closed. Censusv2 observed exactly3rows, including one internal HOUR ADJUSTED
+TradeBar. Benchmarkorigin remains unproved. Newversionedparentv5 will
+explicitly validate that knowncontrolrow while retaining strict targetRAW
+guards, under118.19; no financialsource or economic change is admitted.
+All5diagnosticuploads/compiles/jobs remain separately classified.
+Current direct QC APIrequests128; financialjobs/attempts/outcomelooks0.
 Reviewed v4software passed149parent/182action checks. Owner supplied Mia
 focus;004was visible but its reply is unverified after same-chat refresh,
 and005send remains unconfirmed. Initial2answered Mia turns remain the only
@@ -34589,3 +34591,228 @@ financialjobs/attempts/outcomelooks0, acceptedfullwindow0/5/metricsNULL,
 successfulpushes0. HeartbeatPAUSED, ownOFFSafariTabclosed, quarantinesunchanged.
 
 118.17 finalcurrent-document checks303passed/558deselected5.66s; full14sourceclosure/pins/AST verified. Matching remote still3cf9636e; received9..117history unchanged. Only4censussoftwarefiles+solelane record will becommitted before anyv2effect; successfulpushcount0.
+
+Fresh118Safari claim TPR-R118-CONFIG-CENSUS-UPLOAD-002; HEAD4ef85b7f018f5a11ea56307dd59f71d0b22fd58b; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"attempt_id": "TPR-CENSUS-ATTEMPT-OFF-V2-002", "compile_jobs_ObjectStore_parent_rawSID_providerHTTP": 0, "diagnostic_attempt": 2, "diagnostic_look_id": "TPR-CENSUS-LOOK-OFF-V2-002", "native_requests_max": 6, "native_response_bytes_total_max": 8388608, "native_seconds_each_max": 20, "phase": "upload", "private_inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 4739, "name": "own verified censusv1 source inventory proof", "sha256": "65eb4316e83a65ae199e4ea8df39926c96b103efb8490a169735950f63a00cdf"}], "private_reads_max": 2, "project_id": 38609822, "purpose": "newv2closedexactresolution metadataonly; sameone-query pricefree SPYconfiguration census; no parentguard/economics change; current knownb7ecbefore inventory required; anyreneweddriftSTOPno restoreloop; ownOFFSafariTabremainsclosed", "source_write_max": 1, "source_write_only": "new reviewed deterministic control-only census main.py; preserve all11other files"}; manifest7621B/SHA29af1a7d8672512fea35a2e632365208ee01d841dbb66f31649d28ed3ae523bf andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualconfigcensusupload002 {"action_schema": "tpr-fixed-control-config-census-action-v2", "financial_acceptance": false, "git_head": "4ef85b7f018f5a11ea56307dd59f71d0b22fd58b", "new_diagnostic_jobs": 0, "observed_inventory_sha256": "671d89997a5b6acd60b595a469253990a0daaeafadf1346c0dedf976615c2ba7", "phase": "upload", "plan": {"bytes": 29622, "name": "TPR-R118-CONFIG-CENSUS-UPLOAD-002.plan.json", "sha256": "2f63c1c9809e95d78da390bafceb517ea8ca2e7a338f0f06f241dd0b57ab04e3"}, "planned_candidate_config_sha256": "7617640517feb0fca0872c1d75b09b098884d0347f44575972fef7bada1d352b", "planned_inventory_sha256": "671d89997a5b6acd60b595a469253990a0daaeafadf1346c0dedf976615c2ba7", "planned_new_main": {"bytes": 18507, "sha256": "87106e99e94c5415de26e933185ab26717f97e77b6903a10ad1148f40ac9712b"}, "project_id": 38609822, "receipt": {"bytes": 8482, "name": "TPR-CMP29-API-CENSUS-R118-UPLOAD-002.result.json", "sha256": "ae9cca92958f2de36e91bef2b74f33b0e11f0fd30d428a6b9c508d767674694b"}, "requests": [{"http_status": 200, "id": "metadata", "owner_only": true, "recognized_mia_count": 0, "status": "succeeded", "unknown_nonowner_count": null}, {"http_status": 200, "id": "collaborators", "owner_only": true, "recognized_mia_count": 0, "status": "succeeded", "unknown_nonowner_count": null}, {"http_status": 200, "id": "jobs", "owner_only": null, "recognized_mia_count": null, "status": "succeeded", "unknown_nonowner_count": null}, {"http_status": 200, "id": "before", "owner_only": null, "recognized_mia_count": null, "status": "succeeded", "unknown_nonowner_count": null}, {"http_status": 200, "id": "write", "owner_only": null, "recognized_mia_count": null, "status": "succeeded", "unknown_nonowner_count": null}, {"http_status": 200, "id": "after", "owner_only": null, "recognized_mia_count": null, "status": "succeeded", "unknown_nonowner_count": null}], "schema": "tpr-census-upload-safe-v2", "source_epoch": "TPR-OFF-SPY-CONFIG-CENSUS-20261104-v2", "source_write_request_attempted": true, "status": "completed", "transport_calls_attempted": 6}; ownsafeproof4739B/SHA3c86ae8a28c08375ee9c992f2edee96ccbdada45546079b935293eb2dbae4176. Plannedfieldsrequireafterverification; no compiler/job/parent/rawSID/financialeffect; no sourcecustodyoverride.
+
+Fresh118Safari claim TPR-R118-CONFIG-CENSUS-COMPILE-002; HEAD4ef85b7f018f5a11ea56307dd59f71d0b22fd58b; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"attempt_id": "TPR-CENSUS-ATTEMPT-OFF-V2-002", "candidate": "TPR-CONFIG-CENSUS-20261104-OFF-V2-002", "compile_creates_max": 1, "diagnostic_look_id": "TPR-CENSUS-LOOK-OFF-V2-002", "native_requests_max": 6, "native_response_bytes_total_max": 8388608, "native_seconds_each_max": 20, "new_diagnostic_jobs_max": 0, "non_order_diagnostic_reason": "orders cannot establish native configuration metadata; no strategyperformance evaluated", "phase": "compile", "private_inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 29622, "name": "TPR-R118-CONFIG-CENSUS-UPLOAD-002.plan.json", "sha256": "2f63c1c9809e95d78da390bafceb517ea8ca2e7a338f0f06f241dd0b57ab04e3"}, {"bytes": 4739, "name": "TPR-R118-CONFIG-CENSUS-UPLOAD-002.result.json", "sha256": "3c86ae8a28c08375ee9c992f2edee96ccbdada45546079b935293eb2dbae4176"}], "private_outer_reads_max": 3, "project_id": 38609822, "purpose": "closed committed control-only metadata census chain; exactcurrentHEAD/schema/source/owner/actors/noactivejobs; noparent or financialpath", "source_writes_financialjobs_parent_rawSID_reads": 0}; manifest7754B/SHAce2e9f5e73321e81e4d97e8b524f7a784dccd8db4d3c6f9b4e271f58d733b665 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualconfigcensuscompile002 {"compile_id": "829690fa9b68b0c39d688e7fda1330c0-3f0acce88d336ec77ccb7ae91bfb7adc", "compile_requests_attempted": 1, "compile_state": "InQueue", "financial_acceptance": false, "git_head": "4ef85b7f018f5a11ea56307dd59f71d0b22fd58b", "new_diagnostic_jobs": 0, "plan": {"bytes": 10710, "name": "TPR-R118-CONFIG-CENSUS-COMPILE-002.plan.json", "sha256": "22c5c6fbf6a48e7f87d94ed96b3a8ca2393a83c89a7539f40c0d5970b3713140"}, "project_id": 38609822, "proofs": {"compile_plan": {"bytes": 10709, "name": "TPR-CMP29-API-CENSUS-R118-COMPILE-002.action.spent.json", "sha256": "bc73eea937811483446b642e3d9304de1c3a920ccb91bb9b2423e6ed21e01fad"}, "compile_response": {"bytes": 583, "name": "TPR-CMP29-API-CENSUS-R118-COMPILE-002.compile.response.raw", "sha256": "a2aee63b5cbfacd48f44d772b76551f158d408b0a57bbdf5873e5981d97399da"}, "compile_result": {"bytes": 8576, "name": "TPR-CMP29-API-CENSUS-R118-COMPILE-002.result.json", "sha256": "9c061d6d1d7fce240c969f8e8a475dfb53665953555f6346a0a48a6e6e97ff65"}, "source_after": {"bytes": 303589, "name": "TPR-CMP29-API-CENSUS-R118-COMPILE-002.after.response.raw", "sha256": "f16a11f30ea2c44c9464552a1e8a845c1e23cced94474ffd80f9f5ddf987bb84"}, "source_before": {"bytes": 303589, "name": "TPR-CMP29-API-CENSUS-R118-COMPILE-002.before.response.raw", "sha256": "f16a11f30ea2c44c9464552a1e8a845c1e23cced94474ffd80f9f5ddf987bb84"}}, "receipt": {"bytes": 8576, "name": "TPR-CMP29-API-CENSUS-R118-COMPILE-002.result.json", "sha256": "9c061d6d1d7fce240c969f8e8a475dfb53665953555f6346a0a48a6e6e97ff65"}, "requests": [{"http_status": 200, "id": "metadata", "status": "succeeded"}, {"http_status": 200, "id": "collaborators", "status": "succeeded"}, {"http_status": 200, "id": "jobs", "status": "succeeded"}, {"http_status": 200, "id": "before", "status": "succeeded"}, {"http_status": 200, "id": "compile", "status": "succeeded"}, {"http_status": 200, "id": "after", "status": "succeeded"}], "schema": "tpr-config-census-compile-safe-v2", "status": "completed", "transport_calls_attempted": 6}; safeprivateproof1905B/SHA21675a9973b5a7337c9668abb622de8de0df417c65c5903e958f1cc3b52d515e. No financial acceptance/privateparent/SID; ownclosedproofchain and every prior attempt/look remainretained. Noautomaticretry.
+
+Fresh118Safari claim TPR-R118-CONFIG-CENSUS-BUILD-002; HEAD4ef85b7f018f5a11ea56307dd59f71d0b22fd58b; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"attempt_id": "TPR-CENSUS-ATTEMPT-OFF-V2-002", "candidate": "TPR-CONFIG-CENSUS-20261104-OFF-V2-002", "compile_creates_max": 0, "diagnostic_look_id": "TPR-CENSUS-LOOK-OFF-V2-002", "native_requests_max": 1, "native_response_bytes_total_max": 8388608, "native_seconds_each_max": 20, "new_diagnostic_jobs_max": 0, "non_order_diagnostic_reason": "orders cannot establish native configuration metadata; no strategyperformance evaluated", "phase": "build", "private_inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 10710, "name": "TPR-R118-CONFIG-CENSUS-COMPILE-002.plan.json", "sha256": "22c5c6fbf6a48e7f87d94ed96b3a8ca2393a83c89a7539f40c0d5970b3713140"}, {"bytes": 1905, "name": "TPR-R118-CONFIG-CENSUS-COMPILE-002.result.json", "sha256": "21675a9973b5a7337c9668abb622de8de0df417c65c5903e958f1cc3b52d515e"}], "private_outer_reads_max": 3, "project_id": 38609822, "purpose": "closed committed control-only metadata census chain; exactcurrentHEAD/schema/source/owner/actors/noactivejobs; noparent or financialpath", "source_writes_financialjobs_parent_rawSID_reads": 0}; manifest7750B/SHA7df911da04265f9b1d58437232a744d056f1fb4663a6b97500508a2b0da0d011 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualconfigcensusbuild002 {"build_state": "BuildSuccess", "compile_id": "829690fa9b68b0c39d688e7fda1330c0-3f0acce88d336ec77ccb7ae91bfb7adc", "financial_acceptance": false, "git_head": "4ef85b7f018f5a11ea56307dd59f71d0b22fd58b", "new_diagnostic_jobs": 0, "plan": {"bytes": 10171, "name": "TPR-R118-CONFIG-CENSUS-BUILD-002.plan.json", "sha256": "dd982a1185e8dd1ea182f821a2c62427853af21af5168b93d6b4a427bd7b6403"}, "project_id": 38609822, "proofs": {"build_plan": {"bytes": 10170, "name": "TPR-CMP29-API-CENSUS-R118-BUILD-002.action.spent.json", "sha256": "4c1233e7a330f6b596e30127a6ef76b5551f9b26c942216cdf51936cbb7d08b7"}, "build_response": {"bytes": 2289, "name": "TPR-CMP29-API-CENSUS-R118-BUILD-002.build.response.raw", "sha256": "000a21b73955bf3aa0b3614cd0026abc963e86e0743497d3740ac3ce8461fa71"}, "build_result": {"bytes": 2000, "name": "TPR-CMP29-API-CENSUS-R118-BUILD-002.result.json", "sha256": "939163f158a62d2e03a0f97b84fb954340554c72f7cfe9b50c5829fbc0c89363"}, "compile_plan": {"bytes": 10709, "name": "TPR-CMP29-API-CENSUS-R118-COMPILE-002.action.spent.json", "sha256": "bc73eea937811483446b642e3d9304de1c3a920ccb91bb9b2423e6ed21e01fad"}, "compile_response": {"bytes": 583, "name": "TPR-CMP29-API-CENSUS-R118-COMPILE-002.compile.response.raw", "sha256": "a2aee63b5cbfacd48f44d772b76551f158d408b0a57bbdf5873e5981d97399da"}, "compile_result": {"bytes": 8576, "name": "TPR-CMP29-API-CENSUS-R118-COMPILE-002.result.json", "sha256": "9c061d6d1d7fce240c969f8e8a475dfb53665953555f6346a0a48a6e6e97ff65"}, "source_after": {"bytes": 303589, "name": "TPR-CMP29-API-CENSUS-R118-COMPILE-002.after.response.raw", "sha256": "f16a11f30ea2c44c9464552a1e8a845c1e23cced94474ffd80f9f5ddf987bb84"}, "source_before": {"bytes": 303589, "name": "TPR-CMP29-API-CENSUS-R118-COMPILE-002.before.response.raw", "sha256": "f16a11f30ea2c44c9464552a1e8a845c1e23cced94474ffd80f9f5ddf987bb84"}}, "receipt": {"bytes": 2000, "name": "TPR-CMP29-API-CENSUS-R118-BUILD-002.result.json", "sha256": "939163f158a62d2e03a0f97b84fb954340554c72f7cfe9b50c5829fbc0c89363"}, "requests": [{"http_status": 200, "id": "build", "status": "succeeded"}], "schema": "tpr-config-census-build-safe-v2", "status": "completed", "transport_calls_attempted": 1}; safeprivateproof2091B/SHAf46214ef46666047bee803a4ea8dfb84db80a8947fd9de4a855236981968775c. No financial acceptance/privateparent/SID; ownclosedproofchain and every prior attempt/look remainretained. Noautomaticretry.
+
+Fresh118Safari claim TPR-R118-CONFIG-CENSUS-LAUNCH-002; HEAD4ef85b7f018f5a11ea56307dd59f71d0b22fd58b; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"all_acceptance": false, "attempt_id": "TPR-CENSUS-ATTEMPT-OFF-V2-002", "candidate": "TPR-CONFIG-CENSUS-20261104-OFF-V2-002", "compile_creates_max": 0, "configuration_queries_max": 1, "configuration_rows_max": 8, "dependency_bytes_max": 12582912, "diagnostic_look_id": "TPR-CENSUS-LOOK-OFF-V2-002", "executor_retained_dependency_reads_max": 8, "native_requests_max": 6, "native_response_bytes_total_max": 8388608, "native_seconds_each_max": 20, "native_window": "2021-02-08..2021-02-12", "new_diagnostic_jobs_max": 1, "next_calls_max": 9, "non_order_diagnostic_reason": "orders cannot establish native configuration metadata; no strategyperformance evaluated", "phase": "launch", "private_inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 10171, "name": "TPR-R118-CONFIG-CENSUS-BUILD-002.plan.json", "sha256": "dd982a1185e8dd1ea182f821a2c62427853af21af5168b93d6b4a427bd7b6403"}, {"bytes": 2091, "name": "TPR-R118-CONFIG-CENSUS-BUILD-002.result.json", "sha256": "f46214ef46666047bee803a4ea8dfb84db80a8947fd9de4a855236981968775c"}], "private_native_parent_ObjectStore_History_orders_price_volume_cachewrites_providerHTTP": 0, "private_outer_reads_max": 3, "project_id": 38609822, "purpose": "closed committed control-only metadata census chain; exactcurrentHEAD/schema/source/owner/actors/noactivejobs; noparent or financialpath", "securities_max": 1, "source_writes_financialjobs_parent_rawSID_reads": 0}; manifest8074B/SHA76df647af4191340fa3c4ba91f43812d56baced94d9178450b10b86b9999176f andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualconfigcensuslaunch002 {"actual_new_diagnostic_jobs": 1, "candidate_config_sha256": "7617640517feb0fca0872c1d75b09b098884d0347f44575972fef7bada1d352b", "financial_acceptance": false, "financial_attempts_created": 0, "financial_outcome_looks": 0, "git_head": "4ef85b7f018f5a11ea56307dd59f71d0b22fd58b", "main": {"bytes": 18507, "sha256": "87106e99e94c5415de26e933185ab26717f97e77b6903a10ad1148f40ac9712b"}, "observed_job_ids": ["baee3a357711417e325bca469e02a128"], "observed_source_after_sha256": "671d89997a5b6acd60b595a469253990a0daaeafadf1346c0dedf976615c2ba7", "plan": {"bytes": 12271, "name": "TPR-R118-CONFIG-CENSUS-LAUNCH-002.plan.json", "sha256": "e777b3fd53a72a254905189ab8cf4c81303f9cc1153ac4d9f3c87740f3d262b4"}, "project_id": 38609822, "proof_dependency_bytes": 641505, "proof_dependency_reads": 8, "receipt": {"bytes": 10447, "name": "TPR-CMP29-API-CENSUS-R118-LAUNCH-002.result.json", "sha256": "f4e03c06b34cbc2275bdc907786bc9b7f4cc6d18ed7ec53bd712130b7fb6bea4"}, "requests": [{"http_status": 200, "id": "metadata", "status": "succeeded"}, {"http_status": 200, "id": "collaborators", "status": "succeeded"}, {"http_status": 200, "id": "jobs", "status": "succeeded"}, {"http_status": 200, "id": "before", "status": "succeeded"}, {"http_status": 200, "id": "launch", "status": "succeeded"}, {"http_status": 200, "id": "after", "status": "succeeded"}], "schema": "tpr-config-census-launch-safe-v2", "source_inventory_sha256": "671d89997a5b6acd60b595a469253990a0daaeafadf1346c0dedf976615c2ba7", "status": "completed", "transport_calls_attempted": 6}; safeprivateproof1451B/SHA76d6d0ed76572feba409e5708bb45f336a58d70070ae0770f7591e6f02fb8ab4. No financial acceptance/privateparent/SID; ownclosedproofchain and every prior attempt/look remainretained. Noautomaticretry.
+
+Fresh118Safari claim TPR-R118-CONFIG-CENSUS-V2-STATUS-001; HEAD4ef85b7f018f5a11ea56307dd59f71d0b22fd58b; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"backtest_id": "baee3a357711417e325bca469e02a128", "endpoint": "backtests/read", "financial_projection": false, "inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 1451, "name": "own actual censuslaunch002 result", "sha256": "76d6d0ed76572feba409e5708bb45f336a58d70070ae0770f7591e6f02fb8ab4"}], "native_requests_max": 1, "native_response_bytes_max": 4194304, "native_seconds_max": 30, "private_reads_max": 2, "project_id": 38609822, "purpose": "onefresh fixed4MiB exactnewcanaryjob status observation; no performance/rawbody interpretation; onterminalpause SAMEheartbeat before consumingtransition"}; manifest7309B/SHA6cd042889595844f1a5e861641034ab085ec8b9f17321075583b0e975b7115d6 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118configcensusv2status001 {"financial_acceptance": false, "http_status": 200, "job_source_head": "4ef85b7f018f5a11ea56307dd59f71d0b22fd58b", "metadata": {"backtest_completed": true, "backtest_id": "baee3a357711417e325bca469e02a128", "backtest_status": "Completed.", "credential_echo_refused_before_retention": true, "economics_accepted": false, "entire_wire_validated": true, "financial_fields_projected": false, "json_value_nodes": 463, "max_json_depth": 32, "max_json_nodes": 4194304, "native_origin_independently_attested": false, "original_wire_bytes": 11962, "original_wire_sha256": "d7dc8fee6b126d88ebc2d62438afe41aaee50690cab133c9c57ba370020475ac", "project_id": 38609822, "schema": "tpr-cmp30-job-status-projection-v1"}, "receipt": {"bytes": 1754, "name": "TPR-CMP29-API-R118-CONFIG-CENSUS-V2-STATUS-001.result.json", "sha256": "44b8352c4f9b6698eaa78cd24fe42d05bb97a555e9190b4a7ba618b3307769a9"}, "request_status": "completed", "source_inventory_sha256": "671d89997a5b6acd60b595a469253990a0daaeafadf1346c0dedf976615c2ba7"}; privateproof958B/SHA578ef7f6f1957fc108321655a0cdcff929f8b161aa06e9583a05fe05751aeadf. Metadata observation only; requestcompleted is not jobcompleted; no transition/nativecontinuation until sameheartbeatpause ifterminal.
+
+Fresh118Safari claim TPR-R118-CENSUS-V2-TERMINAL-PAUSE-001; HEAD4ef85b7f018f5a11ea56307dd59f71d0b22fd58b; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"app_update_max": 1, "automation_id": "target-price-qc-job-remaining-backtests", "native_QC_source_jobs_accounts": 0, "purpose": "pause SAMEheartbeat BEFORE consumingcensusv2terminal transition/results", "status": "PAUSED", "terminal_job": "baee3a357711417e325bca469e02a128", "terminal_project": 38609822}; manifest6107B/SHA448be50d8501c7f01a0949775860448f468ab606c40fb1e2af20e65db2ac9aff andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-CENSUS-V2-PAUSE-VERIFY-001; HEAD4ef85b7f018f5a11ea56307dd59f71d0b22fd58b; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"bytes_max": 65536, "content_reads_max": 1, "metadata_checks_max": 4, "native_QC_UI_jobs": 0, "private_exact_file": "/Users/sheltonchen/.codex/automations/target-price-qc-job-remaining-backtests/automation.toml", "purpose": "freshactualPAUSED proof BEFOREcensusv2result"}; manifest6071B/SHA8d80cc221d209cddef96c61cf30b1bd05e1be797019c178bb7c8929dd870395e andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118censusv2terminalsameheartbeatPAUSEDverified {"actual_status": "PAUSED", "automation_id": "target-price-qc-job-remaining-backtests", "config_bytes": 10701, "config_sha256": "35ea4cbcc5f6ded86fae7bf5377f577a16ebb1050430210c19ec138df3c02e72", "native_requests": 0, "terminal_job": "baee3a357711417e325bca469e02a128"}; proof259B/SHA58db867bea158dc6db1ad8e7f3dbb3eefeae22af05b3bab5afb3437ea2bcc757. PauseBEFOREtransition/resultwork.
+
+Fresh118Safari claim TPR-R118-CONFIG-CENSUS-TERMINAL-RESULT-002; HEAD4ef85b7f018f5a11ea56307dd59f71d0b22fd58b; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"backtest_id": "baee3a357711417e325bca469e02a128", "endpoints": ["files/read", "backtests/read/log"], "log_projection_bytes_max": 262144, "log_projection_reads_max": 1, "logs_query": "TPR_CONFIG_CENSUS_RESULT", "logs_range": [0, 20], "native_requests_max": 2, "native_seconds_each_max": 20, "private_registry_reads_max": 1, "project_id": 38609822, "purpose": "afterappandactualsameheartbeatPAUSED verifyEVERYterminalsourcefile and inspectonly exactnewboundedpricefreecontrolmetadata census tag; nofinancialfields/oldjobs/parent/SID", "response_bytes_total_max": 2228224, "result_tag_json_bytes_max": 16384, "source_writes_compiles_jobs_Mia_accounts": 0}; manifest6721B/SHA8f452586c75654d2c9a2ee7e200acf304a0a8efc250c05f1abc2cf2c58038bc9 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118freshcensusprojectionclaimBEFOREopen {"git_head": "4ef85b7f018f5a11ea56307dd59f71d0b22fd58b", "input": {"bytes": 3128, "name": "TPR-CMP29-API-R118-CONFIG-CENSUS-RESULT-002.logs.projection.json", "sha256": "e8914a03b8bedfdc6f809d5ce9c7446aa2fa460380ef4e43a77cec92874af2dc"}, "job": "baee3a357711417e325bca469e02a128", "max_bytes": 262144, "operation_id": "TPR-R118-CONFIG-CENSUS-LOG-PROCESS-002", "purpose": "strictclosedpricefreeowncensusmetadata only; no unknownclassnames/SIDs/exception/financialvalues", "schema": "tpr-returned-own-config-census-projection-read-v1", "source_hashes": {"research/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "research/target_price_revisions_qc/__init__.py": "3bc79e69bc0c775d8ef0ec154551436011cba407f37690c27ccbeb9000153c59", "research/target_price_revisions_qc/comparison_20261028_api.py": "a2a160ac951a8a9f96b9531e5b51a5bf6b4e7b116b7873f77515780f059ebc5a", "research/target_price_revisions_qc/comparison_20261029_project_api.py": "680f31f17447e240f919435ee1d56a9a48526f5197e37ac97332b4b70ee42b87", "research/target_price_revisions_qc/comparison_20261029_projects.py": "6dc87f33105de9d80e7a267a6cc737bb4262f47e49c43b65247592927a5788d7", "research/target_price_revisions_qc/extended_evidence.py": "a816b1ddca5a8428f07e9029bc3a7f7db3c5e1a1f50521664992dabf556aa2d7", "research/target_price_revisions_qc/extended_operations.py": "824b3f0c180f1aeb7038d8f280c44507b5c39687fcccc87c539f242d9256d167"}}; claim1397B/SHA2f23f656c4d54d9cd414d71a9a5f57a88c08f164313b544a9bcd78077a68d5b8
+
+118nativeconfigcensusterminal {"backtest_id": "baee3a357711417e325bca469e02a128", "census": {"cache_writes": 0, "callback_cap_reached": false, "callback_limit": 6400, "collection_count_unchanged": true, "collection_endpoint_supported": true, "collection_reason": null, "complete": true, "current_stage": "end_custody", "direct_order_calls": 0, "direct_provider_calls": 0, "disabled_skips": 0, "enumeration_complete": true, "first_failure_code": null, "first_failure_stage": null, "history_calls": 0, "metadata_complete": true, "object_store_calls": 0, "on_data_entries": 4790, "post_query_skips": 4789, "preopen_empty_slices": 0, "projected_metadata_unchanged": true, "query_count": 1, "retained_row_refs_unchanged": true, "row_limit": 8, "rows": [{"adjusted": false, "custom": false, "daily": false, "data_timezone_ny": true, "exchange_timezone_ny": true, "extended": true, "fill_forward": false, "internal": false, "kind": "trade_bar", "minute": true, "native_row": true, "raw": true, "resolution_kind": "minute", "symbol_sid_matches": true, "unsupported": []}, {"adjusted": false, "custom": false, "daily": false, "data_timezone_ny": true, "exchange_timezone_ny": true, "extended": true, "fill_forward": false, "internal": false, "kind": "quote_bar", "minute": true, "native_row": true, "raw": true, "resolution_kind": "minute", "symbol_sid_matches": true, "unsupported": []}, {"adjusted": true, "custom": false, "daily": false, "data_timezone_ny": true, "exchange_timezone_ny": true, "extended": false, "fill_forward": false, "internal": true, "kind": "trade_bar", "minute": false, "native_row": true, "raw": false, "resolution_kind": "hour", "symbol_sid_matches": true, "unsupported": []}], "rows_seen": 3, "scope_stable": true, "sentinel_limit": 9, "status": "complete_config_census", "target_registrations": 0, "terminal_summary": "complete", "truncated": false}, "financial_acceptance": false, "log_projection": {"bytes": 3128, "name": "TPR-CMP29-API-R118-CONFIG-CENSUS-RESULT-002.logs.projection.json", "sha256": "e8914a03b8bedfdc6f809d5ce9c7446aa2fa460380ef4e43a77cec92874af2dc"}, "logs_archive": {"bytes": 2819, "name": "TPR-CMP29-API-R118-CONFIG-CENSUS-RESULT-002.logs.response.raw", "sha256": "ae65fb17c22b9f7077c07fcd34a25db22ec664a96f943e6c46514de52b8d50a9"}, "observations_proof": {"bytes": 2504, "name": "TPR-R118-CONFIG-CENSUS-OBSERVATIONS-002.json", "sha256": "e5f2883d1d7de26951562ba5f9e9aaac3ba74fe24237f3104139c082d91e2b00"}, "project_id": 38609822, "receipt": {"bytes": 4299, "name": "TPR-CMP29-API-R118-CONFIG-CENSUS-RESULT-002.result.json", "sha256": "48c8ad11d47dc37757cfc86dd818c63d90194342745f3c23d771c5b286944e02"}, "requests": [{"http_status": 200, "id": "source", "status": "succeeded"}, {"http_status": 200, "id": "logs", "status": "succeeded"}], "schema": "tpr-config-census-terminal-safe-v2", "source_archive": {"bytes": 303589, "name": "TPR-CMP29-API-R118-CONFIG-CENSUS-RESULT-002.source.response.raw", "sha256": "99175013f4cf24f6c445a9b2bc537e055f2fc0043b843368898593702a8c0ca3"}, "source_inventory_sha256": "671d89997a5b6acd60b595a469253990a0daaeafadf1346c0dedf976615c2ba7", "status": "completed", "tagged_strings_found": 1}; safeproof2917B/SHA634bda30288a22197327f0412fc5c70dd0ded5d5bd7b6bcae9da9b5cca8db6bc. Entireclosedpricefreemetadata only; notfinancial/source/economic/origin/atomicityacceptance. Parentguardunchanged; noSDKcorrectioninferredbeforeexplicitreview.
+
+### 118.18 Native censusv2 resolves the exact extra control resolution
+
+Censusv2 software was committed LOCALONLY as
+4ef85b7f018f5a11ea56307dd59f71d0b22fd58b before fresh native activation.
+All12source files were verified before/after upload, compile and launch;
+the11nonmain files stayed unchanged. Actualmain18507B/
+SHA87106e99e94c5415de26e933185ab26717f97e77b6903a10ad1148f40ac9712b,
+config7617640517feb0fca0872c1d75b09b098884d0347f44575972fef7bada1d352b,
+inventory671d89997a5b6acd60b595a469253990a0daaeafadf1346c0dedf976615c2ba7.
+Compile829690fa9b68b0c39d688e7fda1330c0-3f0acce88d336ec77ccb7ae91bfb7adc
+reached BuildSuccess; launch independently checked8proofs/641505B.
+
+OFF38609822 jobbaee3a357711417e325bca469e02a128,
+TPR-CONFIG-CENSUS-20261104-OFF-D2, was observed nativeCompleted./completedTRUE.
+Safe status958B/SHA578ef7f6f1957fc108321655a0cdcff929f8b161aa06e9583a05fe05751aeadf.
+Sameheartbeat was paused through the app before transition; actualPAUSED
+verified using a NEW bounded ownedregular fd claim before results.
+Pauseproof259B/SHA58db867bea158dc6db1ad8e7f3dbb3eefeae22af05b3bab5afb3437ea2bcc757.
+No Safari client was reopened, no job was cancelled or other lane touched.
+
+Own report complete_config_census/completeTRUE:1query/3rows/4790callbacks,
+4789postqueryskips, no truncation, unsupported fields, firstfailure or cap.
+Returned-collection count/references, copied metadata, clock/Slice/control/bar
+were stable across bounded endpoint samples. New exact labels are
+minute,minute,HOUR. The third row is one native INTERNAL HOUR ADJUSTED
+TradeBar for the same fixed SPY SID, noncustom/noFF/extendedFALSE/NYdata+
+exchangezones. First two are external MINUTE RAW TradeBar/QuoteBar,
+noncustom/noFF/extendedTRUE/sameSID/NYzones. Benchmark origin remainsUNPROVED.
+No parent/target, ObjectStore, History, orders, prices, volumes, cachewrites
+or directprovider call occurred. All financial/readiness/origin/rights/PIT/
+atomicity/benchmark/trading flags remainFALSE. Metadata equality alone does
+not establish atomic custody or financial input repair.
+
+Terminal source303589B/
+SHA99175013f4cf24f6c445a9b2bc537e055f2fc0043b843368898593702a8c0ca3;
+logs2819B/SHAae65fb17c22b9f7077c07fcd34a25db22ec664a96f943e6c46514de52b8d50a9;
+own observations2504B/SHAe5f2883d1d7de26951562ba5f9e9aaac3ba74fe24237f3104139c082d91e2b00;
+safe result2917B/SHA634bda30288a22197327f0412fc5c70dd0ded5d5bd7b6bcae9da9b5cca8db6bc.
+Current directQCrequests128; actualuploads5/compiles5/newdiagnosticjobs5.
+Financialjobs/attempts/outcomelooks0, acceptedfullwindow0/5/allmetricsNULL,
+successfulpushes0. All prior failed/Completed jobs, exact code epochs,
+refused preflights and every attempt/look/reservation remain retained.
+
+### 118.19 Proposed parentv5 control-only metadata correction — pre-effect freeze
+
+The census proves why the old control cardinality premise refused the native
+environment. It does NOT repair absent target marks or prove benchmark origin.
+Before the next parent diagnostic, a new reviewed source-builder epoch will
+explicitly validate every fixed-control configuration, allowing at most ONE
+exact observed internalHourly/Adjusted TradeBar with noFF/extendedFALSE/
+noncustom/sameSPYidentity/NYzones, alongside the ORIGINAL externalMinuteRAW
+oneTradeBar/atmostoneQuoteBar/noFF/extendedTRUE guarantees. Unknown or duplicate
+internal rows, altered fields, extra rows and noncontrol identities fail closed.
+Do not disable includeInternal or silently filter unknown internal rows.
+The target validation path must retain the original strict1–2externalRAW
+rules and identity/custody semantics without an internal/adjusted allowance.
+No public constructor option or override flag is authorized.
+
+Parentv4actualmain59926B is close to the60000Bsourcecap. Keep the cap and every
+guard; no resource increase or node/guard pruning is accepted. If needed,
+compact generated indentation using token-aware handling, preserve every STRING
+token verbatim, and require complete AST equality including constant values
+between pre/post-compaction emission before enforcing60000B. Naive multiline
+string rewriting is prohibited. This is lexical source transport, not an
+economic or input policy change; fixture and differential checks must prove it.
+
+A private exact-control branch/wrapper may route the fixed SPY identity to
+the explicit known-control validator and every target call to the unchanged
+strict original path. No parent witness/SID export, future price, stale carry,
+WARNINGcash, guessed identity, subscription pruning or4096policy change is
+allowed. Parent configuration/helper/source-witness epochs stay pinned.
+Parentbuilder/reportv5 and fixedaction/proofv6 must be reviewed, focused-tested
+and committed before fresh native source/compile/job effects. Current671d...
+completebefore-source inventory, ownership/completeactors/noactivejobs and
+every new phase's source/HEAD/access/operation/attempt/look claims still apply.
+Any renewed drift stops without another restore loop.
+
+Next candidate lineage:TPR-CACHE-20261104-PARENT-V5-OFF-006,
+diagnostic_attempt6/TPR-CACHE-ATTEMPT-PARENT-V5-OFF-006/
+TPR-CACHE-LOOK-PARENT-V5-OFF-006. This is a changed nonfinancial diagnostic
+guard premise supported by new native evidence, never an unchanged financial
+retry. The actual financial OFF/remaining arms still require verified native
+target input, source/economic recovery, resource coverage and independent full
+order/fill/fee/cash/action/NAV/exposure/clock accounting. All20REMXfractional
+and323pre-inception rows stay quarantined; no routineClaude checkpoint or
+interim push. OwnOFFSafariTabclosed and heartbeatPAUSED.
+
+118.19 dependency correction before activation: the existing censusv2 route
+pins parent-actions c2f477... and parent-builder e45e5... as immutable helper
+closure. Updating those existing files would invalidate its source chain
+and existing focused fixtures. Root verified the coupling and redirected the
+new correction to separate versioned files:
+research/target_price_revisions_qc/native_cache_parent_probe_v5_20261104.py,
+research/target_price_revisions_qc/native_cache_parent_actions_v5_20261104.py,
+and their correspondingly named tests. Authors restored ONLY their own
+uncommitted old-file deltas through scoped HEAD4ef-byte writes; no reset,
+checkout, branch, worktree or history rewrite. All4historical source/test
+files compare byte-exact with HEAD. Census source/test/pins remain untouched.
+This supersedes the earlier in-place integration proposal; do not weaken old
+tests or declare the still-consistent census closure accepted after drift.
+The new fixed route uses direct new-module imports, explicit MODULE/source
+closure and new pinned source/proof epoch, never runtime candidate dispatch.
+
+First v5 render validation refused at60255B after AST-equivalent indentation
+compaction; focused output136failed/14passed is retained as source-budget
+software evidence, not a native failure. The unchanged60000cap held. Only
+nonsemantic blank physical lines outside STRING spans and a redundant fixed
+descriptive policy label may be reduced, preserving exact STRING tokens and
+full emitted AST across compaction. No native effect, cap increase or source
+guard/node pruning followed this refusal.
+
+### 118.20 Verified new versioned parentv5 / actionsv6 software — activation pending
+
+New builder research/target_price_revisions_qc/native_cache_parent_probe_v5_20261104.py:
+47851B/SHAde7c4741e1b643a415199892c86944ad2a46325edaeb9dac2ad69301e77b6378;
+new tests46286B/SHA4d2b82b7f4ed28d50201feddbc1cd6f9fe2ffb07eebf47e55e02d0c4d725c33d.
+The fixed control branch validates EVERY returned native row, at most3rows
+and4nextcalls, oneexternalMinuteRAWTradeBar/atmostoneQuoteBar/noFF/extendedTRUE
+plus atmostONE exactobserved internalHour/Adjusted/TradeBar/noFF/extendedFALSE/
+noncustom/samecontrolidentity+registeredreference/NYzones. Unknown, duplicate,
+altered or extra rows refuse. Target calls delegate to unchanged strict base
+_configs/_config_values; actual Main target differential20cases preserve
+native predicate/getter traces. Label-aware snapshots append Hour/Adjusted
+bits ONLY for control, retaining original frames for target. The one inherited
+_observe endpoint call routes label-aware snapshots; reverted AST comparison
+proves no other inherited method change. No extra configuration query is added.
+All original source/economic/4096/parent-witness/PIT boundaries remain.
+
+Pure token-aware indentation, blank-line and OP-comma formatting preserves
+ordinary/f-string literal tokens and FULL generated AST including Constant
+values. No additional source method/node is removed; unchanged60000Bcap is
+enforced after UTF8 encoding. Fixturemain59627B; maxallowedoperation fixture
+59651B (349Bsynthetic margin before actual parentbinding differences). Actual
+production regeneration independently checks its actual byte size before any
+source write. No resource/cap increase or fabricated input is accepted.
+Parentconfig/build/runtime schemas and epoch advance tov5; fixed controlpolicy
+fixed_spy_control_configs_v5, control3rows/4next/internal1, target2rows/3next,
+benchmark_origin_provenFALSE. Same price-free logtag remains.
+
+New fixed route research/target_price_revisions_qc/native_cache_parent_actions_v5_20261104.py:
+39353B/SHAd1133be544e830b4a53ca2cd9bbc5f7e1d6752401e32096a5daffdeebcd34ea1;
+new tests44814B/SHA7398166d23e5cdc2c86e5dafe0260a8d5f0d2cd860d40cdfdebad296ec10722a.
+Compared with preserved c2f477... source, only newMODULE/directnewbuilderimport,
+newde7c... pin and3action/result/proof-v6 schema literals differ. Fixedgenuine
+TLS/actors/privacy/source/custody/sharedlock/deadline/echo/spend/partialreceipt/
+8-proof bodies and all other pins remain exact. No runtime dispatch, caller
+source/endpoint/transport override or oldschema promotion exists.
+
+Author204newbuilder cases plus149unchangedv4 cases passed353/15.02s.
+Newaction192cases/58.62s retain182original plus6old-epoch/pin refusals and
+4otherwise-valid foreignlineage chains. The earlier actionRED6failed/
+182deselected1.77s occurred before the versioned-path redirect and is retained.
+Additional sourcebudget60131B refusal held60000; final whitespace compaction
+resolved it without weakening tests/guards. An intermediate203passed/1failed
+pureminifier None-input test found StringIO(None) allowed an empty stream;
+explicit str-type guard corrected the helper, then204passed. These are local
+software outcomes only, no private/native effect or reset of prior results.
+
+Root independently ran BOTH exactnew files:396passed70.87s/Python3.13.15 with
+all4final hashes stable before/after. Isolated49/52runtime+syntheticDB preceded
+dispatch/config imports; socket/DNS denied, plugins/cache/parentconftest
+excluded. Focused2files only, no full lane/repo suite. AST/pureLF verified.
+All4historical source/test files remain byte-exactHEAD4ef. An additional root
+18-file audit confirmed the entire prior census14source closure and4tests
+remain committed/exact with validpins. Independent Codex static review on
+finalhashes accepted both newmodules, found no concrete issue and made no
+tests/edits/effects. RoutineClaude checkpoint stays skipped.
+
+Before activation commit these4NEW files plus thisrecord. Freshsource/
+HEAD/owner/access/operation/attempt/look claims still precede EVERY phase.
+No nativev5 request has occurred; count128/uploads5/compiles5/newdiagnosticjobs5,
+financialjobs/attempts/outcomelooks0, acceptedfullwindow0/5/NULLmetrics,
+successfulpushes0. Currentcloud671d... censusv2 remains untouched while code
+is verified. New006 may use only freshly claimed registry3573B, ownpinned
+source-only parentcfg6703B and owncensusv2upload inventoryproof4739B/
+SHA3c86ae8a28c08375ee9c992f2edee96ccbdada45546079b935293eb2dbae4176.
+RawSID/witness remainINQC, onecontains/oneread only after lockedpreopen proof.
+
+Prospective native canary scope also explicitly includes the inherited
+simulated-QC portfolio quantity classifier: atmost10reads (2labels×5closes),
+exporting only zero/nonzero/unknown; no realoperator/broker quantity is read.
+Cache metadata samples atmost41 (11preopen/registration+30close) and bounded
+config samples atmost37 (5preopen+2registration+30close) cover all four
+_same_preopen rechecks plus3perlabel/close; no market price or volume values
+are read/exported, no History/orders/directproviderHTTP/cachewrite occurs.
+A positive unheld-security freshness canary does not prove held financial
+mark validity, exact price/volume quality, fullwindow capacity/accounting,
+benchmarkorigin, rights/PIT or financial acceptance. Those remain separate.
+
+118.20 prospective native-bound count audit, BEFOREeffect: four_same_preopen calls each repeat native config/cache endpoint sampling, so correct all-path maxima are37configqueries/41cachemetadata samples, alongside10simulatedquantity classifiers,1contains/1read/1343Bparent and2boundedparent parses. Earlier35/30draftcounts were corrected before launch claims; no privateeffect occurred under them. No price/volume read/export or source/economic change.
+
+118.20 finalactive-document checks303passed/558deselected5.61s, new12sourceclosure/pins/ASTverified. Source-derived bounds audited beforeeffects; received9..117history retained. Remote remains3cf9636e. Commit only4NEWversionedfiles+thisrecord; historical18fileclosure remains exact, nativecount128 and pushcount0.

@@ -16,6 +16,7 @@ from scripts import trace_short_interest_documents_actor as d
 
 HEAD,TRACKING,NEW,OLD='a'*40,'b'*40,'c'*64,'d'*64
 REPO=Path(__file__).resolve().parents[1]
+BOOTSTRAP_ROOT=str(d.ROOT)  # Rendered into BOOTSTRAP at import; fixtures later repoint d.ROOT.
 
 
 class Clock:
@@ -431,7 +432,7 @@ def bootstrap_fixture(h,monkeypatch,args=None):
         path=h.root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(raw);path.chmod(0o600)
     arguments=[HEAD,TRACKING,*map(d.sha,bodies)] if args is None else args
     monkeypatch.setattr(sys,'argv',['-c',*arguments]);monkeypatch.setattr(os,'geteuid',lambda:0)
-    return d.BOOTSTRAP.replace(str(REPO),str(h.root))
+    return d.BOOTSTRAP.replace(BOOTSTRAP_ROOT,str(h.root))  # SI-CR28-006
 
 
 @pytest.mark.parametrize('args',[[],[HEAD,TRACKING,NEW],['PRIVATE',TRACKING,NEW,OLD]])

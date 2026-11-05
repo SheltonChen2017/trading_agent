@@ -221,6 +221,22 @@ def test_worker_nonzero_stderr_extra_packet_bound_or_overlap_veto(world,change):
     assert all(child.waited for child in world.children)
 
 
+def test_clean_exit_incomplete_packet_never_validates_the_read_interval(world):
+    """SI-CR28-002: Root checks the packet status itself, not only the exit code."""
+    world.worker_raw=t.canonical({**packet(),'status':'incomplete'});result=observe(world)
+    assert result['first_failure']['code']=='worker_packet'
+    assert result['reproducer']['complete_lifetime_inside_native_interval'] is False
+
+
+def test_group_signal_requires_the_owned_child_to_lead_its_group(monkeypatch):
+    """SI-CR28-002: a mismatched group is refused, never signalled."""
+    child=SimpleNamespace(pid=4242,poll=lambda:None);signalled=[]
+    monkeypatch.setattr(t.os,'getpgid',lambda pid:pid+1)
+    monkeypatch.setattr(t.os,'killpg',lambda *a:signalled.append(a))
+    with pytest.raises(t.CodeReadTraceRefusal,match='cleanup'):t._signal_owned(child,t.signal.SIGTERM,True)
+    assert signalled==[]
+
+
 def test_native_pipes_EOF_before_passive_window_is_not_success(world):
     world.native_eof_early=True;result=observe(world)
     assert result['planned_original_handle_shutdown'] is False
@@ -317,6 +333,7 @@ def test_mapping_cannot_omit_or_replace_original_observer_framer(change):
     lambda p:p['authority'].update(source_admitted=0),
     lambda p:p.update(denials={}),
     lambda p:p['denials'].update(python_write_attempts=False),
+    lambda p:p['denials'].update(python_write_attempts=1),  # SI-CR28-002
     lambda p:p.update(code_manifest_sha256='f'*64),
     lambda p:p.pop('interpreter_version'),
     lambda p:p.update(interpreter_version=[3,9,6]),
@@ -391,6 +408,78 @@ def test_selected_worker_runtime_supports_original_public_model_decorator():
         stdout=subprocess.PIPE,stderr=subprocess.PIPE,env={'PATH':'/usr/bin:/bin'},timeout=10,check=False)
     assert run.returncode==0 and run.stderr==b''
     assert json.loads(run.stdout)=={'version':list(t.WORKER_VERSION),'value':1}
+
+
+def root_bootstrap_fixture(tmp_path,monkeypatch):
+    if sys.platform!='darwin':pytest.skip('Root bootstrap requires the designated platform')
+    bodies={name:b'# fabricated public file\n' for name in t.CODE_FILES}
+    bodies[t.SCRIPT]=b"print('AUTHENTICATED_DRIVER_ONLY');raise SystemExit(7)\n"
+    for name,raw in bodies.items():
+        path=tmp_path/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(raw);path.chmod(0o600)
+    monkeypatch.setattr(os,'geteuid',lambda:0)
+    return {name:t.digest(raw) for name,raw in bodies.items()},t._bootstrap().replace(str(t.ROOT),str(tmp_path))
+
+
+@pytest.mark.parametrize('wrong',[t.SCRIPT,t.DOCUMENTS])
+def test_root_bootstrap_hash_mismatch_refuses_before_any_owner_writable_exec(tmp_path,monkeypatch,capsys,wrong):
+    """SI-CR28-001: the check before Root executes owner-writable Python."""
+    mapping,text=root_bootstrap_fixture(tmp_path,monkeypatch);mapping[wrong]='0'*64
+    monkeypatch.setattr(sys,'argv',['-c',HEAD,REMOTE,json.dumps(mapping)])
+    with pytest.raises(SystemExit) as caught:exec(compile(text,'<fabricated-root-bootstrap>','exec'),{})
+    output=capsys.readouterr().out
+    assert caught.value.code==2 and 'AUTHENTICATED_DRIVER_ONLY' not in output
+    report=json.loads(output)
+    assert report['schema']=='si-code-read-actor-bootstrap-refusal-v1' and report['first_failure']['code']=='code_hash'
+
+
+def test_root_bootstrap_exact_mapping_reaches_the_authenticated_driver(tmp_path,monkeypatch,capsys):
+    mapping,text=root_bootstrap_fixture(tmp_path,monkeypatch)
+    monkeypatch.setattr(sys,'argv',['-c',HEAD,REMOTE,json.dumps(mapping)])
+    with pytest.raises(SystemExit) as caught:exec(compile(text,'<fabricated-root-bootstrap>','exec'),{})
+    assert caught.value.code==7 and capsys.readouterr().out=='AUTHENTICATED_DRIVER_ONLY\n'
+
+
+@pytest.fixture
+def audit_world(tmp_path,monkeypatch):
+    held=[]
+    for name in t.CODE_FILES:
+        path=tmp_path/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(name.encode());path.chmod(0o600)
+        held.append((name,name.encode(),t.stamp(os.stat(path,follow_symlinks=False))))
+    monkeypatch.setattr(t,'ROOT',tmp_path);monkeypatch.chdir(tmp_path)
+    w=SimpleNamespace(held=tuple(held),mapping={name:t.digest(raw) for name,raw,pin in held},calls=[],
+        replies={('rev-parse','--show-toplevel'):str(tmp_path).encode()+b'\n',
+            ('branch','--show-current'):b'codex/strategy-short-interest\n',('rev-parse','HEAD'):HEAD.encode()+b'\n',
+            ('status','--porcelain=v1','-z','--untracked-files=all'):b'',
+            ('rev-parse','refs/remotes/origin/codex/strategy-short-interest'):REMOTE.encode()+b'\n'})
+    for name,raw,pin in held:w.replies[('show',HEAD+':'+name)]=raw
+    def run(argv,**kwargs):
+        args=tuple(argv[argv.index('-C')+2:]);w.calls.append((args,kwargs))
+        return SimpleNamespace(returncode=0,stdout=w.replies[args],stderr=b'')
+    monkeypatch.setattr(t.subprocess,'run',run)
+    return w
+
+
+def test_code_audit_passes_only_on_the_exact_clean_committed_lane(audit_world):
+    w=audit_world;t.audit_code(Clock(),HEAD,REMOTE,w.mapping,w.held)
+    assert w.calls and all(kwargs['user']==os.getuid() and kwargs['extra_groups']==[] for args,kwargs in w.calls)
+
+
+@pytest.mark.parametrize('key,value,code',[
+    (('status','--porcelain=v1','-z','--untracked-files=all'),b' M scripts/other.py\0','lane'),
+    (('rev-parse','refs/remotes/origin/codex/strategy-short-interest'),b'f'*40+b'\n','lane'),
+    (('rev-parse','HEAD'),b'f'*40+b'\n','lane'),
+    (('show',HEAD+':'+t.SCRIPT),b'changed committed bytes','code_git'),
+])
+def test_code_audit_refuses_dirty_moved_or_uncommitted_state(audit_world,key,value,code):
+    """SI-CR28-003: the final Root audit has no other guard behind it."""
+    w=audit_world;w.replies[key]=value
+    with pytest.raises(t.CodeReadTraceRefusal,match=code):t.audit_code(Clock(),HEAD,REMOTE,w.mapping,w.held)
+
+
+def test_runtime_launcher_wrong_bytes_refuse_even_with_expected_size(monkeypatch):
+    """SI-CR28-004: launcher authentication rests on this digest."""
+    monkeypatch.setattr(t,'WORKER_SHA256','0'*64)
+    with pytest.raises(t.CodeReadTraceRefusal,match='code_stamp'):t.capture_runtime(Clock())
 
 
 def test_runtime_launcher_exact_bytes_and_original_stamp_are_not_rebased():
@@ -471,7 +560,7 @@ def test_Root_terminal_follows_last_code_audit_and_original_closed_watch(root_wo
     assert result['coordinator_final_target_observation_outside_native']['protection_changed'] is False
 
 
-@pytest.mark.parametrize('change',['target_protection','late_code_audit','unclosed_watch','bindings'])
+@pytest.mark.parametrize('change',['target_protection','late_code_audit','unclosed_watch','bindings','final_runtime','final_null_device'])
 def test_late_Root_boundaries_veto_original_provisional_success(root_world,monkeypatch,change):
     w=root_world
     if change=='target_protection':w.watch.changed=True
@@ -479,6 +568,10 @@ def test_late_Root_boundaries_veto_original_provisional_success(root_world,monke
         def late(clock,*unused):clock.failed=True;clock.check()
         monkeypatch.setattr(t,'audit_code',late)
     elif change=='unclosed_watch':w.watch.closed=False
+    elif change=='final_runtime':  # SI-CR28-004
+        monkeypatch.setattr(t,'capture_runtime',lambda clock,original=None:t.require(original is None,'code_stamp') or tuple(range(10)))
+    elif change=='final_null_device':  # SI-CR28-004
+        monkeypatch.setattr(t,'capture_null_device',lambda clock,original=None:t.require(original is None,'null_device') or NULL_CONTRACT)
     elif change=='bindings':
         original=w.documents.root_trace
         def drift(*args):

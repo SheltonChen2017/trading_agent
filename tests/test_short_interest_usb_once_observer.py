@@ -305,3 +305,54 @@ def test_static_observer_has_no_market_or_file_write_dispatch_and_preserves_lite
     assert '(deny file-read* (subpath "/Volumes"))' in source
     assert '(allow file-write-data (literal "/dev/null"))' in source
     assert 'Source qualification' not in source
+
+
+@pytest.mark.parametrize('change,code',[
+    (lambda p:p['denials'].update(python_socket_attempts=1),'proof'),
+    (lambda p:p.update(first_failure={'phase':'original','role':'unknown','code_ordinal':None,'code':'clock','original_comparison':None,'actor':'unknown'}),'proof'),
+    (lambda p:p.update(cleanup_failures=[{'phase':'cleanup','role':'unknown','code_ordinal':None,'code':'cleanup','original_comparison':None,'actor':'unknown'}]),'proof'),
+    (lambda p:p.update(original_profile_proof=None),'private_aggregate'),
+    (lambda p:p.update(private_model_aggregate=None),'proof'),
+])
+def test_closed_status_alone_never_closes_the_observation(change,code):
+    """SI-CR28-018: the closed packet's own facts must agree with its status string."""
+    payload=envelope();change(payload)
+    result=run_node("const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();w.close();console.log(JSON.stringify((await p).summary()));",payload)
+    assert result['status']=='incomplete' and result['first_failure']==code and result['source_qualified'] is False
+
+
+def test_incomplete_producer_never_closes_the_observation():
+    """SI-CR28-018: a clean exit does not outrank the producer's own status."""
+    payload=envelope();payload.update(status='incomplete')
+    result=run_node("const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();w.close();console.log(JSON.stringify((await p).summary()));",payload)
+    assert result['status']=='incomplete' and result['producer_status']=='incomplete' and result['first_failure']=='proof'
+
+
+def test_private_aggregate_must_be_the_one_the_proof_commits_to():
+    """SI-CR28-018: a valid aggregate with another hash is not the retained report."""
+    payload=envelope();payload['private_model_aggregate']['full']['member_count']=2
+    result=run_node("const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();w.close();console.log(JSON.stringify((await p).summary()));",payload)
+    assert result['status']=='incomplete' and result['first_failure']=='private_aggregate' and not result['private_model_aggregate_present']
+
+
+@pytest.mark.parametrize('field',['profile_sha256','code_mapping_sha256'])
+def test_proof_must_bind_the_registered_profile_and_five_code_map(field):
+    """SI-CR28-018: re-signed, so only the named pin can refuse."""
+    payload=envelope();proof=payload['original_profile_proof'];proof[field]='f'*64;del proof['observation_sha256'];proof['observation_sha256']=sha(canonical(proof))
+    result=run_node("const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();w.close();console.log(JSON.stringify((await p).summary()));",payload)
+    assert result['status']=='incomplete' and result['first_failure']=='proof'
+
+
+@pytest.mark.parametrize('before',["w.child.emit('exit',0,null);","w.child.exitCode=0;"])
+def test_exited_child_group_is_never_signalled_during_shutdown(before):
+    """SI-CR28-018: the group id may already belong to someone else after exit."""
+    result=run_node("const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();"+before+"""
+w.advance(178501);w.close();const r=await p;console.log(JSON.stringify({signals:w.signals,s:r.summary()}));""")
+    assert result['signals']==[] and result['s']['status']=='incomplete'
+
+
+def test_missing_stderr_EOF_never_closes_the_observation():
+    """SI-CR28-018: stdout EOF alone does not prove the child's streams closed."""
+    result=run_node("""const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();w.child.stdout.emit('end');w.child.exitCode=0;
+w.child.emit('exit',0,null);w.child.emit('close',0,null);const r=await p;console.log(JSON.stringify(r.summary()));""")
+    assert result['status']=='incomplete' and result['first_failure']=='EOF' and result['stderr_EOF'] is False

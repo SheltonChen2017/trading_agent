@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -298,3 +299,49 @@ print(m.canonical(value).decode())
     else:
         assert packet['status']=='closed_finite_offline_byte_inspection',packet
         assert not any(packet['denials'].values())
+
+
+def test_swallowed_denial_still_vetoes_the_closed_status(prepared,monkeypatch):
+    """SI-CR28-019: the counter is the check that survives a caught refusal."""
+    h=prepared;original=sys._si_usb_fixture_hook
+    def hook(stage):
+        if stage=='model':
+            with pytest.raises(q.UsbOnceRefusal):h.hooks[0]('socket.connect',(None,('192.0.2.1',443)))
+        return original(stage)
+    monkeypatch.setattr(sys,'_si_usb_fixture_hook',hook)
+    value=h.run();assert value['status']=='incomplete' and value['denials']['python_socket_attempts']==1
+
+
+def test_dirty_lane_refuses_before_the_original_transaction(prepared,monkeypatch):
+    """SI-CR28-019: no original code runs from an uncommitted working tree."""
+    h=prepared;real=subprocess.run
+    def run(arguments,**kwargs):
+        if arguments[1]=='status':return SimpleNamespace(returncode=0,stdout=b' M scripts/other.py\0',stderr=b'')
+        return real(arguments,**kwargs)
+    monkeypatch.setattr(subprocess,'run',run);value=h.run()
+    assert value['status']=='incomplete' and value['first_failure']['code']=='root' and not h.model_seen
+
+
+def test_head_move_after_the_original_transaction_vetoes_closure(prepared,monkeypatch):
+    """SI-CR28-019: the last HEAD check runs after the original transaction returned."""
+    h=prepared;real=subprocess.run;original=q._private_aggregate;done=[]
+    def aggregate(*args):
+        value=original(*args);done.append(True);return value
+    def run(arguments,**kwargs):
+        if done and arguments[1:]==['rev-parse','HEAD']:return SimpleNamespace(returncode=0,stdout=b'f'*40+b'\n',stderr=b'')
+        return real(arguments,**kwargs)
+    monkeypatch.setattr(q,'_private_aggregate',aggregate);monkeypatch.setattr(subprocess,'run',run);value=h.run()
+    assert value['status']=='incomplete' and (value['first_failure']['phase'],value['first_failure']['code'])==('extra_code','root')
+
+
+def test_write_flags_refuse_even_on_a_registered_path(prepared):
+    """SI-CR28-019: a read-allowed code file must not be opened writable."""
+    h=prepared;assert h.run()['status']=='closed_finite_offline_byte_inspection'
+    allowed=str(h.root/q.DRIVER)
+    with pytest.raises(q.UsbOnceRefusal,match='^forbidden_write$'):h.hooks[0]('open',(allowed,'r+',os.O_RDWR))
+
+
+def test_wrong_driver_hash_refuses_before_any_original_entry(prepared):
+    """SI-CR28-019: the caller's hash of this driver must match the committed bytes."""
+    h=prepared;value=q.run_registered(HEAD,REMOTE,'0'*64)
+    assert value['status']=='incomplete' and value['first_failure']['code']=='code' and value['original_profile_proof'] is None and not h.model_seen

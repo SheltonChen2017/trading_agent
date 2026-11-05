@@ -113,11 +113,14 @@ def test_profile_callback_failure_is_permanent_and_cannot_be_retried(prepared,mo
 @pytest.mark.parametrize('event,args,key',[
     ('open',('/Volumes/PRIVATE/data',None,os.O_RDONLY),'forbidden_read_open_attempts'),
     ('open',('/tmp/PRIVATE',None,os.O_WRONLY|os.O_CREAT),'python_write_attempts'),
+    ('open',(str(d.ROOT/d.ORIGINAL),None,os.O_RDWR),'python_write_attempts'),  # SI-CR28-005: allowed read path
     ('socket.connect',(object(),('PRIVATE',443)),'python_socket_attempts'),
     ('subprocess.Popen',('/bin/sh',['/bin/sh','-c','PRIVATE'],None,None),'unexpected_subprocess_attempts')])
 def test_independent_audit_guards_survive_expected_profiler_stop_and_exclude_raw_values(prepared,event,args,key):
     p=prepared;result=p.run();assert result['status']=='closed_initial_window_stopped_before_snapshot'
+    assert not any(result['denials'].values())
     with pytest.raises(d.IntervalRefusal):p.hooks[0](event,args)
+    assert result['denials']=={name:int(name==key) for name in d._DENIAL_KEYS}  # SI-CR28-005
     assert 'PRIVATE' not in json.dumps(result)
 
 

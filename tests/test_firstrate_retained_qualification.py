@@ -256,3 +256,66 @@ def test_fixed_failure_projection_cannot_echo_private_values(q):
     for error in (ValueError('/private/FABRICATED'), q.RetainedQualificationRefusal('/private/FABRICATED')):
         summary = q.failure_summary(error)
         assert summary['code'] is None and b'FABRICATED' not in q._canonical(summary)
+
+
+def discordant(q):
+    """A valid discordant pair, so a report change reaches only its own guard."""
+    payload = aggregate(q); payload['paired_member_mismatches'] = 1
+    payload['year_is_exact_full_2026_token_multiset_subset'] = False
+    payload['year']['all_member_tokens_commitment_sha256'] = 'a' * 64
+    return payload
+
+
+@pytest.mark.parametrize('code, change', [
+    ('accounting', {'inflated_bytes': 2 * 1024**2 + 1}),  # Above the per-member bound for two members.
+    ('accounting', {'inflated_bytes': 0}),
+    ('accounting', {'member_count': 7}),  # More nonempty members than the six rows.
+    ('accounting', {'reported_field_observations': {'fractional_average_volume': 0}}),
+    ('accounting', {'reported_field_observations': {'fractional_average_volume': 7}}),
+    ('accounting', {'reported_field_observations': {'zero_average_volume': 2, 'zero_average_volume_positive_reported_DTC': 3}}),
+    ('accounting', {'row_reason_counts': {'settlement_date': 1, 'days_to_cover_numeric': 2}, 'distinct_settlement_dates': 6}),
+    ('accounting', {'row_reason_counts': {'settlement_date': 2}, 'year_2026_rows': 5}),  # Only four rows have dates.
+    ('accounting', {'year_2026_rows': 1}),  # Two members cannot share one row.
+    ('accounting', {'year_2026_rows': 1, 'year_2026_members': 0}),
+    ('dates', {'distinct_settlement_dates': 0, 'earliest_settlement_date': None, 'latest_settlement_date': None,
+               'year_2026_rows': 0, 'year_2026_members': 0}),  # Six dated rows cannot have no dates.
+    ('dates', {'rows': 0, 'structurally_clear_rows': 0, 'quarantined_rows': 0, 'empty_members': 2, 'row_reason_counts': {},
+               'reported_field_observations': {}, 'distinct_settlement_dates': 0, 'latest_settlement_date': None,
+               'year_2026_rows': 0, 'year_2026_members': 0}),  # No dates, yet one bound remains.
+    ('dates', {'distinct_settlement_dates': 1}),  # One date cannot have two different bounds.
+    ('dates', {'earliest_settlement_date': '2025-01-01', 'latest_settlement_date': '2025-12-31'}),
+    ('dates', {'earliest_settlement_date': '2027-01-01', 'latest_settlement_date': '2027-12-31'}),
+    ('schema', {'member_origin_disposition_commitment_sha256': 'X' * 64}),
+])
+def test_each_report_contradiction_reaches_its_own_guard(q, code, change):
+    """SI-CR28-011: one combined change per case hid guards behind later checks."""
+    payload = discordant(q); payload['full'].update(change)
+    with pytest.raises(q.RetainedQualificationRefusal, match=f'^{code}$'): evaluate(q, payload)
+
+
+@pytest.mark.parametrize('field, value, code', [('schema', 'other', 'schema'), ('scope', 'other', 'schema'),
+                                                ('paired_member_mismatches', 5, 'accounting')])
+def test_each_top_level_contradiction_reaches_its_own_guard(q, field, value, code):
+    """SI-CR28-011: at most four members can differ in this discordant pair."""
+    payload = discordant(q); payload[field] = value
+    with pytest.raises(q.RetainedQualificationRefusal, match=f'^{code}$'): evaluate(q, payload)
+
+
+@pytest.mark.parametrize('role, field, value', [('full', 'year_2026_tokens_commitment_sha256', 'a' * 64),
+                                                ('year', 'year_2026_tokens_commitment_sha256', 'a' * 64),
+                                                ('year', 'year_2026_members', 1), ('year', 'empty_members', 1)])
+def test_reported_match_requires_every_pair_relationship(q, role, field, value):
+    """SI-CR28-011: a reported match implies each of these original relationships."""
+    payload = aggregate(q); payload[role][field] = value
+    with pytest.raises(q.RetainedQualificationRefusal, match='^pair$'): evaluate(q, payload)
+
+
+def test_pair_flag_must_be_a_real_boolean(q):
+    """SI-CR28-011: JSON 1 compares equal to True, so the type check is the guard."""
+    payload = aggregate(q); payload['year_is_exact_full_2026_token_multiset_subset'] = 1
+    with pytest.raises(q.RetainedQualificationRefusal, match='^pair$'): evaluate(q, payload)
+
+
+def test_oversized_bytes_refuse_before_json_parsing(q):
+    """SI-CR28-011: the existing bound case stopped at JSON whichever check ran."""
+    with pytest.raises(q.RetainedQualificationRefusal, match='^bytes$'): q.evaluate_retained_aggregate(b'x' * (q.MAX_BYTES + 1))

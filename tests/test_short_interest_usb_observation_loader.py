@@ -180,22 +180,38 @@ def test_close_failure_preserves_negative_and_independent_cleanup(prepared,monke
     assert 'PRIVATE' not in json.dumps(negative)
 
 
-@pytest.mark.parametrize('field',['authority','authority_counter_bool','denials','proof','proof_counter_bool','aggregate','wrapper','wrapper_counter_bool'])
+@pytest.mark.parametrize('field',['authority','authority_counter_bool','denials','denials_count','proof','proof_counter_bool','aggregate','status',
+    'invocation','runtime_head','matching_remote','manifest','qualified','first_failure','cleanup','wrapper','wrapper_counter_bool','wrapper_claims',
+    'wrapper_authority','wrapper_hash','wrapper_bytes'])
 def test_strict_private_packet_relationships_do_not_accept_counterfactuals(prepared,field):
     h=prepared;q=h.q;bodies=dict(h.contents);packet=json.loads(bodies[q.NAMES[0]])
     if field=='authority':packet['authority']['source_admitted']=True
     elif field=='authority_counter_bool':packet['authority']['provider_HTTP']=False
     elif field=='denials':packet['denials']['python_write_attempts']=False
+    elif field=='denials_count':packet['denials']['python_write_attempts']=1
     elif field=='proof':packet['original_profile_proof']['executed_verified_RAM']=False
     elif field=='proof_counter_bool':packet['original_profile_proof']['authority']['provider_HTTP']=False
     elif field=='aggregate':packet['private_model_aggregate']['scope']='not the original aggregate'
-    else:
-        saved=json.loads(bodies[q.NAMES[1]])
-        if field=='wrapper_counter_bool':saved['owned_observation']['actual_exit_code']=False
-        else:saved['unknown']=True
-        bodies[q.NAMES[1]]=canonical(saved)
-    bodies[q.NAMES[0]]=canonical(packet)+b'\n'
-    with pytest.raises(q.UsbObservationRefusal):q._packet(bodies,h.anchor)
+    elif field=='status':packet['status']='incomplete'
+    elif field=='invocation':packet['invocation_id']='other'
+    elif field=='runtime_head':packet['runtime_head']='f'*40
+    elif field=='matching_remote':packet['matching_remote']='f'*40
+    elif field=='manifest':packet['code_manifest_sha256']='f'*64
+    elif field=='qualified':packet['source_qualified']=True
+    elif field=='first_failure':packet['first_failure']={'phase':'original','code':None}
+    elif field=='cleanup':packet['cleanup_failures']=[{'phase':'cleanup','code':None}]
+    packet_raw=canonical(packet)+b'\n';bodies[q.NAMES[0]]=packet_raw
+    saved=json.loads(bodies[q.NAMES[1]])
+    # SI-CR28-012: without re-signing, every packet case stopped at the wrapper hash.
+    saved.update(original_stdout_bytes=len(packet_raw),original_stdout_sha256=digest(packet_raw))
+    if field=='wrapper_counter_bool':saved['owned_observation']['actual_exit_code']=False
+    elif field=='wrapper':saved['unknown']=True
+    elif field=='wrapper_claims':saved['process_claims']='independently observed'
+    elif field=='wrapper_authority':saved['source_authority']=True
+    elif field=='wrapper_hash':saved['original_stdout_sha256']='f'*64
+    elif field=='wrapper_bytes':saved['original_stdout_bytes']+=1
+    bodies[q.NAMES[1]]=canonical(saved)
+    with pytest.raises(q.UsbObservationRefusal,match='^anchor$'):q._packet(bodies,h.anchor)
 
 
 @pytest.mark.parametrize('change',['entry','getter','property','class'])
@@ -314,3 +330,151 @@ def test_attempt_failure_cannot_be_restarted_by_resetting_public_used_flag(prepa
     # actual completed attempt is independently retained by _ATTEMPTS.
     assert value is not None,negative
     h.q._USED=False;value,negative=result(h);assert value is None and negative['first_failure']['code']=='spent'
+
+
+def lane_reply(monkeypatch,prefix,**reply):
+    """Change one Git answer; every other answer stays the fixture's."""
+    real=subprocess.run
+    def run(arguments,**kwargs):
+        if tuple(arguments[1:len(prefix)+1])==prefix:return SimpleNamespace(**{'returncode':0,'stdout':b'','stderr':b'',**reply})
+        return real(arguments,**kwargs)
+    monkeypatch.setattr(subprocess,'run',run)
+
+
+def opened_private(h,monkeypatch):
+    opened=[];real=os.open
+    def opening(path,*args,**kwargs):
+        if str(path)==h.directory.name:opened.append(path)
+        return real(path,*args,**kwargs)
+    monkeypatch.setattr(os,'open',opening);return opened
+
+
+@pytest.mark.parametrize('prefix,stdout',[(('rev-parse','--show-toplevel'),b'/elsewhere\n'),(('branch','--show-current'),b'other\n'),
+    (('rev-parse','HEAD'),b'f'*40+b'\n'),(('status',),b' M scripts/other.py\0'),
+    (('rev-parse','refs/remotes/origin/codex/strategy-short-interest'),b'f'*40+b'\n'),
+    (('ls-remote',),b'f'*40+b'\trefs/heads/codex/strategy-short-interest\n')])
+def test_moved_or_dirty_lane_refuses_before_any_private_open(prepared,monkeypatch,prefix,stdout):
+    """SI-CR28-013: the first guard had no failure-direction test."""
+    h=prepared;opened=opened_private(h,monkeypatch);lane_reply(monkeypatch,prefix,stdout=stdout);value,negative=result(h)
+    assert value is None and negative['first_failure']=={'phase':'bootstrap','code':'lane'} and not opened
+
+
+def test_wrong_working_directory_refuses_before_any_private_open(prepared,monkeypatch,tmp_path_factory):
+    """SI-CR28-013: Git is told its own directory, so only this check sees the caller's."""
+    h=prepared;opened=opened_private(h,monkeypatch);monkeypatch.chdir(tmp_path_factory.mktemp('elsewhere'));value,negative=result(h)
+    assert value is None and negative['first_failure']=={'phase':'bootstrap','code':'lane'} and not opened
+
+
+@pytest.mark.parametrize('change',['committed_differs','hard_link','group_writable'])
+def test_working_code_must_be_exact_committed_single_owner_bytes(prepared,change):
+    """SI-CR28-014: the loader executes these bytes, so each check needs a refusal."""
+    h=prepared;path=h.root/MODEL
+    if change=='committed_differs':raw=h.code[MODEL];h.code[MODEL]=raw[:-2]+(b'#' if raw[-2:-1]!=b'#' else b' ')+raw[-1:]
+    elif change=='hard_link':os.link(path,h.root/'alias')
+    else:path.chmod(0o664)
+    value,negative=result(h);assert value is None and negative['first_failure']=={'phase':'code','code':'code'}
+
+
+def resign(a):
+    proof=a['original_profile_proof'];proof['observation_sha256']=digest(canonical({k:v for k,v in proof.items() if k!='observation_sha256'}))
+    a['original_owned_observation_sha256']=digest(canonical(a['original_owned_observation']));return a
+
+
+def _map_show(a):
+    history=a['historical_runtime'];history['source_code_mapping']['scripts/observe_short_interest_usb_once.mjs']='f'*64
+    history['execution9_mapping_sha256']=digest(canonical(history['source_code_mapping']))
+
+
+def _map_worker(a):
+    history=a['historical_runtime'];history['worker_source_code_mapping']['data/hashing.py']='f'*64
+    history['worker7_mapping_sha256']=digest(canonical(history['worker_source_code_mapping']))
+
+
+def _receipt_files(a):
+    a['original_independent_audit']['files']=copy.deepcopy(a['original_independent_audit']['files'])  # The fixture shares one object.
+    a['original_independent_audit']['files'][NAMES[0]]['bytes']+=1
+
+
+ANCHOR_CASES={
+    'keys':(lambda a:a.update(unknown=1),'anchor'),
+    'trust':(lambda a:a.update(trust_statement='live process capability'),'anchor'),
+    'root':(lambda a:a['historical_runtime'].update(physical_root='/elsewhere'),'anchor'),
+    'branch':(lambda a:a['historical_runtime'].update(branch='other'),'anchor'),
+    'run':(lambda a:a['private_artifacts'].update(fixed_run='/elsewhere'),'anchor'),
+    'owned_status':(lambda a:a['original_owned_observation'].update(status='incomplete'),'anchor'),
+    'owned_head':(lambda a:a['original_owned_observation'].update(runtime_head='f'*40),'anchor'),
+    'proof_head':(lambda a:a['original_profile_proof'].update(runtime_head='f'*40),'anchor'),
+    'aggregate':(lambda a:a['original_owned_observation'].update(private_model_aggregate_sha256='f'*64),'anchor'),
+    'seams':(lambda a:a['original_owned_observation'].update(test_seams_used=True),'anchor'),
+    'receipt_files':(_receipt_files,'anchor'),
+    'receipt_stamp':(lambda a:a['original_copier_receipt'].update(directory5_sha256='f'*64),'anchor'),
+    'deadline':(lambda a:a['main_attestation'].update(accepted_before_original_deadline=False),'anchor'),
+    'elapsed':(lambda a:a['main_attestation'].update(captured_final_controller_elapsed_ms=180001),'anchor'),
+    'access':(lambda a:a['unchanged_access'].update(provider_HTTP=1),'anchor'),
+    'closures':(lambda a:a['original_local_process_closures'].pop(),'anchor'),
+    'map_hash':(lambda a:a['historical_runtime'].update(execution9_mapping_sha256='f'*64),'history'),
+    'worker_hash':(lambda a:a['historical_runtime'].update(worker7_mapping_sha256='f'*64),'history'),
+    'worker_member':(_map_worker,'history'),
+    'five_code':(lambda a:a['original_profile_proof'].update(code_mapping_sha256='f'*64),'history'),
+    'historical_blob':(_map_show,'history'),
+}
+NAMES=('producer.stdout.private','observation.private.json')
+
+
+@pytest.mark.parametrize('change',sorted(ANCHOR_CASES))
+def test_each_anchor_relationship_refuses_at_its_own_check(prepared,change):
+    """SI-CR28-015: re-signed, so later packet checks cannot hide a missing anchor check."""
+    h=prepared;a=copy.deepcopy(h.anchor);mutate,code=ANCHOR_CASES[change];mutate(a);h.install(resign(a));value,negative=result(h)
+    assert value is None and negative['first_failure']=={'phase':'anchor','code':code}
+
+
+def test_committed_anchor_bytes_must_match_the_loader_pin(prepared):
+    """SI-CR28-015: valid replacement bytes still differ from the fixed hash."""
+    h=prepared;a=copy.deepcopy(h.anchor);a['anchor_id']='other';raw=canonical(a)+b'\n';(h.root/ANCHOR).write_bytes(raw);h.code[ANCHOR]=raw
+    value,negative=result(h);assert value is None and negative['first_failure']=={'phase':'anchor','code':'anchor'}
+
+
+def test_historical_creator_must_be_an_ancestor_of_the_runtime(prepared,monkeypatch):
+    """SI-CR28-015: a non-ancestor creator cannot lend this lane its history."""
+    h=prepared;lane_reply(monkeypatch,('merge-base',),returncode=1);value,negative=result(h)
+    assert value is None and negative['first_failure']=={'phase':'anchor','code':'code'}
+
+
+def repin(h,**replace):
+    """Commit the current private stamps, so only the named check can refuse."""
+    a=copy.deepcopy(h.anchor);paths=list(reversed(h.directory.parents))+[h.directory]
+    chain=[[info.st_dev,info.st_ino,info.st_uid,info.st_gid,info.st_mode] for info in (path.stat() for path in paths)]
+    files={name:{**a['private_artifacts']['files'][name],'original_file10_sha256':digest(canonical(list(stamp((h.directory/name).stat()))))} for name in NAMES}
+    for field in ('private_artifacts','original_copier_receipt','original_independent_audit'):
+        a[field].update(files=files,**{'directory5_sha256':digest(canonical(chain[-1])),'ancestry5_sha256':digest(canonical(chain)),**replace})
+    h.install(a)
+
+
+@pytest.mark.parametrize('change,code',[('mode','stamp'),('hard_link','stamp'),('touched','stamp'),('bytes','bytes'),
+    ('ancestry','directory'),('leaf','directory'),('directory_mode','directory')])
+def test_each_private_artifact_check_refuses_on_its_own(prepared,change,code):
+    """SI-CR28-016: these checks had no case that reached them alone."""
+    h=prepared;path=h.directory/NAMES[0];info=path.stat()
+    if change=='mode':path.chmod(0o640);repin(h)
+    elif change=='hard_link':os.link(path,h.root/'alias');repin(h)
+    elif change=='touched':os.utime(path,ns=(info.st_atime_ns,info.st_mtime_ns+1))
+    elif change=='bytes':raw=path.read_bytes();path.write_bytes(raw[:-2]+(b'X' if raw[-2:-1]!=b'X' else b'Y')+raw[-1:]);repin(h)
+    elif change=='ancestry':repin(h,ancestry5_sha256='f'*64)
+    elif change=='leaf':repin(h,directory5_sha256='f'*64)
+    else:h.directory.chmod(0o750);repin(h)
+    value,negative=result(h);assert value is None and negative['first_failure']=={'phase':'directory','code':code}
+
+
+@pytest.mark.parametrize('old,new',[("POLICY_SHA256 = '9408f0c4c4f2edca105c9f710670ed34d3fef507bdf0bb6b44bce0e266063230'","POLICY_SHA256 = '"+'f'*64+"'"),
+    ("payload = {'schema': SCHEMA, 'policy_sha256': POLICY_SHA256, 'input_aggregate_sha256': _sha(canonical_bytes),","payload = {'schema': SCHEMA, 'policy_sha256': POLICY_SHA256, 'input_aggregate_sha256': _sha(b''),")])
+def test_committed_model_with_another_policy_or_input_binding_is_refused(prepared,old,new):
+    """SI-CR28-017: the loader's own checks on the model it has just compiled."""
+    h=prepared;raw=h.code[MODEL].decode();assert raw.count(old)==1;raw=raw.replace(old,new).encode();(h.root/MODEL).write_bytes(raw);h.code[MODEL]=raw
+    value,negative=result(h);assert value is None and negative['first_failure']=={'phase':'qualification','code':'model'}
+
+
+def test_foreign_caller_cannot_issue_a_closed_report(prepared):
+    """SI-CR28-017: closure is only issued by the original attempt's frame."""
+    q=prepared.q;terminal=('all_original_contexts_closed',0,q.ANCHOR_SHA256);payload,summary={},{}
+    with pytest.raises(q.UsbObservationRefusal,match='^closure$'):q._issue(payload,summary,terminal,q._Clock())
+    assert not q._ISSUED

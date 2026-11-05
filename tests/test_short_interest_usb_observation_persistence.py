@@ -310,3 +310,14 @@ def test_actual_cli_terminal_serialization_expiry_cannot_emit_closed_receipt(pre
         assert q.main() == 2
     result = json.loads(capsys.readouterr().out)
     assert serializations >= 2 and result['status'] == 'incomplete' and result['first_failure']['code'] == 'clock'
+
+
+@pytest.mark.parametrize('change', ['exit_code', 'exit_bool', 'producer_incomplete'])
+def test_closed_copy_requires_a_closed_process_and_producer(prepared, change):
+    """SI-CR28-019: the copier's own lineage check before anything is created."""
+    q = prepared; value, packet = supplied(q, negative=change == 'producer_incomplete'); observed = value['owned_observation']
+    if change == 'exit_code': observed['actual_exit_code'] = 2
+    elif change == 'exit_bool': observed['actual_exit_code'] = False
+    else: observed.update(status='closed_finite_offline_byte_observation', actual_exit_code=0)
+    result = publish(q, value)
+    assert result['status'] == 'incomplete' and result['first_failure']['code'] == 'lineage' and not q.BASE.exists()

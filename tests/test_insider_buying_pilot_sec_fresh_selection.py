@@ -10,6 +10,7 @@ import zipfile
 
 import pytest
 
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 from research import insider_buying_pilot_sec_fresh_selection as m
 from research.insider_buying.sec_quarter_master_index import parse_sec_quarter_master_index
 

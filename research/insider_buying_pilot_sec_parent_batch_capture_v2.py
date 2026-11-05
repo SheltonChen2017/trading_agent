@@ -542,9 +542,22 @@ def verify_invented_batch(root,number,*,expected_complete_sha256,expected_plan_s
         expected_index_sha256=expected_index_sha256,fixture=True)
 
 
+def _bind_planner_receipt(receipt,number,expected_plan_sha256,*,root=LANE_ROOT,fixture=False):
+    """Section 342 (Claude review): the copied planner receipt must equal the
+    planner's own held namespace and name the batch's external plan pin."""
+    _need(type(receipt) is dict and set(receipt)=={"plan_sha256","complete_sha256","execution_identity"}
+        and receipt["plan_sha256"]==expected_plan_sha256 and type(receipt["execution_identity"]) is dict,"batch_planner_receipt_binding")
+    held=campaign.HeldBatchPlan(root,number,expected_plan_sha256=receipt["plan_sha256"],expected_complete_sha256=receipt["complete_sha256"],
+        expected_producer_head=receipt["execution_identity"].get("head"),fixture=fixture)
+    try:_need(_raw(held.receipt)==_raw(receipt),"batch_planner_receipt_binding")
+    finally:held.close()
+
+
 def _readback_actual(identity,**arguments):
     campaign._isolated();campaign._current(identity)
-    value=_verify(LANE_ROOT,arguments.pop("number"),fixture=False,**arguments)
+    number=arguments.pop("number")
+    value=_verify(LANE_ROOT,number,fixture=False,**arguments)
+    _bind_planner_receipt(value["complete"]["planner_receipt"],number,arguments["expected_plan_sha256"])
     campaign._current(identity);return value
 
 

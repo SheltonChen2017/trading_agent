@@ -526,3 +526,58 @@ def test_empty_plan_refuses_before_namespace_or_private_contact(tmp_path,plan):
     with pytest.raises(m.BatchCaptureError,match="^batch_empty_plan_no_contact$"):
         _run(tmp_path,empty,contact=lambda:pytest.fail("private contact read"))
     assert not _base(tmp_path).exists()
+
+
+# Claude review section 342 (IBBATCH-CR34201): the readback copied the planner
+# receipt from complete.json without comparing it with the planner's own
+# namespace or the batch's external plan pin.
+def test_planner_receipt_is_bound_to_the_held_planner_namespace(corpus,tmp_path):
+    helper,values=corpus
+    held,pins=helper._held_plan(values,tmp_path);receipt=dict(held.receipt);held.close()
+    root=tmp_path.resolve()
+    assert m._bind_planner_receipt(receipt,1,pins["expected_plan_sha256"],root=root,fixture=True) is None
+    for changed,plan_pin in (({**receipt,"plan_sha256":"f"*64},"f"*64),({**receipt,"complete_sha256":"e"*64},pins["expected_plan_sha256"]),
+                             (receipt,"d"*64),({**receipt,"extra":True},pins["expected_plan_sha256"])):
+        with pytest.raises(ValueError):
+            m._bind_planner_receipt(changed,1,plan_pin,root=root,fixture=True)
+    # A missing key and an identity field the planner hold does not check
+    # itself are refused by the binding's own exact comparisons.
+    missing={key:value for key,value in receipt.items() if key!="complete_sha256"}
+    changed_identity={**receipt,"execution_identity":{**receipt["execution_identity"],"invented":True}}
+    for changed in (missing,changed_identity):
+        with pytest.raises(m.BatchCaptureError,match="^batch_planner_receipt_binding$"):
+            m._bind_planner_receipt(changed,1,pins["expected_plan_sha256"],root=root,fixture=True)
+
+
+def test_actual_readback_binds_the_planner_receipt(monkeypatch):
+    seen=[]
+    monkeypatch.setattr(m.campaign,"_isolated",lambda:None)
+    monkeypatch.setattr(m.campaign,"_current",lambda identity:None)
+    monkeypatch.setattr(m,"_verify",lambda *a,**k:{"complete":{"planner_receipt":{"invented":True}}})
+    monkeypatch.setattr(m,"_bind_planner_receipt",lambda receipt,number,plan,**k:seen.append((receipt,number,plan)))
+    m._readback_actual({},number=1,expected_complete_sha256="a"*64,expected_plan_sha256="b"*64,expected_index_sha256="c"*64)
+    assert seen==[({"invented":True},1,"b"*64)]
+
+
+# Claude review section 342 (IBBATCH-TEST34201): the namespace guard (mutant
+# B05) was removable with every test green. A repeated batch, a foreign entry
+# beside the batches and a missing predecessor batch each refuse before any
+# request is sent.
+@pytest.mark.parametrize("fault",("repeat","foreign","gap"))
+def test_capture_namespace_refuses_a_repeat_foreign_entry_or_predecessor_gap(tmp_path,plan,corpus,fault):
+    one=_run(tmp_path,plan);target=plan
+    if fault!="repeat":
+        lower=_verify(tmp_path,one)
+        predecessor={"batch_number":1,"complete_sha256":one["complete_sha256"],"plan_sha256":one["plan_sha256"],
+            "index_sha256":one["index_sha256"],"capture_execution_identity":lower["complete"]["execution_identity"],
+            "first64_success_sha256":one["complete_sha256"],"last_finished_utc":lower["complete"]["last_finished_utc"],
+            "capture_completed_without_refusal":True}
+        helper,values=corpus;pipeline=helper._pipeline(values,consumed=lower["index"]["accessions"],number=2,limit=8)
+        pipeline[0].predecessor=predecessor;target=helper._finish(pipeline).to_payload()
+        if fault=="foreign":(_base(tmp_path)/"foreign").mkdir(mode=0o700)
+        else:_run_path(tmp_path).rename(tmp_path/"moved-batch")
+    calls=[]
+    with pytest.raises(m.BatchCaptureError,match="^batch_capture_namespace_consumed_or_gap$"):
+        _run(tmp_path,target,calls=calls,contact=lambda:pytest.fail("private contact read"))
+    assert calls==[]
+    if fault!="repeat":assert not _run_path(tmp_path,2).exists()

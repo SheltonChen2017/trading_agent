@@ -9,6 +9,7 @@ from types import SimpleNamespace
 
 import pytest
 
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 from research import insider_buying_pilot_sec_fresh_selection_runner as m
 
 

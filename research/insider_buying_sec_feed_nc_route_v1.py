@@ -8,6 +8,11 @@ the whole supplied payload. TEXT is opaque, never searched for routing facts.
 All supplied immutable payload bytes finish the unchanged finite contact screen
 before parsing or construction of any private claim. No input hash is needed.
 No source values, routes, names, bytes or their hashes occur in public witnesses.
+Shadow-only front scanning continues past stray DOCUMENT lines but stops before
+a qualified DOCUMENT header's TEXT. An ambiguous or absent TEXT barrier leaves
+a single assessment unqualified and refuses the WHOLE batch, not its bad member
+alone. The existing preamble byte budget also bounds this shadow front, including
+the DOCUMENT header; TEXT itself is never searched for route hints.
 
 Public grammar evidence: https://www.sec.gov/info/edgar/specifications/
 pds-dissemination-spec070114.pdf sections 2 and 3.4. A supported subset is an
@@ -74,6 +79,7 @@ SAFE_ERROR_CODES = frozenset({("input","exact_limits_required"),("input","limits
     ("capacity","payload_byte_bound"),("capacity","batch_byte_bound"),("capacity","member_count_bound"),
     ("capacity","line_count_bound"),("capacity","line_byte_bound"),("capacity","preamble_byte_bound"),
     ("capacity","document_count_bound"),("capacity","group_count_bound"),("capacity","metadata_byte_bound"),
+    ("structure","shadow_front_unqualified"),
     ("privacy","explicit_contact_required"),("privacy","contact_profile_refused"),("privacy","finite_payload_screen_refused"),
     ("contract","genuine_unchanged_claim_required"),("contract","genuine_unchanged_assessment_required"),
     ("contract","genuine_unchanged_batch_required"),("contract","witness_schema_refused"),
@@ -187,6 +193,7 @@ class NCRouteAssessment:
     _payload:bytes=field(repr=False)
     _claim:NCFrontRouteClaim|None=field(repr=False)
     _hints:tuple[str,...]=field(repr=False)
+    _shadow_complete:bool=field(repr=False)
     _witness:bytes=field(repr=False)
     _token:object=field(repr=False)
 
@@ -203,8 +210,9 @@ def validate_nc_route_assessment(value):
     _need(type(value) is NCRouteAssessment and record is not None and record[0]() is value
         and value._token is _TOKEN and type(value._payload) is type(value._witness) is bytes
         and type(value._hints) is tuple and all(type(x) is str for x in value._hints)
+        and type(value._shadow_complete) is bool
         and (value._claim is None or type(value._claim) is NCFrontRouteClaim)
-        and record[1]==(value._payload,value._claim,value._hints,value._witness),
+        and record[1]==(value._payload,value._claim,value._hints,value._shadow_complete,value._witness),
         "contract","genuine_unchanged_assessment_required")
     if value._claim is not None:validate_nc_front_route_claim(value._claim)
     return value
@@ -294,6 +302,40 @@ def _group_close(frame):
     elif tag in {"FORMER-COMPANY","FORMER-NAME"}:_syntax({"FORMER-CONFORMED-NAME","DATE-CHANGED"}<=seen)
 
 
+def _document_header(lines,at,sequence):
+    """Shared exact header grammar; return TYPE and first opaque body line."""
+    _syntax(at<len(lines)-1 and lines[at]==b"<DOCUMENT>");at+=1
+    values={}
+    for name in ("TYPE","SEQUENCE","FILENAME"):
+        _syntax(at<len(lines)-1);closing,tag,value=_token(lines[at]);at+=1
+        _syntax(not closing and tag==name and value);values[name]=value
+    _syntax(len(values["TYPE"])<=20 and len(values["FILENAME"])<=255)
+    _syntax(re.fullmatch(rb"[1-9][0-9]{0,2}",values["SEQUENCE"]) is not None
+        and int(values["SEQUENCE"])==sequence)
+    if at<len(lines)-1 and lines[at].startswith(b"<DESCRIPTION>"):
+        closing,tag,value=_token(lines[at]);_syntax(not closing and tag=="DESCRIPTION" and len(value)<=255);at+=1
+    _syntax(at<len(lines)-1 and lines[at]==b"<TEXT>")
+    return values["TYPE"],at+1
+
+
+def _shadow_front(lines,limits):
+    """Quarantine-only hints; never cross an unqualified TEXT opening."""
+    shadows=[];used=0
+    for at,line in enumerate(lines):
+        if line==b"<DOCUMENT>":
+            try:_kind,body_at=_document_header(lines,at,1)
+            except _Unqualified:pass
+            else:
+                header_bytes=sum(len(part)+1 for part in lines[at:body_at])
+                _need(used+header_bytes<=limits.preamble_bytes,"capacity","preamble_byte_bound")
+                return tuple(shadows),True
+        _need(used+len(line)+1<=limits.preamble_bytes,"capacity","preamble_byte_bound")
+        if b"<TEXT" in line or b"</TEXT" in line:return tuple(shadows),False
+        shadows.extend(match.group(1).decode("ascii") for match in _SHADOW_HINT.finditer(line))
+        used+=len(line)+1
+    return tuple(shadows),False
+
+
 def _parse(lines,limits):
     _syntax(lines[0]==b"<SUBMISSION>" and lines[-1]==b"</SUBMISSION>")
     front={};stack=[];groups=0;front_rank=-1;front_done=False;at=1;preamble= len(lines[0])+1
@@ -338,22 +380,12 @@ def _parse(lines,limits):
         if key in front:_date(front[key])
     observed=0;matching=0
     while at<len(lines)-1:
-        _syntax(lines[at]==b"<DOCUMENT>");at+=1
-        values={}
-        for name in ("TYPE","SEQUENCE","FILENAME"):
-            _syntax(at<len(lines)-1);closing,tag,value=_token(lines[at]);at+=1
-            _syntax(not closing and tag==name and value);values[name]=value
-        _syntax(len(values["TYPE"])<=20 and len(values["FILENAME"])<=255)
-        _syntax(re.fullmatch(rb"[1-9][0-9]{0,2}",values["SEQUENCE"]) is not None
-            and int(values["SEQUENCE"])==observed+1)
-        if at<len(lines)-1 and lines[at].startswith(b"<DESCRIPTION>"):
-            closing,tag,value=_token(lines[at]);_syntax(not closing and tag=="DESCRIPTION" and len(value)<=255);at+=1
-        _syntax(at<len(lines)-1 and lines[at]==b"<TEXT>");at+=1
+        kind,at=_document_header(lines,at,observed+1)
         while at<len(lines)-1 and lines[at]!=b"</TEXT>":
             _syntax(lines[at] not in {b"<DOCUMENT>",b"</DOCUMENT>",b"<SUBMISSION>",b"</SUBMISSION>",b"<TEXT>"})
             at+=1
         _syntax(at+1<len(lines)-1 and lines[at]==b"</TEXT>" and lines[at+1]==b"</DOCUMENT>");at+=2
-        observed+=1;matching+=values["TYPE"]==front["TYPE"]
+        observed+=1;matching+=kind==front["TYPE"]
         _need(observed<=limits.documents,"capacity","document_count_bound")
     _syntax(observed==count and matching==1)
     return accession,form,filed,count
@@ -402,12 +434,12 @@ def _assessment(raw,fixture,screened,limits):
     preamble=b"\n".join(lines[:boundary])
     _need(len(preamble)<=limits.preamble_bytes,"capacity","preamble_byte_bound")
     hints=tuple(match.group(1).decode("ascii") for match in _HINT.finditer(preamble))
-    shadows=tuple(match.group(1).decode("ascii") for match in _SHADOW_HINT.finditer(preamble))
+    shadows,shadow_complete=_shadow_front(lines,limits)
     claim=None;count=0;disposition="unsupported_or_ambiguous_structure"
     try:
         _syntax(len(hints)==1 and not any(b"\r" in line for line in lines))
         accession,form,filed,count=_parse(lines,limits)
-        _syntax(hints==(accession,))
+        _syntax(hints==(accession,) and shadow_complete)
         claim=NCFrontRouteClaim(accession,form,filed,count,raw,_TOKEN)
         _register(_CLAIMS,claim,(accession,form,filed,count,raw))
         disposition="private_direct_front_route_claim"
@@ -415,8 +447,8 @@ def _assessment(raw,fixture,screened,limits):
         disposition="unqualified_documented_status" if error.status else disposition
     witness=validate_nc_route_witness(_witness(raw,fixture,screened,disposition,hints,count),fixture_only=fixture)
     encoded=_raw(witness);_need(len(encoded)<=limits.metadata_bytes,"capacity","metadata_byte_bound")
-    value=NCRouteAssessment(raw,claim,shadows,encoded,_TOKEN)
-    return _register(_ASSESSMENTS,value,(raw,claim,shadows,encoded))
+    value=NCRouteAssessment(raw,claim,shadows,shadow_complete,encoded,_TOKEN)
+    return _register(_ASSESSMENTS,value,(raw,claim,shadows,shadow_complete,encoded))
 
 
 def assess_nc_route(payload,*,privacy_contact,fixture_only=False,limits=None):
@@ -427,8 +459,8 @@ def assess_nc_route(payload,*,privacy_contact,fixture_only=False,limits=None):
 
 def _quarantine(item,disposition):
     witness=item.public_witness();witness["disposition"]=disposition;witness["route_claim_available"]=False
-    encoded=_raw(witness);value=NCRouteAssessment(item._payload,None,item._hints,encoded,_TOKEN)
-    return _register(_ASSESSMENTS,value,(value._payload,None,value._hints,encoded))
+    encoded=_raw(witness);value=NCRouteAssessment(item._payload,None,item._hints,item._shadow_complete,encoded,_TOKEN)
+    return _register(_ASSESSMENTS,value,(value._payload,None,value._hints,value._shadow_complete,encoded))
 
 
 def assess_nc_route_batch(payloads,*,consumed_accessions,privacy_contact,fixture_only=False,limits=None):
@@ -441,6 +473,7 @@ def assess_nc_route_batch(payloads,*,consumed_accessions,privacy_contact,fixture
     _need(sum(map(len,payloads))<=limits.batch_bytes,"capacity","batch_byte_bound")
     screened=_screen(payloads,privacy_contact,fixture_only)
     items=tuple(_assessment(raw,fixture_only,screened,limits) for raw in payloads)
+    _need(all(item._shadow_complete for item in items),"structure","shadow_front_unqualified")
     occurrences=Counter(hint for item in items for hint in set(item._hints))
     selected=[]
     for item in items:

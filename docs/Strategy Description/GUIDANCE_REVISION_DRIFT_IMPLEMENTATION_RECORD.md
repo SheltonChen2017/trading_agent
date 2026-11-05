@@ -1,6 +1,13 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Original guidance and SPY source reconciliation recorded in section 63, 2026-11-04.
+Status: **Guidance corpus/compiler and quote-rights audit recorded in section 64, 2026-11-04.
+Structural exploratory pairs do not certify complete history or execution readiness.
+The Adobe FY2024/FY2025 source audit preserves missing ranges, incompatible definitions and intervening reaffirmations.
+The dataset remains current-vintage, PIT-false and disconnected from strategy arithmetic and execution.
+Massive's November 3 public terms expressly permit personal research/storage and conditional on-behalf processing;
+actual historical stock/SPY NBBO entitlement and usable common history remain unestablished.
+No QC, purchase, API-key read/use, strategy evaluation or monitor rearm occurs in section 64.
+Original guidance and SPY source reconciliation recorded in section 63, 2026-11-04.
 Both SPY conflicts are resolved to exact six-decimal issuer gross-rate evidence in a separate private overlay.
 Vendor files and production input acceptance remain unchanged; no cash posting or historical receipt is inferred.
 JNJ January/April original ranges are verified, including all four predecessor-column bounds.
@@ -9470,3 +9477,240 @@ full lane/repository suite, dependency installation, strategy calculation or
 native/empirical test is run. Final header, staged-file and ownership/ref checks
 precede the sole end-of-round matching-lane push. This is a source-audit handoff,
 not independent Claude acceptance or backtest readiness.
+
+## 64. Exploratory guidance corpus and existing quote-rights audit, 2026-11-04
+
+### 64.1 Owner scope, publication and evidence class
+
+Owner: **"Proceed with building a usable guidance-revision dataset and
+verifying historical stock/SPY bid/ask coverage and licensing using my existing
+subscriptions. Don't access QC or buy anything, and push once when done."**
+This round implements a pure local source compiler, builds an initial original-
+disclosure corpus and refreshes existing-access/official coverage and terms.
+It does not calculate real guidance percentage changes, signal thresholds,
+trade eligibility, returns or portfolio outcomes. The evidence class remains
+declared current-vintage historical reconstruction, `point_in_time_data=false`.
+It is not a frozen research universe or permission to evaluate the strategy.
+
+Start clean local and live matching remote
+`5c2bcdcce97a12969afbb5b60e30fe7265b376f8`, mandatory worktree/branch/origin
+verified. The section-63 publication is complete and is not repeated. No new
+Claude commit is consumed; earlier review dispositions remain unchanged.
+Only the lane module, its explicit review inventory, focused tests and this
+record change. Root/shared documents stay frozen. Monitor remains PAUSED.
+
+### 64.2 Compiler contract and limits
+
+`guidance_dataset.py` compiles explicit source captures and canonical source
+profiles into `gdr.guidance-dataset.v1`. It checks exact retained bytes/hashes,
+primary URI/capture metadata, field-value hashes and locators, declared issuer/
+FY/publication inventory, ordered finite bounds, units, accounting/adjustment,
+share and scope labels. It checks immediate **supplied** predecessor order;
+the declared inventory is not proof that all issuer disclosures were found.
+Unknowns, missing releases, unchanged ranges, corrections, withdrawals and
+incompatible/expired fiscal guidance remain visible. It never forward-fills
+missing full-year bounds or calls the strategy's revision/eligibility routines.
+
+The immutable public constructor rechecks the same inventories as the compiler;
+deserialization requires a separately retained expected hash. A current source
+capture is never backdated into a historical delivery. The safe summary exposes
+counts/hashes/refusal reasons without financial bounds. All PIT, historical-
+availability, source-completeness/authenticity certification, rights, approved-
+strategy-input and execution gates are fixed Boolean false. Source locators
+and semantic interpretations remain author assertions, not proof minted by a
+matching hash. The module has no provider, file, order or native-engine actuator.
+
+Complete issuer presentation originals require 32 MiB per capture / 96 MiB
+total local memory bounds; the actual off-cycle PDFs include approximately
+21.6 MB and 27.3 MB originals. The canonical metadata/profile dataset remains
+capped at 4 MiB. These new local audit bounds do not change any native bundle,
+cloud quota, log transport or recovery candidate. No excerpt is represented
+as an original, and no platform flag or limit is bypassed. The new module is
+added explicitly to `bundle._MODULES`; the native recovery carrier is not rebuilt.
+
+### 64.3 Original-source reconstruction and conservative use
+
+The source scope was chosen before inspecting bounds: Adobe FY2025's initial
+December 2024 release and March/June/September 2025 releases, extended to the
+contiguous FY2024 chain. The publication audit window is December 2023 through
+September 2025. Eight scheduled issuer originals, two issuer-prepared remarks,
+the FY2024 annual report and three dated FY2025 quarterly reports are retained.
+The known intervening March 26, 2024 and March 18, 2025 investor meetings and
+October 14, 2024 MAX material are then added to the source/chain inventory.
+This remains a bounded corpus, not an exhaustive off-cycle census or six-year
+guidance dataset, and it is not selected by price performance or threshold raises.
+
+Quarter-only releases retain explicit missing full-year fields. Initial versus
+later non-GAAP definition changes are preserved as comparability refusals;
+matching revenue/EPS labels alone do not override them. The image-based March
+2025 investor deck required local Apple Vision OCR: 109 pages completed without
+OCR errors, but OCR success alone was not numeric acceptance. Root rendered and
+visually inspected its page 7 and March 2024's page 8, including full-year
+headings, total-revenue versus segment/ARR rows, GAAP versus non-GAAP EPS and
+diluted-share footnotes. Private exact checks confirm all four March 2025 bounds
+match the March 12 original and all four March 2024 bounds match the December
+2023 original. Known reaffirmations are retained rather than skipped when
+determining later supplied predecessors. The MAX material's historical FY
+columns do not manufacture a fresh positive guidance event.
+
+Identity uses a declared issuer SEC-file-number/common-stock-class namespace,
+not a claimed CUSIP/FIGI/CIK mapping. USD normalization uses explicit U.S.-dollar
+reporting context joined to the issuer target table, not a dollar sign alone.
+Fiscal dates derived from the issuer's documented Friday-nearest-November-30
+calendar policy are labelled as calendar derivations; as-presented diluted
+share basis is not a constant share count or verified split-adjusted series.
+These qualifications and source locators remain in the private profiles.
+They do not establish dated universe membership or complete acquisition/
+correction/withdrawal history. Publication dates without reliable times remain
+date-only. No first subscriber receipt, immutable historical version, six-year
+coverage, execution timing, licensing certification or strategy acceptance is
+inferred from a structurally comparable exploratory pair.
+
+Final v2 retains **17 original PDFs / 63,295,358 bytes and 11 profiles**:
+eight scheduled releases and three known off-cycle presentations. Nine profiles
+contain full-year ranges; two quarter-only profiles retain missing full-year
+fields. The compiled 78,601-byte private dataset has two baselines, three
+structurally comparable links and six refusals, with zero missing profiles in
+the explicitly declared eleven-event inventory. The comparable supplied chain
+is March 12 -> March 18 -> June 12 -> September 11, 2025. March 18 republishes
+unchanged targets and is **not** a fresh economic candidate; three comparable
+links are not three qualifying raises or three independent events. Known
+definition changes, missing predecessors and historical republication remain
+refusals. This does not certify the complete issuer archive or an eligible
+trading dataset.
+
+### 64.4 Existing access, quote coverage and current rights
+
+| Provider | Account evidence this round | Historical stock/SPY quote and rights disposition |
+| --- | --- | --- |
+| EODHD | Existing isolated browser is authenticated. All World and Calendar remain displayed Cancelled / available until November 14, 2026. No API key is read or used. | Historical tick documentation describes execution trades, not bid/ask; US live quotes are EDGX, not historical consolidated NBBO. Ordinary private local storage/analysis remains permitted by inspected terms. No new post-term or external-processing grant is inferred. |
+| Massive | The isolated subscriptions route redirects to sign-in. Owner sign-in is requested; no form, agreement or API-data request is submitted. Last verified November 3 account showed Stocks Starter, cancellation pending November 6, and no Advanced/Corporate Guidance grant. | [Historical Quotes](https://massive.com/docs/rest/stocks/trades-quotes/quotes) documents Advanced history from September 10, 2003, excluding Basic/Starter/Developer. SPY uses the same Stocks quote product, not a separate ETF plan. Actual current entitlement and stock/SPY common rows remain unverified; a signed-out page is not a provider denial. |
+| FMP | Isolated dashboard redirects to registration/sign-in. November 3 Starter metadata is retained as historical, not a fresh account grant. | No existing Starter consolidated historical NBBO archive is established. Current/aftermarket quotes and historical OHLCV do not fill it. Applicable account/order rights for retained copies and processing remain to be bound before affected use. |
+| Sharadar direct | Not reopened; November 3 Bundle 5 Years / Personal / Cancelled observation retained with its unknown displayed end date. | Daily bars/reference/actions/fundamentals are useful but do not establish historical NBBO. Direct personal/raw-retention terms remain source-specific. The previously exposed key is not reused. |
+| FirstRate | Owner's licensed-purchase report and already-audited USB inventory remain the evidence. No new USB scan or write. | Existing files supply OHLCV/actions, not quotes. Published perpetual storage and solely-on-behalf service-provider hosting are permitted; no new invoice/sign-off gate is invented. |
+
+The current [Massive Market Data Terms](https://massive.com/legal/market-data-terms-of-service)
+and [Individuals Terms](https://massive.com/legal/individuals-terms-of-service)
+both display November 3, 2026 updates. They expressly permit personal
+nonbusiness research/download/storage using chosen tools and conditionally
+permit tools/agents/hosting processing only on the subscriber's behalf.
+The older blanket display-only/default-cloud-ban inference is superseded at
+the public-text level. Actual operative account and source-specific terms,
+permitted processor use and absence of onward/own-purpose use still control;
+no agreement is accepted here and the public page is not an account grant.
+
+Massive's current raw-retention text distinguishes data included under a new
+plan from data whose licence ends. For affected raw data, stop use and delete
+within 30 days; nonreconstructible research outputs may remain and unused
+automatic backups have a separate maximum 90-day allowance. Cancellation does
+not itself end the already-paid period. The quote size migration also requires
+capture/version/unit binding: current REST shares cannot justify a blanket
+100-share conversion of an arbitrary old file. Documented prices, sizes,
+conditions, exchanges and SIP/participant clocks still need actual stock/SPY
+same-window samples and measured common history before use.
+
+Two focused provider/domain mail searches surface no applicable guidance/NBBO
+grant; an unrelated other-lane acknowledgement is not opened or reused. No
+vendor correspondence is sent. Fifteen direct official-document captures
+include 13 HTTP200 and two FMP HTTP403 responses. The latter remain failed
+transports, not saved licence content; their findings are separately supported
+by official web-tool pages, without bypass. Twenty-eight literal source controls
+pass. No extra subscription is recommended as a conclusion of this round.
+
+### 64.5 Verified author defects and focused validation
+
+| Finding | Priority/status | Evidence and correction |
+| --- | --- | --- |
+| GDR-RP64-001 | P2 / corrected before publication | Direct canonical-dataset construction originally skipped compiler inventory/scope/source-binding checks. Shared inventory validation now checks both construction paths, with forged/missing/duplicate/out-of-scope regressions. No pre-fix runtime failure count is invented. |
+| GDR-RP64-002 | P3 / corrected before publication | Requiring a fiscal-year label to equal its calendar end year was not an original plan rule. Preserve the explicit label independently while validating the full-year interval; focused test uses a differing label/end year. |
+| GDR-RP64-003 | P2 / corrected | Lexical timestamp sorting could place a later fractional instant before its predecessor; equivalent UTC spellings also escaped duplicate detection. Two invented public-path probes demonstrated false acceptance and two dedicated tests failed before correction. Sort/deduplicate parsed UTC instants; corrected tests pass. |
+| GDR-RP64-004 | P2 / corrected before publication | Python equality allowed numeric zero to compare equal to false gates. Require each gate to be exactly Boolean false. Corrected public-constructor probe passes; pre-fix runtime acceptance was not observed and is not claimed. |
+| GDR-RP64-005 | P2 / corrected | A source can contain an expired FY outlook, but it cannot form an eligible unexpired pair. One focused regression failed before correction; now retain the profile and emit a per-event expiry refusal. |
+
+Initial system Python 3.9 cannot import slotted dataclasses, so that probe ran
+no tests. The supported `/opt/homebrew/bin/python3.13 -B` run is authoritative.
+An early invented-test helper error was corrected; it is not a native failure.
+The first private corpus integration also refused noncanonical `+00:00`
+capture clocks before emitting financial fields. A new immutable corpus version
+normalizes those same actual UTC instants to the existing canonical Z contract;
+the old version and its refusal remain, without backdating or overwriting.
+
+Separate author QA inspected constructor/compiler inventory, control/missing/
+unchanged paths and forbidden calls. Its receipt binds the earlier corrected
+compiler source `6cf11cff4de0f2b3ff428d5d8934b8a708f00fceb51c6d41a00caf00a6072fb2`;
+the subsequent expiry and local-source-cap changes require the final focused
+checks below. None of these author checks is independent Claude acceptance.
+
+### 64.6 Custody, remaining blockers and one-push handoff
+
+Private captures, normalized bounds, OCR and compiled datasets stay ignored
+under `artifacts/guidance_revision_drift/guidance-dataset-20261104/`; no raw
+financial corpus enters tracked Git. Official searches returned incidental
+current/unrelated financial snippets. They are not used as dataset inputs and
+no corresponding current/outcome page is opened. Deliberate visual QA displayed
+the two dated public target slides, so there is no round-wide zero-financial-
+display claim. No secret or private paid market row is emitted by this round's
+scripts; API keys are neither read nor saved. No software is installed, TLS
+verification disabled, provider account changed, or new agreement accepted.
+
+This is an initial source dataset and compiler, not six-year empirical
+readiness. Historical stock **and SPY** NBBO entitlement/common dates, complete
+usable guidance/correction/predecessor coverage, dated eligible identities,
+used-minute/action/terminal/calendar/settlement/fee inputs, real-runner integration
+and the original research/economic/date/look freeze remain. The two section-63
+SPY amount conflicts and section-56 budget defect remain closed. Existing
+sampled EODHD payment dates are not called wholly unavailable. No original
+permission field, economics or protected-date decision changes.
+
+The original cycle remains CLOSED FAILED 3/3, with zero manual attempts left.
+The separate retained Mia recovery remains zero attempts / zero intents under
+its maximum three unsuccessful attempts; no journal/project/compile/run is
+created. The accepted `c589b3dd` recovery custody is not rebound to this source.
+Current no-QC direction controls. Accumulate this bounded round's exact lane
+source/tests/record, verify ownership/ref/source/diff checks and make exactly
+one final non-force push to the matching lane. No intermediate publication,
+other ref, PR, merge, scheduler/resource/account change or monitor rearm occurs.
+Final identities, focused results and verified publication are retained below
+and in the paused automation checkpoint; no further round starts automatically.
+
+Frozen local anchors (all data artifacts ignored; hashes identify bytes rather
+than grant rights or historical availability):
+
+| Artifact | SHA256 |
+| --- | --- |
+| `scope-v1.json` | `8c0f33c351ad4b1add54a952a12229dd2c611afa253adcdef0ea96337ca920c7` |
+| `account-observations-v1.json` | `ce3e91d5bb11f3c7f134928b46f8ce4e0a0ccfcb42ff0c9abaae4a5ea54bf102` |
+| `source/profiles-private-v2.json` | `df537dc3471299903b9feaa23619c4bc2db9659bb8c149a08e4634a53e7a1915` |
+| `source/manifest-v2.json` | `69d3e4cd9914215d82d4976efb5aa9c86aa313418874c12db43a8b998c93a030` |
+| `source/disposition-v2.json` | `51ebd81cce9870770ce0129112ef073e8ea5ac4bf3001572a6a2725751e85945` |
+| `source/compiled-dataset-private-v2.json` | `1f004186f7068a6cdcef9b8f9e4fc80f1e8b9ecb834dbf1a3258cf832f35dda9` |
+| `source/compile-receipt-v2.json` | `a301be240eeb28d84b9b858298327178f69f1b58eb243b40aa8c7fa89cb9de99` |
+| `source/adbe-20250318-investor-presentation-ocr-v1.json` | `6212b4523808f1cb01390ea5a151de015bb041ade51a823bca5450e5cc9289c8` |
+| `quotes/coverage-rights-matrix-v1.json` | `7fac93cbe4fdd41654170d7dcfd8d8c185a84b35ae8389ed88f92a9a9c265001` |
+| `quotes/audit-artifact-manifest-v1.json` | `2e6a9b62a5b2bbcf9ed8d7f5385323f2cd6a593f6595c24ddb20946251d19f92` |
+| `author-qa/compiler-author-qa-v1.json` | `9556d8fda3de931f45ebbd4f845c1d0a2f0340b38d44b91ee1dc73d17d12e00e` |
+| `root-corpus-verification-v1.json` | `aafff71426178df92d0d4173c538436f7372ec62d9999c3e9366f7603a405d91` |
+
+The final compiler SHA is
+`b53235979fbc789c6d5da45a64d6336efb73c1b303b5d27f8c7928a7c9070a05`.
+The new full review-source identity is
+`a9ab989cc8d5a0a1f90c09e8c0e78b8530e31e16190e83fb304be8df218c6f5c`,
+61 members. It supersedes `f570bb04` only as the current full offline source
+identity, not as accepted review/runtime/recovery evidence. Root independently
+rehashes all 17 original PDFs and five frozen corpus anchors, verifies the
+eleven known expected profile IDs, recompiles the dataset byte-exact in memory
+and validates its separately retained hash. No strategy arithmetic is invoked.
+
+Closing verification: **22 focused methods pass in 0.447 s**, zero failures,
+errors, skips or reported warnings: the 18 new compiler tests plus transitive
+import boundary, explicit review inventory, fresh-process imports and active-
+document checks. Four changed Python files compile in memory. All 33 quote-
+audit artifact hashes and 28 literal controls pass. Sections 1 through 63 below
+the active header remain byte-exact to `5c2bcdcc`; only the new compiler and
+additive review inventory change the production source set. Native closure
+source is unchanged. No full lane/repository suite, native source build,
+strategy run or empirical evaluation is performed. The closing receipt is
+`final-focused-verification-v1.json`, SHA256
+`e16d417c6acb38c2ac13c3800eba217497bd862a0407ccb83ab73250687d7c6f`.
+After recording these results, the final active-document/diff/status and exact
+staged-file/ref guards precede the one authorized matching-lane publication.

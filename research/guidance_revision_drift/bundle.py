@@ -43,7 +43,7 @@ _FILE_MODE = (stat.S_IFREG | 0o444) << 16
 _MODULES = (
     "__init__", "__main__", "archive", "artifacts", "assessment", "bundle",
     "callback_plan", "comparison", "completion_evidence", "contracts", "controls", "corporate_actions", "coverage_preflight", "evaluation", "events", "execution_contract",
-    "firstrate", "fixtures", "formulas", "guidance_decoder", "guidance_inputs", "historical_market", "input_contracts",
+    "firstrate", "fixtures", "formulas", "guidance_dataset", "guidance_decoder", "guidance_inputs", "historical_market", "input_contracts",
     "input_preparation", "integration", "lean_bridge", "lineage", "order_planning", "pre_qc", "research_reference",
     "market_inputs", "multi_session", "native_bundle", "native_observation", "trace_transport", "cloud_inventory", "evaluation_cycle",
     "paired_bridge", "persistence", "qc_adapter", "qc_project", "readable_transport", "readiness",

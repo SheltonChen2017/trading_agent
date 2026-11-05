@@ -79,6 +79,7 @@ import research.guidance_revision_drift.readiness
 import research.guidance_revision_drift.coverage_preflight
 import research.guidance_revision_drift.input_contracts
 import research.guidance_revision_drift.guidance_inputs
+import research.guidance_revision_drift.guidance_dataset
 import research.guidance_revision_drift.historical_market
 import research.guidance_revision_drift.firstrate
 import research.guidance_revision_drift.input_preparation
@@ -192,6 +193,8 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         # Review-state phrase: rotate it in the same commit as each new review
         # or counter-review section so the status block cannot go stale.
         header = record.split("## 1.", 1)[0]
+        self.assertIn("Guidance corpus/compiler and quote-rights audit recorded in section 64", header)
+        self.assertIn("Structural exploratory pairs do not certify complete history or execution readiness", header)
         self.assertIn("Original guidance and SPY source reconciliation recorded in section 63", header)
         self.assertIn("exact six-decimal issuer gross-rate evidence in a separate private overlay", header)
         self.assertIn("The acquisition-affected pair remains unaccepted", header)
@@ -275,6 +278,7 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertGreater(record.index("\n## 61."), record.index("\n## 60."))
         self.assertGreater(record.index("\n## 62."), record.index("\n## 61."))
         self.assertGreater(record.index("\n## 63."), record.index("\n## 62."))
+        self.assertGreater(record.index("\n## 64."), record.index("\n## 63."))
         self.assertIn("research/__init__.py`, remains unobserved", header)
         self.assertIn("paused pending platform preflight", header)
         self.assertIn("GDR-RP33 is accepted in section 34", header)

@@ -1,9 +1,12 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Independent Claude review of `fc07b099..01b856be` recorded in section 65, 2026-11-04.
+Status: **Codex counter-review of section 65 completed in section 66, 2026-11-04.
+Claude code commit `1870b9c9` is accepted; record commit `6375401b` is accepted after documentation clarification.
+Both new Claude commits are consumed once; no further implementation milestone starts in this round.
+Independent Claude review of `fc07b099..01b856be` recorded in section 65, 2026-11-04.
 Sections 55 and 56 and the FirstRate and guidance modules are accepted as offline software after correction:
 two P2 fixes (GDR-CR65-001 and -002) and regression pins; no strategy rule or engine change.
-Codex counter-review of section 65 pending.
+The two P2 corrections are verified with focused regressions, a names-only action census and byte-exact corpus reconstruction.
 Guidance corpus/compiler and quote-rights audit recorded in section 64, 2026-11-04.
 Structural exploratory pairs do not certify complete history or execution readiness.
 Authenticated Massive follow-up in 64.7 confirms Stocks Starter, cancellation pending November 6, 2026;
@@ -20,7 +23,7 @@ JNJ January/April original ranges are verified, including all four predecessor-c
 The acquisition-affected pair remains unaccepted without verified comparable figures and canonical field binding.
 No strategy arithmetic, QC access, purchase or empirical evaluation occurs. One final lane push is authorized.
 Authenticated EODHD historical field checks recorded in section 62, 2026-11-03.
-Owner-authorized key use succeeded through an in-memory Bearer header; no key was displayed or saved.
+Owner-authorized EODHD key use succeeded through an in-memory Bearer header; output-custody wording is qualified in 66.3.
 AAPL and SPY each return 24 dividend records for 2020--2025 with all payment-date fields populated.
 Section 62's two SPY raw-cash conflicts are reconciled at the source-fact level in section 63.
 JNJ news access is verified for 198 sampled 2025 articles; comparable guidance pairs remain unverified.
@@ -130,7 +133,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 65. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 66. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -9891,7 +9894,7 @@ rechecks repeated by `GuidanceDataset`. The engine's one: `released >= ZERO`,
 which cannot go negative because a buy never fills above its limit.
 
 The ten `ReviewCorrectionTests` methods all fail on Codex's published source,
-with 52 failures across methods and subtests, and pass after correction. Each
+with 52 unsuccessful failure/error outcomes across methods and subtests, and pass after correction. Each
 corrected behavior also has a mutant caught on the corrected source.
 
 Closing checks on the final tree, none of them a full lane suite:
@@ -9920,8 +9923,9 @@ For the owner: 60.5 asked for the exposed Sharadar key to be rotated and no late
 section confirms it. Displayed access ends November 6 for Massive Stocks Starter,
 November 13 for FMP and November 14 for EODHD, and 64.4 records a 30-day deletion
 rule for Massive raw data whose licence ends. Sharadar's status is Cancelled with
-no end date shown, and 60.5 leaves its action CSV in Downloads. Retention of those
-files is the owner's decision.
+no end date shown, and 60.5 leaves its action CSV in Downloads. Disposition of those
+files is the owner's responsibility, subject to applicable licence retention
+and deletion requirements; this review does not grant an exception.
 
 | Commit | Scope |
 |---|---|
@@ -9933,3 +9937,196 @@ never force. It publishes Codex's local `01b856be` and both commits above. QC
 stays untouched and the Mia-led recovery stays paused. The proposed terminal-SPY
 rule and all eleven original decisions stay open. The lane is not backtesting
 ready: section 64.6's remaining inputs still stand.
+
+## 66. Codex counter-review of Claude section 65, 2026-11-04
+
+### 66.1 Exact snapshot and per-commit dispositions
+
+Owner: **"start counter review"**. The existing same-worktree/same-lane
+workflow applies. QC and purchases remain out of scope. Start clean local and
+live matching remote `6375401b063dcfaf08a167d57968b4938db0fb5f`; fetch only the
+matching branch without tags and verify the exact remote object. Mandatory root,
+branch and sole origin/push URL match the standing lane invariants. Section 65
+is the completed Claude handoff, with no concurrent implementation observed.
+
+The new counter-review range is
+`01b856bed1d41c953c9bcbe327b47e0c745038ef..6375401b063dcfaf08a167d57968b4938db0fb5f`.
+Only the two new Claude commits below are consumed. The thirteen earlier Codex
+dispositions in 65.1 are checked for completeness and consistency, not treated
+as thirteen new Claude triggers. Earlier consumed `fc07b099` and all older
+review dispositions remain unchanged.
+
+| Commit | Disposition | Counter-review evidence |
+| --- | --- | --- |
+| `1870b9c91d74a8b1625ec329c617fbcce338c13e` | **Accepted** | Complete production/test diff inspected. Both P2 fixes and the lane-local warning/representation/line/path/URI/binding/size fixes are confirmed; no new production defect is found. Invented regressions and the retained-source red probes reproduce the dangerous directions. Actual action member names and the retained corpus are checked in 66.4. |
+| `6375401b063dcfaf08a167d57968b4938db0fb5f` | **Accepted after documentation clarification** | All thirteen dispositions, sixteen ledger entries and source/count claims balance. Clarify local-only documentation provenance, EODHD output custody, retention responsibility and failure/error terminology below. No corrected strategy economics, source schema, account permission or native result is inferred. |
+
+Review assessment: **8/10 for the bounded offline implementation**. The fixes
+close real constructor and chronology defects and materially strengthen
+regressions. Real-input integration and native/empirical validation remain
+separate unfinished work. This assessment is not a score for market edge or
+backtesting readiness.
+
+### 66.2 Finding-by-finding review and documentation corrections
+
+| Claude finding | Classification and disposition |
+| --- | --- |
+| GDR-CR65-001 | **Confirmed P2, correction accepted.** Every directly constructed or parsed source is bound to matching symbol/kind/raw member naming, including reconciled and quarantined rows. An adjusted or other-symbol file cannot become a Raw row through public construction; split/dividend names cannot be exchanged. |
+| GDR-CR65-002 | **Confirmed P2, correction accepted.** A date-only issuer-local label and a nearby UTC instant cannot establish order. The conservative adjacent-day mixed-clock refusal prevents the demonstrated false pair without inventing a source time zone. |
+| GDR-CR65-003 | **Confirmed P3, correction accepted.** The literal source-member count was stale. The dynamic source inventory plus its two explicit bundle additions is verified by the actual local handoff test; the explicit inventory boundary still rejects missing modules. |
+| GDR-CR65-004 through -007 | **Confirmed P3, corrections accepted.** Central required diagnostics cover direct construction; values are omitted from representations; embedded terminators refuse before eligible-byte hashing; dot-segment labels refuse. Projections and the original Raw/nonexecution flags remain unchanged. |
+| GDR-CR65-008 through -010 | **Confirmed P3, corrections accepted.** Malformed locations/DEL and unhashable binding fields produce static refusals, and the compiler uses the declared dataset limit for scope decoding. These changes introduce no network or credential access. |
+| GDR-CR65-011 and -012 | **Confirmed P3, corrections accepted.** The active scope line derives from the latest heading, and the added FirstRate/compiler/engine/handoff assertions cover meaningful surviving failure directions. |
+| GDR-CR65-013 | **Clarification accepted.** Section 65.1 records the owner's direct focused-only instruction to Claude. No full-suite obligation or formal sign-off is invented from an absent message in Codex's channel. Codex also remains under its standing focused-only testing scope. |
+| GDR-CR65-014 | **Wording concern confirmed; qualified answer in 66.3.** The dashboard display and transient runtime custody must be distinguished from model-visible tool output. No new leak is alleged or disproved through an invented retrospective audit. |
+| GDR-CR65-015 | **Confirmed documented integration limitation, retained.** Publication-date labels still have mixed local/UTC meanings for scope and expiry. A future real-input bridge needs explicit issuer-time-zone/date semantics before it can claim execution timing. Current compiler execution authority remains false. |
+| GDR-CR65-016 | **Confirmed documented integration limitation, retained.** The compiler permits an explicit fiscal label independent of its end-calendar year while the downstream period reader still couples them. No bridge currently connects them. Resolve that contract consistently before building/accepting such a bridge. |
+
+New counter-review documentation ledger; no additional production change:
+
+| ID | Priority/status | Evidence, correction and limit |
+| --- | --- | --- |
+| GDR-CCR66-001 | P3 / clarified | `01b856be` was a clean **local-only documentation** commit when Claude began; its production bytes equal pushed `88a35c0c`. The source review had a pushed anchor, while the additional local-document review was a process deviation from the exact-pushed-snapshot rule. Do not claim it was remote then or invent a retrospective owner waiver. It is now published within exact `6375401b` and inspected in this counter-review. The source acceptance is not expanded by the local-only documentation. |
+| GDR-CCR66-002 | P3 / corrected | The unqualified active-header EODHD "no key displayed" wording is replaced by a custody cross-reference. Section 62's historical author statement is qualified in 66.3; its original account of authorized access is preserved. |
+| GDR-CCR66-003 | P3 / corrected | Section 65.5's "retention ... owner's decision" could imply an unrestricted choice. It now states owner responsibility **subject to applicable licence retention/deletion requirements**. No data is deleted, moved or relicensed by this review. |
+| GDR-CCR66-004 | P3 / corrected | The ten old-source correction methods reproduce 52 unsuccessful outcomes, comprising 46 failures and six errors in Codex's runs. Section 65.4 now says failure/error outcomes rather than calling every outcome an assertion failure. These are expected red checks of retained pre-fix source, not failures on the corrected tree. |
+
+The original section-65 ledger count remains P0 0 / P1 0 / P2 2 / P3 14,
+with twelve corrected, one clarified and three documented entries. All thirteen
+commit dispositions match the ordered old range. No older review is consumed
+again. The two documented future-interface limitations remain visible rather
+than being mislabelled current backtest completion or a new research failure.
+
+### 66.3 EODHD credential-custody clarification
+
+The section-62 key was necessarily present in the provider's authenticated
+token control and in transient browser-runtime state. The retained author
+session account reports that the credential-bearing snapshot was kept in
+runtime variables, outputs were filtered, and the key itself was not emitted
+to model-visible tool output or written to the retained data files; the
+temporary references were cleared. Thus "not displayed" referred to output
+custody, not to absence from the provider webpage.
+
+That retained session account is an **author attestation**, not an independent
+complete transcript audit. The original transient snapshot was not retained
+for reinspection, and this counter-review does not reread dashboard controls,
+Keychain, secret buffers or credentials to recreate it. The available evidence
+does not establish a specific EODHD leak, but cannot independently certify
+every historical output byte either. The active header now preserves this
+qualification instead of an absolute zero-display claim. No secret is quoted,
+copied, saved or sent by this clarification. The separately documented Sharadar
+exposure and its unconfirmed rotation status are not recharacterized.
+
+### 66.4 Actual source compatibility and identities
+
+**Action-member census:** read only the central directories of the four
+already-inventoried USB action archives, after verifying the retained USB
+manifest and action-receipt anchors. No member payload is opened or parsed,
+no financial row/date is inspected, and the USB is not written. All **11,900
+data-member names** satisfy the current symbol/kind/member rule:
+
+| Archive scope | Data members | Known metadata | Incompatible data names |
+| --- | ---: | ---: | ---: |
+| Stock dividends | 3,900 | 0 | 0 |
+| Stock splits | 2,962 | 1 | 0 |
+| ETF dividends | 4,347 | 0 | 0 |
+| ETF splits | 691 | 1 | 0 |
+
+The first census counted two already-inventoried `_splits_readme.txt` entries as
+data. Corrected v2 excludes only those exact retained metadata names and keeps
+v1 as an audit trail; neither pass reads payload bytes. Current archive size
+and central-directory metadata are observed, but historical full-payload hashes
+are retained anchors, **not** newly verified payload hashes. The section-60
+million-row reconciliation remains bound to old adapter `7889276e...`; it is
+not reissued or relabelled as a new-code data audit.
+
+**Private corpus reconstruction:** verify the frozen manifest/profile anchors
+and all seventeen complete original PDF hashes, then compile the same eleven
+profiles using corrected `ab11f1e7...`. Every profile is date-only, so the new
+mixed-clock refusal does not alter this corpus. The resulting **78,601 bytes
+are byte-exact** to retained dataset
+`1f004186f7068a6cdcef9b8f9e4fc80f1e8b9ecb834dbf1a3258cf832f35dda9`:
+two baselines, three structural links and six refusals. All PIT/rights/source-
+certification/approved-input/execution gates remain false. No new document,
+provider data, financial revision/signal calculation or outcome is acquired.
+
+The full source remains
+`14b2b69c104d28dd26242438c67589cdbe30ce2544a8a76c2d39c4a1ecdaa030`,
+61 members. FirstRate is
+`05e5dfb6a8a5c0b16ed712ee06ac6d4685dca7a0ccec7400dc9e27ab578502b9`;
+compiler is
+`ab11f1e7c5896dfffafd781cf7f02ee4c3b59ac6af69a22257a8874e8d796a69`.
+Static Git-byte checks reproduce the three historical source identities listed
+in 65.3, confirm that `01b856be` has `88a35c0c` production bytes, and reproduce
+current `6375401b`. Only these two production modules differ from `01b856be`;
+the native closure and engine are unchanged.
+
+Root independently rebuilds the built-in invented local handoff in memory:
+review bundle `69db61b6...`, 63 members; handoff `363b3cf1...`, 84,069 bytes;
+base replay `2587d448...` and stress replay `0863400c...` all match 65.3. This is
+local invented software reconciliation, not a native/platform run. Every
+native/data-rights/backtest/QC-upload/QC-launch/empirical/order flag remains false.
+
+### 66.5 Focused validation and retained receipts
+
+| Check | Counter-review result |
+| --- | --- |
+| FirstRate module | 43 methods pass, 0.013 s; zero failures/errors/skips. Six correction methods against retained old source produce 44 failures plus one expected hash-guard error, without changing files. |
+| Guidance compiler module | 38 methods pass, 0.293 s; zero failures/errors/skips. Four old-source correction methods produce two failures plus five errors. Five separate invented probes also confirm the two documented future-interface limitations. |
+| Root engine/handoff/import/inventory selection | Seven methods pass, 14.265 s; three changed engine assertions, actual invented handoff reconstruction and three dependency/inventory/fresh-process guards. |
+| Closing active-document check | One method passes, 0.020 s, zero failures/errors/skips. In total, 89 distinct focused methods pass across the four groups; no reported warnings. |
+
+Only focused methods are run. Claude's mutation totals and broad sixteen-file
+check remain its attributed evidence; Codex does not claim to repeat them or
+run a full lane/repository suite. Old-source red probes are executed in memory
+with invented fixtures; no checked-out source is reset, overwritten or stashed.
+
+Ignored receipts under
+`artifacts/guidance_revision_drift/counter-review-65-20261104/`:
+
+| Receipt | SHA256 |
+| --- | --- |
+| `action-member-census-v1.json`, initial metadata classification | `4542b524a6cc8b489197b86553ab869310429efd6373d958011f692b3349874e` |
+| `action-member-census-v2.json`, qualified names-only result | `17f8c1e7d0b7a554e71fe5b203c1729ee75a2077c4956ce1af2f7b7434d88c78` |
+| `corpus-recompile-v1.json` | `4f6e21b52b3f6c037b3d0f923df5803e8e34142114dbe6df7d4bbbf64b5af562` |
+| `offline-identities-v1.json` | `39d12ffd4e33c1b4d9db69cb1dfddba907ebe9a521428a0a7a6900c1f6d9c81a` |
+| `closing-verification-v1.json` | `7ac22f3865c2106c7bb326b03f55b338668977adaff496f2bd22d0f97874585a` |
+
+Seven changed Python files compile in memory. Four receipt anchors verify;
+the complete native source-path inventory is byte-exact to the pre-review
+snapshot. Final diff/staged-file/root/branch/HEAD/live-remote checks close the
+round. Documentation corrections do not alter the reproduced production,
+corpus, handoff or replay identities.
+
+### 66.6 Disposition, publication and next action
+
+Both Claude commits are accepted with the documentation corrections above.
+This round changes only this lane record and its existing active-document
+pins. No new source schema, production behavior, strategy rule, source data,
+provider/account configuration, purchase, shared document or credential changes.
+The original null/false fields, protected dates and funding/trading gates stay
+closed. Original `GDR-base372-approved-20261008` remains CLOSED FAILED 3/3;
+project 37647834 is untouched. Separate Mia recovery remains zero attempts /
+zero intents under its maximum three unsuccessful attempts. Retained
+`c589b3dd` custody is not rebound and no recovery project/journal is created.
+
+The current no-QC direction controls throughout: no QC page, documentation,
+API, quota, source, log, outcome, compile or run is accessed. No provider or
+account is reopened. Source/count checks are local; USB work is names-only.
+No operator database, scheduler, resource, PR, merge, cross-lane or trading work
+occurs. The earlier `5c2bcdcc..88a35c0c` build publication is complete; this is
+a new counter-review round, not a repeat of that push or of Claude's publication.
+
+Finish the standing review handoff with exactly one guarded non-force push
+from the mandatory worktree to only its matching lane branch, against expected
+remote `6375401b`. Verify final root/branch/HEAD/status, exact staged paths and
+the live remote before committing/pushing. Record the final commit and verified
+remote in the paused checkpoint. Monitor stays PAUSED; no further loop rearms.
+
+The lane remains **not backtesting ready**. Section 64.6's guidance/NBBO/
+canonical-input/real-runner and original research/economic/date/look gates
+remain, with the explicit date/time-zone and FY-label bridge work in 65.2.
+Current observed Massive Starter access does not supply historical stock/SPY
+NBBO; no purchase or purported Corporate Guidance sufficiency is inferred.
+The next step requires a separately bounded continuation, not an automatic
+evaluation or another synthetic recovery round.

@@ -21,7 +21,7 @@ from . import native_config_census_20261104 as builder
 api, projects, ops, evidence = fixed.api, fixed.projects, fixed.ops, fixed.evidence
 MODULE = "research/target_price_revisions_qc/native_config_census_actions_20261104.py"
 REQUIRED_SOURCES = fixed.REQUIRED_SOURCES | builder.REQUIRED_SOURCES | frozenset((MODULE,))
-PINS = {**fixed.PINS, **builder.PINNED, fixed.MODULE: "c2f4778240898d9fc4ae563a06e8df2c8ec93ae51e5c9aec7a98948e9cf012be",
+PINS = {**fixed.PINS, **builder.PINNED, fixed.MODULE: "8deda0a470cf22410df1d62aa8d6c59ca50edbf39370d669665c0b3ac98ec9d9",
     builder.MODULE: "580541465c7de84e367c3d605bca89071b40ccac7a18129067cdc4328fa8b1c0"}
 OWNER_SHA256, CREATION_OWNER_SHA256 = fixed.OWNER_SHA256, fixed.CREATION_OWNER_SHA256
 REGISTRY_SHA256 = fixed.REGISTRY_SHA256
@@ -357,7 +357,8 @@ def _execute(action, root, lock_root, *, transport, guard, clock, monotonic, fix
             if request["id"] == "launch": result["actual_new_diagnostic_jobs"] = None
             raw, status, credential, owner = transport(request["endpoint"], api._canonical(request["payload"]),
                 request["seconds"], request["max_response_bytes"], registry["owner_id"])
-            check()
+            # TPR-CR35-004: retain the response before any further source/clock check. A
+            # check here would lose a launched job's identity; the next check still stops.
             if (type(raw) is not bytes or not 0 < len(raw) <= request["max_response_bytes"]
                     or result["response_bytes"]+len(raw) > 8*1024*1024 or type(status) is not int
                     or _native_integer(owner) != registry["owner_id"] or type(credential) is not str
@@ -406,6 +407,8 @@ def _execute(action, root, lock_root, *, transport, guard, clock, monotonic, fix
         except BaseException as error:
             result["receipt_published"] = False
             stop = api._retain_stop(stop, error)
+            # TPR-CR35-005: an unpublished receipt never reports completed.
+            result["status"] = "cancelled" if isinstance(stop, KeyboardInterrupt) else "failed_or_uncertain"
     if isinstance(stop, KeyboardInterrupt):
         raise ActionCancelled(result) from None
     if stop is not None and not isinstance(stop, Exception):

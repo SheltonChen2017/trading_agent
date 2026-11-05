@@ -314,3 +314,45 @@ def test_resolution_kind_mutation_is_detected_even_when_minute_and_daily_stay_fa
     n.algo.on_data(n.algo.current_slice);r=n.algo._report
     assert r["projected_metadata_unchanged"] is False and r["complete"] is False
     assert n.state.queries==1 and r["rows"][2]["minute"] is False and r["rows"][2]["daily"] is False
+
+
+def terminal(n):
+    n.algo.on_end_of_algorithm()
+    return json.loads(n.state.logs[-1].split(" ",1)[1])
+
+
+def test_completed_census_has_complete_status_and_terminal_labels(native):
+    """TPR-CR35-002: the positive labels exist only for a fully observed census."""
+    n=native;n.algo.on_data(n.algo.current_slice);report=terminal(n)
+    assert report["status"]=="complete_config_census" and report["terminal_summary"]=="complete"
+    assert report["first_failure_stage"] is None
+
+
+def test_later_failure_keeps_the_first_code_and_clears_complete(native):
+    n=native;n.algo.on_data(n.algo.current_slice);assert n.algo._report["complete"] is True
+    n.algo._report["current_stage"]="first_stage";n.algo._failure("first_code")
+    n.algo._report["current_stage"]="second_stage";n.algo._failure("second_code")
+    report=terminal(n)
+    assert (report["first_failure_stage"],report["first_failure_code"])==("first_stage","first_code")
+    assert report["complete"] is False and report["status"]=="census_failed"
+    assert report["terminal_summary"]=="incomplete"
+
+
+def test_end_custody_failure_withdraws_a_completed_census(native):
+    n=native;n.algo.on_data(n.algo.current_slice);assert n.algo._report["complete"] is True
+    n.state.lock=False;report=terminal(n)
+    assert report["complete"] is False and report["status"]=="census_failed"
+    assert report["terminal_summary"]=="custody_unproved" and report["first_failure_code"]=="end_custody_unproved"
+
+
+def test_census_never_attempted_is_a_named_failure_not_complete(native):
+    n=native;report=terminal(n)
+    assert n.state.queries==0 and report["complete"] is False
+    assert report["first_failure_code"]=="census_not_attempted" and report["terminal_summary"]=="incomplete"
+
+
+def test_truncated_enumeration_is_partial_never_complete_status(native):
+    n=native;n.state.rows=[n.row() for _ in range(40)]
+    n.algo.on_data(n.algo.current_slice);report=terminal(n)
+    assert report["truncated"] is True and report["complete"] is False
+    assert report["status"]=="partial_config_census" and report["terminal_summary"]=="incomplete"

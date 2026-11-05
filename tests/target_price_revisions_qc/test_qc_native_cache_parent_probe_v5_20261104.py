@@ -45,7 +45,9 @@ def test_pure_renderer_is_fixed_deterministic_and_never_accepts_local_sid():
         "remove_security", "set_market_price", "save", "price", "volume", "close", "cash", "total_portfolio_value"}
 
 
-@pytest.mark.parametrize("config", [None, b"{}", "", "{}", "PRIVATEKEY", "{\"binding\":{}}", "x" * 65537])
+# Short ids: the oversized value as an id overflows PYTEST_CURRENT_TEST on Windows (TPR-CR35-001).
+@pytest.mark.parametrize("config", [None, b"{}", "", "{}", "PRIVATEKEY", "{\"binding\":{}}", "x" * 65537],
+    ids=["none", "bytes", "empty", "empty_object", "private_key", "binding_only", "oversized"])
 def test_production_refuses_any_unpinned_parent_configuration_without_echo(config):
     with pytest.raises(p.ParentCacheRefusal, match="^fixed native-parent cache diagnostic refused$"):
         p.build_cache_probe(parent_probe_config_json=config, helper_source=HELPER, operation_id=OP, git_head=HEAD)
@@ -771,3 +773,76 @@ def test_compaction_preserves_multiline_strings_fstrings_docstrings_comments_and
 def test_compaction_refuses_invalid_input_without_echo(source):
     with pytest.raises(p.ParentCacheRefusal, match="^fixed native-parent cache diagnostic refused$"):
         p._compact_indentation(source)
+
+
+def close_cell(n, label, ended):
+    """Run one exact 16:01 close with a chosen cached bar end; returns that cell."""
+    n.algo.on_data(n.algo.current_slice)
+    n.algo.on_data(n.at(10, 16, 1))
+    security = n.algo._registered[label]
+    security.last = n.TradeBar(security.symbol, ended)
+    n.state.callback()
+    return n.algo._report["sessions"]["2021-02-10"][label]
+
+
+@pytest.mark.parametrize("label,ended,fresh", [
+    ("target", datetime(2021, 2, 10, 15, 59), False), ("target", datetime(2021, 2, 10, 16, 0), True),
+    ("target", datetime(2021, 2, 10, 16, 1), False), ("target", datetime(2021, 2, 9, 16, 0), False),
+    ("control", datetime(2021, 2, 10, 15, 59), False), ("control", datetime(2021, 2, 10, 16, 0), True),
+    ("control", datetime(2021, 2, 10, 16, 1), True), ("control", datetime(2021, 2, 10, 16, 2), False)],
+    ids=["target_early", "target_exact", "target_late", "target_prior_day",
+         "control_over_60s", "control_60s", "control_now", "control_future"])
+def test_headline_verdict_exact_close_and_control_tolerance_boundaries(native, label, ended, fresh):
+    """TPR-CR35-002: the target needs the exact 16:00 close; control allows only 0-60 seconds."""
+    cell = close_cell(native(), label, ended)
+    assert cell["status"] == "bounded_cache_observation"
+    assert cell["freshness_canary"] is fresh
+
+
+def test_missing_session_is_coverage_incomplete_not_complete(native):
+    n = native();n.algo.on_data(n.algo.current_slice)
+    for day in (8, 9, 11, 12):
+        n.algo.on_data(n.at(day, 16, 1));n.state.callback()
+    n.algo.on_end_of_algorithm()
+    report = n.algo._report
+    assert report["status"] == "diagnostic_failed" and report["first_failure_code"] == "coverage_incomplete"
+    assert report["terminal_summary"] == "incomplete_cache_observations"
+
+
+def test_unproved_observations_are_never_labelled_complete(native):
+    """TPR-CR35-003: a refused cell must not yield complete/bounded_snapshot_recorded labels."""
+    n = native();n.algo.on_data(n.algo.current_slice)
+    for day in range(8, 13):
+        n.algo.on_data(n.at(day, 16, 1))
+        row = n.algo._registered["target"].configs[0];mode = row.data_normalization_mode
+        row.data_normalization_mode = "adjusted"
+        n.state.callback()
+        row.data_normalization_mode = mode
+    n.algo.on_end_of_algorithm()
+    report = n.algo._report
+    assert all(row["target"]["status"] == "observation_unproved" for row in report["sessions"].values())
+    assert report["close_summary"] == "snapshot_unproved"
+    assert report["terminal_summary"] == "incomplete_cache_observations"
+    assert report["status"] == "diagnostic_failed" and report["first_failure_code"] == "coverage_incomplete"
+
+
+def test_failed_close_summary_is_not_overwritten_by_a_later_skip(native):
+    """TPR-CR35-003: the later disabled close must keep the earlier failure summary."""
+    n = native();n.algo.on_data(n.algo.current_slice)
+    n.algo.on_data(n.at(8, 16, 1))
+    n.algo._report["close_summary"], n.algo._disabled = "snapshot_unproved", True
+    n.algo.on_data(n.at(9, 16, 1));n.state.callback()
+    assert n.algo._report["close_summary"] == "snapshot_unproved"
+
+
+def test_clock_setup_failure_is_attributed_past_the_completed_custody_stage(native):
+    """TPR-CR35-003: a failed date call is not reported as the stage that already completed."""
+    n = native();n.state.lock = False  # initialize's custody check requires the unlocked setup state
+    algo = n.namespace["Main"]()
+    def refuse(*_args):
+        raise ValueError("synthetic date refusal")
+    algo.set_start_date = refuse
+    algo.initialize()
+    report = algo._report
+    assert report["last_completed_stage"] == "initialize_custody"
+    assert report["first_failure_stage"] == "initialize_control"

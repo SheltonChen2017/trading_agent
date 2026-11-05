@@ -179,11 +179,11 @@ class Main(CacheProbeBase):
                 raise ValueError("setup custody unproved")
             self._completed("initialize_custody")
             self._report.update(operation_id=CONFIG["operation_id"], root_head=CONFIG["git_head"])
+            self._stage("initialize_control")
             self.set_time_zone("America/New_York")
             self.set_start_date(2021, 2, 8)
             self.set_end_date(2021, 2, 12)
             self.settings.daily_precise_end_time = True
-            self._stage("initialize_control")
             control = self.add_equity("SPY", Resolution.MINUTE, fill_forward=False,
                 extended_market_hours=True, data_normalization_mode=DataNormalizationMode.RAW)
             if not isinstance(control, Security):
@@ -506,6 +506,10 @@ class Main(CacheProbeBase):
             self._disabled = True
             self._report["status"] = "diagnostic_failed"
 
+    def _ok(self):
+        return all(c["status"] == "bounded_cache_observation" for r in self._report["sessions"].values()
+            for c in (r["target"], r["control"]))
+
     def _check_close(self):
         if not self._target_ready:
             self._stage("close_without_bootstrap")
@@ -514,7 +518,8 @@ class Main(CacheProbeBase):
             self._report.update(status="diagnostic_failed", close_summary="bootstrap_unproved")
             return
         if self._disabled:
-            self._report["close_summary"] = "skipped_disabled"
+            if self._report["close_summary"] != "snapshot_unproved":
+                self._report["close_summary"] = "skipped_disabled"
             return
         self._stage("close_snapshot")
         CacheProbeBase._check_close(self)
@@ -523,7 +528,7 @@ class Main(CacheProbeBase):
             self._report.update(status="diagnostic_failed", close_summary="snapshot_unproved")
         else:
             self._completed("close_snapshot")
-            self._report["close_summary"] = "bounded_snapshot_recorded"
+            self._report["close_summary"] = "bounded_snapshot_recorded" if self._ok() else "snapshot_unproved"
 
     def on_end_of_algorithm(self):
         try:
@@ -531,7 +536,8 @@ class Main(CacheProbeBase):
             self._bound()
             self._report.update(actual_job_id=self._job, terminal_custody_passed=True)
             self._completed("end_custody")
-            complete = not self._disabled and set(self._report["sessions"]) == set(CONFIG["sessions"])
+            complete = (not self._disabled and set(self._report["sessions"]) == set(CONFIG["sessions"])
+                and self._ok())
             if not self._target_ready:
                 self._stage("end_without_bootstrap")
                 self._failure(code="bootstrap_incomplete", category="state")

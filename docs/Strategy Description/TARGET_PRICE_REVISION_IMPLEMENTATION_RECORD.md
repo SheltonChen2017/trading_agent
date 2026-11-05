@@ -1,5 +1,12 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
+**Current code review, section119 (2026-11-05):** Claude has independently reviewed every
+Codex commit in `3cf9636e..16655093` in section 119 at the owner's direct request, as a code
+review, and accepts the round after correction. The terminal input-blocked claim holds. No
+frozen economics, receipt or historical record changed. The corrections change the three
+native action clients and the v5 probe, so their pinned hashes moved; any later native use
+of them is a new source epoch that Codex verifies on the Mac first.
+
 **Current section118 completed diagnostic / concrete input-blocked handoff (2026-11-05 UTC):**
 QC and Safari access are released for this bounded preflight and serialized backtest continuation.
 The owner directs genuine built-in QC Mia to resolve OFF, then OFF and the
@@ -49,7 +56,7 @@ restoration loop. No provider-wide absence, all-arm failure or full routing/
 engine exclusion is inferred. Section118.21 records the final exact snapshot.
 Before final publication this round still had0successful pushes.
 
-Codex counter-reviewed the two incoming commits in `432205ad..3cf9636e`;
+Codex counter-reviewed the two incoming commits in 432205ad..3cf9636e;
 dc9c67ad isaccepted and3cf9636e isacceptedafter the factual qualifications
 in118.1. Section117's fifteen-commit review and prior checks remain history,
 not a new routine Claude progress stop. No frozen builder, source pin or
@@ -566,10 +573,15 @@ no admitted USB price input and does not change financial/economic source
 epochs. Known REMX gaps do not justify blocking unrelated local source
 preparation or silently changing a frozen financial comparison.
 
-Codex has independently counter-reviewed the exact incoming Claude range
-`432205ad90741db3840abdedf016f4c17fabbf88..3cf9636ee523833d6dc7eacd866c37e5157ec258`:
-dc9c67ad isaccepted;3cf9636e isacceptedafter current-record qualifications
-in118.1. The CLI interruption corrections preserve frozen/native sources.
+Claude has independently reviewed the exact Codex range
+`3cf9636ee523833d6dc7eacd866c37e5157ec258..166550931afc241bf528be3a2d80df75e6c3f39f`
+at the owner's direct request, as a code review: fifteen commits carrying the
+native cache diagnostics, the configuration census and their action clients.
+Section 119 accepts the round after correction and the terminal input-blocked
+claim holds. The corrections change the three native action clients and the v5
+probe, so their pinned hashes moved; any later native use of them is a new
+source epoch that Codex verifies on the Mac first. Section118.1's counter-review
+of the earlier Claude commits remains history.
 Historical117 reviewed fifteen Codex commits; its old range and exact
 per-commit dispositions remain in117. CR33-007 stays verified and legacy
 cleanup retired; no new cleanup is authorized.
@@ -1193,6 +1205,7 @@ known.
 | 2026-10-28 | Claude review | `69ecaf91bd123d24138b915bcb5a37798d676b96..2cce8dfcec2077e7a06987055654eca3e6dfbcad` reviewed; test-correction commit `1ebb7208` and this record/guard commit on this same lane branch | Independent review of sections 102, 103 and 104 (counter-review, offline preparation, owner-released five-arm execution with eight financial jobs); no feature milestone | Dispositioned all thirty Codex commits: twenty-seven accepted, three accepted after correction. Verified the claimed file hashes, section digests, Git attribution, the Lean primary source for the Morningstar group names, and the private safe census and publication receipts. Fixed, not only documented: the open Morningstar stub (now closed to Lean's 56 names, with a misspelling mutant), the untested sell side of the accounting replay (buy-then-sell regression with gross-credit and debit negatives), and the unpinned section-104 outcome (guard pins with outcome-drift and grant mutants). Documented the held-mark policy blocker for the owner's decision. No production source, executed candidate, receipt, shared document or shared test changed; no provider or QC access by Claude. | Algorithm and accounting test modules, the four document-guard modules, the whole QC test package, compileall and `git diff --check` on the final tree, designated worktree, network-denied (figures in 105.5); no full lane suite and no complete suite, per the owner. Provider requests **0**; QC requests **0**; private rows read **0** (safe receipts only); looks **0** by Claude. | No P0. `TPR-CR32-001` (P1) documented for the owner's decision; `TPR-CR32-003`, `TPR-CR32-004` (P2) closed by correction; `TPR-CR32-002` (P3) closed by correction; `TPR-CR32-005` through `TPR-CR32-012` (P3) documented. `TPR-OFF98-010` (P1) open; `TPR-CR30-005`, `TPR-CCR28-003`, `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added; QuantConnect access stays forbidden for Claude. | Make this round's one push. Codex counter-reviews section 105; the owner decides the held-mark policy (105.7) before any five-arm rerun. |
 | 2026-10-29 | Claude review | `cf5157d8433d870dc24376d20a6e5c320e0503f7..a7f83bb4f711cbb187a3bdde4de476f137eb243f` reviewed; this correction and record commit on this same lane branch | Owner-requested independent review of sections 106-107 (Mia005-007, five isolated QC projects, cleanup, 009/010 diagnostics); no feature milestone | Reviewed all eight Codex commits individually with three read-only reviewer passes, each finding re-verified. Fixed the API client's unpinned compile/launch path (P1) and caller-asserted write target, the map probe's reversible ticker digest, the cleanup test gaps, the document guard red since `49d0e144`, and Windows checkout bytes for the QC package and this record. No executed artifact, receipt or frozen economics changed. | Seven new modules: 468 passed, 136 Mac-only skips, 0 failed (before the map-probe fix; that module then gives 72 passed). Lane guard: 600 passed. `compileall` exit 0; `git diff --check` clean. No full lane or repository suite, at the owner's direction. Provider requests **0**; QC requests **0**; Mia **0**; private archives not read (on the Mac); authorized/spent looks **0**. | No P0. `TPR-CR33-001` (P1), `-002`, `-003`, `-005`, `-006` (P2) and `-004` (P3) closed by correction; `-007` and `-008` (P2) open for Codex; `-009` to `-011` (P3) documented. `TPR-CR23-001` and the other open register items unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added. | Make this round's one push. Codex next counter-reviews section 108 and this round's Claude commits, then continues the five frozen arms under the section106/107 owner continuation; the retrospective receipt-chain check of `TPR-CR33-007` runs on the Mac. |
 | 2026-11-03 | Claude review | `e2dac57607cf4ae068051a85dd2f0fa5f2f35a57..432205ad90741db3840abdedf016f4c17fabbf88` reviewed; correction commit `dc9c67ad` and this record/guard commit on this same lane branch | Independent review of sections 109 to 116 (counter-review of section 108, terminal TPR100 handoff, USB assessment, offline build and hold, REMX repair and follow-up, prebacktest capsule, owner-released QC preflight); no feature milestone | Dispositioned all fifteen Codex commits: eleven accepted, four accepted after correction. Verified every section-116 hash and private safe receipt by name, size and digest, the section-112 to 115 digests through the guard, and the absence of any QC-named receipt during the owner's hold window. Fixed, not only documented: the prepare and prebacktest entry points swallowed operator interrupts; two spent-action tests accepted any exception; the REMX repair partition invariant was untested; the zero-quantity boundary was undocumented. Three P2 design points documented: deny-list hold, unpinned prepare command, float-refusing zero check. No frozen source, executed candidate, receipt, shared document or shared test changed; no provider or QC access by Claude. | Eight changed QC test modules, the four document-guard modules, the whole QC test package, compileall and `git diff --check` on the final tree, designated worktree, network-denied (figures in 117.5); three read-only review-agent passes over the ten modules from sections 109 to 115; no full lane suite, per the owner. Provider requests **0**; QC requests **0**; private rows read **0** (safe receipts only); looks **0** by Claude. | No P0. `TPR-CR34-001`, `TPR-CR34-002`, `TPR-CR34-003` (P2) documented; `TPR-CR34-004`, `TPR-CR34-005`, `TPR-CR34-006` (P3) closed by correction; `TPR-CR34-007` through `TPR-CR34-010` (P3) documented. `TPR-OFF98-010` (P1), `TPR-CR32-001` (P1, held-mark policy), `TPR-CR30-005`, `TPR-CCR28-003`, `TPR-CR26-003`, `TPR-CR25-003`, `TPR-CR23-001`, `TPR-CR23-002`, `TPR-CR22-001`, `TPR-MATCHED-002`, `TPR-MATCHED-006`, the six canonical findings and `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. No canonical, QuantConnect, broker, paper, live, capital or trading authority is added; QuantConnect access stays forbidden for Claude. | Make this round's one push. Codex counter-reviews section 117 and continues the owner-released preflight recovery; the owner reads 117.7. |
+| 2026-11-05 | Claude review | `3cf9636ee523833d6dc7eacd866c37e5157ec258..166550931afc241bf528be3a2d80df75e6c3f39f` reviewed; this correction and record commit on this same lane branch | Owner-requested code review of section 118's fifteen commits; no feature milestone | Reviewed every commit with two read-only reviewer passes, each finding re-verified. Fixed lost job identity after a launch, a failed receipt reporting completed, an active-job gate ignoring its count, wrong v5 completion labels and stage attribution, missing verdict and sole-guard tests, and the missing Mac-only test split. No frozen economics or receipt changed. | Seven new modules: 615 passed, 477 Mac-only skips, 1 failed then corrected (a stale literal hash). Whole document guard green. Action clients under a verification-only shim: 593 passed, 3 FIFO failures (no `mkfifo` here), 1 stale literal since corrected. QC, provider and Mia requests **0**; looks **0**. No full lane or repository suite, at the owner's direction. | No P0 or P1. `TPR-CR35-001`, `-002`, `-004` (P2) and `-003`, `-005`, `-006`, `-007` (P3) closed by correction; `-008` (P3) has an exact proposed patch and blocker. | None. | Make this round's one push. Codex verifies the corrected clients on the Mac before any later native use. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 | 2026-10-05 | Codex counter-review and TPR-D0 implementation | Reviewed `9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`; corrections/decisions `cf11788f39a2148d7bc3b801e88807bd2caca5ea`; D0 implementation `8dcfb71851ff22db6f0727395e18292c19f080ef`; this record-only handoff follows | Four-commit Claude counter-review, five bounded owner selections, strict D0 plan and one retained structural audit | Accepted the cumulative Claude range after three record/encoding corrections; selected explicit native/host test variants without changing production trust policy. Implemented the separate standard-library D0 package and immutable aggregate artifacts; retained-source inventory/hashes and all canonical freezes match. Sections 46/47 contain exact dispositions, scope, evidence and remaining limitations. | Cumulative focused suite 491 passed, 5 symlink-permission skips; final routing/artifact guards 107 passed. Standard suite blocked by 110 Analyst `fcntl` collection errors, with zero tests executed. Optional continuation diagnostics capped and incomplete, not reported as totals. Compileall exit 0; diff hygiene clean; Python 3.13.14 / pytest 9.1.1. | CCR16-001/002/003 closed; no new in-lane P0/P1/P2. Six canonical findings remain open and parked. TPR-OOL-017 opened for Windows Analyst collection, documented only. | Exact local retained-structure scope only, expiring 2026-10-12; 587,046 retained rows audited. Provider/outcome/QC/development-look/trading counts zero. No vendor-rights attestation or canonical admission. | One matching-branch non-force push of this Codex round, then independent Claude review of every commit after `c0bfb213` through the exact pushed tip. No automatic D1; later action/source scope must be selected after review and counter-review. |
 
@@ -34948,3 +34961,113 @@ focused-docguard changes after sourcecommit4c1cf17.... Verify actual local/
 remote equality and clean status afterward. No intermediate or second push.
 
 118.21 finalpublication checks:313passed/558deselected7.05s in focused current-document selection, including10new terminal-limit/financial-promotion mutants. DocguardSHA8d5142054427fec047829cd410b5a0fa15c530c0bfb69dfc2c257043f3d7039b; final production+census committedclosures/pins stable, pureLF/AST/diffchecks, received9..117history exact (boundarynewlinesexcluded). No fullsuite/private/native request during finalchecks. SourceimplementationHEAD4c1cf17 remains exact; onlysolelane record+focusedguard changed. Matchingremote fresh3cf9636e;0successfulpushes before the single authorizednonforcepublication. Subsequentactual remote equality/clean-status check will be reported with finalhandoffcommit; no recursivehandoff edit/push.
+
+## 119. Claude code review of the native cache diagnostic and census round - 2026-11-05
+
+**Cumulative disposition: accepted after correction.** The owner asked for
+every unreviewed commit to be reviewed as code only, with bugs fixed rather
+than logged and no full lane suite. Section 118 waived routine Claude review
+for Codex; this is the owner's direct request, not a retroactive gate. No P0
+or P1 was found, no wrong-project, unpinned or repeated effect exists in any
+of the three action clients, and the terminal input-blocked claim holds.
+Record prose in the eight record commits was not audited; only their guard
+changes and the terminal figures were.
+
+### 119.1 Exact reviewed snapshot
+
+| Item | Value |
+|---|---|
+| Branch and worktree | `codex/strategy-target-price-revisions`; the lane worktree resolved from `git worktree list` |
+| Reviewed range | `3cf9636ee523833d6dc7eacd866c37e5157ec258..166550931afc241bf528be3a2d80df75e6c3f39f` |
+| Codex commit 1 | `1041affc04719c3074ad07f997ef6d7aa6ca2d10` - Retain Mia authentication handoff and verified OFF baseline |
+| Codex commit 2 | `3082e45af20441053009b9ffdb4974f1d6ae04ab` - Add fixed prospective native cache diagnostic builder |
+| Codex commit 3 | `f66f545f44b78ace4a2abb60ebadca9574d00c7c` - Record Safari Mia progress and local cache probe verification |
+| Codex commit 4 | `44687221658728aca318c1cb14e696c1520487af` - Add QC-only parent bootstrap diagnostic and fixed launch actions |
+| Codex commit 5 | `54328acadb53613cfb91d70a6a0defc0cd708cbf` - Record Mia diagnosis and verified QC-only diagnostic readiness |
+| Codex commit 6 | `c7471730e38358528bbaad255b3dfaf35d885fda` - Recognize exact authorized Mia in OFF cache preflight |
+| Codex commit 7 | `dd0e57c04c930bcb892060e56423bcc0f4809200` - Record Mia metadata recovery and pending editor restoration |
+| Codex commit 8 | `c055db5acaf9080d850fec55f7c9e50575b00875` - Preserve first failure in native cache diagnostics |
+| Codex commit 9 | `7231de0a1aad45d298b21fc5f8e85919a201f300` - Record native cache canary and reviewed diagnostic continuation |
+| Codex commit 10 | `d7f9e860d72ae60b2b8b4201780e8b6e21d19de1` - Identify exact native subscription configuration refusals |
+| Codex commit 11 | `177595aef351b6a7c1eccc6e618e17f363913025` - Record configuration refusal evidence and reviewed diagnostic epoch |
+| Codex commit 12 | `45fb75a1e2a6309d37f16fc500290675f179d546` - Add bounded OFF subscription configuration census |
+| Codex commit 13 | `4ef85b7f018f5a11ea56307dd59f71d0b22fd58b` - Refine native config census resolution metadata |
+| Codex commit 14 | `4c1cf17befd02fc71eff7d6928991c9e8a655654` - Validate observed SPY control configuration in versioned probe |
+| Codex commit 15 | `166550931afc241bf528be3a2d80df75e6c3f39f` - Record terminal OFF input blocker and final lane handoff |
+| Host | Windows 11 Enterprise, Python 3.13.14, pytest 9.1.1; read-only scratch clones for mutation trials; no QC, provider or Mia request |
+
+### 119.2 Commit-by-commit dispositions
+
+| Codex commit | Disposition | Basis |
+|---|---|---|
+| `1041affc04719c3074ad07f997ef6d7aa6ca2d10` | **Accepted** | Record and guard only. The guard change is stricter: exact range and exact incoming lineage, with the section-116 checks moved to section 118 equivalents. |
+| `3082e45af20441053009b9ffdb4974f1d6ae04ab` | **Accepted** | Base cache probe. Clock, session, config and bound guards are sound; no order, cash, History or price export path. Its verdict rules had no killing test (`TPR-CR35-002`, tests added). |
+| `f66f545f44b78ace4a2abb60ebadca9574d00c7c` | **Accepted** | Record and guard only. |
+| `44687221658728aca318c1cb14e696c1520487af` | **Accepted after correction** | Fixed endpoints, pinned first and last reads, spend-before-effect and the proof chain are sound. A launched job's identity could be lost (`TPR-CR35-004`), a failed receipt could report completed (`TPR-CR35-005`), and the active-job gate ignored `count` (`TPR-CR35-006`). The tests lacked the owner's Mac-only split (`TPR-CR35-001`). All corrected. |
+| `54328acadb53613cfb91d70a6a0defc0cd708cbf` | **Accepted** | Record and guard only. |
+| `c7471730e38358528bbaad255b3dfaf35d885fda` | **Accepted** | Exact hashed Mia collaborator recognition; an unknown collaborator still refuses. |
+| `dd0e57c04c930bcb892060e56423bcc0f4809200` | **Accepted** | Record only. |
+| `c055db5acaf9080d850fec55f7c9e50575b00875` | **Accepted** | First-failure fields are written once and failure codes are a closed list. The summary-overwrite defect that survived into v5 is `TPR-CR35-003`. |
+| `7231de0a1aad45d298b21fc5f8e85919a201f300` | **Accepted** | Record only. |
+| `d7f9e860d72ae60b2b8b4201780e8b6e21d19de1` | **Accepted** | Closed configuration refusal codes, with no private error text in logs. |
+| `177595aef351b6a7c1eccc6e618e17f363913025` | **Accepted** | Record only. |
+| `45fb75a1e2a6309d37f16fc500290675f179d546` | **Accepted after correction** | The census is read-only and bounded, emitting booleans and labels only. Its executor copy carried `TPR-CR35-004` and `-005`, its completion labels had no test (`TPR-CR35-002`), and its tests lacked the split (`TPR-CR35-001`). All corrected. |
+| `4ef85b7f018f5a11ea56307dd59f71d0b22fd58b` | **Accepted** | Resolution metadata refinement; unknown values stay None. |
+| `4c1cf17befd02fc71eff7d6928991c9e8a655654` | **Accepted after correction** | v5 differs from its predecessor only by the control path, flags, compaction and label routing, and no regression was found. Its labels and stage attribution are corrected (`TPR-CR35-003`). The action client inherits `TPR-CR35-004` to `-006`, and the sole-guard tests were missing (`TPR-CR35-007`). |
+| `166550931afc241bf528be3a2d80df75e6c3f39f` | **Accepted** | Record and guard only. The reviewer recounted the terminal claim from the record's safe projection: control freshness 5/5, target freshness 4/5, and the 2021-02-10 target one day stale. |
+
+### 119.3 P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Correction | Verification |
+|---|---|---|---|---|---|---|---|
+| `TPR-CR35-001` | P2 | **Closed by correction** | `44687221`, `45fb75a1`, `4c1cf17b` | the seven new test modules | On this Windows host: 429 failed and 4 errors. The executors wrap a missing POSIX primitive into `ActionRefusal`, so off the Mac positive cases failed and `pytest.raises(ActionRefusal)` cases passed vacuously. This is the owner's 2026-10-12 Mac-only custody class. The 4 errors are a 65,537-character parameter used as a test ID, which overflows `PYTEST_CURRENT_TEST`. | `execute()` skips off the Mac with the owner's reason; short explicit IDs. | 599 passed, 453 skipped, 0 failed before the later additions. Unchanged on the Mac. |
+| `TPR-CR35-002` | P2 | **Closed by correction** | `3082e45a`, `4c1cf17b`, `45fb75a1` | v5 and census test modules | No test killed changes to the headline verdict: target exact-close equality, the control 60-second tolerance, session coverage, or the census status and first-failure labels. A later edit could have accepted any same-day bar as fresh with all suites green. | Exact boundary table for both roles; coverage, first-failure, end-custody, never-attempted and truncated-census tests. The shipped verdict logic was already correct. | Each mutation in 119.4 is red. |
+| `TPR-CR35-003` | P3 | **Closed by correction** | `c055db5a`, `4c1cf17b` | `native_cache_parent_probe_v5_20261104.py` | Three label defects. A run whose cells were all `observation_unproved` still reported `complete_cache_observations` and `bounded_snapshot_recorded`. A later disabled close overwrote `snapshot_unproved` with `skipped_disabled`. A failed date call was attributed to the already completed custody stage. Job `187b4319` is unaffected: all its cells are bounded. | `_ok()` requires every cell bounded for `complete` and the close summary; the skip keeps an earlier failure; the control stage starts before the date calls. The pinned base runtime is unchanged. The fixture main stays within the 59,900-byte test reserve. | Behavioural tests; each reverted fix is red. |
+| `TPR-CR35-004` | P2 | **Closed by correction** | `44687221`, `45fb75a1`, `4c1cf17b` | all three action clients | A `check()` ran after the transport returned and before the response was retained. If HEAD moved, a pinned source changed or the clock passed expiry right after `backtests/create`, the raw response and `backtestId` were lost, leaving a running job with no local identity. `comparison_20261029_project_api.py` already retains first. | Removed that one check; the next loop-top check and the final check still stop and mark the run failed. | Regression test; the restored check is red under the shim. |
+| `TPR-CR35-005` | P3 | **Closed by correction** | `44687221`, `45fb75a1`, `4c1cf17b` | all three action clients | An unpublished `.result.json` still returned `status: "completed"`. | The failing branch sets `failed_or_uncertain` or `cancelled`. | Regression test; the reverted fix is red under the shim. |
+| `TPR-CR35-006` | P3 | **Closed by correction** | `44687221`, `4c1cf17b` | `_projection` in the v4 and v5 clients; the census inherits it | The active-job gate accepted a `backtests/list` whose `count` disagreed with its rows, and duplicate IDs, so a truncated list could prove "no active job". The cleanup client already requires `count`, which is how its presence on real responses is known. | Native integer `count` equal to the row count; duplicates refuse. | Four new faults; each reverted guard is red under the shim. |
+| `TPR-CR35-007` | P3 | **Closed by correction** | `44687221`, `4c1cf17b` | three action test modules | No test failed if the sole `BuildSuccess` gate, or the only link between the pinned compile and the launched compile ID, was removed. | A `BuildError` wire test and an unrelated-compile-ID test. | Reviewer mutation evidence; both pass on the corrected code under the shim. |
+| `TPR-CR35-008` | P3 | **Documented with exact proposed patch** | `c055db5a`, `4c1cf17b` | pinned base runtime; v5 `_failure` | After bootstrap, exact guard codes are lost: an unlocked custody failure at 10:01 reports `inherited_data_unproved`, and a `cfg_*` refusal inside `_observe` leaves no code. No wrong conclusion follows. **Blocker:** the swallowing `except` is in the base runtime pinned by `BASE_RUNTIME_SHA256`, and the input-blocked state offers no native run to use it. **Patch:** have `DiagnosticGuardRefusal.__init__` store the last code on the class; have `_failure(code="inherited_*")` prefer it and clear it; add a closed `failure_code` to each cell; and re-pin the base hash in the next diagnostic epoch. | Not applied. | Not applicable. |
+
+### 119.4 Verification
+
+- **Hash pins.** The v5 probe edit moved `PINS[builder.MODULE]` in the v5
+  client, and the v4 client edit moved `PINS[fixed.MODULE]` in the census
+  client. Both are updated. `BASE_RUNTIME_SHA256` and every frozen source pin
+  are untouched.
+- **v5 and census mutations** in a read-only clone, each restored afterwards.
+  All are red: completion without `_ok`, coverage removed, close summary
+  always bounded, skip overwriting, stage moved back, target accepting any
+  same-day bar, control tolerance widened, first-failure guard off, failure
+  keeping complete, status always complete (red once the truncated-census test
+  existed), terminal always complete, end custody off, not-attempted off.
+- **Action-client execution paths** need POSIX custody, so here they ran only
+  under a verification-only shim that neutralizes custody and is not committed
+  or custody evidence. The three action modules give 593 passed and 4 failed.
+  Three failures are the FIFO test (`os.mkfifo` does not exist on Windows). The
+  fourth was the v5 test's literal copy of the old probe hash, now updated and
+  passing. On the v5 client, each of these is red: retention check restored,
+  receipt status not reset, count check removed, duplicate check removed.
+- **Portable results on this host.** The seven new modules give 615 passed,
+  477 skipped (Mac-only custody) and 1 failed; the failure is that same literal
+  hash, passing after its update and rerun alone. The whole document guard
+  passes. `compileall` exited 0 and `git diff --check` is clean. At the owner's
+  direction, no full lane or repository suite was run.
+- **Not exercised here:** real POSIX custody, the native transport, and any QC
+  behaviour. Codex should run these modules on the Mac.
+
+### 119.5 Authority
+
+This review grants nothing: 0/5 accepted full-window results stand, canonical
+admission is not authorized, no unchanged financial relaunch is authorized by
+this review, and no broker, paper, live or capital authority is added. The
+corrections change no frozen economics and no receipt. Any later native use of
+the changed clients or v5 probe is a new source epoch. Job `187b4319`'s
+evidence stays bound to its recorded commit.
+
+### 119.6 Recommendation
+
+Codex should run the three action modules and the v5 probe module on the Mac
+before any later native use, because their execution paths could only be
+shimmed here. Nothing in this review changes the concrete input blocker that
+section 118.21 hands to the owner.

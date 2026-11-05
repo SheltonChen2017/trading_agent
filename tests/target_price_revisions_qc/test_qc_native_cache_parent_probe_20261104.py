@@ -43,7 +43,9 @@ def test_pure_renderer_is_fixed_deterministic_and_never_accepts_local_sid():
         "remove_security", "set_market_price", "save", "price", "volume", "close", "cash", "total_portfolio_value"}
 
 
-@pytest.mark.parametrize("config", [None, b"{}", "", "{}", "PRIVATEKEY", "{\"binding\":{}}", "x" * 65537])
+# Short ids: the oversized value as an id overflows PYTEST_CURRENT_TEST on Windows (TPR-CR35-001).
+@pytest.mark.parametrize("config", [None, b"{}", "", "{}", "PRIVATEKEY", "{\"binding\":{}}", "x" * 65537],
+    ids=["none", "bytes", "empty", "empty_object", "private_key", "binding_only", "oversized"])
 def test_production_refuses_any_unpinned_parent_configuration_without_echo(config):
     with pytest.raises(p.ParentCacheRefusal, match="^fixed native-parent cache diagnostic refused$"):
         p.build_cache_probe(parent_probe_config_json=config, helper_source=HELPER, operation_id=OP, git_head=HEAD)

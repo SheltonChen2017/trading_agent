@@ -368,8 +368,10 @@ def _projection(body, request, registry, *, latest_owner_instruction_sha256):
         return {"phase": "collaborators", "project_id": builder.PROJECT_ID, "user_permissions": "write",
             "independent_native_origin_attested": False, **stats}
     if identity == "jobs":
-        jobs = body.get("backtests")
-        if type(jobs) is not list or len(jobs) > 1000:
+        jobs, count = body.get("backtests"), body.get("count")
+        # TPR-CR35-006: a list that disagrees with its own count cannot prove no active job.
+        if (type(jobs) is not list or len(jobs) > 1000 or type(count) is evidence.JsonNumber
+                and re.fullmatch(r"[0-9]+", count.lexeme) is None or projects._integer(count, 0, 1000) != len(jobs)):
             _fail()
         for row in jobs:
             if (type(row) is not dict or type(row.get("completed")) is not bool or row["completed"] is not True
@@ -377,6 +379,8 @@ def _projection(body, request, registry, *, latest_owner_instruction_sha256):
                     or re.fullmatch("[a-f0-9]{32}", row["backtestId"]) is None
                     or "projectId" in row and _native_integer(row["projectId"]) != builder.PROJECT_ID):
                 _fail()
+        if len({row["backtestId"] for row in jobs}) != len(jobs):
+            _fail()
         return {"terminal_jobs_observed": len(jobs), "nonterminal_jobs_observed": 0}
     if request["endpoint"] == "files/read":
         inventory = _file_inventory(body)
@@ -640,7 +644,8 @@ def _execute(action, root, lock_root, *, transport, guard, clock, monotonic, fix
             if request["id"] == "launch": result["actual_new_diagnostic_jobs"] = None
             raw, status, credential, owner = transport(request["endpoint"], api._canonical(request["payload"]),
                 request["seconds"], request["max_response_bytes"], registry["owner_id"])
-            check()
+            # TPR-CR35-004: retain the response before any further source/clock check. A
+            # check here would lose a launched job's identity; the next check still stops.
             if (type(raw) is not bytes or not 0 < len(raw) <= request["max_response_bytes"]
                     or result["response_bytes"]+len(raw) > 8*1024*1024 or type(status) is not int
                     or _native_integer(owner) != registry["owner_id"] or type(credential) is not str
@@ -689,6 +694,8 @@ def _execute(action, root, lock_root, *, transport, guard, clock, monotonic, fix
         except BaseException as error:
             result["receipt_published"] = False
             stop = api._retain_stop(stop, error)
+            # TPR-CR35-005: an unpublished receipt never reports completed.
+            result["status"] = "cancelled" if isinstance(stop, KeyboardInterrupt) else "failed_or_uncertain"
     if isinstance(stop, KeyboardInterrupt):
         raise ActionCancelled(result) from None
     if stop is not None and not isinstance(stop, Exception):

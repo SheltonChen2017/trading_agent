@@ -6,6 +6,7 @@ import inspect
 import json
 import os
 from pathlib import Path
+import sys
 
 import pytest
 
@@ -105,7 +106,7 @@ def body(request, content):
             "userPermissions": "write", "userLiveControl": True}
     if endpoint == "backtests/list":
         return {"success": True, "projectId": project, "backtests": [
-            {"backtestId": "d" * 32, "projectId": project, "completed": True, "status": "Completed."}]}
+            {"backtestId": "d" * 32, "projectId": project, "completed": True, "status": "Completed."}], "count": 1}
     if endpoint == "files/read":
         return {"success": True, "projectId": project, "files": [
             {"name": name, "content": raw.decode("ascii"), "projectId": project} for name, raw in content.items()]}
@@ -135,7 +136,17 @@ def backend(a, content=None, effects=None, transform=lambda value, request: valu
     return transport
 
 
+MAC_CUSTODY_REASON = (
+    "Owner-selected Mac-only native custody (TPR-CR25-003): POSIX no-follow/UID/mode/directory-fsync "
+    "custody is not Windows custody evidence"
+)
+
+
 def execute(tmp_path, a=None, **kwargs):
+    # The executor wraps a missing POSIX primitive into ActionRefusal, so off the Mac a
+    # positive case would fail and a refusal case would pass vacuously (TPR-CR35-001).
+    if sys.platform != "darwin":
+        pytest.skip(MAC_CUSTODY_REASON)
     a = action() if a is None else a
     return m._execute_fixture(a, kwargs.pop("root", tmp_path / "cache-actions"),
         transport=kwargs.pop("transport", backend(a)), clock=kwargs.pop("clock", lambda: NOW), **kwargs)
@@ -215,7 +226,8 @@ def test_durable_claims_precede_every_effect_and_success_is_nonfinancial(tmp_pat
 
 
 @pytest.mark.parametrize("fault", ["active_job", "unknown_job", "foreign_job", "wrong_owner", "nonowner_collaborator",
-    "nonwrite", "source_before", "source_after_extra", "source_after_missing"])
+    "nonwrite", "source_before", "source_after_extra", "source_after_missing",
+    "count_mismatch", "count_missing", "empty_nonzero_count", "duplicate_job"])
 def test_native_preconditions_stop_without_policy_or_source_broadening(tmp_path, fault):
     a, effects = action(), []
     reads = [0]
@@ -230,6 +242,11 @@ def test_native_preconditions_stop_without_policy_or_source_broadening(tmp_path,
             if fault == "active_job": value["backtests"][0].update(completed=False, status="Running")
             if fault == "unknown_job": value["backtests"][0]["status"] = "Unknown"
             if fault == "foreign_job": value["backtests"][0]["projectId"] = 42
+            if fault == "count_mismatch": value["count"] = 5
+            if fault == "count_missing": del value["count"]
+            if fault == "empty_nonzero_count": value["count"], value["backtests"] = 3, []
+            if fault == "duplicate_job":
+                value["backtests"].append(dict(value["backtests"][0]));value["count"] = 2
         if endpoint == "files/read":
             reads[0] += 1
             if fault == "source_before" and reads[0] == 1: value["files"][1]["content"] += "drift"
@@ -709,7 +726,7 @@ def test_native_parent_interface_closes_all_sources_and_has_no_local_sid_or_body
     assert sha(helper_source()) == m.builder.HELPER_SHA256 == a["api_plan"]["source_hashes"][m.builder.reader.MODULE]
     expected = m.api.REQUIRED_SOURCES | m.builder.REQUIRED_SOURCES | {m.MODULE, m.custody.MODULE}
     assert m.REQUIRED_SOURCES == expected == set(a["api_plan"]["source_hashes"])
-    assert m.PINS[m.builder.MODULE] == "de7c4741e1b643a415199892c86944ad2a46325edaeb9dac2ad69301e77b6378"
+    assert m.PINS[m.builder.MODULE] == "6f26b28afdbcb35c10f89245e267ed6a7618ff3a0ee137977ad0d0ec3dc548a1"
     assert all(sha((ROOT/name).read_bytes()) == digest for name, digest in m.PINS.items())
     assert 0 < len(fixture_main()) <= 60000  # the unchanged API payload bound
 
@@ -832,3 +849,70 @@ def test_valid_foreign_parent_compile_lineage_is_refused_before_launch(tmp_path,
     result = execute(tmp_path, launch, root=root, transport=backend(launch, effects=effects))
     assert result["status"] == "failed_or_uncertain" and effects == []
     assert result["receipt_published"] and result["transport_calls_attempted"] == 0
+
+
+def test_post_launch_guard_failure_retains_the_returned_job_identity(tmp_path):
+    """TPR-CR35-004: a source/clock failure right after a launch must not lose the running job."""
+    root, descriptors, _ = compile_evidence(tmp_path)
+    launch = action("launch", compile_evidence=descriptors)
+    inner, launched = backend(launch), []
+    def transport(endpoint, *rest):
+        out = inner(endpoint, *rest)
+        if endpoint == "backtests/create":
+            launched.append(True)
+        return out
+    def guard(_plan):
+        if launched:
+            raise ValueError("source moved after the launch returned")
+    result = execute(tmp_path, launch, root=root, transport=transport, guard=guard)
+    row = next(item for item in result["requests"] if item["id"] == "launch")
+    assert launched and row["raw_response"] is not None and len(result["observed_job_ids"]) == 1
+    assert result["actual_new_diagnostic_jobs"] == 1 and result["status"] == "failed_or_uncertain"
+    assert (root / (launch["api_plan"]["operation_id"]+".launch.response.raw")).exists()
+
+
+def test_unpublished_receipt_is_never_reported_completed(tmp_path, monkeypatch):
+    """TPR-CR35-005."""
+    real = m.api._publish
+    def publish(root, name, raw):
+        if name.endswith(".result.json"):
+            raise OSError("synthetic receipt failure")
+        return real(root, name, raw)
+    monkeypatch.setattr(m.api, "_publish", publish)
+    result = execute(tmp_path)
+    assert result["receipt_published"] is False and result["status"] == "failed_or_uncertain"
+
+
+def test_build_error_wire_is_refused(tmp_path):
+    """TPR-CR35-007: BuildSuccess is the only state gate before a compile becomes launchable."""
+    a = action("build")
+    def mutate(value, request):
+        value["state"] = "BuildError"
+        return value
+    result = execute(tmp_path, a, transport=backend(a, content=files("build"), transform=mutate))
+    assert result["status"] == "failed_or_uncertain"
+
+
+def test_launch_refuses_compile_id_never_returned_by_pinned_compile(tmp_path):
+    """TPR-CR35-007: only the compile of the pinned source can supply the launched compile ID."""
+    root, content = tmp_path / "cache-actions", files("compile")
+    compile_action = action("compile")
+    def other(value, request):
+        if request["endpoint"] == "compile/create":
+            value["compileId"] = "unrelated-compile"
+        return value
+    assert execute(tmp_path, compile_action, root=root,
+        transport=backend(compile_action, content=content, transform=other))["status"] == "completed"
+    build_action = action("build")
+    assert execute(tmp_path, build_action, root=root,
+        transport=backend(build_action, content=content))["status"] == "completed"
+    cop, bop = compile_action["api_plan"]["operation_id"], build_action["api_plan"]["operation_id"]
+    names = {"compile_plan": cop+".action.spent.json", "compile_result": cop+".result.json",
+        "source_before": cop+".before.response.raw", "compile_response": cop+".compile.response.raw",
+        "source_after": cop+".after.response.raw", "build_plan": bop+".action.spent.json",
+        "build_result": bop+".result.json", "build_response": bop+".build.response.raw"}
+    evidence = {key: {"name": name, "bytes": len((root/name).read_bytes()), "sha256": sha((root/name).read_bytes())}
+        for key, name in names.items()}
+    launch, effects = action("launch", compile_evidence=evidence), []
+    result = execute(tmp_path, launch, root=root, transport=backend(launch, effects=effects))
+    assert result["status"] == "failed_or_uncertain" and "backtests/create" not in effects

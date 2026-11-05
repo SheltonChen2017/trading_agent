@@ -1297,11 +1297,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION118_RANGE]
+    ) == [SECTION119_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Codex has independently counter-reviewed the exact incoming Claude range"
+        "Claude has independently reviewed the exact Codex range"
         in normalized_current
     )
     assert SECTION118_NEXT_ROLE in normalized_current
@@ -1416,7 +1416,7 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION118_SHORT_RANGE]
+        ) == [SECTION119_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
         assert SECTION118_NEXT_ROLE.lower() in normalized_summary_lower
         assert SECTION117_NEXT_ROLE.lower() not in normalized_summary_lower
@@ -2438,9 +2438,9 @@ def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
     next_actions = re.findall(SECTION8_NEXT_ACTION_STATEMENT, normalized)
     assert len(next_actions) == 1, f"section 8 must name one next action: {next_actions}"
     ranges = re.findall(r"`([0-9a-f]{40})\.{2}([0-9a-f]{40})`", normalized)
-    assert ranges == [(SECTION118_BASE, SECTION118_HEAD)], ranges
-    incoming = tuple(_git_lines("rev-list", "--reverse", SECTION118_RANGE))
-    assert incoming == SECTION118_COMMITS, "exact current incoming commit lineage"
+    assert ranges == [(SECTION119_BASE, SECTION119_HEAD)], ranges
+    incoming = tuple(_git_lines("rev-list", "--reverse", SECTION119_RANGE))
+    assert incoming == SECTION119_COMMITS, "exact current incoming commit lineage"
     # This is the explicitly named current-round starting snapshot, not an
     # accepted source/strategy artifact or a second counter-review range.
     allowed = {*ranges[0], *SECTION8_STABLE_COMMITS, SECTION93_BASE, *incoming}
@@ -4710,7 +4710,7 @@ def test_section118_current_routing_refuses_stale_range_or_role(monkeypatch, fau
     if fault.startswith("current_"):
         original_section = _record_section
         section = original_section("## 8. Exact next step")
-        old, new = (SECTION118_RANGE, SECTION109_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION119_RANGE, SECTION118_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, section) is not None
@@ -4719,7 +4719,7 @@ def test_section118_current_routing_refuses_stale_range_or_role(monkeypatch, fau
             lambda heading: mutated if heading.startswith("## 8.") else original_section(heading))
     else:
         preamble = _record_preamble()
-        old, new = (SECTION118_SHORT_RANGE, SECTION109_SHORT_RANGE) if fault.endswith("range") else (
+        old, new = (SECTION119_SHORT_RANGE, SECTION118_SHORT_RANGE) if fault.endswith("range") else (
             current_next, stale_next)
         pattern = r"\s+".join(re.escape(word) for word in old.split())
         assert re.search(pattern, preamble, flags=re.I) is not None
@@ -5942,6 +5942,28 @@ SECTION118_COMMITS = (
     "dc9c67ad816b2369f7834b2af149627e366165fe",
     SECTION118_HEAD,
 )
+SECTION119_BASE = SECTION118_HEAD
+SECTION119_HEAD = "166550931afc241bf528be3a2d80df75e6c3f39f"
+SECTION119_RANGE = f"{SECTION119_BASE}..{SECTION119_HEAD}"
+SECTION119_SHORT_RANGE = "3cf9636e..16655093"
+SECTION119_COMMITS = (
+    "1041affc04719c3074ad07f997ef6d7aa6ca2d10",
+    "3082e45af20441053009b9ffdb4974f1d6ae04ab",
+    "f66f545f44b78ace4a2abb60ebadca9574d00c7c",
+    "44687221658728aca318c1cb14e696c1520487af",
+    "54328acadb53613cfb91d70a6a0defc0cd708cbf",
+    "c7471730e38358528bbaad255b3dfaf35d885fda",
+    "dd0e57c04c930bcb892060e56423bcc0f4809200",
+    "c055db5acaf9080d850fec55f7c9e50575b00875",
+    "7231de0a1aad45d298b21fc5f8e85919a201f300",
+    "d7f9e860d72ae60b2b8b4201780e8b6e21d19de1",
+    "177595aef351b6a7c1eccc6e618e17f363913025",
+    "45fb75a1e2a6309d37f16fc500290675f179d546",
+    "4ef85b7f018f5a11ea56307dd59f71d0b22fd58b",
+    "4c1cf17befd02fc71eff7d6928991c9e8a655654",
+    SECTION119_HEAD,
+)
+SECTION119_DISPOSITIONS = ("accepted", "accepted", "accepted", "accepted after correction", "accepted", "accepted", "accepted", "accepted", "accepted", "accepted", "accepted", "accepted after correction", "accepted", "accepted after correction", "accepted")
 SECTION118_NEXT_ROLE = (
     'The fixed prospective native-cache diagnostic in OFF project38609822 is complete; the2021-02-10 same-session RAW/SID input blocker remains. The next bounded action is genuine QC/Mia or authoritative native-input diagnosis under fresh bounded source/HEAD/access/operation/attempt/look claims; genuine Mia has supplied no verified code fix, so OFF and the remaining frozen arms proceed serially only after verified source/input/resource recovery, while the20REMXrows remain quarantined, Claude review is skipped, and exactly one final lane push is the publication boundary for this concrete-blocked round.'
 )
@@ -7434,3 +7456,63 @@ def test_section_117_guard_refuses_contradictory_authority(monkeypatch, added_gr
         lambda heading: mutated if heading.startswith("## 117.") else original_section(heading))
     with pytest.raises(AssertionError, match="contradictory section 117 authority"):
         test_section_117_review_records_every_commit_and_grants_nothing()
+
+
+SECTION119_HEADING = "## 119. Claude code review of the native cache diagnostic and census round"
+SECTION119_GRANT = (
+    r"(?:^|[.!?|:;])\s*(?:canonical admission|real-row canonical D1|TPR-1|TPR-0B|broker trading|paper trading|"
+    r"live trading|trading authority|capital expansion|financial acceptance|QuantConnect launch)\s+is\s+authorized\b"
+)
+
+
+def test_section_119_review_records_every_commit_and_grants_nothing() -> None:
+    section = _record_section(SECTION119_HEADING)
+    assert SECTION119_RANGE in section
+    ordered = tuple(re.search(r"`([0-9a-f]{40})`", line).group(1) for line in section.splitlines()
+        if re.match(r"[|] Codex commit [0-9]+ [|]", line))
+    assert ordered == SECTION119_COMMITS == tuple(_git_lines("rev-list", "--reverse", SECTION119_RANGE))
+    block = _bounded(section, "### 119.2 Commit-by-commit dispositions", "### 119.3 P0-P3 ledger", "section 119 dispositions")
+    rows = tuple((m.group(1), m.group(2).lower()) for line in block.splitlines()
+        if (m := re.match(r"\| `([0-9a-f]{40})` \| \*\*([A-Za-z ]+)\*\* \|", line)))
+    assert rows == tuple(zip(SECTION119_COMMITS, SECTION119_DISPOSITIONS)), "exact section 119 dispositions"
+    ledger = _bounded(section, "### 119.3 P0-P3 ledger", "### 119.4 Verification", "section 119 ledger")
+    statuses = dict(re.findall(r"^\| `(TPR-CR35-[0-9]{3})` \| P[0-3] \| \*\*([^*]+)\*\*", ledger, re.M))
+    assert statuses == {**{f"TPR-CR35-00{i}": "Closed by correction" for i in range(1, 8)},
+        "TPR-CR35-008": "Documented with exact proposed patch"}, "exact section 119 ledger"
+    authority = " ".join(_bounded(section, "### 119.5 Authority", "### 119.6 Recommendation", "section 119 authority").split())
+    for required in ("0/5 accepted full-window results", "canonical admission is not authorized",
+            "no unchanged financial relaunch is authorized by this review", "new source epoch"):
+        assert required in authority, required
+    assert re.search(SECTION119_GRANT, authority, re.I) is None, "contradictory section 119 authority"
+
+
+@pytest.mark.parametrize("index", range(len(SECTION119_COMMITS)))
+def test_section_119_guard_refuses_disposition_drift_or_skipped_commit(monkeypatch, index: int) -> None:
+    test_section_119_review_records_every_commit_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 119.")
+    commit, disposition = SECTION119_COMMITS[index], SECTION119_DISPOSITIONS[index]
+    row = f"| `{commit}` | **{disposition.capitalize()}** |"
+    assert section.count(row) == 1
+    drifted = "accepted" if disposition != "accepted" else "accepted after correction"
+    for mutated in (section.replace(row, f"| `{commit}` | **{drifted.capitalize()}** |", 1),
+            section.replace(next(line for line in section.splitlines() if line.startswith(row)), "", 1)):
+        monkeypatch.setitem(globals(), "_record_section",
+            lambda heading, text=mutated: text if heading.startswith("## 119.") else original_section(heading))
+        with pytest.raises(AssertionError, match="exact section 119 dispositions"):
+            test_section_119_review_records_every_commit_and_grants_nothing()
+
+
+@pytest.mark.parametrize("added_grant", ("Canonical admission is authorized.", "Financial acceptance is authorized.",
+    "QuantConnect launch is authorized.", "Live trading is authorized."))
+def test_section_119_guard_refuses_contradictory_authority(monkeypatch, added_grant: str) -> None:
+    test_section_119_review_records_every_commit_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 119.")
+    marker = "### 119.6 Recommendation"
+    assert section.count(marker) == 1
+    mutated = section.replace(marker, added_grant + "\n\n" + marker, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 119.") else original_section(heading))
+    with pytest.raises(AssertionError, match="contradictory section 119 authority"):
+        test_section_119_review_records_every_commit_and_grants_nothing()

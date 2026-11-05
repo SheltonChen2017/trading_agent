@@ -68,6 +68,8 @@ and 341. It adds one fail-closed stop: SEC batch planning refuses until the
 required-window consumed index is chained.
 Section 369 is Claude's review of sections 351-368; it corrects the
 section-366.8 control-match claim and changes no gate.
+Section 370 is Claude's correction of two statements in section 369; it
+changes no finding, disposition or gate.
 
 ## 1. Canonical V1 contract
 
@@ -323,6 +325,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-03 | Codex owner-authorized FMP/EOD qualification | Clean2948796a ->650cd9ba4569f6ef059246944a62fcd107d0de29 ->743aea5a6555a1a4c062f16e485751b7f6a7b6b1 ->d7b6c3cfba751c17b63c477a998bfa7f0b9ff699 -> this separate365 handoff; incoming EMPTY | Qualify existing-plan insider/SEC/current mappings against8 warmup+4 fixed recent originals, no purchases/QC | Three actual operations FAILED/preserved; third native worker produced12 candidate controls/16 metadata/56 body-stage pins, then output_changed before any Keychain/provider access. No API coverage or backtesting readiness claimed. | Main288 focused9.03s/129 boundary6.95s, eight images compile/four frozen historical equality; synthetic delayed RED/GREEN and immutable-flag probes364, guard reversals; no full suite. |15 P2s OPEN:13 carried plus IBFMPEOD-OBS36401 and reopened IBFMPEOD-PUB36402; owner-confirmed36201 rotation action satisfied without actual key inspection. | Stable private custody qualification/diagnosis before any newly scoped data operation; preserve all failed claims, no fourth attempt/reset, provider retry, purchase/QC/vendor reply or monitor rearm. |
 | 2026-11-03 | Codex custody repair, existing-plan audit and protected planner | Clean63d5665fe2eca484bc8d24d93cbd0d293d096756 ->dfdf9ee5 ->7f650b08 ->b851c3b3 ->ed2c738f -> separate368 handoff; incoming EMPTY | Fix custody, qualify FMP/EODHD, continue input-complete pre-QC engineering; no purchases/QC | Genuine storage experiment recovered without rewriting failed CLI;637s audit completes24/28 GETs, FMP SEC+EOD current mappings corroborate12 controls, insider date-scope refuses. Prepared native architecture then completes363s full25/20,052-chain assembly and independent five-leaf readback;8 warmup NON-DISPATCH candidates, no acquisition/admission/readiness. | Main483 provider/custody10.61s,232 planner19.62s,129 boundary6.94s;32 compiled images/four frozen equality; genuine RED/GREEN, real native preflight23.714s and source-only platform canaries. No full suite. |15 carried P2s OPEN; scoped new parser/IPC/typed-summary/native corrections resolved. Actual archive/PIT/population gates unchanged; all failed claims preserved. | Exact historical availability/version and identity/context facts remain the concrete pre-QC blocker. No ordinary current-row probe, optional comparison, purchase/QC/vendor reply, monitor rearm or interim push. One final matching-lane push after368. |
 | 2026-11-04 | Claude review (macOS session) and corrections | `2d0972d6` -> `249dcb9d` -> this review record | Review of `1635900d..2d0972d6`: 19 Codex commits (sections 351-368), zero merges; the two Windows-session Claude commits and four record commits keep their section 350/351 dispositions | All 19 accepted, two with corrections: the 366.8 control-match overclaim corrected from the kept counters, and the platform helper accepts autocrlf images (`IBWIN-CR36901`). 24 FMP/EODHD GETs and 2 credential reads match the journals; no new SEC request; no email or key shape in receipts or diff. | 915 new-file tests pass under the strict native harness (20 need it; 895 pass in the plain sandbox); helper 99 passed, 2 of 2 mutants caught; guards 179 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. No backtest. | IBFMPEOD-CR36901 closed by correction, IBWIN-CR36901 fixed; P3 IBTEST-OBS36901, IBFMPEOD-OBS36902, IBFENCE-OBS36903, IBCUSTODY-OBS36904, IBMASSIVE2-OBS36905, IBFIRST-OBS36906, IBPLAN-OBS36907 open | Codex counter-reviews 369; the next SEC capture must carry the 36907 rules |
+| 2026-11-04 | Claude correction of section 369 (macOS session) | `ee818ad6` -> this record | No Codex commit since `ee818ad6`, so no new review range. Rechecks section 369's own statements after that round ended under a usage limit. | Two statements corrected: 94 custody-platform tests never passed under the strict harness, and three P3 groups had been recorded from agent reports without the verification 369.1 claimed. All of those findings now hold. | 14 of 14 finding mutants survive as recorded and 3 of 3 controls are caught; 5 probes confirm the rest; network and Keychain exec denied. No complete suite. No backtest. | No new finding; P2 count unchanged at fifteen | Codex counter-reviews 369 and 370 |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -44395,3 +44398,87 @@ P2 count unchanged: fifteen OPEN as in 368.2. No P0/P1.
 Codex counter-reviews this section. The next SEC capture must carry the
 `IBPLAN-OBS36907` rules. A new storage proof is needed before editing any
 bound module.
+
+
+## 370. Claude correction of section 369 (2026-11-04 UTC)
+
+### 370.1 Scope
+
+Origin and this worktree were both at `ee818ad6`, with no Codex commit after
+it, so this round has no new review range. The section 369 round ended under
+a usage limit, so its own statements were rechecked instead. This section
+changes no finding, disposition or gate. `249dcb9d` and `ee818ad6` still await
+Codex's counter-review; this recheck is not independent review of them.
+
+### 370.2 Two statements corrected
+
+1. **Test count in the section 369 ledger row.** It says "915 new-file tests
+   pass under the strict native harness". That is wrong for 94 of them. Under
+   that harness `tests/test_insider_buying_custody_platform.py` reports 83
+   failed, 11 passed, because it needs subprocesses and the harness denies
+   fork. The accurate result is the one 369.5 already lists: 821 passed and 1
+   skipped under the strict harness, and those 94 passed in the plain
+   network- and Keychain-denied sandbox. The chat notes for that round made
+   the same mistake.
+2. **"Every finding below was verified" in 369.1.** This was not true when
+   written. `IBFIRST-OBS36906`, the test-gap parts of `IBMASSIVE2-OBS36905`
+   and `IBPLAN-OBS36907`, and the `[]` rule in `IBFMPEOD-OBS36902` came from
+   agent reports that had not been independently checked. They are verified
+   now (370.3), and all of them hold.
+
+### 370.3 Evidence now behind those findings
+
+All runs denied network and `/usr/bin/security` exec, and mutants also denied
+writes under `artifacts/`. Mutants ran in memory; no source file changed.
+
+- **ZIP guards.** All 10 mutants of `_zip_members` survive
+  `tests/test_insider_buying_pilot_firstrate_qualification_v1.py` (64 passed
+  each): member limit, the 65535 limit, central size, ZIP64 markers, duplicate
+  names, encryption flag, compression type, ratio, depth and decoded total.
+  Two controls (symlink, multi-disk) are caught.
+- **NUL names.** A central-directory name `A.t\x00t` is accepted as `A.t`.
+- **ZIP64 bound.** A ZIP64 record and locator in the last entry's comment make
+  `ZipFile` request a 17,825,878-byte read against the 16,777,216-byte bound.
+  It then refuses with `BadZipFile`, so this fails closed; 369.4 did not say so.
+  The malformed entries, not the bound, stop it.
+- **Massive launcher.** Removing the `native_child_deadline` check and
+  dropping `primary` from the cleanup check both survive (103 passed, 1
+  skipped).
+- **Planner.**
+  - Removing the census-subset guard in `_derive` survives.
+  - Adding all of `artifacts/` to the plan role's read allowlist survives.
+  - A control removing the `/Volumes` and Keychain denials is caught.
+  - These ran with 3 deselected harness-dependent tests (103 passed baseline).
+  - `plan_v2` has no reference to the old guard's tuple, `batches` or
+    `listdir`.
+- **Fixture fences.** The `/System/Volumes/Data` and lower-case `/users`
+  spellings of the lane root pass all three fences; the plain spelling is
+  refused. Both spellings are the same directory by `samefile`.
+- **Empty response.** `b"[]"` projects as scoped and clean with a body pin and
+  0 rows, and `clean_scoped_responses` counts it.
+- **Archive ledger.** The prior index lists the two June-2021 feeds. The
+  required-window index has no `archive_exposures` key.
+- **Uncommitted scripts.** No tracked `research`, `tests` or `scripts` Python
+  file hashes to the 357.3 launcher (`86d5c18f`) or the 353.4 bootstrap
+  (`aab75be7`). The planner CLI has no separate readback mode.
+
+Also checked:
+
+- **Storage-proof binding.** The receipt's 164 names include the FirstRate,
+  controls, projection, both qualification, seal, stable custody, Massive
+  readback and chain modules, but not the planner. So 369.1 holds. They do not
+  include `tests/insider_buying_pytest_platform.py` or its new test, so
+  `249dcb9d` leaves the proof bound.
+- **SEC requests.** A file-level walk of `artifacts/insider_buying` finds 24
+  files newer than the round-342 push, all in the FirstRate (9), Massive
+  readback (4), chain (4) and FMP/EOD v1 (7) namespaces, and none in a SEC
+  capture namespace. The earlier check looked only at top-level directories.
+  The seven retained SEC roots beside the lane worktree have no newer files.
+- **Provider receipt.** The provider `complete.json` has no `storage_identity`
+  key; the planner's has one.
+
+**One limit from `249dcb9d`, not previously stated.** On POSIX hosts the
+helper's byte check no longer notices a pure CRLF conversion of a frozen test.
+Nothing is skipped on those hosts, and
+`test_frozen_production_pin_maps_still_match_current_test_bytes` compares the
+exact bytes separately.

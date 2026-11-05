@@ -22,16 +22,16 @@ api, projects, ops, evidence = fixed.api, fixed.projects, fixed.ops, fixed.evide
 MODULE = "research/target_price_revisions_qc/native_config_census_actions_20261104.py"
 REQUIRED_SOURCES = fixed.REQUIRED_SOURCES | builder.REQUIRED_SOURCES | frozenset((MODULE,))
 PINS = {**fixed.PINS, **builder.PINNED, fixed.MODULE: "c2f4778240898d9fc4ae563a06e8df2c8ec93ae51e5c9aec7a98948e9cf012be",
-    builder.MODULE: "75eeb1338fc0a7a418c07335122e33b40af86ee0e711127c5d16847e59a1d5ff"}
+    builder.MODULE: "580541465c7de84e367c3d605bca89071b40ccac7a18129067cdc4328fa8b1c0"}
 OWNER_SHA256, CREATION_OWNER_SHA256 = fixed.OWNER_SHA256, fixed.CREATION_OWNER_SHA256
 REGISTRY_SHA256 = fixed.REGISTRY_SHA256
-BASELINE_INVENTORY_SHA256 = "336251d676c9a176d113d3e8127202cb300562b590e9f24316cda3b1d79566fb"
+BASELINE_INVENTORY_SHA256 = "b7ecf41311265f8828c2f1026216c4e1e167ab621afebfcd96cde0a10bde61aa"
 PRIVATE_ROOT = api.PRIVATE_ROOT.parent / "native-config-census-actions-20261104"
 PROOF_KEYS = fixed.PROOF_KEYS
 MAX_PROOF_BYTES, MAX_OUTPUT_BYTES = fixed.MAX_PROOF_BYTES, fixed.MAX_OUTPUT_BYTES
 SECONDS = fixed.SECONDS
-ACTION_SCHEMA = "tpr-fixed-control-config-census-action-v1"
-RESULT_SCHEMA = "tpr-fixed-control-config-census-action-result-v1"
+ACTION_SCHEMA = "tpr-fixed-control-config-census-action-v2"
+RESULT_SCHEMA = "tpr-fixed-control-config-census-action-result-v2"
 ACTION_KEYS = frozenset(("schema", "phase", "probe_operation_id", "diagnostic_attempt",
     "attempt_id", "diagnostic_look_id", "latest_owner_instruction_sha256", "api_plan",
     "before_inventory", "source_inventory", "compile_id", "compile_evidence"))

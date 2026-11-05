@@ -50,7 +50,7 @@ def native(monkeypatch):
     state = NS(lock=False, rows=[], logs=[], registrations=[], queries=0, next_calls=0, index_reads=0,
         count_reads=0, query_hook=lambda: None, next_hook=lambda: None, count_hook=lambda: None,
         index_hook=lambda: None, field_hook=lambda row, attr, count: None, fields={}, collection="indexed")
-    class Resolution(IntEnum): MINUTE=0;SECOND=1;DAILY=4
+    class Resolution(IntEnum): MINUTE=0;SECOND=1;TICK=2;HOUR=3;DAILY=4;UNKNOWN=99
     class Mode(IntEnum): RAW=0;ADJUSTED=1
     class Identifier:
         def __eq__(self, other): return type(other) is Identifier
@@ -268,3 +268,49 @@ def test_auxiliary_wait_and_callback_cap_have_no_query_retry(native):
     n.algo._report["on_data_entries"]=6400;n.algo.on_data(n.algo.current_slice)
     assert n.algo._report["on_data_entries"]==6400 and n.algo._report["callback_cap_reached"]
     assert n.state.queries==1
+
+
+def test_unknown_native_enum_value_cannot_make_metadata_complete(native):
+    n=native
+    n.state.rows[2].resolution=type(n.state.rows[2].resolution).UNKNOWN
+    n.algo.on_data(n.algo.current_slice)
+    assert n.algo._report["metadata_complete"] is False
+    assert n.algo._report["complete"] is False
+    third=n.algo._report["rows"][2]
+    assert third["resolution_kind"] is None and "resolution_kind_unsupported" in third["unsupported"]
+    assert third["minute"] is False and third["daily"] is False
+
+
+@pytest.mark.parametrize("label",["tick","second","minute","hour","daily"])
+def test_exact_native_resolution_enum_kind_is_projected_without_name_or_number_fallback(native,label):
+    n=native;resolution=type(n.state.rows[2].resolution)
+    n.state.rows[2].resolution={"tick":resolution.TICK,"second":resolution.SECOND,"minute":resolution.MINUTE,
+        "hour":resolution.HOUR,"daily":resolution.DAILY}[label]
+    n.algo.on_data(n.algo.current_slice);r=n.algo._report;third=r["rows"][2]
+    assert third["resolution_kind"]==label and label in p.RESOLUTION_KINDS
+    assert third["minute"] is (label=="minute") and third["daily"] is (label=="daily")
+    assert r["complete"] and n.state.queries==1
+    assert r["schema"]=="tpr-fixed-config-census-result-v2"
+    assert all(r[key] is False for key in p.FLAGS)
+
+
+@pytest.mark.parametrize("replacement",["second",1,None,object()])
+def test_non_enum_resolution_never_uses_an_integer_or_string_fallback(native,replacement):
+    n=native;n.state.rows[2].resolution=replacement
+    n.algo.on_data(n.algo.current_slice);row=n.algo._report["rows"][2]
+    assert row["resolution_kind"] is None and row["minute"] is None and row["daily"] is None
+    assert "resolution_unavailable" in row["unsupported"] and not n.algo._report["metadata_complete"]
+
+
+@pytest.mark.parametrize("initial,changed",[("second","hour"),("hour","tick"),("tick","unknown")])
+def test_resolution_kind_mutation_is_detected_even_when_minute_and_daily_stay_false(native,initial,changed):
+    n=native;row=n.state.rows[2];resolution=type(row.resolution)
+    values={"second":resolution.SECOND,"hour":resolution.HOUR,"tick":resolution.TICK,"unknown":resolution.UNKNOWN}
+    row.resolution=values[initial]
+    n.state.fields.clear()
+    def mutate(item,attr,count):
+        if item is row and attr=="resolution" and count==2: item.__dict__["resolution"]=values[changed]
+    n.state.field_hook=mutate
+    n.algo.on_data(n.algo.current_slice);r=n.algo._report
+    assert r["projected_metadata_unchanged"] is False and r["complete"] is False
+    assert n.state.queries==1 and r["rows"][2]["minute"] is False and r["rows"][2]["daily"] is False

@@ -312,13 +312,14 @@ def test_cancellation_retains_spent_claim_receipt_and_cleans_owned_lock(tmp_path
     assert error.value.report["receipt_published"] and error.value.report["lock_cleanup_complete"]
 
 
-def compile_evidence(tmp_path):
+def compile_evidence(tmp_path, *, content=None, **changes):
     root = tmp_path / "cache-actions"
-    compile_action = action("compile")
-    compiled = execute(tmp_path, compile_action, root=root)
+    compile_action = action("compile", **changes)
+    content = files("compile") if content is None else content
+    compiled = execute(tmp_path, compile_action, root=root, transport=backend(compile_action, content=content))
     assert compiled["status"] == "completed"
-    build_action = action("build")
-    built = execute(tmp_path, build_action, root=root)
+    build_action = action("build", **changes)
+    built = execute(tmp_path, build_action, root=root, transport=backend(build_action, content=content))
     assert built["status"] == "completed"
     cop, bop = compile_action["api_plan"]["operation_id"], build_action["api_plan"]["operation_id"]
     names = {"compile_plan": cop+".action.spent.json", "compile_result": cop+".result.json",
@@ -736,7 +737,7 @@ def test_all_phases_retain_one_bound_baseline_and_only_replace_main():
         a = action(phase)
         assert a["before_inventory"] == baseline
         assert a["source_inventory"] == {**baseline, "main.py": inventory({"main.py": fixture_main()})["main.py"]}
-    assert m.BASELINE_INVENTORY_SHA256 == "336251d676c9a176d113d3e8127202cb300562b590e9f24316cda3b1d79566fb"
+    assert m.BASELINE_INVENTORY_SHA256 == "b7ecf41311265f8828c2f1026216c4e1e167ab621afebfcd96cde0a10bde61aa"
 
 
 def test_production_baseline_pin_is_enforced_after_real_registry_shape_check(monkeypatch):
@@ -767,3 +768,54 @@ def test_old_census_or_parent_proof_schema_cannot_mix_even_with_rehashed_descrip
     a, effects = action("launch", compile_evidence=descriptors), []
     result = execute(tmp_path, a, root=root, transport=backend(a, effects=effects))
     assert result["status"] == "failed_or_uncertain" and effects == []
+
+def test_prior_census_v1_action_is_refused_by_resolution_v2_epoch():
+    a = action()
+    a["schema"] = "tpr-fixed-control-config-census-action-v1"
+    with pytest.raises(m.ActionRefusal):
+        m._validated(a)
+
+
+@pytest.mark.parametrize("key", ("compile_plan", "compile_result", "build_plan", "build_result"))
+def test_prior_census_v1_compile_chain_is_refused_before_native_effect(tmp_path, key):
+    root, descriptors, raw = compile_evidence(tmp_path)
+    value = json.loads(raw[key])
+    value["schema"] = "tpr-fixed-control-config-census-" + ("action-v1" if key.endswith("plan") else "action-result-v1")
+    changed = wire(value)
+    descriptor = descriptors[key]
+    (root / descriptor["name"]).write_bytes(changed)
+    descriptor.update(bytes=len(changed), sha256=sha(changed))
+    a, effects = action("launch", compile_evidence=descriptors), []
+    result = execute(tmp_path, a, root=root, transport=backend(a, effects=effects))
+    assert result["status"] == "failed_or_uncertain" and effects == []
+    assert result["receipt_published"] and result["transport_calls_attempted"] == 0
+
+@pytest.mark.parametrize("fault", ("head", "baseline", "source_closure", "configuration_epoch"))
+def test_valid_foreign_compile_chain_cannot_mix_census_lineage(tmp_path, fault):
+    changes, content = {}, files("compile")
+    if fault == "head":
+        changes["git_head"] = "b"*40
+    elif fault == "baseline":
+        baseline = files("upload")
+        baseline["legacy.py"] = b"# distinct synthetic frozen baseline\n"
+        changes["source_inventory"] = inventory(baseline)
+        content["legacy.py"] = baseline["legacy.py"]
+    elif fault == "source_closure":
+        sources = source_hashes()
+        sources[m.MODULE] = "f"*64
+        changes["source_hashes"] = sources
+    else:
+        changes["probe_operation_id"] = "TPR-CONFIG-CENSUS-20261104-SYNTHETIC-002"
+    content["main.py"] = m.builder.build_config_census(
+        operation_id=changes.get("probe_operation_id", PROBE), git_head=changes.get("git_head", HEAD))[0]
+    root, descriptors, _ = compile_evidence(tmp_path, content=content, **changes)
+    a, effects = action("launch", compile_evidence=descriptors), []
+    result = execute(tmp_path, a, root=root, transport=backend(a, effects=effects))
+    assert result["status"] == "failed_or_uncertain" and effects == []
+    assert result["receipt_published"] and result["transport_calls_attempted"] == 0
+
+def test_prior_census_v1_builder_hash_cannot_enter_resolution_epoch():
+    sources = source_hashes()
+    sources[m.builder.MODULE] = "75eeb1338fc0a7a418c07335122e33b40af86ee0e711127c5d16847e59a1d5ff"
+    with pytest.raises(m.ActionRefusal):
+        action(source_hashes=sources)

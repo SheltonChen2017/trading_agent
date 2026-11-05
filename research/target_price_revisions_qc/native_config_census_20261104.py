@@ -15,13 +15,14 @@ import re
 from . import native_cache_probe_20261104 as base
 
 MODULE = "research/target_price_revisions_qc/native_config_census_20261104.py"
-EPOCH = "TPR-OFF-SPY-CONFIG-CENSUS-20261104-v1"
+EPOCH = "TPR-OFF-SPY-CONFIG-CENSUS-20261104-v2"
 PROJECT_ID = 38609822
 MAX_SOURCE_BYTES = 60000
 BASE_SHA256 = "481602457ae78568b3b708cbefd0315d7115baf95a8bd27536983e8bbfec7a86"
 BASE_RUNTIME_SHA256 = "4ff09e1079905afb08ee8d9a42e0bfc27a72ff0f878efbc9d591e865b661eb10"
 REQUIRED_SOURCES = frozenset((MODULE, base.MODULE))
 PINNED = {base.MODULE: BASE_SHA256}
+RESOLUTION_KINDS = ("tick", "second", "minute", "hour", "daily")
 FLAGS = base.FLAGS + ("source_inputs_admitted", "strategy_accepted", "source_origin_authenticated",
     "sdk_hard_timeout_proven", "sdk_preallocation_byte_bound_proven", "benchmark_origin_proven",
     "provider_wide_absence_proven")
@@ -57,7 +58,7 @@ import re
 class Main(QCAlgorithm):
     def initialize(self):
         self._job, self._disabled, self._attempted, self._waiting_now = None, False, False, None
-        self._report = {"schema": "tpr-fixed-config-census-result-v1", "source_epoch": SOURCE_EPOCH,
+        self._report = {"schema": "tpr-fixed-config-census-result-v2", "source_epoch": SOURCE_EPOCH,
             "operation_id": None, "root_head": None, "project_id": 38609822, "actual_job_id": None,
             "status": "setup_unproved", "first_failure_stage": None, "first_failure_code": None,
             "current_stage": "initialize", "terminal_summary": "not_called", "query_count": 0,
@@ -149,7 +150,7 @@ class Main(QCAlgorithm):
         fields = ("symbol_sid_matches", "minute", "daily", "raw", "adjusted", "internal", "custom",
             "fill_forward", "extended", "exchange_timezone_ny", "data_timezone_ny")
         value = {key: None for key in fields}
-        value.update(native_row=None, kind=None, unsupported=[])
+        value.update(native_row=None, kind=None, resolution_kind=None, unsupported=[])
         try:
             value["native_row"] = isinstance(row, SubscriptionDataConfig)
         except Exception:
@@ -184,6 +185,16 @@ class Main(QCAlgorithm):
                 results = tuple(cell == expected for label, expected in pairs)
                 if any(type(item) is not bool for item in results): raise ValueError("enum predicates")
                 for (label, _), item in zip(pairs, results): value[label] = item
+                if attr == "resolution":
+                    known = (("tick", Resolution.TICK), ("second", Resolution.SECOND), ("minute", Resolution.MINUTE),
+                        ("hour", Resolution.HOUR), ("daily", Resolution.DAILY))
+                    matches = tuple(cell == expected for label, expected in known)
+                    if any(type(item) is not bool for item in matches): raise ValueError("resolution predicates")
+                    labels = tuple(label for (label, _), item in zip(known, matches) if item is True)
+                    if len(labels) == 1:
+                        value["resolution_kind"] = labels[0]
+                    else:
+                        value["unsupported"].append("resolution_kind_unsupported")
             except Exception:
                 value["unsupported"].append(attr+"_unavailable")
         for label, attr in (("internal", "is_internal_feed"), ("custom", "is_custom_data"),
@@ -348,7 +359,7 @@ def build_config_census(*, operation_id, git_head):
             or _sha(base.RUNTIME.encode("utf-8")) != BASE_RUNTIME_SHA256):
         _fail()
     clock_node = next(n for n in ast.parse(base.RUNTIME).body if isinstance(n, ast.FunctionDef) and n.name == "clock")
-    config = {"schema": "tpr-fixed-config-census-config-v1", "source_epoch": EPOCH,
+    config = {"schema": "tpr-fixed-config-census-config-v2", "source_epoch": EPOCH,
         "project_id": PROJECT_ID, "operation_id": operation_id, "git_head": git_head}
     raw = _wire(config)
     prefix = ("SOURCE_EPOCH = "+repr(EPOCH)+"\nCONFIG_JSON = "+repr(raw.decode("ascii"))
@@ -360,7 +371,7 @@ def build_config_census(*, operation_id, git_head):
     if not 0 < len(source) <= MAX_SOURCE_BYTES:
         _fail()
     compile(ast.parse(source), "main.py", "exec")
-    report = {"schema": "tpr-fixed-config-census-build-v1", "source_epoch": EPOCH, "project_id": PROJECT_ID,
+    report = {"schema": "tpr-fixed-config-census-build-v2", "source_epoch": EPOCH, "project_id": PROJECT_ID,
         "operation_id": operation_id, "git_head": git_head, "main_bytes": len(source), "main_sha256": _sha(source),
         "config_sha256": _sha(raw), "base_sha256": BASE_SHA256, "max_config_queries": 1,
         "max_rows": 8, "max_next_calls": 9, "native_requests_dispatched": 0,

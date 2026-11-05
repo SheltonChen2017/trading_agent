@@ -181,3 +181,34 @@ def test_parent_never_runs_worker_before_clean_committed_identity(monkeypatch):
     monkeypatch.setattr(m.stable.source, "_launch", lambda *_a, **_k: pytest.fail("worker activated"))
     with pytest.raises(m.AuditRunnerError, match="source_refused"):
         m.run_actual("1" * 40)
+
+
+def test_failure_diagnostic_never_contains_source_exception_or_private_path():
+    error = OSError(13, "PRIVATE ACCOUNT BODY", "/private/PRIVATE-TOKEN")
+    value = m.failure_info("provider_complete", error)
+    assert value == {"completed": False, "read_only": True, "phase": "provider_complete",
+                     "failure_class": "os_error", "os_errno": 13, "refusal_code": "unknown"}
+    assert b"PRIVATE" not in m.raw(value)
+    assert m.failure_info("PRIVATE STAGE", ValueError("PRIVATE BODY"))["phase"] == "unknown"
+
+
+def test_parent_semantically_refuses_a_successfully_transferred_failed_audit(monkeypatch):
+    identity = {"head": "1" * 40, "sources": {}, "source_inventory_sha256": "2" * 64}
+    diagnostic = m.failure_info("provider_controls", m.AuditRunnerError("PRIVATE VALUE"))
+    monkeypatch.setattr(m, "_identity", lambda *_: identity)
+    monkeypatch.setattr(m, "policy", lambda **_: "invented-policy")
+    monkeypatch.setattr(m.stable.source, "_launch", lambda *_a, **_k: diagnostic)
+    with pytest.raises(m.ReportedAuditRefusal) as caught:
+        m.run_actual("1" * 40)
+    assert caught.value.diagnostic == diagnostic
+
+
+@pytest.mark.parametrize("fault", ("completed", "phase", "class", "errno", "extra"))
+def test_untrusted_failure_wire_cannot_be_reported_as_a_safe_audit_disposition(fault):
+    value = m.failure_info("derive", ValueError())
+    if fault == "completed": value["completed"] = True
+    elif fault == "phase": value["phase"] = "PRIVATE BODY"
+    elif fault == "class": value["failure_class"] = "PRIVATE BODY"
+    elif fault == "errno": value["os_errno"] = True
+    else: value["message"] = "PRIVATE BODY"
+    with pytest.raises(m.AuditRunnerError): m.ReportedAuditRefusal(value)

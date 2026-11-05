@@ -44915,3 +44915,34 @@ Candidate image hashes before the clean execution commit:
 | research/insider_buying_pilot_pit_retained_audit_runner_v1.py |19173|f3eb52003dd993821a06fa6b754c5f8344bf8c5b6158eb3a5a5a92391127f7ac|
 | tests/test_insider_buying_pilot_pit_retained_audit_v1.py |21513|dcdf591beaaff8aa63a3211a338808df858bf9ec7551ea88e2ebd02e8a667374|
 | tests/test_insider_buying_pilot_pit_retained_audit_runner_v1.py |8218|d7c856a9b21f7b67ed3bfd1d768ab906e1c2438b07cb3e760311319807b83574|
+
+### 373.5 Preserved failed first read-only observation and diagnostic correction
+
+The above code/scope exists in already-created clean
+`9aa1a4feac5271efd871f14c86b540c030366b84` before the first actual audit.
+That observer FAILED: exit2 after2.634s, stdout60B, stderr0, finite
+`retained_identity_audit_refused`/read_only response. It produced no accepted
+audit result or new artifact. No external request/credential/QC operation
+occurred and no source claim/output namespace was created, consumed, reset
+or overwritten. Do not call that operation successful.
+
+A separate SOURCE-ONLY check of the same already-existing head passes:
+122 source images, inventory
+`b4954b779252b6b9a7472f27f7fc09402364ec12f497a7f2830a713dd1aee83c`.
+It reads no retained DATA. This localizes the problem beyond parent source
+identity but does not establish the original refusal's exact data-stage cause.
+The first worker collapsed every cause to a generic code, so adding finite
+diagnostics is a verified observability correction before further inspection.
+
+The new runner reports only an allowlisted phase, failure category, bounded
+OS errno and allowlisted own refusal code; never a supplied exception message,
+path, identifier or source row. A transported failure has completed=false;
+the parent still refuses semantically with CLI exit2. IPC success is not audit
+completion. Network/fork/exec/write/DATA/custody/hash/source/memory gates stay
+unchanged. New regressions prove private error text cannot escape, a valid
+failed wire cannot be mistaken for success, and malformed diagnostics refuse.
+Only a newly committed/qualified image may inspect the same seven immutable
+metadata leaves again. This is an authorized read-only diagnostic, not an
+aliased acquisition retry, new source request, plan/corpus admission or
+resumption of any frozen/consumed operation. The failed9aa1a4fe result above
+and its execution-time lineage remain preserved.

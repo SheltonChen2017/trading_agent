@@ -43,10 +43,46 @@ FILES = {PROVIDER: ("complete.json", "controls.json", "storage-qualification.jso
 MAX_INPUT = 256 * 1024 * 1024
 MAX_OUTPUT = 64 * 1024
 SCHEMA = "insider-pilot-pit-retained-audit-runner-v1"
+PHASES = frozenset({"native", "sources", "open_provider", "open_proof", "open_reference",
+    "provider_complete", "proof_complete", "provider_controls", "provider_storage", "storage_binding",
+    "reference_complete", "derive", "final_inputs", "final_sources", "serialization"})
+SAFE_FAILURE_CODES = frozenset({"retained_identity_audit_refused", "input_pin_refused", "input_json_refused",
+    "input_root_refused", "input_name_refused", "input_leaf_refused", "input_changed", "input_cleanup_refused",
+    "projection_refused", "storage_identity_refused", "source_refused", "reference_completion_refused",
+    "controls_refused", "output_refused", "worker_result_refused", "input_refused", "authority_refused",
+    "count_refused", "pin_refused", "provider_refused", "control_evidence_missing", "row_schema_refused",
+    "row_limit_refused", "arguments_refused", "control_refused", "accounting_refused", "genuine_result_required", "unknown"})
 
 
 class AuditRunnerError(ValueError):
     """Finite own refusal only; never serialize source or exception text."""
+
+
+class ReportedAuditRefusal(AuditRunnerError):
+    def __init__(self, diagnostic):
+        need(type(diagnostic) is dict and set(diagnostic) == {"completed", "read_only", "phase", "failure_class", "os_errno", "refusal_code"}
+             and diagnostic["completed"] is False and diagnostic["read_only"] is True
+             and diagnostic["phase"] in PHASES | {"unknown"}
+             and diagnostic["failure_class"] in {"audit_control", "audit_metadata", "custody", "os_error", "other"}
+             and diagnostic["refusal_code"] in SAFE_FAILURE_CODES
+             and (diagnostic["os_errno"] is None or type(diagnostic["os_errno"]) is int
+                  and 0 <= diagnostic["os_errno"] <= 255), "failure_diagnostic_refused")
+        self.diagnostic = dict(diagnostic)
+        super().__init__("retained_identity_audit_refused")
+
+
+def failure_info(phase, error):
+    category = ("audit_control" if isinstance(error, AuditRunnerError) else
+                "audit_metadata" if isinstance(error, audit.PitRetainedAuditError) else
+                "custody" if isinstance(error, stable.CustodyError) else
+                "os_error" if isinstance(error, OSError) else "other")
+    number = error.errno if isinstance(error, OSError) else None
+    if type(number) is not int or not 0 <= number <= 255:
+        number = None
+    code = str(error) if type(error) in {AuditRunnerError, audit.PitRetainedAuditError} else "unknown"
+    return {"completed": False, "read_only": True, "phase": phase if phase in PHASES else "unknown",
+            "failure_class": category, "os_errno": number,
+            "refusal_code": code if code in SAFE_FAILURE_CODES else "unknown"}
 
 
 def need(value, code="retained_identity_audit_refused"):
@@ -283,21 +319,30 @@ def policy(python=None, *, sources=()):
 
 
 def worker(identity):
-    guard, holders = None, []
+    guard, holders, phase = None, [], "native"
     try:
         stable.native._isolated()
         stable.native.batch.campaign.base._prove_isolation()
         guard = stable.native._WorkerMemoryGuard()
+        phase = "sources"
         _source_current(identity)
+        phase = "open_provider"
         provider = Held(PROVIDER); holders.append(provider)
+        phase = "open_proof"
         proof = Held(PROOF); holders.append(proof)
+        phase = "open_reference"
         refs = Held(SHARADAR); holders.append(refs)
+        phase = "provider_complete"
         complete = decode(provider.read("complete.json", PINS["provider_complete"], check=guard.check), PINS["provider_complete"])
+        phase = "proof_complete"
         old_proof = decode(proof.read("complete.json", PINS["proof_complete"], check=guard.check), PINS["proof_complete"])
         named = complete["published_leaf_pins"]
         controls_pin, storage_pin = named["controls.json"], named["storage-qualification.json"]
+        phase = "provider_controls"
         controls = decode(provider.read("controls.json", controls_pin, check=guard.check), controls_pin)
+        phase = "provider_storage"
         storage = decode(provider.read("storage-qualification.json", storage_pin, check=guard.check), storage_pin)
+        phase = "storage_binding"
         root_hold = stable._HeldChain(stable.PRIVATE_CUSTODY_ROOT, ())
         try:
             stable._managed(root_hold)
@@ -305,6 +350,7 @@ def worker(identity):
             storage_binding(physical, old_proof, storage)
         finally:
             root_hold.close()
+        phase = "reference_complete"
         receipt = decode(refs.read("complete.json", PINS["reference_complete"], check=guard.check), PINS["reference_complete"])
         need(receipt["capture_manifest_sha256"] == MANIFEST
              and receipt["tickers_projection_sha256"] == PINS["tickers_projection"]["sha256"]
@@ -313,6 +359,7 @@ def worker(identity):
              "reference_completion_refused")
         need(controls["fixture_only"] is False and len(controls["cases"]) == 12, "controls_refused")
         sources = {**PINS, "provider_controls": controls_pin, "provider_storage": storage_pin}
+        phase = "derive"
         value = audit.build_audit(controls["cases"], complete,
             projection(refs, "tickers_projection.json", PINS["tickers_projection"],
                 columns=reference.TICKER_COLUMNS, schema=reference.TICKERS_SCHEMA, count=74150, check=guard.check),
@@ -320,20 +367,24 @@ def worker(identity):
                 columns=reference.ACTION_COLUMNS, schema=reference.ACTIONS_SCHEMA, count=698455, check=guard.check),
             sources, check=guard.check, fixture_only=False)
         answer = audit.public_summary(value)
+        phase = "final_inputs"
         for held in holders:
             held.check(check=guard.check)
+        phase = "final_sources"
         _source_current(identity)
         guard.check()
         answer.update(execution_head=identity["head"], source_inventory_sha256=identity["source_inventory_sha256"],
                       source_images=len(identity["sources"]), actual_input_leaves=sum(len(h.leaves) for h in holders),
-                      read_only=True, new_requests=0, credential_reads=0, qc_accesses=0)
+                      read_only=True, completed=True, new_requests=0, credential_reads=0, qc_accesses=0)
+        phase = "serialization"
         wire = raw({"ok": True, "value": answer}) + b"\n"
         need(len(wire) <= MAX_OUTPUT, "output_refused")
         sys.stdout.buffer.write(wire); sys.stdout.buffer.flush(); guard.check()
-    except Exception:
-        sys.stdout.buffer.write(b'{"code":"source_qualification_refused","ok":false}\n')
+    except Exception as error:
+        # A successful IPC transfer is distinct from a failed semantic audit.
+        # Preserve finite phase/class metadata without any supplied exception text.
+        sys.stdout.buffer.write(raw({"ok": True, "value": failure_info(phase, error)}) + b"\n")
         sys.stdout.buffer.flush()
-        raise SystemExit(2) from None
     finally:
         primary = sys.exc_info()[0] is not None
         failed = False
@@ -360,7 +411,12 @@ def run_actual(head):
     try:
         value = stable.source._launch(command, timeout=180)
         need(_identity(head) == identity, "source_refused")
+        if value.get("completed") is False:
+            raise ReportedAuditRefusal(value)
+        need(value.get("completed") is True, "worker_result_refused")
         return value
+    except ReportedAuditRefusal:
+        raise
     except Exception:
         raise AuditRunnerError("retained_identity_audit_refused") from None
 
@@ -371,6 +427,9 @@ def main():
     args = parser.parse_args()
     try:
         print(raw(run_actual(args.expected_head)).decode())
+    except ReportedAuditRefusal as error:
+        print(raw({"code": "retained_identity_audit_refused", **error.diagnostic}).decode())
+        raise SystemExit(2) from None
     except Exception:
         print('{"code":"retained_identity_audit_refused","read_only":true}')
         raise SystemExit(2) from None

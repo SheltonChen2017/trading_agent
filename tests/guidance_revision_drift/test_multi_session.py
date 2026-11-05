@@ -1116,6 +1116,7 @@ class CounterReviewActionTests(unittest.TestCase):
                 self.assertEqual(result[sleeve]["settled_cash"], baseline[sleeve]["settled_cash"])
                 self.assertEqual(result[sleeve]["receivables"], [])
                 self.assertEqual(result["unresolved"].get(security), "fractional_split_cash_in_lieu_unsupported")
+                self.assertIn("unresolved_action_economics_requires_reconciliation", reasons(result["permanent_parity_blockers"]))
 
     def test_later_integral_split_does_not_scale_an_unknown_share_basis(self):
         for security, sleeve in (("INVENTED-SEC", "strategy"), ("INVENTED-SPY", "comparator")):
@@ -1174,6 +1175,16 @@ class CounterReviewActionTests(unittest.TestCase):
             at(session(data, 19), 17), key="INVENTED-LAST-SPLIT"), "ratio": "1.5"}
         self.assertEqual(run_replay(**data, actions=(split,))["unresolved"].get("INVENTED-SEC"),
                          "fractional_split_cash_in_lieu_unsupported")
+
+
+    def test_exit_beyond_the_window_still_marks_the_held_position(self):
+        data = inputs(count=2)
+        withdraw(data, at(session(data, 1), 10, 30))
+        result = run_replay(**data)
+        self.assertEqual(result["unresolved"], {"INVENTED-SEC": "invalidation_exit_outside_replay_window"})
+        self.assertEqual(len(result["daily_nav"]), 2)
+        self.assertEqual(result["daily_nav"][-1]["strategy_nav"], "99995.0500")
+        self.assertFalse(result["complete_software_replay"])
 
 
 class EdgePinTests(unittest.TestCase):
@@ -1480,6 +1491,18 @@ class BudgetReconciliationTests(unittest.TestCase):
                 self.assertTrue(proof["within_rounding"])
                 self.assertIn("comparator_partial_or_unmatched_execution", reasons(result["permanent_parity_blockers"]))
                 self.assertTrue(result["comparison_parity_blocked"])
+
+    def test_unfinished_comparator_entry_has_no_proof_and_no_false_budget_mismatch(self):
+        data = inputs(count=1)
+        edit_batches(data, lambda batch, raw: [minute.update(v=500) for minute in raw["minutes"]]
+                     if batch.role == "benchmark" else None)
+        result = run_replay(**data)
+        tranche = result["comparator"]["positions"][0]
+        self.assertEqual(tranche["quantity"], 25)
+        self.assertIsNone(tranche["entry_budget_reconciliation"])
+        found = reasons(result["permanent_parity_blockers"])
+        self.assertIn("comparator_unfilled_remainder_at_close", found)
+        self.assertNotIn("comparator_budget_mismatch_beyond_rounding", found)
 
     def test_funding_and_zero_share_refusals_are_not_certified_by_rounding(self):
         replay = MultiSessionReplay(**inputs(count=1))

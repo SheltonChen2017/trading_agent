@@ -14,6 +14,7 @@ from data.hashing import hash_bytes
 from research.guidance_revision_drift.bundle import BundlePublicationUncertain
 from research.guidance_revision_drift.input_contracts import InputError, canonical_bytes
 from research.guidance_revision_drift.pre_qc import MAX_HANDOFF_BYTES, build_handoff, verify_handoff, main
+from research.guidance_revision_drift.reporting import source_manifest
 
 
 class PreQCHandoffTests(unittest.TestCase):
@@ -22,7 +23,8 @@ class PreQCHandoffTests(unittest.TestCase):
         raw = canonical_bytes(report)
         self.assertEqual(verify_handoff(raw, expected_sha256=hash_bytes(raw)), report)
         self.assertEqual(canonical_bytes(build_handoff()), raw)
-        self.assertEqual(report["source_bundle_members"], 61)
+        # The review bundle adds its manifest and the invented fixture to the lane source.
+        self.assertEqual(report["source_bundle_members"], len(source_manifest()) + 2)
         self.assertEqual(report["schema"], "gdr.pre-qc-handoff.v2")
         self.assertEqual(report["status"], "invented_replays_reconciled_external_gates_closed")
         self.assertEqual(set(report["plans"]), {"base", "stress"})

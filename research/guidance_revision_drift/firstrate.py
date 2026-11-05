@@ -8,7 +8,7 @@ bytes; they do not authenticate a provider, subscription or availability clock.
 from __future__ import annotations
 
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal, DecimalException
 from pathlib import PurePosixPath
@@ -28,6 +28,8 @@ MAX_RECORDS = 100_000
 NY = ZoneInfo("America/New_York")
 KINDS = frozenset(("daily", "minute", "split", "dividend"))
 Key = tuple[str, str, str]
+_MEMBER_NAMES = {"daily": "{}_full_1day_UNADJUSTED.txt", "minute": "{}_full_1min_UNADJUSTED.txt",
+                 "split": "{}.txt", "dividend": "{}_divs.txt"}
 _DATE = re.compile(rb"[0-9]{4}-[0-9]{2}-[0-9]{2}\Z")
 _STAMP = re.compile(rb"[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:00\Z")
 _NUMBER = re.compile(rb"-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\Z")
@@ -52,10 +54,32 @@ def _provider_amount(token: bytes) -> Decimal:
 def _member(value: object) -> str:
     if (type(value) is not str or not 1 <= len(value) <= 512 or "\\" in value
             or any(ord(char) < 32 or ord(char) > 126 for char in value)
-            or PurePosixPath(value).is_absolute() or ".." in value.split("/")
-            or any(part == "" for part in value.split("/"))):
+            or PurePosixPath(value).is_absolute()
+            or any(part in ("", ".", "..") for part in value.split("/"))):
         raise InputError("safe relative FirstRate member label required")
     return value
+
+
+def _require_member(symbol: str, kind: str, member: str) -> None:
+    """The source file fixes symbol, adjustment and action kind for every path in."""
+    if PurePosixPath(member).name != _MEMBER_NAMES[kind].format(symbol):
+        raise InputError("explicit_matching_raw_member_required")
+
+
+def _required_warnings(kind: str, values: tuple[Decimal, ...], observed: date) -> tuple[str, ...]:
+    """Diagnostics a row must carry however it was constructed."""
+    warnings = []
+    if kind in ("split", "dividend") and observed.weekday() >= 5:
+        warnings.append("action_effective_date_requires_reconciliation")
+    if kind == "daily" and values[-1] == 0:
+        warnings.append("zero_daily_volume_requires_reconciliation")
+    if kind == "dividend" and values[0] == 0:
+        warnings.append("zero_dividend_requires_reconciliation")
+    if kind in ("split", "dividend"):
+        warnings.append("action_identity_currency_availability_unverified")
+    if kind == "dividend":
+        warnings.append("dividend_payment_date_missing")
+    return tuple(warnings)
 
 
 def _flags() -> dict:
@@ -147,7 +171,7 @@ def _values(kind: str, values: object) -> tuple[Decimal, ...]:
 class FirstRateLine:
     status: str
     key: Key | None
-    values: tuple[Decimal, ...]
+    values: tuple[Decimal, ...] = field(repr=False)
     reasons: tuple[str, ...]
     warnings: tuple[str, ...]
     source: SourceRef
@@ -167,12 +191,15 @@ class FirstRateLine:
             raise InputError("exact FirstRate session date required")
         if self.key is not None:
             _key(self.key)
+            _require_member(self.key[0], self.key[1], self.source.member)
             if self.session_date != date.fromisoformat(self.key[2][:10]):
                 raise InputError("FirstRate row date/key mismatch")
         if self.status == "accepted":
             if self.key is None or self.source.line_sha256 is None or self.reasons:
                 raise InputError("accepted FirstRate row requires exact key and eligible-byte hash")
             _values(self.key[1], self.values)
+            if not set(_required_warnings(self.key[1], self.values, self.session_date)) <= set(self.warnings):
+                raise InputError("required_firstrate_warning_missing")
             if self.key[1] in ("daily", "minute") and self.session_date.weekday() >= 5:
                 raise InputError("weekend_bar_date")
             if self.key[1] == "minute" and (self.start_utc, self.end_utc) != _minute_bounds(self.key[2]):
@@ -206,10 +233,7 @@ def parse_line(raw: bytes, *, source_id: str, member: str, line_number: int,
         raise InputError("explicit raw FirstRate kind required")
     identifier(symbol)
     source = SourceRef(source_id, member, line_number, None)
-    if kind in ("daily", "minute"):
-        period = "1day" if kind == "daily" else "1min"
-        if PurePosixPath(member).name != f"{symbol}_full_{period}_UNADJUSTED.txt":
-            raise InputError("explicit_matching_unadjusted_member_required")
+    _require_member(symbol, kind, member)
     if type(start) is not date or type(stop) is not date or not START <= start < stop <= STOP:
         raise InputError("bounded unprotected FirstRate window required")
     if type(raw) is not bytes or not 1 <= len(raw) <= MAX_LINE_BYTES:
@@ -227,12 +251,14 @@ def parse_line(raw: bytes, *, source_id: str, member: str, line_number: int,
     if observed < start or observed >= stop:
         code = "protected_date" if observed >= STOP else "outside_requested_window"
         return FirstRateLine("excluded", None, (), (code,), (), source, observed)
+    # A later row inside these bytes has its own unchecked date.
+    if any(char in raw.rstrip(b"\r\n") for char in (b"\r", b"\n")):
+        return FirstRateLine("refused", None, (), ("embedded_line_terminator",), (), source, observed)
     source = SourceRef(source_id, member, line_number, hash_bytes(raw))
     stamp_length = 19 if kind == "minute" else 10
     stamp = raw[:stamp_length]
     key = (symbol, kind, stamp.decode("ascii", errors="replace"))
     opening = closing = None
-    warnings = []
     try:
         if kind == "minute":
             if not _STAMP.fullmatch(stamp) or raw[stamp_length:stamp_length + 1] != b",":
@@ -242,8 +268,6 @@ def parse_line(raw: bytes, *, source_id: str, member: str, line_number: int,
             raise InputError("invalid_date_delimiter")
         if kind in ("daily", "minute") and observed.weekday() >= 5:
             raise InputError("weekend_bar_date")
-        if kind in ("split", "dividend") and observed.weekday() >= 5:
-            warnings.append("action_effective_date_requires_reconciliation")
         fields = raw.rstrip(b"\r\n").split(b",")
         expected = 6 if kind in ("daily", "minute") else 2
         if len(fields) != expected or fields[0] != stamp:
@@ -253,16 +277,8 @@ def parse_line(raw: bytes, *, source_id: str, member: str, line_number: int,
         except (UnicodeError, InputError) as exc:
             raise InputError("invalid_or_nonfinite_numeric") from exc
         _values(kind, values)
-        if kind == "daily" and values[-1] == 0:
-            warnings.append("zero_daily_volume_requires_reconciliation")
-        if kind == "dividend" and values[0] == 0:
-            warnings.append("zero_dividend_requires_reconciliation")
-        if kind in ("split", "dividend"):
-            warnings.append("action_identity_currency_availability_unverified")
-        if kind == "dividend":
-            warnings.append("dividend_payment_date_missing")
-        return FirstRateLine("accepted", key, values, (), tuple(warnings), source,
-                             observed, opening, closing)
+        return FirstRateLine("accepted", key, values, (), _required_warnings(kind, values, observed),
+                             source, observed, opening, closing)
     except (InputError, ValueError) as exc:
         # Error text is a controlled code, never provider financial values.
         code = str(exc) if isinstance(exc, InputError) else "invalid_minute_timestamp"
@@ -306,7 +322,7 @@ def _source_refs(sources: object) -> None:
 @dataclass(frozen=True, slots=True)
 class ReconciledRow:
     key: Key
-    values: tuple[Decimal, ...]
+    values: tuple[Decimal, ...] = field(repr=False)
     sources: tuple[SourceRef, ...]
     warnings: tuple[str, ...]
 
@@ -316,7 +332,11 @@ class ReconciledRow:
         if self.key[1] in ("daily", "minute") and date.fromisoformat(self.key[2][:10]).weekday() >= 5:
             raise InputError("weekend_bar_date")
         _source_refs(self.sources)
+        for source in self.sources:
+            _require_member(self.key[0], self.key[1], source.member)
         _codes(self.warnings)
+        if not set(_required_warnings(self.key[1], self.values, date.fromisoformat(self.key[2][:10]))) <= set(self.warnings):
+            raise InputError("required_firstrate_warning_missing")
 
     @property
     def source_sha256(self) -> str:
@@ -349,6 +369,8 @@ class QuarantinedRow:
         if tuple(sorted(self.reasons)) != self.reasons:
             raise InputError("ordered FirstRate quarantine diagnostics required")
         _source_refs(self.sources)
+        for source in self.sources:
+            _require_member(self.key[0], self.key[1], source.member)
 
     def projection(self) -> dict:
         self.__post_init__()

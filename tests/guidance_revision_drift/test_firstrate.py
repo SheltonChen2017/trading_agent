@@ -6,10 +6,10 @@ from itertools import permutations
 import unittest
 from unittest.mock import patch
 
-from data.hashing import hash_bytes
+from data.hashing import hash_bytes, hash_payload
 from research.guidance_revision_drift.firstrate import (
     MAX_LINE_BYTES, FirstRateLine, QuarantinedRow, Reconciliation, ReconciledRow, SourceRef,
-    parse_line, reconcile_records, regular_minute,
+    _member, _minute_bounds, parse_line, reconcile_records, regular_minute,
 )
 from research.guidance_revision_drift.input_contracts import InputError
 from research.guidance_revision_drift.research_reference import CalendarSession
@@ -375,6 +375,386 @@ class FirstRateTests(unittest.TestCase):
         with self.assertRaises(InputError):
             QuarantinedRow(row.key, ("reason",), tuple(sorted((row.sources[0], changed))))
 
+
+BAR = (Decimal("10"), Decimal("11"), Decimal("9"), Decimal("10"), Decimal("100"))
+DAILY_KEY = ("SYN", "daily", "2025-04-04")
+MINUTE_KEY = ("SYN", "minute", "2025-04-04 10:00:00")
+DAILY_MEMBER = "SYN_full_1day_UNADJUSTED.txt"
+
+
+def ref(member=DAILY_MEMBER, line=1, sha="a" * 64, source="A"):
+    return SourceRef(source, member, line, sha)
+
+
+def accepted_line(key=DAILY_KEY, values=BAR, source=None, **changes):
+    fields = dict(status="accepted", key=key, values=values, reasons=(), warnings=(),
+                  source=source or ref(), session_date=date.fromisoformat(key[2][:10]))
+    fields.update(changes)
+    return FirstRateLine(**fields)
+
+
+class ReviewCorrectionTests(unittest.TestCase):
+    """GDR-CR65 corrections; each case fails on the source Codex published."""
+
+    def test_public_constructors_cannot_relabel_an_adjusted_or_other_symbol_file(self):
+        bounds = dict(start_utc=datetime(2025, 4, 4, 14, tzinfo=timezone.utc),
+                      end_utc=datetime(2025, 4, 4, 14, 1, tzinfo=timezone.utc))
+        for member in ("SYN_full_1min_ADJUSTED.txt", "SYN_full_1min_SPLIT_ADJUSTED.txt",
+                       "OTHER_full_1min_UNADJUSTED.txt", "SYN_full_1day_UNADJUSTED.txt", "SYN.txt"):
+            source = ref(member)
+            with self.subTest(member=member, path="line"), self.assertRaisesRegex(InputError, "raw_member"):
+                accepted_line(MINUTE_KEY, source=source, **bounds)
+            with self.subTest(member=member, path="reconciled"), self.assertRaisesRegex(InputError, "raw_member"):
+                ReconciledRow(MINUTE_KEY, BAR, (source,), ())
+            with self.subTest(member=member, path="quarantined"), self.assertRaisesRegex(InputError, "raw_member"):
+                QuarantinedRow(MINUTE_KEY, ("reason",), (source,))
+            with self.subTest(member=member, path="refused"), self.assertRaisesRegex(InputError, "raw_member"):
+                FirstRateLine("refused", MINUTE_KEY, (), ("reason",), (), source, date(2025, 4, 4))
+        # Every source of a multi-source row is bound, not only the first.
+        with self.assertRaisesRegex(InputError, "raw_member"):
+            ReconciledRow(DAILY_KEY, BAR, (ref(), ref("SYN_full_1day_ADJUSTED.txt", source="B")), ())
+        with self.assertRaisesRegex(InputError, "raw_member"):
+            QuarantinedRow(DAILY_KEY, ("reason",), (ref(), ref("SYN_full_1day_ADJUSTED.txt", source="B")))
+
+    def test_action_files_bind_symbol_and_action_kind(self):
+        for kind, member, raw in (("split", "SYN_divs.txt", b"2025-04-04,0.25\n"),
+                                  ("dividend", "SYN.txt", b"2025-04-04,2\n"),
+                                  ("dividend", "OTHER_divs.txt", b"2025-04-04,0.25\n"),
+                                  ("split", "OTHER.txt", b"2025-04-04,2\n")):
+            with self.subTest(kind=kind, member=member), self.assertRaisesRegex(InputError, "raw_member"):
+                parse_line(raw, source_id="A", member=member, line_number=1, symbol="SYN", kind=kind)
+        # The file is bound before any row, including rows that never reach a key.
+        for raw in (b"2026-09-01,x\n", b"\n"):
+            with self.subTest(raw=raw), self.assertRaisesRegex(InputError, "raw_member"):
+                parse_line(raw, source_id="A", member="SYN_full_1day_ADJUSTED.txt", line_number=1,
+                           symbol="SYN", kind="daily")
+        nested = parse_line(b"2025-04-04,0.25\n", source_id="A", member="Stock_Dividends.zip/3/SYN_divs.txt",
+                            line_number=1, symbol="SYN", kind="dividend")
+        self.assertEqual(nested.status, "accepted")
+
+    def test_direct_rows_cannot_drop_the_diagnostics_parse_line_requires(self):
+        for key, values, member, warnings in (
+                (("SYN", "dividend", "2025-04-04"), (Decimal("0"),), "SYN_divs.txt", ()),
+                (("SYN", "dividend", "2025-04-04"), (Decimal("1"),), "SYN_divs.txt",
+                 ("action_identity_currency_availability_unverified",)),
+                (("SYN", "dividend", "2025-04-04"), (Decimal("1"),), "SYN_divs.txt",
+                 ("dividend_payment_date_missing",)),
+                (("SYN", "dividend", "2025-04-04"), (Decimal("0"),), "SYN_divs.txt",
+                 ("action_identity_currency_availability_unverified", "dividend_payment_date_missing")),
+                (("SYN", "split", "2025-04-05"), (Decimal("2"),), "SYN.txt",
+                 ("action_identity_currency_availability_unverified",)),
+                (DAILY_KEY, BAR[:4] + (Decimal("0"),), DAILY_MEMBER, ())):
+            with self.subTest(key=key, warnings=warnings, path="line"), self.assertRaisesRegex(InputError, "warning_missing"):
+                accepted_line(key, values, ref(member), warnings=warnings)
+            with self.subTest(key=key, warnings=warnings, path="row"), self.assertRaisesRegex(InputError, "warning_missing"):
+                ReconciledRow(key, values, (ref(member),), warnings)
+        parsed_row = parsed(b"2025-04-04,0.25\n", kind="dividend")
+        self.assertEqual(parsed_row.warnings, ("action_identity_currency_availability_unverified",
+                                               "dividend_payment_date_missing"))
+        weekend = parsed(b"2025-04-05,0\n", kind="dividend")
+        self.assertEqual(weekend.warnings, ("action_effective_date_requires_reconciliation",
+                                            "zero_dividend_requires_reconciliation",
+                                            "action_identity_currency_availability_unverified",
+                                            "dividend_payment_date_missing"))
+        self.assertEqual(parsed(b"2025-04-04,2\n", kind="split").warnings,
+                         ("action_identity_currency_availability_unverified",))
+        self.assertEqual(parsed(b"2025-04-05,2\n", kind="split").warnings,
+                         ("action_effective_date_requires_reconciliation",
+                          "action_identity_currency_availability_unverified"))
+        self.assertEqual(parsed().warnings, ())
+
+    def test_financial_values_stay_out_of_row_representations(self):
+        row = parsed(b"2025-04-04,10,11,9,10.123456,100\n")
+        reconciled = reconcile_records([row]).accepted[0]
+        for rendered in (repr(row), str(row), repr(reconciled), str(reconciled)):
+            self.assertNotIn("10.123456", rendered)
+        self.assertEqual(row.values[3], Decimal("10.123456"))
+
+    def test_embedded_terminators_are_not_hashed_as_one_row(self):
+        for raw in (b"2025-04-04,10,11,9,10,100\n2026-09-02,1,1,1,1,1\n",
+                    b"2025-04-04,10,11,9,10,100\r2026-09-02,1,1,1,1,1\r\n"):
+            with self.subTest(raw=raw[25:27]), \
+                 patch("research.guidance_revision_drift.firstrate.hash_bytes", side_effect=AssertionError("hashed")):
+                row = parsed(raw)
+            self.assertEqual(row.status, "refused")
+            self.assertEqual(row.reasons, ("embedded_line_terminator",))
+            self.assertIsNone(row.key)
+            self.assertIsNone(row.source.line_sha256)
+        for raw in (b"2025-04-04,10,11,9,10,100", b"2025-04-04,10,11,9,10,100\n", b"2025-04-04,10,11,9,10,100\r\n"):
+            self.assertEqual(parsed(raw).status, "accepted")
+
+    def test_dot_segments_cannot_mint_a_second_location_for_one_member(self):
+        for member in ("./SYN_full_1day_UNADJUSTED.txt", "a/./SYN_full_1day_UNADJUSTED.txt",
+                       "SYN_full_1day_UNADJUSTED.txt/.", "a/../SYN_full_1day_UNADJUSTED.txt"):
+            with self.subTest(member=member), self.assertRaises(InputError):
+                parsed(member=member)
+
+
+class EdgePinTests(unittest.TestCase):
+    """Boundaries the original methods left unpinned."""
+
+    def assert_refused(self, raw, reason, *, key=DAILY_KEY, kind="daily"):
+        row = parsed(raw, kind=kind)
+        self.assertEqual(row.status, "refused")
+        self.assertEqual(row.reasons, (reason,))
+        self.assertEqual(row.key, key)
+        self.assertEqual(row.values, ())
+
+    def test_exact_refusal_codes_and_bounds_of_parse_line(self):
+        for raw in (b"2025-04-04,0,0,0,0,1\n", b"2025-04-04,-1,-1,-1,-1,1\n"):
+            self.assertEqual(parsed(raw).status, "refused")
+        self.assert_refused(b"2025-04-04,10,11,9,8,1\n", "firstrate_invalid_ohlc_bounds")
+        self.assert_refused(b"2025-04-04,10,11,9,12,1\n", "firstrate_invalid_ohlc_bounds")
+        self.assert_refused(b"2025-04-04X10,11,9,10,1\n", "invalid_date_delimiter")
+        self.assert_refused(b"2025-04-04,10,11,9,10\n", "invalid_field_count_or_timestamp")
+        self.assert_refused(b"2025-04-04,10,11,9,10,1,1\n", "invalid_field_count_or_timestamp")
+        self.assert_refused(b"2025-04-04 10:00:00X10,11,9,10,1\n", "invalid_minute_timestamp", key=MINUTE_KEY, kind="minute")
+        self.assert_refused(b"2025-04-04 10:00:00,10,11,9,10\n", "invalid_field_count_or_timestamp", key=MINUTE_KEY, kind="minute")
+        self.assertEqual(parsed(b"2025-04-04,10,11,9,10,1000000000000\n").values[-1], Decimal(10**12))
+        self.assertEqual(parsed(b"2025-04-04," + b"1e" + b"0" * 130 + b"1,11,9,10,1\n").status, "refused")
+        self.assertEqual(parsed(b"2025-04-04 10:00:00,10,11,9,10,1\n", kind="minute").status, "accepted")
+        self.assertEqual(parsed(b"2025-04-05 10:00:00,10,11,9,10,1\n", kind="minute").reasons, ("weekend_bar_date",))
+        self.assertEqual(parsed(b"2025-04-06,10,11,9,10,1\n").reasons, ("weekend_bar_date",))
+        # Python's ISO parser accepts week dates; the provider format does not.
+        week = parsed(b"2025-W14-5,10,11,9,10,1\n")
+        self.assertEqual((week.status, week.reasons, week.key), ("refused", ("invalid_date_prefix",), None))
+
+    def test_exclusion_codes_and_retained_dates(self):
+        protected = parsed(b"2026-09-01,x\n")
+        self.assertEqual((protected.reasons, protected.session_date), (("protected_date",), date(2026, 9, 1)))
+        early = parsed(b"2012-12-31,x\n")
+        self.assertEqual((early.reasons, early.session_date), (("outside_requested_window",), date(2012, 12, 31)))
+        narrowed = parse_line(b"2025-04-04,x\n", source_id="A", member=DAILY_MEMBER, line_number=1,
+                              symbol="SYN", kind="daily", stop=date(2025, 4, 4))
+        self.assertEqual(narrowed.reasons, ("outside_requested_window",))
+        last = parse_line(b"2026-08-31,10,11,9,10,1\n", source_id="A", member=DAILY_MEMBER, line_number=1,
+                          symbol="SYN", kind="daily")
+        self.assertEqual(last.status, "accepted")
+
+    def test_member_and_source_labels_refuse_unsafe_text(self):
+        for value in (r"a\SYN.txt", "a" * 513, "a\tb", "café.txt", "a\x7fb", "a//b", "/a", "", 1):
+            with self.subTest(value=repr(value)[:24]), self.assertRaises(InputError):
+                _member(value)
+        self.assertEqual(_member("a" * 512), "a" * 512)
+        self.assertEqual(_member("~a.txt"), "~a.txt")
+        for args in (("bad id", "a.txt", 1, None), ("A", "a.txt", 100_000_001, None),
+                     ("A", "a.txt", 1, "A" * 64), ("A", "a.txt", 1, "a" * 63)):
+            with self.subTest(args=args[:3]), self.assertRaises(InputError):
+                SourceRef(*args)
+        self.assertEqual(SourceRef("A", "a.txt", 100_000_000, None).line_number, 100_000_000)
+        with self.assertRaises(InputError):
+            parse_line(b"2025-04-04,1\n", source_id="A", member="bad id.txt", line_number=1,
+                       symbol="bad id", kind="split")
+
+    def test_row_keys_and_values_refuse_every_noncanonical_shape(self):
+        sources = (ref(),)
+        for key in (list(DAILY_KEY), DAILY_KEY + ("x",), ("bad id", "daily", "2025-04-04"),
+                    ("SYN", "daily", "2012-12-31"), ("SYN", "daily", "2025-04-04 extra"),
+                    ("SYN", "daily", "20250404"), ("SYN", 1, "2025-04-04"), ("SYN", "daily", 20250404)):
+            with self.subTest(key=key), self.assertRaises(InputError):
+                ReconciledRow(key, BAR, sources, ())
+        with self.assertRaises(InputError):
+            ReconciledRow(("SYN", "weekly", "2025-04-04"), (Decimal("1"),), sources, ())
+        with self.assertRaises(InputError):
+            ReconciledRow(("bad id", "daily", "2025-04-04"), BAR, (ref("bad id_full_1day_UNADJUSTED.txt"),), ())
+        for values in (BAR[:4], BAR + (Decimal("1"),), list(BAR), tuple(str(x) for x in BAR)):
+            with self.subTest(values=len(values)), self.assertRaises(InputError):
+                ReconciledRow(DAILY_KEY, values, sources, ())
+        for stamp in ("2025-04-04 10:00:0\u00e9", 1):
+            with self.subTest(stamp=stamp), self.assertRaisesRegex(InputError, "invalid_minute_timestamp"):
+                _minute_bounds(stamp)
+
+    def test_direct_line_construction_rechecks_each_field(self):
+        good = dict(status="accepted", key=DAILY_KEY, values=BAR, reasons=(), warnings=(),
+                    source=ref(), session_date=date(2025, 4, 4))
+        self.assertEqual(FirstRateLine(**good).status, "accepted")
+        bounds = (datetime(2025, 4, 4, 14, tzinfo=timezone.utc), datetime(2025, 4, 4, 14, 1, tzinfo=timezone.utc))
+        minute = dict(good, key=MINUTE_KEY, source=ref("SYN_full_1min_UNADJUSTED.txt"),
+                      start_utc=bounds[0], end_utc=bounds[1])
+        self.assertEqual(FirstRateLine(**minute).status, "accepted")
+        tampered = ref()
+        object.__setattr__(tampered, "member", "../x")
+        for label, fields in (
+                ("status", dict(good, status="approved")),
+                ("source type", dict(good, source=None)),
+                ("tampered source", dict(good, source=tampered)),
+                ("values type", dict(good, values=list(BAR))),
+                ("empty values type", dict(good, status="refused", values=[], reasons=("reason",))),
+                ("unkeyed tampered source", dict(good, status="refused", key=None, values=(), reasons=("reason",),
+                                                 session_date=None, source=tampered)),
+                ("unkeyed session type", dict(good, status="refused", key=None, values=(), reasons=("reason",),
+                                              session_date="2025-04-04")),
+                ("reason type", dict(good, status="refused", values=(), reasons=["x"])),
+                ("reason text", dict(good, status="refused", values=(), reasons=("bad code",))),
+                ("warning text", dict(good, warnings=("bad code",))),
+                ("session type", dict(good, session_date="2025-04-04")),
+                ("key", dict(good, key=("SYN", "daily", "2026-09-01"), session_date=date(2026, 9, 1))),
+                ("date mismatch", dict(good, session_date=date(2025, 4, 3))),
+                ("missing hash", dict(good, source=SourceRef("A", DAILY_MEMBER, 1, None))),
+                ("accepted reasons", dict(good, reasons=("reason",))),
+                ("accepted values", dict(good, values=(Decimal("0"),) * 4 + (Decimal("1"),))),
+                ("weekend", dict(good, key=("SYN", "daily", "2025-04-05"), session_date=date(2025, 4, 5))),
+                ("minute clock", dict(minute, end_utc=bounds[0])),
+                ("refused values", dict(good, status="refused", reasons=("reason",))),
+                ("refused reasonless", dict(good, status="refused", values=())),
+                ("excluded key", dict(good, status="excluded", values=(), reasons=("reason",),
+                                      source=SourceRef("A", DAILY_MEMBER, 1, None))),
+                ("excluded hash", dict(good, status="excluded", key=None, values=(), reasons=("reason",)))):
+            with self.subTest(label=label), self.assertRaises(InputError):
+                FirstRateLine(**fields)
+        row = FirstRateLine(**good)
+        self.assertEqual(row.projection(include_values=True)["values"], ["10", "11", "9", "10", "100"])
+        self.assertNotIn("values", row.projection())
+        with self.assertRaises(InputError):
+            row.projection(include_values=1)
+
+    def test_diagnostic_and_source_inventories_are_bounded_ordered_and_hashed(self):
+        for warnings in (("x",) * 2, tuple(f"code-{i}" for i in range(33)), ["x"], ("bad code",), (1,)):
+            with self.subTest(warnings=len(warnings)), self.assertRaises(InputError):
+                ReconciledRow(DAILY_KEY, BAR, (ref(),), warnings)
+        self.assertEqual(len(ReconciledRow(DAILY_KEY, BAR, (ref(),), tuple(f"code-{i}" for i in range(32))).warnings), 32)
+        one, two = ref(line=1), ref(line=2)
+        tampered = ref()
+        object.__setattr__(tampered, "source_id", "bad id")
+        for sources in ((two, one), (SourceRef("A", DAILY_MEMBER, 1, None),), (None,), (tampered,), [one], ()):
+            with self.subTest(sources=repr(sources)[:40]), self.assertRaises(InputError):
+                ReconciledRow(DAILY_KEY, BAR, sources, ())
+        with patch("research.guidance_revision_drift.firstrate.MAX_RECORDS", 1), self.assertRaises(InputError):
+            ReconciledRow(DAILY_KEY, BAR, (one, two), ())
+        with self.assertRaises(InputError):
+            ReconciledRow(("SYN", "daily", "2025-04-05"), BAR, (one,), ())
+        with self.assertRaises(InputError):
+            QuarantinedRow(DAILY_KEY, ("z", "a"), (one,))
+        quarantined = QuarantinedRow(DAILY_KEY, ("a", "z"), (one,))
+        self.assertEqual(quarantined.projection(), {"key": list(DAILY_KEY), "reasons": ["a", "z"], "sources": [one.projection()]})
+        object.__setattr__(quarantined, "reasons", ())
+        with self.assertRaises(InputError):
+            quarantined.projection()
+
+    def test_reconciled_projection_flags_hash_and_authority_are_exact(self):
+        result = reconcile_records([parsed(source="A"), parsed(source="B")])
+        row = result.accepted[0]
+        self.assertEqual(row.source_sha256, hash_payload([source.projection() for source in row.sources]))
+        flags = {"provider": "firstrate", "normalization": "Raw", "fill_forward": False,
+                 "point_in_time_data": False, "coverage_verified": False, "calendar_verified": False,
+                 "reference_mapping_verified": False, "historical_availability_verified": False,
+                 "execution_authority": False, "native_execution_evidence": False}
+        self.assertEqual(row.projection(), {"key": list(DAILY_KEY), "sources": [x.projection() for x in row.sources],
+                                            "source_sha256": row.source_sha256, "warnings": []} | flags)
+        self.assertEqual(row.projection(include_values=True)["values"], ["10", "11", "9", "10.5", "10000"])
+        self.assertEqual(result.projection(), {"schema": "gdr.firstrate-reconciliation.v1", "input_records": 2,
+            "accepted": [row.projection()], "quarantined": [], "unkeyed_refusals": [], "excluded": [],
+            "supplied_source_inventory_only": True, "source_set_has_unkeyed_refusal": False,
+            "backtest_ready": False} | flags)
+        self.assertEqual(result.projection(include_values=True)["accepted"][0]["values"][3], "10.5")
+        for call in (row.projection, result.projection, reconcile_records([]).projection):
+            with self.assertRaises(InputError):
+                call(include_values=1)
+        action = reconcile_records([parsed(b"2025-04-04,0.25\n", kind="dividend"),
+                                    parsed(b"2025-04-04,0.5\n", kind="dividend", source="B")])
+        self.assertEqual(action.accepted, ())
+        warned = reconcile_records([parsed(b"2025-04-04,10,11,9,10,0\n", source="A"),
+                                    parsed(b"2025-04-04,10,11,9,10,0\n", source="B")]).accepted[0]
+        self.assertEqual(warned.projection()["warnings"], ["zero_daily_volume_requires_reconciliation"])
+        blocked = reconcile_records([parsed(), parsed(b"BAD DATE!!,x\n", source="B")])
+        self.assertTrue(blocked.projection()["source_set_has_unkeyed_refusal"])
+
+    def test_reconciliation_rechecks_members_order_and_categories(self):
+        row = reconcile_records([parsed()]).accepted[0]
+        later = reconcile_records([parsed(b"2025-04-07,10,11,9,10.5,10000\n", source="B")]).accepted[0]
+        self.assertEqual(Reconciliation((row, later), (), (), (), 2).accepted, (row, later))
+        with self.assertRaises(InputError):
+            Reconciliation((later, row), (), (), (), 2)
+        with patch("research.guidance_revision_drift.firstrate.MAX_RECORDS", 1), self.assertRaises(InputError):
+            Reconciliation((row, later), (), (), (), 1)
+        quarantine = QuarantinedRow(row.key, ("reason",), row.sources)
+        keyed = parsed(b"2025-04-05,10,11,9,10,1\n", source="B")
+        self.assertIsNotNone(keyed.key)
+        blank = parsed(b"\n", source="C")
+        refused = parsed(b"BAD DATE!!,x\n", source="D")
+        for groups in (((quarantine,), (), (), ()), ((), (row,), (), ()), ((), (), (keyed,), ()),
+                       ((), (), (blank,), ()), ((), (), (), (refused,)), ((), (), (row,), ())):
+            with self.subTest(groups=[len(x) for x in groups]), self.assertRaises(InputError):
+                Reconciliation(*groups, 5)
+        second = parsed(b"BAD DATE!!,y\n", source="E")
+        self.assertEqual(len(Reconciliation((), (), (refused, second), (), 2).refusals), 2)
+        with self.assertRaises(InputError):
+            Reconciliation((), (), (second, refused), (), 2)
+        with self.assertRaises(InputError):
+            Reconciliation((), (), (refused, refused), (), 2)
+        object.__setattr__(row, "warnings", ("bad code",))
+        with self.assertRaises(InputError):
+            Reconciliation((row,), (), (), (), 1)
+
+    def test_reconciled_results_recheck_tampering_before_use(self):
+        result = reconcile_records([parsed()])
+        key = result.accepted[0].key
+        object.__setattr__(result, "input_records", -1)
+        for call in (result.projection, lambda: result.require(key)):
+            with self.assertRaises(InputError):
+                call()
+        other = reconcile_records([parsed()])
+        with self.assertRaisesRegex(InputError, "unprotected|invalid"):
+            other.require(("SYN", "daily", "2026-09-01"))
+        record = parsed()
+        object.__setattr__(record, "reasons", ("reason",))
+        with self.assertRaises(InputError):
+            reconcile_records([record])
+        with self.assertRaisesRegex(InputError, "exact parsed"):
+            reconcile_records([object()])
+
+    def test_reconciliation_budget_warning_union_and_input_order(self):
+        self.assertEqual(reconcile_records([parsed()], max_records=1).input_records, 1)
+        zero = parsed(b"2025-04-05,0\n", kind="dividend", source="B")
+        plain = parsed(b"2025-04-05,0.0\n", kind="dividend", source="C")
+        self.assertEqual(reconcile_records([zero, plain]).accepted[0].warnings,
+                         ("action_effective_date_requires_reconciliation",
+                          "action_identity_currency_availability_unverified",
+                          "dividend_payment_date_missing",
+                          "zero_dividend_requires_reconciliation"))
+        bad_b = parsed(b"BAD DATE!!,x\n", source="B")
+        bad_a = parsed(b"BAD DATE!!,x\n", source="A")
+        self.assertEqual([x.source.source_id for x in reconcile_records([bad_b, bad_a]).refusals], ["A", "B"])
+        gap_b = parsed(b"2026-09-01,x\n", source="B")
+        gap_a = parsed(b"2026-09-01,x\n", source="A")
+        self.assertEqual([x.source.source_id for x in reconcile_records([gap_b, gap_a]).excluded], ["A", "B"])
+
+    def test_regular_minute_carries_exact_lineage_values_and_refuses_other_rows(self):
+        raw = b"2025-04-04 10:00:00,10,12,9,11,100\n"
+        row = reconcile_records([parsed(raw, kind="minute")]).accepted[0]
+        result = regular_minute(row, session=session(), security_id="SYN-SEC")
+        self.assertEqual((result.security_id, result.symbol, result.source_sha256), ("SYN-SEC", "SYN", row.source_sha256))
+        self.assertEqual((result.open, result.high, result.low, result.close, result.volume),
+                         (Decimal("10"), Decimal("12"), Decimal("9"), Decimal("11"), 100))
+        self.assertEqual(result.start_timestamp_ns, int(datetime(2025, 4, 4, 14, tzinfo=timezone.utc).timestamp()) * 10**9)
+        last = reconcile_records([parsed(b"2025-04-04 15:59:00,10,12,9,11,100\n", kind="minute")]).accepted[0]
+        self.assertEqual(regular_minute(last, session=session(), security_id="SYN-SEC").volume, 100)
+        first = reconcile_records([parsed(b"2025-04-04 09:30:00,10,12,9,11,100\n", kind="minute")]).accepted[0]
+        self.assertEqual(regular_minute(first, session=session(), security_id="SYN-SEC").volume, 100)
+        daily = reconcile_records([parsed()]).accepted[0]
+        with self.assertRaisesRegex(InputError, "regular-minute source required"):
+            regular_minute(daily, session=session(), security_id="SYN-SEC")
+        warned = ReconciledRow(row.key, row.values, row.sources, ("zero_daily_volume_requires_reconciliation",))
+        with self.assertRaisesRegex(InputError, "warnings require reconciliation"):
+            regular_minute(warned, session=session(), security_id="SYN-SEC")
+        with self.assertRaises(InputError):
+            regular_minute(row, session=session(), security_id="bad id")
+        forged = session()
+        object.__setattr__(forged, "session_date", date(2025, 4, 7))
+        with self.assertRaises(InputError):
+            regular_minute(row, session=forged, security_id="SYN-SEC")
+        other_day = CalendarSession(date(2025, 4, 7), datetime(2025, 4, 7, 13, 30, tzinfo=timezone.utc),
+                                    datetime(2025, 4, 7, 20, tzinfo=timezone.utc))
+        with self.assertRaisesRegex(InputError, "outside supplied"):
+            regular_minute(row, session=other_day, security_id="SYN-SEC")
+        widened = session()
+        object.__setattr__(widened, "close_utc", datetime(2025, 4, 4, 21, tzinfo=timezone.utc))
+        with self.assertRaises(InputError):
+            regular_minute(row, session=widened, security_id="SYN-SEC")
+        tampered = reconcile_records([parsed(raw, kind="minute")]).accepted[0]
+        object.__setattr__(tampered, "values", (Decimal("NaN"),) * 5)
+        with self.assertRaises(InputError):
+            regular_minute(tampered, session=session(), security_id="SYN-SEC")
 
 
 if __name__ == "__main__":

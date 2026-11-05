@@ -65,10 +65,15 @@ def _refuse(reason: str) -> None:
 def _uri(value: object) -> None:
     if type(value) is not str or len(value) > 2048:
         _refuse("bounded_https_source_uri_required")
-    parsed = urlsplit(value)
-    if (parsed.scheme != "https" or not parsed.hostname or parsed.username
+    try:
+        parsed = urlsplit(value)
+        hostname = parsed.hostname
+    except ValueError:
+        # The parser's own message can echo the supplied location.
+        raise GuidanceDatasetError("credential_free_https_source_uri_required") from None
+    if (parsed.scheme != "https" or not hostname or parsed.username
             or parsed.password or parsed.query or parsed.fragment
-            or any(ord(char) < 33 for char in value)):
+            or any(ord(char) < 33 or ord(char) == 127 for char in value)):
         _refuse("credential_free_https_source_uri_required")
 
 
@@ -164,7 +169,7 @@ def _profile(value: object) -> dict:
     for binding in bindings:
         row = keys(binding, {"field", "source_sha256", "locator", "value_sha256"})
         name = row["field"]
-        if name not in _SEMANTICS or values[name] is None or name in seen:
+        if type(name) is not str or name not in _SEMANTICS or values[name] is None or name in seen:
             _refuse("unique_nonnull_semantic_field_binding_required")
         seen.add(name)
         digest(row["source_sha256"])
@@ -272,6 +277,10 @@ def _decisions(scope: dict, profiles: list[dict]) -> tuple[list[dict], list[str]
         ambiguous = any(days[row["published_date"]] > 1 and row["published_at"] is None for row in group)
         precise = [utc(row["published_at"]) for row in group if row["published_at"] is not None]
         ambiguous = ambiguous or len(precise) != len(set(precise))
+        # Only an instant's date is UTC. A date-only row carries an issuer-local
+        # date, so neighbouring days do not establish which was published first.
+        dated = [day(row["published_date"]) for row in group if row["published_at"] is None]
+        ambiguous = ambiguous or any(abs((instant.date() - other).days) <= 1 for instant in precise for other in dated)
         previous = None
         known = {}
         for current in group:
@@ -382,7 +391,7 @@ def compile_guidance_dataset(*, scope: dict, profiles: tuple[GuidanceSourceProfi
     Missing/intervening profiles, unknowns and control events remain visible.
     The declared inventory is not proof of the issuer's complete event history.
     """
-    scoped = _scope(decode_object(canonical_bytes(scope)))
+    scoped = _scope(decode_object(canonical_bytes(scope), MAX_DATASET_BYTES))
     if (type(profiles) is not tuple or not 0 < len(profiles) <= MAX_PROFILES
             or type(captures) is not tuple or not 0 < len(captures) <= MAX_PROFILES):
         _refuse("bounded_profile_and_capture_tuples_required")

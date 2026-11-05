@@ -295,6 +295,307 @@ class GuidanceDatasetTests(unittest.TestCase):
         with self.assertRaises(InputError):
             GuidanceSourceProfile.from_dict(supplied)
 
+def rebound(**changes):
+    values = profile().to_dict()
+    values.update(changes)
+    bind(values)
+    return values
+
+
+def forged(original, mutate):
+    changed = deepcopy(original)
+    mutate(changed)
+    return GuidanceDataset(canonical_bytes(changed))
+
+
+def extra_source(**changes):
+    return {"source_id": "zz-extra", "source_uri": "https://example.invalid/extra",
+            "captured_at": "2026-01-01T00:00:00Z", "sha256": "0" * 64, "byte_count": 1} | changes
+
+
+class ReviewCorrectionTests(unittest.TestCase):
+    """GDR-CR65 corrections; each case fails on the source Codex published."""
+
+    def test_malformed_locations_refuse_statically_without_echoing_the_location(self):
+        for uri in ("https://[bad", "https://[::1/x", "https://exa℀mple.invalid/x", "https://example.invalid/\x7f"):
+            with self.subTest(uri=uri), self.assertRaises(GuidanceDatasetError) as caught:
+                SourceCapture("fixture", uri, "2026-01-01T00:00:00Z", b"invented")
+            self.assertEqual(str(caught.exception), "credential_free_https_source_uri_required")
+
+    def test_unhashable_binding_field_is_a_static_refusal(self):
+        for name in ([], {}):
+            values = profile().to_dict()
+            values["bindings"][0]["field"] = name
+            with self.subTest(name=name), self.assertRaises(GuidanceDatasetError):
+                GuidanceSourceProfile.from_dict(values)
+
+    def test_scope_at_the_declared_inventory_limit_compiles(self):
+        ids = sorted(["fixture-d1", "fixture-d2"] + [f"fixture-z{index:04d}-{'x' * 100}" for index in range(1022)])
+        self.assertGreater(len(canonical_bytes(scope(ids))), 65536)
+        result = build(scoped=scope(ids))
+        self.assertEqual(len(result.to_dict()["missing_profile_ids"]), 1022)
+        self.assertEqual(GuidanceDataset(result.canonical_bytes).sha256, result.sha256)
+
+    def test_neighbouring_date_only_and_instant_rows_do_not_establish_order(self):
+        for published, instant in (("2025-01-03", "2025-01-03T00:30:00Z"),
+                                   ("2025-01-02", "2025-01-02T12:00:00Z"),
+                                   ("2025-01-01", "2025-01-01T23:30:00Z")):
+            new = profile("fixture-d2", published, None if published == "2025-01-01" else "fixture-d1", published_at=instant)
+            old = profile(predecessor="fixture-d2") if published == "2025-01-01" else profile()
+            result = build((old, new), scoped=scope(publication_start="2024-12-01")).to_dict()["decisions"]
+            with self.subTest(instant=instant):
+                self.assertTrue(all("ambiguous_publication_order" in row["refusal_reasons"] for row in result))
+                self.assertTrue(all(row["disposition"] == "refused" for row in result))
+        # Two clear days between the clocks settle the order under any US issuer date.
+        for old, new in ((profile(), profile("fixture-d2", "2025-01-04", "fixture-d1", published_at="2025-01-04T00:30:00Z")),
+                         (profile(published_at="2025-01-02T12:00:00Z"), profile("fixture-d2", "2025-01-04", "fixture-d1"))):
+            self.assertEqual(build((old, new)).safe_summary()["dispositions"], {"baseline": 1, "comparable_pair": 1})
+
+
+class EdgePinTests(unittest.TestCase):
+    """Boundaries the original methods left unpinned."""
+
+    def test_source_location_rules_are_each_enforced(self):
+        for uri in (1, None, "https://example.invalid/" + "a" * 2048, "https:///a", "https://user@example.invalid/a",
+                    "https://:secret@example.invalid/a", "https://example.invalid/a b", "https://example.invalid/a\nb"):
+            with self.subTest(uri=repr(uri)[:40]), self.assertRaises(InputError):
+                SourceCapture("fixture", uri, "2026-01-01T00:00:00Z", b"invented")
+        exact = "https://example.invalid/" + "a" * (2048 - len("https://example.invalid/"))
+        self.assertEqual(SourceCapture("fixture", exact, "2026-01-01T00:00:00Z", b"invented").source_uri, exact)
+        for args in (("bad id", "https://example.invalid/a", "2026-01-01T00:00:00Z", b"x"),
+                     ("fixture", "https://example.invalid/a", "2026-01-01", b"x"),
+                     ("fixture", "https://example.invalid/a", "2026-01-01T00:00:00Z", b""),
+                     ("fixture", "https://example.invalid/a", "2026-01-01T00:00:00Z", "x")):
+            with self.subTest(args=args[0::2]), self.assertRaises(InputError):
+                SourceCapture(*args)
+
+    def test_profile_fields_refuse_each_invalid_value(self):
+        good = profile().to_dict()
+        for changes in ({"schema": "gdr.other.v1"}, {"profile_id": "bad id"}, {"predecessor_profile_id": "bad id"},
+                        {"source_sha256": "A" * 64}, {"source_uri": "http://example.invalid/a"},
+                        {"issues": "x"}, {"issues": [f"code-{index:02d}" for index in range(65)]}, {"issues": ["bad code"]},
+                        {"issues": ["b", "a"]}, {"issues": ["a", "a"]}, {"bindings": "x"}):
+            with self.subTest(changes=str(changes)[:40]), self.assertRaises(InputError):
+                GuidanceSourceProfile.from_dict({**good, **changes})
+        for changes in ({"supersedes": "bad id", "kind": "correction"}, {"kind": "guess", "supersedes": "fixture-d0"},
+                        {"kind": "disclosure", "supersedes": "fixture-d0"}, {"kind": "correction", "supersedes": None},
+                        {"kind": "withdrawal", "supersedes": None}, {"fiscal_year": "2025"}, {"fiscal_year": 1899},
+                        {"fiscal_year": 2201}, {"fiscal_year": True}, {"fiscal_end": "2025-10-27"}, {"fiscal_end": "2026-02-06"},
+                        {"currency": "bad code"}, {"revenue": {"lower": 1, "upper": 2, "kind": "range"}},
+                        {"revenue": {"lower": "1", "upper": "2", "kind": "guess"}},
+                        {"published_date": "2026-01-01", "published_at": "2026-01-01T00:00:01Z"}):
+            with self.subTest(changes=str(changes)[:60]), self.assertRaises(InputError):
+                GuidanceSourceProfile.from_dict(rebound(**changes))
+        for changes in ({"fiscal_end": "2025-10-28"}, {"fiscal_end": "2026-02-05"}, {"fiscal_year": 1900}, {"fiscal_year": 2200},
+                        {"fiscal_end": None}, {"fiscal_start": None}, {"fiscal_year": None}, {"predecessor_profile_id": "fixture-d0"},
+                        {"revenue": {"lower": "1", "upper": "1", "kind": "point"}},
+                        {"published_date": "2026-01-01", "published_at": "2026-01-01T00:00:00Z"}):
+            with self.subTest(accepted=str(changes)[:60]):
+                self.assertEqual(GuidanceSourceProfile.from_dict(rebound(**changes)).to_dict()["schema"],
+                                 "gdr.guidance-source-profile.v1")
+
+    def test_every_nonnull_semantic_field_needs_one_valid_binding(self):
+        good = profile().to_dict()
+        def changed(mutate):
+            values = deepcopy(good)
+            mutate(values)
+            return values
+        by_field = {row["field"]: index for index, row in enumerate(good["bindings"])}
+        cases = {
+            "unbound": lambda v: v["bindings"].pop(by_field["revenue"]),
+            "duplicate": lambda v: v["bindings"].append(deepcopy(v["bindings"][0])),
+            "bad source": lambda v: v["bindings"][0].update(source_sha256="A" * 64),
+            "bad value hash": lambda v: v["bindings"][0].update(value_sha256="A" * 64),
+            "empty locator": lambda v: v["bindings"][0].update(locator=""),
+            "long locator": lambda v: v["bindings"][0].update(locator="a" * 513),
+            "control locator": lambda v: v["bindings"][0].update(locator="a\nb"),
+            "numeric locator": lambda v: v["bindings"][0].update(locator=1),
+        }
+        for label, mutate in cases.items():
+            with self.subTest(label=label), self.assertRaises(InputError):
+                GuidanceSourceProfile.from_dict(changed(mutate))
+        def null_binding(values):
+            binding = deepcopy(values["bindings"][by_field["eps"]])
+            values["eps"] = None
+            binding["value_sha256"] = hash_bytes(canonical_bytes({"value": None}))
+            values["bindings"][by_field["eps"]] = binding
+        with self.assertRaisesRegex(InputError, "semantic_field_binding"):
+            GuidanceSourceProfile.from_dict(changed(null_binding))
+        exact = changed(lambda v: v["bindings"][0].update(locator="a" * 512))
+        self.assertEqual(GuidanceSourceProfile.from_dict(exact).to_dict()["bindings"][0]["locator"], "a" * 512)
+
+    def test_noncanonical_profile_and_dataset_bytes_refuse(self):
+        raw = profile().canonical_bytes
+        with self.assertRaisesRegex(InputError, "canonical_guidance_profile"):
+            GuidanceSourceProfile(b" " + raw)
+        dataset = build().canonical_bytes
+        with self.assertRaisesRegex(InputError, "canonical_guidance_dataset"):
+            GuidanceDataset(b" " + dataset)
+
+    def test_scope_refuses_each_invalid_inventory(self):
+        for changes in ({"schema": "gdr.other.v1"}, {"scope_id": "bad id"},
+                        {"publication_start": "2026-01-01"}, {"issuer_ids": "fixture-issuer"}, {"issuer_ids": []},
+                        {"issuer_ids": ["bad id", "fixture-issuer"]}, {"issuer_ids": ["fixture-issuer", "a"]},
+                        {"issuer_ids": ["fixture-issuer", "fixture-issuer"]},
+                        {"expected_profile_ids": []}, {"expected_profile_ids": ["bad id", "fixture-d1", "fixture-d2"]},
+                        {"expected_profile_ids": ["fixture-d2", "fixture-d1"]}, {"fiscal_years": 2025}, {"fiscal_years": []},
+                        {"fiscal_years": list(range(1993, 2026))}, {"fiscal_years": [1899, 2025]}, {"fiscal_years": [2025, 2201]},
+                        {"fiscal_years": [True]}, {"fiscal_years": [2026, 2025]}, {"fiscal_years": [2025, 2025]}):
+            with self.subTest(changes=str(changes)[:40]), self.assertRaises(InputError):
+                build(scoped=scope(**changes))
+        with patch.object(guidance_dataset, "MAX_PROFILES", 1), self.assertRaisesRegex(InputError, "scope_inventory"):
+            build((profile(),), (source(),), scope(("fixture-d1", "fixture-d2")))
+        self.assertEqual(build(scoped=scope(fiscal_years=list(range(1994, 2026)))).safe_summary()["profile_count"], 2)
+
+    def test_profiles_outside_the_declared_inventory_refuse(self):
+        with self.assertRaisesRegex(InputError, "outside_declared"):
+            build(scoped=scope(("fixture-d2", "fixture-d3")))
+        for start, end in (("2025-01-03", "2025-12-31"), ("2025-01-01", "2025-02-01")):
+            with self.subTest(start=start), self.assertRaisesRegex(InputError, "outside_declared"):
+                build(scoped=scope(publication_start=start, publication_end=end))
+        self.assertEqual(build(scoped=scope(publication_start="2025-01-02", publication_end="2025-02-02")).safe_summary()["profile_count"], 2)
+
+    def test_public_dataset_rechecks_each_source_and_profile_row(self):
+        original = build().to_dict()
+        def add(**changes):
+            return lambda value: value["sources"].append(extra_source(**changes))
+        cases = {
+            "source id": add(source_id="zz bad"), "source uri": add(source_uri="http://example.invalid/a"),
+            "source clock": add(captured_at="2026-01-01"), "source hash": add(sha256="A" * 64),
+            "zero bytes": add(byte_count=0), "too many bytes": add(byte_count=guidance_dataset.MAX_SOURCE_BYTES + 1),
+            "source fields": lambda value: value["sources"].append({"source_id": "zz-extra"}),
+            "duplicate source": lambda value: value["sources"].append(deepcopy(value["sources"][-1])),
+            "unsorted sources": lambda value: value["sources"].reverse(),
+            "unsorted profiles": lambda value: value["profiles"].reverse(),
+            "unbound profile": lambda value: value["profiles"][0].update(bindings=[]),
+            "schema": lambda value: value.update(schema="gdr.other.v1"),
+            "missing gate": lambda value: value["gates"].pop("execution_ready"),
+            "extra gate": lambda value: value["gates"].update(extra=False),
+            "gates type": lambda value: value.update(gates=[]),
+            "missing ids": lambda value: value.update(missing_profile_ids=["fixture-zz"]),
+            "profile list": lambda value: value.update(profiles={}),
+            "source list": lambda value: value.update(sources={}),
+        }
+        for label, mutate in cases.items():
+            with self.subTest(label=label), self.assertRaises(InputError):
+                forged(original, mutate)
+        accepted = forged(original, lambda value: value["sources"].append(extra_source()))
+        self.assertEqual(accepted.safe_summary()["source_count"], 3)
+
+    def test_retained_bytes_require_their_own_hash(self):
+        result = build()
+        self.assertEqual(GuidanceDataset.from_bytes(result.canonical_bytes, expected_sha256=result.sha256).sha256, result.sha256)
+        for expected in ("0" * 64, "A" * 64):
+            with self.subTest(expected=expected[:1]), self.assertRaisesRegex(InputError, "hash_mismatch|SHA256"):
+                GuidanceDataset.from_bytes(result.canonical_bytes, expected_sha256=expected)
+        with self.assertRaisesRegex(InputError, "hash_mismatch"):
+            GuidanceDataset.from_bytes(bytearray(result.canonical_bytes), expected_sha256=result.sha256)
+
+    def test_exact_decisions_and_summary_without_financial_values(self):
+        result = build()
+        self.assertEqual(result.to_dict()["decisions"], [
+            {"profile_id": "fixture-d1", "predecessor_profile_id": None, "disposition": "baseline",
+             "refusal_reasons": [], "publication_clock_precision": "date"},
+            {"profile_id": "fixture-d2", "predecessor_profile_id": "fixture-d1", "disposition": "comparable_pair",
+             "refusal_reasons": [], "publication_clock_precision": "date"}])
+        self.assertEqual(result.safe_summary(), {"schema": "gdr.guidance-dataset-summary.v1", "dataset_sha256": result.sha256,
+            "source_count": 2, "profile_count": 2, "missing_profile_count": 0,
+            "dispositions": {"baseline": 1, "comparable_pair": 1}, "refusal_counts": {},
+            "gates": {"point_in_time_data": False, "historical_availability_verified": False,
+                      "source_completeness_verified": False, "source_authenticity_verified": False,
+                      "rights_verified": False, "approved_strategy_input": False, "execution_ready": False}})
+        gapped = build(scoped=scope(("fixture-d1", "fixture-d2", "fixture-d3", "fixture-d4")))
+        self.assertEqual(gapped.safe_summary()["missing_profile_count"], 2)
+        timed = build((profile(published_at="2025-01-02T12:00:00Z"),
+                       profile("fixture-d2", "2025-02-02", "fixture-d1", published_at="2025-02-02T12:00:00Z")))
+        self.assertEqual({row["publication_clock_precision"] for row in timed.to_dict()["decisions"]}, {"instant"})
+
+    def test_decisions_sort_by_identity_and_chains_are_per_issuer_and_year(self):
+        later = profile("fixture-a-later", "2025-03-02", "fixture-z-earlier")
+        earlier = profile("fixture-z-earlier", "2025-01-02")
+        decisions = build((later, earlier), captures=(source("fixture-a-later"), source("fixture-z-earlier")),
+                          scoped=scope(("fixture-a-later", "fixture-z-earlier"))).to_dict()["decisions"]
+        self.assertEqual([row["profile_id"] for row in decisions], ["fixture-a-later", "fixture-z-earlier"])
+        self.assertEqual([row["disposition"] for row in decisions], ["comparable_pair", "baseline"])
+        ids = ("fixture-d1", "fixture-d2")
+        other_year = profile("fixture-d2", "2025-02-02", fiscal_year=2026, fiscal_start="2026-01-01", fiscal_end="2026-12-31")
+        self.assertEqual(build((profile(), other_year), scoped=scope(ids, fiscal_years=[2025, 2026])).safe_summary()["dispositions"], {"baseline": 2})
+        other_issuer = profile("fixture-d2", "2025-02-02", issuer_id="fixture-other")
+        self.assertEqual(build((profile(), other_issuer), scoped=scope(ids, issuer_ids=["fixture-issuer", "fixture-other"])).safe_summary()["dispositions"], {"baseline": 2})
+        wrong = profile("fixture-d2", "2025-02-02", fiscal_year=2026, fiscal_start="2026-01-01", fiscal_end="2026-12-31",
+                        kind="correction", supersedes="fixture-d1", revenue=None, eps=None)
+        decision = build((profile(), wrong), scoped=scope(ids, fiscal_years=[2025, 2026])).to_dict()["decisions"][1]
+        self.assertIn("unknown_or_wrong_identity_control_target", decision["refusal_reasons"])
+
+    def test_inputs_compile_to_identical_bytes_in_any_order(self):
+        rows = (profile(), profile("fixture-d2", "2025-02-02", "fixture-d1"))
+        first, second = source(), source("fixture-d2")
+        self.assertEqual(build(rows, (first, second)).sha256, build(rows[::-1], (second, first)).sha256)
+
+    def test_compiler_refuses_wrong_container_and_member_types(self):
+        rows, captures = (profile(), profile("fixture-d2", "2025-02-02", "fixture-d1")), (source(), source("fixture-d2"))
+        for fields in (dict(profiles=list(rows), captures=captures), dict(profiles=rows, captures=list(captures)),
+                       dict(profiles=(), captures=captures), dict(profiles=rows, captures=()),
+                       dict(profiles=rows, captures=(object(),)), dict(profiles=(rows[0].to_dict(),), captures=captures),
+                       dict(profiles=rows, captures=(source(), source()))):
+            with self.subTest(fields=sorted(type(x).__name__ for x in fields.values())), self.assertRaises(InputError):
+                compile_guidance_dataset(scope=scope(), **fields)
+        with patch.object(guidance_dataset, "MAX_PROFILES", 1), self.assertRaises(InputError):
+            compile_guidance_dataset(scope=scope(("fixture-d1",)), profiles=rows, captures=captures[:1])
+        with patch.object(guidance_dataset, "MAX_DATASET_BYTES", 2048), self.assertRaisesRegex(InputError, "byte_limit"):
+            build()
+
+    def test_control_events_and_predecessor_defects_report_their_named_reasons(self):
+        known = profile("fixture-d2", "2025-02-02", "fixture-d1", kind="correction", supersedes="fixture-d1")
+        decision = build((profile(), known)).to_dict()["decisions"][1]
+        self.assertEqual(decision["disposition"], "control_event")
+        self.assertEqual(decision["refusal_reasons"], ["control_event_cannot_create_comparable_pair"])
+        flagged = profile(issues=["fixture-table-unreadable"])
+        decisions = build((flagged, profile("fixture-d2", "2025-02-02", "fixture-d1"))).to_dict()["decisions"]
+        self.assertEqual(decisions[0]["refusal_reasons"], ["fixture-table-unreadable"])
+        self.assertEqual(decisions[0]["disposition"], "refused")
+        self.assertEqual(decisions[1]["refusal_reasons"], ["predecessor_issue_fixture-table-unreadable"])
+        current_flag = profile("fixture-d2", "2025-02-02", "fixture-d1", issues=["fixture-table-unreadable"])
+        self.assertEqual(build((profile(), current_flag)).to_dict()["decisions"][1]["refusal_reasons"], ["fixture-table-unreadable"])
+        unknown_year = profile("fixture-d2", "2025-02-02", "fixture-d1", fiscal_year=None)
+        self.assertIn("unresolved_profile_identity_or_fiscal_year", build((profile(), unknown_year)).safe_summary()["refusal_counts"])
+        missing = profile("fixture-d2", "2025-02-02", "fixture-d1", eps=None)
+        reasons = build((profile(), missing)).to_dict()["decisions"][1]["refusal_reasons"]
+        self.assertEqual(reasons.count("current_missing_eps"), 1)
+        baseline = build((profile(eps=None),), (source(),), scope(("fixture-d1",))).to_dict()["decisions"][0]
+        self.assertEqual((baseline["disposition"], baseline["refusal_reasons"]), ("refused", ["current_missing_eps"]))
+
+    def test_unsupported_units_and_bases_are_refused_even_when_unchanged(self):
+        for changes, reason in (({"currency": "EUR"}, "unsupported_currency_or_units"),
+                                ({"revenue_units": "EUR"}, "unsupported_currency_or_units"),
+                                ({"eps_units": "EUR_per_share"}, "unsupported_currency_or_units"),
+                                ({"revenue_basis": "non-gaap"}, "unsupported_accounting_basis"),
+                                ({"eps_basis": "gaap"}, "unsupported_accounting_basis"),
+                                ({"period": "Q1"}, "full_year_guidance_required")):
+            old = profile(**changes)
+            new = profile("fixture-d2", "2025-02-02", "fixture-d1", **changes)
+            with self.subTest(changes=changes):
+                self.assertIn(reason, build((old, new)).to_dict()["decisions"][1]["refusal_reasons"])
+        for changes, reason in (({"revenue_basis": "non-gaap"}, "unsupported_accounting_basis"),
+                                ({"currency": "EUR"}, "unsupported_currency_or_units"),
+                                ({"period": "Q1"}, "full_year_guidance_required")):
+            with self.subTest(predecessor_only=changes):
+                self.assertIn(reason, build((profile(**changes), profile("fixture-d2", "2025-02-02", "fixture-d1"))).to_dict()["decisions"][1]["refusal_reasons"])
+        dollars = profile("fixture-d2", "2025-02-02", "fixture-d1", revenue_units="USD")
+        self.assertEqual(build((profile(revenue_units="USD"), dollars)).safe_summary()["dispositions"], {"baseline": 1, "comparable_pair": 1})
+
+    def test_publication_on_the_fiscal_end_date_has_not_expired(self):
+        old = profile(fiscal_start="2024-02-01", fiscal_end="2025-02-02")
+        new = profile("fixture-d2", "2025-02-02", "fixture-d1", fiscal_start="2024-02-01", fiscal_end="2025-02-02")
+        self.assertEqual(build((old, new)).safe_summary()["dispositions"], {"baseline": 1, "comparable_pair": 1})
+
+    def test_same_day_date_only_and_instant_rows_sort_without_a_type_error(self):
+        old = profile()
+        new = profile("fixture-d2", "2025-01-02", "fixture-d1", published_at="2025-01-02T12:00:00Z")
+        result = build((old, new)).to_dict()["decisions"]
+        self.assertTrue(all("ambiguous_publication_order" in row["refusal_reasons"] for row in result))
+        self.assertEqual(result[1]["predecessor_profile_id"], "fixture-d1")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -27,7 +27,7 @@ REQUIRED_SOURCES = api.REQUIRED_SOURCES | builder.REQUIRED_SOURCES | frozenset((
 PINS = {api.MODULE: "680f31f17447e240f919435ee1d56a9a48526f5197e37ac97332b4b70ee42b87",
     api.PROJECTS_MODULE: "6dc87f33105de9d80e7a267a6cc737bb4262f47e49c43b65247592927a5788d7",
     custody.MODULE: "702d31144a7e62b59a53d374af695078f150809b19f0992415e690d07fa418a4",
-    builder.MODULE: "e097664fbc34f62b7184fc6d0c65d6bcd8a2c06d25490e210c0cbb12ce9ba63e",
+    builder.MODULE: "da295c0249b17afe45d2310a72fa1b876ba201c3f9e697646c6662b598da4a31",
     **builder.PINNED}
 OWNER_SHA256 = "1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa"
 MIA_PUBLIC_ID_SHA256 = "790fd84f9177e87e0c5bc385f8bef44e107330b3d2ff329d9b59f26298704ee1"
@@ -211,7 +211,7 @@ def _prepare(*, phase, parent_probe_config_json, helper_source, project_bindings
         attempt_id=None if phase == "build" else attempt_id,
         reserved_look_id=None if phase == "build" else diagnostic_look_id,
         mode="offline-fixture" if fixture else "production")
-    action = {"schema": "tpr-fixed-parent-cache-action-v3", "phase": phase,
+    action = {"schema": "tpr-fixed-parent-cache-action-v4", "phase": phase,
         "parent_probe_config_json": parent_probe_config_json, "helper_source_utf8": helper_source.decode("utf-8"),
         "probe_operation_id": probe_operation_id, "diagnostic_attempt": diagnostic_attempt,
         "attempt_id": attempt_id, "diagnostic_look_id": diagnostic_look_id,
@@ -428,7 +428,7 @@ def _proof(action, raws):
         _fail()
     results = [_parse(raws[key]) for key in ("compile_result", "build_result")]
     for other, result in zip((compiled, built), results):
-        if (result.get("schema") != "tpr-fixed-parent-cache-action-result-v3" or result.get("status") != "completed"
+        if (result.get("schema") != "tpr-fixed-parent-cache-action-result-v4" or result.get("status") != "completed"
                 or result.get("action_sha256") != _sha(_wire(other)) or result.get("receipt_published") is not True
                 or result.get("lock_cleanup_complete") is not True or result.get("automatic_retry") is not False
                 or result.get("observed_job_ids") != []
@@ -559,7 +559,7 @@ def _execute(action, root, lock_root, *, transport, guard, clock, monotonic, fix
         path.mkdir(mode=0o700, exist_ok=True)
         ops._custody(path.lstat(), True)
     operation, lock, stop, written = plan["operation_id"], None, None, 0
-    result = {"schema": "tpr-fixed-parent-cache-action-result-v3", "phase": action["phase"],
+    result = {"schema": "tpr-fixed-parent-cache-action-result-v4", "phase": action["phase"],
         "operation_id": operation, "action_sha256": _sha(frozen), "git_head": plan["git_head"],
         "project_id": builder.PROJECT_ID, "candidate_config_sha256": plan["candidate_config_sha256"],
         "status": "failed_or_uncertain", "requests": [], "transport_calls_attempted": 0,

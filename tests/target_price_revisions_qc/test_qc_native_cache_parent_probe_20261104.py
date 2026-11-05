@@ -317,3 +317,131 @@ def test_final_configuration_query_cannot_cross_parent_effect_or_registration_en
     if boundary == "before_contains": assert not n.state.contains and not n.state.reads
     elif boundary == "before_read": assert len(n.state.contains) == 1 and not n.state.reads
     else: assert len(n.state.contains) == len(n.state.reads) == 1
+
+
+def test_close_summary_preserves_the_first_failed_guard_context(native):
+    n = native();n.at(8, 9, 30)
+    n.algo.on_data(n.algo.current_slice)
+    first = n.algo._report.get("first_failure_stage", n.algo._report["status"])
+    n.state.callback()
+    assert n.algo._report.get("first_failure_stage", n.algo._report["status"]) == first
+
+
+def test_v3_distinguishes_no_callback_from_failed_callback_and_disabled_skips(native):
+    untouched = native();untouched.state.callback();untouched.algo.on_end_of_algorithm()
+    no_entry = untouched.algo._report
+    assert no_entry["schema"] == "tpr-native-parent-cache-observations-v3"
+    assert no_entry["on_data_entries"] == no_entry["on_data_disabled_skips"] == 0
+    assert no_entry["first_failure_stage"] == "close_without_bootstrap"
+    assert no_entry["first_failure_code"] == "bootstrap_incomplete"
+    assert no_entry["first_failure_category"] == "state"
+    assert no_entry["terminal_summary"] == "incomplete_cache_observations"
+    failed = native();failed.state.lock = False;failed.algo.on_data(failed.algo.current_slice)
+    report = failed.algo._report
+    assert report["on_data_entries"] == 1 and report["on_data_disabled_skips"] == 0
+    assert failed.algo._slices == 0
+    assert report["first_failure_stage"] == "waiting_custody"
+    assert report["first_failure_code"] == "custody_locked"
+    assert report["first_failure_category"] == "guard"
+    first = {k: report[k] for k in ("first_failure_stage", "first_failure_code", "first_failure_category", "last_completed_stage")}
+    failed.state.lock = True
+    failed.algo.on_data(failed.algo.current_slice);failed.state.callback();failed.algo.on_end_of_algorithm()
+    assert report["on_data_entries"] == 2 and report["on_data_disabled_skips"] == 1
+    assert {k: report[k] for k in first} == first
+    assert report["terminal_custody_passed"] is True
+    assert not failed.state.contains and not failed.state.reads
+
+
+@pytest.mark.parametrize("fault,stage,code", [
+    ("late", "waiting_clock", "stage_failed"),
+    ("slice_argument", "waiting_slice", "stage_failed"),
+    ("foreign_control", "waiting_control", "stage_failed"),
+    ("cache", "preopen_bar", "stage_failed"),
+    ("configs", "preopen_configs", "stage_failed"),
+    ("current_slice", "waiting_custody", "custody_current_slice")])
+def test_earliest_guard_phase_is_preserved_without_private_error_payload(native, fault, stage, code):
+    n = native();data = n.algo.current_slice
+    if fault == "late": n.at(8, 9, 30);data = n.algo.current_slice
+    elif fault == "slice_argument": data = n.Slice(dict(data.bars))
+    elif fault == "foreign_control": data.bars = {object(): next(iter(data.bars.values()))}
+    elif fault == "cache": next(iter(data.bars.values())).period = timedelta(days=1)
+    elif fault == "configs":
+        class PrivateError(AttributeError):
+            def __str__(self): raise AssertionError("private exception string consumed")
+        n.state.config_hook = lambda rows: (_ for _ in ()).throw(PrivateError("PRIVATE KEY/BODY"))
+    elif fault == "current_slice": n.algo.current_slice = None
+    n.algo.on_data(data)
+    report = n.algo._report
+    assert (report["first_failure_stage"], report["first_failure_code"]) == (stage, code)
+    assert report["first_failure_category"] in p.FAILURE_CATEGORIES
+    assert not n.state.contains and not n.state.reads
+    n.state.callback();n.algo.on_end_of_algorithm()
+    assert report["first_failure_stage"] == stage
+    assert "PRIVATE" not in n.state.logs[-1] and "PrivateError" not in n.state.logs[-1]
+
+
+def test_observability_counters_are_capped_and_cannot_trigger_a_private_retry(native):
+    n = native();n.algo._report["on_data_entries"] = p.ON_DATA_ENTRY_MAX
+    n.algo.on_data(n.algo.current_slice)
+    report = n.algo._report
+    assert report["on_data_entries"] == p.ON_DATA_ENTRY_MAX and report["on_data_entry_cap_reached"] is True
+    assert report["on_data_disabled_skips"] == 1
+    assert report["first_failure_code"] == "entry_budget_exceeded"
+    report["on_data_disabled_skips"] = p.ON_DATA_ENTRY_MAX
+    first = report["first_failure_stage"]
+    n.algo.on_data(n.algo.current_slice)
+    assert report["on_data_disabled_skips"] == p.ON_DATA_ENTRY_MAX
+    assert report["on_data_disabled_skip_cap_reached"] is True and report["first_failure_stage"] == first
+    assert not n.state.contains and not n.state.reads
+
+
+def test_bound_ast_split_preserves_original_predicates_prelude_and_assignment():
+    original = next(n for c in ast.parse(p.base.RUNTIME).body if isinstance(c, ast.ClassDef)
+        for n in c.body if isinstance(n, ast.FunctionDef) and n.name == "_bound")
+    rewritten = next(n for c in ast.parse(p._base_source()).body if isinstance(c, ast.ClassDef)
+        for n in c.body if isinstance(n, ast.FunctionDef) and n.name == "_bound")
+    dump = lambda n: ast.dump(n, include_attributes=False)
+    assert [dump(n) for n in original.body[:2]] == [dump(n) for n in rewritten.body[:2]]
+    assert dump(original.body[-1]) == dump(rewritten.body[-1])
+    assert [dump(n) for n in original.body[2].test.values] == [dump(n.test) for n in rewritten.body[2:-1]]
+
+
+@pytest.mark.parametrize("fault", ["valid_none", "valid_same", "algorithm", "live", "warmup", "slice",
+    "project_type", "project", "locked", "job_type", "job_format", "job_changed"])
+def test_bound_differential_trace_preserves_lazy_evaluation_and_native_call_counts(native, fault):
+    n = native();original_node = next(m for c in ast.parse(p.base.RUNTIME).body if isinstance(c, ast.ClassDef)
+        for m in c.body if isinstance(m, ast.FunctionDef) and m.name == "_bound")
+    scopes = dict(n.namespace)
+    exec(compile(ast.fix_missing_locations(ast.Module(body=[original_node], type_ignores=[])), "original_bound.py", "exec"), scopes)
+    original, rewritten = scopes["_bound"], n.namespace["CacheProbeBase"]._bound
+    active = []
+    original_match = scopes["re"].fullmatch
+    def regex(*a, **k): active.append("regex_call");return original_match(*a, **k)
+    scopes["re"] = n.namespace["re"] = NS(fullmatch=regex)
+    parent = object if fault == "algorithm" else n.namespace["QCAlgorithm"]
+    class Probe(parent):
+        def __getattribute__(self, name):
+            if name in ("_configuration", "algorithm_id", "live_mode", "is_warming_up", "current_slice",
+                    "project_id", "get_locked", "_job"):
+                active.append(name)
+            return object.__getattribute__(self, name)
+        def __setattr__(self, name, value):
+            if name == "_job": active.append("assign_job")
+            object.__setattr__(self, name, value)
+        def _configuration(self): active.append("configuration_call")
+        def get_locked(self): active.append("locked_call");return self._locked
+    def execute(method):
+        active.clear();obj = object.__new__(Probe)
+        obj.__dict__.update(algorithm_id="b"*32, live_mode=False, is_warming_up=False,
+            current_slice=n.Slice(), project_id=p.PROJECT_ID, _locked=True, _job=None)
+        key, value = {"valid_same": ("_job", "b"*32), "live": ("live_mode", True),
+            "warmup": ("is_warming_up", True), "slice": ("current_slice", None),
+            "project_type": ("project_id", str(p.PROJECT_ID)), "project": ("project_id", p.PROJECT_ID+1),
+            "locked": ("_locked", False), "job_type": ("algorithm_id", 1),
+            "job_format": ("algorithm_id", "invalid"), "job_changed": ("_job", "c"*32)}.get(fault, ("unused", None))
+        obj.__dict__[key] = value
+        refused = False
+        try: method(obj)
+        except ValueError: refused = True
+        return refused, list(active), obj.__dict__["_job"]
+    assert execute(original) == execute(rewritten)

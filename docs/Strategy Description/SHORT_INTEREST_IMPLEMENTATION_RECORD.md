@@ -32270,3 +32270,194 @@ independent Claude review.
 Main's final repeat of the same record/active-document selection passed
 98 tests in 0.97 s after the prose/peer update; append scope and whitespace
 passed. This result line adds no implementation or authority change.
+
+## 150. Prepared synchronized trace of the original code-read interval (2026-11-04)
+
+### 150.1 Owner scope and prospective registration
+
+SI-AUTH-20261104-01 is the owner's instruction: "Trace the actual failing read
+interval and fix custody without weakening checks or losing data. Keep existing
+budgets, build to the last step before QC/Safari, and push once. No QC/Safari or
+purchases." SI-DEC-20261104-02 registers ONE new source-free synchronized
+diagnostic under that scope. It is not a restart of any spent capture, old
+USB invocation, passive trace or metadata probe. Section149 remains the honest
+quiet passive result; it did not identify or repair the directory writer.
+
+The baseline is clean local/tracking/actual
+af1d00f66a8d611997749c164a04c48e4eb635e4 in the designated absolute Short
+Interest worktree and codex/strategy-short-interest. No alternate checkout,
+branch, fetch, reset, rebase or history rewrite. The original five code files,
+Documents observer and old framer remain BYTE-IDENTICAL to that baseline.
+Only two new diagnostic scripts, their tests and this record change.
+
+### 150.2 Synchronized observation and independent source stop
+
+The new coordinator authenticates nine complete current/committed public-code
+files before executing owner-writable Python as Root. Root Git children are
+demoted to the lane owner's UID/GID with no supplementary groups; no
+safe.directory exception is used. All successful initialization, observation,
+owned waits, publication, final code/control audits and formatting remain
+inside one original 120-second clock beginning before the first code open.
+Bootstrap/code accesses before native readiness are outside the native
+coverage claim; profiling and preload overhead are not claimed absent.
+
+A separately owned eslogger session receives the same nine notification types.
+The reader is NOT launched until a valid sequence-zero native record is parsed,
+the original tracer is alive, no known issue exists and native stderr is zero.
+Readiness has 10 seconds within the fixed 30-second native interval. No ready
+record means no read and an incomplete result, never a seeded directory entry,
+fixed-sleep assumption, longer window or automatic retry.
+
+The demoted isolated worker executes the genuine unchanged inspect_registered,
+_new_graph and initial _code_window, including every original five-file
+full10 comparison, interleaved Git-show check, audit, reverse close and
+after-close check. A diagnostic-only exact-frame profile hook accepts closure
+only from the genuine _WINDOWS/_COMMITS/caller/clock provenance. It raises
+its own retained StopBeforeSnapshot at the ORIGINAL _issue_snapshot call
+BEFORE its body. No snapshot is minted, no USB source reader is reached and
+no model inspection function runs. Model module definitions are compiled as
+part of the authenticated original graph; model_body_unentered refers to the
+inspection function, not module initialization. Original refusals remain
+original refusals; a stopped code-only success is not an archive pass.
+
+The worker's permanent Python audit hook independently denies writes, sockets
+and nonexact subprocesses. A tested OS sandbox additionally denies /Volumes
+read/metadata access, file writes and the specified Keychain/credential-helper/
+shell routes; Python audit hooks alone do not cover all metadata calls.
+The unchanged original matching-lane Git metadata exception still exists.
+No universal claim of zero OS credential-service activity is inferred from
+Python source-reader counters or an ambient Git environment.
+
+The worker uses the fixed resolved Python 3.13.15 launcher, SHA256
+fdae91cd6e017f2053cd4e10457b6130e545597b12512ee4180c433ab9ba7dab,
+34640 bytes, UID501/GID80/mode100755. It executes only AFTER the UID/GID drop.
+The venv alias is a sanity check, not the executed path. Its original full10
+stamp/bytes are checked before launch and against the SAME original afterward.
+This is launcher authentication, not a complete stdlib/dylib attestation.
+
+A worker-stop reserve begins eight seconds BEFORE native 30-second shutdown.
+The coordinator stops, reaps and drains its owned worker while native coverage
+is still live. Group signals require the still-owned unreaped child/session
+identity; uncertain or reused ownership is never signalled. Unknown termination,
+nonzero exit, missing EOF, stderr, malformed/extra packets, incomplete overlap,
+cleanup or clock failure vetoes closure and retains any required owner action.
+Actual worker lifetime is bounded by the PARENT's own monotonic envelope;
+cross-process monotonic epochs are not assumed interchangeable.
+
+### 150.3 Causal evidence, privacy and final original controls
+
+The new helper projects only genuinely failed original Documents-chain
+comparisons: fixed code ordinal/chain3, original device/inode, original and
+observed mtime/ctime/flags, mismatching field names and conservative time
+brackets. Stat operands precede comparison-call instrumentation, so the lower
+bound is original WINDOW ENTRY through the failed comparison RETURN.
+No later stat reconstructs a prior failure; no source values or private rows
+are emitted. All nine Root notification projections remain bounded and omit
+unrelated filenames/arguments/environment. Matching setters additionally retain
+requested flags, strict attribute bitmaps or requested atime/mtime plus receive
+timestamps. These support correlation, not automatic syscall-success or actor
+assignment. Parent samples/native candidates and child original comparisons
+are separate evidence: an inherited parent-only no-transition label cannot
+erase a genuine child comparison.
+
+The fresh fixed output is outside both old attribution and native-proof bases:
+Library/Application Support/CodexShortInterestCodeReadAttribution/
+code-read-20261104-v1/report.private.json. No old namespace/member, proof image,
+flag, timestamp, claim or datum is modified or adopted. The existing native
+proof base's exact membership is preserved. The report remains PROVISIONAL.
+After the final nine-file/launcher audit, the coordinator rechecks the ORIGINAL
+output-directory anchors and original terminal report bytes/SHA/full10/leaf5
+through the last fresh FD close, then samples the original target outside
+native coverage and checks the original clock. Any late negative overrides
+the delegated provisional/positive result. No control is rewritten or resealed.
+
+### 150.4 Verified pre-release findings and corrections
+
+| ID (SI-READ-20261104-) | Priority | Corrected before actual release |
+| --- | --- | --- |
+| 001 | P2 | Removed an accidental unconditional witness expression; exact tuple5, original commit issuer and genuine caller graph/clock must agree. Regressions refuse before any snapshot call rather than passing through a later guard. |
+| 002 | P2 | System Python3.9 cannot initialize the original slots=True model. The worker now uses the fixed existing3.13.15 runtime; the pinned REAL launcher is executed directly instead of a mutable venv alias. No historical interpreter identity is invented. |
+| 003 | P3 | Worker-bootstrap owner/hash/stamp/OS/compile failures now emit fixed bounded diagnostics with separate cleanup. Verified helper execution remains outside that catch. |
+| 004 | P2 | The initial coordinator rejected the genuine True diagnostic marker and lacked strict denial/manifest binding. Exact typed schema, zero counters and six-file helper mapping now match a genuinely produced fabricated packet. |
+| 005 | P2 | An incomplete worker could continue after native termination. The stop reserve, owned wait/EOF ordering, stderr readiness and explicit unknown-worker owner-action fields now preserve the observation boundary. |
+| 006 | P2 | Genuine post-close Documents drift was misclassified as a callback failure. Exact original contract/phase/relation pairs now retain its genuine failed stamp evidence. |
+| 007 | P2 | A real permanent-audit fabricated child proved CPython audits its automatic profiler clear after the issued stop. Exactly one genuine stop/frame/window/current-profile-bound clear is permitted; manual, copied or later substitutions still refuse. |
+| 008 | P2 | Final code audits previously followed the last report check. Original anchors, report hashes/stamps and last-fresh-FD-close checks now follow the final code/runtime audit. |
+| 009 | P3 | Malformed direct helper arguments could be echoed despite being excluded by the reviewed Root bootstrap. Unvalidated identifiers now become null; no raw argument/type is serialized. |
+| 010 | P3 | A later native failure could overwrite an earlier worker failure. The first remains primary and later fixed details are bounded separately. |
+
+These are new software/adapter findings, not newly observed provider,
+filesystem, FileProvider, Keychain or historical custody causes.
+
+### 150.5 Frozen software, validation and pending OS action
+
+| New file | Bytes | SHA256 |
+| --- | --- | --- |
+| scripts/diagnose_short_interest_code_read_interval.py | 26543 | d2b47a171a102e90b49c3dc7a4f9b0d41d93d1ac3cf319cd2528b3f881f253a7 |
+| tests/test_short_interest_code_read_interval.py | 19114 | 9867e661f2594e3d777b7322cb2a3943aa8cea703fb9026c1697192e071979e7 |
+| scripts/trace_short_interest_code_read_actor.py | 42905 | 31865f789a4108b9dd5cdab006817cbac8d70eaf558262e71921fd32d8e8c896 |
+| tests/test_short_interest_code_read_actor.py | 34422 | 525015c7c8254948aaafa89cbb47d2101078a6e38668df5e5b0ddf32080cb915 |
+
+Exact nine-path list SHA256
+f77395931164f9696e01eb54189101eceeeea86b72dbc9090c3049ec5b111602;
+complete current-byte mapping SHA256
+6f348198e905db9861dcfe3fd73d51a22d555b8cc11c22011a868bf0a9ec4b5d.
+Sandbox literal SHA256
+b31e4631e620e9d110452868bbd7a5636e0efc75f837bc0b634cdbafce6d283d.
+
+Main's new-helper/coordinator/original-window/Documents/framer/import-boundary/
+active-document selection passed393 tests,1 deselected,29.42s under OS network
+denial. That was BEFORE the minimal 010 change at coordinator f42be674; it is
+not attributed to the final coordinator hash. After 010, Main's relevant final
+coordinator selection passed 78 tests, 1 deselected, 1.37s. The final real sandbox
+regression separately passed 1/.59s with network denied INSIDE its child; nested
+sandboxing is not supported by this host. An initial author harness run had
+36 passed/1 failed because of nested sandbox_apply EPERM, not a production
+sandbox refusal. No protection was relaxed: only this test's outer harness
+placement changed. Main verified final four hashes, original seven byte
+equality, exact nine-file inventory, Python3.9 AST/in-memory bootstrap compile
+and shell syntax WITHOUT executing the command. No full lane/repository suite.
+
+Helper author27/17.11s and final coordinator author78/1.46s plus isolated1/.34s
+are separate fabricated executions. Helper causal reversals yielded expected
+failures001:4,006:2,007:1,009:2 and were restored. Before010 the coordinator's
+seven RAM reversals yielded11 expected failures plus10 unaffected passes,
+then21 restored passes;010 was separately red/green and reversed/restored.
+The peer accepted final helper/coordinator code; its prior 25/16.90s helper
+selection preceded 009, followed only by narrow final privacy 2/.35s checks.
+No advisory run is presented as Main's rerun, actual domain closure or an
+independent Claude review. All authors are now frozen.
+
+The noninteractive administrator check is FALSE; no password was requested.
+The remaining OS step is the owner's already-authorized administrator
+authentication in Terminal, with responsible-Terminal Full Disk Access.
+AFTER this software/record is committed clean, Main prepares one immutable
+command-only owner artifact against the exact local committed HEAD, unchanged
+actual/tracking AF1 and the nine-file mapping above; syntax-check only.
+The fixed AppSupport output must still be absent/empty before registration.
+A stale command, existing report, unknown operation or unexpected lane/remote
+advance stops; no removal/reset/adoption is allowed. Paste the final original
+terminal receipt or fixed error; do NOT rerun after an error or unknown result.
+
+No actual synchronized trace, code-read reproduction, USB/source retrieval,
+new claim/START/charged byte, outcome, QC/Safari or purchase has occurred in
+this preparation. SourceAUTH/052, SI-CR27-008, USB/source/input/rights/cash and
+readiness gates remain. Count 84,005 START / 4,294,967,296 bytes, permanent unknown
+8 START / 16,777,216 bytes and separate DAILY residual 36,837 attempts /
+3,327,988,047 bytes / 71,468,572 rows stay unchanged. Historical initial upper-bound
+14,000 START / 40,229,897 bytes is not a freshly verified balance. Canonical looks
+0/0, exploratory 0, alpha 0, IDs none and QC launches 0.
+
+This round has made ZERO pushes. Keep the prepared snapshot LOCAL and frozen
+while the one-shot is pending, so publication cannot trigger a review watcher
+and stale its exact HEAD/tracking binding. No edit/test/commit/push overlaps
+an active actual diagnostic. After trustworthy terminal closure, authenticate
+the original report/terminal/file10/leaf5, complete read overlap, waits/EOF,
+mapping/runtime and negatives before any causal correction or next in-scope
+qualification. Quiet/no-reproduction alone is not a repair. Reserve the ONE
+final matching-lane nonforce push for the completed round or a concrete final
+owner/external blocker after valid records and concurrency checks. No new
+monitor, automatic retry, other-chat message or QC release is armed.
+
+Main post-record selection passed 98 tests in 0.93s, OS networking denied;
+the entire AF1 record prefix remains byte-exact. Owned whitespace passed.

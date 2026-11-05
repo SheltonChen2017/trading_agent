@@ -5943,8 +5943,9 @@ SECTION118_COMMITS = (
     SECTION118_HEAD,
 )
 SECTION118_NEXT_ROLE = (
-    "The next bounded action is genuine QC Mia diagnosis and verification in protected OFF project38609822 using the owner's signed-in Safari session, "
-    "under fresh bounded source/HEAD/access/operation/attempt/look claims; verified source/input/resource recovery then permits OFF and the remaining frozen arms serially, "
+    "The next bounded action is to complete and verify the fixed prospective native-cache diagnostic in OFF project38609822 "
+    "under fresh bounded source/HEAD/access/operation/attempt/look claims; genuine Mia has supplied no verified code fix, "
+    "so OFF and the remaining frozen arms proceed serially only after verified source/input/resource recovery, "
     "while the20REMXrows remain quarantined, Claude review is skipped, and exactly one final lane push is reserved for the completed or concrete-blocked round."
 )
 SECTION118_RECEIVED_HISTORY_SHA256 = {
@@ -6001,7 +6002,7 @@ def _assert_section116_historical_review_facts(text: str) -> None:
 
 
 def _assert_section118_current_facts(text: str) -> None:
-    """Authentication enables the authorized Mia task; evidence gates remain separate."""
+    """Mia diagnosis leaves a prospective input check, with no financial promotion."""
     folded = " ".join(text.replace("*", "").replace(chr(96), "").split()).casefold()
     assert SECTION118_NEXT_ROLE.casefold() in folded
     assert SECTION117_NEXT_ROLE.casefold() not in folded, "section117 counter-review is completed history"
@@ -6009,12 +6010,16 @@ def _assert_section118_current_facts(text: str) -> None:
     assert SECTION116_RELEASE_SCOPE.casefold() in folded
     for required in (
         "fresh bounded source/head/access/operation/attempt/look claims",
-        "genuine qc mia diagnosis and verification in protected off project38609822",
-        "using the owner's signed-in safari session",
-        "verified source/input/resource recovery then permits",
+        "fixed prospective native-cache diagnostic in off project38609822",
+        "genuine mia has supplied no verified code fix",
+        "safari is authenticated in protected off38609822",
+        "historical history results do not rule out prospective native-cache/feed routing",
+        "provider-wide absence remains unproved",
+        "a positive cache canary does not establish full financial repair or atomicity",
+        "raw sid and parent witness remain inside qc; local sid export is not authorized",
         "authentication is a required input, not renewed task permission",
         "the frozen same-session native raw/sid policy is unchanged",
-        "off and the remaining frozen arms serially",
+        "off and the remaining frozen arms proceed serially only after verified source/input/resource recovery",
         "while the20remxrows remain quarantined",
         "0/5 accepted full-window results", "all financial metrics null",
         "financial acceptance remains false", "claude review is skipped",
@@ -6041,6 +6046,26 @@ def _assert_section118_current_facts(text: str) -> None:
         "completed proves accepted source/economics/accounting",
         "the20remxrows are admitted to the frozen financial input",
         "after the owner completes authentication in the tool-visible in-app tab",
+        "genuine qc mia diagnosis and verification in protected off project38609822 using the owner's signed-in safari session",
+        "the next bounded action is manual text focus in mia",
+        "the next bounded action is waiting for mia's final diagnosis",
+        "the next bounded action is owner authentication in the in-app tab",
+        "historical history results rule out prospective native-cache/feed routing",
+        "prior history results prove this is not a configuration, routing or engine-side issue",
+        "provider-wide absence is proved",
+        "empty history proves provider-wide absence",
+        "mia's reply automatically admits financial source",
+        "mia completed, so financial source/economics is accepted",
+        "a positive cache canary establishes full financial repair",
+        "a positive cache canary proves atomicity",
+        "the cache canary proves native-origin authentication",
+        "local raw sid export is authorized to activate v1",
+        "export the parent witness locally to activate v1",
+        "raw sid export activates the v1 cache probe",
+        "initialize may read the private parent before actual job/locked proof",
+        "reuse the old d012 claim for this parent read",
+        "parent feb10 hindsight identity has pittrue",
+        "parent2021-02-10 hindsight identity is point-in-time verified",
         "owner sign-in alone proves financial readiness",
         "owner sign-in alone proves backtesting readiness",
         "mia reply automatically admits source/economics",
@@ -7032,11 +7057,10 @@ def test_section109_history_guard_refuses_retrospective_rewrite(monkeypatch) -> 
 
 @pytest.mark.parametrize("surface", ("current", "preamble"))
 @pytest.mark.parametrize("before,after", (
-    ("genuine QC Mia diagnosis and verification in protected OFF project38609822", "generic agent diagnosis in any project"),
-    ("using the owner's signed-in Safari session",
-     "using an unauthenticated generic browser session"),
-    ("verified source/input/resource recovery then permits", "unverified source/input/resource recovery permits"),
-    ("OFF and the remaining frozen arms serially", "all frozen arms concurrently"),
+    ("fixed prospective native-cache diagnostic in OFF project38609822", "arbitrary cache diagnostic in any project"),
+    ("genuine Mia has supplied no verified code fix", "Mia automatically admits a financial code fix"),
+    ("only after verified source/input/resource recovery", "without verified source/input/resource recovery"),
+    ("OFF and the remaining frozen arms proceed serially", "all frozen arms proceed concurrently"),
     ("while the20REMXrows remain quarantined", "rounds the20REMXrows into financial inputs"),
     ("Claude review is skipped", "Claude review is required"),
     ("exactly one final lane push", "multiple intermediate lane pushes"),
@@ -7096,10 +7120,19 @@ def test_section118_current_released_handoff_facts_are_explicit(surface):
     ("QC and Safari access are released for this bounded preflight and serialized backtest continuation",
      "QC and Safari access remain deferred"),
     ("fresh bounded source/HEAD/access/operation/attempt/look claims", "reused expired claims"),
-    ("verified source/input/resource recovery then permits", "without source, input or resource prerequisites"),
+    ("only after verified source/input/resource recovery", "without source, input or resource prerequisites"),
+    ("genuine Mia has supplied no verified code fix", "Mia supplied a financially accepted fix"),
+    ("Safari is authenticated in protected OFF38609822", "Safari is unauthenticated"),
+    ("Historical History results do not rule out prospective native-cache/feed routing",
+     "Historical History results rule out prospective native-cache/feed routing"),
+    ("Provider-wide absence remains unproved", "Provider-wide absence is proved"),
+    ("A positive cache canary does not establish full financial repair or atomicity",
+     "A positive cache canary establishes full financial repair"),
+    ("Raw SID and parent witness remain inside QC; local SID export is not authorized",
+     "Local raw SID export is authorized to activate v1"),
     ("Authentication is a required input, not renewed task permission", "Authentication is renewed task permission"),
     ("The frozen same-session native RAW/SID policy is unchanged", "Stale or future marks are authorized"),
-    ("OFF and the remaining frozen arms serially", "all frozen arms concurrently"),
+    ("OFF and the remaining frozen arms proceed serially", "all frozen arms concurrently"),
     ("while the20REMXrows remain quarantined", "uses rounded REMX rows"),
     ("0/5 accepted full-window results", "5/5 accepted full-window results"),
     ("all financial metrics NULL", "all financial metrics available"),
@@ -7138,6 +7171,26 @@ def test_section118_current_fact_guard_refuses_replacements(monkeypatch, surface
     "Multiple intermediate lane pushes.",
     "The20REMXrows are admitted to the frozen financial input.",
     "After the owner completes authentication in the tool-visible in-app tab.",
+    "The next bounded action is genuine QC Mia diagnosis and verification in protected OFF project38609822 using the owner's signed-in Safari session.",
+    "The next bounded action is manual text focus in Mia.",
+    "The next bounded action is waiting for Mia's final diagnosis.",
+    "The next bounded action is owner authentication in the in-app tab.",
+    "Historical History results rule out prospective native-cache/feed routing.",
+    "Prior History results prove this is not a configuration, routing or engine-side issue.",
+    "Provider-wide absence is proved.",
+    "Empty History proves provider-wide absence.",
+    "Mia's reply automatically admits financial source.",
+    "Mia completed, so financial source/economics is accepted.",
+    "A positive cache canary establishes full financial repair.",
+    "A positive cache canary proves atomicity.",
+    "The cache canary proves native-origin authentication.",
+    "Local raw SID export is authorized to activate v1.",
+    "Export the parent witness locally to activate v1.",
+    "Raw SID export activates the v1 cache probe.",
+    "Initialize may read the private parent before actual job/locked proof.",
+    "Reuse the old D012 claim for this parent read.",
+    "Parent Feb10 hindsight identity has PITTRUE.",
+    "Parent2021-02-10 hindsight identity is point-in-time verified.",
     "Owner sign-in alone proves financial readiness.",
     "Owner sign-in alone proves backtesting readiness.",
     "Mia reply automatically admits source/economics.",
@@ -7166,6 +7219,10 @@ def test_section118_current_fact_guard_refuses_appended_contradictions(monkeypat
     "1 QC request.", "1 Safari request.", "1 native compile.", "1 backtest.",
     "Owner authentication completed.", "A verified Mia diagnosis was obtained in this round.",
     "1 new Codex financial launch occurred; full-window accounting remains unaccepted.",
+    "1 new nonfinancial native-cache attempt launched.",
+    "The fixed cache canary is positive; financial acceptance remains FALSE.",
+    "1 QC-only parent contains and1 QC-only parent read under fresh claims.",
+    "Parent Feb10 identity is used retrospectively for a nonfinancial diagnostic; PIT remains FALSE.",
 ))
 def test_section118_release_does_not_permanently_freeze_native_observation_counts(surface, observation):
     text = _current_qualification(_record_section("## 8. Exact next step")) if surface == "current" else _record_preamble()

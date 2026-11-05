@@ -33105,3 +33105,173 @@ a concrete final owner/external blocker.
 Main post-result active-document/counter-review-record selection passed89/.91s;
 historical prefix, original committed software and whitespace checks remain
 intact. No full suite or independent Claude review was run.
+
+## 154. Retained historical FirstRate observation bridge — prospective software (2026-11-04)
+
+Under continuing SI-AUTH-20261104-01, SI-DEC-20261104-05 authorizes the next
+bounded source-only software unit after153's actual closure: authenticate the
+RETAINED two-file private observation against a fixed committed Main anchor,
+then privately assess its aggregate structure. Starting clean HEAD
+0dbe4aeca2e7c5677a9f6869a5b34258698596be and actual/tracking origin
+af1d00f66a8d611997749c164a04c48e4eb635e4 remain the hard lane. This is software
+preparation; no actual new loader/private-file operation is registered until
+code/policy/anchor/manifest/tests and durable record are frozen and committed.
+
+The fixed public anchor
+research/short_interest_etf/specs/usb_observation_anchor_20261104_v1.json is
+10968 bytes, raw canonical+oneLF SHA256
+dc8518ff48d574dab0b0ac798ae09624784a54ee94ef90138de8e1064f1c7cb9.
+It binds ORIGINAL actual source creator3a0951, historical9/worker7 code,
+profile/model/observation/aggregate hashes, original owned closure, copier and
+independent-audit/file10/ancestry5/leaf5 receipts. Its trust statement is
+Main-attested HISTORICAL closure authenticated from committed evidence.
+It does not reconstruct an original live process handle or a native/source
+capability. False interpretation authority flags do NOT establish absence of
+suitable private factual evidence. No private aggregate values, rows, usability,
+license/contact/account facts or secrets enter the anchor.
+
+Only the new pure model, fixed historical loader, their two focused tests,
+this anchor and lane record may change. No old source/observer/copier/claim
+or private artifact may change; source invocation and publication remain spent.
+The proposed loader takes exact current HEAD/matching remote only, verifies the
+anchor is committed/current/exact before ANY private I/O, authenticates original
+two-file membership/bytes/file10 and directory/ancestry5, historical code and
+strict schema/closure relationships, and only issues a sealed metadata report
+after genuine source/code exits and final clock/serialization checks. Detailed
+assessment remains PRIVATE; public output contains hashes and false authority.
+No caller payload/complete flag, model registry copy or serialized receipt can
+mint current observed-process, source, native, denominator or input authority.
+
+The pure aggregate assessor has no filesystem/network/model-replay seam.
+It checks original schemas/pins/types, CRC/completeness, consistent totals,
+paired commitments, dates and preserved quarantine dispositions. Overlapping
+row-reason counts are not summed as disjoint rows; quarantines or unused
+DTC/average-volume attributes do not automatically become unconditional S1
+gates. The saved aggregate has no member-level SI rows or native/class/CIK/USD
+links. There is no existing FirstRate row-to-native adapter: a future extractor
+requires a separately frozen original-byte context and exact origin/evidence
+binder, never fabricated Massive/Sharadar provenance or aggregate-to-matrix cast.
+
+No new USB read, original model scan, provider request, credential/claim/START/
+charge, outcome join/evaluation/backtest, QC/Safari or purchase is authorized by
+this unit. All immutable budgets/look accounting and open factual gates in153
+remain. The independent latest-revised descriptive route retains its hypothetical
+timing/non-PIT limits; missing original vintages alone do not veto it. Shared
+documents stay frozen. The round still has ZERO pushes; implementation and
+validation remain pending at this prospective entry.
+
+### 154.1 Corrected pre-release findings and private trust limits
+
+| ID (SI-USBRETAIN-20261104-) | Priority | Verified issue/correction |
+| --- | --- | --- |
+| 001 | P2, closed | The draft anchor omitted its explicit ordered9 inventory while the loader incorrectly hashed sorted mapping keys against the ORIGINAL ordered-list pin. Added the original list to the uncommitted anchor; verify exact unique9/set/hash without sorting. No actual historical fact or private file changed. |
+| 002 | P2, closed | Coordinated pure authority/policy/hash mutation could change an already-issued public summary; byte-alias mutation could affect fresh issuance and a denial path. Pin original policy/authority callables/code/bytes/hash, issue immutable original public/authority bytes, latch failures, and close-bind diagnostic authority independently of mutable aliases. Synthetic variants only; no actual source operation was affected. |
+| 003 | P2, closed | Private final named controls originally preceded later code/Git checks. Repeat ORIGINAL directory/membership/full10 controls AFTER the last code/Git audit, then the original clock. Never capture a replacement baseline. Late mtime/mode/extra/replacement/ancestor/flags-only reversals refuse. |
+| 004 | P2, closed | Loader fallback diagnostics read mutable current authority and could emit a true source flag on refusal. A module-birth closed projection now supplies original false authority for genuine negative, fallback and final-format paths; preserve first cause/cleanup and issued-object latch. |
+
+Peer's suspected1588-byte inner-summary versus2049-byte saved-file mismatch
+was a verified FALSE ALARM, closed without change. The original publisher saves
+a canonical wrapper containing that exact owned summary plus its metadata.
+Public reconstruction matches the ORIGINAL2049-byte/c54ded commitment exactly;
+neither reviewer opened a private file to check this.
+
+The pure API evaluate_retained_aggregate(canonical_bytes) accepts supplied
+metadata and never authenticates its source. Policy SHA256
+9408f0c4c4f2edca105c9f710670ed34d3fef507bdf0bb6b44bce0e266063230
+binds its fixed schema/pins/accounting/private dispositions and closed
+projection. RetainedAggregateAssessment canonical_bytes/to_payload are PRIVATE;
+public_summary contains hashes and false authority only. Byte-alias changes
+cannot mint new authority or alter diagnostic projections. Original quarantines
+and pair discordance remain explicit private dispositions; no rows are created.
+
+The loader's qualify_registered_observation(head,remote) has a30-second
+original local bound before its first Git/anchor/private read. It RAM-loads
+verified committed pure-model bytes, audits original entry/class/getters and
+module bindings, verifies the fixed wrapper/proof/aggregate chain and issues
+ClosedRetainedUsbQualification only through its original completed factory.
+Current bridge runtime is distinct from creator3a0951. Historical9 Git blobs
+are hashed, NEVER executed as a model replay. Original source/code FDs, all
+closes, late original named controls, unchanged matching-ref guards and final
+serialization/clock checks apply. Failures remain latched. No JSON flag can
+reconstruct Main's old process handle or grant source/input authority.
+
+### 154.2 Frozen checkpoint and attributed verification
+
+| New file | Bytes | SHA256 |
+| --- | --- | --- |
+| scripts/load_short_interest_usb_observation.py | 28956 | 69fd1047aadb56d82d95dff6bc500da56fe71a4e6f3774476aa1e3ea570fd0e8 |
+| research/short_interest_etf/firstrate_retained_qualification.py | 17551 | e3341e46b66ea081e423c43b80bd0d7acfec0d70cee4a01d2a76a62dd8609182 |
+| tests/test_short_interest_usb_observation_loader.py | 20423 | 56c2a4cd5ca87501c6812c27025253ef51b79de3a5d31f06f90f844a6e05253d |
+| tests/test_firstrate_retained_qualification.py | 16565 | 27f2eaa1cff209de7366382beb7bf0b57997142f7480af6193fbc586df3f73e4 |
+| research/short_interest_etf/specs/usb_observation_anchor_20261104_v1.json | 10968 | dc8518ff48d574dab0b0ac798ae09624784a54ee94ef90138de8e1064f1c7cb9 |
+
+Current three-file loader/model/anchor mapping SHA256
+8ab021df431ba615ee37066fbc5fde1f09f372c1df66c4eddcf22aa7851388d2; ordered path-list SHA256
+5bb9a49164cf217f6d5a171659158c7eeffd7f7821cab3d75fe897eb4b2f5616.
+These are bridge code/anchor identities, not a new source capture or amendment
+to the ORIGINAL historical9 map.
+
+Main FINAL focused loader/pure/import-boundary/active-document selection passed
+181/2.50s with OS networking denied. Main178/2.17s preceded004 and remains a
+prior execution, not final-tree evidence. Author final pure64/.52s and loader+
+pure103/1.58s are separate fabricated executions. Peer prior pure61/.50s and
+combined100/1.26s preceded residual002/004; their snapshot limits are retained.
+No full lane/repository suite or independent Claude review.
+
+Author003 RAM barrier removal produced6 expected failures/.76s, restored6passes/.20s.
+004 diagnostic reversal produced3 expected failures/.13s, restored3passes/.09s.
+Clock-origin and issuance-phase reversals each produced1 expected failure/.06s,
+restored1pass/.05s and1pass/.06s; the phase reversal still refused and tests
+HONEST attribution rather than claiming a complete admission escape.
+Pure002 original pin reversal1expectedfailure/.56s/restored1pass/.62s and
+residual-byte guard1expectedfailure/.63s/restored1pass/.26s establish mandatory
+refusal sensitivity. Independent sealed projections still kept authorityfalse
+under those isolated guard removals; these are not overstated as reproducing
+the complete old leak. Diagnostic original-alias case was red1/.56s before its
+correction and green in the final64 selection. All RAM changes were restored
+in finally; no repository reversal or actual artifact access.
+
+Main AST/system3.9 memory compile, exact new-file LF/whitespace, canonical
+anchor/ordered inventory, historical9 committed blobs and full0dbe record-prefix
+checks passed. Source and test bytes are frozen; no old software/artifact/claim
+changed. Final source-only operational dispatch remains PENDING until the
+checkpoint is committed clean and its actual run is separately guarded.
+
+### 154.3 Next actual metadata operation and independent factual gates
+
+After final review/record and commit, reverify designated physical/Git roots,
+branch, exact clean current HEAD/status and matching actual/trackingAF1. Use
+ONLY this fixed committed bridge/anchor and original two private files; no
+caller paths/payloads/hashes, no USB or old-model scan, no provider/credential,
+new claim/START/charge, source re-capture or legacy registry cast. Own the
+actual finite process and both stdio EOF; authenticate its complete private
+report/safe projection and genuine closed factory, final clock/serialization
+and every negative before claiming actual metadata qualification. Keep private
+dispositions out of tool/chat/Git output. No edit/test/commit/push while active.
+A new failure is preserved and analysed causally, never silently retried.
+
+Local rights, upstream identity and companion-input evidence are independent
+factual gates. Public code has no registered FirstRate rights receipt that can
+be substituted by a possession/HTTP/enum/approval flag. This is not proof that
+suitable private evidence is absent. Main asked only for the location of
+EXISTING licence/entitlement or purchase/download evidence, while continuing
+independent work; no purchase, new terms, contact, external lookup or secret
+search. QC representation/third-party processing rights remain separately held.
+No QC/Safari until further notice.
+
+The source archive, old claims/debits/unknown reservations and all earlier
+negatives remain untouched. No actual new bridge private-file read has occurred
+at this frozen preparation checkpoint. Budget/count/look accounting remains
+exactly153; no source, denominator, actual-input or backtest readiness is
+claimed. Five local commits through0dbe remain accumulated with ZERO pushes;
+reserve the ONE final matching-lane push for the completed round or a concrete
+final owner/external blocker, never an interim/partial publication.
+
+Final independent004 delta review accepted exact frozen69fd/test56c2 bytes;
+3 focused regressions passed/.40s,3expected RAM reversal failures/.33s,
+restored3passes/.36s (each36deselected). Peer reported no remaining confirmed
+finding in this bounded unit. No actual artifact/source access in review.
+
+Main post-record active-document/counter-review selection passed89/.66s;
+complete0dbe historical prefix, five final file/hash bindings and whitespace
+passed. No actual new metadata/private/USB operation preceded this checkpoint.

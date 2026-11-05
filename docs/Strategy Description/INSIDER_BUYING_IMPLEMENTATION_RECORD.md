@@ -1,14 +1,14 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **371 COMPLETES CODEX COUNTER-REVIEW OF ALL THREE CLAUDE COMMITS
-THROUGH f99c66eb. ACCEPTED AFTER THE TEST-FIXTURE CORRECTION cf82f573 AND
-THE EVIDENCE QUALIFICATIONS BELOW. ACCESSION+CIK AGREES FOR ALL12 CONTROLS;
-THE COUNTERS GUARANTEE AT LEAST ONE EXACT JOINT ROW WITH FORM AGREEMENT
-FOR6 CONTROLS AND NAIVE ACCEPTANCE AGREEMENT FOR4. NEITHER IS HISTORICAL
-PUBLIC-AVAILABILITY/PIT PROOF. FIFTEEN CARRIED P2s REMAIN OPEN; SEVEN369
-P3 GROUPS KEEP THEIR EXACT OPEN/SUCCESSOR SCOPES. FROZEN AND CONSUMED
-IMAGES/CLAIMS ARE PRESERVED. NO NEXT MILESTONE, NEW SOURCE OPERATION,
-PURCHASE, QC/SAFARI, VENDOR REPLY OR MONITOR REARM. NOT BACKTEST-READY.**
+Status: **373 STARTS THE OWNER-AUTHORIZED SHARADAR ARCHIVE FOLLOW-UP AND
+RETAINED-METADATA PIT IDENTITY AUDIT. ONE SHARADAR REPLY SENT/READ BACK;
+REGISTERED SUBSCRIBER EMAIL REMAINS UNCONFIRMED AND IS NOT GUESSED. NEW
+READ-ONLY AUDIT WILL JOIN THE12 RETAINED SEC CONTROLS TO THE ALREADY-HELD
+FULL SHARADAR REFERENCE PROJECTIONS, WITHOUT NEW PROVIDER REQUESTS OR
+HISTORICAL IDENTITY/PUBLIC-AVAILABILITY PROMOTION. EXISTING15 OPEN P2s AND
+SEVEN369 P3 GROUPS REMAIN AT THEIR EXACT SCOPES. NO PURCHASE/UPGRADE,
+QC/SAFARI, FROZEN SOURCE CHANGE, CLAIM RESET OR MONITOR REARM. NOT
+BACKTEST-READY; OBSERVED AUDIT RESULTS AND FINAL HANDOFF FOLLOW BELOW.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -74,6 +74,8 @@ Section 370 is Claude's correction of two statements in section 369; it
 changes no finding, disposition or gate.
 Sections 371-372 are Codex's counter-review and separate durable handoff of
 all three incoming Claude commits. This round is counter-review only.
+The later explicit373 owner direction releases the reply hold for Sharadar
+only and authorizes the bounded retained-input identity audit; no QC release.
 
 ## 1. Canonical V1 contract
 
@@ -44704,3 +44706,212 @@ expected denied-fork warnings in the strict group; this is not a count of
 unique tests or a full-suite result. This validation tail changes no contract
 or source. Final diff, narrow secret-shape scan, exact root/branch/HEAD/status
 and matching-origin checks precede the separate record commit and sole push.
+
+
+## 373. Sharadar archive inquiry and retained-input PIT identity audit (2026-11-04)
+
+### 373.1 Latest authority and bounded decisions before actual data inspection
+
+Start clean exact local/origin
+`9b12e0ebe8108f107b2481d9fd22907f85b53108` on the designated Insider
+worktree/branch; matching-only fetch and incoming range EMPTY. The owner now
+directs: `Proceed with Sharadar's archive inquiry and the PIT identity audit.
+You may reply to Sharadar. Use existing subscriptions only; no purchases or
+QC access. Document everything and push once when done.` This is a new
+bounded implementation/outreach round after completed371/372 counter-review,
+not an extension that changes its review-only historical scope.
+
+**IBDEC-373-01:** release347's vendor-reply hold ONLY for the existing
+Sharadar archive conversation and necessary subscriber verification. Do not
+contact Massive/EODHD/FMP, create a new ticket/thread or activate a purchase,
+upgrade, trial, paid export or plan change. The known5-Year history limit and
+2020Q4 warm-up gap remain questions, not inferred entitlements. QC/Safari/
+API/SDK/history/jobs/uploads/looks/backtests remain prohibited. Monitors stay
+disarmed; no other chat or scheduler is changed.
+
+**IBDEC-373-02:** use already-retained reference metadata before downloading
+another current table. The prior Sharadar assessment is2006Q1-specific, but
+its underlying TICKERS/ACTIONS projections contain the full74,150 and698,455
+metadata rows. Reuse those exact projections with their pinned completion;
+do not pretend their old2006 assessment is a2021–2025 PIT security master.
+The12 controls are the existing8 warm-up plus4 fixed recent controls, not a
+new selection, full required21 admission or complete pilot population.
+FMP/EOD v2 receipts retain aggregates, not original mapping rows: actual
+EOD identifier crosswalk values cannot be reconstructed from those counters.
+No new provider API, Keychain read, USB read, SEC request or source acquisition
+is needed for this retained-evidence audit.
+
+**IBDEC-373-03:** add a pure finite audit and a fixed-input READ-ONLY native
+observer. No output epoch, writable custody receiver, reservation, source
+request or second storage experiment is created. Authenticated existing
+control metadata can support counts/gaps without editing the164 proof-bound
+images or loading a new producer into the historical storage-only closure.
+The new producer's own clean committed execution/source hashes are separate
+from the original dfdf9ee5 proof lineage. Source/test/scope must be committed
+and qualified before any actual audit DATA read; no interim push.
+
+**IBDEC-373-04:** CIK claims from canonical SEC URLs identify CURRENT provider
+candidate groups only. Account all rows, duplicates, conflicting permatickers,
+label multiplicity and all12 cases. Exact retained SEC symbols and current
+candidate labels may discover primary/counterparty ACTIONS context, with
+per-control row deduplication, but never merge issuers/classes or turn names,
+related labels, action dates, first/last price dates, capture time or naive
+SEC acceptance into historical validity/known-by intervals. Both intervals
+remain null; historical source/PIT/rights/canonical/population/look/QC/
+backtesting authorities remain false/0 even for one current candidate.
+The original C/J/A exact-row guarantee and all refusal/unattempted accounting
+are retained. This is a12-control evidence/gap audit, not a positive resolver.
+
+### 373.2 Sharadar reply actually sent; account verification still factual
+
+The existing Sharadar archive thread still contains the original inquiry and
+the subscriber-email question, with no archive answer or attachment. A narrow
+provider subscription/billing mail search supplies no verified subscription
+email. The older related Sharadar account response says it cannot find the
+subscription from the sending address; that address is therefore NOT guessed
+to be the subscriber identity. The owner is asked for the registered email
+as a missing factual input, while independent audit work continues.
+
+One authorized reply is sent through connected Gmail to public support
+`connect@sharadar.com`, in the SAME thread and with subject
+`Re: Historical SF2/Insiders delivery archive sample — existing 5-Year Bundle only`.
+It acknowledges that the registered email is being confirmed separately and
+asks whether a retained historical archive exists, then requests a small
+accession/version-bound SF2 delivery sample, historical clock/timezone and
+correction/deletion/backfill lineage, dated TICKERS/ACTIONS/share-class/
+listing evidence, actual5-Year coverage including2020 warm-up, gaps and
+permitted local private research use. Exact first-public seconds are not
+required; an authenticated historical upper bound suffices. No private SEC
+control list, body, licensed row, account value, API key or credential is
+attached or newly disclosed. No charge or plan activation is authorized.
+
+Observed sent header date is2026-11-04 22:09:10 PST, equivalent2026-11-05
+06:09:10 UTC. Independent Gmail readback confirms SENT, same recipient,
+subject and thread, and the exact authored HTML as the message prefix.
+Authored HTML is1,761 UTF-8 bytes, SHA-256
+`60c44de9a5c1ec8f9fc8309ff3ea804d53505aa539d60e430323d47c1ee39c27`.
+Gmail appends a2,829-character quoted prior-thread tail; it is not mislabelled
+as part of the authored-body hash. Private mail/sender/subscriber/message IDs,
+transport headers and quoted bodies remain out of Git. This proves sent
+acceptance/readback, not vendor receipt/read, archive capability, account
+verification, sample entitlement or research rights. No archive sample has
+been supplied at this readback; subscriber verification remains pending.
+The Massive reply hold and no-QC/purchase holds remain unchanged.
+
+### 373.3 Exact retained-input and native observer contract
+
+Fixed Sharadar root is the existing private
+`artifacts/insider_buying/sharadar_reference_cohort/ib-sharadar-cohort-2006q1-compact-v2-20261014-once`.
+Only three leaves are selected: completion7,985B/
+`07dd203d82c3d90f90e1af239b8ef2255ecba47400595d6f415a65989ee29f97`,
+TICKERS projection29,841,795B/
+`da2bf31da6436127dd405154b339d1a31ad6c14a788d0017ce620ad5217aea60`,
+and ACTIONS projection116,139,300B/
+`27387a32fffe710e7733b8f8b225250fc92ad3d829d720efc77df77a015c5246`.
+Their capture manifest remains
+`94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b`.
+Read the13 ticker and6 action metadata fields ONLY; the projected data has no
+action value, price, returns, fundamentals or strategy outcomes. Do not open
+the original ZIPs, supplied sibling capture, old assessment or USB.
+
+Fixed provider completion remains70,190B/
+`f52646ad80a2a7497f9eb56d471987d8041ac744600b194e5e9ea99c6684a552`
+under the existing stable qualification epoch. Authenticate it BEFORE decode
+or deriving `controls.json`/`storage-qualification.json` pins. The only other
+private proof leaf is23,187B/
+`e801524572f54c9c7415798386b5c579f66b35fcc46eb7a9b9e57aa977ad81b3`.
+Explicitly require the current physical managed-root identity to equal BOTH
+the authenticated old proof and provider storage qualification; do not rely
+on the provider completion's absent storage_identity field. Seven exact DATA
+leaves in total, no neighboring artifacts or source financial bodies.
+
+Every selected leaf uses owner-only, single-link, regular no-follow held
+descriptors, exact byte/hash authentication before JSON, typed/canonical
+metadata, full dev/inode/mode/link/owner/group/size/mtime/ctime/flag checks,
+final named-path/content rehash and exhaustive cleanup. All source rows and
+ordinals must be accounted; no filtered or current-only survivor replacement.
+Actual projection rows must equal74,150/698,455; all12 controls conserved.
+No assertion of absent whole-epoch or full corpus completeness is inferred
+from these seven selected leaves.
+
+The worker denies native network, fork, writes and exec except the exact
+Python launcher/re-exec images. DATA reads allow only the seven selected
+leaves, exact committed Python source files, runtime libraries and exact
+ancestor directory literals. No broad lane/artifact/private-store/System
+data-volume subpath is allowed. Effective native guards and initial
+`-I -S -B -X pycache_prefix=/var/empty/insider-pilot-sec-parent-audit-no-bytecode`
+are proved before inputs. Real Darwin4GiB incremental VM/readback and4GiB
+sampled peak-RSS fuse remain live through serialization/stdout; sampling is
+not misrepresented as an instantaneous hard-RSS bound. Input cap256MiB/leaf,
+public worker output64KiB, qualified bounded IPC and180-second wall budget.
+Only safe counts/fixed pins/result digest leave memory; no raw identifier,
+symbol, company/owner name, mail/account value or financial row is output.
+Parent Git/source identity is checked before and after the native observer.
+
+### 373.4 Public capability correction and preactivation findings
+
+Primary EODHD documentation currently says Symbol Change History starts
+2022-07-22 and requires All-In-One or EOD+Intraday All World Extended:
+https://eodhd.com/financial-apis/us-stock-symbol-rename-history-api .
+The observed EOD All World+Calendar subscription does not establish that
+entitlement or2020Q4/2021 coverage. This corrects the earlier advisory's
+unqualified suggestion to use that service under the existing plan. No
+endpoint call, upgrade or alternative account was attempted. Current EOD
+ID mappings retain their separate existing-plan/aggregate scope.
+Sharadar's actual metadata families remain documented at
+https://sharadar.com/docs/tickers and https://sharadar.com/docs/actions ;
+their current dates are not contemporaneous knowledge timestamps.
+
+Preactivation source QA finds two genuine new-candidate issues and corrects
+them without touching old proof-bound code. The first policy accepted only
+a short module-directory list and refused legitimate root-level/other
+committed Python closure paths before launch; four new tests are genuinely
+RED,4 failures0.92s, before exact-leaf path validation replaces that assumption.
+The initial discovery audit omitted old SEC source labels and ACTIONS
+counterparties; three new tests are RED,3 failures0.93s. Its correction adds
+those labels as deduplicated DISCOVERY only, leaving CIK/class/PIT identity
+unchanged. Names and related labels still cannot create an identity join.
+
+Source-only native canaries identify startup directory-FD, resolved timezone
+and exact dynamic-library needs before any actual DATA read. Narrow DATA
+policy initially aborts at interpreter startup, then refuses ZoneInfo and
+OpenSSL loading. Adding broad/System orHomebrew scope does not solve the
+startup directory allowance and would weaken isolation; it is not retained.
+Final policy uses literal`/`/ancestor directories, resolved zoneinfo and exact
+existing runtime-library images. A genuine final canary passes exit0,
+0.625s, stderr0: selected invented leaf readable, neighbor and its
+`/System/Volumes/Data` alias denied, real native/memory guards pass,
+ZERO actual DATA reads. Read-only advisory source QA is not independent
+Claude acceptance or an observed real-data audit. Final focused validation,
+compiled images and already-created clean execution commit precede the
+actual observation/results below; no complete suite or early push.
+
+Final preactivation focused checks PASS171 in1.35s (new pure/runner,
+existing provider projector and EXACT package guard), zero skips/warnings;
+outer2.230s, stderr0. The prior164-check green1.36s preceded seven added
+physical-root regressions. Boundary/record/active-document/import/platform/
+EXACT group PASS229 in25.53s, zero skips/warnings, native process-tree
+network/security denial with required child processes allowed. Strict
+focused tests additionally deny fork and actual DATA, with fresh TMP-only
+writes and real memory guard. Four new images compile; all four frozen v3
+and17 frozen test hashes remain exact.
+
+Physical-root guard reversal is caught by all six negative cases (6 expected
+failures0.93s). A faithful in-memory C/J/A-to-any-agreement reversal is caught
+by the nonexact-negative control (1 expected failure/1 positive-control pass,
+1.00s). A prior selection of only the positive C/J/A case naturally remained
+green; it is not counted as a negative sensitivity proof. An earlier counter-
+field deletion hit the schema guard first and is likewise not counted as
+isolated evidence of the guarantee. All reversals are process-local; on-disk
+source is unchanged. The optional EOD nullable-pagination hypothesis was
+withdrawn after inspecting the frozen upstream parser, which refuses missing
+total/limit/offset; no valid schema was weakened for it.
+
+Candidate image hashes before the clean execution commit:
+
+| New image | Bytes | SHA-256 |
+|---|---:|---|
+| research/insider_buying_pilot_pit_retained_audit_v1.py |27668|31171e610d3b9a62bcf6915294ad1b516f0bf8511287ca39187654b4599a473c|
+| research/insider_buying_pilot_pit_retained_audit_runner_v1.py |19173|f3eb52003dd993821a06fa6b754c5f8344bf8c5b6158eb3a5a5a92391127f7ac|
+| tests/test_insider_buying_pilot_pit_retained_audit_v1.py |21513|dcdf591beaaff8aa63a3211a338808df858bf9ec7551ea88e2ebd02e8a667374|
+| tests/test_insider_buying_pilot_pit_retained_audit_runner_v1.py |8218|d7c856a9b21f7b67ed3bfd1d768ab906e1c2438b07cb3e760311319807b83574|

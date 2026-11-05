@@ -11,6 +11,18 @@ import subprocess
 from types import SimpleNamespace
 
 import pytest
+import os
+
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
 
 SPEC = importlib.util.spec_from_file_location(
     'journal_actor_trace', Path(__file__).parents[1] / 'scripts/trace_short_interest_journal_actor.py')
@@ -319,6 +331,7 @@ def test_graceful_interrupt_preserves_matches_and_stops_original_child():
 
 
 @pytest.mark.parametrize('bad', ['hash', 'mode', 'owner', 'drift', None])
+@_POSIX_CAPTURE_ONLY
 def test_root_bootstrap_verifies_held_bytes_before_exec(monkeypatch, bad):
     source = b'raise RuntimeError("must not execute fixture source")'
     sha = hashlib.sha256(source).hexdigest()
@@ -351,6 +364,7 @@ def test_root_bootstrap_verifies_held_bytes_before_exec(monkeypatch, bad):
     assert opened[0] == (str(t.ROOT / t.SCRIPT), t.os.O_RDONLY | t.os.O_NOFOLLOW)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_privilege_gate_precedes_all_opens_and_subprocesses(monkeypatch):
     monkeypatch.setattr(t.os, 'geteuid', lambda: 501)
     monkeypatch.setattr(t.os, 'open', lambda *a, **k: pytest.fail('opened before root gate'))
@@ -359,6 +373,7 @@ def test_privilege_gate_precedes_all_opens_and_subprocesses(monkeypatch):
         t.root_trace(HEAD, SHA)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_absence_means_any_entry_not_only_regular_file(monkeypatch):
     monkeypatch.setattr(t.os, 'stat', lambda *a, **k: SimpleNamespace(st_mode=stat.S_IFLNK))
     with pytest.raises(t.TraceRefusal, match='reserved_name_exists'):
@@ -486,6 +501,7 @@ class RootWorld:
 
 
 @pytest.mark.parametrize('bad', [info(mode=0o40755), info(uid=0)])
+@_POSIX_CAPTURE_ONLY
 def test_directory_protection_never_adopts_drift(monkeypatch, bad):
     monkeypatch.setattr(t.os, 'open', lambda *a, **k: 31)
     monkeypatch.setattr(t.os, 'fstat', lambda fd: bad)
@@ -497,6 +513,7 @@ def test_directory_protection_never_adopts_drift(monkeypatch, bad):
 
 
 @pytest.mark.parametrize('failure', ['guard', 'directory', 'publication', 'guard_and_close'])
+@_POSIX_CAPTURE_ONLY
 def test_post_observation_failure_retains_only_projected_evidence(monkeypatch, failure):
     world = RootWorld(monkeypatch)
     world.guard_fails = failure.startswith('guard')
@@ -523,6 +540,7 @@ def test_post_observation_failure_retains_only_projected_evidence(monkeypatch, f
     assert world.opened[0][1] & t.os.O_EXCL and world.opened[0][1] & t.os.O_NOFOLLOW
 
 
+@_POSIX_CAPTURE_ONLY
 def test_successful_root_trace_writes_only_fixed_owned_output_and_returns_original_digest(monkeypatch, capsys):
     world = RootWorld(monkeypatch)
     monkeypatch.setattr(t, 'supervise', world.observed)
@@ -546,6 +564,7 @@ def test_successful_root_trace_writes_only_fixed_owned_output_and_returns_origin
                      'tracer_pid': 900, 'tracer_pgid': 900}
 
 
+@_POSIX_CAPTURE_ONLY
 def test_native_failure_publishes_negative_under_owned_nlink_transition_without_creating_subject(monkeypatch):
     world = RootWorld(monkeypatch)
     def failed_native(consumer, **kwargs):
@@ -567,6 +586,7 @@ def test_native_failure_publishes_negative_under_owned_nlink_transition_without_
 
 @pytest.mark.parametrize('place', ['trace', 'subject'])
 @pytest.mark.parametrize('mutation', ['extra_entry', 'link_only_drift'])
+@_POSIX_CAPTURE_ONLY
 def test_unowned_namespace_or_link_change_is_never_rebaselined(monkeypatch, place, mutation):
     world = RootWorld(monkeypatch)
     def observed(consumer, **kwargs):
@@ -590,6 +610,7 @@ def test_unowned_namespace_or_link_change_is_never_rebaselined(monkeypatch, plac
 
 
 @pytest.mark.parametrize('bad', ['deleted', 'replaced', 'mode', 'owner', 'links'])
+@_POSIX_CAPTURE_ONLY
 def test_reserved_target_needs_original_calibration_inode_and_protection(monkeypatch, bad):
     world = RootWorld(monkeypatch)
     def observed(consumer, **kwargs):
@@ -611,6 +632,7 @@ def test_reserved_target_needs_original_calibration_inode_and_protection(monkeyp
     assert world.closed == [33, 32, 31]
 
 
+@_POSIX_CAPTURE_ONLY
 def test_subject_creation_without_valid_native_calibration_is_not_adopted(monkeypatch):
     world = RootWorld(monkeypatch)
     def unobserved(consumer, **kwargs):
@@ -623,6 +645,7 @@ def test_subject_creation_without_valid_native_calibration_is_not_adopted(monkey
     assert caught.value.report['terminal_failure']['contract_code'] == 'target_unseen_or_deleted'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_wrong_precreation_count_refuses_before_output_or_native_dispatch(monkeypatch):
     world = RootWorld(monkeypatch)
     world.trace_link_drift = 1
@@ -633,6 +656,7 @@ def test_wrong_precreation_count_refuses_before_output_or_native_dispatch(monkey
     assert world.opened == [] and world.trace_names == {'trace.private.json'}
 
 
+@_POSIX_CAPTURE_ONLY
 def test_deleting_an_old_entry_is_not_hidden_by_owned_addition(monkeypatch):
     world = RootWorld(monkeypatch)
     def observed(consumer, **kwargs):
@@ -646,6 +670,7 @@ def test_deleting_an_old_entry_is_not_hidden_by_owned_addition(monkeypatch):
 
 
 @pytest.mark.parametrize('mutation', ['output', 'target', 'directory'])
+@_POSIX_CAPTURE_ONLY
 def test_final_named_audit_outlives_all_owned_handle_closes(monkeypatch, mutation):
     world = RootWorld(monkeypatch)
     monkeypatch.setattr(t, 'supervise', world.observed)
@@ -667,6 +692,7 @@ def test_final_named_audit_outlives_all_owned_handle_closes(monkeypatch, mutatio
 
 
 @pytest.mark.parametrize('trigger', ['subject_directory', 'output'])
+@_POSIX_CAPTURE_ONLY
 def test_last_target_check_follows_directory_and_other_file_audits(monkeypatch, trigger):
     world = RootWorld(monkeypatch)
     monkeypatch.setattr(t, 'supervise', world.observed)
@@ -738,6 +764,7 @@ def test_terminal_failures_emit_only_fixed_category_contract_errno_and_entered_s
 
 
 @pytest.mark.parametrize('bad', ['dirty', 'head', 'branch', 'code'])
+@_POSIX_CAPTURE_ONLY
 def test_clean_committed_exact_binding_before_dispatch(monkeypatch, bad):
     original_root = t.ROOT
     source = b'fabricated committed helper'

@@ -192,12 +192,17 @@ class HeldFiles:
 
 def _git(root, arguments, guard):
     guard.check()
+    response = None
     try:
+        # Bounded: the guard's deadline checks cannot run while this call is stalled.
         response = subprocess.run(["git", *arguments], cwd=root, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE, check=False)
+                stderr=subprocess.PIPE, check=False, timeout=30)
+    except subprocess.TimeoutExpired:
+        pass
     finally:
         guard.check()
-    require(response.returncode == 0 and type(response.stdout) is bytes, "guarded_cache_Git_refused")
+    require(response is not None and response.returncode == 0 and type(response.stdout) is bytes,
+            "guarded_cache_Git_refused")
     return response.stdout
 
 

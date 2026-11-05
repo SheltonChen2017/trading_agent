@@ -17,6 +17,17 @@ import pytest
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import short_interest_native_main_receipt as m
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 p = m.p
 HEAD, REMOTE, OPERATION = "a" * 40, "b" * 40, "c" * 32
 
@@ -146,6 +157,7 @@ def process_boundary(monkeypatch):
             child.finish_writes(); child.stdout.close(); child.stderr.close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_policy_freeze_exact_eight_source_closure_and_no_source_authority():
     m.registered()
     assert len(m.code_paths()) == len(set(m.code_paths())) == 8
@@ -178,6 +190,7 @@ def test_pending_anchor_refuses_before_private_or_code_open(tmp_path, monkeypatc
         with m.load_registered(HEAD, REMOTE): pytest.fail("pending receipt yielded")
 
 
+@_POSIX_CAPTURE_ONLY
 def test_raw_reader_drains_two_coalesced_lines_without_textio_buffer_loss():
     r, w = os.pipe(); os.write(w, b'{"n":1762000000000000001}\n{"n":2}\n'); os.close(w)
     value = m._Lines(r, SimpleNamespace(check=lambda: 1))
@@ -188,6 +201,7 @@ def test_raw_reader_drains_two_coalesced_lines_without_textio_buffer_loss():
 
 
 @pytest.mark.parametrize("raw", [b"missing-newline", b"x" * 4096 + b"\n", b"{}\nextra"])
+@_POSIX_CAPTURE_ONLY
 def test_raw_reader_refuses_incomplete_overlong_or_extra_after_ack(raw):
     r, w = os.pipe(); os.write(w, raw); os.close(w)
     value = m._Lines(r, SimpleNamespace(check=lambda: 1))
@@ -204,6 +218,7 @@ def test_clock_permanently_latches_regression_and_late_deadline(monkeypatch):
     with pytest.raises(m.NativeMainReceiptRefusal, match="main_latched"): clock.check()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_publication_ro_handoff_and_original_descriptor_held(kernel):
     value, directory = kernel.publication(); descriptor = value.descriptor()
     assert value.initial != tuple(descriptor["directory_native_full9"])
@@ -216,6 +231,7 @@ def test_original_publication_ro_handoff_and_original_descriptor_held(kernel):
 
 
 @pytest.mark.parametrize("mutation", ["ctime", "flags", "bytes", "mode", "hardlink", "rename", "extra", "directory", "nlink"])
+@_POSIX_CAPTURE_ONLY
 def test_original_metadata_drift_never_reseals_or_rebaselines(kernel, mutation):
     value, directory = kernel.publication(); descriptor = value.descriptor()
     held = m._HeldArtifact(directory, descriptor, m.ROOT_PROJECTION, kernel.clock)
@@ -235,6 +251,7 @@ def test_original_metadata_drift_never_reseals_or_rebaselines(kernel, mutation):
     held.close(); value.close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_postclose_original_metadata_drift_is_still_negative(kernel):
     value, directory = kernel.publication(); held = m._HeldArtifact(directory, value.descriptor(), m.ROOT_PROJECTION, kernel.clock)
     value.close(); held.close(); key = tuple((directory.path / m.ROOT_PROJECTION).lstat().__dict__[name] for name in ("st_dev", "st_ino"))
@@ -242,6 +259,7 @@ def test_postclose_original_metadata_drift_is_still_negative(kernel):
     with pytest.raises(m.NativeMainReceiptRefusal): held.named()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_owned_root_wait_requires_both_raw_eof_and_actual_zero(process_boundary):
     Child = process_boundary.Child; Child.initial_stdout = b'{"one":1}\n{"two":2}\n'
     child = m._launch_root(HEAD, REMOTE, OPERATION); child.finish_writes()
@@ -254,6 +272,7 @@ def test_original_owned_root_wait_requires_both_raw_eof_and_actual_zero(process_
 
 
 @pytest.mark.parametrize("copy_kind", ["origin", "wait", "wait_and_stdout"])
+@_POSIX_CAPTURE_ONLY
 def test_original_launch_and_wait_tuple_identity_cannot_be_copied_or_rebaselined(process_boundary, copy_kind):
     child = m._launch_root(HEAD, REMOTE, OPERATION); child.finish_writes()
     pump = m._Pump(child, SimpleNamespace(check=lambda: 1)); pump.finish()
@@ -268,6 +287,7 @@ def test_original_launch_and_wait_tuple_identity_cannot_be_copied_or_rebaselined
 
 
 @pytest.mark.parametrize("status", [True, False, 1, -9, None])
+@_POSIX_CAPTURE_ONLY
 def test_nonzero_unknown_and_boolean_root_wait_cannot_issue_receipt(process_boundary, status):
     process_boundary.Child.status = status
     child = m._launch_root(HEAD, REMOTE, OPERATION); child.finish_writes(); pump = m._Pump(child, SimpleNamespace(check=lambda: 1))
@@ -275,6 +295,7 @@ def test_nonzero_unknown_and_boolean_root_wait_cannot_issue_receipt(process_boun
     assert child not in m._WAITS
 
 
+@_POSIX_CAPTURE_ONLY
 def test_wait_failure_and_late_clock_are_not_a_success(process_boundary):
     child = m._launch_root(HEAD, REMOTE, OPERATION); child.finish_writes()
     child.wait_error = subprocess.TimeoutExpired("fabricated-controlled-command", 1)
@@ -283,6 +304,7 @@ def test_wait_failure_and_late_clock_are_not_a_success(process_boundary):
     assert child not in m._WAITS
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_deadline_is_rechecked_after_actual_zero_wait(process_boundary):
     state = {"late": False}
     def check():
@@ -294,6 +316,7 @@ def test_original_deadline_is_rechecked_after_actual_zero_wait(process_boundary)
 
 
 @pytest.mark.parametrize("problem", ["stderr", "extra_stdout", "overlong", "args", "forged_wait"])
+@_POSIX_CAPTURE_ONLY
 def test_pipe_negative_bytes_and_forged_launch_wait_are_rejected(process_boundary, problem):
     Child = process_boundary.Child
     if problem == "stderr": Child.initial_stderr = b"sensitive dynamic text must never become diagnostics"
@@ -337,6 +360,7 @@ def _fabricated_body(kernel, manifest):
 
 
 @pytest.mark.parametrize("drift", [None, "sha256", "native_full9", "original_flags", "bytes", "boolean_flags"])
+@_POSIX_CAPTURE_ONLY
 def test_projection_inventory_reference_matches_authenticated_original_marker(kernel, monkeypatch, drift):
     manifest = {name: hash_bytes(name.encode()) for name in m.code_paths()}
     body = _fabricated_body(kernel, manifest); native = {"EXPLICIT_FABRICATED_NATIVE": True}
@@ -408,6 +432,7 @@ def composition(kernel, process_boundary, monkeypatch):
     pub.close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_full_main_handoff_actual_owned_wait_and_original_counterreceipt(composition, process_boundary):
     value = m.coordinate_registered(HEAD, REMOTE, OPERATION); summary = value.public_summary()
     child = process_boundary.processes[0]
@@ -422,6 +447,7 @@ def test_full_main_handoff_actual_owned_wait_and_original_counterreceipt(composi
     assert len(raw) <= 4096 and composition.sources[0].closed and composition.code.closed
 
 
+@_POSIX_CAPTURE_ONLY
 def test_main_observation_copied_factory_frame_and_restored_bytes_do_not_undo_failure(composition):
     value = m.coordinate_registered(HEAD, REMOTE, OPERATION); row = m._OBSERVED[id(value)]
     forged = object.__new__(m.MainReceiptObservation)
@@ -433,6 +459,7 @@ def test_main_observation_copied_factory_frame_and_restored_bytes_do_not_undo_fa
     with pytest.raises(m.NativeMainReceiptRefusal, match="main_latched"): value.public_summary()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_final_code_close_failure_vetoes_main_observation_and_retains_evidence(composition, no_actual_external_operations):
     composition.code.fail_close = True
     with pytest.raises(m.NativeMainReceiptRefusal, match="main_code"):
@@ -443,6 +470,7 @@ def test_final_code_close_failure_vetoes_main_observation_and_retains_evidence(c
     assert (composition.kernel.root / "main-receipt" / m.MAIN_RECEIPT).exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_missing_closed_frame_can_never_publish_main_receipt(composition, process_boundary, no_actual_external_operations):
     def no_closed(child): child.finish_writes()
     composition.Child.on_ack = staticmethod(no_closed)
@@ -451,6 +479,7 @@ def test_missing_closed_frame_can_never_publish_main_receipt(composition, proces
     assert no_actual_external_operations.holds[0]["root_file"].fd is not None
 
 
+@_POSIX_CAPTURE_ONLY
 def test_epipe_before_owned_wait_retains_original_fds_and_raw_bytes_even_if_poll_claims_zero(composition,
         process_boundary, no_actual_external_operations):
     process_boundary.Child.poll_override = 0  # Insufficient caller-poll seam.
@@ -493,6 +522,7 @@ def test_caller_fabricated_registry_row_is_not_an_authenticated_factory_receipt(
 
 
 @pytest.mark.parametrize("late_error", [False, True])
+@_POSIX_CAPTURE_ONLY
 def test_root_exports_ready_then_same_original_closed_only_after_ack_and_all_exits(kernel, monkeypatch,
         no_actual_external_operations, late_error):
     manifest = {name: hash_bytes(("FABRICATED " + name).encode()) for name in m.code_paths()}
@@ -564,6 +594,7 @@ def durable(composition, monkeypatch):
     yield SimpleNamespace(anchor=anchor, path=path, composition=composition)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_durable_loader_uses_committed_original_seal_and_historical_code_and_stays_held(durable):
     with m.load_registered(HEAD, REMOTE) as receipt:
         assert type(receipt) is m.AuthenticatedDurableMainReceipt
@@ -575,6 +606,7 @@ def test_durable_loader_uses_committed_original_seal_and_historical_code_and_sta
     with pytest.raises(m.NativeMainReceiptRefusal, match="main_closed"): receipt.public_summary()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_factory_frame_cannot_be_transplanted_to_copied_receipt(durable):
     with m.load_registered(HEAD, REMOTE) as receipt:
         original = m._AUTHENTICATED[id(receipt)]
@@ -585,6 +617,7 @@ def test_original_factory_frame_cannot_be_transplanted_to_copied_receipt(durable
 
 
 @pytest.mark.parametrize("after_close", [False, True])
+@_POSIX_CAPTURE_ONLY
 def test_anchor_ancestor_redirection_is_negative_even_when_original_file_stamp_and_bytes_match(durable, after_close):
     holder = m._Anchor(HEAD); original = holder.original
     if after_close: holder.close()
@@ -598,6 +631,7 @@ def test_anchor_ancestor_redirection_is_negative_even_when_original_file_stamp_a
 
 
 @pytest.mark.parametrize("mutation", ["copied_receipt", "receipt_flags", "root_flags", "anchor", "root_dir", "historical_code"])
+@_POSIX_CAPTURE_ONLY
 def test_durable_loader_never_adopts_copied_changed_or_wrong_epoch_evidence(durable, monkeypatch, mutation):
     kernel = durable.composition.kernel
     receipt = kernel.root / "main-receipt" / m.MAIN_RECEIPT
@@ -615,6 +649,7 @@ def test_durable_loader_never_adopts_copied_changed_or_wrong_epoch_evidence(dura
         with m.load_registered(HEAD, REMOTE): pytest.fail("changed original admitted")
 
 
+@_POSIX_CAPTURE_ONLY
 def test_well_formed_but_uncommitted_anchor_is_never_admitted(durable, monkeypatch):
     """SI-CR27-005: the held anchor must equal the committed bytes, not just parse."""
     committed = {**durable.anchor, "outer_elapsed_ns": durable.anchor["outer_elapsed_ns"] + 1}
@@ -625,6 +660,7 @@ def test_well_formed_but_uncommitted_anchor_is_never_admitted(durable, monkeypat
         with m.load_registered(HEAD, REMOTE): pytest.fail("uncommitted anchor admitted")
 
 
+@_POSIX_CAPTURE_ONLY
 def test_anchor_runtime_head_must_be_an_ancestor_of_the_loading_head(durable, monkeypatch):
     """SI-CR27-005: a failed merge-base ancestry check refuses the anchor."""
     monkeypatch.setattr(m.subprocess, "run", lambda *args, **kwargs: SimpleNamespace(returncode=1))
@@ -633,6 +669,7 @@ def test_anchor_runtime_head_must_be_an_ancestor_of_the_loading_head(durable, mo
 
 
 @pytest.mark.parametrize("mutation", ["root_flags", "anchor", "clock", "association"])
+@_POSIX_CAPTURE_ONLY
 def test_held_durable_getter_permanently_latches_late_mutation(durable, monkeypatch, mutation):
     # SI-CR27-005: record each getter refusal inside the context; a close-time
     # refusal must not stand in for a getter that stopped rechecking.
@@ -653,6 +690,7 @@ def test_held_durable_getter_permanently_latches_late_mutation(durable, monkeypa
     assert len(codes) == 2 and "main_latched" not in codes[0] and "main_latched" in codes[1]
 
 
+@_POSIX_CAPTURE_ONLY
 def test_anchor_is_closed_when_current_code_constructor_fails(durable, monkeypatch):
     holders = []; original = m._Anchor
     def anchor(head):
@@ -665,6 +703,7 @@ def test_anchor_is_closed_when_current_code_constructor_fails(durable, monkeypat
     assert len(holders) == 1 and holders[0].closed and holders[0].fd is None
 
 
+@_POSIX_CAPTURE_ONLY
 def test_final_durable_close_clock_check_vetoes_after_last_context(durable, monkeypatch):
     with pytest.raises(m.NativeMainReceiptRefusal, match="main_deadline"):
         with m.load_registered(HEAD, REMOTE) as receipt:
@@ -672,3 +711,83 @@ def test_final_durable_close_clock_check_vetoes_after_last_context(durable, monk
             def late():
                 original(); monkeypatch.setattr(held.clock, "check", lambda: m.require(False, "main_deadline"))
             monkeypatch.setattr(held.anchor_holder, "named", late)
+
+
+def _bare_loaded(**latched):
+    class Item(m._Latched):
+        def __init__(self, label, audit_error=None):
+            super().__init__(); self.label, self.audit_error = label, audit_error
+        def close(self): pass
+        def named(self):
+            def action():
+                if self.audit_error is not None: raise self.audit_error
+            return self._run(action)
+        check = named
+    value = object.__new__(m._Loaded); value.failed = value.closed = False
+    for name in ("reader", "config", "main_file", "root_file", "main_directory", "root_directory", "config_directory", "code", "anchor_holder", "clock"):
+        item = Item(name, latched.get(name)); setattr(value, name, item)
+    return value, Item
+
+
+def test_close_does_not_replace_the_primary_with_main_latched():
+    # The artifact already raised main_bytes; rereading it could only say main_latched.
+    value, unused = _bare_loaded(); value.main_file.failed = True
+    value.close()
+    assert value.closed and value.failed
+    with pytest.raises(m.NativeMainReceiptRefusal, match="main_latched"): value.validate()
+
+
+def test_close_does_not_replace_a_deadline_refusal_with_main_latched():
+    value, unused = _bare_loaded(); value.clock.failed = True
+    value.close()
+    assert value.closed and value.failed
+
+
+def test_close_still_reports_a_fresh_failure_on_an_unlatched_item():
+    error = m.NativeMainReceiptRefusal("REFUSED: main_bytes")
+    value, unused = _bare_loaded(root_file=error)
+    with pytest.raises(m.NativeMainReceiptRefusal, match="main_bytes"): value.close()
+    assert value.closed and value.failed
+
+
+@pytest.fixture
+def stub_loader(monkeypatch):
+    class Code:
+        def close(self): pass
+    class Holder(Code): pass
+    h = SimpleNamespace(close_error=None, validated=[])
+    class Loaded:
+        def __init__(self, *args): pass
+        def validate(self): h.validated.append(True)
+        def close(self):
+            if h.close_error is not None: raise h.close_error
+    monkeypatch.setattr(m, "_phase", lambda *a: None); monkeypatch.setattr(m, "registered", lambda: None)
+    monkeypatch.setattr(m.p, "_guard", lambda *a: None); monkeypatch.setattr(m.p, "_Code7", lambda *a: Code())
+    monkeypatch.setattr(m, "_anchor", lambda head: ({"runtime_head": head, "receipt_sha256": "a" * 64, "projection_sha256": "b" * 64}, Holder()))
+    monkeypatch.setattr(m, "_Loaded", Loaded)
+    @contextmanager
+    def denied(): yield
+    monkeypatch.setattr(m.p, "_source_denied", denied)
+    return h
+
+
+def test_cleanup_failure_cannot_replace_a_refusal_from_the_held_body(stub_loader):
+    stub_loader.close_error = m.NativeMainReceiptRefusal("REFUSED: main_cleanup")
+    with pytest.raises(m.NativeMainReceiptRefusal, match="main_primary"):
+        with m.load_registered(HEAD, REMOTE):
+            raise m.NativeMainReceiptRefusal("REFUSED: main_primary")
+
+
+def test_cleanup_failure_still_refuses_when_nothing_else_did(stub_loader):
+    stub_loader.close_error = m.NativeMainReceiptRefusal("REFUSED: main_cleanup")
+    with pytest.raises(m.NativeMainReceiptRefusal, match="main_cleanup"):
+        with m.load_registered(HEAD, REMOTE): pass
+    assert stub_loader.validated == [True]
+
+
+def test_failed_construction_keeps_its_primary_when_cleanup_also_fails(monkeypatch):
+    def primary(name): raise m.NativeMainReceiptRefusal("REFUSED: main_primary")
+    def secondary(self): raise m.NativeMainReceiptRefusal("REFUSED: main_cleanup")
+    monkeypatch.setattr(m, "_directory", primary); monkeypatch.setattr(m._Loaded, "close", secondary)
+    with pytest.raises(m.NativeMainReceiptRefusal, match="main_primary"):
+        m._Loaded(HEAD, REMOTE, object(), object(), {}, object())

@@ -13,6 +13,17 @@ from types import ModuleType,SimpleNamespace
 
 import pytest
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 REPO=Path(__file__).resolve().parents[1]
 DRIVER='scripts/load_short_interest_usb_observation.py'
 MODEL='research/short_interest_etf/firstrate_retained_qualification.py'
@@ -107,6 +118,7 @@ def result(h):
     except BaseException as error:return None,h.q.failure_summary(error)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_genuine_fabricated_history_closes_without_source_or_live_process_authority(prepared):
     h=prepared;value,negative=result(h);assert value is not None,negative
     public=value.public_summary();private=json.loads(value.canonical_bytes())
@@ -129,6 +141,7 @@ def test_anchor_must_be_committed_before_any_private_open(prepared,monkeypatch):
 
 
 @pytest.mark.parametrize('change',['ordered','hash','owned','proof','authority','process'])
+@_POSIX_CAPTURE_ONLY
 def test_counterfactual_anchor_cannot_relabel_historical_lineage(prepared,change):
     h=prepared;a=copy.deepcopy(h.anchor)
     if change=='ordered':a['historical_runtime']['execution9_path_list'].reverse()
@@ -141,6 +154,7 @@ def test_counterfactual_anchor_cannot_relabel_historical_lineage(prepared,change
 
 
 @pytest.mark.parametrize('change',['mtime','mode','extra','replacement','ancestor'])
+@_POSIX_CAPTURE_ONLY
 def test_final_private_audit_vetoes_drift_during_last_git_guard(prepared,change):
     h=prepared
     def drift(h):
@@ -155,6 +169,7 @@ def test_final_private_audit_vetoes_drift_during_last_git_guard(prepared,change)
     assert value is None and h.ls_count==3 and negative['first_failure']['phase']=='final'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_flags_only_drift_is_not_rebased(prepared,monkeypatch):
     h=prepared;inode=(h.directory/h.q.NAMES[0]).stat().st_ino;drift=[False];fstat,stat_fn,lstat=os.fstat,os.stat,os.lstat
     class Info:
@@ -169,6 +184,7 @@ def test_flags_only_drift_is_not_rebased(prepared,monkeypatch):
     assert value is None and negative['first_failure']['code']=='stamp'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_close_failure_preserves_negative_and_independent_cleanup(prepared,monkeypatch):
     h=prepared;opened=set();real_open,real_close=os.open,os.close;failed=[False]
     def opening(*args,**kwargs):fd=real_open(*args,**kwargs);opened.add(fd);return fd
@@ -215,6 +231,7 @@ def test_strict_private_packet_relationships_do_not_accept_counterfactuals(prepa
 
 
 @pytest.mark.parametrize('change',['entry','getter','property','class'])
+@_POSIX_CAPTURE_ONLY
 def test_original_pure_bindings_are_checked_after_assessment_and_during_closure(prepared,change):
     h=prepared
     def substitute(h):
@@ -240,6 +257,7 @@ def test_early_fstat_failure_closes_every_owned_descriptor(prepared,monkeypatch,
     value,negative=result(h);assert value is None and not opened and 'PRIVATE' not in json.dumps(negative)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_forged_or_copied_metadata_report_cannot_become_an_issued_object(prepared):
     h=prepared;value,negative=result(h);assert value is not None,negative
     with pytest.raises(h.q.UsbObservationRefusal):h.q.ClosedRetainedUsbQualification()
@@ -249,6 +267,7 @@ def test_forged_or_copied_metadata_report_cannot_become_an_issued_object(prepare
     assert value.public_summary()['authority']['source_admitted'] is False
 
 
+@_POSIX_CAPTURE_ONLY
 def test_report_failure_is_permanent_even_after_registry_row_restored(prepared):
     h=prepared;value,negative=result(h);assert value is not None,negative
     original=value._anchor;bad=tuple(list(original));value._anchor=bad
@@ -257,12 +276,14 @@ def test_report_failure_is_permanent_even_after_registry_row_restored(prepared):
     with pytest.raises(h.q.UsbObservationRefusal):value.canonical_bytes()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_clock_start_cannot_be_rebased_after_original_context_closure(prepared,monkeypatch):
     now=[0];monkeypatch.setattr(prepared.q.time,'monotonic_ns',lambda:now[0]);value,negative=result(prepared);assert value is not None,negative
     clock=value._anchor[5];now[0]=31*10**9;clock.start=clock.last=now[0]
     with pytest.raises(prepared.q.UsbObservationRefusal,match='clock'):clock.check()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_actual_cli_serialization_is_inside_original_deadline(prepared,monkeypatch,capsys):
     h=prepared;now=[0];count=[0];original=h.q.json.dumps
     monkeypatch.setattr(h.q.time,'monotonic_ns',lambda:now[0])
@@ -276,6 +297,7 @@ def test_actual_cli_serialization_is_inside_original_deadline(prepared,monkeypat
     assert packet['first_failure']=={'phase':'final_format','code':'clock'}
 
 
+@_POSIX_CAPTURE_ONLY
 def test_issuance_serialization_expiry_keeps_honest_phase_and_original_negative(prepared,monkeypatch):
     h=prepared;now=[0];original=h.q.json.dumps;reached=[False]
     monkeypatch.setattr(h.q.time,'monotonic_ns',lambda:now[0])
@@ -300,6 +322,7 @@ def test_negative_authority_is_original_even_when_current_authority_code_changes
     finally:h.q.authority.__code__=original
 
 
+@_POSIX_CAPTURE_ONLY
 def test_final_format_authority_mutation_veto_uses_closed_projection_and_latches_report(prepared,monkeypatch,capsys):
     h=prepared;expected=h.q.authority();code=h.q.authority.__code__;dumps=h.q.json.dumps;count=[0]
     def serialize(value,*args,**kwargs):
@@ -323,6 +346,7 @@ def test_bad_cli_arguments_never_echo_values(prepared,capsys):
     assert 'PRIVATE' not in capsys.readouterr().out
 
 
+@_POSIX_CAPTURE_ONLY
 def test_attempt_failure_cannot_be_restarted_by_resetting_public_used_flag(prepared):
     h=prepared;h.q._USED=True;value,negative=result(h);assert value is None
     h.q._USED=False;value,negative=result(h)
@@ -366,6 +390,7 @@ def test_wrong_working_directory_refuses_before_any_private_open(prepared,monkey
 
 
 @pytest.mark.parametrize('change',['committed_differs','hard_link','group_writable'])
+@_POSIX_CAPTURE_ONLY
 def test_working_code_must_be_exact_committed_single_owner_bytes(prepared,change):
     """SI-CR28-014: the loader executes these bytes, so each check needs a refusal."""
     h=prepared;path=h.root/MODEL
@@ -422,18 +447,21 @@ NAMES=('producer.stdout.private','observation.private.json')
 
 
 @pytest.mark.parametrize('change',sorted(ANCHOR_CASES))
+@_POSIX_CAPTURE_ONLY
 def test_each_anchor_relationship_refuses_at_its_own_check(prepared,change):
     """SI-CR28-015: re-signed, so later packet checks cannot hide a missing anchor check."""
     h=prepared;a=copy.deepcopy(h.anchor);mutate,code=ANCHOR_CASES[change];mutate(a);h.install(resign(a));value,negative=result(h)
     assert value is None and negative['first_failure']=={'phase':'anchor','code':code}
 
 
+@_POSIX_CAPTURE_ONLY
 def test_committed_anchor_bytes_must_match_the_loader_pin(prepared):
     """SI-CR28-015: valid replacement bytes still differ from the fixed hash."""
     h=prepared;a=copy.deepcopy(h.anchor);a['anchor_id']='other';raw=canonical(a)+b'\n';(h.root/ANCHOR).write_bytes(raw);h.code[ANCHOR]=raw
     value,negative=result(h);assert value is None and negative['first_failure']=={'phase':'anchor','code':'anchor'}
 
 
+@_POSIX_CAPTURE_ONLY
 def test_historical_creator_must_be_an_ancestor_of_the_runtime(prepared,monkeypatch):
     """SI-CR28-015: a non-ancestor creator cannot lend this lane its history."""
     h=prepared;lane_reply(monkeypatch,('merge-base',),returncode=1);value,negative=result(h)
@@ -452,6 +480,7 @@ def repin(h,**replace):
 
 @pytest.mark.parametrize('change,code',[('mode','stamp'),('hard_link','stamp'),('touched','stamp'),('bytes','bytes'),
     ('ancestry','directory'),('leaf','directory'),('directory_mode','directory')])
+@_POSIX_CAPTURE_ONLY
 def test_each_private_artifact_check_refuses_on_its_own(prepared,change,code):
     """SI-CR28-016: these checks had no case that reached them alone."""
     h=prepared;path=h.directory/NAMES[0];info=path.stat()
@@ -467,6 +496,7 @@ def test_each_private_artifact_check_refuses_on_its_own(prepared,change,code):
 
 @pytest.mark.parametrize('old,new',[("POLICY_SHA256 = '9408f0c4c4f2edca105c9f710670ed34d3fef507bdf0bb6b44bce0e266063230'","POLICY_SHA256 = '"+'f'*64+"'"),
     ("payload = {'schema': SCHEMA, 'policy_sha256': POLICY_SHA256, 'input_aggregate_sha256': _sha(canonical_bytes),","payload = {'schema': SCHEMA, 'policy_sha256': POLICY_SHA256, 'input_aggregate_sha256': _sha(b''),")])
+@_POSIX_CAPTURE_ONLY
 def test_committed_model_with_another_policy_or_input_binding_is_refused(prepared,old,new):
     """SI-CR28-017: the loader's own checks on the model it has just compiled."""
     h=prepared;raw=h.code[MODEL].decode();assert raw.count(old)==1;raw=raw.replace(old,new).encode();(h.root/MODEL).write_bytes(raw);h.code[MODEL]=raw

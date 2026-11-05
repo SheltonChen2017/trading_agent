@@ -11,6 +11,17 @@ from types import ModuleType, SimpleNamespace
 
 import pytest
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 
 REPOSITORY = Path(__file__).resolve().parents[1]
 DRIVER = "scripts/inspect_short_interest_usb_code_snapshot.py"
@@ -124,6 +135,7 @@ def negative(h):
     return h.module.failure_summary(caught.value)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_whole_five_file_profile_and_closed_observation(fixture):
     h = fixture; result = run(h)
     assert h.model_seen and result["status"] == "closed_finite_code_windows_external_byte_inspection"
@@ -137,6 +149,7 @@ def test_original_whole_five_file_profile_and_closed_observation(fixture):
     with pytest.raises(h.module.CodeSnapshotRefusal, match="snapshot_failed"): snapshot._record()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_old_reader_and_pure_model_production_files_are_not_runtime_imported(fixture,monkeypatch):
     h = fixture
     existing={name:module for name,module in tuple(sys.modules.items()) if name.startswith("research.short_interest_etf.firstrate")}
@@ -150,6 +163,7 @@ def test_old_reader_and_pure_model_production_files_are_not_runtime_imported(fix
     assert set(after)==set(existing) and all(after[name] is module for name,module in existing.items())
 
 
+@_POSIX_CAPTURE_ONLY
 def test_gap_only_shared_code_ancestor_drift_is_explicitly_limited_not_rebaselined(fixture):
     h = fixture
     def action(h):
@@ -162,6 +176,7 @@ def test_gap_only_shared_code_ancestor_drift_is_explicitly_limited_not_rebaselin
 
 
 @pytest.mark.parametrize("window",["initial","terminal"])
+@_POSIX_CAPTURE_ONLY
 def test_same_ancestor_drift_inside_each_window_refuses(fixture,window):
     h = fixture
     def mutate(h,name):
@@ -174,6 +189,7 @@ def test_same_ancestor_drift_inside_each_window_refuses(fixture,window):
 
 
 @pytest.mark.parametrize("change", ["bytes", "mtime", "replace"])
+@_POSIX_CAPTURE_ONLY
 def test_gap_code_file_change_never_becomes_a_new_original(fixture,change):
     h=fixture
     def action(h):
@@ -189,6 +205,7 @@ def test_gap_code_file_change_never_becomes_a_new_original(fixture,change):
 
 
 @pytest.mark.parametrize("change", ["global", "function", "method", "code_identity", "resolver", "alias"])
+@_POSIX_CAPTURE_ONLY
 def test_snapshot_module_global_callable_import_or_class_substitution_refuses(fixture,change):
     h=fixture
     def action(h):
@@ -205,6 +222,7 @@ def test_snapshot_module_global_callable_import_or_class_substitution_refuses(fi
 
 
 @pytest.mark.parametrize("change", ["bytes", "mtime", "replace", "parent"])
+@_POSIX_CAPTURE_ONLY
 def test_USB_data_checks_remain_continuous_and_strict(fixture,change):
     h=fixture
     def action(h):
@@ -220,6 +238,7 @@ def test_USB_data_checks_remain_continuous_and_strict(fixture,change):
     assert report["first_failure"]["original_comparison"] is not None
 
 
+@_POSIX_CAPTURE_ONLY
 def test_whole_deadline_after_model_cannot_reset_or_return_provisional(fixture):
     h=fixture;h.action=lambda h:setattr(h,"tick",h.tick+181)
     report=negative(h)
@@ -227,6 +246,7 @@ def test_whole_deadline_after_model_cannot_reset_or_return_provisional(fixture):
     assert report["cleanup_failures"]
 
 
+@_POSIX_CAPTURE_ONLY
 def test_first_model_failure_survives_later_namespace_cleanup_failure(fixture):
     h=fixture
     def action(h):
@@ -238,6 +258,7 @@ def test_first_model_failure_survives_later_namespace_cleanup_failure(fixture):
     assert "PRIVATE" not in json.dumps(report) and "/secret/path" not in json.dumps(report)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_copied_snapshot_with_original_frame_is_not_a_factory_capability(fixture):
     h=fixture
     def action(h):
@@ -266,6 +287,7 @@ def test_code_snapshot_constructor_and_unknown_refusal_never_accept_caller_flags
     assert report["first_failure"]["code"] is None and "PRIVATE" not in json.dumps(report)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_production_profile_registration_five_code_catalogue_and_unchanged_old_sources():
     source=(REPOSITORY/DRIVER).read_bytes();compile(source,str(REPOSITORY/DRIVER),'exec')
     module=ModuleType("_usb5_policy_only");module.__file__=str(REPOSITORY/DRIVER)
@@ -276,6 +298,7 @@ def test_production_profile_registration_five_code_catalogue_and_unchanged_old_s
 
 
 @pytest.mark.parametrize("field", ("dev","ino","uid","gid","mode","nlink","size","mtime_ns","ctime_ns","flags"))
+@_POSIX_CAPTURE_ONLY
 def test_every_original_USB_stamp_field_still_refuses_without_rebaseline(fixture,monkeypatch,field):
     h=fixture; actual=os.fstat; target=(h.usb/"full.literal").stat()
     def overlay(fd):
@@ -291,6 +314,7 @@ def test_every_original_USB_stamp_field_still_refuses_without_rebaseline(fixture
     assert detail["relation"]=="file_descriptor_before_bytes_vs_original"
 
 
+@_POSIX_CAPTURE_ONLY
 def test_USB_metadata_change_after_LAST_fresh_close_is_still_refused(fixture,monkeypatch):
     h=fixture; actual=os.close; target=h.usb/"full.literal"; inode=target.stat().st_ino; closes=0
     def close(fd):
@@ -307,6 +331,7 @@ def test_USB_metadata_change_after_LAST_fresh_close_is_still_refused(fixture,mon
     assert report["first_failure"]["original_comparison"]["entered_phase"]=="post_close_named_audit"
 
 
+@_POSIX_CAPTURE_ONLY
 def test_terminal_code_metadata_change_after_LAST_fresh_close_is_refused(fixture,monkeypatch):
     h=fixture;actual=os.close;target=h.root/"data/hashing.py";inode=target.stat().st_ino;closes=0
     def close(fd):
@@ -323,6 +348,7 @@ def test_terminal_code_metadata_change_after_LAST_fresh_close_is_refused(fixture
 
 
 @pytest.mark.parametrize("window",["initial","terminal"])
+@_POSIX_CAPTURE_ONLY
 def test_original_code_context_close_failure_prevents_positive(fixture,monkeypatch,window):
     h=fixture; actual=os.close; inode=(h.root/"data/__init__.py").stat().st_ino;closes=0
     def close(fd):
@@ -338,6 +364,7 @@ def test_original_code_context_close_failure_prevents_positive(fixture,monkeypat
     assert h.model_seen is (window=="terminal") and "PRIVATE" not in json.dumps(report)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_source_constructor_comparison_survives_its_own_cleanup_failure(fixture,monkeypatch):
     h=fixture; target=h.usb/"full.literal"; original_read=os.read;original_close=os.close; altered=False
     inode=target.stat().st_ino;failed=False
@@ -360,6 +387,7 @@ def test_source_constructor_comparison_survives_its_own_cleanup_failure(fixture,
     assert not h.model_seen and "PRIVATE" not in json.dumps(report)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_unknown_inner_primary_and_genuine_cleanup_remain_separate_context_observations(fixture):
     h=fixture
     def action(h):
@@ -379,6 +407,7 @@ def test_unknown_inner_primary_and_genuine_cleanup_remain_separate_context_obser
 
 
 @pytest.mark.parametrize("kind",["HEAD","remote"])
+@_POSIX_CAPTURE_ONLY
 def test_terminal_lane_or_remote_change_prevents_observation(fixture,monkeypatch,kind):
     h=fixture; original=subprocess.run
     def git(args,**kwargs):
@@ -391,6 +420,7 @@ def test_terminal_lane_or_remote_change_prevents_observation(fixture,monkeypatch
     assert report["first_failure"]["code"]==("lane_changed" if kind=="HEAD" else "remote_changed")
 
 
+@_POSIX_CAPTURE_ONLY
 def test_snapshot_runtime_function_substitution_is_permanently_vetoed(fixture):
     h=fixture
     def action(h):
@@ -416,6 +446,7 @@ def test_committed_fifth_file_differing_from_running_bootstrap_refuses(fixture,c
     assert (report["first_failure"]["code"],report["first_failure"]["phase"])==("runtime_changed","bootstrap")
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_bootstrap_module_binding_cannot_be_replaced_midrun(fixture):
     h=fixture
     def action(h):sys.modules[h.module.__name__]=ModuleType("replacement_bootstrap")
@@ -423,6 +454,7 @@ def test_original_bootstrap_module_binding_cannot_be_replaced_midrun(fixture):
     assert report["first_failure"]["code"]=="namespace_changed"
 
 
+@_POSIX_CAPTURE_ONLY
 def test_hash_primitive_cannot_be_substituted_midrun(fixture,monkeypatch):
     h=fixture
     def action(h):
@@ -431,6 +463,7 @@ def test_hash_primitive_cannot_be_substituted_midrun(fixture,monkeypatch):
     assert report["first_failure"]["code"]=="runtime_changed"
 
 
+@_POSIX_CAPTURE_ONLY
 def test_final_format_clock_includes_namespace_cleanup_and_last_serialization(fixture,monkeypatch):
     h=fixture; original=json.dumps
     def dumps(value,*args,**kwargs):
@@ -442,6 +475,7 @@ def test_final_format_clock_includes_namespace_cleanup_and_last_serialization(fi
     assert report["first_failure"]["phase"]=="final_format" and report["first_failure"]["code"]=="clock_failed"
 
 
+@_POSIX_CAPTURE_ONLY
 def test_git_subprocess_metadata_has_no_Python_write_open_under_unchanged_denial():
     code=r'''
 import sys,os,importlib.util

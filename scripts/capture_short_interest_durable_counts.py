@@ -909,6 +909,20 @@ def _expected_output(root, plan, chunk):
     return root / storage.PARENT / (storage.NAMESPACE_PREFIX + "-" + plan.sha256 + f"-chunk{chunk:03d}") / storage.MOUNT_NAME / "capture"
 
 
+def _require_negative_exposure_floor(plan):
+    """A source lease needs the registered permanent negative floor (SI-CR27-008).
+
+    The registered protocol and the checkpoint loader both expect the nine-part
+    plan. The legacy eight-part plan budgets from 13,992 with no 16 MiB floor and
+    +16 first-chunk extras, so with the eight unknown exec13448 STARTs it could
+    pass 84,005 if the 052 gate were replaced without the newly frozen operational
+    protocol that record section 141.2 requires. Refuse it before any code
+    context, storage, claim or key. This grants nothing: the gate still refuses first.
+    """
+    require(type(plan) is research_budget.CountRecoveryPlan and plan.negative_exposure() is not None,
+        "durable_capture_plan_changed")
+
+
 @contextmanager
 def _prepare_registered_source_lease(token, budget, *, root, runtime_head, actual_remote, complete_code_manifest):
     registered()
@@ -918,6 +932,7 @@ def _prepare_registered_source_lease(token, budget, *, root, runtime_head, actua
     archive = _archive_binding(token); plan = _ARCHIVE_PLANS.get(token)
     require(type(budget) is accounting.DurableCountBudget and type(plan) is research_budget.CountRecoveryPlan
         and budget.plan is plan and plan._parts[1] is archive[3], "durable_capture_plan_changed")
+    _require_negative_exposure_floor(plan)
     manifest = _manifest_shape(complete_code_manifest); guard = lane.LaneGuard(root,
         expected_head=runtime_head, expected_remote=actual_remote)
     lock = _thread.RLock(); began = time.monotonic(); started = transport._clock()

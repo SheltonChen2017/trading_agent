@@ -237,3 +237,14 @@ def test_failed_file_protection_constructor_closes_every_created_fd(monkeypatch,
         for fd in tuple(active):
             tracked_close(fd)
     assert not remaining, "failed bounded constructor retained an unowned source FD"
+
+
+def test_stalled_git_is_a_fixed_refusal_after_the_final_guard_check(monkeypatch):
+    checks, seen = [], {}
+    def stalled(command, **kwargs):
+        seen.update(kwargs); raise m.subprocess.TimeoutExpired(command, kwargs["timeout"])
+    monkeypatch.setattr(m.subprocess, "run", stalled)
+    guard = type("Guard", (), {"check": lambda self: checks.append(1)})()
+    with pytest.raises(Exception, match="guarded_cache_Git_refused"):
+        m._git(Path("."), ["ls-remote"], guard)
+    assert checks == [1, 1] and seen["timeout"] == 30

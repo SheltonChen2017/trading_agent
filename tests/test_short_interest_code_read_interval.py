@@ -10,6 +10,18 @@ from types import SimpleNamespace
 
 import pytest
 
+# The runtime under test imports POSIX-only stdlib modules at import time, so
+# this module cannot even be collected on the supported Windows host; see the
+# lane record SI-CR18-001. Portable contract logic stays covered on POSIX.
+pytest.importorskip(
+    "fcntl",
+    reason=(
+        "the protected-capture runtime imports the POSIX-only module "
+        "fcntl at import time; it cannot execute on this host, see the "
+        "lane record SI-CR18-001"
+    ),
+)
+
 from scripts import diagnose_short_interest_code_read_interval as d
 
 spec=importlib.util.spec_from_file_location('code_interval_fabricated_support',Path(__file__).with_name('test_short_interest_usb_code_snapshot.py'))

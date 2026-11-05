@@ -11,6 +11,17 @@ from types import SimpleNamespace
 
 import pytest
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 
 SOURCE = Path(__file__).resolve().parents[1] / 'scripts/persist_short_interest_usb_observation.py'
 HEAD, REMOTE = 'a' * 40, 'b' * 40
@@ -69,6 +80,7 @@ def publish(q, value):
 
 
 @pytest.mark.parametrize('negative,bootstrap', [(False, False), (True, False), (True, True)])
+@_POSIX_CAPTURE_ONLY
 def test_exact_historical_copy_preserves_bytes_without_process_or_source_authority(prepared, negative, bootstrap):
     q = prepared; value, packet = supplied(q, negative=negative, bootstrap=bootstrap)
     result = publish(q, value)
@@ -112,6 +124,7 @@ def test_nested_authority_is_not_granted_by_copying_json(prepared):
     assert publish(q, value)['status'] == 'incomplete' and not q.BASE.exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_existing_namespace_is_never_adopted_or_overwritten(prepared):
     q = prepared; value, unused = supplied(q); first = publish(q, value)
     before = {p.name: p.read_bytes() for p in q.DIRECTORY.iterdir()}
@@ -123,12 +136,14 @@ def test_existing_namespace_is_never_adopted_or_overwritten(prepared):
     assert {p.name: p.read_bytes() for p in q.DIRECTORY.iterdir()} == before
 
 
+@_POSIX_CAPTURE_ONLY
 def test_symlink_base_is_refused(prepared):
     q = prepared; value, unused = supplied(q); target = q.ROOT / 'unrelated'; target.mkdir()
     q.BASE.symlink_to(target, target_is_directory=True)
     assert publish(q, value)['status'] == 'incomplete' and not (target / q.INVOCATION).exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_permissive_existing_base_is_refused_without_chmod_or_adoption(prepared):
     q = prepared; value, unused = supplied(q); q.BASE.mkdir(mode=0o755)
     assert publish(q, value)['status'] == 'incomplete' and stat.S_IMODE(q.BASE.stat().st_mode) == 0o755
@@ -148,6 +163,7 @@ def test_bounded_strict_input_refuses_without_publishing(prepared, change):
     assert result['status'] == 'incomplete' and not q.BASE.exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_public_receipt_never_exports_the_private_caller_payload(prepared):
     q = prepared; value, unused = supplied(q)
     value['owned_observation']['private_marker'] = 'FABRICATED_PRIVATE_DO_NOT_ECHO'
@@ -157,12 +173,14 @@ def test_public_receipt_never_exports_the_private_caller_payload(prepared):
     assert 'FABRICATED_PRIVATE_DO_NOT_ECHO' in (q.DIRECTORY / q.NAMES[1]).read_text()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_owner_uid_is_required_without_elevation(prepared, monkeypatch):
     q = prepared; value, unused = supplied(q)
     monkeypatch.setattr(q.os, 'geteuid', lambda: os.getuid() + 1)
     assert publish(q, value)['status'] == 'incomplete' and not q.BASE.exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_directory_rule_does_not_accept_writable_ancestry(prepared):
     q = prepared
     function = q._Anchors.audit.__globals__['_dir']
@@ -171,6 +189,7 @@ def test_original_directory_rule_does_not_accept_writable_ancestry(prepared):
     with pytest.raises(q.CopyRefusal, match='directory'): function(bad)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_creator_gid_is_the_original_held_parent_not_process_gid(prepared, monkeypatch):
     q = prepared; value, unused = supplied(q)
     original_gid = os.getgid()
@@ -181,6 +200,7 @@ def test_creator_gid_is_the_original_held_parent_not_process_gid(prepared, monke
     assert all((q.DIRECTORY / name).stat().st_gid == q.DIRECTORY.stat().st_gid for name in q.NAMES)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_metadata_drift_after_first_seal_stays_negative_and_preserves_content(prepared, monkeypatch):
     q = prepared; value, packet = supplied(q); original = q._Anchors.file_audit; changed = False
     def drift(self, name, fd, pin, raw):
@@ -194,6 +214,7 @@ def test_metadata_drift_after_first_seal_stays_negative_and_preserves_content(pr
     assert (q.DIRECTORY / q.NAMES[0]).read_bytes() == packet
 
 
+@_POSIX_CAPTURE_ONLY
 def test_partial_write_failure_preserves_spent_prefix_without_retry(prepared, monkeypatch):
     q = prepared; value, packet = supplied(q); original = os.write; count = 0
     def broken(fd, raw):
@@ -225,6 +246,7 @@ def test_constructor_fstat_failure_closes_every_owned_descriptor(prepared, monke
     assert publish(q, value)['status'] == 'incomplete' and not opened
 
 
+@_POSIX_CAPTURE_ONLY
 def test_close_failure_is_negative_but_other_descriptors_still_close(prepared, monkeypatch):
     q = prepared; value, unused = supplied(q); real_open, real_close = os.open, os.close; opened = set(); failed = False
     def opening(*args, **kwargs):
@@ -240,6 +262,7 @@ def test_close_failure_is_negative_but_other_descriptors_still_close(prepared, m
     assert result['first_failure']['phase'] == 'close'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_file_protection_change_after_close_is_not_resealed(prepared, monkeypatch):
     q = prepared; value, unused = supplied(q); real_close = os.close; changed = False
     def closing(fd):
@@ -252,6 +275,7 @@ def test_original_file_protection_change_after_close_is_not_resealed(prepared, m
     assert changed and result['status'] == 'incomplete' and stat.S_IMODE((q.DIRECTORY / q.NAMES[0]).stat().st_mode) == 0o644
 
 
+@_POSIX_CAPTURE_ONLY
 def test_fresh_postclose_read_checks_original_bytes_without_stamp_rebaseline(prepared, monkeypatch):
     q = prepared; value, unused = supplied(q); original = q._Anchors.file_audit; count = 0; reached = False
     def corrupt_read(self, name, fd, pin, raw):
@@ -268,6 +292,7 @@ def test_fresh_postclose_read_checks_original_bytes_without_stamp_rebaseline(pre
     assert reached and result['status'] == 'incomplete' and result['first_failure']['code'] == 'bytes'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_last_named_file_audit_runs_after_all_ancestor_handles_close(prepared, monkeypatch):
     q = prepared; value, packet = supplied(q); original_open = q._Anchors.open; real_close = os.close; scope = []; changed = False
     def capture(self):
@@ -284,6 +309,7 @@ def test_last_named_file_audit_runs_after_all_ancestor_handles_close(prepared, m
     assert (q.DIRECTORY / q.NAMES[0]).read_bytes() == packet
 
 
+@_POSIX_CAPTURE_ONLY
 def test_expiry_before_writes_does_not_create_payload_files(prepared, monkeypatch):
     q = prepared; value, unused = supplied(q); now = [0]; original = q._Anchors.write
     monkeypatch.setattr(q.time, 'monotonic_ns', lambda: now[0])
@@ -294,6 +320,7 @@ def test_expiry_before_writes_does_not_create_payload_files(prepared, monkeypatc
     assert result['status'] == 'incomplete' and q.DIRECTORY.exists() and not list(q.DIRECTORY.iterdir())
 
 
+@_POSIX_CAPTURE_ONLY
 def test_actual_cli_terminal_serialization_expiry_cannot_emit_closed_receipt(prepared, monkeypatch, capsys):
     q = prepared; value, unused = supplied(q); now = [0]; serializations = 0; original = q.canonical
     monkeypatch.setattr(q.time, 'monotonic_ns', lambda: now[0])

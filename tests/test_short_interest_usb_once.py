@@ -13,6 +13,17 @@ import pytest
 
 from scripts import qualify_short_interest_usb_once as q
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 REPOSITORY=Path(__file__).resolve().parents[1]
 REAL_RUN,REAL_POPEN=subprocess.run,subprocess.Popen
 spec=importlib.util.spec_from_file_location('usb_once_original_profile_support',Path(__file__).with_name('test_short_interest_usb_code_snapshot.py'))
@@ -42,6 +53,7 @@ def prepared(fixture,monkeypatch):
     return h
 
 
+@_POSIX_CAPTURE_ONLY
 def test_genuine_full_profile_reads_fake_four_closes_and_never_grants_source_authority(prepared):
     h=prepared;value=h.run()
     assert value['status']=='closed_finite_offline_byte_inspection',value
@@ -57,12 +69,14 @@ def test_genuine_full_profile_reads_fake_four_closes_and_never_grants_source_aut
     assert not any(name in sys.modules for name in q._MODULES)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_copied_original_profile_dict_is_not_an_original_factory_result(prepared,monkeypatch):
     original=q._original_result
     monkeypatch.setattr(q,'_original_result',lambda module,value,*pins:original(module,dict(value),*pins))
     result=prepared.run();assert result['status']=='incomplete' and result['first_failure']['code']=='original_result'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_replacement_factory_cannot_manufacture_the_accepted_original_frame(prepared,monkeypatch):
     validator=q._original_result
     def replace(module,value,entry,entry_code):
@@ -74,6 +88,7 @@ def test_replacement_factory_cannot_manufacture_the_accepted_original_frame(prep
     result=prepared.run();assert result['status']=='incomplete' and result['first_failure']['code']=='original_result'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_source_metadata_drift_stays_a_refusal_without_rebaseline(prepared):
     h=prepared
     def change(h):
@@ -84,6 +99,7 @@ def test_original_source_metadata_drift_stays_a_refusal_without_rebaseline(prepa
 
 
 @pytest.mark.parametrize('name',[q.HELPER,q.DRIVER])
+@_POSIX_CAPTURE_ONLY
 def test_extra_code_original_leaf_stamp_drift_vetoes_even_after_full_original_profile(prepared,name):
     h=prepared
     def change(h):
@@ -93,6 +109,7 @@ def test_extra_code_original_leaf_stamp_drift_vetoes_even_after_full_original_pr
     assert result['private_model_aggregate'] is not None and result['source_qualified'] is False
 
 
+@_POSIX_CAPTURE_ONLY
 def test_final_extra_code_descriptor_close_failure_is_negative(prepared,monkeypatch):
     h=prepared;close=os.close;key=(h.root/q.DRIVER).stat().st_ino;failed=[False]
     def closing(fd):
@@ -104,6 +121,7 @@ def test_final_extra_code_descriptor_close_failure_is_negative(prepared,monkeypa
     assert 'PRIVATE' not in json.dumps(result)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_authentication_failure_preserves_primary_and_independent_close_failure(prepared,monkeypatch):
     h=prepared;git=q._git;close=os.close;closed=[]
     def fail(arguments,start):
@@ -118,6 +136,7 @@ def test_authentication_failure_preserves_primary_and_independent_close_failure(
     assert result['cleanup_failures'][0]['phase']=='cleanup' and 'PRIVATE' not in json.dumps(result)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_copied_private_report_and_replaced_registry_cannot_replace_original_source_report(prepared,monkeypatch):
     reader=q._private_aggregate
     def copy(module,proof):
@@ -147,6 +166,7 @@ def test_original_private_model_bindings_cannot_be_replaced_after_graph_cleanup(
     assert result['source_qualified'] is False
 
 
+@_POSIX_CAPTURE_ONLY
 def test_private_aggregate_digest_must_match_immutable_original_inspected_tuple(prepared,monkeypatch):
     reader=q._private_aggregate
     def rebase(module,proof):
@@ -162,18 +182,21 @@ def test_private_aggregate_digest_must_match_immutable_original_inspected_tuple(
     assert result['private_model_aggregate'] is None and 'PRIVATE' not in json.dumps(result)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_private_aggregate_bound_is_not_an_admission_or_truncation_route(prepared,monkeypatch):
     monkeypatch.setattr(q,'MAX_PRIVATE_AGGREGATE',1);result=prepared.run()
     assert result['status']=='incomplete' and result['first_failure']['code']=='private_aggregate'
     assert result['private_model_aggregate'] is None and result['source_qualified'] is False
 
 
+@_POSIX_CAPTURE_ONLY
 def test_closed_shared_pipe_classifier_cannot_be_substituted(prepared,monkeypatch):
     h=prepared;assert h.run()['status']=='closed_finite_offline_byte_inspection'
     with pytest.raises(q.UsbOnceRefusal,match='forbidden_open'):h.hooks[0]('open',(99,'r',os.O_RDONLY))
 
 
 @pytest.mark.parametrize('change',['predicate','predicate_code','REF','CODE_FILES','DRIVER','ENV_value','ENV_object','ROOT_object'])
+@_POSIX_CAPTURE_ONLY
 def test_shared_git_predicate_and_exact_policy_globals_cannot_be_rebased(prepared,change):
     h=prepared;assert h.run()['status']=='closed_finite_offline_byte_inspection'
     audit=h.hooks[0];cells=dict(zip(audit.__code__.co_freevars,audit.__closure__));binding=cells['original_helper'].cell_contents
@@ -193,6 +216,7 @@ def test_shared_git_predicate_and_exact_policy_globals_cannot_be_rebased(prepare
 
 
 @pytest.mark.parametrize('replacement',[False,True])
+@_POSIX_CAPTURE_ONLY
 def test_original_producer_environment_identity_and_contents_cannot_change(prepared,monkeypatch,replacement):
     h=prepared;assert h.run()['status']=='closed_finite_offline_byte_inspection'
     if replacement:monkeypatch.setattr(q,'ENV',dict(q.ENV))
@@ -202,12 +226,14 @@ def test_original_producer_environment_identity_and_contents_cannot_change(prepa
     with pytest.raises(q.UsbOnceRefusal,match='forbidden_open'):h.hooks[0]('open',(99,'r',os.O_RDONLY))
 
 
+@_POSIX_CAPTURE_ONLY
 def test_unregistered_input_name_or_blob_cannot_be_opened_by_python_audit(prepared):
     h=prepared;value=h.run();assert value['status']=='closed_finite_offline_byte_inspection'
     with pytest.raises(q.UsbOnceRefusal):h.hooks[0]('open',('/Volumes/PRIVATE/other.zip','r',os.O_RDONLY))
     assert 'PRIVATE' not in json.dumps(value)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_repeated_invocation_and_bad_identifier_do_not_restart_the_original_profile(prepared):
     h=prepared;assert h.run()['status']=='closed_finite_offline_byte_inspection'
     again=h.run();assert again['status']=='incomplete' and again['first_failure']['code']=='attempt_spent'
@@ -240,6 +266,7 @@ def test_original_five_and_shared_helper_production_bytes_are_not_modified_by_th
 
 
 @pytest.mark.parametrize('substitute',[False,True])
+@_POSIX_CAPTURE_ONLY
 def test_isolated_permanent_audit_full_profile_and_real_stdlib_pipes_on_fake_four(prepared,monkeypatch,substitute):
     h=prepared;payload={'root':str(h.root),'usb':str(h.usb),'head':HEAD,'remote':REMOTE,
         'inputs':h.module.INPUTS,'sha':h.own_sha,'substitute':substitute,'bodies':{name:base64.b64encode(raw).decode() for name,raw in h.committed.items()}}
@@ -301,6 +328,7 @@ print(m.canonical(value).decode())
         assert not any(packet['denials'].values())
 
 
+@_POSIX_CAPTURE_ONLY
 def test_swallowed_denial_still_vetoes_the_closed_status(prepared,monkeypatch):
     """SI-CR28-019: the counter is the check that survives a caught refusal."""
     h=prepared;original=sys._si_usb_fixture_hook
@@ -322,6 +350,7 @@ def test_dirty_lane_refuses_before_the_original_transaction(prepared,monkeypatch
     assert value['status']=='incomplete' and value['first_failure']['code']=='root' and not h.model_seen
 
 
+@_POSIX_CAPTURE_ONLY
 def test_head_move_after_the_original_transaction_vetoes_closure(prepared,monkeypatch):
     """SI-CR28-019: the last HEAD check runs after the original transaction returned."""
     h=prepared;real=subprocess.run;original=q._private_aggregate;done=[]
@@ -334,6 +363,7 @@ def test_head_move_after_the_original_transaction_vetoes_closure(prepared,monkey
     assert value['status']=='incomplete' and (value['first_failure']['phase'],value['first_failure']['code'])==('extra_code','root')
 
 
+@_POSIX_CAPTURE_ONLY
 def test_write_flags_refuse_even_on_a_registered_path(prepared):
     """SI-CR28-019: a read-allowed code file must not be opened writable."""
     h=prepared;assert h.run()['status']=='closed_finite_offline_byte_inspection'
@@ -341,6 +371,7 @@ def test_write_flags_refuse_even_on_a_registered_path(prepared):
     with pytest.raises(q.UsbOnceRefusal,match='^forbidden_write$'):h.hooks[0]('open',(allowed,'r+',os.O_RDWR))
 
 
+@_POSIX_CAPTURE_ONLY
 def test_wrong_driver_hash_refuses_before_any_original_entry(prepared):
     """SI-CR28-019: the caller's hash of this driver must match the committed bytes."""
     h=prepared;value=q.run_registered(HEAD,REMOTE,'0'*64)

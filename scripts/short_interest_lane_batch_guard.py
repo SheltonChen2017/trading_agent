@@ -20,6 +20,7 @@ from research.short_interest_etf import native_parallel_count_contract as parall
 
 ROOT = Path("/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest")
 BRANCH = "codex/strategy-short-interest"
+GIT_TIMEOUT_SECONDS = 30
 REF = "refs/heads/" + BRANCH
 MAXIMUM_BATCH_REQUESTS = 8
 
@@ -34,8 +35,10 @@ def require(value, reason):
 
 
 def _run(root, command):
+    # Deadline checks run only after a call returns, so a stalled ls-remote must end here.
     try:
-        result = subprocess.run(command, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+        result = subprocess.run(command, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False,
+            timeout=GIT_TIMEOUT_SECONDS)
     except Exception:
         raise LaneBatchRefusal("lane_Git_unavailable") from None
     require(result.returncode == 0 and type(result.stdout) is bytes and len(result.stdout) <= 16 * 1024 * 1024,

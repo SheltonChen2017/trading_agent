@@ -374,6 +374,8 @@ def worker_packet(raw, head, tracking, mapping, allow_incomplete=False):
     require(set(window)=={'entered','original_closed','start_monotonic_ns','end_monotonic_ns','start_unix_ns','end_unix_ns'},'worker_packet')
     closed=value['status']=='closed_initial_window_stopped_before_snapshot'
     require(window['original_closed'] is closed and value.get('expected_stop_before_snapshot') is closed,'worker_packet')
+    # A worker failure after the stop must not close the observation with first_failure null.
+    require(not closed or value['cleanup_failures']==[],'worker_packet')
     for key in ('start_monotonic_ns','end_monotonic_ns','start_unix_ns','end_unix_ns'):
         require(type(window.get(key)) is str and re.fullmatch('[0-9]{1,24}',window[key]),'worker_packet')
     require(int(window['start_monotonic_ns'])<=int(window['end_monotonic_ns']), 'worker_packet')

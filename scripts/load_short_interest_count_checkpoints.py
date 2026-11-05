@@ -51,6 +51,12 @@ _MONOTONIC = time.monotonic
 _RESOLUTION_FUNCTION = negative_resolution.resolve_registered
 _RESOLUTION_CODE = _RESOLUTION_FUNCTION.__code__
 _RESOLUTION_PHASE, _RESOLUTION_ISSUED = None, {}
+CLAIM_PATH = "claim/claim.spent.json"
+FINAL_CONTROL_PATHS = ("capture/final_inventory/inventory.private.json", "capture/final_provisional/provisional.json",
+    "capture/final_closed/closed.json", "capture/final_manifest/manifest.private.json")
+RECEIVED_FIELDS = ("schema", "ordinal", "reservation_sha256", "request_sha256", "START_sha256",
+    "operator_protocol_sha256", "observation_sha256", "http_invoked", "http_status", "body_sha256",
+    "body_bytes", "received_at", "diagnostic", "budget_release_authority")
 LEGACY_EIGHT_PART_PRODUCER_PROTOCOLS = (
     "0364f7bca6bc7eaf7c41af850df8c6e1558f23354c179e5ce27126b118b60cd7",
     "0a12282d516613ac3d6f5e407aab331c385159fbf5244370bc05b88f5551f7e5",
@@ -564,14 +570,49 @@ def _terminal_metadata(index, descriptors, round_directories, round_body9, round
     _tick(deadline)
 
 
+def _diagnostic_mapping(pairs):
+    """The sealed received record stores the fixed diagnostic as ordered pairs."""
+    if pairs is None: return None
+    require(type(pairs) is list and all(type(row) is list and len(row) == 2 and type(row[0]) is str for row in pairs)
+        and len({row[0] for row in pairs}) == len(pairs), "checkpoint_loader_accounting_changed")
+    return dict(pairs)
+
+
+def _observation_sha256(received):
+    """Recompute the operator's observation hash from the sealed received record alone."""
+    return hash_payload({"request_sha256": received["request_sha256"], "START_sha256": received["START_sha256"],
+        "protocol_sha256": received["operator_protocol_sha256"], "http_invoked": received["http_invoked"],
+        "http_status": received["http_status"], "body_sha256": received["body_sha256"],
+        "body_bytes": received["body_bytes"], "received_at": received["received_at"],
+        "diagnostic": received["diagnostic"]})
+
+
+def _exact_members(descriptor, private):
+    """Every retained START, receipt and control belongs to a charged attempt.
+
+    The catalogue authenticates each listed file's bytes, not its role. A START
+    with no attempts row would be a spent request that no account ever charges.
+    """
+    expected = {descriptor["external_claim_path"], *FINAL_CONTROL_PATHS}
+    for attempt in descriptor["attempts"]:
+        expected.update((attempt["START_path"], attempt["received_path"]))
+        expected.update(attempt[role] for role in ("body_path", "receipt_path") if attempt[role] is not None)
+    require(set(private) == expected, "checkpoint_loader_catalogue_changed")
+
+
 def _attempts(descriptor, private, plan, lifetime, *, ordinal_offset=0):
     attempts = descriptor["attempts"]; chunk = descriptor["plan"]["chunk"]
     require(type(attempts) is list and 0 < len(attempts) <= len(plan.chunk_positions(chunk)) + plan.chunk_extra_limit(chunk),
         "checkpoint_loader_accounting_changed")
     charges, reservations, covered, chains, epoch_tries = [], [], set(), {}, {}
-    claim = _parse(private[descriptor["external_claim_path"]])
+    require(descriptor["external_claim_path"] == CLAIM_PATH, "checkpoint_loader_accounting_changed")
+    claim = _parse(private[CLAIM_PATH]); producer = descriptor["producer"]
     require(claim.get("schema") == "si-count-spent-claim-v1" and claim.get("spent") is True
-        and claim.get("chunk") == chunk and claim.get("plan_sha256") == plan.sha256,
+        and claim.get("chunk") == chunk and claim.get("plan_sha256") == plan.sha256
+        and claim.get("operator_protocol_sha256") == producer["operator_protocol_sha256"]
+        and claim.get("registration_sha256") == producer["registration_sha256"]
+        and claim.get("runtime_head") == producer["head"] and claim.get("actual_remote") == producer["remote"]
+        and claim.get("dispatch_authority") is False and claim.get("source_admitted") is False,
         "checkpoint_loader_accounting_changed")
     def clock(value):
         try: return old_archive.count.old.cache.parallel.clock(value)
@@ -606,7 +647,10 @@ def _attempts(descriptor, private, plan, lifetime, *, ordinal_offset=0):
         if position in chains:
             previous = chains[position]
             detail = previous["fixed_diagnostic"]
-            require(previous["http_status"] is None and type(detail) is dict and detail.get("retryable") is True
+            # The same conditions as the dispatch gate; previous was bound to its sealed record below.
+            require(previous["http_invoked"] is True and previous["http_status"] is None and type(detail) is dict
+                and set(detail) == {"code", "phase", "failure_class", "http_status", "retryable", "errno_name"}
+                and detail.get("retryable") is True
                 and detail.get("code") == "network_failure" and detail.get("http_status") is None
                 and detail.get("phase") == "open" and detail.get("failure_class") in (
                     "timeout", "dns_temporary", "connection_reset", "connection_refused", "connection_aborted")
@@ -627,6 +671,17 @@ def _attempts(descriptor, private, plan, lifetime, *, ordinal_offset=0):
             and received.get("http_invoked") is attempt["http_invoked"]
             and type(received.get("http_status")) is type(attempt["http_status"])
             and received.get("http_status") == attempt["http_status"], "checkpoint_loader_accounting_changed")
+        # Retry legality and backoff below read this attempt's diagnostic and time, so
+        # both must be the sealed record's, and the hash must derive from that record.
+        _keys(received, RECEIVED_FIELDS)
+        require(received["schema"] == "si-count-received-v1" and received["budget_release_authority"] is False
+            and type(received["ordinal"]) is int and received["ordinal"] == number
+            and received["reservation_sha256"] == attempt["reservation_sha256"]
+            and received["request_sha256"] == reservation["request_sha256"]
+            and received["operator_protocol_sha256"] == producer["operator_protocol_sha256"]
+            and received["received_at"] == attempt["received_at"]
+            and _diagnostic_mapping(received["diagnostic"]) == attempt["fixed_diagnostic"]
+            and _observation_sha256(received) == attempt["observation_sha256"], "checkpoint_loader_accounting_changed")
         require(clock(started.get("started_at")) <= clock(attempt["received_at"]), "checkpoint_loader_accounting_changed")
         if position in epoch_tries:
             require(clock(started["started_at"]) >= epoch_tries[position][1]
@@ -875,8 +930,10 @@ def load_registered_count_checkpoints(root, *, runtime_head, actual_remote,
                     require(str(mount) == root_entry["mount"], "checkpoint_loader_native_changed")
                     private = _catalogue(mount, descriptor["files"], descriptor["directories"], clock_boundary,
                         system_entries=descriptor["volume"]["system_entries"])
-                    if account: accounts.append(_attempts(descriptor, private, plan, lifetime,
-                        ordinal_offset=sum(len(item["charges"]) for item in accounts)))
+                    if account:
+                        accounts.append(_attempts(descriptor, private, plan, lifetime,
+                            ordinal_offset=sum(len(item["charges"]) for item in accounts)))
+                        _exact_members(descriptor, private)
                     manifest = _parse(private["capture/final_manifest/manifest.private.json"])
                     expected_members = [{"name": row["path"][8:], "bytes": row["bytes"], "sha256": row["sha256"]}
                         for row in descriptor["files"] if row["path"].startswith("capture/")

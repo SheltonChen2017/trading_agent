@@ -13,6 +13,17 @@ import pytest
 
 from scripts import trace_short_interest_documents_actor as d
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 
 HEAD,TRACKING,NEW,OLD='a'*40,'b'*40,'c'*64,'d'*64
 REPO=Path(__file__).resolve().parents[1]
@@ -78,6 +89,7 @@ def event(h,kind,seq=0):
 
 
 @pytest.mark.parametrize('kind',tuple(d.EVENTS))
+@_POSIX_CAPTURE_ONLY
 def test_nine_event_numeric_concordance_strict_target_relations_and_no_child_names(context,kind):
     h=context;h.consumer.feed(d.canonical(event(h,kind)))
     assert h.consumer.records==1 and len(h.consumer.matches)==1
@@ -92,6 +104,7 @@ def test_nine_event_numeric_concordance_strict_target_relations_and_no_child_nam
 
 @pytest.mark.parametrize('kind',['create','rename'])
 @pytest.mark.parametrize('wrong',[0,True,2])
+@_POSIX_CAPTURE_ONLY
 def test_destination_enum_must_match_exact_union_before_projection(context,kind,wrong):
     h=context;obj=event(h,kind);obj['event'][kind]['destination_type']=wrong
     with pytest.raises(d.DocumentsTraceRefusal,match='event_schema'):h.consumer.consume(obj)
@@ -99,6 +112,7 @@ def test_destination_enum_must_match_exact_union_before_projection(context,kind,
 
 
 @pytest.mark.parametrize('kind',['create','rename'])
+@_POSIX_CAPTURE_ONLY
 def test_existing_file_and_source_parent_are_explicitly_path_only(context,kind):
     h=context;obj=event(h,kind);body=obj['event'][kind]
     body['destination_type']=0;body['destination']={'existing_file':file(str(h.target)+'/PRIVATE-destination')}
@@ -107,6 +121,7 @@ def test_existing_file_and_source_parent_are_explicitly_path_only(context,kind):
 
 
 @pytest.mark.parametrize('truncated',[False,True])
+@_POSIX_CAPTURE_ONLY
 def test_original_parent_inode_match_survives_aliased_or_truncated_path_as_negative(context,truncated):
     h=context;obj=event(h,'unlink');obj['event']['unlink']['parent_dir']=file('/PRIVATE-aliased',h.watch.key[:2],truncated)
     h.consumer.consume(obj)
@@ -114,6 +129,7 @@ def test_original_parent_inode_match_survives_aliased_or_truncated_path_as_negat
     assert 'PRIVATE' not in json.dumps(h.consumer.matches)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_unrelated_actor_is_not_parsed_or_persisted(context):
     h=context;obj=event(h,'unlink');obj['event']['unlink']['parent_dir']=file('/PRIVATE-other')
     obj['process']={'PRIVATE':'malformed actor must never be parsed'}
@@ -122,6 +138,7 @@ def test_unrelated_actor_is_not_parsed_or_persisted(context):
 
 
 @pytest.mark.parametrize('signing',['com.PRIVATE.valid.identifier','PRIVATE /path@email'])
+@_POSIX_CAPTURE_ONLY
 def test_unknown_signing_identity_is_hashed_even_if_dotted(context,signing):
     h=context;obj=event(h,'setflags');obj['process']['signing_id']=signing
     obj['process']['executable']['path']='/Users/PRIVATE/Actor'
@@ -130,6 +147,7 @@ def test_unknown_signing_identity_is_hashed_even_if_dotted(context,signing):
     assert row['allowlisted_system_executable'] is None and 'PRIVATE' not in json.dumps(row)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_unknown_result_is_negative_never_success_inference(context):
     h=context;obj=event(h,'create');obj['result']={'UNKNOWN':'PRIVATE'}
     h.consumer.consume(obj)
@@ -138,6 +156,7 @@ def test_unknown_result_is_negative_never_success_inference(context):
     assert 'PRIVATE' not in json.dumps(h.consumer.matches)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_watch_observes_timestamp_size_nlink_without_resealing(context):
     h=context;original=h.watch.original
     (h.target/'PRIVATE').mkdir()
@@ -146,12 +165,14 @@ def test_watch_observes_timestamp_size_nlink_without_resealing(context):
     assert 'mtime_ns' in row['fd_changed_fields'] and 'nlink' in row['name_changed_fields']
 
 
+@_POSIX_CAPTURE_ONLY
 def test_watch_close_uses_name_only_observation_without_descriptor_mislabel(context):
     h=context;h.watch.close();row=h.watch.samples[-1]
     assert row['descriptor_open'] is False and row['fd_mtime_ns'] is None
     assert row['metadata_pair_concordant'] is None and row['fd_changed_fields']==[]
 
 
+@_POSIX_CAPTURE_ONLY
 def test_failed_initial_watch_sample_closes_original_fd(context,monkeypatch):
     opened=[];closed=[];op=os.open;close=os.close
     monkeypatch.setattr(os,'open',lambda *a,**kw:(opened.append(op(*a,**kw)) or opened[-1]))
@@ -165,6 +186,7 @@ def test_failed_initial_watch_sample_closes_original_fd(context,monkeypatch):
 
 @pytest.mark.parametrize('boundary',['fstat','pin'])
 @pytest.mark.parametrize('ordinal',[1,3])
+@_POSIX_CAPTURE_ONLY
 def test_output_constructor_owns_each_fd_before_fstat_or_pin(context,monkeypatch,boundary,ordinal):
     opened=[];closed=[];calls=0;op=os.open;close=os.close;fstat=os.fstat;pin=d.OutputDirectory.pin
     def opening(*args,**kwargs):
@@ -193,6 +215,7 @@ def test_output_constructor_owns_each_fd_before_fstat_or_pin(context,monkeypatch
                 except OSError:pass
 
 
+@_POSIX_CAPTURE_ONLY
 def test_postlaunch_clock_failure_still_reaps_and_closes_both_streams(context,monkeypatch):
     h=context;events=[]
     class Stream:
@@ -225,6 +248,7 @@ def root_run(context,monkeypatch):
     return h
 
 
+@_POSIX_CAPTURE_ONLY
 def test_genuine_report_fd_directory_closure_and_terminal_original_hashes(root_run):
     h=root_run;result=h.run();raw=d.OUTPUT.read_bytes();report=json.loads(raw)
     assert result['status']=='closed_passive_observation' and result['source_authority'] is False
@@ -235,6 +259,7 @@ def test_genuine_report_fd_directory_closure_and_terminal_original_hashes(root_r
     assert not result['first_failure']
 
 
+@_POSIX_CAPTURE_ONLY
 def test_late_target_protection_change_after_report_close_vetoes_terminal_without_rewrite(root_run,monkeypatch):
     h=root_run;close=os.close;changed=False
     def close_and_change(fd):
@@ -248,6 +273,7 @@ def test_late_target_protection_change_after_report_close_vetoes_terminal_withou
     assert json.loads(raw)['status']=='provisional_until_terminal_context_close'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_output_ancestor_symlink_after_close_never_becomes_original(root_run,monkeypatch):
     h=root_run;close=d.OutputDirectory.close
     def redirect(self):
@@ -256,6 +282,7 @@ def test_output_ancestor_symlink_after_close_never_becomes_original(root_run,mon
     result=h.run();assert result['status']=='incomplete' and result['first_failure']['code']=='directory'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_nonzero_native_lifecycle_never_positive(root_run,monkeypatch):
     h=root_run
     def failed(consumer,watch,clock):
@@ -277,6 +304,7 @@ def test_plan_is_bound_to_four_identifiers_and_bootstrap_precedes_code_open():
     assert plan['whole_seconds']==120 and plan['passive_seconds']==30
 
 
+@_POSIX_CAPTURE_ONLY
 def test_root_code_guard_runs_every_Git_read_as_the_lane_owner(tmp_path,monkeypatch):
     """SI-CR27-004: root never parses owner-writable repository config itself."""
     raw={d.SCRIPT:b'# fabricated driver\n',d.FRAMER:b'# fabricated framer\n'};held=[]
@@ -307,6 +335,7 @@ def test_unknown_exception_diagnostic_never_formats_private_text():
 
 
 @pytest.mark.parametrize('role',['unlink_object','rename_source','create_existing','rename_existing'])
+@_POSIX_CAPTURE_ONLY
 def test_original_Documents_object_is_retained_separately_from_parent_relation(context,role):
     h=context;kind={'unlink_object':'unlink','rename_source':'rename','create_existing':'create','rename_existing':'rename'}[role]
     obj=event(h,kind);body=obj['event'][kind];original=file(h.target,h.watch.key[:2]);other=file('/PRIVATE-unrelated')
@@ -320,6 +349,7 @@ def test_original_Documents_object_is_retained_separately_from_parent_relation(c
     assert 'PRIVATE' not in json.dumps(h.consumer.matches)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_constructor_primary_and_cleanup_errors_remain_separate(context,monkeypatch):
     sample=d.Watch.sample;close=os.close
     def fail_sample(*args):raise d.DocumentsTraceRefusal('target_identity')
@@ -333,6 +363,7 @@ def test_constructor_primary_and_cleanup_errors_remain_separate(context,monkeypa
         monkeypatch.setattr(d.Watch,'sample',sample);monkeypatch.setattr(os,'close',close)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_output_constructor_primary_and_cleanup_are_separate(context,monkeypatch):
     close=d.OutputDirectory.close
     monkeypatch.setattr(d.OutputDirectory,'audit',lambda *a,**kw:(_ for _ in ()).throw(d.DocumentsTraceRefusal('directory')))
@@ -343,6 +374,7 @@ def test_output_constructor_primary_and_cleanup_are_separate(context,monkeypatch
     assert caught.value.owner.closed is True
 
 
+@_POSIX_CAPTURE_ONLY
 def test_nonTimeout_wait_and_kill_error_still_make_independent_second_wait(context,monkeypatch):
     h=context;events=[]
     class Stream:
@@ -365,6 +397,7 @@ def test_nonTimeout_wait_and_kill_error_still_make_independent_second_wait(conte
     assert result['first_failure']['code']=='clock' and result['cleanup_failures']
 
 
+@_POSIX_CAPTURE_ONLY
 def test_child_dead_at_deadline_never_counts_as_owned_planned_shutdown(context,monkeypatch):
     h=context;actions=[]
     class Stream:
@@ -395,6 +428,7 @@ def test_child_dead_at_deadline_never_counts_as_owned_planned_shutdown(context,m
     assert 'ended_before_owned_shutdown' in h.consumer.issues
 
 
+@_POSIX_CAPTURE_ONLY
 def test_last_fresh_report_RO_close_ancestor_change_vetoes_terminal(root_run,monkeypatch):
     h=root_run;close=os.close;count=0
     def close_and_redirect(fd):
@@ -436,6 +470,7 @@ def bootstrap_fixture(h,monkeypatch,args=None):
 
 
 @pytest.mark.parametrize('args',[[],[HEAD,TRACKING,NEW],['PRIVATE',TRACKING,NEW,OLD]])
+@_POSIX_CAPTURE_ONLY
 def test_bootstrap_bad_arguments_emit_one_fixed_private_free_refusal(context,monkeypatch,capsys,args):
     text=bootstrap_fixture(context,monkeypatch,args)
     with pytest.raises(SystemExit) as error:exec(compile(text,'<fabricated-bootstrap>','exec'),{})
@@ -445,6 +480,7 @@ def test_bootstrap_bad_arguments_emit_one_fixed_private_free_refusal(context,mon
     assert packet['source_authority'] is False and 'PRIVATE' not in json.dumps(packet)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_stale_bootstrap_hash_refuses_before_unverified_exec_and_closes_original_fd(context,monkeypatch,capsys):
     text=bootstrap_fixture(context,monkeypatch,[HEAD,TRACKING,NEW,OLD]);opened=[];closed=[];op=os.open;close=os.close
     monkeypatch.setattr(os,'open',lambda *a,**kw:(opened.append(op(*a,**kw)) or opened[-1]))
@@ -457,6 +493,7 @@ def test_stale_bootstrap_hash_refuses_before_unverified_exec_and_closes_original
 
 
 @pytest.mark.parametrize('boundary,number',[('open',errno.EPERM),('read',errno.EIO)])
+@_POSIX_CAPTURE_ONLY
 def test_bootstrap_bounded_OS_diagnostics_never_format_private_exception(context,monkeypatch,capsys,boundary,number):
     text=bootstrap_fixture(context,monkeypatch);opened=[];closed=[];op=os.open;close=os.close
     def opening(*args,**kwargs):
@@ -470,12 +507,14 @@ def test_bootstrap_bounded_OS_diagnostics_never_format_private_exception(context
     assert 'PRIVATE' not in json.dumps(packet) and closed==opened
 
 
+@_POSIX_CAPTURE_ONLY
 def test_bootstrap_authenticated_main_exec_is_outside_prefix_catch(context,monkeypatch,capsys):
     text=bootstrap_fixture(context,monkeypatch)
     with pytest.raises(SystemExit) as error:exec(compile(text,'<fabricated-bootstrap>','exec'),{})
     assert error.value.code==7 and capsys.readouterr().out=='AUTHENTICATED_MAIN_ONLY\n'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_private_framer_contract_diagnostic_uses_exact_original_class_callable_and_catalogue(context,monkeypatch):
     h=context;error=h.framer.TraceRefusal('input_limit')
     assert d.diagnostic(error,'native_observation')=={'stage':'native_observation','role':'framer','code':'input_limit','errno_name':None,'category':'local_contract_refusal'}
@@ -486,6 +525,7 @@ def test_private_framer_contract_diagnostic_uses_exact_original_class_callable_a
 
 
 @pytest.mark.parametrize('number',[errno.EPERM,errno.EACCES,99999])
+@_POSIX_CAPTURE_ONLY
 def test_runtime_errno_projection_is_allowlisted_and_exception_text_free(context,number):
     class Secret(OSError):
         def __str__(self):raise AssertionError('exception formatting forbidden')
@@ -495,6 +535,7 @@ def test_runtime_errno_projection_is_allowlisted_and_exception_text_free(context
     assert result['category']=='local_os_refusal' and 'PRIVATE' not in json.dumps(result)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_private_64MiB_cap_boundaries_preserve_original_shared_8MiB_module(context):
     from scripts import trace_short_interest_journal_actor as shared
     h=context;raw=(REPO/d.FRAMER).read_bytes();before=d.sha(raw)
@@ -506,6 +547,7 @@ def test_private_64MiB_cap_boundaries_preserve_original_shared_8MiB_module(conte
     assert (d.MAX_RECORD,d.MAX_MATCHES,d.MAX_OUTPUT,d.PASSIVE_NS,d.WHOLE_NS)==(65536,256,1048576,30000000000,120000000000)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_private_framer_validates_original_cap_before_override(context,monkeypatch):
     raw=(REPO/d.FRAMER).read_bytes();variant=raw.replace(b'MAX_INPUT = 8 * 1024 * 1024',b'MAX_INPUT = 64 * 1024 * 1024',1)
     assert variant!=raw
@@ -515,6 +557,7 @@ def test_private_framer_validates_original_cap_before_override(context,monkeypat
 
 
 @pytest.mark.parametrize('raw',[b"raise AssertionError('PRIVATE_UNVERIFIED_EXEC')\n",bytearray(b'PRIVATE')])
+@_POSIX_CAPTURE_ONLY
 def test_untrusted_private_framer_bytes_refuse_before_module_creation_or_exec(context,monkeypatch,raw):
     monkeypatch.setattr(d,'ModuleType',lambda *a:pytest.fail('Unverified module must not be created'))
     original=d._FRAMER_DIAGNOSTIC
@@ -522,12 +565,14 @@ def test_untrusted_private_framer_bytes_refuse_before_module_creation_or_exec(co
     assert d._FRAMER_DIAGNOSTIC is original
 
 
+@_POSIX_CAPTURE_ONLY
 def test_record_bound_remains_64KiB_after_private_stream_cap_change(context):
     h=context
     with pytest.raises(h.framer.TraceRefusal,match='record_limit'):h.consumer.feed(b'{"x":"'+b'a'*65536)
     assert d.diagnostic(h.framer.TraceRefusal('record_limit'),'native_observation')['code']=='record_limit'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_initial_nonzero_sequence_is_unverified_coverage_not_invented_drops(context):
     h=context;h.consumer.consume(event(h,'setflags',9));h.consumer.consume(event(h,'setflags',11))
     assert h.consumer.first_seq==9 and h.consumer.last_seq==11
@@ -535,6 +580,7 @@ def test_initial_nonzero_sequence_is_unverified_coverage_not_invented_drops(cont
     assert not any('drop' in key for key in h.consumer.issues)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_no_records_is_incomplete_but_valid_unrelated_records_with_zero_candidates_can_close(context):
     h=context;h.consumer.finish();assert 'no_valid_native_records' in h.consumer.issues
     value=d.make_consumer(h.framer,h.watch);obj=event(h,'unlink');obj['event']['unlink']['parent_dir']=file('/unrelated')
@@ -542,6 +588,7 @@ def test_no_records_is_incomplete_but_valid_unrelated_records_with_zero_candidat
 
 
 @pytest.mark.parametrize('mode',['planned','kill','stderr'])
+@_POSIX_CAPTURE_ONLY
 def test_original_lifecycle_TERM_EOF_kill_stderr_bounds_and_sampling_intervals(context,monkeypatch,mode):
     h=context;actions=[];now=[0];reads={111:[d.canonical(event(h,'setflags')),b''],222:[b'']}
     class Timer(Clock):
@@ -597,12 +644,14 @@ def test_original_lifecycle_TERM_EOF_kill_stderr_bounds_and_sampling_intervals(c
         assert result['planned_original_handle_shutdown'] is False and result['native_stdout_stderr_EOF'] is False
 
 
+@_POSIX_CAPTURE_ONLY
 def test_own_unknown_exception_remains_unknown_without_formatting(context):
     class Unknown(Exception):
         def __str__(self):raise AssertionError('private exception formatting forbidden')
     assert d.diagnostic(Unknown('PRIVATE'),'native_observation')=={'stage':'native_observation','role':'unknown','code':None,'errno_name':None,'category':'unknown_local_failure'}
 
 
+@_POSIX_CAPTURE_ONLY
 def test_expired_publication_reserve_never_writes_or_extends_whole_clock(root_run,monkeypatch):
     h=root_run;now=[0];monkeypatch.setattr(d.time,'monotonic_ns',lambda:now[0]);monkeypatch.setattr(d,'_BOOTSTRAP_START',0)
     original=d.observe;writes=[];write=os.write

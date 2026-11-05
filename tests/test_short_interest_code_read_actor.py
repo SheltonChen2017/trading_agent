@@ -13,6 +13,18 @@ from types import SimpleNamespace
 
 import pytest
 
+# The runtime under test imports POSIX-only stdlib modules at import time, so
+# this module cannot even be collected on the supported Windows host; see the
+# lane record SI-CR18-001. Portable contract logic stays covered on POSIX.
+pytest.importorskip(
+    "fcntl",
+    reason=(
+        "the protected-capture runtime imports the POSIX-only module "
+        "fcntl at import time; it cannot execute on this host, see the "
+        "lane record SI-CR18-001"
+    ),
+)
+
 from scripts import trace_short_interest_code_read_actor as t
 from scripts import trace_short_interest_documents_actor as d
 from scripts import diagnose_short_interest_code_read_interval as helper
@@ -973,3 +985,15 @@ def test_python39_syntax_and_no_runtime_repository_imports():
     source=(REPO/'scripts/trace_short_interest_code_read_actor.py').read_text()
     tree=ast.parse(source,feature_version=(3,9))
     assert not any(isinstance(node,ast.ImportFrom) and (node.module or '').startswith(('scripts','research','data')) for node in ast.walk(tree))
+
+
+def _closed_packet(**changes):
+    return t.canonical({**packet('closed_initial_window_stopped_before_snapshot'),**changes})
+
+
+def test_closed_worker_packet_with_a_later_failure_is_refused_by_root():
+    """A cleanup failure after the stop may not end as closed with first_failure null."""
+    parsed=t.worker_packet(_closed_packet(),HEAD,REMOTE,MAPPING)
+    assert parsed['cleanup_failures']==[]
+    with pytest.raises(t.CodeReadTraceRefusal,match='worker_packet'):
+        t.worker_packet(_closed_packet(cleanup_failures=[{'phase':'cleanup','code':'graph_changed'}]),HEAD,REMOTE,MAPPING)

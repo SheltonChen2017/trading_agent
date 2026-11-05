@@ -13,6 +13,17 @@ import pytest
 
 from scripts import inspect_short_interest_usb_archive as driver
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 
 class Clock:
     def check(self):
@@ -35,6 +46,7 @@ def changed_info(info, field):
 
 
 @pytest.mark.parametrize("field", driver._STAMP_FIELDS)
+@_POSIX_CAPTURE_ONLY
 def test_exact_failed_original_stamp_projects_all_ten_field_names_without_new_stat(tmp_path, monkeypatch, field):
     target = tmp_path / "private-source-name"
     target.write_bytes(b"private fabricated bytes")
@@ -63,6 +75,7 @@ def test_exact_failed_original_stamp_projects_all_ten_field_names_without_new_st
 
 
 @pytest.mark.parametrize("comparison", ["root_descriptor", "root_name", "directory_descriptor", "directory_name"])
+@_POSIX_CAPTURE_ONLY
 def test_root_zero_and_directory_ordinal_and_first_failed_relation_preserve_short_circuit(tmp_path, monkeypatch, comparison):
     target = tmp_path / "literal"; target.write_bytes(b"fabricated")
     item = driver._Read(target, 64, Clock(), component=("code", 4))
@@ -93,6 +106,7 @@ def test_root_zero_and_directory_ordinal_and_first_failed_relation_preserve_shor
     finally: item.close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_constructor_failure_reports_actual_entered_initial_phase(tmp_path, monkeypatch):
     target = tmp_path / "literal"; target.write_bytes(b"fabricated")
     read = driver._Read._read; first = True
@@ -111,6 +125,7 @@ def test_constructor_failure_reports_actual_entered_initial_phase(tmp_path, monk
     assert "mtime_ns" in detail["mismatching_fields"]
 
 
+@_POSIX_CAPTURE_ONLY
 def test_close_failure_preserves_exact_phase_and_terminal_negative_only_fixed_fields(tmp_path, monkeypatch, capsys):
     target = tmp_path / "literal"; target.write_bytes(b"fabricated")
     item = driver._Read(target, 64, Clock(), component=("year", None))
@@ -126,6 +141,7 @@ def test_close_failure_preserves_exact_phase_and_terminal_negative_only_fixed_fi
 
 
 @pytest.mark.parametrize("late", [False, True])
+@_POSIX_CAPTURE_ONLY
 def test_post_close_original_comparison_and_after_last_close_are_diagnosed(tmp_path, monkeypatch, late):
     target = tmp_path / "literal"; target.write_bytes(b"fabricated")
     item = driver._Read(target, 64, Clock(), component=("readme", None)); item.close()
@@ -147,6 +163,7 @@ def test_post_close_original_comparison_and_after_last_close_are_diagnosed(tmp_p
     assert "mtime_ns" in detail["mismatching_fields"] and item.failed
 
 
+@_POSIX_CAPTURE_ONLY
 def test_forged_or_unrelated_failures_do_not_adopt_another_comparison_diagnostic(tmp_path, monkeypatch):
     target = tmp_path / "literal"; target.write_bytes(b"fabricated")
     item = driver._Read(target, 64, Clock(), component=("full", None))
@@ -164,6 +181,7 @@ def test_forged_or_unrelated_failures_do_not_adopt_another_comparison_diagnostic
     finally: item.close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_helper_called_outside_original_method_is_unknown_even_with_matching_literal_labels(tmp_path):
     target = tmp_path / "literal"; target.write_bytes(b"fabricated")
     item = driver._Read(target, 64, Clock(), component=("full", None))
@@ -176,6 +194,7 @@ def test_helper_called_outside_original_method_is_unknown_even_with_matching_lit
     finally: item.close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_actual_after_bytes_comparison_is_not_misattributed_to_earlier_check(tmp_path, monkeypatch):
     target = tmp_path / "literal"; target.write_bytes(b"fabricated")
     item = driver._Read(target, 64, Clock(), component=("full", None)); read = item._read
@@ -219,6 +238,7 @@ def test_literal_custody_error_without_original_frame_has_no_inferred_component(
 
 
 @pytest.mark.parametrize("drift", ["component", "reopen"])
+@_POSIX_CAPTURE_ONLY
 def test_constructor_role_and_phase_cannot_be_relabelled_before_genuine_failure(tmp_path, drift):
     target = tmp_path / "literal"; target.write_bytes(b"fabricated")
     item = driver._Read(target, 64, Clock(), component=("full", None))
@@ -231,6 +251,7 @@ def test_constructor_role_and_phase_cannot_be_relabelled_before_genuine_failure(
     assert driver.comparison_diagnostic(caught.value) is None
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_read_is_readonly_and_exact_and_closes_all_handles(tmp_path):
     import fcntl
     target = tmp_path / "literal"
@@ -248,6 +269,7 @@ def test_original_read_is_readonly_and_exact_and_closes_all_handles(tmp_path):
             os.fstat(fd)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_empty_code_is_explicit_and_source_default_still_refuses(tmp_path):
     target = tmp_path / "empty_code.py"
     target.write_bytes(b"")
@@ -260,6 +282,7 @@ def test_empty_code_is_explicit_and_source_default_still_refuses(tmp_path):
 
 
 @pytest.mark.parametrize("change", ["bytes", "timestamps", "replacement"])
+@_POSIX_CAPTURE_ONLY
 def test_any_original_file_change_refuses_and_latches(tmp_path, change):
     target = tmp_path / "literal"
     target.write_bytes(b"fabricated")
@@ -282,6 +305,7 @@ def test_any_original_file_change_refuses_and_latches(tmp_path, change):
     assert not item.fds
 
 
+@_POSIX_CAPTURE_ONLY
 def test_post_close_same_bytes_new_metadata_never_rebaseline(tmp_path):
     target = tmp_path / "literal"
     target.write_bytes(b"same bytes")
@@ -299,6 +323,7 @@ def test_post_close_same_bytes_new_metadata_never_rebaseline(tmp_path):
         item.after_close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_post_close_parent_metadata_change_also_refuses(tmp_path):
     target = tmp_path / "literal"
     target.write_bytes(b"same bytes")
@@ -310,6 +335,7 @@ def test_post_close_parent_metadata_change_also_refuses(tmp_path):
         item.after_close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_metadata_change_at_last_fresh_descriptor_close_is_detected(tmp_path, monkeypatch):
     target = tmp_path / "literal"
     target.write_bytes(b"same bytes")
@@ -332,6 +358,7 @@ def test_metadata_change_at_last_fresh_descriptor_close_is_detected(tmp_path, mo
 
 
 @pytest.mark.parametrize("kind", ["file_symlink", "parent_symlink", "hardlink", "oversize", "empty"])
+@_POSIX_CAPTURE_ONLY
 def test_untrusted_path_or_file_shape_fails_closed(tmp_path, kind):
     target = tmp_path / "literal"
     target.write_bytes(b"fabricated")
@@ -487,6 +514,7 @@ print("isolated_four_file_inspector_only")
     assert result.stdout.strip() == "isolated_four_file_inspector_only"
 
 
+@_POSIX_CAPTURE_ONLY
 def test_git_metadata_reads_work_under_unchanged_all_write_open_denial():
     root = Path(__file__).resolve().parents[1]
     program = r'''

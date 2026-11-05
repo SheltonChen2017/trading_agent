@@ -241,3 +241,13 @@ def test_local_dirty_change_after_publication_batch_open_refuses_before_named_wr
     with pytest.raises(m.LaneBatchRefusal):
         value.authorize_publication("started.json")
     assert not value._state["publication"][1]
+
+
+def test_stalled_git_refuses_instead_of_blocking_past_every_deadline(monkeypatch):
+    seen = {}
+    def stalled(command, **kwargs):
+        seen.update(kwargs); raise m.subprocess.TimeoutExpired(command, kwargs["timeout"])
+    monkeypatch.setattr(m.subprocess, "run", stalled)
+    with pytest.raises(m.LaneBatchRefusal, match="lane_Git_unavailable"):
+        m._run(Path("."), ["git", "ls-remote"])
+    assert seen["timeout"] == m.GIT_TIMEOUT_SECONDS

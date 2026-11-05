@@ -142,6 +142,9 @@ def fabricated_current_code_lease(monkeypatch, tmp_path):
     h = SimpleNamespace(plan=genuine_plan(monkeypatch), tick=100., events=[], fail_close=False)
     h.budget = outer.accounting.open_durable_count_budget(h.plan)
     monkeypatch.setattr(outer.source_scope, "require_dispatch_allowed", lambda: None)  # Explicit SOFTWARE-ONLY fixture seam.
+    # genuine_plan is the eight-part plan; these cases exercise lease mechanics, and the
+    # floor itself is tested by test_source_lease_refuses_floorless_plan_before_any_context.
+    monkeypatch.setattr(outer, "_require_negative_exposure_floor", lambda plan: None)
     h.token = object.__new__(outer.OriginalClosedArchiveToken)
     model = h.plan._parts[1]; h.archive = (h.token, object(), object(), model, b"{}", "d" * 64,
         model._parts[1].query_plan, object())
@@ -180,6 +183,33 @@ def fabricated_current_code_lease(monkeypatch, tmp_path):
     h.context = lambda: outer._prepare_registered_source_lease(h.token, h.budget, root=tmp_path,
         runtime_head="c" * 40, actual_remote="b" * 40, complete_code_manifest=h.manifest)
     return h
+
+
+_REAL_NEGATIVE_FLOOR = outer._require_negative_exposure_floor
+
+
+def test_source_lease_refuses_floorless_plan_before_any_context(fabricated_current_code_lease, monkeypatch):
+    # SI-CR27-008: even with the 052 gate replaced, the legacy eight-part plan never
+    # reaches a code context, guard refresh, storage, claim or key.
+    h = fabricated_current_code_lease
+    monkeypatch.setattr(outer, "_require_negative_exposure_floor", _REAL_NEGATIVE_FLOOR)
+    assert h.plan.negative_exposure() is None
+    with pytest.raises(outer.DurableCountCaptureRefusal, match="durable_capture_plan_changed"):
+        with h.context():
+            pytest.fail("floorless plan yielded a source lease")
+    assert h.events == []
+
+
+def test_negative_floor_accepts_only_the_nine_part_conservative_plan(conservative_archive, monkeypatch):
+    h = conservative_archive
+    basis = outer.freeze_conservative_recovery_from_archive(h.token)
+    plan = outer._conservative_archive_binding(h.token, basis)[4]
+    assert plan.negative_exposure() is not None and plan.budget_profile()["initial_START_upper_bound"] == (
+        plan._parts[1].public_summary()["START_debits"] + 8)
+    outer._require_negative_exposure_floor(plan)
+    for bad in (None, object(), "plan"):
+        with pytest.raises(outer.DurableCountCaptureRefusal, match="durable_capture_plan_changed"):
+            outer._require_negative_exposure_floor(bad)
 
 
 def test_new_lease_uses_original_plan_query_lock_and_closed_archive_lineage(fabricated_current_code_lease):

@@ -18,6 +18,17 @@ import pytest
 
 from scripts import prove_short_interest_local_metadata as m
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 HEAD, REMOTE, OPERATION = "a" * 40, "b" * 40, "c" * 64
 
 
@@ -158,6 +169,7 @@ def _observer_input(fixture, packets, monkeypatch, *, returncode=0):
     return rows
 
 
+@_POSIX_CAPTURE_ONLY
 def test_policy_is_one_fixed_source_free_finite_profile():
     assert str(m.BASE) == "/Users/sheltonchen/Library/Application Support/CodexShortInterestCustody"
     assert m.NAMESPACE == "local-metadata-20261103-v1"
@@ -170,6 +182,7 @@ def test_policy_is_one_fixed_source_free_finite_profile():
         if key not in {"location_metadata_observation_only", "provider_HTTP", "credential_reads", "new_source_claims", "source_STARTs", "source_bytes", "qc_attempts"})
 
 
+@_POSIX_CAPTURE_ONLY
 def test_registration_checks_frozen_profile_without_actual_platform_call(monkeypatch):
     calls = []
     monkeypatch.setattr(m.p, "_require_immutable_platform", lambda: calls.append("platform"))
@@ -189,6 +202,7 @@ def test_no_path_override_or_native_domain_import_framework():
     assert m.producer.__globals__["p"]._Files is m.p._Files
 
 
+@_POSIX_CAPTURE_ONLY
 def test_complete_fabricated_genuine_publisher_original_RO_and_independent_tail(fabricated_local_profile, monkeypatch):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -209,6 +223,7 @@ def test_complete_fabricated_genuine_publisher_original_RO_and_independent_tail(
     assert not list((f.base / m.NAMESPACE / "control").iterdir())
 
 
+@_POSIX_CAPTURE_ONLY
 def test_existing_base_is_not_adopted(fabricated_local_profile):
     f = fabricated_local_profile
     f.base.mkdir(mode=0o700)
@@ -216,6 +231,7 @@ def test_existing_base_is_not_adopted(fabricated_local_profile):
         m._Scope(m._Clock(), create=True)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_base_symlink_not_adopted(fabricated_local_profile):
     f = fabricated_local_profile
     target = f.base.parent / "target"
@@ -226,6 +242,7 @@ def test_base_symlink_not_adopted(fabricated_local_profile):
 
 
 @pytest.mark.parametrize("field,value", [("st_uid", -1), ("st_mode", stat.S_IFDIR | 0o770), ("st_mode", stat.S_IFREG | 0o700)])
+@_POSIX_CAPTURE_ONLY
 def test_ancestry_owner_mode_and_type_refuse(field, value):
     info = dict(st_mode=stat.S_IFDIR | 0o700, st_uid=os.getuid(), st_gid=os.getgid(), st_dev=1, st_ino=2, st_nlink=2)
     info[field] = value
@@ -248,6 +265,7 @@ def test_host_does_not_claim_nobrowse_or_native_volume_admission(monkeypatch):
 
 
 @pytest.mark.parametrize("mutation", ["extra_data", "extra_control", "extra_namespace", "chmod", "missing_literal"])
+@_POSIX_CAPTURE_ONLY
 def test_exact_membership_and_private_mode_refuse(fabricated_local_profile, monkeypatch, mutation):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -269,6 +287,7 @@ def test_exact_membership_and_private_mode_refuse(fabricated_local_profile, monk
 
 
 @pytest.mark.parametrize("mutation", ["flags", "ctime", "bytes", "replace", "mode", "link"])
+@_POSIX_CAPTURE_ONLY
 def test_original_file_drift_is_never_rebased(fabricated_local_profile, monkeypatch, mutation):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -292,6 +311,7 @@ def test_original_file_drift_is_never_rebased(fabricated_local_profile, monkeypa
 
 
 @pytest.mark.parametrize("returncode", [None, -15, 1, True, "0"])
+@_POSIX_CAPTURE_ONLY
 def test_unknown_or_nonzero_actual_exit_claim_vetoes(fabricated_local_profile, monkeypatch, returncode):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -301,6 +321,7 @@ def test_unknown_or_nonzero_actual_exit_claim_vetoes(fabricated_local_profile, m
     assert f.clock.now == 100
 
 
+@_POSIX_CAPTURE_ONLY
 def test_raw_line_reader_preserves_coalesced_lines_exact_large_integers():
     reader_fd, writer_fd = os.pipe()
     try:
@@ -315,6 +336,7 @@ def test_raw_line_reader_preserves_coalesced_lines_exact_large_integers():
 
 
 @pytest.mark.parametrize("extra", [b"{}\n", b"x"])
+@_POSIX_CAPTURE_ONLY
 def test_raw_finish_refuses_coalesced_extra_packets_or_partial_bytes(extra):
     reader_fd, writer_fd = os.pipe()
     try:
@@ -330,6 +352,7 @@ def test_raw_finish_refuses_coalesced_extra_packets_or_partial_bytes(extra):
             os.close(writer_fd)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_raw_finish_requires_actual_EOF_and_rejects_late_extra_byte():
     reader_fd, writer_fd = os.pipe()
     try:
@@ -341,6 +364,7 @@ def test_raw_finish_requires_actual_EOF_and_rejects_late_extra_byte():
         os.close(reader_fd); os.close(writer_fd)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_raw_finish_accepts_exact_EOF():
     reader_fd, writer_fd = os.pipe()
     os.close(writer_fd)
@@ -356,6 +380,7 @@ def test_noncanonical_duplicate_float_or_extra_line_refuses(raw):
         m._decode(raw)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_raw_reader_EOF_failure_is_permanently_latched():
     reader_fd, writer_fd = os.pipe()
     os.close(writer_fd)
@@ -414,6 +439,7 @@ def test_mismatch_projects_field_names_only():
     assert str(original[-1]) not in json.dumps(m.failure_summary(caught.value))
 
 
+@_POSIX_CAPTURE_ONLY
 def test_final_read_compares_original_seal_and_keeps_authority_false(fabricated_local_profile, monkeypatch):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -423,6 +449,7 @@ def test_final_read_compares_original_seal_and_keeps_authority_false(fabricated_
     assert result["status"].endswith("external_waits_still_required")
 
 
+@_POSIX_CAPTURE_ONLY
 def test_control_must_remain_empty_until_final_read_finishes(fabricated_local_profile, monkeypatch):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -432,6 +459,7 @@ def test_control_must_remain_empty_until_final_read_finishes(fabricated_local_pr
         m.final_read(HEAD, REMOTE, OPERATION, packets["producer_sealed"][1])
 
 
+@_POSIX_CAPTURE_ONLY
 def test_partial_creation_never_reports_false_zero(fabricated_local_profile, monkeypatch):
     f = fabricated_local_profile
     def fail_after_open(self, name, raw):
@@ -446,6 +474,7 @@ def test_partial_creation_never_reports_false_zero(fabricated_local_profile, mon
     assert value["creation_accounting"] == "unknown" and "PRIVATE" not in json.dumps(value)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_single_invocation_never_retries_existing_namespace(fabricated_local_profile, monkeypatch):
     _run_producer(fabricated_local_profile, monkeypatch)
     with pytest.raises(m.LocalMetadataRefusal, match="local_latched"):
@@ -469,6 +498,7 @@ def test_each_producer_closure_failure_vetoes_positive(fabricated_local_profile,
 
 
 @pytest.mark.parametrize("boundary", ["literal_close", "literal_named", "code_close", "code_named", "scope_close", "scope_named"])
+@_POSIX_CAPTURE_ONLY
 def test_each_observer_closure_failure_vetoes_positive(fabricated_local_profile, monkeypatch, boundary):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -488,6 +518,7 @@ def test_each_observer_closure_failure_vetoes_positive(fabricated_local_profile,
 
 @pytest.mark.parametrize("actor,boundary", [("producer", "literal_close"), ("producer", "code_close"),
     ("producer", "scope_close"), ("observer", "literal_close"), ("observer", "code_close"), ("observer", "scope_close")])
+@_POSIX_CAPTURE_ONLY
 def test_mutation_after_each_real_close_cannot_emit_positive(fabricated_local_profile, monkeypatch, actor, boundary):
     f = fabricated_local_profile
     packets = None
@@ -510,6 +541,7 @@ def test_mutation_after_each_real_close_cannot_emit_positive(fabricated_local_pr
 
 
 @pytest.mark.parametrize("mutation", ["bytes", "mode", "replace"])
+@_POSIX_CAPTURE_ONLY
 def test_last_original_named_read_checks_after_its_own_FD_close(fabricated_local_profile, monkeypatch, mutation):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -564,6 +596,7 @@ def fabricated_code8(tmp_path, monkeypatch):
     return SimpleNamespace(path=path, raw=raw, manifest=manifest)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_new_eighth_code_file_is_committed_and_original_RO(fabricated_code8):
     f = fabricated_code8
     code = m._Code8(HEAD, REMOTE, m._Clock())
@@ -575,6 +608,7 @@ def test_new_eighth_code_file_is_committed_and_original_RO(fabricated_code8):
 
 
 @pytest.mark.parametrize("mutation", ["new_bytes", "rename", "uncommitted_Git", "SDK_hash", "missing_old_code"])
+@_POSIX_CAPTURE_ONLY
 def test_code_byte_stamp_manifest_or_sdk_drift_permanently_refuses(fabricated_code8, monkeypatch, mutation):
     f = fabricated_code8
     code = m._Code8(HEAD, REMOTE, m._Clock())
@@ -598,6 +632,7 @@ def test_code_byte_stamp_manifest_or_sdk_drift_permanently_refuses(fabricated_co
 
 
 @pytest.mark.parametrize("mutation", ["head", "remote", "operation", "policy", "authority", "original_ns_bool", "flags_bool"])
+@_POSIX_CAPTURE_ONLY
 def test_handoff_cannot_override_original_binding_or_integer_schema(fabricated_local_profile, monkeypatch, mutation):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -622,6 +657,7 @@ def test_handoff_cannot_override_original_binding_or_integer_schema(fabricated_l
         m.observer(HEAD, REMOTE, OPERATION)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_partial_directory_creation_keeps_data_FD_in_cleanup(fabricated_local_profile, monkeypatch):
     f = fabricated_local_profile
     actual_open = f.proxy.open
@@ -641,6 +677,7 @@ def test_partial_directory_creation_keeps_data_FD_in_cleanup(fabricated_local_pr
             f.actual_fstat(fd)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_host_contract_checked_after_last_directory_context_close(fabricated_local_profile, monkeypatch):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -664,6 +701,7 @@ def _held_controller(f, packets):
     return scope, literal, controls
 
 
+@_POSIX_CAPTURE_ONLY
 def test_postexit_explicit_controller_uses_original_literal_and_own_roles(fabricated_local_profile, monkeypatch):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -679,6 +717,7 @@ def test_postexit_explicit_controller_uses_original_literal_and_own_roles(fabric
     assert m.authority()["durable_Main_receipt"] is False
 
 
+@_POSIX_CAPTURE_ONLY
 def test_postexit_control_named_original_drift_after_control_handle_close_refuses(fabricated_local_profile, monkeypatch):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -696,6 +735,7 @@ def test_postexit_control_named_original_drift_after_control_handle_close_refuse
 
 
 @pytest.mark.parametrize("mutation", ["extra", "old_literal_flag", "control_flag", "control_bytes", "wrong_role"])
+@_POSIX_CAPTURE_ONLY
 def test_controller_phase_cannot_adopt_extra_old_drift_or_bad_roles(fabricated_local_profile, monkeypatch, mutation):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -719,6 +759,7 @@ def test_controller_phase_cannot_adopt_extra_old_drift_or_bad_roles(fabricated_l
         literal.close(); controls.close(); scope.close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_controller_cannot_attach_to_fresh_unbound_scope_or_other_literal(fabricated_local_profile):
     scope = m._Scope(m._Clock(), create=True)
     try:
@@ -728,6 +769,7 @@ def test_controller_cannot_attach_to_fresh_unbound_scope_or_other_literal(fabric
         scope.close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_per_role_wire_and_unchanged_publisher_control_size_bounds(fabricated_local_profile, monkeypatch):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -752,6 +794,7 @@ def test_authority_binding_rejects_boolean_integer_aliases(key, alias):
 
 
 @pytest.mark.parametrize("field,alias", [("pid", True), ("flags", True), ("original9", True), ("literal_bytes", True)])
+@_POSIX_CAPTURE_ONLY
 def test_original_packet_fields_refuse_boolean_aliases(field, alias):
     value = {"pid": 1, "original9": [1, 2, os.getuid(), os.getgid(), 384, 1, 41, 9, 10], "flags": 3, "literal_bytes": 41}
     if field == "original9":
@@ -763,6 +806,7 @@ def test_original_packet_fields_refuse_boolean_aliases(field, alias):
 
 
 @pytest.mark.parametrize("actor", ["producer", "observer"])
+@_POSIX_CAPTURE_ONLY
 def test_source_context_exit_after_terminal_packet_still_refuses(fabricated_local_profile, monkeypatch, actor):
     f = fabricated_local_profile
     if actor == "observer":
@@ -779,6 +823,7 @@ def test_source_context_exit_after_terminal_packet_still_refuses(fabricated_loca
     assert actor + "_closed" in events and events[-1] == actor + "_refused"
 
 
+@_POSIX_CAPTURE_ONLY
 def test_final_read_does_not_accept_untyped_pid_claim(fabricated_local_profile, monkeypatch):
     f = fabricated_local_profile
     packets = _run_producer(f, monkeypatch)
@@ -796,6 +841,7 @@ def test_retirement_keeps_original_local_metadata_sdk_pin_frozen():
 
 
 @pytest.mark.parametrize("actor", ["producer", "observer"])
+@_POSIX_CAPTURE_ONLY
 def test_retirement_changed_sdk_refuses_before_namespace_or_publication(tmp_path, monkeypatch, actor):
     """Only fabricated code custody reaches the old pin; no old namespace is opened."""
     original_sdk = "e477f8921c71410c36aa8c4b23e9c76f46aa68286b62bf2991882832b7a73237"

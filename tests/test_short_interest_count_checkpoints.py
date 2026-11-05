@@ -302,6 +302,21 @@ def test_authority_never_recreates_old_process_or_source_budget():
     assert found["provider_HTTP"] == found["new_claims"] == found["new_STARTs"] == found["qc_attempts"] == 0
 
 
+OPERATOR_PROTOCOL = "c" * 64
+SAVED_PRODUCER = {"head": "a" * 40, "remote": "b" * 40, "operator_protocol_sha256": OPERATOR_PROTOCOL, "registration_sha256": "e" * 64}
+
+
+def _received(number, reservation, request, start_raw, status=200, body=None, received_at="2026-10-27T00:00:01Z", diagnostic=None):
+    """The exact sealed record the control custody writes, including its derived hash."""
+    value = {"schema": "si-count-received-v1", "ordinal": number, "reservation_sha256": reservation, "request_sha256": request,
+        "START_sha256": hash_bytes(start_raw), "operator_protocol_sha256": OPERATOR_PROTOCOL, "http_invoked": True,
+        "http_status": status, "body_sha256": None if body is None else hash_bytes(body),
+        "body_bytes": None if body is None else len(body), "received_at": received_at, "diagnostic": diagnostic,
+        "budget_release_authority": False}
+    value["observation_sha256"] = reader._observation_sha256(value)
+    return value
+
+
 @pytest.fixture
 def account_fixture(monkeypatch):
     """Genuine toy query plan/tickets; explicit synthetic saved control bytes."""
@@ -309,18 +324,21 @@ def account_fixture(monkeypatch):
     plan = genuine_plan(monkeypatch); instance = budget.open_durable_count_budget(plan)
     private, attempts = {}, []
     claim = canonical_json({"schema": "si-count-spent-claim-v1", "spent": True, "chunk": 1,
-        "plan_sha256": plan.sha256}).encode(); private["claim/claim.spent.json"] = claim
+        "plan_sha256": plan.sha256, "operator_protocol_sha256": OPERATOR_PROTOCOL,
+        "registration_sha256": SAVED_PRODUCER["registration_sha256"], "runtime_head": SAVED_PRODUCER["head"],
+        "actual_remote": SAVED_PRODUCER["remote"], "started_at": "2026-10-27T00:00:00Z",
+        "dispatch_authority": False, "source_admitted": False}).encode(); private["claim/claim.spent.json"] = claim
     raw = b'{"synthetic":true}'
     for number, position in enumerate(plan.chunk_positions(1), 1):
         ticket = instance.reserve_start_slot(position); bound = budget.ticket_binding(ticket)
-        reserved = __import__("json").loads(bound[13]); observed = hash_payload(["synthetic", number])
+        reserved = __import__("json").loads(bound[13])
         start_path, received_path = f"capture/starts/{number:06d}/START.spent.json", f"capture/received/{number:06d}/received.private.json"
         body, receipt = f"capture/responses/{number:06d}/response.raw", f"capture/responses/{number:06d}/response.receipt.private.json"
         started = {"reservation_sha256": bound[9], "request_sha256": bound[8], "spent": True,
             "claim_sha256": hash_bytes(claim), "ordinal": number, "lifetime_try": bound[7], "started_at": "2026-10-27T00:00:00Z"}
         private[start_path] = canonical_json(started).encode()
-        private[received_path] = canonical_json({"observation_sha256": observed, "START_sha256": hash_bytes(private[start_path]),
-            "http_invoked": True, "http_status": 200, "body_sha256": hash_bytes(raw)}).encode()
+        saved = _received(number, bound[9], bound[8], private[start_path], body=raw); observed = saved["observation_sha256"]
+        private[received_path] = canonical_json(saved).encode()
         private[body] = raw; private[receipt] = canonical_json({"body_sha256": hash_bytes(raw), "body_bytes": len(raw),
             "http_observation_sha256": observed, "source_admitted": False, "budget_release_authority": False}).encode()
         attempts.append({"reservation": reserved, "reservation_sha256": bound[9], "observation_sha256": observed,
@@ -330,8 +348,9 @@ def account_fixture(monkeypatch):
     account = {"chunk": 1, "reservation_sha256s": [row["reservation_sha256"] for row in attempts],
         "charges": [len(raw)] * len(attempts), "covered_positions": list(plan.chunk_positions(1)), "manifest_sha256": "f" * 64}
     descriptor = {"plan": {"chunk": 1}, "attempts": attempts, "external_claim_path": "claim/claim.spent.json",
-        "account": account, "final_manifest_sha256": "f" * 64}
-    return SimpleNamespace(plan=plan, descriptor=descriptor, private=private, lifetime=list(plan._parts[4][0]))
+        "producer": dict(SAVED_PRODUCER), "account": account, "final_manifest_sha256": "f" * 64}
+    return SimpleNamespace(plan=plan, descriptor=descriptor, private=private, lifetime=list(plan._parts[4][0]),
+        budget=instance, ticket_binding=budget.ticket_binding)
 
 
 def test_original_saved_tickets_query_identity_controls_and_body_debits_reconstruct_account(account_fixture):
@@ -531,9 +550,14 @@ def test_saved_ordinals_are_global_across_chunks_not_restarted_at_one(account_fi
         row["reservation_sha256"] = hash_payload(row["reservation"])
         start = reader._parse(remapped.pop(row["START_path"])); received = reader._parse(remapped.pop(row["received_path"]))
         start["ordinal"], start["reservation_sha256"] = ordinal, row["reservation_sha256"]
+        receipt = reader._parse(remapped[row["receipt_path"]])
         row["START_path"] = f"capture/starts/{ordinal:06d}/START.spent.json"
         row["received_path"] = f"capture/received/{ordinal:06d}/received.private.json"
         remapped[row["START_path"]] = canonical_json(start).encode(); received["START_sha256"] = hash_bytes(remapped[row["START_path"]])
+        received["ordinal"], received["reservation_sha256"] = ordinal, row["reservation_sha256"]
+        received["observation_sha256"] = row["observation_sha256"] = reader._observation_sha256(received)
+        receipt["http_observation_sha256"] = row["observation_sha256"]
+        remapped[row["receipt_path"]] = canonical_json(receipt).encode()
         remapped[row["received_path"]] = canonical_json(received).encode()
         for role, filename in (("body_path", "response.raw"), ("receipt_path", "response.receipt.private.json")):
             raw = remapped.pop(row[role]); row[role] = f"capture/responses/{ordinal:06d}/{filename}"; remapped[row[role]] = raw
@@ -764,3 +788,150 @@ def test_final_metadata_deadline_includes_last_original_Main_receipt_audit(termi
         if path == h.main: h.ticks[0] = 1800.0
     monkeypatch.setattr(reader, "_file_metadata", audit)
     with pytest.raises(reader.CountCheckpointLoaderRefusal, match="window_exhausted"): h.audit()
+
+
+def _resave_received(h, attempt, **changes):
+    saved = reader._parse(h.private[attempt["received_path"]]); saved.update(changes)
+    saved["observation_sha256"] = attempt["observation_sha256"] = reader._observation_sha256(saved)
+    h.private[attempt["received_path"]] = canonical_json(saved).encode()
+    if attempt["receipt_path"] is not None:
+        # Re-sign the receipt too, so a case reaches its own check and not this binding.
+        receipt = reader._parse(h.private[attempt["receipt_path"]]); receipt["http_observation_sha256"] = saved["observation_sha256"]
+        h.private[attempt["receipt_path"]] = canonical_json(receipt).encode()
+
+
+TRANSIENT = {"code": "network_failure", "phase": "open", "failure_class": "timeout", "http_status": None,
+    "retryable": True, "errno_name": None}
+
+
+def _with_retry(h, *, detail=TRANSIENT, retry_started="2026-10-27T00:00:03Z"):
+    """First position fails with a transport diagnostic and is retried as the last attempt."""
+    attempts = h.descriptor["attempts"]; first = attempts[0]; position = first["reservation"]["source_position"]
+    for role in ("body_path", "receipt_path"): del h.private[first[role]]; first[role] = None
+    first.update(http_status=None, charged_bytes=reader.MAXIMUM_BYTES, fixed_diagnostic=dict(detail))
+    _resave_received(h, first, http_status=None, body_sha256=None, body_bytes=None, diagnostic=[list(row) for row in detail.items()])
+    number = len(attempts) + 1; ticket = h.budget.reserve_start_slot(position); bound = h.ticket_binding(ticket); raw = b'{"retried":true}'
+    start_path, received_path = f"capture/starts/{number:06d}/START.spent.json", f"capture/received/{number:06d}/received.private.json"
+    body, receipt = f"capture/responses/{number:06d}/response.raw", f"capture/responses/{number:06d}/response.receipt.private.json"
+    h.private[start_path] = canonical_json({"reservation_sha256": bound[9], "request_sha256": bound[8], "spent": True,
+        "claim_sha256": hash_bytes(h.private["claim/claim.spent.json"]), "ordinal": number, "lifetime_try": bound[7],
+        "started_at": retry_started}).encode()
+    saved = _received(number, bound[9], bound[8], h.private[start_path], body=raw, received_at="2026-10-27T00:00:20Z")
+    h.private[received_path] = canonical_json(saved).encode(); h.private[body] = raw
+    h.private[receipt] = canonical_json({"body_sha256": hash_bytes(raw), "body_bytes": len(raw),
+        "http_observation_sha256": saved["observation_sha256"], "source_admitted": False, "budget_release_authority": False}).encode()
+    attempts.append({"reservation": __import__("json").loads(bound[13]), "reservation_sha256": bound[9],
+        "observation_sha256": saved["observation_sha256"], "http_invoked": True, "http_status": 200,
+        "received_at": "2026-10-27T00:00:20Z", "fixed_diagnostic": None, "START_path": start_path, "received_path": received_path,
+        "body_path": body, "receipt_path": receipt, "charged_bytes": len(raw)})
+    account = h.descriptor["account"]
+    account["reservation_sha256s"].append(bound[9]); account["charges"][0] = reader.MAXIMUM_BYTES; account["charges"].append(len(raw))
+
+
+def test_legal_retry_chain_reconstructs_from_the_sealed_records(account_fixture):
+    h = account_fixture; _with_retry(h)
+    assert reader._attempts(h.descriptor, h.private, h.plan, h.lifetime) == h.descriptor["account"]
+
+
+@pytest.mark.parametrize("change", ["received_at", "diagnostic", "ordinal", "reservation", "request", "protocol", "schema", "release", "extra"])
+def test_saved_attempt_must_equal_its_sealed_received_record(account_fixture, change):
+    # Retry legality and backoff read these fields, so a descriptor alone cannot supply them.
+    h = account_fixture; attempt = h.descriptor["attempts"][0]
+    if change == "received_at": attempt["received_at"] = "2026-10-27T00:00:02Z"
+    elif change == "diagnostic": attempt["fixed_diagnostic"] = dict(TRANSIENT)
+    elif change == "ordinal": _resave_received(h, attempt, ordinal=99)
+    elif change == "reservation": _resave_received(h, attempt, reservation_sha256="f" * 64)
+    elif change == "request": _resave_received(h, attempt, request_sha256="f" * 64)
+    elif change == "protocol": _resave_received(h, attempt, operator_protocol_sha256="f" * 64)
+    elif change == "schema": _resave_received(h, attempt, schema="other")
+    elif change == "release": _resave_received(h, attempt, budget_release_authority=True)
+    else:
+        saved = reader._parse(h.private[attempt["received_path"]]); saved["unknown"] = 1
+        h.private[attempt["received_path"]] = canonical_json(saved).encode()
+    with pytest.raises(reader.CountCheckpointLoaderRefusal):
+        reader._attempts(h.descriptor, h.private, h.plan, h.lifetime)
+
+
+def test_observation_hash_must_derive_from_the_sealed_record(account_fixture):
+    # A matching stored hash is not enough; it has to recompute from the record's own fields.
+    h = account_fixture; attempt = h.descriptor["attempts"][0]
+    saved = reader._parse(h.private[attempt["received_path"]]); saved["received_at"] = attempt["received_at"] = "2026-10-27T00:00:09Z"
+    h.private[attempt["received_path"]] = canonical_json(saved).encode()  # observation_sha256 deliberately not recomputed.
+    with pytest.raises(reader.CountCheckpointLoaderRefusal):
+        reader._attempts(h.descriptor, h.private, h.plan, h.lifetime)
+
+
+@pytest.mark.parametrize("detail", [{**TRANSIENT, "retryable": False}, {**TRANSIENT, "phase": "read"},
+    {**TRANSIENT, "code": "http_status"}, {**TRANSIENT, "failure_class": "resource"}, {**TRANSIENT, "http_status": 500},
+    {key: value for key, value in TRANSIENT.items() if key != "errno_name"}, {**TRANSIENT, "extra": 1}])
+def test_sealed_diagnostic_that_the_gate_would_refuse_cannot_justify_a_retry(account_fixture, detail):
+    h = account_fixture; _with_retry(h, detail=detail)
+    with pytest.raises(reader.CountCheckpointLoaderRefusal):
+        reader._attempts(h.descriptor, h.private, h.plan, h.lifetime)
+
+
+def test_retry_without_an_invoked_request_is_refused(account_fixture):
+    h = account_fixture; _with_retry(h); first = h.descriptor["attempts"][0]
+    first["http_invoked"] = False; _resave_received(h, first, http_invoked=False)
+    with pytest.raises(reader.CountCheckpointLoaderRefusal):
+        reader._attempts(h.descriptor, h.private, h.plan, h.lifetime)
+
+
+def test_retry_backoff_is_measured_from_the_sealed_receipt_time(account_fixture):
+    h = account_fixture; _with_retry(h, retry_started="2026-10-27T00:00:02Z")  # One second after the sealed receipt.
+    with pytest.raises(reader.CountCheckpointLoaderRefusal):
+        reader._attempts(h.descriptor, h.private, h.plan, h.lifetime)
+
+
+@pytest.mark.parametrize("field,value", [("registration_sha256", "f" * 64), ("runtime_head", "f" * 40), ("actual_remote", "f" * 40),
+    ("operator_protocol_sha256", "f" * 64), ("dispatch_authority", True), ("source_admitted", True)])
+def test_claim_must_bind_the_producer_and_grant_nothing(account_fixture, field, value):
+    h = account_fixture; claim = reader._parse(h.private["claim/claim.spent.json"]); claim[field] = value
+    raw = canonical_json(claim).encode(); h.private["claim/claim.spent.json"] = raw
+    for attempt in h.descriptor["attempts"]:
+        started = reader._parse(h.private[attempt["START_path"]]); started["claim_sha256"] = hash_bytes(raw)
+        h.private[attempt["START_path"]] = canonical_json(started).encode()
+        _resave_received(h, attempt, START_sha256=hash_bytes(h.private[attempt["START_path"]]))
+    with pytest.raises(reader.CountCheckpointLoaderRefusal):
+        reader._attempts(h.descriptor, h.private, h.plan, h.lifetime)
+
+
+def test_claim_cannot_be_read_from_another_catalogued_file(account_fixture):
+    h = account_fixture; h.private["capture/elsewhere.json"] = h.private.pop("claim/claim.spent.json")
+    h.descriptor["external_claim_path"] = "capture/elsewhere.json"
+    with pytest.raises(reader.CountCheckpointLoaderRefusal):
+        reader._attempts(h.descriptor, h.private, h.plan, h.lifetime)
+
+
+def _with_final_controls(h):
+    for path in reader.FINAL_CONTROL_PATHS: h.private[path] = b"{}"
+    return h
+
+
+def test_catalogue_equal_to_the_charged_attempts_is_accepted(account_fixture):
+    h = _with_final_controls(account_fixture)
+    assert reader._exact_members(h.descriptor, h.private) is None
+
+
+@pytest.mark.parametrize("extra", ["capture/starts/999999/START.spent.json", "capture/received/999999/received.private.json",
+    "capture/responses/999999/response.raw", "capture/unknown.json"])
+def test_retained_file_with_no_charged_attempt_is_refused(account_fixture, extra):
+    # An unreferenced START would be a spent request that no account ever charges.
+    h = _with_final_controls(account_fixture); h.private[extra] = b"{}"
+    with pytest.raises(reader.CountCheckpointLoaderRefusal, match="catalogue_changed"):
+        reader._exact_members(h.descriptor, h.private)
+
+
+def test_catalogue_missing_a_final_control_is_refused(account_fixture):
+    h = _with_final_controls(account_fixture); del h.private[reader.FINAL_CONTROL_PATHS[0]]
+    with pytest.raises(reader.CountCheckpointLoaderRefusal, match="catalogue_changed"):
+        reader._exact_members(h.descriptor, h.private)
+
+
+def test_loader_applies_the_member_check_after_each_accounted_chunk():
+    # sweep_files needs a whole native volume, so this call site is checked from the source.
+    tree = __import__("ast").parse(Path(reader.__file__).read_bytes())
+    ast = __import__("ast")
+    sweep = next(node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef) and node.name == "sweep_files")
+    lines = {node.func.id: node.lineno for node in ast.walk(sweep) if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)}
+    assert lines["_attempts"] < lines["_exact_members"]

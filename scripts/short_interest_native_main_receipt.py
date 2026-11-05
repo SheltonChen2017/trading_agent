@@ -557,8 +557,9 @@ def _close_all(items, primary=None):
 
 
 def _config(head, remote, body, code):
-    directory = _directory("bootstrap"); inputs = p._Inputs(directory)
+    directory = _directory("bootstrap"); inputs = None
     try:
+        inputs = p._Inputs(directory)
         raw = inputs.read("launch.spec.json")
         require(hash_bytes(raw) == body["spec_sha256"], "main_code")
         spec = _json(raw)
@@ -567,8 +568,8 @@ def _config(head, remote, body, code):
         require(inputs.read("job.plist") == plistlib.dumps(p.build_launchd_plist(head, remote, hash_bytes(raw), spec["observer"], profile=_profile()), sort_keys=True), "main_code")
         require(p.config_identity7_sha256(inputs) == body["config_identity7_sha256"], "main_original")
         return directory, inputs
-    except BaseException:
-        _close_all((inputs, directory)); raise
+    except BaseException as error:
+        _close_all((inputs, directory), error); raise
 
 
 def _originals(head, remote, body, code, clock):
@@ -734,8 +735,12 @@ def _anchor_value(value, head):
     for key in ("receipt_sha256", "receipt_native_full9_sha256", "receipt_directory_full9_sha256", "projection_sha256", "projection_native_full9_sha256", "outer_stdout_sha256"):
         require(_digest(value[key]), "main_anchor_changed")
     _flags(value["receipt_original_flags"])
-    result = subprocess.run(["git", "merge-base", "--is-ancestor", value["runtime_head"], head], cwd=ROOT,
-        env=p.worker._environment(), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+    try:
+        result = subprocess.run(["git", "merge-base", "--is-ancestor", value["runtime_head"], head], cwd=ROOT,
+            env=p.worker._environment(), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            check=False, timeout=30)
+    except subprocess.TimeoutExpired:
+        raise NativeMainReceiptRefusal("REFUSED: main_anchor_changed") from None
     require(type(result.returncode) is int and result.returncode == 0, "main_anchor_changed")
     return value
 
@@ -812,7 +817,11 @@ class _Loaded(_Latched):
             require(hash_bytes((canonical_json(public) + "\n").encode()) == anchor["outer_stdout_sha256"], "main_anchor_changed")
             self.validate()
         except BaseException:
-            self.failed = True; self.close(); raise
+            self.failed = True
+            # Cleanup failure must not replace the refusal that is already propagating.
+            try: self.close()
+            except BaseException: pass
+            raise
     def _receipt(self):
         r = self.receipt
         keys = {"schema", "runtime_head", "actual_remote", "operation", "protocol_sha256", "native_policy_sha256", "storage_profile", "root_projection", "root_pid", "actual_root_exit", "root_stdout_sha256", "root_stderr_sha256", "root_ready_sha256", "root_closed_sha256", "command_sha256", "environment_sha256", "code_manifest", "root_context_snapshot_sha256", "native_inventory_sha256", "status", "authority"}
@@ -847,17 +856,26 @@ class _Loaded(_Latched):
                 except BaseException as error:
                     if first is None: first = error
         self.closed = True
+        # An already latched item has raised its own refusal. Auditing it again would
+        # only raise main_latched and replace that primary, so it is not reread; the
+        # receipt stays failed, so validate() still refuses.
+        latched = lambda item: getattr(item, "failed", False) is True
+        if any(latched(item) for item in (self.code, self.reader, self.config, self.main_file,
+                self.root_file, self.anchor_holder, self.clock)):
+            self.failed = True
         for item in (self.code, self.reader, self.config, self.main_file, self.root_file):
-            if item is not None:
+            if item is not None and not latched(item):
                 try: item.audit(named=True) if type(item) is p._Inputs else item.named()
                 except BaseException as error:
                     if first is None: first = error
-        try: self.anchor_holder.named()
-        except BaseException as error:
-            if first is None: first = error
-        try: self.clock.check()
-        except BaseException as error:
-            if first is None: first = error
+        if not latched(self.anchor_holder):
+            try: self.anchor_holder.named()
+            except BaseException as error:
+                if first is None: first = error
+        if not latched(self.clock):
+            try: self.clock.check()
+            except BaseException as error:
+                if first is None: first = error
         if first is not None: self.failed = True; raise first
 
 
@@ -866,7 +884,7 @@ def load_registered(head, remote):
     """Held custody-only receipt; pending anchor refuses before private I/O."""
     _phase("loader"); clock = _Deadline(); registered(); p._guard(head, remote)
     anchor, anchor_holder = _anchor(head)
-    code = loaded = None
+    code = loaded = primary = None
     try:
         code = p._Code7(head, remote, clock)
         with p._source_denied():
@@ -878,9 +896,15 @@ def load_registered(head, remote):
             value._anchor = row; _AUTHENTICATED[id(value)] = row
             yield value
             loaded.validate()
+    except BaseException as error:
+        primary = error; raise
     finally:
-        if loaded is not None: loaded.close()
-        else: _close_all((code, anchor_holder))
+        # A close failure reports only when nothing else has already refused.
+        try:
+            if loaded is not None: loaded.close()
+            else: _close_all((code, anchor_holder), primary)
+        except BaseException:
+            if primary is None: raise
 
 
 def main(argv=None):

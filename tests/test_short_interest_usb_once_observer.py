@@ -10,6 +10,17 @@ import subprocess
 
 import pytest
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 
 ROOT=Path(__file__).resolve().parents[1]
 OBSERVER=ROOT/'scripts/observe_short_interest_usb_once.mjs'
@@ -115,6 +126,7 @@ function setup(mode='normal',budget=180000){
     return json.loads(result.stdout)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_owned_positive_exact_proof_is_observation_only_and_raw_stays_private():
     result=run_node("""const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();w.close();const r=await p;
 const a=r.privateStdoutBytes();a[0]^=255;const b=r.privateStdoutBytes();
@@ -142,6 +154,7 @@ console.log(JSON.stringify({s:r.summary(),same:b.equals(originalRaw),mutableCopy
     lambda p:p['private_model_aggregate'].update(PRIVATE_ROWS=['PRIVATE']),
     lambda p:p['private_model_aggregate']['full'].update(rows=1),
 ])
+@_POSIX_CAPTURE_ONLY
 def test_lineage_exact_types_complete_proof_and_private_aggregate_mismatch_refuse(change):
     payload=envelope();change(payload)
     result=run_node("const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();w.close();console.log((await p).summaryJson());",payload)
@@ -149,6 +162,7 @@ def test_lineage_exact_types_complete_proof_and_private_aggregate_mismatch_refus
     assert result['source_qualified'] is False and 'PRIVATE' not in json.dumps(result)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_negative_first_cleanup_and_raw_commitment_are_preserved():
     payload=envelope();payload['status']='incomplete';payload['private_model_aggregate']=None;payload['original_profile_proof']=None
     payload['first_failure']={'phase':'initial_code','role':'code','code_ordinal':5,'code':'original_directory_changed','original_comparison':None,'actor':'unknown'}
@@ -164,6 +178,7 @@ def test_original_negative_first_cleanup_and_raw_commitment_are_preserved():
     'fixed_usb_input_changed','lane_snapshot_changed','matching_remote_changed','model_namespace_occupied',
     'terminal_code_changed','working_code_differs_from_commit',
 ])
+@_POSIX_CAPTURE_ONLY
 def test_genuine_reader_codes_survive_negative_envelope_without_admission(code):
     payload=envelope();payload.update(status='incomplete',private_model_aggregate=None,original_profile_proof=None)
     payload['first_failure']={'phase':'source_open','role':'full','code_ordinal':None,
@@ -191,6 +206,7 @@ def test_fixed_fact_catalogue_covers_original_reader_snapshot_and_producer_codes
         assert set(split.func.value.value.split())<=accepted
 
 
+@_POSIX_CAPTURE_ONLY
 def test_authentic_pre_output_bootstrap_arguments_refusal_is_not_masked():
     payload={'schema':'si-usb-once-bootstrap-refusal-v1','invocation_id':INVOCATION,'status':'incomplete',
         'source_qualified':False,'first_failure':{'phase':'arguments','role':'bootstrap','code':'owner',
@@ -201,6 +217,7 @@ def test_authentic_pre_output_bootstrap_arguments_refusal_is_not_masked():
 
 
 @pytest.mark.parametrize('mode',['stderr','nonzero','noEOF','extra','invalidUTF','stdoutLimit'])
+@_POSIX_CAPTURE_ONLY
 def test_stderr_exit_EOF_extra_bytes_and_caps_are_negative_without_leaking_rows(mode):
     body="""const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);MODE;
 const r=await p;console.log(JSON.stringify({s:r.summary(),signals:w.signals}));"""
@@ -219,6 +236,7 @@ const r=await p;console.log(JSON.stringify({s:r.summary(),signals:w.signals}));"
 
 
 @pytest.mark.parametrize('mode',['clock_after_spawn','listener_failure'])
+@_POSIX_CAPTURE_ONLY
 def test_postspawn_failure_retains_automatic_KILL_and_waits_for_owned_close(mode):
     result=run_node(f"""const w=setup({json.dumps(mode)});const p=m.observeOnceForTests(encodedConfig,w.seams);
 let settled=false;p.then(()=>settled=true);await Promise.resolve();const before=settled,scheduled=w.timers.size;
@@ -229,6 +247,7 @@ console.log(JSON.stringify({{s:r.summary(),before,scheduled,signals:w.signals}})
     assert result['s']['status']=='incomplete'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_deadline_bounded_unknown_exit_does_not_signal_after_original_child_exit():
     result=run_node("""const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();
 w.child.exitCode=0;w.child.emit('exit',0,null);w.advance(180000);const r=await p;
@@ -237,6 +256,7 @@ console.log(JSON.stringify({s:r.summary(),signals:w.signals}));""")
     assert result['s']['status']=='incomplete' and result['s']['automatic_deadline_shutdown']
 
 
+@_POSIX_CAPTURE_ONLY
 def test_actual_timers_terminate_then_kill_only_owned_synthetic_child():
     result=run_node("""const w=setup('ignore_TERM',35);w.seams.setTimeout=setTimeout;w.seams.clearTimeout=clearTimeout;
 const p=m.observeOnceForTests(encodedConfig,w.seams);const r=await p;
@@ -245,6 +265,7 @@ console.log(JSON.stringify({s:r.summary(),signals:w.signals}));""")
     assert result['s']['status']=='incomplete' and result['s']['actual_signal']=='SIGKILL'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_late_getter_and_private_copy_reject_original_clock_without_rebaseline():
     result=run_node("""const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();w.close();const r=await p;
 const early=r.summary();w.advance(180001);let code=null;try{r.privateStdoutBytes();}catch(e){code=e.fixedCode;}
@@ -253,6 +274,7 @@ console.log(JSON.stringify({early,late:r.summary(),copyCode:code}));""")
     assert result['late']['status']=='incomplete' and result['copyCode']=='deadline'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_byte_chunks_are_copied_and_no_caller_command_or_secret_environment_exists():
     result=run_node("""const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);const copied=Buffer.from(originalRaw);w.send(copied);copied.fill(120);w.close();const r=await p;
 console.log(JSON.stringify({s:r.summary(),same:r.privateStdoutBytes().equals(originalRaw),launch:w.launches[0]}));""")
@@ -264,6 +286,7 @@ console.log(JSON.stringify({s:r.summary(),same:r.privateStdoutBytes().equals(ori
 
 
 @pytest.mark.parametrize('extra',['command','cwd','env','deadlineMs','executable','complete'])
+@_POSIX_CAPTURE_ONLY
 def test_caller_config_cannot_inject_control_arguments(extra):
     result=run_node(f"""const w=setup();const config=JSON.parse(encodedConfig);config[{json.dumps(extra)}]='PRIVATE';
 const r=await m.observeOnceForTests(m.canonicalJson(config),w.seams);console.log(JSON.stringify({{s:r.summary(),launched:w.launches.length}}));""")
@@ -271,12 +294,14 @@ const r=await m.observeOnceForTests(m.canonicalJson(config),w.seams);console.log
     assert 'PRIVATE' not in json.dumps(result)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_extra_original_proof_field_and_missing_false_marker_are_not_accepted():
     payload=envelope();payload['original_profile_proof']['caller_complete']=True
     result=run_node("const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();w.close();console.log((await p).summaryJson());",payload)
     assert result['status']=='incomplete'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_private_union_mismatch_bound_uses_both_archives_without_fitness_promotion():
     payload=envelope();private=payload['private_model_aggregate']
     private['full'].update(member_count=50000,empty_members=50000)
@@ -289,6 +314,7 @@ def test_private_union_mismatch_bound_uses_both_archives_without_fitness_promoti
     assert '100000' not in json.dumps(result) and 'paired_member_mismatches' not in json.dumps(result)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_final_summary_serialization_checks_original_clock_after_formatting():
     result=run_node("""const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();w.close();const r=await p;
 const original=JSON.stringify;let tripped=false;
@@ -314,6 +340,7 @@ def test_static_observer_has_no_market_or_file_write_dispatch_and_preserves_lite
     (lambda p:p.update(original_profile_proof=None),'private_aggregate'),
     (lambda p:p.update(private_model_aggregate=None),'proof'),
 ])
+@_POSIX_CAPTURE_ONLY
 def test_closed_status_alone_never_closes_the_observation(change,code):
     """SI-CR28-018: the closed packet's own facts must agree with its status string."""
     payload=envelope();change(payload)
@@ -321,6 +348,7 @@ def test_closed_status_alone_never_closes_the_observation(change,code):
     assert result['status']=='incomplete' and result['first_failure']==code and result['source_qualified'] is False
 
 
+@_POSIX_CAPTURE_ONLY
 def test_incomplete_producer_never_closes_the_observation():
     """SI-CR28-018: a clean exit does not outrank the producer's own status."""
     payload=envelope();payload.update(status='incomplete')
@@ -328,6 +356,7 @@ def test_incomplete_producer_never_closes_the_observation():
     assert result['status']=='incomplete' and result['producer_status']=='incomplete' and result['first_failure']=='proof'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_private_aggregate_must_be_the_one_the_proof_commits_to():
     """SI-CR28-018: a valid aggregate with another hash is not the retained report."""
     payload=envelope();payload['private_model_aggregate']['full']['member_count']=2
@@ -336,6 +365,7 @@ def test_private_aggregate_must_be_the_one_the_proof_commits_to():
 
 
 @pytest.mark.parametrize('field',['profile_sha256','code_mapping_sha256'])
+@_POSIX_CAPTURE_ONLY
 def test_proof_must_bind_the_registered_profile_and_five_code_map(field):
     """SI-CR28-018: re-signed, so only the named pin can refuse."""
     payload=envelope();proof=payload['original_profile_proof'];proof[field]='f'*64;del proof['observation_sha256'];proof['observation_sha256']=sha(canonical(proof))
@@ -344,6 +374,7 @@ def test_proof_must_bind_the_registered_profile_and_five_code_map(field):
 
 
 @pytest.mark.parametrize('before',["w.child.emit('exit',0,null);","w.child.exitCode=0;"])
+@_POSIX_CAPTURE_ONLY
 def test_exited_child_group_is_never_signalled_during_shutdown(before):
     """SI-CR28-018: the group id may already belong to someone else after exit."""
     result=run_node("const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();"+before+"""
@@ -351,6 +382,7 @@ w.advance(178501);w.close();const r=await p;console.log(JSON.stringify({signals:
     assert result['signals']==[] and result['s']['status']=='incomplete'
 
 
+@_POSIX_CAPTURE_ONLY
 def test_missing_stderr_EOF_never_closes_the_observation():
     """SI-CR28-018: stdout EOF alone does not prove the child's streams closed."""
     result=run_node("""const w=setup();const p=m.observeOnceForTests(encodedConfig,w.seams);w.send();w.child.stdout.emit('end');w.child.exitCode=0;

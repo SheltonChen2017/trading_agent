@@ -11,6 +11,17 @@ import pytest
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from scripts import short_interest_count_process_supervisor as supervisor
 
+# Only protected-I/O cases require POSIX; pure parsing, transport and early
+# refusal checks must remain active on the supported Windows host.
+_POSIX_CAPTURE_ONLY = pytest.mark.skipif(
+    not hasattr(os, "getuid"),
+    reason=(
+        "the protected-capture runtime requires POSIX ownership and mode "
+        "semantics (os.getuid, O_NOFOLLOW, 0o600/0o700, symlinks); it cannot "
+        "execute on this host, see the lane record SI-CR17-002"
+    ),
+)
+
 HEAD, REMOTE = "a" * 40, "b" * 40
 
 
@@ -65,6 +76,7 @@ def prepare(proof):
     return value["launch_spec_sha256"]
 
 
+@_POSIX_CAPTURE_ONLY
 def test_frozen_proof_registration_and_pending_refusal_leave_capture_blocked(monkeypatch):
     monkeypatch.setattr(supervisor, "_guard", lambda *a: pytest.fail("I/O before refusal"))
     assert supervisor.PROOF_POLICY_SHA256 == hash_payload(supervisor.policy())
@@ -98,6 +110,7 @@ def test_launchd_builder_is_fixed_one_shot_and_has_no_submission_seam():
     assert not hasattr(supervisor, "bootstrap") and not hasattr(supervisor, "launchctl")
 
 
+@_POSIX_CAPTURE_ONLY
 def test_prepare_creates_only_exclusive_spec_and_reserved_job(proof):
     digest = prepare(proof)
     names = {path.name for path in supervisor.NAMESPACE.iterdir()}
@@ -112,6 +125,7 @@ def test_prepare_creates_only_exclusive_spec_and_reserved_job(proof):
     with pytest.raises(FileExistsError): supervisor.prepare_proof(HEAD, REMOTE)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_original_child_wait_issues_distinct_source_free_exit_witness(proof):
     digest = prepare(proof)
     witness = supervisor.supervise_proof(HEAD, REMOTE, digest)
@@ -143,6 +157,7 @@ def test_caller_JSON_or_status_cannot_mint_OS_exit_witness():
 
 
 @pytest.mark.parametrize("raw", [b"PRIVATE_SECRET\n", b"{}\n", b"X" * 1025 + b"\n"])
+@_POSIX_CAPTURE_ONLY
 def test_unknown_child_output_is_not_logged_or_relabelled_terminal(proof, monkeypatch, raw):
     digest = prepare(proof); proof.raw = raw
     class Held(BaseException): pass
@@ -157,6 +172,7 @@ def test_unknown_child_output_is_not_logged_or_relabelled_terminal(proof, monkey
     assert not proof.processes[0].stdout.closed and supervisor._HELD
 
 
+@_POSIX_CAPTURE_ONLY
 def test_nonzero_child_gets_truthful_negative_without_positive_witness_or_restart(proof, monkeypatch):
     digest = prepare(proof); proof.status = 2
     monkeypatch.setattr(supervisor, "_hold_unknown", lambda *a: pytest.fail("known actual exit became unknown"))
@@ -172,6 +188,7 @@ def test_nonzero_child_gets_truthful_negative_without_positive_witness_or_restar
     assert proof.processes[0].stdout.closed
 
 
+@_POSIX_CAPTURE_ONLY
 def test_spawn_failure_spends_launch_log_without_starting_or_retrying(proof, monkeypatch):
     digest = prepare(proof); attempts = []
     def fail(*args, **kwargs): attempts.append(True); raise OSError("PRIVATE_ERROR")
@@ -183,6 +200,7 @@ def test_spawn_failure_spends_launch_log_without_starting_or_retrying(proof, mon
     assert attempts == [True]
 
 
+@_POSIX_CAPTURE_ONLY
 def test_observation_deadline_retains_original_handle_and_records_unknown(proof, monkeypatch):
     digest = prepare(proof)
     clock = iter((100., 106.))
@@ -196,6 +214,7 @@ def test_observation_deadline_retains_original_handle_and_records_unknown(proof,
     assert result["requires_process_hold"] is True and result["actual_process_exit"] is None
 
 
+@_POSIX_CAPTURE_ONLY
 def test_result_publication_cannot_hide_changed_stdout_binding(proof, monkeypatch):
     digest = prepare(proof); original = supervisor._Namespace.write
     def changed(self, name, raw):
@@ -209,6 +228,7 @@ def test_result_publication_cannot_hide_changed_stdout_binding(proof, monkeypatc
     assert len(proof.processes[0].waits) == 1 and supervisor._EXITS == {} and supervisor._HELD == []
 
 
+@_POSIX_CAPTURE_ONLY
 def test_close_failure_drains_other_metadata_descriptors_and_cannot_issue_witness(proof, monkeypatch):
     digest = prepare(proof); real_close = os.close; failed = []
     original_create = supervisor._Namespace.create; target = []
@@ -230,6 +250,7 @@ def test_close_failure_drains_other_metadata_descriptors_and_cannot_issue_witnes
     assert failed and supervisor._EXITS == {} and proof.processes[0].stdout.closed
 
 
+@_POSIX_CAPTURE_ONLY
 def test_fresh_file_constructor_closes_fd_if_mode_protection_fails(proof, monkeypatch):
     prepare(proof); ns = supervisor._Namespace(create=False)
     real_open, real_close = os.open, os.close
@@ -247,6 +268,7 @@ def test_fresh_file_constructor_closes_fd_if_mode_protection_fails(proof, monkey
 
 
 @pytest.mark.parametrize("hazard", ["symlink", "mode"])
+@_POSIX_CAPTURE_ONLY
 def test_unsafe_namespace_refuses_before_child(proof, hazard):
     digest = prepare(proof)
     if hazard == "mode": supervisor.NAMESPACE.chmod(0o750)
@@ -259,6 +281,7 @@ def test_unsafe_namespace_refuses_before_child(proof, hazard):
 
 
 @pytest.mark.parametrize("hazard", ["mode", "hardlink", "symlink", "fifo"])
+@_POSIX_CAPTURE_ONLY
 def test_metadata_read_refuses_unsafe_named_entry_before_open(proof, monkeypatch, hazard):
     prepare(proof); ns = supervisor._Namespace(create=False)
     path = supervisor.NAMESPACE / "launch.spec.json"
@@ -282,6 +305,7 @@ def test_metadata_read_refuses_unsafe_named_entry_before_open(proof, monkeypatch
     finally: ns.close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_metadata_regular_to_FIFO_race_uses_nonblocking_open_and_never_reads(proof, monkeypatch):
     prepare(proof); ns = supervisor._Namespace(create=False)
     path = supervisor.NAMESPACE / "launch.spec.json"
@@ -301,6 +325,7 @@ def test_metadata_regular_to_FIFO_race_uses_nonblocking_open_and_never_reads(pro
     finally: ns.close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_metadata_postclose_named_replacement_refuses_original_bytes(proof, monkeypatch):
     prepare(proof); ns = supervisor._Namespace(create=False)
     path = supervisor.NAMESPACE / "launch.spec.json"; inode = path.lstat().st_ino
@@ -353,6 +378,7 @@ def test_supervisor_import_boundary_and_no_kill_or_submission_calls():
         for node in ast.walk(tree))
 
 
+@_POSIX_CAPTURE_ONLY
 def test_cli_post_result_refusal_has_a_distinct_dominating_negative(proof, monkeypatch, capsys):
     digest = prepare(proof)
     original = supervisor._Namespace.write
@@ -371,6 +397,7 @@ def test_cli_post_result_refusal_has_a_distinct_dominating_negative(proof, monke
     assert negative["actual_child_exit"] == 0
 
 
+@_POSIX_CAPTURE_ONLY
 def test_cli_after_anchor_cleanup_reports_original_failure_without_reopening(proof, monkeypatch, capsys):
     digest = prepare(proof)
     original = supervisor._Namespace.close
@@ -397,6 +424,7 @@ def terminal():
     return json.loads(raw)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_full_main_success_is_one_fixed_preopened_terminal_line(proof, capsys):
     digest = prepare(proof)
     assert run_cli(digest) == 0
@@ -409,6 +437,7 @@ def test_full_main_success_is_one_fixed_preopened_terminal_line(proof, capsys):
     assert len(proof.launches) == len(proof.processes[0].waits) == 1
 
 
+@_POSIX_CAPTURE_ONLY
 def test_post_context_original_stamp_failure_uses_original_dup_anchors(proof, monkeypatch):
     digest = prepare(proof); original = supervisor._Namespace.close; closes = []
     def changed_after_primary_cleanup(self):
@@ -427,6 +456,7 @@ def test_post_context_original_stamp_failure_uses_original_dup_anchors(proof, mo
     assert len(closes) == 2 and all(value.fd is value.parent is None for value in closes)
 
 
+@_POSIX_CAPTURE_ONLY
 def test_final_reporter_cleanup_failure_does_not_reopen_or_adopt_namespace(proof, monkeypatch):
     digest = prepare(proof); original = supervisor._Namespace.close; calls = []
     def failed_last_cleanup(self):
@@ -444,6 +474,7 @@ def test_final_reporter_cleanup_failure_does_not_reopen_or_adopt_namespace(proof
     assert supervisor._EXITS == {}
 
 
+@_POSIX_CAPTURE_ONLY
 def test_public_summary_failure_reaches_independent_channel_without_false_success(proof, monkeypatch):
     digest = prepare(proof)
     def fail(self): raise OSError(5, "PRIVATE_SUMMARY_SECRET")
@@ -456,6 +487,7 @@ def test_public_summary_failure_reaches_independent_channel_without_false_succes
     assert json.loads((supervisor.NAMESPACE / "result.json").read_bytes())["actual_process_exit"] == 0
 
 
+@_POSIX_CAPTURE_ONLY
 def test_failed_negative_publication_keeps_first_actual_failure(proof, monkeypatch):
     digest = prepare(proof); original = supervisor._Namespace.write
     def fail(self, name, raw):
@@ -471,6 +503,7 @@ def test_failed_negative_publication_keeps_first_actual_failure(proof, monkeypat
     assert not (supervisor.NAMESPACE / "run.refused.json").exists()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_v2_preparation_preserves_existing_v1_namespace_and_controls(proof):
     old = supervisor.NAMESPACE.with_name("count-process-supervisor-proof-v1")
     old.mkdir(mode=0o700)
@@ -484,6 +517,7 @@ def test_v2_preparation_preserves_existing_v1_namespace_and_controls(proof):
 
 
 @pytest.mark.parametrize("hazard", ["mode", "hardlink", "nonempty"])
+@_POSIX_CAPTURE_ONLY
 def test_preopened_channel_protection_and_zero_size_refuse_before_child(proof, hazard):
     digest = prepare(proof); channel = supervisor.NAMESPACE / "supervisor.jsonl"
     if hazard == "mode": channel.chmod(0o644)
@@ -494,6 +528,7 @@ def test_preopened_channel_protection_and_zero_size_refuse_before_child(proof, h
     assert channel.read_bytes() == before
 
 
+@_POSIX_CAPTURE_ONLY
 def test_terminal_channel_rejects_arbitrary_payload_and_cannot_emit_twice(proof):
     prepare(proof); channel = supervisor._TerminalChannel(); ns = supervisor._Namespace(create=False)
     try:
@@ -507,6 +542,7 @@ def test_terminal_channel_rejects_arbitrary_payload_and_cannot_emit_twice(proof)
     assert (supervisor.NAMESPACE / "supervisor.jsonl").read_bytes() == b""
 
 
+@_POSIX_CAPTURE_ONLY
 def test_replacement_opened_by_launcher_cannot_be_adopted_for_refusal_output(proof):
     digest = prepare(proof)
     channel = supervisor.NAMESPACE / "supervisor.jsonl"
@@ -519,6 +555,7 @@ def test_replacement_opened_by_launcher_cannot_be_adopted_for_refusal_output(pro
     assert json.loads((supervisor.NAMESPACE / "run.refused.json").read_bytes())["failure"]["contract_code"] == "supervisor_channel_changed"
 
 
+@_POSIX_CAPTURE_ONLY
 def test_pre_spec_channel_is_unavailable_for_diagnostics_without_original_binding(proof, monkeypatch):
     digest = prepare(proof)
     def refuse(*args): raise supervisor.ProcessSupervisorRefusal("REFUSED: supervisor_lane_changed")
@@ -527,6 +564,7 @@ def test_pre_spec_channel_is_unavailable_for_diagnostics_without_original_bindin
     assert (supervisor.NAMESPACE / "supervisor.jsonl").read_bytes() == b""
 
 
+@_POSIX_CAPTURE_ONLY
 def test_terminal_partial_or_no_progress_write_is_never_retried_as_a_second_line(proof, monkeypatch):
     digest = prepare(proof); original = os.write; attempts = []
     def write(fd, raw):
@@ -539,6 +577,7 @@ def test_terminal_partial_or_no_progress_write_is_never_retried_as_a_second_line
     assert json.loads((supervisor.NAMESPACE / "result.json").read_bytes())["actual_process_exit"] == 0
 
 
+@_POSIX_CAPTURE_ONLY
 def test_channel_must_match_spec_original_stamp_even_if_new_file_is_private(proof, monkeypatch):
     digest = prepare(proof)
     channel = supervisor.NAMESPACE / "supervisor.jsonl"
@@ -556,6 +595,7 @@ def test_channel_must_match_spec_original_stamp_even_if_new_file_is_private(proo
     assert channel.read_bytes() == b""
 
 
+@_POSIX_CAPTURE_ONLY
 def test_negative_created_during_last_original_reporter_close_vetoes_witness(proof, monkeypatch):
     digest = prepare(proof); original = supervisor._Namespace.close; calls = []
     def late_negative(self):
@@ -569,6 +609,7 @@ def test_negative_created_during_last_original_reporter_close_vetoes_witness(pro
     assert terminal()["failure"]["stage"] == "post_context_audit"
 
 
+@_POSIX_CAPTURE_ONLY
 def test_dup_failure_is_not_replaced_by_cleanup_failure_and_dup_fd_is_drained(proof, monkeypatch):
     prepare(proof); ns = supervisor._Namespace(create=False)
     real_dup, real_close = os.dup, os.close
@@ -591,6 +632,7 @@ def test_dup_failure_is_not_replaced_by_cleanup_failure_and_dup_fd_is_drained(pr
 
 
 @pytest.mark.parametrize("role", ["fd", "parent"])
+@_POSIX_CAPTURE_ONLY
 def test_original_namespace_close_errno_is_preserved_while_both_anchors_drain(proof, monkeypatch, role):
     digest = prepare(proof)
     original_init, original_close = supervisor._Namespace.__init__, os.close
@@ -613,6 +655,7 @@ def test_original_namespace_close_errno_is_preserved_while_both_anchors_drain(pr
 
 
 @pytest.mark.parametrize("phase,number", [("create", 1), ("write", 28), ("read", 13)])
+@_POSIX_CAPTURE_ONLY
 def test_metadata_primary_failure_survives_secondary_original_fd_close_error(proof, monkeypatch, phase, number):
     prepare(proof); ns = supervisor._Namespace(create=False)
     real_open, real_close = os.open, os.close
@@ -642,6 +685,7 @@ def test_metadata_primary_failure_survives_secondary_original_fd_close_error(pro
 
 
 @pytest.mark.parametrize("phase", ["read", "write"])
+@_POSIX_CAPTURE_ONLY
 def test_clean_metadata_path_close_failure_still_refuses(proof, monkeypatch, phase):
     prepare(proof); ns = supervisor._Namespace(create=False)
     real_open, real_close = os.open, os.close
@@ -663,6 +707,7 @@ def test_clean_metadata_path_close_failure_still_refuses(proof, monkeypatch, pha
     finally: ns.close()
 
 
+@_POSIX_CAPTURE_ONLY
 def test_code_mismatch_is_not_replaced_by_original_code_fd_close_failure(proof, monkeypatch):
     path = supervisor.ROOT / "fabricated-code.py"; path.write_bytes(b"FABRICATED")
     monkeypatch.setattr(supervisor, "CODE_FILES", (path.name,))
@@ -691,6 +736,7 @@ def test_unrelated_caller_exception_does_not_hide_clean_close_failure(monkeypatc
 
 
 @pytest.mark.parametrize("name", ["launch.spec.json", "result.json"])
+@_POSIX_CAPTURE_ONLY
 def test_ambient_caller_exception_cannot_turn_metadata_close_failure_into_success(proof, monkeypatch, name):
     digest = prepare(proof); original_open, original_close = os.open, os.close
     target, failed = [], []
@@ -713,6 +759,7 @@ def test_ambient_caller_exception_cannot_turn_metadata_close_failure_into_succes
     if name == "launch.spec.json": assert (supervisor.NAMESPACE / "supervisor.jsonl").read_bytes() == b""
 
 
+@_POSIX_CAPTURE_ONLY
 def test_negative_write_own_close_failure_is_not_labelled_published(proof, monkeypatch):
     digest = prepare(proof)
     original_create, original_write, original_close = supervisor._Namespace.create, supervisor._Namespace.write, os.close

@@ -7,6 +7,7 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import unittest
@@ -193,6 +194,11 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         # Review-state phrase: rotate it in the same commit as each new review
         # or counter-review section so the status block cannot go stale.
         header = record.split("## 1.", 1)[0]
+        latest = max(int(number) for number in re.findall(r"^## (\d+)\.", record, re.MULTILINE))
+        self.assertIn(f"Current scope/evidence are sections 17 through {latest}.", header)
+        self.assertIn("Independent Claude review of `fc07b099..01b856be` recorded in section 65", header)
+        self.assertIn("two P2 fixes (GDR-CR65-001 and -002) and regression pins; no strategy rule or engine change", header)
+        self.assertIn("Codex counter-review of section 65 pending", header)
         self.assertIn("Guidance corpus/compiler and quote-rights audit recorded in section 64", header)
         self.assertIn("Structural exploratory pairs do not certify complete history or execution readiness", header)
         self.assertIn("Original guidance and SPY source reconciliation recorded in section 63", header)
@@ -228,7 +234,8 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertIn("The invented SPY budget reconciliation is corrected in section 56 without", header)
         self.assertIn("changing strategy rules, orders, fills or cash", header)
         self.assertIn("released price-protection reserves are accounted for separately", header)
-        self.assertIn("The new section-55/56 source awaits independent Claude review", header)
+        self.assertIn("The section-55/56 source was independently reviewed in section 65", header)
+        self.assertNotIn("The new section-55/56 source awaits independent Claude review", header)
         self.assertNotIn("Codex counter-review of section 53 pending", header)
         self.assertIn("The SYN native closure changes in `simulation.py` only (section 54);", header)
         self.assertIn("the retained `c589b3dd` custody and its recovery authorization are unchanged", header)
@@ -279,6 +286,7 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertGreater(record.index("\n## 62."), record.index("\n## 61."))
         self.assertGreater(record.index("\n## 63."), record.index("\n## 62."))
         self.assertGreater(record.index("\n## 64."), record.index("\n## 63."))
+        self.assertGreater(record.index("\n## 65."), record.index("\n## 64."))
         self.assertIn("research/__init__.py`, remains unobserved", header)
         self.assertIn("paused pending platform preflight", header)
         self.assertIn("GDR-RP33 is accepted in section 34", header)

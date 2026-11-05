@@ -1,6 +1,10 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Guidance corpus/compiler and quote-rights audit recorded in section 64, 2026-11-04.
+Status: **Independent Claude review of `fc07b099..01b856be` recorded in section 65, 2026-11-04.
+Sections 55 and 56 and the FirstRate and guidance modules are accepted as offline software after correction:
+two P2 fixes (GDR-CR65-001 and -002) and regression pins; no strategy rule or engine change.
+Codex counter-review of section 65 pending.
+Guidance corpus/compiler and quote-rights audit recorded in section 64, 2026-11-04.
 Structural exploratory pairs do not certify complete history or execution readiness.
 Authenticated Massive follow-up in 64.7 confirms Stocks Starter, cancellation pending November 6, 2026;
 no Advanced or Corporate Guidance product is displayed. The sign-in obstacle is resolved, not quote coverage.
@@ -55,7 +59,7 @@ The published `fc07b099` review is consumed once.
 The invented SPY budget reconciliation is corrected in section 56 without
 changing strategy rules, orders, fills or cash. Whole-share rounding and
 released price-protection reserves are accounted for separately.
-The new section-55/56 source awaits independent Claude review.
+The section-55/56 source was independently reviewed in section 65.
 Claude follow-up corrections recorded in section 54, 2026-10-28:
 GDR-CR53-007 and GDR-CR53-008 are corrected, with one new P2 (GDR-CR54-002).
 The SYN native closure changes in `simulation.py` only (section 54);
@@ -126,7 +130,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 63. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 65. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -9757,3 +9761,175 @@ The ignored `account-verification-followup-v1.json` receipt is SHA256
 Only this record's header and 64.7 change. Closing validation uses the existing
 active-document method plus diff/source/status/ref checks; no full suite or
 implementation/native work is repeated.
+
+## 65. Independent Claude review of `fc07b099..01b856be`, 2026-11-04
+
+### 65.1 Scope, direction and commit dispositions
+
+Owner direction to Claude on November 3: "monitor Codex's work on this lane.
+when it pushes, start reviewing all unreviewed commits. apply corrections where
+necessary. when done, push once" and "do not do full lane suite after the
+review." On November 4 the owner repeated: "Review all unreviewed commits, push
+once when done". The review started from remote `88a35c0c` with Codex's clean
+local record commit `01b856be` one ahead. That commit is reviewed here and
+published by this round's single push, as 64.7 anticipated.
+
+Same branch and worktree; no other branch. Every test and mutation run was
+network-denied and used invented rows only. Claude did not contact QC, a broker,
+a provider or a provider account, and did not read the USB disk or Codex's
+ignored private artifacts. Provider, USB and corpus results in sections 57
+through 64 are therefore checked here for internal arithmetic and consistency
+only; their measured values rest on Codex's retained receipts.
+
+| Commit | Disposition | Evidence |
+|---|---|---|
+| `3530f5a3` | Accepted, pins added | GDR-CCR55-001 is sound. Two mutants survived: the parity flag on the new refusal and the exit-window mark. GDR-CR65-012 pins both. |
+| `69f2a4a2` | Accepted, pin added | The limit-based reconciliation matches 56.1 and the plan's no-top-up rule. A mutant certifying a partly filled entry survived; GDR-CR65-012 pins it. |
+| `7d633144` | Accepted after clarification | Section 56 identities reproduce exactly (65.3). GDR-CR65-013 clarifies GDR-CCR55-002. |
+| `f95b84e5` | Accepted | Record only. Later sections qualify its open items. |
+| `918f405b` | Accepted | Record only. Inventory arithmetic is consistent. |
+| `e7a785c0` | Accepted | Record only. Action, member and integrity counts balance. |
+| `3e144031` | Accepted after correction | Identities and all section-60 totals reproduce. GDR-CR65-001, -003 to -007 and -012 correct the adapter and its tests. |
+| `2ba55cf5` | Accepted | Record only. Public-demo limits are stated. |
+| `392f020d` | Accepted, one open question | Request and response counts balance. GDR-CR65-014 questions the key-display wording. |
+| `3b04814a` | Accepted | Record only; states the owner's publication direction. |
+| `5c2bcdcc` | Accepted | Record only. The SPY reconciliation keeps vendor values and posts no cash. |
+| `88a35c0c` | Accepted after correction | Identities reproduce. GDR-CR65-002, -008 to -010, -012, -015 and -016 concern the compiler. |
+| `01b856be` | Accepted after correction | Record only. GDR-CR65-011 corrects the stale scope line. |
+
+Sections 55 and 56, `firstrate.py` and `guidance_dataset.py` are accepted as
+offline software after these corrections. The status of "exact source independent
+review" in the handoff's remaining list stays as written, because every later
+source change reopens it. This acceptance establishes neither native execution
+nor empirical readiness.
+
+### 65.2 Findings ledger
+
+| ID | Priority/status | Location, evidence and correction |
+|---|---|---|
+| GDR-CR65-001 | P2 / corrected | `firstrate.py` constructors. Only `parse_line` checked the member name. A directly built row from `SYN_full_1min_ADJUSTED.txt` or `OTHER_full_1min_UNADJUSTED.txt` reconciled, projected `normalization: Raw` and reached `regular_minute`, contradicting 60.2's claim that public construction cannot bypass the reconciler. Action files were not bound at all: a dividend file parsed as `kind="split"` was accepted, so a cash amount could be read as a split ratio. One member rule now covers `parse_line`, `FirstRateLine`, `ReconciledRow` and `QuarantinedRow`, for every source of a row. |
+| GDR-CR65-002 | P2 / corrected | `guidance_dataset._decisions`. A date-only row carries an issuer-local date, but `_profile` requires an instant's date to be UTC. A January 2 date-only row followed by a January 2 evening New York release, stored as January 3 UTC, sorted as a clean pair with no ambiguity. This is the class of defect GDR-RP64-003 rated P2. Rows within one day across the two clock kinds now refuse with `ambiguous_publication_order`; the refusal is conservative and adds no financial arithmetic. |
+| GDR-CR65-003 | P3 / corrected | `test_pre_qc.py`. `test_actual_handoff_reconstructs_complete_source_and_two_closed_plans` has failed since `3e144031` and still failed at `88a35c0c`: it pinned 61 members while the source builds 62, then 63. The handoff itself was right. Codex's focused closures did not include this file, repeating GDR-CR31-001 and GDR-CR47-001. The pin now derives from `source_manifest()`, so the next module cannot break it. |
+| GDR-CR65-004 | P3 / corrected | `firstrate.py`. Direct construction could drop required diagnostics, including `dividend_payment_date_missing` and `zero_dividend_requires_reconciliation`. One `_required_warnings` definition now serves parsing and both constructors. |
+| GDR-CR65-005 | P3 / corrected | `firstrate.py`. `repr` of `FirstRateLine` and `ReconciledRow` printed licensed values, unlike the compiler's `repr=False` bytes. Values are excluded from `repr`; projections are unchanged. |
+| GDR-CR65-006 | P3 / corrected | `firstrate.parse_line`. Bytes containing an interior line terminator were hashed as one eligible row even when a later row carried a protected date, against the module's date-gate-before-hash contract. They now refuse unhashed and unkeyed as `embedded_line_terminator`, which blocks the source set. |
+| GDR-CR65-007 | P3 / corrected | `firstrate._member`. `./x`, `a/./x` and `x/.` were accepted, so one member could occupy two source locations and pass as a duplicate. Dot segments now refuse. |
+| GDR-CR65-008 | P3 / corrected | `guidance_dataset._uri`. `https://[bad` raised plain `ValueError`, and an NFKC-invalid host raised a message that echoed the location, against the module's static-refusal contract. Both now raise the static refusal; DEL is refused with the other control characters. |
+| GDR-CR65-009 | P3 / corrected | `guidance_dataset._profile`. A list or object in a binding's `field` raised `TypeError`. It is now the named refusal. |
+| GDR-CR65-010 | P3 / corrected | `compile_guidance_dataset`. Scope decoding used the 64 KiB default, so an inventory inside `MAX_PROFILES` could be refused with a generic error, while the public constructor accepted the same scope. Scope decoding now uses the dataset limit. |
+| GDR-CR65-011 | P3 / corrected | Record line "Current scope/evidence are sections 17 through 63" missed section 64. It is corrected, and `test_boundaries.py` now derives the expected number from the latest section heading. |
+| GDR-CR65-012 | P3 / corrected | Test adequacy across `firstrate.py`, `guidance_dataset.py`, `multi_session.py` and `pre_qc.py`; counts are in 65.4. Pinned behavior includes `regular_minute` lineage and close values, zero-price refusal, OHLC bounds for close, every unsupported unit and basis, baseline missing fields, retained-hash mismatch and the unfinished SPY entry. |
+| GDR-CR65-013 | P3 / clarified | GDR-CCR55-002 says section 55 establishes no waiver of a Claude full-lane obligation. For this round the waiver is the owner's direct instruction quoted in 65.1, given in Claude's channel, so this review runs focused checks only. Under GDR-CCR42-002 the same rule runs both ways: each agent records direct human messages the other cannot see. |
+| GDR-CR65-014 | P3 / documented | 62.1 and the status block say no EODHD key "was displayed or saved", yet 62.1 also takes the key from the dashboard's displayed token control through the browser and clears "credential-bearing temporary snapshot text". Claude cannot see Codex's tool output and does not claim a leak. Codex should state whether that snapshot reached model-visible output and, if so, qualify the claim as 60.5 did for Sharadar. |
+| GDR-CR65-015 | P3 / documented | `published_date` has two meanings: issuer-local when date-only and UTC when an instant is present. GDR-CR65-002 contains the ordering effect. `fiscal_year_expired_at_publication` and the scope window still use the mixed value, and an evening release cannot state its local date. A later adapter needs an explicit issuer time zone. Not fixed: that is a schema decision for the corpus author. |
+| GDR-CR65-016 | P3 / documented | GDR-RP64-002 removed the rule that a fiscal label equals its end year, but `guidance_inputs._period` still requires it. A compiled pair for a fiscal year ending after its label would be refused downstream. No bridge exists yet, so nothing is wrong today. The original plan's rule should be settled before one is built. |
+
+Scripted count from this table: P0 0, P1 0, P2 2, P3 14; corrected 12, clarified 1, documented 3.
+
+Pattern scan of every added record and code line: no key, token,
+email or phone-shaped value, and no licensed financial amount. Section 56's
+dollar amounts and section 55's reproducer are invented. The public repository
+does carry account-plan status, cancellation dates and the USB mount name.
+Those are already in published history, and this review does not rewrite them.
+
+### 65.3 Reproduced identities and arithmetic
+
+Rebuilt in scratch exports, network-denied, matching Codex's records exactly:
+
+| Commit | Source | Review ZIP | Handoff | Native audit |
+|---|---|---|---|---|
+| `7d633144` | `aeefa0b3...`, 59 members | `dd5d193a...`, 900,365 bytes | `cd8bad6f...`, 84,069 bytes | `fa562a43...` |
+| `3e144031` | `f570bb04...`, 60 members | not recorded by Codex | not recorded by Codex | `fa562a43...` |
+| `88a35c0c` | `a9ab989c...`, 61 members | not recorded by Codex | not recorded by Codex | `fa562a43...` |
+
+Contract `219706fd...`, both plans `a314a98e...` and `2b6c67cc...`, and
+coverage metadata `3019cd91...` also reproduce. `firstrate.py` `7889276e...`,
+its tests `58ed9d19...` and `guidance_dataset.py` `b5323597...` match at their
+commits. Section 60's scope table sums to 23,585,624 and 58,586, and its input
+occurrences balance at 24,081,651. The 28,388 source anchors, 293,067 actions,
+396,030 action rows, 16 requests and 11 guidance profiles also balance. These
+checks cover Codex's arithmetic, not the underlying files.
+
+Current identities after this round's correction:
+
+| Artifact | SHA-256 / shape |
+|---|---|
+| Full source | `14b2b69c104d28dd26242438c67589cdbe30ce2544a8a76c2d39c4a1ecdaa030`, 61 members |
+| Review ZIP | `69db61b6809c87cdf3d4513f159ba675b315b784339f8340382f715511a17f7c`, 948,312 bytes, 63 members |
+| Handoff | `363b3cf1f690e06d35f48008e444bd4ee4e5bde0af3ef1a6000ca22f38338012`, 84,069 bytes |
+| Base replay | `2587d448d523559c8d8d943f5f1cc52aa21a720970a6d2a0e794f5c337f6cc31` |
+| Stress replay | `0863400c9c8ba9dcab5f95e7898826bda103f1f52b7b20e52a6b865616f0862c` |
+| `firstrate.py` | `05e5dfb6a8a5c0b16ed712ee06ac6d4685dca7a0ccec7400dc9e27ab578502b9` |
+| `guidance_dataset.py` | `ab11f1e7c5896dfffafd781cf7f02ee4c3b59ac6af69a22257a8874e8d796a69` |
+| Native audit ZIP, unchanged | `fa562a43d49f59e5e3305c3d99cb2d3537bf0045a494504c3f5e5711fd8ae3e6`, 293,994 bytes |
+
+Contract, plans and coverage metadata stay as above. `multi_session.py`,
+`pre_qc.py` and the rest of the native closure are unchanged in this round, so
+the 29 consumer files in section 54 were not rerun. The replay and handoff
+hashes change only because they bind the producing source hash. Retained
+`c589b3dd` custody and its recovery authorization are untouched.
+
+### 65.4 Mutation and focused verification
+
+All mutants were rewritten in memory; no source file was changed by a run.
+
+| Module and tests | On Codex's tests | After this round |
+|---|---|---|
+| `firstrate.py` | 230 mutants: 110 caught, 114 survived, 6 harness pattern errors | 245 mutants: 224 caught, 21 survived |
+| `guidance_dataset.py` | 172 mutants: 58 caught, 113 survived, 1 harness pattern error | 182 mutants: 165 caught, 17 survived |
+| `multi_session.py`, `pre_qc.py` changes | 38 mutants: 33 caught, 4 survived, 1 harness pattern error | 39 mutants: 38 caught, 1 survived |
+
+Each remaining survivor was run and has a stated reason. FirstRate's 21: regexes
+already used through `fullmatch` or rejected by the next check; `UnicodeError`
+being a `ValueError`; the DST offset guard making the round-trip check and
+`later` equivalent; constructor rechecks returning the same code; defensive
+error-text cleanup with no reachable input; and count, key and location rules
+refusing what an ordering or size check would. The compiler's 17: empty or
+malformed inventories refused by the next check, hash equality covering the
+digest check, one of two identical `current_missing` loops, and compiler
+rechecks repeated by `GuidanceDataset`. The engine's one: `released >= ZERO`,
+which cannot go negative because a buy never fills above its limit.
+
+The ten `ReviewCorrectionTests` methods all fail on Codex's published source,
+with 52 failures across methods and subtests, and pass after correction. Each
+corrected behavior also has a mutant caught on the corrected source.
+
+Closing checks on the final tree, none of them a full lane suite:
+
+| Check | Result |
+|---|---|
+| Sixteen focused files: FirstRate, compiler, engine, handoff, decoder, planner, reference, contract, coverage, input contracts, historical market, guidance inputs, input preparation, bundle, release, preparation CLI | 361 passed, 918 subtests, zero failures, 289 s |
+| `test_boundaries.py` and `tests/test_active_document_consistency.py` | 76 passed, zero failures |
+| `git diff --check`, frozen documents | Clean; `docs/SESSION_HANDOFF.md` and `docs/ACTION_PLAN_2026-08-20.md` unchanged |
+
+### 65.5 Open items and next action
+
+Codex should counter-review this section and do three things Claude cannot:
+
+1. Run a names-only census of the four action archives against the new member
+   rule, because Claude did not read the USB. Fixtures and sections 59 to 62 show
+   `{symbol}.txt` for splits and `{symbol}_divs.txt` for dividends. A different
+   name now raises rather than mislabels. The v3 reconciliation report stays bound
+   to adapter `7889276e...` and is not reissued by this change.
+2. Recompile private corpus v2 with the corrected compiler and report whether
+   `1f004186...` is unchanged. It changes only if a date-only row sits within a
+   day of an instant, or a URI has a DEL character.
+3. Answer GDR-CR65-014.
+
+For the owner: 60.5 asked for the exposed Sharadar key to be rotated and no later
+section confirms it. Displayed access ends November 6 for Massive Stocks Starter,
+November 13 for FMP and November 14 for EODHD, and 64.4 records a 30-day deletion
+rule for Massive raw data whose licence ends. Sharadar's status is Cancelled with
+no end date shown, and 60.5 leaves its action CSV in Downloads. Retention of those
+files is the owner's decision.
+
+| Commit | Scope |
+|---|---|
+| `1870b9c9` | GDR-CR65-001 to -010 and -012 fixes and pins, and the -003 pin repair |
+| This record commit | Section 65, status block, scope line, `test_boundaries.py` guard and pin rotation |
+
+This round gets one push, guarded on the remote head still being `88a35c0c`;
+never force. It publishes Codex's local `01b856be` and both commits above. QC
+stays untouched and the Mia-led recovery stays paused. The proposed terminal-SPY
+rule and all eleven original decisions stay open. The lane is not backtesting
+ready: section 64.6's remaining inputs still stand.

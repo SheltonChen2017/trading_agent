@@ -1,12 +1,14 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **369 IS CLAUDE'S REVIEW OF SECTIONS 351-368 (19 CODEX COMMITS). ALL 19
-ACCEPTED; NO P0/P1. 366.8 OVERCLAIMED THE FMP CONTROL MATCHES: ACCESSION+CIK
-MATCH FOR ALL 12, BUT THE KEPT COUNTERS PROVE THE EXACT ROW'S FORM FOR ONLY 6
-AND ITS NAIVE ACCEPTANCE FOR ONLY 4 (CORRECTED IN 369). THE WINDOWS TEST
-HELPER NOW ACCEPTS AUTOCRLF IMAGES. FIFTEEN P2s STAY OPEN; NEW P3 SUCCESSOR
-RULES BIND THE NEXT CAPTURE. NO QC, PURCHASE, PROVIDER OR SEC ACCESS BY THE
-REVIEWER. NOT BACKTEST-READY.**
+Status: **371 COMPLETES CODEX COUNTER-REVIEW OF ALL THREE CLAUDE COMMITS
+THROUGH f99c66eb. ACCEPTED AFTER THE TEST-FIXTURE CORRECTION cf82f573 AND
+THE EVIDENCE QUALIFICATIONS BELOW. ACCESSION+CIK AGREES FOR ALL12 CONTROLS;
+THE COUNTERS GUARANTEE AT LEAST ONE EXACT JOINT ROW WITH FORM AGREEMENT
+FOR6 CONTROLS AND NAIVE ACCEPTANCE AGREEMENT FOR4. NEITHER IS HISTORICAL
+PUBLIC-AVAILABILITY/PIT PROOF. FIFTEEN CARRIED P2s REMAIN OPEN; SEVEN369
+P3 GROUPS KEEP THEIR EXACT OPEN/SUCCESSOR SCOPES. FROZEN AND CONSUMED
+IMAGES/CLAIMS ARE PRESERVED. NO NEXT MILESTONE, NEW SOURCE OPERATION,
+PURCHASE, QC/SAFARI, VENDOR REPLY OR MONITOR REARM. NOT BACKTEST-READY.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -70,6 +72,8 @@ Section 369 is Claude's review of sections 351-368; it corrects the
 section-366.8 control-match claim and changes no gate.
 Section 370 is Claude's correction of two statements in section 369; it
 changes no finding, disposition or gate.
+Sections 371-372 are Codex's counter-review and separate durable handoff of
+all three incoming Claude commits. This round is counter-review only.
 
 ## 1. Canonical V1 contract
 
@@ -326,6 +330,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-03 | Codex custody repair, existing-plan audit and protected planner | Clean63d5665fe2eca484bc8d24d93cbd0d293d096756 ->dfdf9ee5 ->7f650b08 ->b851c3b3 ->ed2c738f -> separate368 handoff; incoming EMPTY | Fix custody, qualify FMP/EODHD, continue input-complete pre-QC engineering; no purchases/QC | Genuine storage experiment recovered without rewriting failed CLI;637s audit completes24/28 GETs, FMP SEC+EOD current mappings corroborate12 controls, insider date-scope refuses. Prepared native architecture then completes363s full25/20,052-chain assembly and independent five-leaf readback;8 warmup NON-DISPATCH candidates, no acquisition/admission/readiness. | Main483 provider/custody10.61s,232 planner19.62s,129 boundary6.94s;32 compiled images/four frozen equality; genuine RED/GREEN, real native preflight23.714s and source-only platform canaries. No full suite. |15 carried P2s OPEN; scoped new parser/IPC/typed-summary/native corrections resolved. Actual archive/PIT/population gates unchanged; all failed claims preserved. | Exact historical availability/version and identity/context facts remain the concrete pre-QC blocker. No ordinary current-row probe, optional comparison, purchase/QC/vendor reply, monitor rearm or interim push. One final matching-lane push after368. |
 | 2026-11-04 | Claude review (macOS session) and corrections | `2d0972d6` -> `249dcb9d` -> this review record | Review of `1635900d..2d0972d6`: 19 Codex commits (sections 351-368), zero merges; the two Windows-session Claude commits and four record commits keep their section 350/351 dispositions | All 19 accepted, two with corrections: the 366.8 control-match overclaim corrected from the kept counters, and the platform helper accepts autocrlf images (`IBWIN-CR36901`). 24 FMP/EODHD GETs and 2 credential reads match the journals; no new SEC request; no email or key shape in receipts or diff. | 915 new-file tests pass under the strict native harness (20 need it; 895 pass in the plain sandbox); helper 99 passed, 2 of 2 mutants caught; guards 179 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. No backtest. | IBFMPEOD-CR36901 closed by correction, IBWIN-CR36901 fixed; P3 IBTEST-OBS36901, IBFMPEOD-OBS36902, IBFENCE-OBS36903, IBCUSTODY-OBS36904, IBMASSIVE2-OBS36905, IBFIRST-OBS36906, IBPLAN-OBS36907 open | Codex counter-reviews 369; the next SEC capture must carry the 36907 rules |
 | 2026-11-04 | Claude correction of section 369 (macOS session) | `ee818ad6` -> this record | No Codex commit since `ee818ad6`, so no new review range. Rechecks section 369's own statements after that round ended under a usage limit. | Two statements corrected: 94 custody-platform tests never passed under the strict harness, and three P3 groups had been recorded from agent reports without the verification 369.1 claimed. All of those findings now hold. | 14 of 14 finding mutants survive as recorded and 3 of 3 controls are caught; 5 probes confirm the rest; network and Keychain exec denied. No complete suite. No backtest. | No new finding; P2 count unchanged at fifteen | Codex counter-reviews 369 and 370 |
+| 2026-11-04 | Codex counter-review only | `2d0972d690ba7fe22e537628a561ba7977e056ff..f99c66eb1f7f428190e7cf1b868f4f015bdc03f2`; correction `cf82f573e4d3a76fcaa44ecf7fa0b6d4c6ae4c90`, separate372 handoff | Review249dcb9d, ee818ad6 and f99c66eb individually; no next milestone | Accepted after CRLF fixture correction and append-only qualifications371. All12 accession+CIK/6 form/4 naive timestamp guarantees independently confirmed from hash-authenticated receipt; original failed claims and source images unchanged. | Observed536 focused PASS/1 skip/21 warnings under strict denial;102 platform/EXACT PASS with inherited network/security denial and fork allowed. Genuine fixture RED1/GREEN, two helper mutants caught; final record/import checks below. No full suite or historical replay. |15 carried P2s OPEN; new IBWIN-CCR37101 P3 RESOLVED in cf82f573; all seven369 P3 groups retained with precise dispositions | Genuine historical archive/PIT/population evidence remains missing. Vendor-reply, purchase and QC holds stay active; monitors disarmed. Exactly one final matching-lane push after372. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -44482,3 +44487,220 @@ helper's byte check no longer notices a pure CRLF conversion of a frozen test.
 Nothing is skipped on those hosts, and
 `test_frozen_production_pin_maps_still_match_current_test_bytes` compares the
 exact bytes separately.
+
+
+## 371. Codex counter-review of Claude sections 369-370 (2026-11-04)
+
+### 371.1 Captured range, authority and per-commit dispositions
+
+Designated worktree is
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`,
+branch `codex/strategy-insider-buying`. Matching-only fetch establishes clean
+local/origin `f99c66eb1f7f428190e7cf1b868f4f015bdc03f2`, descended from
+the exact prior outgoing `2d0972d690ba7fe22e537628a561ba7977e056ff`.
+The complete ordered incoming range contains the THREE commits below,
+zero merges. The third arrived before capture; it is included explicitly.
+No fast-forward, checkout/branch change, merge, cherry-pick or reset was needed.
+There was no local-only unrelated commit or dirty work to bundle.
+
+The owner's latest instruction is `start counter review`. Apply it as
+COUNTER-REVIEW ONLY, with the standing one-final-push instruction; do not
+restart the older continuous build, acquire a sample, activate the eight
+candidate requests, contact vendors or access QC. No next milestone this
+round. The review confirms Claude's declared19-Codex-commit scope, while
+the earlier four record/two Windows-session commits keep their350/351
+dispositions. This counter-review is not new independent review of Codex's
+own implementation. Three read-only advisory agents assisted source checks;
+observed runs below were independently executed by Codex.
+
+| Incoming commit | Disposition | Independent reason/evidence |
+|---|---|---|
+| `249dcb9daf842b7a762a6799b885e65a37b8e8b7` | ACCEPTED AFTER CORRECTION `cf82f573e4d3a76fcaa44ecf7fa0b6d4c6ae4c90` | The helper keeps the17 paths/pins, symlink/path refusals and unsupported-host scope. Its CRLF-to-LF normalization also accepts mixed LF/CRLF and applies on POSIX; production raw-pin checks stay exact. The new test fixture, however, doubled CR on an already-CRLF source checkout.371.2 fixes only that unbound fixture and proves both source formats. No actual Windows run is claimed. |
+| `ee818ad61957116ddca8f04ef77ec88310fc1961` | ACCEPTED AFTER CORRECTIONS/QUALIFICATIONS in370 and371 | Complete diff is record-only. The FMP aggregate overclaim correction is independently confirmed from the exact retained receipt371.3.370 corrects the original915-strict-tests and every-finding-verified statements without retroactively changing what was observed.371.4 qualifies empty responses, exact-row guarantees, spent/successor scopes and unrepeated reviewer evidence. |
+| `f99c66eb1f7f428190e7cf1b868f4f015bdc03f2` | ACCEPTED WITH THE QUALIFICATIONS IN371 | Complete diff is record-only; it adds370 and a ledger/pointer entry. The corrected821+1skip strict versus94 fork-dependent test split is consistent with source and independently observed harness dependence. Its fourteen surviving mutants/three controls/five probes remain attributed Claude evidence; Codex does not claim to have repeated them all. Source mechanisms were checked, and selected material observations were independently reproduced below. |
+
+### 371.2 Confirmed new finding and correction
+
+**IBWIN-CCR37101, P3, RESOLVED in cf82f573.** The five new review tests
+read working-tree bytes and transform every LF into CRLF. On the actual
+autocrlf source layout that means CRLF becomes CRCRLF, so the intended
+positive test refuses. This is a test-fixture compatibility defect, not
+permission to normalize production custody or rewrite the17 frozen tests.
+
+The correction canonicalizes ONLY the fixture's source bytes before its
+existing transforms. All original five cases remain, with two new genuine
+source-root cases (LF and CRLF). The CRLF source case is RED on the preceding
+fixture:1 failed/6 passed1.14s, native-denied, stderr0. The final corrected
+file participates in102 PASS16.00s (seven review,94 custody-platform,
+EXACT package guard), zero skips/warnings. Test-file SHA-256 is
+`99f8bf5039d525254a92f9eb034dab05845a93e64c6026d1b5cd64342f2d1cc6`.
+
+Two independent in-memory helper reversals are caught: LF-only hashing
+causes3 expected failures/4 passes1.00s; always-accept causes the three
+invalid-byte refusals to fail,4 other passes1.00s. Neither mutates source
+files. The17 exact frozen test hashes and four v3 production hashes remain
+unchanged. The source-only platform treatment does not close IBWIN-CR02's
+actual Windows/default-invocation scope or claim a Windows custody port.
+
+### 371.3 Observed retained-control verification; no new source work
+
+Native read-only diagnostics pin and hash BEFORE decoding the exact70,190-byte
+provider completion receipt SHA-256
+`f52646ad80a2a7497f9eb56d471987d8041ac744600b194e5e9ea99c6684a552`,
+and the exact23,187-byte storage-proof receipt
+`e801524572f54c9c7415798386b5c579f66b35fcc46eb7a9b9e57aa977ad81b3`.
+Only those fixed metadata/control leaves are readable under the private-root
+DATA denial; no provider raw/normalized body, original financial row, token,
+mail/account detail or credential is read/printed/hashed. All writes are
+fresh temporary data or `/dev/null`; native network, fork and security-exec
+denial, initial isolated flags and the real Darwin VM/RSS guard apply.
+
+Observed historical counters remain28 planned,24 transport invocations,
+24 projections,23 clean/scoped,4 unattempted and2 credential reads;12 FMP SEC,
+1 FMP insider,11 EOD mapping attempts. They describe the prior operation,
+not new requests now and not measured remote requests/transferred bytes.
+The FMP SEC projections contain12 control cases and14 joint accession+CIK
+matching row occurrences. For each case let C be candidate rows, J joint
+accession+CIK rows and A agreeing rows. `A > C-J` guarantees AT LEAST ONE
+joint row agrees:6 controls for form and4 for naive acceptance. It does not
+prove every joint row agrees or bind the form and timestamp to the same
+row. All12 retain accession+CIK agreement. None proves timezone, public
+delivery, original-body equality, processing rights or historical identity.
+Raw rows were not retained and are not reconstructed or re-requested.
+
+The proof actually binds164 source images and excludes the planner, platform
+helper and newly corrected review-test file. Its execution head remains
+historical dfdf9ee5; no later correction hash is relabelled as already
+existing during that experiment. The provider completion lacks a physical
+`storage_identity` field. All its readiness/authority fields remain false/0.
+The final aggregate/pure-observation diagnostic passes exit0, stderr0,
+0.709s outer time; it also independently reproduces the empty-response and
+NUL-member observations described next. No retained-root replay, storage
+experiment, provider call, SEC request or claimed namespace is rerun.
+
+### 371.4 Finding-by-finding qualifications and successor boundaries
+
+| Finding | Counter-review disposition, reason and next-use condition |
+|---|---|
+| IBFMPEOD-CR36901, P2 | CLOSED only for the corrected durable claim; verified371.3. Use the at-least-one exact-row guarantee. Contract tests and current labels do not close the topical evidence gates. |
+| IBWIN-CR36901, P3 | Helper correction accepted at its collection-only scope; fixture issue separately resolved371.2. POSIX LF/CRLF normalization is not exact physical-byte equality, but skips nothing there and the production raw-pin contract remains unchanged. |
+| IBTEST-OBS36901, P3 | OPEN reproducibility/committed-harness gap. Independently observed strict versus fork-permitted requirements below. The temporary harness is not represented as a committed reusable tool. No test-only patch grants acquisition safety. |
+| IBFMPEOD-OBS36902, P3 | Source-confirmed successor requirements for hard wall deadline and durable start sync. SIGALRM raises TimeoutError/OSError, which inner OSError handlers/address retry may swallow; recorded hard16s is not guaranteed. Stable writes use fsync, not F_FULLFSYNC. Empty `[]` independently projects scoped/clean with a body pin and zero rows.364.1/366.4 deliberately permit empty capability observations while denying coverage; distinguish empty from positive matched/coverage reporting in a successor, rather than call the old empty observation itself unauthorized or rewrite the actual23 nonempty clean results. Exact-row counter improvements require a successor. |
+| IBFENCE-OBS36903, P3 | Source-confirmed path-spelling weakness in the three fixture fences; require physical device/inode alias exclusion in a successor. Do not use an alias as permission to read/write real artifacts. No actual-root fixture qualification was run here. |
+| IBCUSTODY-OBS36904, P3 | Source-confirmed conditional physical-root check and audit-ID-only Epoch reservation; the wrapper separately snapshots old v1 claims, but this is not a general cross-epoch request ledger. Probe policy explicitly denies security exec, not every non-Git executable.366.2's Git-only assertion overstates native enforcement. Before future reuse require explicit physical-root binding, cross-epoch consumption and actual exec confinement. No bound source or old receipt is edited now. |
+| IBMASSIVE2-OBS36905, P3 | Source-confirmed spent-route readback/health file-fence difference, missing isolated deadline regression and indistinguishable primary/cleanup test errors.370's mutant counts remain Claude-attributed. No false claim of a separately applied historical outer sandbox, no retry of the failed actual readback. |
+| IBFIRST-OBS36906, P3 | Source-confirmed guard/test sensitivity and ZIP64 preallocation concern. Independently constructed in-memory ZIP central name `A.t` followed by NUL and `t` is accepted by the member checker after stdlib truncation. This does not establish successful full-member admission; stdlib open can subsequently refuse.370's ZIP64 probe ends in BadZipFile: retain resource-bound gap/fail-closed qualification, not a claim that malformed data was admitted. Ten surviving mutants/two controls and exact17,825,878-byte read remain attributed. Frozen consumed source stays unchanged. |
+| IBPLAN-OBS36907, P3 | Source-confirmed missing general later-capture discovery, dropped archive-exposure ledger, absent focused census-subset regression, substring policy-test weakness and incomplete newer-root census. Known20,052 consumed accessions remain protected; archive membership stays unknown, not zero. Planner has internal protected readback but no standalone readback CLI; old launch/readback scripts are not tracked. Advisory source hash audit791 tracked Python files confirms neither named script hash. Before ANY future capture, authenticate intervening batches/captures and archive-exposure ledger, qualify effective read fences/census conservation and a reproducible committed controller. No new plan, collector, SEC fetch or old namespace activation this round. |
+
+All15 carried P2s remain OPEN at their exact scopes: IB1C-REAL-CR01,
+IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01, sharedIBSH-CR02,
+sharedIBQC-SHARED-META01, IBARCHIVE-OBS-01/02, IBPARENT-PLAN-OBS01,
+IBPUBLIC-KNOWNBY-01, IBQC-ACK-33001, partlyIBPILOT-COMP-33001,
+partlyIBWIN-CR02, IBFMPEOD-OBS36401 and originalIBFMPEOD-PUB36402.
+No open P0/P1; the new test-fixture P3 is resolved. All seven369 P3 groups
+remain at the open/spent/successor scopes above. Older resolved findings,
+IBIPC-36001, IBMASSIVE2-OBS34101 and sharedIBSH-CR01 keep their prior scopes.
+Nothing here substitutes a new P3 label for a carried P2 or erases a failure.
+
+### 371.5 Validation, exclusions and precise limits
+
+- Observed strict focused group:536 passed,1 skipped,21 expected native
+  denied-fork DeprecationWarnings in9.46s; outer10.742s, stderr0. Exact files:
+  stable_custody_v2, sec_required21_plan_v2, fmp_eod_projection_v1,
+  fmp_eod_qualification_v2, firstrate_qualification_v1 and
+  massive_evidence_readback_v1. This is a focused group, not a full lane suite.
+- Observed platform group:102 passed16.00s, zero skips/warnings;
+  outer16.917s, stderr0, seven review tests plus94 custody-platform plus
+  EXACT `tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`.
+  It permits child processes required by those tests while enforcing native
+  process-tree network/security denial and actual-data/write fences.
+- Both groups use Python3.13.15, `-I -S -B`, exact
+  `-X pycache_prefix=/var/empty/insider-pilot-sec-parent-audit-no-bytecode`,
+  explicit venv site-packages, no inherited credentials, pytest plugin
+  autoload/cache disabled, fresh TMPDIR/basetemp, native network/security
+  denial, actual artifact/USB/Keychain DATA denial, TMP/devnull-only writes
+  and real live Darwin VM/RSS guards. Strict group also denies process-fork.
+  Native denial is proved before collection. Metadata/stat checks may inspect
+  root identity; they do not read private DATA. Shared Git administration is
+  metadata only; no sibling checkout source is used.
+- Eleven relevant source/test images compile in memory without bytecode
+  publication. Four frozen v3 source hashes and all17 frozen test hashes
+  remain exact. Corrected source-test hash371.2; no production source change.
+- Genuine RED/GREEN and two in-memory reversals are371.2. Most370 mutation
+  probes were not repeated: keep them attributed. No actual Windows host,
+  retained-root replay, complete suite, acquisition or readiness validation.
+- Harness/diagnostic mistakes remain failures of those diagnostics: two
+  platform bootstraps required fork denial despite their fork-permitted
+  group and stopped before pytest; corrected only the caller's proof choice.
+  An initial135-check boundary run used fork denial and had131 pass/4 fail
+  because three Git checks and one child-import check require subprocesses;
+  rerun with inherited native network/security denial and fork allowed below.
+  One aggregate diagnostic used projection-family instead of receipt-family
+  spelling and failed its zero-case assertion; corrected label, authenticated
+  final result371.3. One compile/hash diagnostic imported pytest without
+  site-packages; source-only AST pin inspection corrected the harness.
+  No such error is called a lane regression or successful evidence operation.
+
+## 372. Separate durable handoff — counter-review only (2026-11-04)
+
+Exact incoming range and every per-commit disposition are371.1. The only
+outgoing code/test correction is existing
+`cf82f573e4d3a76fcaa44ecf7fa0b6d4c6ae4c90`, after captured origin
+`f99c66eb1f7f428190e7cf1b868f4f015bdc03f2`. This separate record/handoff
+commit follows that exact existing hash; no incoming or earlier Codex commit
+is silently omitted. All repository work/tests/commits remain in the one
+designated lane worktree/branch. The root Session Handoff, Action Plan,
+architecture manifest, shared behaviors and other lane records stay frozen.
+Quality assessment8/10 for this bounded review/correction: narrow useful
+helper repair and candid corrected evidence, with unresolved successor/test
+reproducibility limitations. It is not a score for strategy edge/readiness.
+
+STOP at the same factual pre-QC blocker. Real accession/body/version-linked
+historical public-available-by evidence for2020-10-01–2025-12-31, historical
+issuer/share-class/listing/PIT identity, full required21 original admission,
+genuine older target-affecting lots, real contexts/both earnings diagnostics,
+processing rights and permanent population/look/engine-parity roots remain
+missing. Exact first-public seconds are unnecessary; authenticated upper
+bounds before the frozen09:28/09:30 US Eastern cutoffs can suffice. Current
+SEC acceptance/current mappings or an arbitrary lag cannot manufacture them.
+No new purchase has been established as necessary. Any later archive sample
+must be qualified before scaling. Existing vendor replies still require the
+owner's explicit release of the no-reply hold and subscriber disclosure;
+this counter-review does not send or draft correspondence or check mail.
+
+**NO NEXT MILESTONE THIS ROUND.** Zero new provider/SEC/credential/licensed-row
+acquisition, QC/Safari/API/SDK/job/upload/outcome look/backtest, purchase/
+upgrade/trial/paid export, scheduler/operator-database/broker action,
+deployment/capital/funded/paper/live/order/trading operation. Monitors remain
+disarmed; no other chat is messaged. All failed claims/receipts, consumed
+epochs, eight NON-DISPATCH candidates and20,052 consumption chain stay intact.
+Frozen IB1C v1/scale/pilot and all four v3 sources are untouched. Stoppedv3
+remains1,846 completed/1,847 starts unresolved; separate7,373-byte diagnostic
+and report206e6db9677fb169455f62357ce966384926080b6eba582094e9536e88d705b7
+does not resolve the original unmatched start or establish authenticity/PIT/
+rights. Legacy19,846/99,394 and79,548 unattempted remain unchanged; strictD23
+seven nonexact/no82-quarter promotion digest. Frozen study/pilot windows,
+economics, both diagnostics and causal/refusal accounting remain unchanged.
+The two final nonretroactive classifications stay distinct:372 earlier
+requests have historical authorization provenance not established; the
+reviewer incident is reviewer-reported probable unintended SEC access with
+exact request count and transferred bytes not established.
+
+Reverify exact root/branch/HEAD/expected status and fetch only the matching
+lane before this record commit/final publication; stop on unexpected origin
+advancement. Exactly ONE final matching-lane push is authorized for this
+completed counter-review round, followed by independent exact remote-tip and
+clean/synced verification. No interim push has occurred. Final record/import/
+active-document validation and publication checks are recorded below.
+
+Final135 record/active-document/lane-import/ML-import/EXACT package-guard
+checks PASS12.59s, zero skips/warnings (outer13.651s, stderr0), after the
+complete371/372 content. Fork is permitted for the three read-only Git checks
+and package-import child, with native process-tree network/security denial,
+actual DATA/write isolation and the real memory guard retained. No shared
+SEP-2 test or full suite was run; sharedIBSH-CR02 remains OPEN. The three
+final focused groups total773 passing test executions and1 skip, with21
+expected denied-fork warnings in the strict group; this is not a count of
+unique tests or a full-suite result. This validation tail changes no contract
+or source. Final diff, narrow secret-shape scan, exact root/branch/HEAD/status
+and matching-origin checks precede the separate record commit and sole push.

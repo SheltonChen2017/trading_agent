@@ -266,12 +266,17 @@ def _extend_cell(percent, original_sources, original_profile, *, activation, rep
     end = [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == 'on_end_of_algorithm']
     require(len(end) == 1 and len(end[0].body) == 1 and isinstance(end[0].body[0], ast.Expr)
         and ast.unparse(end[0].body[0]) == 'self._arv2_driver.on_end_of_algorithm()', 'transform')
+    # Only a valid aggregate earns the period report. build_report refuses an
+    # invalid one, and that refusal here would turn a Completed run_valid=false
+    # run into a Runtime Error whose three statistics the result reader may not
+    # open, losing the reason the run was invalid.
     end[0].body = ast.parse("""aggregate = self._arv2_driver.on_end_of_algorithm()
-report = build_report(self._arv2_driver._account_observations,
-    evaluation_sessions=self._arv2_driver._evaluation_sessions,
-    ar_percent=AR_PERCENT, source_profile_sha256=self._arv2_driver._profile['profile_sha256'],
-    account_path_schema=ACCOUNT_PATH_SCHEMA, legacy_aggregate=aggregate)
-self.set_summary_statistic(STATISTIC_NAME, canonical_report_bytes(report).decode('ascii'))
+if aggregate['run_valid'] is True:
+    report = build_report(self._arv2_driver._account_observations,
+        evaluation_sessions=self._arv2_driver._evaluation_sessions,
+        ar_percent=AR_PERCENT, source_profile_sha256=self._arv2_driver._profile['profile_sha256'],
+        account_path_schema=ACCOUNT_PATH_SCHEMA, legacy_aggregate=aggregate)
+    self.set_summary_statistic(STATISTIC_NAME, canonical_report_bytes(report).decode('ascii'))
 """.replace('AR_PERCENT', str(percent))).body
     sources['main.py'] = ast.unparse(ast.fix_missing_locations(tree)) + '\n'
     buffers = tuple(sorted((name, raw.encode('ascii')) for name, raw in sources.items()))
@@ -424,4 +429,5 @@ def profile_record():
         'economics': 'successful_QCOM_restored_six_10pct_3verified_1positive_next_open_MOO_RAW_strict_same_session_closing_minute_repair_only',
         'period': ['2021-01-04','2026-10-13'], 'decision_count':302,'evaluation_count':1451,
         'reporting': 'actual_same_job_NAV_and_returned_legacy_aggregate_after_unchanged_run_valid_gates',
+        'invalid_run_reporting': 'run_valid_false_stays_Completed_with_its_three_legacy_statistics_and_no_period_report',
         'output': 'private_ASCII_source_buffers_and_profiles_no_source_input_payloads', **FALSE_FLAGS}

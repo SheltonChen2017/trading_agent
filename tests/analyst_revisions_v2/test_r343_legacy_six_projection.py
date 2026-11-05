@@ -202,6 +202,38 @@ def test_unchanged_financial_modules_and_reached_emitted_report_hook(prepared,hi
     assert events == ['legacy_validity','report',('emit',('PERIODS','{}'))]
 
 
+@pytest.mark.parametrize('index', range(7))
+def test_invalid_run_stays_completed_with_only_its_legacy_statistics(prepared,index):
+    # build_report refuses run_valid=false. Unguarded, that refusal would turn a
+    # Completed invalid run into a Runtime Error the result reader may not open.
+    sources = {name: raw for name,raw in prepared['bundle']['cells'][index]['source_pairs']}
+    tree = ast.parse(sources['main.py'])
+    function = next(n for n in ast.walk(tree) if isinstance(n,ast.FunctionDef) and n.name=='on_end_of_algorithm')
+    events=[]
+    driver=SimpleNamespace(on_end_of_algorithm=lambda: (events.append('legacy_validity'),{'run_valid':False})[1],
+        _account_observations={},_evaluation_sessions=(),_profile={'profile_sha256':'f'*64})
+    def refuse(*_args,**_kwargs):
+        raise AssertionError('an invalid run must not reach the period report')
+    namespace={'build_report':refuse,'canonical_report_bytes':refuse,'STATISTIC_NAME':'PERIODS','ACCOUNT_PATH_SCHEMA':'unused'}
+    exec(compile(ast.Module(body=[function],type_ignores=[]),'actual-emitted-end-hook','exec'),namespace)
+    algorithm=SimpleNamespace(_arv2_driver=driver,set_summary_statistic=lambda *args:events.append(('emit',args)))
+    namespace['on_end_of_algorithm'](algorithm)
+    assert events == ['legacy_validity']
+
+
+def test_caller_inventory_pins_the_current_projection_and_reporting_bytes():
+    # The caller cannot import off Darwin, so read its pin as text. A projection
+    # edit without a repin would otherwise surface only at the one-use prepare.
+    raw = (ROOT/'scripts/arv2_r343_legacy_six_source_pins.json').read_bytes()
+    caller = (ROOT/'scripts/prepare_arv2_r343_legacy_six.py').read_text(encoding='ascii')
+    assert f"INVENTORY_SHA256 = '{hashlib.sha256(raw).hexdigest()}'" in caller
+    files = json.loads(raw)['files']
+    for relative in ('scripts/arv2_r343_legacy_six_projection.py',
+            'research/analyst_revisions_v2_qc/legacy_six_october_reporting.py'):
+        data = (ROOT/relative).read_bytes()
+        assert files[relative] == {'byte_count':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+
+
 def test_actual_six_year_diagnostic_validator_and_Decimal96_transport(prepared):
     sources={name:raw for name,raw in prepared['bundle']['cells'][0]['source_pairs']}
     axis=m.october._sessions();sessions,decisions=m._geometry(axis)

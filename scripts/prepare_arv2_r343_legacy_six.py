@@ -32,8 +32,9 @@ BRANCH = 'codex/strategy-analyst-revisions-v2'
 PYTHON = '/Users/sheltonchen/.venvs/trading_agent-py313/bin/python'
 SOURCE = ROOT / 'scripts/prepare_arv2_r343_legacy_six.py'
 INVENTORY = ROOT / 'scripts/arv2_r343_legacy_six_source_pins.json'
-INVENTORY_SHA256 = '8e81932e0ea34bd5e8e1de1594e5ffd34cbe2f8838b3ecbef0774797646b53df'
-CONTROL = ROOT / 'artifacts/analyst_revisions_v2/legacy_six_extension/R343-20261105-A'
+INVENTORY_SHA256 = '433dfb7adb661e418e81852995c0ea439552edd61eefd31f002fe4e83f9fb011'
+# Leaf A is spent and holds main.py sources without the invalid-run guard (344).
+CONTROL = ROOT / 'artifacts/analyst_revisions_v2/legacy_six_extension/R343-20261105-B'
 INPUT = ROOT / 'artifacts/analyst_revisions_v2/massive_ratings_delta/R297-20261013-D5/package'
 PACKAGE = INPUT / 'arv2-preliminary-qc-package-411c2734da61c7d4172c4cb3'
 LINEAGE = INPUT / 'arv2-october-lineage-e4518e06a68a18a3151fe36e5926699624fc68b97c31a8e06917d44103831fd9/lineage.json'
@@ -471,7 +472,7 @@ def profile_record():
         'maximum_launch_attempts_per_candidate': 3,
         'candidate_policy': 'new_R343_identities_never_reuse_spent_R260_to_R266_claims_or_projects',
         'future_submission_gate': 'QC_hold_release_then_fresh_rights_account_privacy_idle_capacity_exact_source_input_project_run_freeze',
-        'result_protocol': 'actual_zero_exit_and_matching_source_receipt_terminal_and_bounded_four_statistic_authentication',
+        'result_protocol': 'actual_zero_exit_and_matching_source_receipt_terminal_and_bounded_four_statistic_authentication_or_three_legacy_statistics_when_run_valid_false',
         'period_interpretation': 'related_R223_R224_already_inspected_2026_through_Sep25;later_sessions_not_automatically_untouched;exploratory_only',
         'evaluation_first': '2021-01-04', 'valuation_end': '2026-10-13',
         'old_controls': 'never_read_or_replayed', 'source_guard_return_before_publication': True,

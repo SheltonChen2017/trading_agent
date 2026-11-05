@@ -10,7 +10,7 @@ The frozen same-session native RAW/SID policy is unchanged.
 
 The owner explicitly confirms sign-in and requests Safari.
 Safari is authenticated in protected OFF38609822.
-Two genuine built-in Mia requests completed in the same Ask Before Edits
+The initial two genuine built-in Mia requests completed in the same Ask Before Edits
 conversation. The final answer supplied no verified code fix. Prior
 request/config/map/control facts are corroborated; the broad engine/routing
 exclusion is not accepted.
@@ -18,22 +18,34 @@ Historical History results do not rule out prospective native-cache/feed routing
 Provider-wide absence remains unproved.
 A positive cache canary does not establish full financial repair or atomicity.
 Raw SID and parent witness remain inside QC; local SID export is not authorized.
-Fresh postMia full-source/job reads verified EVERY file unchanged and only
-the same two Completed diagnostics, with no active OFF backtest.
+Initial postMia002 full-source/job reads verified EVERY file unchanged and
+the then-same two Completed diagnostics. Latest postMiaCanary003 verifies
+all12 current files at55805... and all3diagnosticsCompleted,0activeOFFjobs.
 No source/economic/financial acceptance follows from Mia's reply.
 The authentication/manual-focus observations in118.2–118.4 remain history.
-Login and the second Mia diagnosis are complete. Owner removal of only
-Codex's unsent421character schema question from the OFF editor is pending;
-no further UI action or source write may race that repair.
-The QC-only parent renderer passed85focused tests. The new fixed action
-route's exact Mia/null-UID compatibility passed172focused tests locally;
-its v3 action/result framing requires a committed source snapshot before use.
-The first upload preflight stopped after one metadata read, before any write.
-Fresh pre-repair native source capture still matched the complete saved
-baseline; editor restoration and a new full source comparison remain required.
-No rawSID/parent-witness export, source API upload, compile or new job occurred.
-Local1041interim,3082builder,f66f545fhandoff,44687221QC-only
-implementation and54328acahandoff commits remain unpushed;
+Login and the second Mia diagnosis are complete. The later owner correction
+was unable to locate the file, so no removal assertion was assumed.
+Codex reopened exact OFF, verified the loaded selected editor has no own
+unsent question, then freshly verified ALL saved files match08c386....
+The first upload preflight had stopped on nullable UID before any write.
+A new guarded upload and BuildSuccess compile succeeded at HEADdd0e57c0;
+every other cloud file stayed exact and terminal inventory is55805a68....
+One nonfinancial native-cache diagnostic5b8cc1a48cefff60ff82422996258ca0
+reached nativeCompletedTRUE. Its tagged report is bootstrap-unproved with
+0parentreads and0closechecks; zero delivered-slice counts do not prove no
+OnData callbacks because those counters begin only after bootstrap.
+A local reporting defect overwrites the earlier failure at scheduled close.
+A new diagnostic-only observability epoch is committed locally with107parent
+and177action checks and all guards preserved; no verified SDK or financial
+correction is established. The owner supplied manual Mia focus. The004
+message was visible, but no verifiable reply persisted after same-chat
+refresh;005send is unconfirmed. Only the initial2answered Mia turns are
+admitted diagnoses. No new manual-focus input is pending. The reviewed
+first-failure diagnostic continues independently under owner bestjudgment;
+no SDK/input fix or financial retry is inferred from unconfirmed UI sends.
+No rawSID/parent-witness export or financial job occurred.
+Local1041,3082,f66f545f,44687221,54328aca,c7471730,dd0e57c0 andc055db5a
+implementation/handoff commits remain unpushed;
 this same round still has no successful push.
 
 Codex counter-reviewed the two incoming commits in `432205ad..3cf9636e`;
@@ -116,7 +128,7 @@ owner-answer checkpoint is added by this factual blocked handoff.
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **SECTION118 OWNER-AUTHORIZED GENUINE MIA/OFF CONTINUATION; SAFARI AUTHENTICATED; GENUINE MIA DIAGNOSIS COMPLETED; EDITOR RESTORATION PENDING;20REMXROWS QUARANTINED; SKIP CLAUDE REVIEW; SOLE FINAL PUSH RESERVED. NATIVE INPUT/SOURCE/RESOURCE AND ACCOUNTING PREREQUISITES REMAIN;0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
+Status: **SECTION118 OWNER-AUTHORIZED GENUINE MIA/OFF CONTINUATION; SAFARI AUTHENTICATED; EDITOR/SAVED SOURCE VERIFIED; FIRST CACHE CANARY BOOTSTRAP UNPROVED; MIA GUARD REPLY UNVERIFIED; REVIEWED DIAGNOSTIC CONTINUATION;20REMXROWS QUARANTINED; SKIP CLAUDE REVIEW; SOLE FINAL PUSH RESERVED. NATIVE INPUT/SOURCE/RESOURCE AND ACCOUNTING PREREQUISITES REMAIN;0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
 in106 remains accepted after its document/current-routing correction.
 Historicalsection105 review/disposition/fullrange remains intact in105.
 
@@ -574,23 +586,28 @@ financial acceptance remains FALSE.**
 
 The next bounded action is to complete and verify the fixed prospective native-cache diagnostic in OFF project38609822 under fresh bounded source/HEAD/access/operation/attempt/look claims; genuine Mia has supplied no verified code fix, so OFF and the remaining frozen arms proceed serially only after verified source/input/resource recovery, while the20REMXrows remain quarantined, Claude review is skipped, and exactly one final lane push is reserved for the completed or concrete-blocked round.
 
-Fresh OFF baselines001/002 andpostMia002 have the same complete source
-inventory and two Completed native diagnostics, with no active OFF backtest.
+Initial OFF baselines001/002 andpostMia002 had the same complete source
+inventory and two Completed diagnostics. Latest postMiaCanary003 verifies
+all12currentfiles at55805... and all3diagnosticsCompleted,0activeOFFjobs.
 Safari is authenticated in protected OFF38609822.
-Two genuineMia turns areCompleted and the final reply offers no verified
-code fix. Owner removal of Codex's unsent421character schema question from
-the OFF editor is pending; no UI action or source write may race that repair.
+The initial two genuineMia turns areCompleted and the final reply offers no verified
+code fix. Reopening exact OFF verified the loaded editor has no own unsent
+question; fresh native saved-source comparison matched08c386....
 Historical History results do not rule out prospective native-cache/feed routing.
 Provider-wide absence remains unproved.
 A positive cache canary does not establish full financial repair or atomicity.
 Raw SID and parent witness remain inside QC; local SID export is not authorized.
-The QC-only renderer passed85focused checks; fixed diagnostic actions now
-have a narrow v3 Mia/null-UID predicate with172focused checks. The first
-upload preflight stopped on nullable-UID framing after1metadata read and
-0writes. No source API upload/compile/new diagnostic or financial launch
-occurred. Pre-repair saved source still matched the baseline. After owner
-editor restoration, verify its absence and every saved file again before
-a fresh committed-source upload; preserve the failed preflight and UI misfire.
+The guarded diagnostic upload/compile and one native job succeeded technically;
+terminal source inventory55805a68... matches launch. The diagnostic's own
+bootstrap is unproved:0parentreads/0closechecks. Delivered-slice counters start
+after bootstrap, so zeros do not establish no OnData. Scheduled close overwrites
+the first failure; the new locally committed diagnostic epoch preserves it
+without relaxing guards (107parent/177action checks). The owner supplied Mia
+focus;004was visible but its reply is unverified after same-chat refresh,
+and005send remains unconfirmed. Initial2answered Mia turns remain the only
+admitted diagnoses. No new manual-focus input is pending; the reviewed
+first-failure diagnostic proceeds independently, accepting no Mia code fix.
+No financial launch/input repair is established by nativeCompleted.
 Authentication or a Mia response alone cannot admit private source,
 changed economics or financial readiness. Held OFF2021-02-10nativeRAW/SID
 input remains unresolved. Preserve4096; cloud1008192increase and identity/
@@ -33576,3 +33593,316 @@ quarantines remain intact. Final push is reserved, not spent at this
 interactive input wait.
 
 118.8 root current-document verification:303passed/558deselected5.37s on unchanged guard363888B/SHA5b79ff5e813c472ae68908f7300319a96c00cedfe372aa7ee49fa1135e5cefb1, same isolated Python3.13.15/syntheticDB/socket+DNS denial. Current preamble/status/section8 now distinguish completed Mia diagnosis, local v3 metadata correction and pending owner editor repair. All prior claims/results/failed scopes remain. No native effect or final push follows this record-only interactive checkpoint.
+
+Fresh118Safari claim TPR-R118-EDITOR-LOCATE-002; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"AX_characters_max": 180000, "UI_reads_max": 1, "app": "Safari", "latest_owner_correction": "was not able to find the file", "owned_url": "https://www.quantconnect.com/project/38609822", "project_id": 38609822, "purpose": "owner correction: unable to find file; locate only ownOFFfile tabs/editor and presence of own unsent literal, no restoration assumed", "typing_clicks_Save_source_API_compiles_jobs_or_Mia_requests": 0}; manifest6106B/SHAabe90f2a5422cf577f8a82b2a765e878508426c4ecdcdae8f1746b2038018545 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118editorlocate002 freshAX invocation had local undeclaredbinding ReferenceError after RHS evaluation; no projection or UI mutation accepted. Read budget conservatively consumed;003 uses declared persistent binding, not same failing input path.
+
+Fresh118Safari claim TPR-R118-EDITOR-LOCATE-003; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"AX_characters_max": 180000, "UI_reads_max": 1, "app": "Safari", "owned_url": "https://www.quantconnect.com/project/38609822", "project_id": 38609822, "purpose": "locate ownOFFfile/editor using declared persistent AX binding after local variable failure; current owner says unable to find file", "typing_clicks_Save_source_API_compiles_jobs_or_Mia_requests": 0}; manifest6046B/SHAb5ff18572cfb8682044595a0930fb18b0a5c9d76910bcd7cfa5e71d25c561f33 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118editorlocate003 actual active SafariURL is QC/lab, not ownOFF editor. No literal/editor absence or restoration inferred. Projection filter was too broad and emitted unrelated tab titles including contact labels; no such fields are retained/reprocessed or used as authority. Future outputs restrict exactownedURL and OFF editor controls only. Latest owner correction unable-to-find supersedes earlier removal assertion.
+
+Fresh118Safari claim TPR-R118-EDITOR-OPENOFF-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"AX_characters_max": 180000, "Return_max": 1, "UI_reads_max": 2, "address_set_value_max": 1, "app": "Safari", "destination": "https://www.quantconnect.com/project/38609822", "initial_owned_active_url": "https://www.quantconnect.com/lab", "navigations_max": 1, "other_tabs_source_edits_Save_Mia_compiles_jobs_accounts": 0, "purpose": "locate namedOFFfile for owntext restoration; navigate only currentQCprojectlist tab to exactprotectedOFF"}; manifest6121B/SHAc479e9a79fa57407f7d3f92dde534548004ebd7724d126a6ae21287fc751e115 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-EDITOR-VERIFY-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"AX_characters_max": 180000, "UI_reads_max": 1, "app": "Safari", "editor": "extended_algorithm_successor.py", "project_id": 38609822, "purpose": "after exactOFF navigation verify current selectedfile/editor loaded and own421questionpresence without exposing source or other tabtitles", "source_edits_Save_Mia_compiles_jobs_accounts": 0}; manifest6021B/SHA41c8f5b2972df9b21b53d343fdfd7c9de14a38c0409aad4b9017f5f2b48641db andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-EDITOR-RESTORE-002; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"endpoint": "files/read", "native_requests_max": 1, "private_registry_read_bytes": 3573, "private_registry_reads_max": 1, "project_id": 38609822, "purpose": "verify ALL savedOFFfiles after exactprojectnavigation and nativeAXloadededitor ownliteralabsent; earlier ownerremovalassertion superseded by unable-to-find correction; noaccount/sourceAPIwrite/compile/job effects", "response_bytes_max": 2097152, "seconds_max": 20}; manifest6107B/SHA0a09eda516d1d88b93b69c8ed0295c28c7b129bb5a2662705e1f1d63f5838e52 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118editorreopen savedsourceverification {"compile_jobs": 0, "matches_correct_baseline": true, "receipt": {"bytes": 3434, "name": "TPR-CMP29-API-R118-EDITOR-RESTORE-002.result.json", "sha256": "ec77bfc85a834601d99fddc314dfba73895bedcbc7223609822327070da1d4b9"}, "source_API_writes": 0, "source_archive": {"bytes": 345980, "name": "TPR-CMP29-API-R118-EDITOR-RESTORE-002.source.response.raw", "sha256": "d443465a128e667da558f5104f7ced743bae0ec39187287bad48500d2844a203"}, "source_inventory_sha256": "08c386c17a93d934d54f30715a407fef3b91c1ac841bd575b8a3d5ae081f6ae1", "status": "completed"}; proof1928B/SHA5e72596357568881e3a001568aefa6c85dfee6b5c8607c10a19695694ee17d3e. ActualMia submissionsremain2; nativeAXloadededitor ownliteralabsent after exactOFFnavigation; no deletion/save was issued and current savedsource comparison controls continuation. This is directQCrequest10; sourcewrites/compiles/jobs remain0.
+
+Fresh118Safari claim TPR-R118-PARENT-UPLOAD-002; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"attempt_id": "TPR-CACHE-ATTEMPT-PARENT-V3-OFF-002", "compile_jobs_ObjectStore_parent_witness_rawSID_reads": 0, "diagnostic_attempt": 2, "diagnostic_look_id": "TPR-CACHE-LOOK-PARENT-V3-OFF-002", "later_owner_correction": "was not able to find the file", "native_requests_max": 6, "native_response_bytes_total_max": 8388608, "native_seconds_each_max": 20, "owner_continuation": "Removed the text without saving. Verify the source, then continue OFF and the remaining arms. Keep the 20 REMX rows quarantined, skip Claude review, and push only once when done.", "phase": "upload", "private_inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 6703, "name": "own source-only parent configuration", "sha256": "8292239f62e01d20a221fe49f76b3c29a23e9089eed3d6468f0a0953cbbb02b3"}, {"bytes": 1928, "name": "fresh editor-restored full saved-source proof", "sha256": "5e72596357568881e3a001568aefa6c85dfee6b5c8607c10a19695694ee17d3e"}], "private_reads_max": 3, "project_id": 38609822, "purpose": "new committed v3 exactMia predicate fixes prior local nullableUID refusal; freshownership/collaborators/noactivejob/fullsource preflight then exactregenerated main-onlyupload; no financial/economicadmission", "recovery_proof": "actual reopened loadedOFFeditor ownliteralabsent; freshnativefullinventory08c386matched", "source_write_max": 1, "source_write_only": "regenerated main.py; preserve ALL other files/notebooks"}; manifest7697B/SHAf8c6d94bfad1dbe0f0a68597b0f79780e3ecabdaec87e27e25af1bdc6f347d79 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualparentupload002 {"actual_sid_local": false, "financial_acceptance": false, "git_head": "dd0e57c04c930bcb892060e56423bcc0f4809200", "new_diagnostic_jobs": 0, "observed_inventory_sha256": "55805a68673a281808a96df0c7b3715c4b9db5b34185b6811297739678ec3e2e", "parent_witness_local": false, "phase": "upload", "plan": {"bytes": 86705, "name": "TPR-R118-PARENT-UPLOAD-002.plan.json", "sha256": "2270af76d7c98bfbbef7afea95066218189d8b994b0f6a87429812a6f40d34f9"}, "planned_candidate_config_sha256": "be3ee05a405c1a9f95803bafbc3807bf635af5d6821f7180f5360421272cba7e", "planned_inventory_sha256": "55805a68673a281808a96df0c7b3715c4b9db5b34185b6811297739678ec3e2e", "planned_new_main": {"bytes": 49422, "sha256": "4738d865523bbeff27c5c5b74a5861b94fccc1c34139980a858b1ea5f3a1b87f"}, "project_id": 38609822, "receipt": {"bytes": 8459, "name": "TPR-CMP29-API-CACHE-R118-PARENT-UPLOAD-002.result.json", "sha256": "46e6c74139861ac4fe435bad6c1ee5d5a83bb53e6cbb229d9b928d7b81ac904c"}, "requests": [{"collaborator_count": 1, "http_status": 200, "id": "metadata", "owner_only": true, "recognized_mia_count": 0, "status": "succeeded"}, {"collaborator_count": 1, "http_status": 200, "id": "collaborators", "owner_only": true, "recognized_mia_count": 0, "status": "succeeded"}, {"collaborator_count": null, "http_status": 200, "id": "jobs", "owner_only": null, "recognized_mia_count": null, "status": "succeeded"}, {"collaborator_count": null, "http_status": 200, "id": "before", "owner_only": null, "recognized_mia_count": null, "status": "succeeded"}, {"collaborator_count": null, "http_status": 200, "id": "write", "owner_only": null, "recognized_mia_count": null, "status": "succeeded"}, {"collaborator_count": null, "http_status": 200, "id": "after", "owner_only": null, "recognized_mia_count": null, "status": "succeeded"}], "schema": "tpr-parent-upload-safe-v2", "status": "completed", "transport_calls_attempted": 6}; privateproof4609B/SHA8a19de3ecb098571e140d6bf012d31a594b6aeaa95ba5324742cbd66b5f2ebaf. Planned fields remainplanned unless afterresponse verifies. No financialcode/economicadmission, no compile/newjob or parent/SIDlocalread; failed001preserved.
+
+Fresh118Safari claim TPR-R118-PARENT-COMPILE-002; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"compile_create_max": 1, "native_requests_max": 6, "native_response_bytes_total_max": 8388608, "native_seconds_each_max": 20, "phase": "compile", "private_inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 86705, "name": "own upload002 action plan", "sha256": "2270af76d7c98bfbbef7afea95066218189d8b994b0f6a87429812a6f40d34f9"}, {"bytes": 4609, "name": "own verified upload002 result", "sha256": "8a19de3ecb098571e140d6bf012d31a594b6aeaa95ba5324742cbd66b5f2ebaf"}], "private_reads_max": 3, "project_id": 38609822, "purpose": "compile exactobserved49422B/4738d865main only after fresh owner/collabs/noactivejobs/allsource verification; preserveHEADdd0/source/config/economicFALSE", "source_writes_jobs_ObjectStore_parent_rawSID_reads": 0}; manifest7046B/SHA3530c89172b3ea65de7ce1d37c99f76dbdd52cab21fdca8229a6c9ec6f6e1557 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualparentcompile002 {"compile_id": "4bb87e38c60d4070db56f4e03732d777-1a9fe866550fc19773c4fecf6ecc87eb", "compile_requests_attempted": 1, "compile_state": "InQueue", "financial_acceptance": false, "git_head": "dd0e57c04c930bcb892060e56423bcc0f4809200", "new_diagnostic_jobs": 0, "plan": {"bytes": 33902, "name": "TPR-R118-PARENT-COMPILE-002.plan.json", "sha256": "229d745c30b26191e8089df73957be641818357263e0a152eb3830f6a15c0fb3"}, "project_id": 38609822, "proofs": {"compile_plan": {"bytes": 33901, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-002.action.spent.json", "sha256": "cd942c4e120a22033d413edc67f594403c182f8c88abde979e4d99e685ee1c45"}, "compile_response": {"bytes": 583, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-002.compile.response.raw", "sha256": "affe0f1d87895a50f0c2c90d6bf2289a1f5f4cf49ae299ab5362e251331c759a"}, "compile_result": {"bytes": 8553, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-002.result.json", "sha256": "de941663662ed5a46c68981297cad61ebbe6812b2b2a7ce46625bbe04465a8c7"}, "source_after": {"bytes": 336189, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-002.after.response.raw", "sha256": "9aa769d7db62ed2bc3211516b9007ea11b1bc6de56b60fd8d7d0d3216c8c202c"}, "source_before": {"bytes": 336189, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-002.before.response.raw", "sha256": "9aa769d7db62ed2bc3211516b9007ea11b1bc6de56b60fd8d7d0d3216c8c202c"}}, "receipt": {"bytes": 8553, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-002.result.json", "sha256": "de941663662ed5a46c68981297cad61ebbe6812b2b2a7ce46625bbe04465a8c7"}, "requests": [{"http_status": 200, "id": "metadata", "status": "succeeded"}, {"http_status": 200, "id": "collaborators", "status": "succeeded"}, {"http_status": 200, "id": "jobs", "status": "succeeded"}, {"http_status": 200, "id": "before", "status": "succeeded"}, {"http_status": 200, "id": "compile", "status": "succeeded"}, {"http_status": 200, "id": "after", "status": "succeeded"}], "schema": "tpr-parent-compile-safe-v1", "status": "completed", "transport_calls_attempted": 6}; safeprivateproof1927B/SHA2e1ef074dea31a2bab391d01c7a4ffbc1fe94815a7e4462b2dc136e8d1c36671. Fixedexactsource/nativecompile only; no sourceupdate/newjob/financialattempt or parent/SIDlocalread. HEAD frozen acrosscompile/build/launch; no push.
+
+Fresh118Safari claim TPR-R118-PARENT-BUILD-002; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"endpoint": "compile/read", "native_requests_max": 1, "native_response_bytes_max": 131072, "native_seconds_max": 20, "phase": "build", "private_inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 33902, "name": "own compile002 plan", "sha256": "229d745c30b26191e8089df73957be641818357263e0a152eb3830f6a15c0fb3"}, {"bytes": 1927, "name": "own compile002 safe result", "sha256": "2e1ef074dea31a2bab391d01c7a4ffbc1fe94815a7e4462b2dc136e8d1c36671"}], "private_reads_max": 3, "project_id": 38609822, "purpose": "one exactsourceboundcompile status read; require BuildSuccess before diagnostic launch, not requeststatuscompleted", "source_writes_compile_create_jobs_ObjectStore_parent_SID_reads": 0}; manifest6996B/SHA1fb189775759bfa0d5b8621812d7e6ac54e21bdeb12e78f272226402dc5dc692 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualparentbuild002 {"build_state": "BuildSuccess", "compile_id": "4bb87e38c60d4070db56f4e03732d777-1a9fe866550fc19773c4fecf6ecc87eb", "financial_acceptance": false, "git_head": "dd0e57c04c930bcb892060e56423bcc0f4809200", "new_jobs": 0, "plan": {"bytes": 33351, "name": "TPR-R118-PARENT-BUILD-002.plan.json", "sha256": "8287fe257d597b7a7f488f33a23dd451ac06282e28b1b417c2f447ae2cbd2bb6"}, "project_id": 38609822, "proofs": {"build_plan": {"bytes": 33350, "name": "TPR-CMP29-API-CACHE-R118-PARENT-BUILD-002.action.spent.json", "sha256": "a722d878c10cc3c84141004806270725d4eff2db7b7780b42af2726891216753"}, "build_response": {"bytes": 2409, "name": "TPR-CMP29-API-CACHE-R118-PARENT-BUILD-002.build.response.raw", "sha256": "7e047004e0f02ff8492894ed17b71f18f710c46e2fc594f15461d00db845823a"}, "build_result": {"bytes": 1917, "name": "TPR-CMP29-API-CACHE-R118-PARENT-BUILD-002.result.json", "sha256": "25b660d62716b1cea3b09057fa0f55d1598817f9c533f8346e11b7b769cc237c"}, "compile_plan": {"bytes": 33901, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-002.action.spent.json", "sha256": "cd942c4e120a22033d413edc67f594403c182f8c88abde979e4d99e685ee1c45"}, "compile_response": {"bytes": 583, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-002.compile.response.raw", "sha256": "affe0f1d87895a50f0c2c90d6bf2289a1f5f4cf49ae299ab5362e251331c759a"}, "compile_result": {"bytes": 8553, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-002.result.json", "sha256": "de941663662ed5a46c68981297cad61ebbe6812b2b2a7ce46625bbe04465a8c7"}, "source_after": {"bytes": 336189, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-002.after.response.raw", "sha256": "9aa769d7db62ed2bc3211516b9007ea11b1bc6de56b60fd8d7d0d3216c8c202c"}, "source_before": {"bytes": 336189, "name": "TPR-CMP29-API-CACHE-R118-PARENT-COMPILE-002.before.response.raw", "sha256": "9aa769d7db62ed2bc3211516b9007ea11b1bc6de56b60fd8d7d0d3216c8c202c"}}, "receipt": {"bytes": 1917, "name": "TPR-CMP29-API-CACHE-R118-PARENT-BUILD-002.result.json", "sha256": "25b660d62716b1cea3b09057fa0f55d1598817f9c533f8346e11b7b769cc237c"}, "schema": "tpr-parent-build-safe-v1", "status": "completed", "transport_calls_attempted": 1}; safeprivateproof2053B/SHA3e09fcf1a0e16a595dd8cb73511c13916bcd3d2a61b74a65bdad8feca8121b10. Exactcompile binding observed, no newcompile/sourcewrite/job or financialresult. All8retainedproof descriptors subject to independent fixedlaunchvalidation; no override.
+
+Fresh118Safari claim TPR-R118-PARENT-LAUNCH-002; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"attempt_id": "TPR-CACHE-ATTEMPT-PARENT-V3-OFF-002", "candidate": "TPR-CACHE-20261104-PARENT-OFF-002", "close_observations_max": 5, "dependency_bytes_max": 1048576, "diagnostic_attempt": 2, "diagnostic_look_id": "TPR-CACHE-LOOK-PARENT-V3-OFF-002", "executor_retained_dependency_reads_max": 8, "native_requests_max": 6, "native_response_bytes_total_max": 8388608, "native_seconds_each_max": 20, "native_window": "2021-02-08..2021-02-12", "new_diagnostic_jobs_max": 1, "non_order_diagnostic_reason": "inputtype/cachetiming availability only, no strategyperformance orfinancialevaluation; orders would not prove missingnativebar repair", "orders_History_price_volume_cachewrites_providerHTTP_exports": 0, "phase": "launch", "private_inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 33351, "name": "own Build002 plan", "sha256": "8287fe257d597b7a7f488f33a23dd451ac06282e28b1b417c2f447ae2cbd2bb6"}, {"bytes": 2053, "name": "own BuildSuccess002 safe result", "sha256": "3e09fcf1a0e16a595dd8cb73511c13916bcd3d2a61b74a65bdad8feca8121b10"}], "private_native_parent_scope": {"bytes": 1343, "contains_max": 1, "effect_clock": "only firstlockedgenuineSPYtradebar 2021-02-08 04:00<=NY<09:30 afterendpointchecks; Initializeprivateeffects0", "identity_selection": "hindsightdiagnostic/PITFALSE", "parent_attempt": 4, "parent_job": "12dd4732ba5d9d8f57950beb2a371c79", "parent_project": 37650980, "provider": "existing QC ObjectStore in exactauthorizedparent source-boundnamespace", "raw_SID_or_parent_export": false, "read_max": 1, "sha256": "eef08aca32b99056dee0ce00389c53a8ee6a1628c29188afd8bebd362fe183dd"}, "private_outer_reads_max": 3, "project_id": 38609822, "purpose": "validate all8nativecompileproofs/currentHEAD then freshowner/collabs/jobs/allsource conditions, create exactlyone nonfinancialnativecachecanary; never replay unchanged financialfailure", "securities_max": 2, "source_writes_compilecreates_financialjobs": 0}; manifest8181B/SHA5d67cd81b3cc5b33954589d9b56df99af6d8fcad1af4df4ec5f11b762f654057 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualparentlaunch002 {"actual_new_diagnostic_jobs": 1, "candidate_config_sha256": "be3ee05a405c1a9f95803bafbc3807bf635af5d6821f7180f5360421272cba7e", "financial_acceptance": false, "financial_attempts_created": 0, "financial_outcome_looks": 0, "git_head": "dd0e57c04c930bcb892060e56423bcc0f4809200", "main": {"bytes": 49422, "sha256": "4738d865523bbeff27c5c5b74a5861b94fccc1c34139980a858b1ea5f3a1b87f"}, "observed_job_ids": ["5b8cc1a48cefff60ff82422996258ca0"], "observed_source_after_sha256": "55805a68673a281808a96df0c7b3715c4b9db5b34185b6811297739678ec3e2e", "parent_or_rawSID_export": false, "plan": {"bytes": 35503, "name": "TPR-R118-PARENT-LAUNCH-002.plan.json", "sha256": "50b6ae2ead6e6f07de50812a51dbce1a78ab05f957481db39a6584c328c9306d"}, "project_id": 38609822, "proof_dependency_bytes": 753091, "proof_dependency_reads": 8, "receipt": {"bytes": 10472, "name": "TPR-CMP29-API-CACHE-R118-PARENT-LAUNCH-002.result.json", "sha256": "0e8671b0fe8ddcc5bc60e3bdbfd69a3d93005045969469c05070d93bb6125754"}, "requests": [{"http_status": 200, "id": "metadata", "status": "succeeded"}, {"http_status": 200, "id": "collaborators", "status": "succeeded"}, {"http_status": 200, "id": "jobs", "status": "succeeded"}, {"http_status": 200, "id": "before", "status": "succeeded"}, {"http_status": 200, "id": "launch", "status": "succeeded"}, {"http_status": 200, "id": "after", "status": "succeeded"}], "schema": "tpr-parent-launch-safe-v1", "source_inventory_sha256": "55805a68673a281808a96df0c7b3715c4b9db5b34185b6811297739678ec3e2e", "status": "completed", "transport_calls_attempted": 6}; safeprivateproof1475B/SHA56d62e20c8a751f8b06736951de07a853adea4d6958408fed74dd4de5c935887. Distinct nonfinancial attempt/look/candidate reservations consumed; allfinancial outcomes remainNULL, no nativeparentlocalread/export and no strategy/readiness acceptance. Terminalstatus must be observed through fixed4MiB statusroute then pause sameheartbeat before transition; no sourcechanges/cancel whilewaiting.
+
+Fresh118Safari claim TPR-R118-PARENT-STATUS-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"backtest_id": "5b8cc1a48cefff60ff82422996258ca0", "endpoint": "backtests/read", "financial_projection": false, "inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 1475, "name": "own actual launch002 result", "sha256": "56d62e20c8a751f8b06736951de07a853adea4d6958408fed74dd4de5c935887"}], "native_requests_max": 1, "native_response_bytes_max": 4194304, "native_seconds_max": 30, "private_reads_max": 2, "project_id": 38609822, "purpose": "onefresh fixed4MiB exactnewcanaryjob status observation; no performance/rawbody interpretation; onterminalpause SAMEheartbeat before consumingtransition"}; manifest6355B/SHA707fe8146892fb8e6a089f41a8556f393ab776105d3099f54c97d977e7c006e8 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118canarystatus001 {"financial_acceptance": false, "http_status": 200, "job_source_head": "dd0e57c04c930bcb892060e56423bcc0f4809200", "metadata": {"backtest_completed": true, "backtest_id": "5b8cc1a48cefff60ff82422996258ca0", "backtest_status": "Completed.", "credential_echo_refused_before_retention": true, "economics_accepted": false, "entire_wire_validated": true, "financial_fields_projected": false, "json_value_nodes": 463, "max_json_depth": 32, "max_json_nodes": 4194304, "native_origin_independently_attested": false, "original_wire_bytes": 11955, "original_wire_sha256": "5024797f658dd9594df79e1442e556124ff2377ab35ed013cc562a235ec41b40", "project_id": 38609822, "schema": "tpr-cmp30-job-status-projection-v1"}, "receipt": {"bytes": 1714, "name": "TPR-CMP29-API-R118-PARENT-STATUS-001.result.json", "sha256": "56e10702c51ce226a51280b10553afc43513d698112fcebc1560b753589b807a"}, "request_status": "completed", "source_inventory_sha256": "55805a68673a281808a96df0c7b3715c4b9db5b34185b6811297739678ec3e2e"}; privateproof948B/SHA628a9f3d6b88f1292f96226ffe86ee451985b68d60e6ac3c249c1f7bbe7e1f34. Metadata observation only; requestcompleted is not jobcompleted; no transition/nativecontinuation until sameheartbeatpause ifterminal.
+
+Fresh118Safari claim TPR-R118-CANARY-TERMINAL-PAUSE-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"app_update_max": 1, "automation_id": "target-price-qc-job-remaining-backtests", "config_source": "previousexactownedverifiedconfig retained incontroller memory; preserveallfields", "other_automations_native_QC_source_Mia_jobs": 0, "purpose": "actual terminalmetadata job5b8cc1a48cefff60ff82422996258ca0 CompletedTRUE; pause SAMEheartbeat throughapp BEFORE terminaltransition/result/source consumption", "status": "PAUSED"}; manifest6126B/SHAa0a56474dd56b3f453eba75e43f358c210261ecc021ce2929efdc156662b8813 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-CANARY-PAUSE-VERIFY-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"bytes_max": 65536, "native_QC_UI_jobs": 0, "private_exact_file": "/Users/sheltonchen/.codex/automations/target-price-qc-job-remaining-backtests/automation.toml", "purpose": "verify actualsameheartbeatPAUSED afterapp pause and before terminaltransition; no glob/DB/stopflag reads", "reads_max": 1}; manifest5998B/SHAe0b1273f1f8c88f095fc16fc32070d7b6c3cbd0fedc3692d20ef09072e0c2dbf andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118sameheartbeat terminalpause actual {"actual_status": "PAUSED", "automation_id": "target-price-qc-job-remaining-backtests", "config_bytes": 10701, "config_sha256": "3244accd2f0a1db39c11f7312c417f0c1b9e1ddb55da774fea6105af7f521147", "native_QC_requests": 0, "schema": "tpr-terminal-heartbeat-pause-proof-v1", "terminal_job": "5b8cc1a48cefff60ff82422996258ca0", "terminal_transition_may_begin": true}; privateproof348B/SHA8f4bd3df3ff3527237b5ae8f7fa887299f5b054afbe0bf2f47cbec466adef32c. Apppause preceded transition; no raw result/source or economics read yet.
+
+Fresh118Safari claim TPR-R118-CANARY-WIRE-SCHEMA-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"input": {"bytes": 11955, "name": "own freshlyretained exactterminal statuswire", "sha256": "5024797f658dd9594df79e1442e556124ff2377ab35ed013cc562a235ec41b40"}, "native_QC_requests": 0, "private_reads_max": 1, "purpose": "afterapp/actualPAUSEDproof inspect only response schema and diagnostic logavailability flags; no financial values or error/source/rawSID strings"}; manifest6064B/SHA20528e4a3eabd1a396b3ceb9d3b407838069e37f71f9a0a019452889a2834c0a andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118terminalwire shape {"backtest_fields": ["analysis", "backtestEnd", "backtestId", "backtestStart", "charts", "completed", "created", "error", "hasInitializeError", "name", "nodeName", "note", "optimizationId", "organizationId", "outOfSampleDays", "outOfSampleMaxEndDate", "parameterSet", "progress", "projectId", "researchGuide", "rollingWindow", "runtimeStatistics", "serverStatistics", "snapshotId", "stacktrace", "statistics", "status", "totalPerformance", "tradeableDates"], "diagnostic_tag_present": false, "financial_values_projected": false, "native_requests": 0, "runtime_error_present": false, "schema": "tpr-native-diagnostic-response-shape-v1", "top_fields": ["backtest", "success"]}; privateproof633B/SHA004e2319beadc85af2c41a2af69208e97edb24984b1d51f7bb2e519872d3e67a. No financial/source/nativeorigin acceptance; no newprovider/privateparent read.
+
+Fresh118Safari claim TPR-R118-CANARY-TERMINAL-RESULT-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"backtest_id": "5b8cc1a48cefff60ff82422996258ca0", "endpoints": ["files/read", "backtests/read/log"], "log_projection_bytes_max": 262144, "log_projection_reads_max": 1, "logs_query": "TPR_PARENT_CACHE_PROBE_RESULT", "logs_range": [0, 20], "native_requests_max": 2, "native_seconds_each_max": 20, "private_registry_reads_max": 1, "project_id": 38609822, "purpose": "afteractualappPAUSED verify EVERYterminalsourcefile and retrieve only exactnewpricefreecache diagnostic taggedlog; no financial fields/oldjobs/parentbody/SIDreads", "response_bytes_total_max": 2228224, "result_tag_json_bytes_max": 16384, "source_writes_compiles_jobs_Mia_accounts": 0}; manifest6336B/SHA95cd1e7a62fb51502be0c38265fb53e4ccd39ef4590376288b6534b52aff3a95 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118freshreturnedcanaryprojection readclaim BEFOREopen {"git_head": "dd0e57c04c930bcb892060e56423bcc0f4809200", "input": {"bytes": 2143, "name": "TPR-CMP29-API-R118-CANARY-RESULT-001.logs.projection.json", "sha256": "4fc3726e14b2ae0210e9ae797fafb5b42b3ffadc37bba9a8d0e5b26aac0b8af4"}, "job": "5b8cc1a48cefff60ff82422996258ca0", "max_bytes": 262144, "operation_id": "TPR-R118-CANARY-LOG-PROCESS-001", "purpose": "find exactpricefreeprobetag, emitonlyfieldnames/count; nofinance/identityvalues", "schema": "tpr-returned-own-diagnostic-projection-read-v1", "source_hashes": {"research/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "research/target_price_revisions_qc/__init__.py": "3bc79e69bc0c775d8ef0ec154551436011cba407f37690c27ccbeb9000153c59", "research/target_price_revisions_qc/comparison_20261028_api.py": "a2a160ac951a8a9f96b9531e5b51a5bf6b4e7b116b7873f77515780f059ebc5a", "research/target_price_revisions_qc/comparison_20261029_project_api.py": "680f31f17447e240f919435ee1d56a9a48526f5197e37ac97332b4b70ee42b87", "research/target_price_revisions_qc/comparison_20261029_projects.py": "6dc87f33105de9d80e7a267a6cc737bb4262f47e49c43b65247592927a5788d7", "research/target_price_revisions_qc/extended_evidence.py": "a816b1ddca5a8428f07e9029bc3a7f7db3c5e1a1f50521664992dabf556aa2d7", "research/target_price_revisions_qc/extended_operations.py": "824b3f0c180f1aeb7038d8f280c44507b5c39687fcccc87c539f242d9256d167"}}; claim1363B/SHA0852f4cbb0c16880500f618835a98f8dfa67241302413df9a1bb4db4ad062451
+
+118nativecanaryterminalresult {"backtest_id": "5b8cc1a48cefff60ff82422996258ca0", "financial_acceptance": false, "log_body_container_type": "dict", "log_body_fields": ["length", "logs", "success"], "log_projection": {"bytes": 2143, "name": "TPR-CMP29-API-R118-CANARY-RESULT-001.logs.projection.json", "sha256": "4fc3726e14b2ae0210e9ae797fafb5b42b3ffadc37bba9a8d0e5b26aac0b8af4"}, "logs_archive": {"bytes": 1834, "name": "TPR-CMP29-API-R118-CANARY-RESULT-001.logs.response.raw", "sha256": "54306082c221318b71db7bb6beaa8061426e4dd9ccfce7793755db8ba7bd9bf6"}, "native_scope_result": {"cache_updates": 0, "close_checks": 0, "delivered_bar_rows": 0, "delivered_slices": 0, "direct_order_calls": 0, "direct_provider_calls": 0, "history_calls": 0, "object_store_calls": 0, "parent_contains_calls": 0, "parent_hash_verified": false, "parent_read_calls": 0, "parent_schema_verified": false, "parent_sid_hash_verified": false, "preopen_empty_slices": 0, "registration_before_open": false, "resource_cap_changes": 0, "sessions": {}, "status": "native_parent_bootstrap_unproved", "subscription_removals": 0, "target_close_canary_days": 0}, "observations_proof": {"bytes": 1632, "name": "TPR-R118-CANARY-OBSERVATIONS-001.json", "sha256": "e444233ab0fb3941f7e425d0f28f1111176d7705d85b27cd614691e4977ffb9c"}, "project_id": 38609822, "receipt": {"bytes": 4250, "name": "TPR-CMP29-API-R118-CANARY-RESULT-001.result.json", "sha256": "2f0536e30248751172757383471c9e2a2b5259369d0e350b9d76bca0b1e396aa"}, "requests": [{"http_status": 200, "id": "source", "status": "succeeded"}, {"http_status": 200, "id": "logs", "status": "succeeded"}], "schema": "tpr-canary-terminal-safe-v1", "source_archive": {"bytes": 336189, "name": "TPR-CMP29-API-R118-CANARY-RESULT-001.source.response.raw", "sha256": "9aa769d7db62ed2bc3211516b9007ea11b1bc6de56b60fd8d7d0d3216c8c202c"}, "source_inventory_sha256": "55805a68673a281808a96df0c7b3715c4b9db5b34185b6811297739678ec3e2e", "status": "completed", "tagged_strings_found": 1}; safeproof1849B/SHAf66a4873c42d84ffd43a16845d4f09b04d82011dfec3ffa7231ee77a19009b3d. Completedalone isnotfinancial/source/economicacceptance; pricefreeobservations only; parent/rawSIDstayedINQC; nofinancialjob launched.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-CONTROLS-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"AX_characters_max": 180000, "UI_reads_max": 1, "app": "Safari", "clicks_typing_Mia_messages_source_compiles_jobs_accounts": 0, "project_id": 38609822, "purpose": "locate genuineMia controls/mode/composer and actualfocus for exactnewcanaryguard diagnosis; no source/job/metrics/rawlogs processing"}; manifest5997B/SHAae0d81c620ac5dd029ca0c979dcf344ea7156f5f694d5b080f9b40454d6c1363 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-FOCUS-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"UI_reads_max": 1, "app": "Safari", "clicks_max": 1, "project_id": 38609822, "purpose": "focus observed emptyMia composer196 and verify actualfocusedAXelement BEFORE anytyping; prior unintendedinput guard stays", "typing_Send_Mia_source_compiles_jobs_accounts": 0}; manifest5957B/SHAb63fc02dc4aee832ced6a073253703f0f2fd256cd06060508f1885f9cc9ff951 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118Mia canaryfocus001 AXsemanticclick didnotproduce explicitfocusedcomposer proof; no typing orSend attempted. Currentcontrolwindow0 exposesRaise; documentedcomputer.launch_app unavailable. NextpathraisesexactexistingSafariwindow before freshfocus/screenshot observation, no repeatedblindtyping.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-RAISE-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"UI_reads_max": 1, "app": "Safari", "project_id": 38609822, "purpose": "bringexactownedSafariwindowfront usingdocumentedexposedRaise action, thenrederivecomposerindices/focus; no input withoutproof", "raise_max": 1, "typing_Send_source_jobs_accounts": 0, "window_secondary_action": "Raise onobservedwindow0"}; manifest5999B/SHAc3d0ff9fb2ec827db390b97f5372d3b3b10e45b2601bba577e8cd246aa0798fb andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-VISUAL-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"app": "Safari", "image_bytes_max": 16777216, "project_id": 38609822, "purpose": "afterexactwindowRaise checknativevisualinputavailability; useonlyownOFFMia geometry forfocus, no input yet", "screenshots_max": 1, "typing_Send_source_jobs_accounts": 0}; manifest5946B/SHA077faf7e8dcc9a654ad7e3ffab452ef4137774e6393267c382da7cbe980a8fcf andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118nativevisual001 succeeded:273037 is screenshotBYTES, notnativewindowcount; first JS crossrealmUint8Array check misclassified its length, correctedwithoutnewUIread. ExactOFFviewport shows emptyMia composer atx1122..1863/y944..1023. A new directcoordinatefocus path now exists; require explicitfreshAXfocusproof beforetyping, not merevisiblecontrols. No source/UItyping effect yet.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-COORD-FOCUS-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"UI_reads_max": 1, "app": "Safari", "coordinate": [1450, 980], "coordinate_clicks_max": 1, "project_id": 38609822, "purpose": "freshscreenshotshows exactemptyMia input; actualnativeclick thenexplicitAXfocus proof, no typing unless verified", "typing_Send_source_jobs_accounts": 0}; manifest5982B/SHA0dcd63a4568e17416cd08b11eaad008c75fc164c8e3585b716b41a6ee856ba7a andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+
+### 118.9 Reopened source verified; first prospective cache job fails closed
+
+The owner's earlier removal assertion was followed by "was not able to find
+the file"; no restoration was inferred from that assertion. Safari's actual
+active URL was QC/lab. Codex navigated only that current QC tab to protected
+OFF38609822. The loaded selected extended_algorithm_successor.py editor had
+no TPR118-CUSTODY-003 literal. No Undo/Delete/Save was issued in this recovery.
+Fresh files/read verified EVERY saved file against08c386c17a93d934d54f30715a407fef3b91c1ac841bd575b8a3d5ae081f6ae1;
+proof1928B/SHA5e72596357568881e3a001568aefa6c85dfee6b5c8607c10a19695694ee17d3e.
+The initial read's undeclared JavaScript binding error conservatively consumed
+its read budget; a new declared binding/read scope fixed that local error.
+One overly broad tab-title projection emitted unrelated contact labels;
+those are not retained/reprocessed or used as task authority. Further
+projections are restricted to exact owned URL and editor/Mia controls.
+
+New v3 preflight/upload002 made6requests: fresh ownership/collaborators,
+no-active-job census, full source before, main-only update and all-file after.
+Both actual metadata paths contained only the registered owner (Mia0), so
+the reviewed narrow Mia branch was not exercised by this native response.
+The prior null-UID failure is retained; no new identity or permission was
+silently accepted. Upload succeeded and observed:
+main49422B/SHA4738d865523bbeff27c5c5b74a5861b94fccc1c34139980a858b1ea5f3a1b87f,
+configbe3ee05a405c1a9f95803bafbc3807bf635af5d6821f7180f5360421272cba7e,
+inventory55805a68673a281808a96df0c7b3715c4b9db5b34185b6811297739678ec3e2e.
+All other files/notebooks stayed exact. Safe upload4609B/
+SHA8a19de3ecb098571e140d6bf012d31a594b6aeaa95ba5324742cbd66b5f2ebaf.
+
+The fresh compile phase made6requests; compileId
+4bb87e38c60d4070db56f4e03732d777-1a9fe866550fc19773c4fecf6ecc87eb
+was InQueue at create, then a separate single exact compile/read observed
+BuildSuccess. Safe compile1927B/SHA2e1ef074dea31a2bab391d01c7a4ffbc1fe94815a7e4462b2dc136e8d1c36671;
+safe build2053B/SHA3e09fcf1a0e16a595dd8cb73511c13916bcd3d2a61b74a65bdad8feca8121b10.
+All8 retained proof descriptors,753091privatebytes, were freshly claimed and
+validated by the fixed v3 launch route. Fresh source/custody/job guards
+preceded exactly one diagnostic launch; source-after matched55805....
+HEAD stayeddd0e57c04c930bcb892060e56423bcc0f4809200 through all phases.
+
+Actual nonfinancial job5b8cc1a48cefff60ff82422996258ca0 is
+TPR-CACHE-20261104-OFF-D2 in OFF38609822, candidate
+TPR-CACHE-20261104-PARENT-OFF-002, diagnostic_attempt2,
+attemptTPR-CACHE-ATTEMPT-PARENT-V3-OFF-002,
+lookTPR-CACHE-LOOK-PARENT-V3-OFF-002.
+The failed001 preflight never created a job; its metadata lineage and spent
+scope remain distinct. Safe launch1475B/
+SHA56d62e20c8a751f8b06736951de07a853adea4d6958408fed74dd4de5c935887.
+This five-day, two-security, non-order diagnostic checks native type/cache
+timing only; orders would not prove input availability. It is not a strategy
+performance evaluation, financial attempt or financial outcome look.
+
+One fresh fixed4MiB status read observed actual Completed./completedTRUE.
+Safe status948B/SHA628a9f3d6b88f1292f96226ffe86ee451985b68d60e6ac3c249c1f7bbe7e1f34;
+full private safe wire11955B/SHA5024797f658dd9594df79e1442e556124ff2377ab35ed013cc562a235ec41b40.
+Before consuming the terminal transition, Codex paused THIS existing
+heartbeat through the app, then an exact owned bounded TOML read verified
+actual PAUSED; proof348B/SHA8f4bd3df3ff3527237b5ae8f7fa887299f5b054afbe0bf2f47cbec466adef32c.
+No rearm or parallel monitor was created.
+
+Fresh terminal source+tagged-log requests verified unchanged full inventory
+and fetched only this job's price-free TPR_PARENT_CACHE_PROBE_RESULT.
+Source archive336189B/SHA9aa769d7db62ed2bc3211516b9007ea11b1bc6de56b60fd8d7d0d3216c8c202c;
+logs1834B/SHA54306082c221318b71db7bb6beaa8061426e4dd9ccfce7793755db8ba7bd9bf6.
+The single tagged payload matched schema/operation/HEAD/actualjob, retained
+1632B/SHAe444233ab0fb3941f7e425d0f28f1111176d7705d85b27cd614691e4977ffb9c;
+terminal safe summary1849B/SHAf66a4873c42d84ffd43a16845d4f09b04d82011dfec3ffa7231ee77a19009b3d.
+Its status is native_parent_bootstrap_unproved, closechecks0/sessions{},
+parent contains0/read0/objectstore0, parent proof flagsFALSE, registrationFALSE,
+delivered slices/bars0 and preopen empty slices0. These are the exact
+source-bound self-reported observations, not independent origin attestation.
+
+Local source audit confirmed scheduled _check_close overwrites earlier
+setup/OnData status when target_ready isFALSE. Slice/bar counters increment
+only after successful bootstrap; zero does NOT prove no OnData or SPY data.
+EOD _bound passed enough to populate actual_job_id, but that does not prove
+the first callback gate passed. No particular QC/PythonNET SDK correction,
+provider-wide absence, target-data absence or financial repair is established.
+A new diagnostic-only first-failure/callback observability epoch is now
+authorized locally, preserving every existing clock/custody/input/privacy
+guard and effect ceiling. No guessed ABI relaxation or unchanged rerun.
+
+Genuine Mia read-only diagnosis of this exact new job/main is prepared.
+Semantic composer click supplied no explicit focus proof. Window Raise
+succeeded; a273037byte screenshot succeeded (an initial cross-realm type
+check mislabeled its length as a window count, then corrected without a
+new screenshot). Fresh screenshot coordinate click still returned
+noWindowsAvailable, so no typing/Send was attempted. The owner was asked
+only to focus the empty OFF Mia composer; this technical input is pending.
+Mia actual submissions remain2, not3, and no extra cloud source/job effect
+is attributed to an unsent prepared question.
+
+Current direct QC API request count32:9prior+1reopen source+6upload+
+6compile+1build+6launch+1status+2terminalsource/log. Source API uploads1,
+native compiles1, new diagnostic jobs1, financial jobs/attempts/looks0,
+successful pushes0. Internal Mia reads remain separate. All prior failures,
+Completed jobs and spent reservations remain;0/5 accepted full-window
+financial outcomes, all metrics NULL. The20REMX and323pre-inception rows
+remain quarantined; no USB/provider packet, raw parent/SID, operatorDB or
+stopflag was reopened. The heartbeat remainsPAUSED and the sole final
+matching-lane nonforce push stays reserved for the completed or concrete
+final blocked round.
+
+Fresh118Safari claim TPR-R118-OFF-INVENTORY-COUNT-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"input": {"bytes": 4609, "name": "own verifiedupload002 safeinventory proof", "sha256": "8a19de3ecb098571e140d6bf012d31a594b6aeaa95ba5324742cbd66b5f2ebaf"}, "native_QC_requests": 0, "private_reads_max": 1, "purpose": "resolve actualOFFfile count vs inherited17-filewording; count alreadyhashverifiedinventory only, no sourcebody/providerpacket reopen"}; manifest6050B/SHA56c60e9ed7e735919236c28fa7be41b04366cc9295c7cb302dc1eed39ed19d82 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualOFFinventory count qualification {"all_inventory_entries_compared": true, "file_count": 12, "inventory_sha256": "55805a68673a281808a96df0c7b3715c4b9db5b34185b6811297739678ec3e2e", "native_requests": 0, "nonmain_files": 11, "notebooks": 1, "project_id": 38609822, "python_files": 11, "schema": "tpr-actual-off-inventory-count-v1", "source_bodies_reopened": false}; privateproof311B/SHAcca201a1c0052d861e01022dc6865564434f4f5663a972d6c02aa16e6a4edab7. Earlier17-file wording was inheritedscope language, not a freshOFFcount; completehashinventorycomparison remainsvalid, no files omitted.
+
+118MiaType preparation JS TextEncoder unavailable beforeexec/claim/UI; corrected toPythonUTF8bytecount. No scope/native/UIeffect consumed; no sourceinput.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-TYPE-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"Mia_allowed_after_later_send": {"exact_job": "5b8cc1a48cefff60ff82422996258ca0", "main_only_bytes_max": 65536, "tagged_log_bytes_max": 16384}, "Mia_submissions": 0, "UI_reads_max": 2, "app": "Safari", "input_calls_max": 1, "owned_url": "https://www.quantconnect.com/project/38609822", "owner_focus_confirmation": "Cursor is in OFF\u2019s Mia box", "owner_focus_confirmation_sha256": "3f4f56af4cc8453a4c6d3301c473a60c2e7124cd620e3d5c92ed3fa09c80591b", "project_id": 38609822, "prompt_bytes": 804, "prompt_sha256": "4b8f58bcc037a99e5bdef3900f868f336a43c10fc7e14c76abd2844cf8ae1902", "purpose": "afterfreshmanualMiafocusconfirm, verifyownedURL/mode then enterpreparedread-onlyprompt; verifyonlycorrectMiafieldnonce beforeanySend", "source_edits_compile_jobs_History_ObjectStore_parent_rawSID_or_account_effects": 0, "source_inventory_sha256": "55805a68673a281808a96df0c7b3715c4b9db5b34185b6811297739678ec3e2e"}; manifest6578B/SHA66881ddd64bf3e785035702927632d36c22f8f4e8d83629cf2739ab1f388424b andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118MiaCanaryType001 actualApp.typeText accepted804characters; freshAX ownnonce isinsideMia196composer, AskBeforeEdits visible. No Send yet. Exact full draft not independentlyextracted fromAX; intendedliteral SHA4b8f58bcc037a99e5bdef3900f868f336a43c10fc7e14c76abd2844cf8ae1902 with readonly/noedit/nojob/privacy constraints atfront.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-SEND-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"Enter_max": 1, "Mia_log_job": "5b8cc1a48cefff60ff82422996258ca0", "Mia_source_bytes_max": 65536, "Mia_source_edits_compiles_jobs_History_ObjectStore_parent_rawSID_provider_or_accounts": 0, "Mia_source_files": ["main.py"], "Mia_submissions_max": 1, "Mia_tagged_log_bytes_max": 16384, "UI_reads_max": 1, "app": "Safari", "input_calls": 0, "project_id": 38609822, "prompt_bytes": 804, "prompt_sha256": "4b8f58bcc037a99e5bdef3900f868f336a43c10fc7e14c76abd2844cf8ae1902", "purpose": "submit onlyalreadyenteredverifiedMianonce/read-onlydraft once; retainmanualfocus andnoeditorinput; finalfacts-onlyresponse", "source_inventory_sha256": "55805a68673a281808a96df0c7b3715c4b9db5b34185b6811297739678ec3e2e"}; manifest6372B/SHA00970dae2bc088646ee99ab249b4f32985d058ec766bb022c0e78595ae67d5e6 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118MiaCanarySend001 issuedReturnexactlyonce; composer cleared, but immediateAXhadnoownnonce ornewRunning marker. Submission remains unconfirmed until freshobservation; never duplicateSend.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-RESPONSE-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"AX_characters_max": 262144, "UI_reads_max": 1, "app": "Safari", "project_id": 38609822, "purpose": "confirm whether singlepreparedcanaryMiarequest enteredconversation and observeRunning/Completed/finalmarkedfacts only; no newprompt/source/job orreasoning/rawlog projection", "typing_clicks_Send_compiles_jobs_accounts": 0}; manifest6022B/SHA5850ae59bbee7a583288f3243b3645d5afea462d732bf6db9301000603a4ebcd andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118MiaCanaryResponse001 stillhasno004nonce/newRunning/finalfacts afterdelayedread. FirstReturn isunconfirmed, not counted assubmission3. Nextpath inspectsactualSendcontrol then nativepaste+explicitsemanticSend, not unchangedReturnreplay; preserve all prior lookscopes.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-SEND-CONTROL-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"UI_reads_max": 1, "app": "Safari", "project_id": 38609822, "purpose": "inspect emptyMia composer and actualSendbutton semantics afterunconfirmedReturn; no promptreplayyet", "typing_paste_Send_source_jobs_accounts": 0}; manifest5927B/SHA9cdfa0216ef1e41eadae1a7f0424f70b54a092e7eaae85bae37c6f020875746f andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118MiaSendControl001 identifiedactualSendbutton216 but fixed23linewindow overrancomposer intoadjacentdiagnostic chart labels/zero-valuedstats. These values are notfinancialacceptance, notretained/reprocessed/interpreted; futureprojection stops atcomposer boundary. Indiceschanged210vs196, so inspectlatestalreadycapturedownnonce/status BEFOREanypaste/resend to avoid duplicate iflateMiaresponsearrived.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-LATE-CHECK-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"AX_characters_max": 262144, "app": "Safari", "new_UI_reads": 0, "project_id": 38609822, "purpose": "checklatestalreadycapturedAX for lateown004message/status/onlyFINAL_FACTmarkedanswer, no duplicateprompt; omitallmetrics/source/reasoning", "stored_AX_processing_max": 1, "typing_paste_Send_source_jobs_accounts": 0}; manifest6017B/SHA5934ffc3313778e4e7c125c89bfd0ba29171dec71829b37698435b2763c1dbd4 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118latecheck001 own004request isnowvisible inactualgenuineMia conversation afterdelay; submissionsconfirmed3 total. No duplicatepaste/Sendwasperformed. StatusheaderCompleted observed, no finalfacts admittedyet. Nativecompletedcanary andMiaread-onlytaskremainseparate.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-RESPONSE-002; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"AX_characters_max": 262144, "UI_reads_max": 1, "app": "Safari", "project_id": 38609822, "purpose": "observe delayed genuineMia004finalanswer/status, allowFINAL_FACTnumberedformatprefixes only; do notdumpchainofthought/rawlogs/source/financialvalues", "typing_clicks_Send_source_jobs_accounts": 0}; manifest5996B/SHA8075eef420badc0c848c868872ea763f1cea940343e3b25b1168913989fbd5af andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-STRUCTURE-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"app": "Safari", "new_UI_reads": 0, "project_id": 38609822, "purpose": "classify only toolcardpresence/assistantmessagecount after actual004request, not reasoning/source/logcontents; determinewhether completedread-onlyturn lacksfinalanswer", "stored_AX_processing_max": 1, "typing_Send_source_jobs_accounts": 0}; manifest6012B/SHAe9813f6602627d134150c73e0ae0d9c8d0fec4292cdc0ef65ccfa02a8f9c1641 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118Mia004 actualownmessageconfirmed; following8textelements includeexistingexactjobLogSearchcard, noFINAL_FACTtag. Completedheader/disabledStopvisible. One finalfactscontinuation usesalreadyreadsource/logONLY andexplicitSendcontrol, no newsource/logscope or financialjob; retain004 asconfirmedsubmission3.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-FINAL-TYPE-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"Mia_new_source_log_private_reads_edits_compiles_jobs_accounts": 0, "Mia_submissions": 0, "UI_reads_max": 1, "app": "Safari", "input_calls_max": 1, "owner_focus_lineage": "Cursor is in OFF\u2019s Mia box; inputfocusretainedaftertype/Return, subsequentactionsread-only", "project_id": 38609822, "prompt_bytes": 214, "prompt_sha256": "d2e75db84525fed571344e673d63eab88088363f3e2b65479ee222771696db46", "purpose": "enter shortfinalfacts-onlycontinuation intoexistingMiafocus; verifyFULL<=512literalinsidecomposer beforeexplicitSend"}; manifest6225B/SHAea06eb1c9245945bbd7dc5aff4c6f43d4d28df43c14c94bf5114c17655011c80 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-FINAL-SEND-001; HEADdd0e57c04c930bcb892060e56423bcc0f4809200; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"Mia_new_source_log_private_reads_edits_compiles_jobs_accounts": 0, "Mia_submissions_max": 1, "UI_reads_max": 1, "app": "Safari", "full_draft_verified_characters": 214, "observed_Send_button": 216, "project_id": 38609822, "prompt_sha256": "d2e75db84525fed571344e673d63eab88088363f3e2b65479ee222771696db46", "purpose": "explicitSendactualarrowbutton216 forFULLverifiedshortfinalfactsdraft; no secondEnter/retype; alreadyreadfacts only", "semantic_clicks_max": 1, "typing_Enter_calls": 0}; manifest6179B/SHAce5e3e70de82cee1e3ec99c8adeccbeaa3e3c7394d170028a0d97ece83f85713 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+
+### 118.10 Reviewed first-failure observability epoch; genuine Mia continuation
+
+The actual OFF inventory is12files:11Python plus1notebook;11non-main files
+were preserved. This is freshly counted from the already verified upload
+proof, not from reopening source bodies. Count proof311B/
+SHAcca201a1c0052d861e01022dc6865564434f4f5663a972d6c02aa16e6a4edab7.
+Earlier17-file wording was inherited scope language, not a fresh OFF count.
+The complete before/after inventory equality and source hashes remain valid.
+
+The diagnostic reporting defect was reproduced RED1failed/85deselected0.07s.
+The new parent epoch is TPR-NATIVE-PARENT-PREOPEN-CACHE-20261104-v3, with
+v3 config/build/observation schemas. It preserves immutable first_failure_stage,
+first_failure_code/category and the last completed stage at that failure;
+close and end summaries are separate. Callback entries and disabled skips
+are counted before the early return, capped6400 (existing400wait plus6000
+delivered-slice budgets). These are diagnostic counters, not financial gates.
+The pinned custody OR guard is AST-split into exactly its existing predicates,
+in the original lazy order, with the original configuration/job prelude and
+final assignment. Its refusal body and reason/category choices are closed
+program-owned constants; no exception text/type name, SID, key, witness,
+price or volume is emitted. No native getter or private effect is added.
+Original preopen/native/cache/clock/identity guards,1contains+1read,0private
+Initialize, subscription/resource limits and every acceptanceFALSE flag stay.
+
+Exact reviewed parent source34619B/
+SHAda295c0249b17afe45d2310a72fa1b876ba201c3f9e697646c6662b598da4a31;
+tests26259B/SHAe3315188f6023fd3bf5aab81a0e8f3b06c46e7fcf17355a54efaea3167fa9214.
+Author107passed1.59s; root107passed2.29s with stable hashes. All85prior
+guards remain, plus early-failure/close/end survival, callback-vs-no-callback,
+disabled skips/caps, private-error non-echo, exact AST guard comparison and
+12differential custody call traces. Fixture main59649B; builder source bound
+is tightened to60000B, matching the unchanged existing API limit. This is
+fixture software verification, not an actual new production render or run.
+
+Fixed actions advance to v4 action/result/proof framing and pin only this
+new parent hash. Every old API/custody/base/helper pin, Mia predicate,
+custody/deadline/claim/reservation guard and fixed native endpoint is unchanged.
+Source39340B/SHA5bb087d38d5d77dad2981e53e3840b6f209c4b13a7517d5133a6da7663f49d7c;
+tests40801B/SHAa5c68bd04a659dc30ba21842a38fd04f3c1560ef6729fe08b8799afc9e927b86.
+Five old-v3 action/compile/build mix regressions were RED5failed/
+172deselected0.90s before schema advancement. Final author177passed10.25s;
+root177passed11.09s, stable before/after hashes, all172prior guards retained.
+Both sets ran in isolated49/52runtime with syntheticDB before imports and
+socket+DNS denial. Independent Codex static review accepted all four exact
+files with no further concrete finding. AST/LF/narrow secret-shape/diff checks
+pass, received sections9..117 remain byte-exact, and no full suite was run.
+These four files are committed LOCAL ONLY at
+c055db5acaf9080d850fec55f7c9e50575b00875. A following record handoff is still
+required before activation; no native SDK/input/economic correction is
+inferred, and the new epoch has not been uploaded, compiled or launched.
+
+The owner manually focused OFF's Mia composer. After a fresh claim and
+URL/AskBeforeEdits verification, App.typeText accepted the804character
+TPR118-CACHE-MIA-004 read-only prompt. AX verified its nonce specifically
+inside the Mia composer. Enter was issued once under a fresh send-only claim.
+The composer cleared but the immediate and first delayed observations did
+not show the request. Codex did not replay it. A later fresh observation
+confirmed the actual004 request and its exact-job log-search card. This is
+confirmed genuine Mia submission3, not a financial attempt or source fix.
+No FINAL_FACT-marked answer was admitted from that turn's visible response.
+
+A short214character final-facts-only continuation
+TPR118-CACHE-MIA-005 was then entered in the retained Mia focus. The FULL
+literal was observed inside the correct composer before a newly claimed
+semantic click of the actual Send-arrow button. It permits0further reads,
+edits, compiles, jobs or other effects and asks only for facts from already
+read source/log. Immediate AX cleared the composer but did not yet show005;
+its submission/final answer is pending confirmation, never silently counted
+as4 or replayed. No further manual-focus input is currently pending.
+The earlier JS TextEncoder helper failure happened before any exec/claim/UI
+effect and was corrected by Python UTF8 length computation. An overly broad
+composer-control projection briefly included adjacent diagnostic chart labels
+and zero-valued metrics; these are not retained/reprocessed/interpreted and
+grant no financial acceptance. Subsequent projections stop at the composer
+boundary and final answers are restricted to marked fact text.
+
+Mia access remains genuine Safari built-in activity; no generic AI/agent API
+is impersonated. Its current task is constrained to this completed canary,
+main<=64KiB and one tagged log<=16KiB, with no ObjectStore/rawSID/parent read,
+source edit, compile/job or account/permission effect. Pending final facts
+must be verified independently; before any native continuation, freshly
+compare ALL cloud files and job metadata to preserve every negative attempt
+and detect unexpected effects. Cloud remains the v2 canary source55805...,
+distinct from the locally committed new v3 observability software.
+Current direct QC API count stays32; sourceupload1/compile1/diagnosticjob1,
+new financial jobs/attempts/outcome looks0, pushes0. The heartbeat isPAUSED.
+All five financial outcomes remain NULL,20REMX+323pre-inception quarantine
+stays intact, and no unchanged failing financial candidate is relaunched.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-RESPONSE-003; HEADc055db5acaf9080d850fec55f7c9e50575b00875; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"AX_characters_max": 262144, "UI_reads_max": 1, "app": "Safari", "project_id": 38609822, "purpose": "confirm005actualmessage and latestCompletedMia result; extractonlyFINAL_FACTmarkedanswer regardlessheading/bullettextrole, excludeownrequest instructions", "typing_clicks_Send_source_jobs_accounts": 0}; manifest6001B/SHAebe725d4753c7d33c89a8d1ef8d15e8b9c99f72a027daa48c53bd0ee2913c9e1 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-SCROLL-CONTROLS-001; HEADc055db5acaf9080d850fec55f7c9e50575b00875; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"app": "Safari", "new_UI_reads": 0, "project_id": 38609822, "purpose": "locate accessibleMia scroll-to-bottom/button/scrollbar controls inalreadycapturedtree;005notvisiblecouldbeviewportvirtualization, no duplicateSend", "stored_AX_processing_max": 1, "typing_Send_source_jobs_accounts": 0}; manifest6003B/SHAccf159eece7edbab16fdd9abc41069720d9bc0cfd64234378242b41136b5803d andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-CHAT-NAV-001; HEADc055db5acaf9080d850fec55f7c9e50575b00875; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"Mia_messages_source_edits_Save_reload_compiles_jobs_accounts": 0, "UI_reads_max": 1, "app": "Safari", "chat_content_open_max": 0, "chat_list_metadata_page_max": 1, "clicks_max": 1, "observed_control": "124 Browse chats popup", "project_id": 38609822, "purpose": "005maybeoffviewport; inspectexistingchatnavigation metadata to reopen ONLYcurrentgenuineMia conversation withoutreloadingproject/discardingdrafts; ignoreallotherchatcontents/titles"}; manifest6139B/SHA03938674d1ce58f0da3ab67ce556c7508e72a8cd13aed0e0ea7b05bfa885ed3f andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-CHAT-REFRESH-001; HEADc055db5acaf9080d850fec55f7c9e50575b00875; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"Mia_submissions_otherchats_source_Save_compiles_jobs_accounts": 0, "UI_reads_max": 1, "app": "Safari", "clicks_max": 1, "observed_current_chat_row": 126, "own_chat_title_hash_label": "Analyze native feed defect SID SHA1122fa5f1349f79e231e106127c098da27ef730836a97052d2154ecc46f1afc1", "project_id": 38609822, "purpose": "reopenONLYsameCompletedMia conversation torefreshpane/currentmessages; no projectreload or source/unknownchatdraftdiscard"}; manifest6148B/SHAb99615ab74127da382e4cdd1505b45484f947af07022131e61d1562f3c1aac34 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-MIA-CANARY-REFRESH-RESULT-001; HEADc055db5acaf9080d850fec55f7c9e50575b00875; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"AX_characters_max": 262144, "UI_reads_max": 1, "app": "Safari", "project_id": 38609822, "purpose": "samechatsemanticrefresh initialsnapshotwasloading; onefreshloadedstatus/004005visibility/markedfinalfacts check, no replay or additionalMiarequest", "typing_clicks_Send_source_jobs_accounts": 0}; manifest6006B/SHA18dc870a612d9c4b9b19f2ab40cf04a6bccc3a121076d86b7384fd4fece9599a andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-POSTMIA-CANARY-003; HEADc055db5acaf9080d850fec55f7c9e50575b00875; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"endpoints": ["files/read", "backtests/list"], "native_requests_max": 2, "native_seconds_each_max": 20, "private_registry_reads_max": 1, "project_id": 38609822, "purpose": "aftergenuineMiaUIconsultation attempts verify EVERYcurrentcloudfile unchanged55805 and exactOFFterminaljobcensus; no newmessage/sourcefix/financialadmission", "response_bytes_total_max": 3145728, "returned_job_projection_reads_max": 1, "returned_projection_bytes_max": 1048576, "source_writes_compiles_jobs_Mia_History_ObjectStore_exports_accounts": 0}; manifest6205B/SHAaab45a5db753624901ebccfd7dac6bd1ff0e7b6bf367f48c8ae596677c6b717b andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118freshpostMia003jobmetadata readclaim BEFOREopen {"git_head": "c055db5acaf9080d850fec55f7c9e50575b00875", "input": {"bytes": 2448, "name": "TPR-CMP29-API-R118-POSTMIA-CANARY-003.jobs.projection.json", "sha256": "bb3c7adb257fe44574ed24c69470bed7a9ffaa112a61c44d85ee3e2b567c6b82"}, "max_bytes": 1048576, "project_id": 38609822, "schema": "tpr-own-off-jobmetadata-readclaim-v1", "scope": "exactIDs/status/completed only; no statistics", "source_hashes": {"research/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "research/target_price_revisions_qc/__init__.py": "3bc79e69bc0c775d8ef0ec154551436011cba407f37690c27ccbeb9000153c59", "research/target_price_revisions_qc/comparison_20261028_api.py": "a2a160ac951a8a9f96b9531e5b51a5bf6b4e7b116b7873f77515780f059ebc5a", "research/target_price_revisions_qc/comparison_20261029_project_api.py": "680f31f17447e240f919435ee1d56a9a48526f5197e37ac97332b4b70ee42b87", "research/target_price_revisions_qc/comparison_20261029_projects.py": "6dc87f33105de9d80e7a267a6cc737bb4262f47e49c43b65247592927a5788d7", "research/target_price_revisions_qc/extended_evidence.py": "a816b1ddca5a8428f07e9029bc3a7f7db3c5e1a1f50521664992dabf556aa2d7", "research/target_price_revisions_qc/extended_operations.py": "824b3f0c180f1aeb7038d8f280c44507b5c39687fcccc87c539f242d9256d167"}}; 1251B/SHA2a91744b321b54277f77e0b5fd2793d8b6bb9c8ef6cef1694ba512e8587bcffd
+
+118postMia003 source/census {"financial_acceptance": false, "jobs": [{"backtest_id": "5b8cc1a48cefff60ff82422996258ca0", "classification": "OBSERVED_METADATA_DIAGNOSTIC_NOT_FINANCIAL", "completed": true, "status": "Completed."}, {"backtest_id": "4d401e93e4e23af30f6961b466394d9c", "classification": "OBSERVED_METADATA_DIAGNOSTIC_NOT_FINANCIAL", "completed": true, "status": "Completed."}, {"backtest_id": "7c76bcb94216e8e347a7662cc834fde8", "classification": "OBSERVED_METADATA_DIAGNOSTIC_NOT_FINANCIAL", "completed": true, "status": "Completed."}], "new_financial_jobs": 0, "nonterminal_jobs": 0, "receipt": {"bytes": 4250, "name": "TPR-CMP29-API-R118-POSTMIA-CANARY-003.result.json", "sha256": "82cb2bcc2787846f4882c9ac5c7117f6470e8f3523ce2154e7e9e7837b7304f0"}, "schema": "tpr-post-mia-canary-custody-v1", "source_archive": {"bytes": 336189, "name": "TPR-CMP29-API-R118-POSTMIA-CANARY-003.source.response.raw", "sha256": "9aa769d7db62ed2bc3211516b9007ea11b1bc6de56b60fd8d7d0d3216c8c202c"}, "source_inventory_sha256": "55805a68673a281808a96df0c7b3715c4b9db5b34185b6811297739678ec3e2e", "status": "completed", "verified_new_Mia_reply_or_code_fix": false}; privateproof2480B/SHAfe4fb18deeb0b4b5a27a15f4aa482d57b7f223deb1e092be17933d36f8f5eab4. Allpriorjobshistorypreserved; no newMiafixorfinancialacceptance. UI004messageobservationretained but modelreplyunverified;005sendunconfirmed aftersamechatrefresh, no newrequestreplay. Reviewedv3observabilitycontinuesindependentlyunderownerbestjudgment; notunchangedfinancialretry.
+
+118.10 later Mia qualification: same-conversation BrowseChats/current-row refresh produced no004/005nonce or markedfinalfacts in the loadedaccessibleview. Preserve the earlier actual004message observation, but classify model-turn/reply persistence asUNVERIFIED;005send remainsUNCONFIRMED. There are2verifiedansweredMiaturns,1additionalUI-observedrequest and1additionalunconfirmedsend, not4answeredMiaturns. No explicitSend/Enter is replayed. A fresh readonly source/job census then verified all12files unchanged55805..., exactly the three known Completed diagnostics5b8cc1...,4d401e...,7c76bc...,0nonterminal and no newjob/sourcechange observed: safe2480B/SHAfe4fb18deeb0b4b5a27a15f4aa482d57b7f223deb1e092be17933d36f8f5eab4; archive336189B/9aa769d7.... DirectQCAPIcount34. The new reviewed observability epoch addresses the verified reporting defect independently; it does not rely on an unverified Mia recommendation or relaunch unchanged financial bytes. No new owner-approval checkpoint is added. This record handoff must be committed before freshv3preparation/effects.
+
+118.10 root final current-document verification:303passed/558deselected6.35s (earlier same-current-facts check6.13s), unchanged guard363888B/SHA5b79ff5e813c472ae68908f7300319a96c00cedfe372aa7ee49fa1135e5cefb1. Root parent107passed2.29s and actions177passed11.09s exact committed c055db5a bytes; no full suite. Before this handoff commit, AST/LF/diff/narrow privacy checks pass and received9..117 stay byte-preserved. No final push is spent. Following actual HEAD is the new authority for fresh v3 manifest/preparation; cloud remains previous canary55805..., not silently promoted to new source.

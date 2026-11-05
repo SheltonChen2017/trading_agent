@@ -25,7 +25,8 @@ def _copy(tmp_path, transform):
     for relative in helper.FROZEN_POSIX_TEST_SHA256:
         target = tmp_path / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(transform(relative, (ROOT / relative).read_bytes()))
+        raw = (ROOT / relative).read_bytes().replace(b"\r\n", b"\n")
+        target.write_bytes(transform(relative, raw))
     return tmp_path
 
 
@@ -37,6 +38,21 @@ def test_autocrlf_checkout_of_the_exact_pins_is_accepted(tmp_path):
 
 def test_exact_lf_images_are_still_accepted(tmp_path):
     helper._validate_frozen_images(root=_copy(tmp_path, lambda _relative, raw: raw))
+
+
+@pytest.mark.parametrize("source_crlf", (False, True))
+def test_autocrlf_fixture_accepts_lf_and_crlf_source_checkouts(tmp_path, monkeypatch, source_crlf):
+    source = tmp_path / "source"
+    for relative in helper.FROZEN_POSIX_TEST_SHA256:
+        target = source / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        raw = (ROOT / relative).read_bytes().replace(b"\r\n", b"\n")
+        target.write_bytes(raw.replace(b"\n", b"\r\n") if source_crlf else raw)
+    monkeypatch.setitem(globals(), "ROOT", source)
+    copied = _copy(tmp_path / "copied", lambda _relative, raw: raw.replace(b"\n", b"\r\n"))
+    assert all(b"\r\r\n" not in (copied / relative).read_bytes()
+               for relative in helper.FROZEN_POSIX_TEST_SHA256)
+    helper._validate_frozen_images(root=copied)
 
 
 @pytest.mark.parametrize("fault", ("crlf-plus-edit", "lone-cr", "doubled-cr"))

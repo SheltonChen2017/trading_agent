@@ -40,6 +40,18 @@ _PROJECTION_KEYS = frozenset({"schema", "family", "scoped", "metadata_clean", "r
     "current_label_agreement_is_historical_identity", "naive_acceptance_is_publication_or_timezone_evidence",
     "latest_date_filter_semantics_verified", "financial_values_interpreted", "authority"})
 _CATEGORIES = ("listed", "delisted", "ticker_change", "merger", "acquisition", "spinoff", "other")
+# Sharadar's action vocabulary is directional and subtyped: a family named only
+# by its bare word would count mergerto/acquisitionby/spunofffrom as "other".
+_ACTION_CATEGORIES = {
+    "listed": "listed",
+    "delisted": "delisted", "regulatorydelisting": "delisted", "voluntarydelisting": "delisted",
+    "bankruptcyliquidation": "delisted",
+    "tickerchange": "ticker_change", "tickerchangefrom": "ticker_change", "tickerchangeto": "ticker_change",
+    "ticker_change": "ticker_change",
+    "merger": "merger", "mergerfrom": "merger", "mergerto": "merger",
+    "acquisition": "acquisition", "acquisitionby": "acquisition", "acquisitionof": "acquisition",
+    "spinoff": "spinoff", "spinoffdividend": "spinoff", "spunofffrom": "spinoff",
+}
 MISSING_EVIDENCE = (
     "exact_version_historical_public_available_by_not_established",
     "historical_clock_and_correction_lineage_not_established",
@@ -300,14 +312,9 @@ def _rows(value):
 
 
 def _category(value):
-    value = value.lower()
-    if value in {"listed", "delisted"}:
-        return value
-    if value in {"tickerchange", "tickerchangefrom", "tickerchangeto", "ticker_change"}:
-        return "ticker_change"
-    if value in {"merger", "acquisition", "spinoff"}:
-        return value
-    return "other"
+    # Exact codes only: an unrecognized action stays counted as "other", so this
+    # table can only under-classify, never invent a corporate-action family.
+    return _ACTION_CATEGORIES.get(value.lower(), "other")
 
 
 def build_audit(cases, provider_complete, ticker_rows, action_rows, source_pins, *, check=None, fixture_only=True):

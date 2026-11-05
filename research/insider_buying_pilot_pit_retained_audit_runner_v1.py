@@ -293,6 +293,12 @@ def policy(python=None, *, sources=()):
     directories = (Path("/System/Library"), Path("/usr/lib"), Path("/usr/share"),
                    Path("/private/var/db/dyld"), Path(sys.base_prefix).resolve(),
                    Path(sys.executable).parent.parent.resolve(), Path("/usr/share/zoneinfo").resolve())
+    # A subtree grant covers everything beneath it. An interpreter installed
+    # directly under the home directory or the lane root would otherwise turn
+    # the exact DATA allowlist below into read access to every retained input.
+    protected = tuple(path.resolve() for path in (ROOT, stable.PRIVATE_CUSTODY_ROOT, *FILES))
+    need(not any(path.is_relative_to(directory) for path in protected for directory in directories),
+         "source_refused")
     leaves = (*fixed_input_paths(), *(ROOT / name for name in sources), *targets,
               Path("/dev/null"), Path("/dev/urandom"), Path("/dev/random"),
               Path("/etc/localtime"), Path("/private/etc/localtime"))

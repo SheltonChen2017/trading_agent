@@ -366,7 +366,8 @@ def test_every_lane_test_reaching_fcntl_guards_before_its_first_posix_load():
             continue
         if not before and path.name in FROZEN_FILES_350:
             relative = path.relative_to(ROOT).as_posix()
-            assert hashlib.sha256(path.read_bytes()).hexdigest() == platform_policy.FROZEN_POSIX_TEST_SHA256[relative]
+            # The pins are LF blobs; an autocrlf checkout of the same blob is the same image.
+            assert platform_policy._pinned_image(path.read_bytes(), platform_policy.FROZEN_POSIX_TEST_SHA256[relative])
             frozen.append(path.name)
         else:
             (guarded if before else unguarded).append(f"{path.name}:{statement.lineno}")
@@ -445,7 +446,10 @@ def test_frozen_platform_policy_refuses_changed_contract_or_image(tmp_path, muta
         target = tmp_path / "same-bytes.py"
         target.write_bytes(original.read_bytes())
         original.unlink()
-        original.symlink_to(target)
+        try:
+            original.symlink_to(target)
+        except OSError:
+            pytest.skip("this host needs a privilege to create a symlink")
     with pytest.raises(pytest.UsageError):
         platform_policy._validate_frozen_images(tmp_path, pins)
 

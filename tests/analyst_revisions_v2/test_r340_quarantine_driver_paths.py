@@ -274,16 +274,26 @@ def buy_without_quote(monkeypatch):
 
 def test_buy_without_a_quote_fails_closed_before_any_order(monkeypatch):
     d, orders = buy_without_quote(monkeypatch)
-    with pytest.raises(Exception):
+    with pytest.raises((m.Refused, m.targets.NewruleError)) as caught:
         d.on_after_open()
+    assert caught.value.args[0] in ('quote_execution_slice', 'quote_execution_engine_price')
     assert orders == [] and not d._executed
+
+
+def test_missing_quote_check_does_not_accept_an_unrelated_driver_crash(monkeypatch):
+    def unexpected():
+        raise RuntimeError('synthetic unexpected driver crash')
+    monkeypatch.setitem(globals(), 'buy_without_quote',
+        lambda _: (NS(on_after_open=unexpected, _executed=set()), []))
+    with pytest.raises(RuntimeError, match='synthetic unexpected driver crash'):
+        test_buy_without_a_quote_fails_closed_before_any_order(monkeypatch)
 
 
 @pytest.mark.xfail(strict=True, raises=AssertionError,
     reason='ARV2R340-001: require raises contract.Refused, so the cash-bound clause relabels quote refusals')
 def test_buy_without_a_quote_keeps_its_own_refusal_code(monkeypatch):
     d, _ = buy_without_quote(monkeypatch)
-    with pytest.raises(Exception) as caught:
+    with pytest.raises((m.Refused, m.targets.NewruleError)) as caught:
         d.on_after_open()
     assert caught.value.args == ('quote_execution_slice',)
 

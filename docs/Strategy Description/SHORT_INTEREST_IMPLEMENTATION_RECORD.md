@@ -32536,3 +32536,185 @@ Main's two isolated final sandbox tests passed 2/.66s; final record/active-doc
 checks passed 98/.98s. The entire 2BF record prefix is preserved; whitespace
 passed. These capability and fabricated checks did not invoke the actual
 initial code window or eslogger.
+
+## 151. Actual synchronized v1 refusal and verified offline adapter corrections (2026-11-04)
+
+### 151.1 Original negative, authenticated without replay
+
+The owner executed the CE027 command ONCE and returned
+si-code-read-actor-trace-v1-terminal/status=incomplete. Main first verified
+physical/Git roots, the lane branch, expected clean
+ce027c842cd742fe898faa7422a972d792d8a1d2 and actual/tracking
+af1d00f66a8d611997749c164a04c48e4eb635e4. It independently authenticated the
+original AppSupport report through nofollow directory/file descriptors,
+private0700/0600 ownership and membership, exact bytes/canonical JSON,
+FD/name stamps through close, and the ORIGINAL owner-terminal hashes:
+
+| Binding | Original value, independently matched |
+| --- | --- |
+| Report bytes | 80281 |
+| Report SHA256 | bea48683a39eaf62507736e514ebad34b74450870ef741bad352665da89eec27 |
+| Original file10 stamp SHA256 | fb1ef02317aa2d77cec5db0d933f669344d8e1d9afe4e18a0991b013ff1d5587 |
+| Original output leaf identity5 SHA256 | d0f909f493a2b7267e71f8fce199558904f08704e272b8e949230884f1ca95f8 |
+
+The first terminal failure is worker_exit; bounded later native/projection
+and post-close vetoes remain. Main also parsed the original worker packet
+against the EXACT CE027 committed coordinator and six-file manifest, rather
+than the later corrected working files. No currently named worker/eslogger
+remained active. Absence was not used as historical success evidence.
+
+Original worker39861 actually exited2 with both pipes EOF at parent offset
+1149507334ns. Its window.entered=false, all window times null, no original
+window closure/comparison, one forbidden-read-open counter and all other
+denial counters zero. The packet's first window_witness/bootstrap masks the
+earlier audit refusal; conservative unentered-body flags=false are not proof
+that a body executed. The original code order and bounded source denials do
+not authorize any source admission.
+
+Original native39859 supplied343 records, consecutive sequence0..342,
+793878 input bytes and no stderr. A projection refusal ended observation
+around19690040917ns. Native actual wait was-15 during UNPLANNED cleanup;
+native EOF=false and full30-second coverage was NOT established. Every
+negative overrides provisional/positive markers. The old namespace
+code-read-20261104-v1, report and commands are spent/immutable and NEVER rerun,
+reset, removed, relabelled complete or adopted into the successor.
+
+### 151.2 Current FileProvider association; historical cause still qualified
+
+Sequence342 reports setattrlist by com.apple.fileproviderd, PID761/
+pidversion1934, at the allowlisted system FileProvider executable, for the
+EXACT original Documents dev16777234/inode334342. Event UTC is
+2026-11-05T02:05:37.615547286Z. The SAME held FD/name identity changed from
+mtime1793844296000000000/ctime1793844296949080531 to
+mtime1793844336000000000/ctime1793844337615614745; no protection change.
+The new ctime is67459ns after the native event's UTC timestamp. Parent
+sample183 observed the delta before queued event delivery; this is not a
+timing contradiction.
+
+This is a specific CURRENT reported setter temporally associated with an
+observed metadata delta, NOT proof of syscall success, exclusive causation
+or the historical failed-read cause. The worker had exited about18 seconds
+before this mutation and never entered the requested read window. Delayed
+effects of earlier preload/authentication activity are not excluded.
+Requested bitmaps and the actual original attrlist key set were NOT retained
+when projection failed; they remain UNKNOWN and are never reconstructed.
+
+### 151.3 Verified failures012/013 and stronger causal regressions
+
+SI-READ-20261104-012, P2, is a verified diagnostic/stdlib composition defect.
+Trusted Python3.13 subprocess.Popen.__init__ wraps its stdout/stderr pipe
+FD integers via io.open BEFORE _execute_child emits the subprocess audit.
+The original first Git guard necessarily reaches those wrappers before the
+code window; the old hook rejected every integer open. This explains the
+source-evident failure direction and observed counter pattern, without
+pretending the unretained original audit arguments were recovered.
+
+The correction permits ONLY genuine original Popen-owned c2pread/errread
+read wrappers: original constructor/get-handles/run/io.open/os.pipe/fstat/
+fcntl identities, fixed allowed Git argv/cwd/env/options, two distinct
+owned roles, FIFO and F_GETFL readonly, immutable Root binding. Write opens
+are rejected FIRST. Arbitrary integer FDs, regular files, unowned pipes,
+other commands/options/contexts and all source/provider denials remain.
+The immediate fixed audit cause is latched; window_witness and later vetoes
+remain bounded SECONDARY evidence instead of replacing it.
+
+Previous tests separately mocked subprocess.run or omitted permanent auditing
+on the real model. New composition tests execute CURRENT REAL public
+model/hashing/reader/fifth code with permanent auditing and REAL stdlib
+run/Popen/pipe handling, mocking ONLY kernel child execution/wait. A separate
+actual local-Git metadata-only capability passes; neither test invokes a real
+Root/USB read window. Negative cases reject broader FD adoption.
+
+SI-READ-20261104-013, P2, is the strict attrlist producer/consumer mismatch.
+Static decoding of installed Apple eslogger's Swift reflection metadata
+binds the attrlist CodingKeys enum to EXACT six fields: bitmapcount and five
+attribute groups. The C struct has a seventh reserved alignment-padding field.
+This proves a supported producer variant rejected by the former seven-key
+guard; it does NOT recover CE027's missing values or claim its unretained
+exact key set.
+
+The new projection accepts exact six-key native or explicit seven-key legacy
+with reserved=0, bitmapcount exact uint16=5 and five uint32 groups. Bool,
+extra/missing fields and unsupported types refuse projection. Unsupported
+matched details now retain the validated actor/inode candidate plus ONLY
+fixed known-field presence/type enums and unknown-field count, mark an issue
+that VETOES completeness, and continue the remaining bounded native capture.
+No raw unknown keys/values, filename, exception or private row escapes.
+Core event/identity, full10 custody, deadlines and all admission checks remain.
+
+Primary local producer SHA256
+ebff5608a2840a8b0b3ee2e4bbc9afaa1034171729c5e78c72ec63b0c7e1fcd1,
+1180224 bytes: C attrlist field descriptor0x1000658c8 has7 fields;
+CodingKeys descriptor0x10006183c has6. Symbolic context binds enum0x10005d268
+through extension0x10005d25c to imported __C.attrlist0x10005f62c.
+The regression independently parses Mach-O sections, relative field names
+and context pointers; it never executes eslogger. SDK ESMessage.h
+SHA256dfc1aa8edadf585ec047e1c82e4084dfaeb9dc0116b497d5a4f91e947cad1554
+and sys/attr.h
+SHA25646202d465dfbdc520943b30bb1fb718a4f7efc3ae37868801485a6ca6604c003
+identify the event/struct and reserved padding. No secondary web narrative
+is used to invent an actual native payload.
+
+### 151.4 Frozen successor and real limits
+
+Under continuing SI-AUTH-20261104-01, SI-DEC-20261104-03 registers ONE
+prospective corrected v2 only AFTER the verified012/013 corrections and causal
+tests. This is not a namespace retry to guess around unknown local state.
+Fresh schema si-code-read-actor-trace-v2 uses new fixed directory
+code-read-20261104-v2 in the SAME dedicated attribution base, outside the
+native-proof base. Oldv1 remains untouched. Native30s/whole120s/readiness10s/
+worker-stop reserve8s, original code/source/control checks, actual owned waits,
+EOF, same runtime/null identity and final report barriers remain unchanged.
+The worker still stops BEFORE snapshot/source/model-inspection bodies.
+
+| Final new file | Bytes | SHA256 |
+| --- | --- | --- |
+| diagnose_short_interest_code_read_interval.py | 29699 | be69961b25d04ba6ad82e18fbc14012d1b4d65399bcee2e9871d35170b15db34 |
+| test_short_interest_code_read_interval.py | 28036 | a4c4ab531d7ff680921797b062504831673a902d6c7573b59d4708c4fbb5b825 |
+| trace_short_interest_code_read_actor.py | 48422 | 1c57ec615ad604d3c5b6050f8b5c6177ea0485c2d6c6f89ee7cc149b1696817b |
+| test_short_interest_code_read_actor.py | 48487 | 19e1c4fb1c3e156950906d699c035ce84027e479f037099bdb066c264fc643f6 |
+
+The original SEVEN code files remain byte-identical to CE027. Exact nine-path
+inventory is unchanged; new complete mapping SHA256
+a33f14bcf06238a7ddadd1286ecc8d47d340cf17a1025d9486bbd1a4286d8cb0.
+No original code/data/claim/receipt/proof image is changed.
+
+Main final seven-file focused selection passed444 tests,2 deselected,40.54s
+with OS networking denied. Two sandbox tests run separately with internal
+child network denial. Author helper42/21.26s and restored5/4.61s are separate;
+pipe-permit/cause/secondary-veto/broad-FD reversals produced6 expected failures.
+Coordinator author113/1.48s plus sandbox2/.48s are separate; four RAM reversals
+produced14 expected failures plus10 unaffected passes, restored24 passes.
+No file mutation during these reversals. The coordinator's initial handmade
+test helper-state omission was corrected as a TEST fixture error, not a
+production source failure. Peer accepted012/013 read-only, no test/actual
+operation. No full lane/repository suite or independent Claude review.
+Final hashes, original7 equality, AST/system in-memory compile and command
+syntax WITHOUT execution passed. Historical test counts retain attribution.
+
+Before any owner command: commit software/record clean, reverify exact roots,
+branch/HEAD/status and actual/tracking AF1, all current/committed9 bytes,
+oldv1 original controls and absence ofv2/active operation; prepare ONLY the new
+private v2 namespace and an immutable new command filename bound to that exact
+local HEAD. Administrator authentication in responsible Terminal/FDA remains
+an OS step, not renewed task permission. No Root/worker source reproduction
+or esloggerv2 has run. Never execute the old CE027 command again.
+
+SourceAUTH/052 and SI-CR27-008, USB/source/input/rights/cash/readiness gates
+remain. No new provider/key/claim/START/charged byte/outcome/QC/Safari/purchase.
+Count84005START/4294967296bytes, permanent unknown8START/16777216bytes and
+separate DAILY36837attempts/3327988047bytes/71468572rows remain exact.
+The historical14000START/40229897byte upper bound is not a current re-audit.
+Canonical looks0/0, exploratory0, alpha0, IDsnone, QCattempts0.
+
+The round remains LOCAL with ZERO pushes. Keep the successor snapshot frozen
+while its actual one-shot is active/pending; do not edit/test/commit/push during
+it. Authenticate its original terminal/report/file10/leaf5, runtime, manifest,
+read overlap, owned exits/EOF and negatives before a causal custody correction
+or source qualification. Neither this association nor fixtures establish a
+repair or the last step before QC. Reserve the ONE final matching-lane push
+for the valid completed round or concrete final owner/external blocker.
+No new monitor or automatic retry is armed.
+
+Main final isolated sandbox checks passed 2/.65s. Post-record checks passed
+98/1.15s with OS networking denied; the full CE027 record prefix is preserved.

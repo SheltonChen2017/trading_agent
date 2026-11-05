@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import shlex
+import struct
 import subprocess
 import sys
 from types import SimpleNamespace
@@ -587,7 +588,9 @@ def native_event(kind):
     body={'target':target}
     if kind=='setflags':body['flags']=64
     if kind=='utimes':body.update(atime='2026-11-04T01:02:03.123456789Z',mtime='2026-11-04T01:02:04Z')
-    if kind=='setattrlist':body['attrlist']={k:0 for k in ('bitmapcount','reserved','commonattr','volattr','dirattr','fileattr','forkattr')}
+    if kind=='setattrlist':
+        body['attrlist']={k:0 for k in ('bitmapcount','reserved','commonattr','volattr','dirattr','fileattr','forkattr')}
+        body['attrlist']['bitmapcount']=5
     return {'schema_version':1,'version':5,'action_type':1,'global_seq_num':0,'event_type':d.EVENTS[kind],
         'event':{kind:body},'time':'2026-11-04T01:02:03.123456789Z',
         'process':{'audit_token':{'pid':101,'pidversion':3},'group_id':102,'signing_id':'com.apple.fileproviderd',
@@ -604,7 +607,9 @@ def test_original_matching_setter_metadata_is_bounded_and_exact(kind):
     row=consumer.matches[0]
     assert row['received_monotonic_offset_ns'].isdigit() and row['received_unix_time_ns'].isdigit()
     if kind=='setflags':assert row['requested_flags']==64
-    if kind=='setattrlist':assert set(row['attribute_bitmaps'])==set(native_event(kind)['event'][kind]['attrlist'])
+    if kind=='setattrlist':
+        assert row['requested_attribute_projection']=='legacy_seven_keys_reserved_zero'
+        assert set(row['attribute_bitmaps'])==set(t.ATTR_CURRENT_KEYS)
     if kind=='utimes':assert row['requested_times']['mtime']=='2026-11-04T01:02:04Z'
     assert 'PRIVATE' not in json.dumps(row)
 
@@ -727,13 +732,148 @@ def test_null_postclose_replacement_is_refused_against_original_identity(null_wo
 
 
 def test_native_null_data_exception_does_not_allow_any_Python_null_write_open(monkeypatch):
-    hooks=[];state={'failed':False,'denials':{name:0 for name in helper._DENIAL_KEYS}}
+    hooks=[];state={'failed':False,'own_failure':None,'window_frame':None,'denials':{name:0 for name in helper._DENIAL_KEYS}}
     monkeypatch.setattr(helper,'_ADD_AUDIT',hooks.append)
     helper._install_denials(HEAD,state)
     assert len(hooks)==1
     with pytest.raises(helper.IntervalRefusal,match='forbidden_write'):
         hooks[0]('open',('/dev/null',None,os.O_RDWR))
     assert state['failed'] is True and state['denials']['python_write_attempts']==1
+
+
+def decoded_Apple_attrlist_CodingKeys():
+    """Static installed-system producer metadata only; never execute eslogger.
+
+    Independently decode Swift field descriptors and their symbolic context
+    links. Find eslogger's CodingKeys extension of the imported C attrlist,
+    rather than reusing the parser's expected key list or any market payload.
+    """
+    raw=Path('/usr/bin/eslogger').read_bytes()
+    assert t.digest(raw)=='ebff5608a2840a8b0b3ee2e4bbc9afaa1034171729c5e78c72ec63b0c7e1fcd1'
+    assert raw[:4]==bytes.fromhex('cafebabe')
+    n=struct.unpack_from('>I',raw,4)[0];assert 0<n<=8
+    rows=[struct.unpack_from('>IIIII',raw,8+20*i) for i in range(n)]
+    architecture=next(row for row in rows if row[0]==0x100000c)
+    data=raw[architecture[2]:architecture[2]+architecture[3]]
+    assert data[:4]==bytes.fromhex('cffaedfe')
+    segments=[];sections={};position=32
+    for unused in range(struct.unpack_from('<I',data,16)[0]):
+        command,size=struct.unpack_from('<II',data,position)
+        if command==0x19:
+            vm,vs,fo,fs=struct.unpack_from('<QQQQ',data,position+24);segments.append((vm,vs,fo,fs))
+            count=struct.unpack_from('<I',data,position+64)[0]
+            for j in range(count):
+                p=position+72+80*j;name=data[p:p+16].split(b'\0')[0].decode()
+                address,length,offset=struct.unpack_from('<QQI',data,p+32);sections[name]=(address,length,offset)
+        position+=size
+    def offset(address):return next(fo+address-vm for vm,vs,fo,fs in segments if vm<=address<vm+fs)
+    def relative(address):return address+struct.unpack_from('<i',data,offset(address))[0]
+    def text(address):
+        p=offset(address);end=data.index(b'\0',p,p+256);return data[p:end].decode('utf8')
+    def kind(address):return struct.unpack_from('<I',data,offset(address))[0]&31
+    def direct_symbolic(address):
+        return relative(address+1) if data[offset(address)]==1 else None
+    address,length,base=sections['__swift5_fieldmd'];cursor=0;matches=[]
+    while cursor+16<=length:
+        at=base+cursor;va=address+cursor
+        mangled,superclass,record_kind,record_size,count=struct.unpack_from('<iiHHI',data,at)
+        assert record_size>=12 and count<10000
+        names=[text(va+16+record_size*j+8+struct.unpack_from('<i',data,at+16+record_size*j+8)[0]) for j in range(count)]
+        context=direct_symbolic(va+mangled)
+        if context is not None and kind(context)==18 and text(relative(context+8))=='CodingKeys':
+            extension=relative(context+4)
+            if kind(extension)==1:
+                imported=direct_symbolic(relative(extension+8))
+                if imported is not None and kind(imported)==17 and text(relative(imported+8))=='attrlist':
+                    module=relative(imported+4)
+                    if kind(module)==0 and text(relative(module+8))=='__C':matches.append((va,context,imported,tuple(names)))
+        cursor+=16+record_size*count
+    assert len(matches)==1
+    descriptor,context,imported,names=matches[0]
+    assert (descriptor,context,imported)==(0x10006183c,0x10005d268,0x10005f62c)
+    return names
+
+
+def projection_consumer():
+    clock=Clock();watch=SimpleNamespace(clock=clock,key=(7,8,0));captured=[]
+    framer=d.load_framer((REPO/d.FRAMER).read_bytes())
+    consumer=t._consumer_factory(d.make_consumer,d,captured)(framer,watch);consumer.tracer_pid=9000
+    return consumer
+
+
+def test_current_Apple_producer_CodingKeys_variant_is_admitted_without_invented_padding():
+    if sys.platform!='darwin':pytest.skip('registered Apple eslogger producer artifact')
+    keys=decoded_Apple_attrlist_CodingKeys()
+    assert keys==t.ATTR_CURRENT_KEYS and 'reserved' not in keys
+    obj=native_event('setattrlist')
+    obj['event']['setattrlist']['attrlist']={key:5 if key=='bitmapcount' else 0 for key in keys}
+    consumer=projection_consumer();consumer.feed(d.canonical(obj))
+    assert not consumer.issues
+    assert consumer.matches[0]['requested_attribute_projection']=='native_six_keys'
+    assert set(consumer.matches[0]['attribute_bitmaps'])==set(keys)
+
+
+@pytest.mark.parametrize('change',[
+    lambda a:a.pop('commonattr'),lambda a:a.update(PRIVATE_ATTRIBUTE='PRIVATE_VALUE'),
+    lambda a:a.update(bitmapcount=True),lambda a:a.update(bitmapcount=0),lambda a:a.update(bitmapcount=65536),
+    lambda a:a.update(bitmapcount=5.0),lambda a:a.update(commonattr=True),lambda a:a.update(commonattr=-1),
+    lambda a:a.update(commonattr=2**32),lambda a:a.update(reserved=True),lambda a:a.update(reserved=1),
+])
+def test_unsupported_attribute_schema_keeps_safe_candidate_signature_and_vetoes_completeness(change):
+    obj=native_event('setattrlist');attrs=obj['event']['setattrlist']['attrlist'];change(attrs)
+    consumer=projection_consumer();consumer.feed(d.canonical(obj));consumer.finish()
+    assert consumer.records==1 and len(consumer.matches)==1
+    row=consumer.matches[0]
+    assert row['actor']['signing_id']=='com.apple.fileproviderd'
+    assert row['requested_attribute_projection']=='unsupported_schema' and 'attribute_bitmaps' not in row
+    assert 'matching_attribute_schema_unsupported' in consumer.issues
+    signature=row['requested_attribute_schema_signature']
+    assert set(signature)=={'container_type','known_fields','unknown_field_count'}
+    assert set(signature['known_fields'])==set(t.ATTR_KNOWN_KEYS)
+    assert all(set(field)=={'present','type'} for field in signature['known_fields'].values())
+    assert 'PRIVATE' not in json.dumps(row)
+
+
+@pytest.mark.parametrize('attrs',[None,[],True,'PRIVATE_VALUE',2])
+def test_non_mapping_attribute_signature_never_echoes_values(attrs):
+    obj=native_event('setattrlist');obj['event']['setattrlist']['attrlist']=attrs
+    consumer=projection_consumer();consumer.feed(d.canonical(obj))
+    signature=consumer.matches[0]['requested_attribute_schema_signature']
+    assert signature['unknown_field_count'] is None and 'PRIVATE' not in json.dumps(signature)
+    assert not any(field['present'] for field in signature['known_fields'].values())
+
+
+def test_supported_native_and_legacy_attribute_integer_boundaries():
+    attrs={key:0 for key in t.ATTR_CURRENT_KEYS};attrs['bitmapcount']=5
+    for group in t.ATTR_GROUPS:attrs[group]=2**32-1
+    assert t.attribute_projection(attrs)==('native_six_keys',attrs)
+    legacy={**attrs,'reserved':0}
+    assert t.attribute_projection(legacy)==('legacy_seven_keys_reserved_zero',attrs)
+
+
+def test_unsupported_attribute_shape_does_not_abort_remaining_native_interval(world,monkeypatch):
+    world.watch.clock=world.clock;world.watch.key=(7,8,0)
+    framer=d.load_framer((REPO/d.FRAMER).read_bytes())
+    consumer=t._consumer_factory(d.make_consumer,d,[])(framer,world.watch);world.consumer=consumer
+    obj=native_event('setattrlist');obj['event']['setattrlist']['attrlist']['PRIVATE_FIELD']='PRIVATE_VALUE'
+    original=t.os.read
+    def read(fd,limit):
+        value=original(fd,limit)
+        return d.canonical(obj) if fd==101 and value==b'NATIVE' else value
+    monkeypatch.setattr(t.os,'read',read)
+    result=observe(world)
+    assert result['first_failure'] is None and result['planned_original_handle_shutdown'] is True
+    assert result['actual_native_exit']==-15 and result['native_stdout_stderr_EOF'] is True
+    assert int(result['native_observation_end_ns'])-int(result['native_observation_start_ns'])>=30_000_000_000
+    assert len(world.children)==1 and result['reproducer']['pid'] is None
+    assert len(consumer.matches)==1 and 'attribute_bitmaps' not in consumer.matches[0]
+    assert 'matching_attribute_schema_unsupported' in consumer.issues
+    assert 'PRIVATE' not in json.dumps(consumer.matches)
+
+
+def test_successor_namespace_does_not_reuse_or_adopt_actual_v1_report():
+    assert t.DIRECTORY.name=='code-read-20261104-v2'
+    assert t.SCHEMA=='si-code-read-actor-trace-v2'
 
 
 def test_python39_syntax_and_no_runtime_repository_imports():

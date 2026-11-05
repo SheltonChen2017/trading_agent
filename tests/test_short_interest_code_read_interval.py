@@ -317,3 +317,145 @@ print(worker.canonical(result).decode())
     assert not any(packet['denials'].values()) and packet['source_body_unentered']
     assert packet['test_profile_events']==[{'controlled':True,'stop_issued':False},
         {'controlled':False,'stop_issued':True},{'controlled':True,'stop_issued':True}]
+
+
+def test_actual_local_Git_metadata_uses_owned_readonly_pipe_wrappers_under_permanent_audit():
+    """Local rev-parse only; no original window, source, provider or remote read."""
+    raw=(REPOSITORY/d.DRIVER).read_bytes();payload={'raw':base64.b64encode(raw).decode()}
+    child='''import base64,json,sys,time,types
+p=json.loads(sys.stdin.read());m=types.ModuleType('_local_git_audit');m.__file__='public_helper';sys.modules[m.__name__]=m
+exec(compile(base64.b64decode(p['raw']),'public_helper','exec'),m.__dict__)
+state={'failed':False,'own_failure':None,'window_frame':None,'profile_change_allowed':False,'auto_disable_permit':None,'profile_function':None,'original_module':None,'auto_disable_used':False,'stop':None,'denials':{key:0 for key in m._DENIAL_KEYS}}
+m._install_denials('a'*40,state)
+value=m._git(['rev-parse','HEAD'],'a'*40,time.monotonic_ns())
+print(json.dumps({'head':value.decode().strip(),'denials':state['denials'],'first':state['own_failure']}))
+'''
+    expected=REAL_RUN(['git','rev-parse','HEAD'],cwd=REPOSITORY,env={'PATH':'/usr/bin:/bin'},
+        stdin=None,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=10,check=False)
+    assert expected.returncode==0
+    result=REAL_RUN(['/Users/sheltonchen/.venvs/trading_agent-py313/bin/python','-I','-S','-B','-c',child],
+        input=json.dumps(payload).encode(),stdout=subprocess.PIPE,stderr=subprocess.PIPE,cwd=REPOSITORY,
+        env={'PATH':'/usr/bin:/bin'},timeout=10,check=False)
+    assert result.returncode==0,result.stderr
+    packet=json.loads(result.stdout)
+    assert packet['head']==expected.stdout.decode().strip()
+    assert packet['first'] is None and not any(packet['denials'].values())
+
+
+def production_public_fixture(tmp_path):
+    """Original model/hash/reader bodies; only the fifth's fixture ROOT/policy vary."""
+    root=(tmp_path/'public-lane').resolve();root.mkdir()
+    bodies={name:(REPOSITORY/name).read_bytes() for name in (*d.CODE_FILES,d.DRIVER)}
+    profile=support.replace_assignments(bodies[d.ORIGINAL],{'ROOT':'Path('+repr(str(root))+')','PROFILE_SHA256':repr('PENDING')})
+    from types import ModuleType
+    seed=ModuleType('_public_profile_seed');exec(compile(profile,str(root/d.ORIGINAL),'exec'),seed.__dict__)
+    bodies[d.ORIGINAL]=support.replace_assignments(profile,{'PROFILE_SHA256':repr(seed._hash(seed.policy()))})
+    for name,raw in bodies.items():
+        path=root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(raw)
+    return root,bodies
+
+
+PUBLIC_GRAPH_CHILD='''import base64,json,os,sys,time,types,threading
+p=json.loads(sys.stdin.read());bodies={name:base64.b64decode(raw) for name,raw in p['bodies'].items()};root=p['root'];mode=p['mode'];os.chdir(root)
+# Test-only frozen SHARED host ancestors; fixture-owned directories/files stay real.
+from pathlib import Path
+fstat,stat,lstat=os.fstat,os.stat,os.lstat
+shared={}
+for parent in Path(root).parent.parents:
+ info=lstat(parent);shared[(info.st_dev,info.st_ino)]=info
+def common(info):return shared.get((info.st_dev,info.st_ino),info)
+os.fstat=lambda fd:common(fstat(fd));os.stat=lambda path,*a,**kw:common(stat(path,*a,**kw));os.lstat=lambda path,*a,**kw:common(lstat(path,*a,**kw))
+m=types.ModuleType('_production_interval_helper');m.__file__=root+'/scripts/diagnose_short_interest_code_read_interval.py';sys.modules[m.__name__]=m
+exec(compile(bodies['scripts/diagnose_short_interest_code_read_interval.py'],m.__file__,'exec'),m.__dict__)
+m.ROOT=Path(root);m._BOOTSTRAP_START_NS=time.monotonic_ns();launches=[];writers=[]
+def reply(args):
+ if args[0]=='show':return bodies[args[1].split(':',1)[1]]
+ if args==['rev-parse','--show-toplevel']:return root.encode()
+ if args==['branch','--show-current']:return b'codex/strategy-short-interest'
+ if args==['rev-parse','HEAD']:return p['head'].encode()
+ if args[0]=='status':return b''
+ if args[0]=='ls-remote':return (p['remote']+'\\trefs/heads/codex/strategy-short-interest').encode()
+ return p['remote'].encode()
+def execute(self,args,executable,preexec_fn,close_fds,pass_fds,cwd,env,startupinfo,creationflags,shell,p2cread,p2cwrite,c2pread,c2pwrite,errread,errwrite,*tail):
+ sys.audit('subprocess.Popen',args[0],args,cwd,env);launches.append(tuple(args));raw=reply(args[1:])
+ def write():
+  try:
+   offset=0
+   while offset<len(raw):offset+=os.write(c2pwrite,raw[offset:])
+  finally:
+   os.close(c2pwrite);os.close(errwrite)
+ thread=threading.Thread(target=write,daemon=True);writers.append(thread);thread.start()
+ self.pid=424242;self.returncode=0;self._closed_child_pipe_fds=True
+# Real run/Popen.__init__/_get_handles/io.open/communicate are untouched.
+# Only the kernel-child boundary supplies fixed PUBLIC Git responses.
+m.subprocess.Popen._execute_child=execute
+if mode.startswith('graph'):
+ if mode=='graph_identity_drift':m._IO_OPEN=None
+ result=m.run_registered(p['head'],p['remote'],m.digest(bodies[m.DRIVER]))
+ result['test_kernel_launches']=len(launches)
+else:
+ state={'failed':False,'own_failure':None,'window_frame':None,'profile_change_allowed':False,'auto_disable_permit':None,'profile_function':None,'original_module':None,'auto_disable_used':False,'stop':None,'denials':{key:0 for key in m._DENIAL_KEYS}}
+ readfd,writefd=os.pipe();regular=os.open(root+'/'+m.DRIVER,os.O_RDONLY)
+ hook=m._install_denials(p['head'],state);args=['git','rev-parse','HEAD'];kwargs={'cwd':m.ROOT,'env':m.ENV,'stdin':None,'stdout':m.subprocess.PIPE,'stderr':m.subprocess.PIPE,'check':False}
+ try:
+  if mode=='unowned_pipe':hook('open',(readfd,'r',os.O_RDONLY))
+  elif mode=='regular_fd':hook('open',(regular,'r',os.O_RDONLY))
+  elif mode=='write_fd':hook('open',(writefd,'w',os.O_WRONLY))
+  else:
+   if mode=='other_command':args=['curl','https://PRIVATE']
+   if mode=='other_git':args=['git','status','--porcelain=v1']
+   if mode=='env':kwargs['env']={**m.ENV,'PRIVATE':'PRIVATE'}
+   if mode=='cwd':kwargs['cwd']=m.ROOT.parent
+   if mode=='role':kwargs['stdout']=regular
+   if mode=='stdin':kwargs['stdin']=m.subprocess.PIPE
+   if mode=='root_binding':m.ROOT=Path(str(m.ROOT))
+   if mode=='constructor_identity':
+    original_init=m.subprocess.Popen.__init__
+    def changed_init(self,*args,**kwargs):return original_init(self,*args,**kwargs)
+    m.subprocess.Popen.__init__=changed_init
+   if mode=='handles_identity':
+    original_handles=m.subprocess.Popen._get_handles
+    def changed_handles(self,*args,**kwargs):return original_handles(self,*args,**kwargs)
+    m.subprocess.Popen._get_handles=changed_handles
+   m.subprocess.run(args,**kwargs)
+ except m.IntervalRefusal:pass
+ finally:
+  for fd in (readfd,writefd,regular):os.close(fd)
+ result={'denials':state['denials'],'first':state['own_failure'],'test_kernel_launches':len(launches),'failed':state['failed']}
+for thread in writers:thread.join(2)
+print(m.canonical(result).decode())
+'''
+
+
+def public_graph_child(tmp_path,mode):
+    root,bodies=production_public_fixture(tmp_path)
+    payload={'root':str(root),'head':HEAD,'remote':REMOTE,'mode':mode,
+        'bodies':{name:base64.b64encode(raw).decode() for name,raw in bodies.items()}}
+    result=REAL_RUN(['/Users/sheltonchen/.venvs/trading_agent-py313/bin/python','-I','-S','-B','-c',PUBLIC_GRAPH_CHILD],
+        input=json.dumps(payload).encode(),stdout=subprocess.PIPE,stderr=subprocess.PIPE,cwd=REPOSITORY,
+        env={'PATH':'/usr/bin:/bin'},timeout=30,check=False)
+    assert result.returncode==0,result.stderr
+    return json.loads(result.stdout)
+
+
+def test_real_production_graph_and_stdlib_pipe_wrappers_with_permanent_audit(tmp_path):
+    packet=public_graph_child(tmp_path,'graph')
+    assert packet['status']=='closed_initial_window_stopped_before_snapshot',packet
+    assert packet['window']['entered'] and packet['window']['original_closed'] and packet['source_body_unentered']
+    assert packet['test_kernel_launches']>20 and not any(packet['denials'].values())
+
+
+def test_first_audit_cause_precedes_later_window_veto_in_genuine_production_graph(tmp_path):
+    packet=public_graph_child(tmp_path,'graph_identity_drift')
+    assert packet['status']=='incomplete' and packet['window']['entered'] is False
+    assert packet['first_failure']['code']=='forbidden_open' and packet['first_failure']['phase']=='bootstrap'
+    assert any(row['code']=='window_witness' for row in packet['cleanup_failures'])
+    assert packet['denials']['forbidden_read_open_attempts']==1 and not packet['documents_comparisons']
+
+
+@pytest.mark.parametrize('mode',['unowned_pipe','regular_fd','write_fd','other_command','other_git','env','cwd','role','stdin','root_binding','constructor_identity','handles_identity'])
+def test_no_generic_int_pipe_or_changed_constructor_permission(tmp_path,mode):
+    packet=public_graph_child(tmp_path,mode)
+    assert packet['failed'] is True and packet['test_kernel_launches']==0
+    assert packet['first']['code'] in ('forbidden_open','forbidden_write')
+    assert sum(packet['denials'].values())==1 and 'PRIVATE' not in json.dumps(packet)

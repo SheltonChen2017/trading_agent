@@ -33,9 +33,12 @@ CODE_FILES = ('data/__init__.py', 'data/hashing.py',
 DOCUMENTS_SHA = '4fa266113c4ad23c4c8747a30bcea04f02fdc25fde22a109262eea31bf73c01d'
 FRAMER_SHA = 'ed462f3b0552d3f74c468c6a51e47ef215b90d9f7e38a372364aaec5c7fcdf63'
 BASE = Path('/Users/sheltonchen/Library/Application Support/CodexShortInterestCodeReadAttribution')
-DIRECTORY = BASE / 'code-read-20261104-v1'
+DIRECTORY = BASE / 'code-read-20261104-v2'
 OUTPUT = DIRECTORY / 'report.private.json'
-SCHEMA = 'si-code-read-actor-trace-v1'
+SCHEMA = 'si-code-read-actor-trace-v2'
+ATTR_GROUPS = ('commonattr','volattr','dirattr','fileattr','forkattr')
+ATTR_CURRENT_KEYS = ('bitmapcount',*ATTR_GROUPS)
+ATTR_KNOWN_KEYS = ('bitmapcount','reserved',*ATTR_GROUPS)
 WHOLE_NS, PASSIVE_NS, READINESS_NS = 120_000_000_000, 30_000_000_000, 10_000_000_000
 MAX_CODE, MAX_HELPER, MAX_HELPER_STDERR = 1024**2, 32768, 4096
 WORKER_PYTHON = '/Users/sheltonchen/.venvs/trading_agent-py313/bin/python'
@@ -548,13 +551,54 @@ def _consumer_factory(original, documents, captured):
                 row['received_unix_time_ns']=str(time.time_ns())
                 if kind=='setflags':row['requested_flags']=framer.uint(body.get('flags'),32)
                 elif kind=='setattrlist':
-                    attrs=body.get('attrlist');keys=('bitmapcount','reserved','commonattr','volattr','dirattr','fileattr','forkattr')
-                    require(type(attrs) is dict and set(attrs)==set(keys),'native')
-                    row['attribute_bitmaps']={key:framer.uint(attrs[key],32) for key in keys}
+                    attrs=body.get('attrlist');projection=attribute_projection(attrs)
+                    if projection is None:
+                        # Keep the already validated actor/inode candidate.
+                        # Unknown requested metadata vetoes completeness but
+                        # does not truncate the remaining bounded capture.
+                        row['requested_attribute_projection']='unsupported_schema'
+                        row['requested_attribute_schema_signature']=attribute_signature(attrs)
+                        self.issue('matching_attribute_schema_unsupported')
+                    else:
+                        row['requested_attribute_projection']=projection[0]
+                        row['attribute_bitmaps']=projection[1]
                 elif kind=='utimes':row['requested_times']={key:framer.timestamp(body.get(key)) for key in ('atime','mtime')}
                 self.projected_bytes+=len(documents.canonical(row));require(self.projected_bytes<documents.MAX_OUTPUT//2,'native')
         return Consumer()
     return factory
+
+
+def attribute_projection(attrs):
+    """Two explicit producer variants; no arbitrary optional-field fallback.
+
+    Current Apple eslogger CodingKeys omit the C alignment-only reserved word.
+    The legacy seven-field variant is accepted only with exact zero padding.
+    This diagnostic representation changes no source/control custody checks.
+    """
+    if type(attrs) is not dict:return None
+    keys=set(attrs)
+    if keys==set(ATTR_CURRENT_KEYS):variant='native_six_keys'
+    elif keys==set(ATTR_KNOWN_KEYS):
+        if type(attrs['reserved']) is not int or attrs['reserved']!=0:return None
+        variant='legacy_seven_keys_reserved_zero'
+    else:return None
+    count=attrs['bitmapcount']
+    if type(count) is not int or not 0<=count<2**16 or count!=5:return None
+    if not all(type(attrs[key]) is int and 0<=attrs[key]<2**32 for key in ATTR_GROUPS):return None
+    return variant,{key:attrs[key] for key in ATTR_CURRENT_KEYS}
+
+
+def attribute_signature(attrs):
+    """Only fixed field presence/type enums and an unknown-key count escape."""
+    def kind(value):
+        for cls,label in ((type(None),'null'),(bool,'bool'),(int,'int'),(float,'float'),(str,'string'),(list,'list'),(dict,'dict')):
+            if type(value) is cls:return label
+        return 'other'
+    is_dict=type(attrs) is dict
+    return {'container_type':kind(attrs),
+        'known_fields':{key:{'present':is_dict and key in attrs,
+            'type':kind(attrs[key]) if is_dict and key in attrs else 'absent'} for key in ATTR_KNOWN_KEYS},
+        'unknown_field_count':sum(key not in ATTR_KNOWN_KEYS for key in attrs) if is_dict else None}
 
 
 def load_documents(raw):

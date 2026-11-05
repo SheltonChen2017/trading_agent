@@ -6,6 +6,8 @@ not cover all metadata syscalls; this module makes no contrary claim.
 """
 import hashlib
 import importlib
+import io
+import fcntl
 import json
 import math
 import os
@@ -30,6 +32,15 @@ MAX_SECONDS, MAX_BYTES, MAX_OUTPUT, MAX_COMPARISONS = 30, 1024**2, 32768, 128
 MODULE = '_si_original_code_interval_v1'
 _USED = False
 _ADD_AUDIT = sys.addaudithook
+_POPEN = subprocess.Popen
+_POPEN_INIT = _POPEN.__init__
+_POPEN_INIT_CODE = _POPEN_INIT.__code__
+_POPEN_HANDLES = _POPEN._get_handles
+_POPEN_HANDLES_CODE = _POPEN_HANDLES.__code__
+_RUN = subprocess.run
+_RUN_CODE = _RUN.__code__
+_IO_OPEN, _FSTAT, _F_GETFL = io.open, os.fstat, fcntl.fcntl
+_PIPE = os.pipe
 _CODES = frozenset('arguments interpreter attempt_spent clock root code code_runtime original_negative window_witness stop_witness profile_callback profile_changed source_barrier forbidden_open forbidden_write forbidden_socket forbidden_subprocess forbidden_import output_bound cleanup'.split())
 _DENIAL_KEYS = ('python_write_attempts','python_socket_attempts','forbidden_read_open_attempts',
     'unexpected_subprocess_attempts','unexpected_source_entry_attempts')
@@ -220,15 +231,22 @@ def _documents_comparison(module,graph,frame,before,after,window_frame):
 
 
 def _install_denials(head,state):
+    root=ROOT
     absolute={str(ROOT/name) for name in (DRIVER,*CODE_FILES)}
     absolute.update(str(path) for name in (DRIVER,*CODE_FILES) for path in (ROOT/name).parents)
     relative={part for name in (DRIVER,*CODE_FILES) for part in (ROOT/name).parts}
     def denied(key,code):
-        state['denials'][key]+=1;state['failed']=True;raise IntervalRefusal(code)
+        state['denials'][key]+=1;state['failed']=True;error=IntervalRefusal(code)
+        if state['own_failure'] is None:
+            state['own_failure']=_safe_failure(error,'initial_code' if state['window_frame'] is not None else 'bootstrap')
+        raise error
     def audit(event,args):
         if event=='open':
             path,mode,flags=args
             if type(flags) is not int or flags&(os.O_WRONLY|os.O_RDWR|os.O_CREAT|os.O_TRUNC|os.O_APPEND):denied('python_write_attempts','forbidden_write')
+            if type(path) is int:
+                if _owned_git_pipe(path,mode,flags,head,root):return
+                denied('forbidden_read_open_attempts','forbidden_open')
             text=os.fsdecode(path) if type(path) in (str,bytes) else None
             if text not in absolute and text not in relative:denied('forbidden_read_open_attempts','forbidden_open')
         elif event.startswith('socket.') or event in ('socket.getaddrinfo','socket.gethostbyname'):
@@ -259,6 +277,33 @@ def _install_denials(head,state):
             state['auto_disable_used']=True;state['auto_disable_permit']=None
     _ADD_AUDIT(audit)
     return audit
+
+
+def _owned_git_pipe(fd,mode,flags,head,root):
+    """Only original Popen's two read-only Git pipe wrappers, never fd adoption."""
+    try:
+        frame=sys._getframe(2)  # audit callback's genuine C io.open caller.
+        if not (type(frame) is FrameType and frame.f_code is _POPEN_INIT_CODE and frame.f_globals is subprocess.__dict__
+                and subprocess.Popen is _POPEN and _POPEN.__init__ is _POPEN_INIT and _POPEN_INIT.__code__ is _POPEN_INIT_CODE
+                and _POPEN._get_handles is _POPEN_HANDLES and _POPEN_HANDLES.__code__ is _POPEN_HANDLES_CODE
+                and subprocess.run is _RUN and _RUN.__code__ is _RUN_CODE and io.open is _IO_OPEN
+                and os.fstat is _FSTAT and fcntl.fcntl is _F_GETFL and os.pipe is _PIPE and ROOT is root
+                and root.resolve()==root and Path.cwd().resolve()==root):return False
+        values=frame.f_locals;child=values.get('self');arguments=values.get('args')
+        if not (type(child) is _POPEN and type(arguments) is list and arguments[:1]==['git']
+                and all(type(value) is str for value in arguments) and _git_allowed(arguments[1:],head)
+                and Path(values.get('cwd'))==root and values.get('env')==ENV
+                and values.get('stdin') is None and type(values.get('stdout')) is int and values['stdout']==subprocess.PIPE
+                and type(values.get('stderr')) is int and values['stderr']==subprocess.PIPE
+                and values.get('shell') is False and values.get('executable') is None and values.get('preexec_fn') is None
+                and values.get('close_fds') is True and values.get('pass_fds')==()
+                and values.get('user') is None and values.get('group') is None and values.get('extra_groups') is None
+                and type(fd) is int and fd>=0 and fd in (values.get('c2pread'),values.get('errread'))
+                and type(values.get('c2pread')) is int and type(values.get('errread')) is int
+                and values['c2pread']!=values['errread'] and mode=='r' and type(flags) is int
+                and flags&os.O_ACCMODE==os.O_RDONLY):return False
+        return stat.S_ISFIFO(_FSTAT(fd).st_mode) and _F_GETFL(fd,fcntl.F_GETFL)&os.O_ACCMODE==os.O_RDONLY
+    except (OSError,ValueError,TypeError,AttributeError):return False
 
 
 def _observe_original(module,head,remote,state):
@@ -359,7 +404,10 @@ def run_registered(head,matching_remote,helper_sha256):
         for name,pin in originals.items():require(_stamp((ROOT/name).lstat())==pin,'code')
         _check(start)
     except BaseException as error:
-        first=state['own_failure'] or _safe_failure(error)
+        late=_safe_failure(error);primary=state['own_failure'] or first or late
+        if first is not None and first is not primary:later=[*later,first]
+        if late!=primary:later=[*later,late]
+        first=primary
         status='incomplete'
     finally:
         if module is not None:

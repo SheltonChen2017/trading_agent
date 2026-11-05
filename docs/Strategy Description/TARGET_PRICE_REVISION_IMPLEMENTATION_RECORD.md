@@ -22,12 +22,18 @@ Fresh postMia full-source/job reads verified EVERY file unchanged and only
 the same two Completed diagnostics, with no active OFF backtest.
 No source/economic/financial acceptance follows from Mia's reply.
 The authentication/manual-focus observations in118.2–118.4 remain history.
-No further login or composer-focus input is currently needed.
-The committed pure cache builder passed59focused tests and independent
-static review; its separate fixed dispatcher is being built locally.
-No actual privateSID render, source upload, compile or new job has occurred.
-Local1041interim,3082builder,f66f545fhandoff and44687221QC-only
-implementation commits remain unpushed;
+Login and the second Mia diagnosis are complete. Owner removal of only
+Codex's unsent421character schema question from the OFF editor is pending;
+no further UI action or source write may race that repair.
+The QC-only parent renderer passed85focused tests. The new fixed action
+route's exact Mia/null-UID compatibility passed172focused tests locally;
+its v3 action/result framing requires a committed source snapshot before use.
+The first upload preflight stopped after one metadata read, before any write.
+Fresh pre-repair native source capture still matched the complete saved
+baseline; editor restoration and a new full source comparison remain required.
+No rawSID/parent-witness export, source API upload, compile or new job occurred.
+Local1041interim,3082builder,f66f545fhandoff,44687221QC-only
+implementation and54328acahandoff commits remain unpushed;
 this same round still has no successful push.
 
 Codex counter-reviewed the two incoming commits in `432205ad..3cf9636e`;
@@ -110,7 +116,7 @@ owner-answer checkpoint is added by this factual blocked handoff.
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **SECTION118 OWNER-AUTHORIZED GENUINE MIA/OFF CONTINUATION; SAFARI AUTHENTICATED; GENUINE MIA DIAGNOSIS RUNNING;20REMXROWS QUARANTINED; SKIP CLAUDE REVIEW; SOLE FINAL PUSH RESERVED. NATIVE INPUT/SOURCE/RESOURCE AND ACCOUNTING PREREQUISITES REMAIN;0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
+Status: **SECTION118 OWNER-AUTHORIZED GENUINE MIA/OFF CONTINUATION; SAFARI AUTHENTICATED; GENUINE MIA DIAGNOSIS COMPLETED; EDITOR RESTORATION PENDING;20REMXROWS QUARANTINED; SKIP CLAUDE REVIEW; SOLE FINAL PUSH RESERVED. NATIVE INPUT/SOURCE/RESOURCE AND ACCOUNTING PREREQUISITES REMAIN;0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
 in106 remains accepted after its document/current-routing correction.
 Historicalsection105 review/disposition/fullrange remains intact in105.
 
@@ -572,14 +578,19 @@ Fresh OFF baselines001/002 andpostMia002 have the same complete source
 inventory and two Completed native diagnostics, with no active OFF backtest.
 Safari is authenticated in protected OFF38609822.
 Two genuineMia turns areCompleted and the final reply offers no verified
-code fix; no final-answer or manual-focus wait remains.
+code fix. Owner removal of Codex's unsent421character schema question from
+the OFF editor is pending; no UI action or source write may race that repair.
 Historical History results do not rule out prospective native-cache/feed routing.
 Provider-wide absence remains unproved.
 A positive cache canary does not establish full financial repair or atomicity.
 Raw SID and parent witness remain inside QC; local SID export is not authorized.
-The separate fixed diagnostic dispatcher remains local software work;
-no actual privateSID rendering/upload/compile/new diagnostic or financial
-launch has occurred.
+The QC-only renderer passed85focused checks; fixed diagnostic actions now
+have a narrow v3 Mia/null-UID predicate with172focused checks. The first
+upload preflight stopped on nullable-UID framing after1metadata read and
+0writes. No source API upload/compile/new diagnostic or financial launch
+occurred. Pre-repair saved source still matched the baseline. After owner
+editor restoration, verify its absence and every saved file again before
+a fresh committed-source upload; preserve the failed preflight and UI misfire.
 Authentication or a Mia response alone cannot admit private source,
 changed economics or financial readiness. Held OFF2021-02-10nativeRAW/SID
 input remains unresolved. Preserve4096; cloud1008192increase and identity/
@@ -33455,3 +33466,113 @@ not f66/446 metadata as a spent effect scope. Only after that handoff is
 committed may fresh preparation/native preflight begin. No private rawSID
 or parent witness export is authorized, no new financial result is accepted,
 and the one final nonforce lane push is still unspent.
+
+Fresh118Safari claim TPR-R118-PARENT-UPLOAD-001; HEAD54328acadb53613cfb91d70a6a0defc0cd708cbf; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"attempt_id": "TPR-CACHE-ATTEMPT-PARENT-V2-OFF-001", "compile_jobs_ObjectStore_parent_witness_rawSID_reads": 0, "diagnostic_attempt": 1, "diagnostic_look_id": "TPR-CACHE-LOOK-PARENT-V2-OFF-001", "native_requests_max": 6, "native_response_bytes_total_max": 8388608, "native_seconds_each_max": 20, "phase": "upload", "private_inputs": [{"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}, {"bytes": 6703, "name": "own source-only parent configuration", "sha256": "8292239f62e01d20a221fe49f76b3c29a23e9089eed3d6468f0a0953cbbb02b3"}, {"bytes": 2289, "name": "own postMia complete inventory proof", "sha256": "5d0ec86ab34a3108ff8568ff98c79adb481d8887d36cf44add93ed1fde160d94"}], "private_reads_max": 3, "project_id": 38609822, "purpose": "fixedowner/collaborators/noactivejob/fullsource preflight then exactregenerated main-onlyupload; no financial/economicadmission", "source_write_max": 1, "source_write_only": "regenerated main.py; preserve ALL other17-file inventory entries/notebooks"}; manifest7262B/SHA5691d264b008411675c83be8f37d43b3b2502427bc4ae351670808cd6c169e71 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118actualparentupload {"actual_sid_local": false, "candidate_config_sha256": "478dad829a688f9b8df3085e3f6e9cfc5f8e1f8ac01b6dce80feaaa9e6a53e6f", "financial_acceptance": false, "git_head": "54328acadb53613cfb91d70a6a0defc0cd708cbf", "new_diagnostic_jobs": 0, "new_main": {"bytes": 49422, "sha256": "4181ba88b1529eecc86168f6d93865f56cee528b8f502ca1818479983d2be224"}, "parent_witness_local": false, "phase": "upload", "project_id": 38609822, "receipt": {"bytes": 1840, "name": "TPR-CMP29-API-CACHE-R118-PARENT-UPLOAD-001.result.json", "sha256": "11ef82f99f34abce6752506723852c0612a57200643ac12739942b663ad4264a"}, "requests": [{"http_status": 200, "id": "metadata", "status": "failed_or_unknown"}], "schema": "tpr-parent-upload-safe-v1", "source_inventory_sha256": "ce22d422757aeaaebbfe437f288e2a4ad473f83d5b5ca5c6e9943403f42f0ab4", "status": "failed_or_uncertain", "transport_calls_attempted": 1}; privateproof2236B/SHAc04e0a58cbbb44a18e8dc13d4d3d4893d3cf73a501a99085361fc00e665dda9f. Strictfixedsource/owner/jobpreflight; no compile/newjob or parent/SIDlocalread. GenericAPI mutationexecutor unused.
+
+Fresh118Safari claim TPR-R118-PARENT-METADATA-DIAG-001; HEAD54328acadb53613cfb91d70a6a0defc0cd708cbf; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"metadata_bytes_max": 131072, "native_requests_source_writes_compiles_jobs": 0, "private_inputs": [{"bytes": 1840, "name": "own native action failure receipt", "sha256": "11ef82f99f34abce6752506723852c0612a57200643ac12739942b663ad4264a"}, {"bytes": 3573, "name": "own immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}], "private_native_metadata_read_max": 1, "private_receipt_registry_reads_max": 2, "purpose": "body-free locate metadata validation refusal from retainedHTTP200 only; neverprintowner/account/privatefieldvalues or exceptiontext"}; manifest6835B/SHAf28241f40332a08e0f799a21c427eb521de175e460afbff1bf8330dbf1852eb6 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118metadata-only exactretainedresponse readclaim BEFOREopen: {"bytes": 1584, "name": "TPR-CMP29-API-CACHE-R118-PARENT-UPLOAD-001.metadata.response.raw", "sha256": "e8e0efd3870dedc3837b090e26869ef07c6015de0757a1ba4694938a96b1267c"}; HEAD54328acadb53613cfb91d70a6a0defc0cd708cbf; native/source/compile/job effects0; no exceptiontext/privatevalues.
+
+118metadatarefusaldiagnosis {"compile_created": false, "error_category": "ProjectRefusal", "metadata_descriptor": {"bytes": 1584, "name": "TPR-CMP29-API-CACHE-R118-PARENT-UPLOAD-001.metadata.response.raw", "sha256": "e8e0efd3870dedc3837b090e26869ef07c6015de0757a1ba4694938a96b1267c"}, "native_requests": 0, "new_jobs": 0, "planned_main_not_observed": {"bytes": 49422, "sha256": "4181ba88b1529eecc86168f6d93865f56cee528b8f502ca1818479983d2be224"}, "project_rows": 1, "projection_succeeded": false, "public_trace": [{"function": "<module>", "line": 43, "module": "<string>"}, {"function": "_projection", "line": 296, "module": "native_cache_actions_20261104.py"}, {"function": "_projection", "line": 178, "module": "comparison_20261103_project_custody.py"}, {"function": "_metadata", "line": 251, "module": "comparison_20261029_projects.py"}, {"function": "_collaborators", "line": 194, "module": "comparison_20261029_projects.py"}, {"function": "_integer", "line": 71, "module": "comparison_20261029_projects.py"}, {"function": "_fail", "line": 57, "module": "comparison_20261029_projects.py"}], "schema": "tpr-native-metadata-diagnosis-v1", "source_upload_occurred": false, "top_field_names": ["count", "projects", "success", "versions"]}; privateproof1136B/SHA5b561ded4c01303a5e2d299157b8350490dab2c8fa72424ca3b30de7dd66e894. HTTP200isnotaccesssuccess; generatedmain/config/inventoryinuploadsafe_summarywerePLANNED, notobservedupload. Only1metadataTLSrequest occurred; directnativeQCrequestcountnow8, no upload/compile/newjob; preservefailedscope, no unchangedretry.
+
+Fresh118Safari claim TPR-R118-PARENT-COLLAB-SCHEMA-001; HEAD54328acadb53613cfb91d70a6a0defc0cd708cbf; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"inputs": [{"bytes": 1136, "name": "own bodyfree metadata diagnosis", "sha256": "5b561ded4c01303a5e2d299157b8350490dab2c8fa72424ca3b30de7dd66e894"}, {"bytes_max": 131072, "name": "exactretainednative metadata"}, {"bytes": 3573, "name": "immutable registry", "sha256": "154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1"}], "native_requests_source_uploads_compiles_jobs": 0, "private_reads_max": 3, "purpose": "classify collaboratorUID representation/presence and owner-matchbooleans only; no raw identifiers/account/PII/exceptiontext"}; manifest6791B/SHAc836f0edf4e37da66ea85f98eba4b477fa387e012183946de59ba88518ab5e63 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118retainedmetadata collaborator schema classification {"collaborator_count": 2, "collaborators_type": "list", "native_requests": 0, "rows": [{"digit_string_matches_owner": false, "field_names": ["bio", "email", "liveControl", "name", "owner", "permission", "profileImage", "publicId", "uid"], "live_control_type": "bool", "owner_flag": true, "permission": "write", "typed_integer_matches_owner": true, "uid_is_none": false, "uid_is_strict_digits": false, "uid_present": true, "uid_type": "JsonNumber"}, {"digit_string_matches_owner": false, "field_names": ["bio", "email", "liveControl", "name", "owner", "permission", "profileImage", "publicId", "uid"], "live_control_type": "bool", "owner_flag": false, "permission": "write", "typed_integer_matches_owner": false, "uid_is_none": true, "uid_is_strict_digits": false, "uid_present": true, "uid_type": "NoneType"}], "schema": "tpr-native-collaborator-schema-v1", "write_authority_accepted": false}; privateproof827B/SHA7367d6cd56c31ac13d0c2655b1ba0443ed5625380d26763289e02e0ce9c430ff. No raw UID/PII/account values output; no new native request or mutation; unknown identity isnotwrite authority.
+
+Fresh118Safari claim TPR-R118-PARENT-WRITER-CLASS-001; HEAD54328acadb53613cfb91d70a6a0defc0cd708cbf; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"inputs": [{"bytes": 1136, "name": "own metadata diagnosis", "sha256": "5b561ded4c01303a5e2d299157b8350490dab2c8fa72424ca3b30de7dd66e894"}, {"bytes_max": 131072, "name": "exact retained metadata"}], "native_requests_permission_changes_source_writes": 0, "private_reads_max": 2, "purpose": "determine whether nullUIDwriter has exactknownMia/system/anonymous label; classificationonly NOTwriteauthority, no names/emails/IDs output"}; manifest6675B/SHA52453a4376d54a46fbee797faabe1e75b8dcbe1ee7cc6c7d2c4328386c287984 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118nullUIDwritecollaborator classification {"email_is_empty": false, "email_type": "str", "known_label_class": "Mia", "label_not_identity_authority": true, "live_control": true, "name_sha256": "41509508705bc1b71f2ed1f7d742b02582f2e15dbdefd9aa691dc79837249320", "native_requests": 0, "public_id_is_empty": false, "public_id_sha256": "790fd84f9177e87e0c5bc385f8bef44e107330b3d2ff329d9b59f26298704ee1", "public_id_type": "str", "schema": "tpr-null-writer-label-classification-v1", "source_changes": 0, "write_accepted": false}; privateproof456B/SHA27bf3c10ec8ceafff11efc5c2d60f0610068d08f66bda31305921275ee8e6168. Label isnotvalidatedidentity orsourcewriteauthority; no permissions/source changes or extraQCcall.
+
+Fresh118Safari claim TPR-R118-PUBLIC-MIA-IDENTITY-001; HEAD54328acadb53613cfb91d70a6a0defc0cd708cbf; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"native_QC_requests_source_or_permission_changes": 0, "private_query_values": 0, "public_primary_pages_max": 4, "public_queries_max": 2, "purpose": "verify documentedbuilt-inMia collaboratoridentity/schema; a displaylabelalonecannotwaiveownershipgate", "seconds_max": 300}; manifest5971B/SHAefd829b96d68bada00aa5bdfb0b6f67f41a3a97d1dd9b9db9f0bc46c0d5ef12c andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-SAFARI-MIA-CUSTODY-003; HEAD54328acadb53613cfb91d70a6a0defc0cd708cbf; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"Enter_max": 1, "Mia_submissions_max": 1, "UI_reads_max": 3, "app": "Safari", "direct_type_calls_max": 1, "private_source_log_ObjectStore_reads_edits_jobs_permissions_accounts": 0, "project_id": 38609822, "prompt_bytes": 421, "prompt_sha256": "cb3509fdf42233215f8775da54550feb55936c1d5271a8358496f641892af849", "public_docs_source_opens_max": 4, "purpose": "genuineMiaread-onlydocumentedsystemcollaboratoridentityclarification; no policybypass or genericagent", "seconds_max": 180}; manifest6166B/SHA0a03c330dbab58b774ccc930a9c38272091bf8b5575cd710a89abba9cfbc24e8 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-INPUT-MISFIRE-BEFORE-001; HEAD54328acadb53613cfb91d70a6a0defc0cd708cbf; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"endpoint": "files/read", "native_requests_max": 1, "private_registry_read_bytes": 3573, "private_registry_reads_max": 1, "project_id": 38609822, "purpose": "retain exactsourceversion beforeundo of ownunsubmittedschemaquestioninsertion inextended_algorithm_successor.py; noaccount/sourceAPIwrite/compile/job effects", "response_bytes_max": 2097152, "seconds_max": 20}; manifest6064B/SHA31838f7ca50c46f65e4c5bd65cdfcb68f2d946d75e6ca20ffa0ecf5a9817e593 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118ownschemaquestioninputmisfire BEFOREundo {"compile_jobs": 0, "matches_correct_baseline": true, "receipt": {"bytes": 3458, "name": "TPR-CMP29-API-R118-INPUT-MISFIRE-BEFORE-001.result.json", "sha256": "d59e65186950003b80764595a8093643d740f637b77331e9461fded2723f3335"}, "source_API_writes": 0, "source_archive": {"bytes": 345980, "name": "TPR-CMP29-API-R118-INPUT-MISFIRE-BEFORE-001.source.response.raw", "sha256": "d443465a128e667da558f5104f7ced743bae0ec39187287bad48500d2844a203"}, "source_inventory_sha256": "08c386c17a93d934d54f30715a407fef3b91c1ac841bd575b8a3d5ae081f6ae1", "status": "completed"}; proof1940B/SHA1d7c0db6b019af40dec59c4b3c93cb87be06f2d0c0ded895c4d73775152c0ada. ActualMia submissionsremain2; custodyquestionwasNOTsent, typedintoownOFFextended_algorithm_successor.pyeditor. Sourcecapturepreservesfailurebeforecorrection; no intentionalcompile/job. DirectQCreadonlyrequestcountnow9.
+
+Fresh118Safari claim TPR-R118-INPUT-MISFIRE-UNDO-001; HEAD54328acadb53613cfb91d70a6a0defc0cd708cbf; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"UI_reads_max": 2, "Undo_keypress_max": 1, "app": "Safari", "owned_editor": "extended_algorithm_successor.py", "project_id": 38609822, "purpose": "undo ONLY own421character unsubmittedschemaquestion; nativepreUndofullinventory08c386matchedcorrectbaseline so no cloudsaveproved", "typing_Send_compile_jobs_account_effects": 0}; manifest6020B/SHAd1a44b242262ae16cb4be454f1af15b0d1dd5a5acca5d202546dda8e66c1b72a andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+Fresh118Safari claim TPR-R118-INPUT-MISFIRE-REMOVE-001; HEAD54328acadb53613cfb91d70a6a0defc0cd708cbf; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"BackSpace_max": 1, "UI_reads_max": 2, "app": "Safari", "editor_file": "extended_algorithm_successor.py", "exact_own_literal_characters": 421, "project_id": 38609822, "purpose": "CommandZdidnotremoveownliteral; selectONLYexactknownown421text via documentededitable-textselection anddeleteit; neverRevertFile/discardotherdrafts", "selectText_max": 1, "typing_Save_Send_compile_jobs_account_changes": 0}; manifest6096B/SHAc96e7f41c18a9257de11a468e090dfc20fb94ea24834e6f3a5149066941ebf10 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118CommandZ001 leftfull421ownliteralpresent; no Save/Send, no sourceAPIwrite. Native BEFOREcaptureall17filesstillmatched08c386, so no cloudsavewasobserved. Usea different exact-text removalpath; no blindUndo repetition orwholefileRevert.
+
+Fresh118Safari claim TPR-R118-MIA-PUBLIC-PROFILE-001; HEAD54328acadb53613cfb91d70a6a0defc0cd708cbf; standingtaskSHA1d0fad9452169f520b28be16f0e0f6ddd2c356dab28a7d127806e85f1f132daa; latestownerconfirmationSHA82f2d90a868e9bddc26089bf8c5b11e8321e519561550aa4dc633993a741c2ac; bounds{"inputs": [{"bytes": 1136, "name": "own metadata diagnosis", "sha256": "5b561ded4c01303a5e2d299157b8350490dab2c8fa72424ca3b30de7dd66e894"}, {"bytes_max": 131072, "name": "own retained metadata"}], "native_API_source_permission_changes": 0, "private_reads_max": 2, "public_destination": "https://www.quantconnect.com/u/ exactreturnedpublicId only", "public_profile_opens_max": 1, "purpose": "verify publicserviceidentity withoutprintingprivateUID/email/account/projectassociation; displaypublicprofileidentityonly"}; manifest6753B/SHA68883357ffd06e987a8e9ec52ce47070cb6987b37fa0f5f1fe8efd2c31889e94 andrecord fsynced BEFORE effect. EA2Dcreation authority separate;20REMXrows stay quarantined; no altered economics/otherlane/broker/account authority.
+
+118publicMia-profilelookup usesonly returnedpublicId digest790fd... atsameQCprovider, no privateproject/owner/account/credential/queryvalues. This publiclookupdoesNOTgrantwriteauthority.
+
+
+### 118.8 Nullable Mia metadata compatibility; editor restoration pending
+
+The first fixed parent upload preflight at54328aca stopped after one
+HTTP200 projects/read request, before files/update. Its legacy collaborator
+parser requires an integer UID; the actual authenticated response contains
+the registered owner and one Mia row with explicitly null UID. This was a
+local framing refusal, not failed authentication or a native backtest error.
+Receipt1840B/SHA11ef82f99f34abce6752506723852c0612a57200643ac12739942b663ad4264a
+and safe summary2236B/SHAc04e0a58cbbb44a18e8dc13d4d3d4893d3cf73a501a99085361fc00e665dda9f
+remain retained. The generated main49422B/4181ba88..., config478dad82...
+and inventoryce22d422... in that summary are PLANNED, not observed uploads.
+Actual saved inventory stayed08c386c17a93d934d54f30715a407fef3b91c1ac841bd575b8a3d5ae081f6ae1.
+
+Official [Project collaborator source](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Api/Project.cs)
+declares nullable UID; the [collaboration API example](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/collaboration/create-project-collaborator)
+recognizes the Mia principal. These sources do not independently map the
+observed A-instance to a public agent identity. The narrow new fixed-OFF
+predicate instead rests on the existing explicit owner UseMia authority,
+two genuine built-in Mia turns in this same project, and the authenticated
+instance hash790fd84f9177e87e0c5bc385f8bef44e107330b3d2ff329d9b59f26298704ee1.
+No raw A-ID, email or credential enters committed source/tests/record.
+A display name or nullable UID alone is insufficient.
+
+Implementation committed LOCAL ONLY atc7471730e38358528bbaad255b3dfaf35d885fda:
+actions39340B/SHA84699a29ff6c1b90665d3baeea8ebe69e6c0d28fec82def820a0cd7f0977f374;
+tests39717B/SHAba1b7ed7288355ad05ebbad00b32dbb589ecd267e8bd41d5794218009fefc63e.
+Both metadata and dedicated collaboration paths classify the full unfiltered
+actor list before write, require the exact present/typed Mia fields and
+instance hash, and reject duplicate/unknown/human actors or changed context.
+Core project/owner/org/private validation stays intact; old helpers and
+source pins are unchanged. Reported owner_only isFALSE, nonowner1,
+recognizedMia1, unknown0 and independent_agent_identity_attestedFALSE for
+that shape. No permission or live authority is granted. Empty/Mia-only
+lists retain the prior separately authenticated ownership contract.
+Action/result/proof framing advances to v3; mixed v2 proofs are refused.
+
+Author reproduced the known-shape regression RED1failed/100deselected0.19s,
+then GREEN1passed0.09s. Its first expanded run5failed/161passed7.27s exposed
+four optional context contradictions and one test-only invented isShared
+alias; both endpoints now check documented existing context keys and the
+mutant uses the existing shared spelling. Final author172passed7.47s;
+root independently172passed8.04s with identical before/after hashes,
+isolated49/52runtime and syntheticDB before imports, socket+DNS denial.
+Independent Codex static review accepted the exact final bytes with no
+further concrete finding. AST/LF, narrow secret-shape and diff checks pass;
+no full suite, Windows custody or native SDK success is claimed.
+
+The attempted third schema question TPR118-CUSTODY-003 was NOT submitted to
+Mia. Codex wrongly typed its421characters into extended_algorithm_successor.py
+after losing composer focus. Fresh BEFORE-repair native files/read retained
+all saved source unchanged at08c386...; proof1940B/
+SHA1d7c0db6b019af40dec59c4b3c93cb87be06f2d0c0ded895c4d73775152c0ada,
+source archive345980B/SHAd443465a128e667da558f5104f7ced743bae0ec39187287bad48500d2844a203.
+No cloud save was observed. One CommandZ did not remove the visible literal;
+selectText refused an unsupported range, so BackSpace was never executed.
+The owner was asked to remove ONLY that leading question without saving.
+That input remains pending. No further Safari action or write may race it.
+After confirmation, fresh bounded AX absence and ALL-file saved-source
+equality checks are required before a new source upload. No blind Undo,
+RevertFile, Save or unrelated draft deletion is authorized.
+
+Current direct QC API request count is9; built-in Mia internal reads are
+separate. Actual genuine Mia submissions2, source API uploads0,
+native compiles0, new diagnostic jobs0, new financial jobs0 and successful
+pushes0. Preserve the spent upload001/read/UI scopes; any continuation uses
+new IDs and committed actual HEAD, never an unchanged failed path.
+The heartbeat remainsPAUSED. All five accepted financial outcomes remain
+NULL/0of5; frozen RAW/SID/economics/4096limit and20REMX plus323pre-inception
+quarantines remain intact. Final push is reserved, not spent at this
+interactive input wait.
+
+118.8 root current-document verification:303passed/558deselected5.37s on unchanged guard363888B/SHA5b79ff5e813c472ae68908f7300319a96c00cedfe372aa7ee49fa1135e5cefb1, same isolated Python3.13.15/syntheticDB/socket+DNS denial. Current preamble/status/section8 now distinguish completed Mia diagnosis, local v3 metadata correction and pending owner editor repair. All prior claims/results/failed scopes remain. No native effect or final push follows this record-only interactive checkpoint.

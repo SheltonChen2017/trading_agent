@@ -1,15 +1,15 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **373 COMPLETES THE RETAINED-METADATA PIT GAP AUDIT ON CLEAN
-ab7eb151: ALL74,150 TICKER/698,455 ACTION ROWS ACCOUNTED,12 CONTROLS/
-11 ISSUERS. EIGHT CONTROLS HAVE ONE CURRENT CANDIDATE, THREE MULTIPLE,
-ONE NONE;309 ACTION ROWS ARE DISCOVERY ONLY. ALL HISTORICAL/PIT/RIGHTS/
-READINESS GATES STAY FALSE. TWO EARLIER READ-ONLY FAILURES ARE PRESERVED.
-ONE SHARADAR REPLY SENT; ITS NEW ANSWER AGAIN REQUIRES THE REGISTERED
-SUBSCRIBER EMAIL, STILL UNCONFIRMED. NO ARCHIVE SAMPLE/CAPABILITY ANSWER.
-EXISTING15 OPEN P2s/SEVEN369 P3 GROUPS RETAINED. NO PURCHASE/UPGRADE,
-QC/SAFARI, NEW PROVIDER REQUEST, FROZEN SOURCE CHANGE, CLAIM RESET OR
-MONITOR REARM. NOT BACKTEST-READY; EXACT HANDOFF IS374.**
+Status: **SECTION 375 (CLAUDE, WINDOWS SESSION, CODE-ONLY) REVIEWS `f99c66eb..19060da1`. THE
+RETAINED PIT AUDIT CODE IS ACCEPTED AFTER CORRECTIONS IN `c77e9fb9`: THE RUNNER'S SANDBOX POLICY NO
+LONGER GRANTS AN INTERPRETER PREFIX COVERING THE LANE OR CUSTODY ROOTS, ACTION CATEGORIES COUNT
+DIRECTIONAL CODES, THE CONVENTION TEST ACCEPTS AUTOCRLF CHECKOUTS, AND 32 UNPINNED MODULE GUARDS
+ARE PINNED. THE RUNNER'S FILESYSTEM AND WORKER PATHS WERE READ, NOT EXECUTED, ON THIS HOST; CODEX
+COUNTER-REVIEW AND A NATIVE MACOS RUN OF THE TWO NEW REVIEW FILES ARE NEXT. A RERUN OF THE AUDIT
+WILL PRODUCE A NEW RESULT HASH. EXISTING 15 OPEN P2s RETAINED; NO OPEN P0/P1. THE REGISTERED
+SHARADAR SUBSCRIBER EMAIL IS STILL UNCONFIRMED AND NO ARCHIVE SAMPLE EXISTS. NO PURCHASE, QC,
+PROVIDER REQUEST OR FROZEN SOURCE CHANGE IN THIS ROUND; LOOKS 0/0/0. NOT BACKTEST-READY. NO
+FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -335,6 +335,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-04 | Claude correction of section 369 (macOS session) | `ee818ad6` -> this record | No Codex commit since `ee818ad6`, so no new review range. Rechecks section 369's own statements after that round ended under a usage limit. | Two statements corrected: 94 custody-platform tests never passed under the strict harness, and three P3 groups had been recorded from agent reports without the verification 369.1 claimed. All of those findings now hold. | 14 of 14 finding mutants survive as recorded and 3 of 3 controls are caught; 5 probes confirm the rest; network and Keychain exec denied. No complete suite. No backtest. | No new finding; P2 count unchanged at fifteen | Codex counter-reviews 369 and 370 |
 | 2026-11-04 | Codex counter-review only | `2d0972d690ba7fe22e537628a561ba7977e056ff..f99c66eb1f7f428190e7cf1b868f4f015bdc03f2`; correction `cf82f573e4d3a76fcaa44ecf7fa0b6d4c6ae4c90`, separate372 handoff | Review249dcb9d, ee818ad6 and f99c66eb individually; no next milestone | Accepted after CRLF fixture correction and append-only qualifications371. All12 accession+CIK/6 form/4 naive timestamp guarantees independently confirmed from hash-authenticated receipt; original failed claims and source images unchanged. | Observed536 focused PASS/1 skip/21 warnings under strict denial;102 platform/EXACT PASS with inherited network/security denial and fork allowed. Genuine fixture RED1/GREEN, two helper mutants caught; final record/import checks below. No full suite or historical replay. |15 carried P2s OPEN; new IBWIN-CCR37101 P3 RESOLVED in cf82f573; all seven369 P3 groups retained with precise dispositions | Genuine historical archive/PIT/population evidence remains missing. Vendor-reply, purchase and QC holds stay active; monitors disarmed. Exactly one final matching-lane push after372. |
 | 2026-11-04 | Codex Sharadar archive follow-up and retained PIT evidence audit | Clean9b12e0eb ->9aa1a4fe ->c2d34967 ->ab7eb151; separate374 handoff, incoming EMPTY | Existing-thread Sharadar reply and source-bound read-only audit; existing inputs only, no QC/purchases | One reply sent/read back; supplier again asks subscriber email, no sample. First two read-only observations FAILED/preserved; corrected15.439s audit PASS accounts74,150/698,455 metadata rows,12 controls/11 issuers, current candidates8 single/3 multiple/1 none and309 action discovery rows. No PIT/source/public-known-by/rights/population promotion. | Final181 focused PASS1.41s; preactivation229 boundary/platform PASS25.53s; native exact-leaf/alias canary, RED/GREEN and physical/CJA reversals, compiled/frozen hash checks. Final document checks below; no full suite. |15 carried P2s and seven369 P3 groups OPEN at exact scopes; IBPIT-READ-37301 correctedab7eb151, diagnostic observability37302 correctedc2d34967. Historical facts remain missing. | Owner's registered Sharadar email is required to unblock supplier verification; qualify a genuine historical sample if supplied. No inferred purchase, QC, extra provider query, alias capture retry or monitor rearm. One final matching-lane push after374. |
+| 2026-11-05 | Claude review (Windows session) and corrections | `19060da1` -> `c77e9fb9` -> this review record | Code-only review of `f99c66eb..19060da1` (six commits, zero merges): the retained PIT audit module and runner, finite failure diagnostics, the basename fix, and the CRLF fixture correction | Fixed a fail-open interpreter-prefix read grant in the runner's sandbox policy, the action-category mapping, the convention test's raw-byte comparison on autocrlf checkouts, and 32 unpinned module guards. Full detail in section 375, including the required 1-10 rating. | Under process-level network denial: focused selection 231 passed, 45 skipped, 1 harness artifact that passes without the harness; module mutants 43 of 47 and runner mutants 19 of 20 caught, survivors redundant; no full lane or repository suite, per owner direction. The runner ran under import stand-ins here, and its filesystem and worker paths were read, not executed. No SEC, provider, QC, credential, custody, or trading access; **0 research looks**. | All code commits accepted, `9aa1a4fe` after correction; the 15 open P2s are unchanged and no P0/P1 is open. | Codex counter-reviews and runs the two new review files natively; substantive blockers unchanged from 374. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -45117,3 +45118,72 @@ historical root replay or outcome run. This final validation note changes
 no contract/source. Final diff/narrow secret/mail-ID scan and designated
 root/branch/HEAD/expected status/matching-origin checks precede this separate
 record commit and the sole matching-lane push; exact remote readback follows.
+
+## 375. Claude review - the retained PIT audit code, with corrections (2026-11-05 UTC)
+
+Reviewer: Claude, the Windows lane session, in the lane worktree on
+`codex/strategy-insider-buying`; no branch or worktree was created. The worktree
+was fast-forwarded from `d786e82e` to the published head `19060da1`. Every commit
+from there through `2d0972d6` is named in the macOS Claude session's sections
+369-370 (checked: 19 of 19), and sections 371-372 counter-review them, so the
+unreviewed range is `f99c66eb..19060da1`: six commits, zero merges.
+
+Owner direction for this round: review code only, fix bugs rather than only
+documenting them, and do not run the full lane suite. Record prose was therefore
+not reviewed, and no full lane or repository suite was run or is represented.
+
+### 375.1 Commit dispositions
+
+| Commit | Change | Disposition |
+|---|---|---|
+| `cf82f573` | CRLF review fixtures | **Accepted.** The fixture now normalizes its source before converting, and all of that file's cases pass on this autocrlf checkout. |
+| `9b12e0eb` | Record only | Not reviewed, per the code-only direction. |
+| `9aa1a4fe` | Retained PIT audit module, runner, tests | **Accepted after correction in `c77e9fb9`.** Input validation is sound: 32 malformed provider, row, pin, argument and control shapes each refused with a typed code. Findings below. |
+| `c2d34967` | Finite failure diagnostics | **Accepted.** A failure after the success line produces two JSON documents, which `_ipc_result` refuses, so it cannot reach the parent as success; this is now pinned. |
+| `ab7eb151` | Underscore basenames in the held reader | **Accepted.** Slash and traversal stay refused by the grammar. |
+| `19060da1` | Record only | Not reviewed, per the code-only direction. |
+
+### 375.2 Findings
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBPIT-POLICY-CR37501 | P2 | **FIXED in `c77e9fb9`** | `9aa1a4fe` | `insider_buying_pilot_pit_retained_audit_runner_v1.py`, `policy()` | The worker's read allowlist grants `sys.base_prefix` and `Path(sys.executable).parent.parent` as subtrees. An interpreter directly under the home directory or lane root would silently widen the exact seven-leaf DATA allowlist to every retained input and the custody root. No sibling front grants an interpreter prefix. | Simulated prefixes covering the lane root, its parent and the custody parent all built a policy before the fix. | The isolation boundary failed open without any signal. | `policy()` refuses a grant covering the lane root, the custody root or a fixed input root. | Six new cases; removing the guard is caught. The record does not name the interpreter path of the `ab7eb151` run, so this review cannot say whether that run was affected; the next run refuses if it would be. |
+| IBPIT-CAT-CR37502 | P3 | **FIXED in `c77e9fb9`** | `9aa1a4fe` | `insider_buying_pilot_pit_retained_audit_v1.py`, `_category` | Merger, acquisition, spinoff and delisting families matched only bare words, so `mergerto`, `acquisitionby`, `spunofffrom`, `regulatorydelisting` and similar codes were counted as `other`, while the same function handled `tickerchangefrom`/`tickerchangeto`. The published `action_categories` would understate those families. | Direct probe of the function. No test covered categories. | A published count must not report a false zero. | One exact code table; anything unrecognized stays `other`, so it cannot invent a family. | 23 parametrized cases plus conservation of row counts; restoring the old function is caught. The vocabulary comes from this reviewer's knowledge of Sharadar's published codes. It was not checked against retained rows, which are only on the macOS host. No number in section 373 changes, because 373 does not report categories; `cb4354e6` stays attributed to `ab7eb151`, and a rerun will produce a new result hash. |
+| IBTEST-CR37503 | P3 | **FIXED in `c77e9fb9`** | `b4846efe` | `tests/test_insider_buying_custody_platform.py` | The convention test hashed raw working-copy bytes against the LF pins, so it failed on every autocrlf checkout, while the helper already has `_pinned_image`. Its symlink case also needed a privilege this host lacks. | Failed on this checkout; passes after. | A red guard on a supported checkout hides real violations. | Uses `_pinned_image`; the symlink case skips when the host refuses. | Custody file green here; LF hosts are unchanged, because exact bytes still match. |
+| IBPIT-TEST-CR37504 | P3 | **FIXED in `c77e9fb9`** | `9aa1a4fe` | Two new `*_review.py` test files | 32 of 46 module guards could be removed with every test still passing, including the authority, false-flag, evidence-counting, quarantine and row-limit guards. The module was correct; its tests could not have detected a regression. | Bytecode-safe mutation sweep. | These guards are the module's reason to exist. | New pins, in separate files so the module's own test images are unchanged. | Module 43 of 47 caught; runner 19 of 20 caught. Survivors are redundant: `A3` and `O3` (a mutated or cloned result already fails the byte and registry checks), `W3` (the byte cap is at least as strict as the character cap), `O1` (largest buildable result measured at 45,936 of 131,072 bytes), `D2` (canonical re-encoding refuses duplicate keys). |
+| IBWIN-OBS37505 | P3 | **OPEN; observation, support scope** | Earlier | 14 lane test files reaching POSIX-only `os` attributes | On this host the 29 candidate files show 376 failures and 26 errors alongside 1,088 passes, with the failures in 14 files. They are outside the reviewed range and inside the declared macOS/POSIX support scope. A module-level guard would also hide the passing tests. | One bounded run of the 29 candidate files. | Not a defect in the reviewed code. | None. | Reported to the owner. |
+
+The 15 open P2 findings of 371.4 and 374 are unchanged, and `IBPIT-POLICY-CR37501` opened and closed within this round. No P0 or P1 is open.
+
+### 375.3 Implementation-quality rating
+
+`9aa1a4fe` with `c2d34967` and `ab7eb151` rates **7 of 10**. The input validation
+is strict and the failure reporting is carefully finite. The deductions are the
+one fail-open read grant, the category mapping that no test exercised, and a test
+suite that left most guards unpinned.
+
+### 375.4 Validation and limits
+
+All runs were under this session's proven process-level network denial, Python
+3.13.14, on the commit named. No SEC, EDGAR, provider, mail, QuantConnect,
+credential, journal, custody, retained-row, broker or trading surface was touched,
+and looks stay **0/0/0**.
+
+| Check on `c77e9fb9` | Result |
+|---|---|
+| Focused selection: audit and runner tests with their review files, CRLF review, custody platform, lane import boundary, exact package guard, module hygiene, Decimal guard | 231 passed, 45 skipped, 1 failed |
+| The one failure, `test_importing_the_whole_package_loads_no_network_capable_lane_module` | harness artifact: it fails only because the denial harness preloads `socket`, and passes without the harness |
+| Record and active-document gates on the final tree | **72 passed** |
+| `compileall` of the changed files; `git diff --check` | exit 0; clean |
+
+The runner cannot import on this host. Its mutation sweep and its review file ran
+under import stand-ins for `fcntl`, `resource`, `termios`, `pwd` and similar, with
+14 path-format and filesystem tests failing as a host-only baseline. Those results
+cover its pure functions only. `Held`, the sandbox launch and the real worker path
+were reviewed by reading and were **not executed here**, so Codex should run both
+new review files natively on macOS.
+
+### 375.5 Next step
+
+Codex counter-reviews `c77e9fb9` and this section. The substantive blockers stay as
+374 states them. Nothing is started by inference.

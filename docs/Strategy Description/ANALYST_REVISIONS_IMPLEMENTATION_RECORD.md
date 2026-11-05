@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–342 retain the milestone, review, preregistration, QC
+strategy. Sections 1–343 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -898,6 +898,8 @@ Section 341 counter-reviews both Claude commits, tightens a broad-exception
 test, and qualifies the findings without editing frozen operational sources.
 Section 342 is Claude's review of section 341: accepted with notes, no defect
 found, and a new test audits all 20 generated quarantine files.
+Section343 records the owner's old-six October extension, counter-review of
+both342commits, and a separately versioned offline submission preparation.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1304,24 +1306,20 @@ claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
 
-Section 342 is Claude's independent review of Codex's section-341 counter-review
-(`96b5ecd8..cd00b12b`). The one commit is accepted with notes, and no new defect
-is found. Claude accepts Codex's corrections to its section-340 findings and
-withdraws its owner-confirmation request `ARV2R340-011`, because 296.1 quotes the
-owner's Keychain direction. New `db0313ef` audits all 20 generated quarantine
-files of all six cells against every clause of the lane's cloud audit.
-`ARV2R340-001` and `-002` remain pre-launch blockers pending a separately
-versioned correction and freeze; no frozen source or spent control is edited or
-replayed. The reference figures describe an eligibility subset, not an upper
-bound on runtime reference demand. The native provider policy did not restrict
-outbound ports. The proposed extension of the old six-universe family remains a
-recommendation, not a successor or a run permit, and its months through
-2026-09-25 are not unseen data (`ARV2R342-002`). QC and Safari remain prohibited,
-all prior uses stay spent, and 338/259/54/699 is unchanged. No next milestone
-starts in this round. The immediate next step is that Codex counter-reviews
-section 342 and its new test file.
-
-The owner explicitly waives Claude review of section 339. Historical holdings discovery found Massive ETF Global daily history as the best documented calendar-fit candidate and SEC/FMP dated filings as partial crosschecks. Sole existing-account capability parent/validator at c6bfacad both actual0 authenticated the observation, but Massive first sample returned403 and FMP disclosure dates402;22later queries remain unobserved. No historical DATA was acquired and no expiry/tier cause is proved. Both uses are now SPENT. Daily-source access/completeness, historical caps/callback/identity semantics and actual strategy holdings remain concrete barriers. Keep QC/Safari prohibited and R338 inputs/sixsource variants/5369reference and836277holding-potential gaps unchanged. Section339.6–7 owns evidence, source decision and final single-push handoff; no purchase, capture, source substitution or readiness/attempt/run authority follows.
+The owner explicitly waives Claude review of section 343 and activates only
+the QCOM-restored SIX-universe old-rule extension through2026-10-13, ending
+at offline readiness for submission. Both incoming342commits are accepted
+after test correction/qualification. R343 preserves seven old AR80–200 arms,
+after-close/next-open MOO economics and the genuine October input. Its local
+one-use preparation/validation status and exact freeze are in343.5–343.6;
+no QC submission is authorized while the hold remains. QC/Safari/provider/
+credential/USB access stay off limits this round. No old operation/control
+is replayed and338/259/54/699 remains unchanged. The broad new-rule six/eight
+rebuild is paused, not deleted or completed. Its quarantine/source/coverage
+blockers remain scoped to that route. A Massive ETF Global purchase is not
+a prerequisite for using QC's previously exercised historical data path.
+Actual source/price/identity/rights/privacy/idle/capacity/project/attempt/run
+checks still precede any later contact; all formal/PIT/live flags stay false.
 
 
 Sections 137–142 retain the owner-assisted cloud diagnoses, project cleanup,
@@ -4442,6 +4440,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-04 | Claude independent review of the eleven Codex commits `18e6d567..20b485ae` (sections 337–339), after the fact | `20b485ae` -> `c2bca9ba` (tests) -> this record commit | All eleven accepted; section 340 | New tests run the real quarantine driver paths and real result emission; two source defects held as strict expected failures and pre-launch blockers; reference-figure, outbound-profile and 403 qualifiers documented | 22 range test files 1,928 passed; 121 gates and regressions; new file 24 passed, 2 expected failures; 5/5 mutations caught; 86 record gates; no full suite, no QC/Safari/provider access; 0 looks, 338/259/54/699 unchanged | 0 P0, 0 P1, 5 P2 (one corrected for coverage, two blockers, two documented), 6 P3 | Codex counter-reviews section 340; a new freeze corrects `ARV2R340-001` and `-002` before any QC upload |
 | 2026-11-05 | Codex counter-review of Claude340, limited to review correction and handoff | `96b5ecd8` -> this section341 commit | Exact incoming `20b485ae..96b5ecd8`: `c2bca9ba` and `96b5ecd8` accepted after test/documentary correction | Missing-quote assertions reject unrelated crashes; all eleven findings disposed; spent sources preserved, no successor or operation | Focused native-denied results and expected-red memory proofs in341.4; no full suite or private evidence read | CR341-001 P2 test gap corrected; two frozen quarantine blockers retained; permission-renewal demand rejected under existing authority | ONE matching final push; no QC/Safari/provider/credential/USB action, launch or look;338/259/54/699 unchanged |
 | 2026-11-04 PST /05 UTC | Claude independent review of Codex's section-341 counter-review | `cd00b12b` -> `db0313ef` (tests) -> this record commit | `cd00b12b` accepted with notes; section 342 | New test audits all 20 generated quarantine files of all six cells against every lane audit clause; Claude withdraws `ARV2R340-011` and narrows `-001` and `-010` | 204 focused tests passed with 2 expected failures; 86 record gates; 6/6 mutations caught; no full suite, no QC/Safari/provider access; 0 looks, 338/259/54/699 unchanged | 0 P0, 0 P1, 0 P2, 3 P3 (one corrected for coverage, two documented) | Codex counter-reviews section 342; `ARV2R340-001` and `-002` still need a new freeze before any QC upload |
+| 2026-11-05 | Owner-waived old-six QCOM-restored October extension and342counter-review; section343 | `4daba8b7` -> section343freeze -> final result/handoff | Both342commits accepted after exact-count test correction/qualification; current new implementation review waived | Seven old-rule source closures, genuine October input binding and same-job period reporting; one separately frozen local preparation only | Focused results and pre-use corrections343.3–343.5; no full suite or QC contact | Quarantine remains frozen/blocked; no source/PIT/formal promotion; current-cloud gates remain | Exactly ONE final matching push after actual local result is recorded; no intermediate push,338/259/54/699 unchanged |
 
 
 
@@ -77029,3 +77028,281 @@ stays with the owner, with `ARV2R342-002` as an input to it.
 
 The immediate next step is that Codex counter-reviews section 342 and its new
 test file.
+
+## 343. QCOM-restored old-six extension through October13,2026, 2026-11-05
+
+### 343.1 Owner scope, base and incoming counter-review
+
+Owner: "Proceed with the QCOM-restored six-universe extension through October
+13, 2026. Keep QC and Safari off limits, skip Claude review, document progress,
+and push once when ready for submission." This activates offline source/input
+preparation for the old strategy. It does not activate the new-rule six/eight
+comparison, refresh data pastOctober13, buy rights, contact QC/providers, or
+permit funded/broker/real-order/paper/live activity.
+
+Entry root /Users/sheltonchen/Code/trading_agent__analyst_revisions_v2,
+branch codex/strategy-analyst-revisions-v2, clean. Local/tracking/live matching
+HEAD4daba8b7eb05941b62ada8774bb923faaf2d22fc. Matching-only fetch confirmed
+the following TWO new Claude commits after cd00b12b73a44779974b7c7c73019b28b78ce999.
+CLAUDE.md was read completely; current lane navigation, action plan, README,
+review/handoff instructions and old source/tests govern this bounded round.
+
+|Incoming Claude commit|Disposition|Evidence/correction|
+|---|---|---|
+|db0313ef5ac7c4e0d3b5e4a5eaa0365f61a7271f|Accepted after test correction|Complete128-line test addition read. The exact20-file/six-cell scan adds useful direct-form coverage, but sets lost duplicate capabilities inside an already-approved file. CR343-001 adds exact per-file counts and three reached duplicate regressions.|
+|4daba8b7eb05941b62ada8774bb923faaf2d22fc|Accepted with qualifications|Every342finding disposed below; retain the seen2026 qualification and corrected owner-authority provenance. Do not infer universal dynamic unreachability from a lexical AST scan.|
+
+ARV2R342-001 is PARTIALLY CORRECT: the inherited save_bytes hit and filename
+layout mismatch are confirmed, but the incoming set-based test did not enforce
+all capability cardinalities. CR343-001(P2/CORRECTED) uses exact per-file
+attribute counts; duplicating a capability in EACH already-allowed file now
+refuses. "Cannot run/in any form" becomes "no direct static reference found";
+computed names/reflection/aliases are outside that proof. Known quarantine
+violations stay pinned, not cleared. ARV2R342-002 is CONFIRMED: R223/R224 had
+already inspected2025-08-01..2026-09-25 (61decisions, +53.7655799466% /
++53.6512129385%, -0.114367008100pp) under DIFFERENT25%/five-name rules.
+Later dates are only later relative to those runs, not an automatic untouched
+confirmation sample. ARV2R342-003 is CONFIRMED documentary qualification:
+the message-bounded terminal raises remains,296.1 supplies existing Keychain
+authority, and341's date is UTC. No historical result/date is rewritten.
+
+### 343.2 Fixed strategy, source recipe and period interpretation
+
+Seven candidates are frozen BEFORE any outcome: R343-AR080/100/120/140/160/
+180/200, respectively descended from R260–266. No setting is chosen by the
+new results. Six sleeves SPY/QQQ/SOXX/XLV/REMX/XLE retain equal98% gross
+budgets,9.8% aggregate per-stock identity cap,10% mapping/cap coverage floors,
+three verified names and one positive analyst score for non-XLE admission,
+XLE's cap rule, top-ten selection, own-sleeve ETF residual, original donor
+floors/receiver caps, whole shares,10bps per-side fees and zero base modeled
+slippage. The2x buying-power admission bridge is not2x positions or AR leverage.
+
+After-close decision targets use that session's RAW close and execute next
+session's MOO. QC RAW daily reference history retains only the old exact
+same-session closing-minute repair; no stale mark, scalar price, quote/NAV
+splice, local grid injection, stock dropping or five-case quarantine is added.
+Valuation ends2026-10-13, last weekly decision2026-10-12, final next-midnight
+callback2026-10-14. Warmup remains2020-11-01; evaluation2021-01-04..2026-10-13
+has1451close observations,1450returns and302weekly decisions. Reference dates
+can include the preceding2020-12-31; they are not an extra NAV observation.
+
+New scripts/arv2_r343_legacy_six_projection.py reconstructs each exact
+historical17-file source closure using ONLY pinned public templates and frozen
+pure source rewrites. Every historical profile/file-manifest/total byte count
+must equal the committed R260–266 manifest BEFORE extension. No old private
+wrapper is invented, no old high-level builder/operator runs and no frozen
+module global is patched in production. The public historical activation
+descriptor is from170.7:4015bytes,69b663c35b245e965b2d4e1f8402b3b14432d6d713f387eacb888f6756e78a41,
+arv2/preliminary-rating/73643a2cc47b5ed07cd79498/transport-manifest.json.
+This source recipe is provenance, not authority to read the old package.
+
+The real consumer requires the genuine sealed October wrapper, full3466-axis
+and original6151-binding stream. It rebinds package411c2734da61c7d4172c4cb3d33c4ffdde650f40336a5e807d26e50cc7de0bad,
+lineagee4518e06a68a18a3151fe36e5926699624fc68b97c31a8e06917d44103831fd9,
+activation70f64450a44bedfa8ea371ac74a00e2134045fb79b433b93f0114be652bc6147/4631B.
+Old modules, captures, run controls and R338/R339 artifacts remain frozen.
+Each new18-file closure is flat-loaded/profile-checked, compiled with the QC
+prelude and audited across EVERY file, retaining64k per-file and448KiB total
+minus32KiB review-margin bounds. Historical economic modules retain their AST.
+
+New research/analyst_revisions_v2_qc/legacy_six_october_reporting.py emits one
+additional bounded statistic from the ACTUAL returned legacy aggregate and
+ACTUAL same-job NAV dictionary after unchanged validity gates. Total2021–26
+and historical2021–25 retain the old first-close denominator.2026YTD and
+2026seen throughSeptember25 use the same job's December31,2025 NAV boundary;
+laterSeptember28..October13 uses its September25 NAV. All five are overlapping
+descriptions, not independent experiments or a splice of old saved returns.
+Full path/total metrics are checked against the old aggregate; an external
+reader without daily rows cannot independently recompute subperiod volatility,
+drawdown or their path hashes. Every custom statistic stays within8192bytes.
+
+### 343.3 Verified pre-use corrections and validation limits
+
+No actual input/control was opened during authoring. Same-round advisory source
+audits are not independent final review; the owner explicitly waived this
+implementation's Claude checkpoint.
+
+- CR343-001 exact-count gap in342tests corrected as above;9focused passes6.80s.
+- Initial source-only proof fixtures confused raw JSON file SHA and canonical
+  semantic SHA; corrected before use while preserving both commitments.
+  Test-only invented profile keys/API calls were corrected, not source gates.
+- The genuine public calendar caught REAL1452→1451 evaluation geometry;302
+  decisions remain correct. Another reached test caught inherited diagnostics'
+ 5annual/30universe/7530panel constants; ONLY new generated sources use6/36/8706.
+  Reached Decimal96 six-year diagnostic validates within the unchanged8192 cap.
+  The first geometry run had16passes/1failure/23fixture errors; an intermediate
+  diagnostic selection8failures/41passes reflected wrong test API/expected
+  profile fields. Final50projection tests pass21.41s. Those earlier counts
+  overlap; none is an operational result or an erased failure.
+- A prospective source-guard ordering defect was corrected BEFORE use: source
+  ExitStack MUST return normally before submission/report publication, while
+  the exclusive Store keeps descriptors. Reached input/source-exit refusals
+  prove only claim/start marker remain, never a success package/report.
+- Isolated-I entry plus rejection of already-cached selected modules prevents
+  bypassing held-byte imports. Public source ancestors are shared, with a
+  descriptor-demand/RLIMIT check; no OS limit is changed. Parent900s and a
+  clamped600s projection phase preserve exact finite dependency deadline codes.
+- The supplied stdout validator now invokes the closed seven-arm/date/input/
+  source-summary validator, requires actual exit0 and strict canonical framing.
+  This validates the ORIGINAL observed envelope, not arbitrary edited output
+  or independent private-file attestation. Every later consumer must freshly
+  hold-read exact private DATA and compare the recorded external pin.
+- A fresh PRIVATE-ONLY32-byte random transport nonce is created after claim
+  and start marker, bound with the claim pin into the private package before
+  its public hash. No nonce, rows, credentials or raw exception is printed.
+- Full sanitized environment requires EVERY configured temp/cache/SQLite/Git
+  key and only the exact optional current-UID0x... macOS CF value. No inherited
+  credentials/proxies are copied. Disk/host/branch/HEAD/source checks precede
+  claim. The old incorrect CF representation was caught statically before use.
+- Native policy applied directly to /usr/bin/true exits0. An early test run
+  had56passes/1nested-sandbox rejection (sandbox_apply denied inside an already
+  applied sandbox), not a policy success. The standalone native rehearsal
+  applies the same policy once; isolation is never removed from pytest.
+- Public-only155-file bootstrap initially refused an accessible source xattr.
+  This was a scope bug: private-evidence allowlist policy had been applied to
+  public tracked code. The uninvoked contract now requires owned0600/0644 code,
+  external byte pins, all10held/named metadata fields, EMPTY native ACL and a
+  bounded FD-bound census/fingerprint of ALL observed accessible xattr names
+  and values (8KiB names/32names/64KiB aggregate values). No attribute is changed,
+  hidden, omitted or treated as historical continuity. The source-only actual
+  bootstrap now passes155files and normal-returns under ALL-artifact denial.
+  Private package, lineage AND controls retain the UNCHANGED strict empty-ACL /
+  provenance-only-xattr policy. The first public implementation used unavailable
+  os.listxattr on this Python; corrected to the already-verified Darwin ABI.
+
+The complete lane/repository suite is not run. All pytest/mutations/audit
+parsers use native ALL-network, ALL-artifact, USB, BOTH-Keychain and security-CLI
+denial. Plugins/shared conftest/cacheprovider are disabled; -B,--noconftest,
+--ignore=artifacts and in-root .pytest_cache/r343-root support paths are used.
+No denied-contact accounting or continuous security proof is inferred.
+Exact root final selection and import-boundary checks follow before the freeze.
+
+CR343-002(P2/CORRECTED): the mandatory exhaustive QC-package boundary test
+initially failed because23modules were unregistered,22already tracked at the
+entry HEAD and only the new report added this round. Exact audited additions
+classify6zero-direct-I/O,3host and14action-bearing runtime modules. The final
+214-package-module/215-node closure retains all old boundaries and explicit
+projected-sibling/repository edges; three pure-contract→runtime edges are
+recorded. The audit also found two scanner omissions, add_security and
+market_order, now detected in direct/alias forms with exact affected surfaces
+and reached regressions. This is a lane-only TEST repair, not permission to
+execute those capabilities. Known quarantine subprocess/absent-reader gates
+remain blocked. The initial1failure is retained; six focused boundary/mutation
+cases pass4.87s. An author probe with stale copied line numbers raised an
+IndentationError before its audit; fresh-process memory omissions then both
+failed as intended and were restored. No full suite was substituted.
+
+### 343.4 New one-use preparation contract and fixed scope
+
+New caller scripts/prepare_arv2_r343_legacy_six.py is a real offline producer,
+not a QC caller. All selected public code/JSON is held by external byte pins,
+full metadata and the stated native observations. It exclusively mkdir/fsyncs
+ONLY artifacts/analyst_revisions_v2/legacy_six_extension/R343-20261105-A and
+claims/marks before entering the genuine input. The fixed leaf has NOT been
+inspected, allocated or used at this pre-use record. Existing leaf/partial
+claim means spent/ambiguous; no retry, repair, overwrite, cleanup or new name
+is implicit. This local use consumes NO QC launch attempt or result cell.
+
+Input scope is ONLY the original R297-D5 October PACKAGE directory and exact
+lineage.json under massive_ratings_delta/R297-20261013-D5/package. Unchanged
+arv2_r338_quarantine_input_v2.GenuineInput is a fresh guarded DATA adapter,
+not the spent R338 operator/reader. Its original sealed loader authenticates
+the genuine compact transport, full source payloads, bindings, memberships,
+axis and contributions. No old control/report, archive, source assessment,
+capture, coverage-private data, USB or price grid is read.
+
+After BOTH input and source contexts normal-return, the tool publishes ONLY
+its own exclusive0600 submission-private.json and report.json. The Store's
+original descriptors/full metadata/native security stay held through readback
+and final close. The private submission contains all7exact sources/profiles,
+genuine ORIGINAL upload descriptors/payloads, receipt, nonce, and distinct
+proposed private project/backtest names. Payloads precede activation in the
+declared future upload order. No proposed project is claimed to exist, be idle,
+be private, have capacity or have current files/rights. Preparation is not a
+live/cloud permit. Private limit16MiB, stdout128KiB, parent900s, validator30s;
+host suspension/uninterruptible I/O remain explicit deadline limits.
+
+Native parent denies ALL network, USB, BOTH Keychains/security CLI, unrelated
+artifacts and writes outside this new control/parent and designated support.
+Native exceptions for package/lineage/control ancestry can reveal directory
+names; they are not continuous isolation or a corpus census. The original-
+stdin validator uses separate ALL-artifact denial and never reopens outputs.
+Actual parent exit0 plus validated original output are both mandatory; a late
+failure can leave files but is not accepted. All source/PIT/master/formal/
+paper/live readiness flags remain false. Native policy/operator commands are
+fixed by the exact committed run decision in343.5, before ANY private use.
+
+### 343.5 Exact offline run freeze (pre-use)
+
+The owner expressly waives Claude review for this current implementation and
+one offline preparation/once-only original-stdin validation. No QC/Safari,
+provider, credential, USB, operational price/outcome or funded action is
+authorized. Actual source/test/profile pins, focused checks and clean freeze
+HEAD are bound below before dispatch. Future QC needs a NEW exact run decision
+after the owner releases the hold and applicable gates genuinely pass.
+
+Pre-use source/test pins:
+
+|Component|Bytes|SHA256|
+|---|---:|---|
+|caller|34319|00e83268c018f2ceb8c87c7158f0ad35836720769c381f1900474e99d82139fa|
+|projection|44383|53f95e17f5b57c294d092ff4703374a40cd390a2c5bc4e72415727d14d1d0bd5|
+|reporting|18635|0a61059da3539ba30a8ca7d917484d47a7305676e873f7c85bb27f82ff5a615c|
+|caller tests|16537|2f797da91fb7c4e49324003eec01c51d843727b152a24d9608026da7c14695d2|
+|projection tests|14080|3d0c595eac985bd7f16dcf8410ba68c2918dc93f3e36215e358cd190a7501a0f|
+|reporting tests|17567|b56a3e7a3875b7ad1266030a93159d8e4a5b602423b61a66bbf87bacc0b7f9c0|
+|selected source inventory JSON|25033|8e81932e0ea34bd5e8e1de1594e5ffd34cbe2f8838b3ecbef0774797646b53df|
+
+Caller canonical profile2806B/62cb30e7ee41c5f2e6829164f5a73a5de89e869d7470dce4cb32ef1b350de844;
+projection profile3138B/a864d23212c79f8c948c7a49fe769eb68e3e784f0b02470196d2f05694eb6277;
+reporting profile1403B/bd4bd79fb499f6ecbeee4d9336fe4d94d35f762003d7974702c08a54a2dc6c17.
+The155-file inventory adopts ONLY known public code/JSON under this NEW
+uninvoked contract; every old inherited source hash was first reproduced.
+Parent native policy718be4e952b706e4b8042e68176ff47979c1e7d1db14eb884e6ef8380e043015
+is exactly native_profile() in the pinned caller, applied externally before
+Python-I-B starts. The separate validator inherits an explicit native policy
+with ALL-network/ALL-artifact/USB/BOTH-Keychain/security-CLI denial, so it has
+NO input/control exception. Its canonical original stdin is carried by a
+bounded controller pipe; no reader opens the preparation leaf.
+
+Final root selection300DISTINCTpasses31.68s (50projection+113reporting+
+89caller+9corrected342audit+6package-boundary+33record/redaction). No failures,
+skips, expected failures or warnings in this final selection. Earlier299 and
+author subsets overlap, not additive. Eight changed/new Python files compiled
+in memory without bytecode. Three reached caller memory omissions (publication
+before source-return, private nonce, pinned-module freshness) each caused one
+expected failure0.08s and were restored in finally; earlier diagnostic/path/
+boundary and registry omissions are retained above. No source file was mutated
+by these probes. No full lane/repository suite or operational replay occurred.
+Unchanged compact loader still removes its own temporary construction spool
+under the designated support path; orchestration performs no evidence cleanup.
+
+H is the full clean commit containing THIS pre-use freeze. Before dispatch,
+resolve/record H, verify root/branch/status/live remote unchanged, and use
+--expected-head H --caller-sha256 00e83268c018f2ceb8c87c7158f0ad35836720769c381f1900474e99d82139fa
+--profile-sha256 62cb30e7ee41c5f2e6829164f5a73a5de89e869d7470dce4cb32ef1b350de844.
+Only the designated Darwin/POSIX Python3.13 venv may run prepare. Exact env-i
+keys/values are safe_env() in that caller: in-root TMPDIR/SQLITE_TMPDIR/cache/
+pycache, plugins disabled, bytecode disabled, GIT_OPTIONAL_LOCKS=0 and fixed
+PATH/LANG/LC_ALL; optional macOS CF key must equal the current UID exactly.
+Call the native-sandboxed prepare ONCE. Record its ACTUAL exit and complete
+original bounded stdout before any acceptance. If and only if actual exit0,
+call validate ONCE in a separate all-artifact-denied process with the ORIGINAL
+stdout, SAME bindings and --actual-exit0. Edited/rehashed envelopes are not
+independent attestation; future use must freshly authenticate retained DATA.
+No unchanged retry, alternate leaf, old reader or automatic source-pin refresh.
+This authorization grants offline preparation only and does not release QC.
+The staged diff check caught one extra EOF blank line in each new projection
+source/test. Both were normalized before any commit/private use; only these
+format bytes and their dependent NEW inventory/caller/profile bindings changed.
+The final300passes31.68s revalidate that tree; prior300passes31.55s and299
+are overlapping authoring selections, not additional tests or operational uses.
+Final pre-use record/redaction33passes0.53s also overlap this selection.
+
+### 343.6 Actual local result and concluded-round handoff
+
+NOT INVOKED at this freeze. No successful preparation or submission readiness
+is claimed by prospective prose. Actual exits, original-output pins, prepared
+source/input/manifest identities and remaining limitations will be appended
+after the sole invocation. Keep all old evidence/floors and all dirty/concurrent
+work. Accumulate local commits and push exactly ONCE when this round concludes.

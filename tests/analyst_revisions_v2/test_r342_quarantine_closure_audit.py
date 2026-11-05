@@ -1,14 +1,18 @@
-"""Every generated quarantine source against every clause of the lane's cloud audit.
+"""Generated quarantine source audit of direct AST forms and exact capabilities.
 
 Claude review section 342 (ARV2R342-001). Section 340's guard read only the 19
 shared files and only the import clause. This file reads all 20 files of all six
-cells, including each generated Main, and every clause of
+cells, including each generated Main, and the direct AST predicates of
 `newrule_comparison_projection.audit`. It uses only public code and invented
 identifiers. It is not cloud evidence and does not clear ARV2R340-002. A new
 freeze cannot call `audit` unchanged, because `audit` pins the order capability
 to file names this closure does not use.
+
+These lexical checks are not a general dynamic-call or reachability proof.
+Computed attribute names, reflection and aliases require separate assessment.
 """
 import ast
+from collections import Counter
 
 import pytest
 
@@ -19,12 +23,13 @@ PUBLICATION = 'newrule_native_price_book_publication.py'
 COMMON_PRICE = 'newrule_five_case_quarantine_common_price.py'
 KNOWN_VIOLATIONS = {
     (COMMON_PRICE, 'import', 'subprocess'),  # the open ARV2R340-002 blocker
-    (PUBLICATION, 'call', 'save_bytes'),  # no caller: see the publisher test below
+    (PUBLICATION, 'call', 'save_bytes'),  # no direct static caller found below
 }
 EXPECTED_CAPABILITIES = {
-    'market_order': {'newrule_available_history_comparison_runtime.py', 'newrule_five_case_quarantine_runtime.py'},
-    'remove_security': {'newrule_legacy_primitives.py'},
-    'market_on_open_order': set(),
+    'market_order': {'newrule_available_history_comparison_runtime.py': 1,
+        'newrule_five_case_quarantine_runtime.py': 1},
+    'remove_security': {'newrule_legacy_primitives.py': 1},
+    'market_on_open_order': {},
 }
 
 
@@ -49,8 +54,18 @@ def violations(name, raw):
 
 
 def capabilities(name, raw):
-    attributes = {node.attr for node in ast.walk(ast.parse(raw)) if isinstance(node, ast.Attribute)}
-    return {(capability, name) for capability in EXPECTED_CAPABILITIES if capability in attributes}
+    attributes = Counter(node.attr for node in ast.walk(ast.parse(raw)) if isinstance(node, ast.Attribute))
+    return {(capability, name): attributes[capability] for capability in EXPECTED_CAPABILITIES
+        if attributes[capability]}
+
+
+def assert_capability_inventory(cell):
+    seen = Counter()
+    for name, raw in cell.items():
+        seen.update(capabilities(name, raw))
+    expected = {(capability, name): count for capability, files in EXPECTED_CAPABILITIES.items()
+        for name, count in files.items()}
+    assert dict(seen) == expected
 
 
 def closures(batch):
@@ -70,7 +85,8 @@ def test_scan_reports_each_forbidden_form():
     for raw, (kind, what) in cases.items():
         assert violations('x.py', raw) == {('x.py', kind, what)}
     assert violations('x.py', b'import json\nprint(json.dumps({}))\n') == set()
-    assert capabilities('x.py', b'algo.market_order(1)\n') == {('market_order', 'x.py')}
+    assert capabilities('x.py', b'algo.market_order(1)\n') == {('market_order', 'x.py'): 1}
+    assert capabilities('x.py', b'algo.market_order(1)\nalgo.market_order(2)\n') == {('market_order', 'x.py'): 2}
 
 
 def test_all_six_cells_hold_twenty_files_with_only_main_differing(prepared):
@@ -93,17 +109,27 @@ def test_generated_main_of_every_cell_is_clean(prepared):
         assert violations('main.py', cell['main.py']) == set()
 
 
-def test_order_capabilities_sit_only_in_the_named_files(prepared):
+def test_order_capabilities_have_exact_counts_in_the_named_files(prepared):
     for cell in closures(prepared[2]):
-        seen = set()
-        for name, raw in cell.items():
-            seen |= capabilities(name, raw)
-        assert seen == {(capability, name) for capability, names in EXPECTED_CAPABILITIES.items() for name in names}
+        assert_capability_inventory(cell)
 
 
-def test_no_generated_file_reaches_the_object_store_publisher(prepared):
-    # `save_bytes` sits in SpecificSourceBookNamespace.publish. A closure with no
-    # reference to that class or to `publish` in any form cannot call it.
+@pytest.mark.parametrize('capability,name', [(capability, name)
+    for capability, files in EXPECTED_CAPABILITIES.items() for name in files])
+def test_duplicate_capability_in_an_already_allowed_file_refuses(prepared, capability, name):
+    cell = closures(prepared[2])[0]
+    assert_capability_inventory(cell)
+    changed = dict(cell)
+    changed[name] += ('\nalgorithm.' + capability + '(None)\n').encode('ascii')
+    assert capabilities(name, changed[name])[(capability, name)] == 2
+    with pytest.raises(AssertionError):
+        assert_capability_inventory(changed)
+
+
+def test_no_direct_static_reference_to_the_object_store_publisher(prepared):
+    # `save_bytes` sits in SpecificSourceBookNamespace.publish. No direct name,
+    # attribute, import alias or matching literal is found by this scanner.
+    # This is not proof against computed names, reflection or dynamic aliases.
     cell = closures(prepared[2])[0]
     tree = ast.parse(cell[PUBLICATION])
     owners = [node.name for node in tree.body if isinstance(node, ast.ClassDef)

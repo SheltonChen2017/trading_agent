@@ -1,15 +1,16 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE (MACOS SESSION) HAS REVIEWED THE THIRTY-SEVEN COMMITS
-`f27d836..a184a41` (SECTION 147): THE 34 CODEX COMMITS OF SECTIONS 132-146, THE
-TWO WINDOWS CLAUDE COMMITS ALREADY COUNTER-REVIEWED IN 133.1 AND THE SAME-LANE
-MERGE `572ed52`. NO P0/P1. CORRECTION COMMIT `3a8f39211bb3e0ec2b68603e5ee91492a0265885` FIXES FOUR P2
-DEFECTS: THE CHECKPOINT LOADER'S CODE CATALOGUE AFTER `808df63`'S EAGER IMPORTS
-(A RED TEST AT `a184a41`), THE STARTUP DIAGNOSTIC RELEASING ENDPOINTS AFTER A
-POST-START CONTROLLER DEATH, AND THE PREPARED DOCUMENTS TRACE RUNNING A
-PATH-RESOLVED `sudo` AND ROOT GIT UNDER `safe.directory` (SI-CR27-001..004);
-TESTS CLOSE SI-CR27-005..007. THE PREPARED OWNER DOCUMENTS-TRACE COMMAND IS
-STALE AND MUST NOT BE RUN; CODEX FIXES SI-CR27-009 AND REGENERATES IT.
+Status: **CLAUDE (MACOS SESSION) HAS REVIEWED THE NINE CODEX COMMITS
+`219b701..97cc10e` (SECTION 157), WHICH COVER SECTIONS 148-156: THE SI-CR27-009
+FIX, THE PASSIVE DOCUMENTS TRACE, THE SYNCHRONIZED CODE-READ TRACE, ONE ACTUAL
+OFFLINE USB BYTE INSPECTION AND ONE RETAINED METADATA BRIDGE. NO P0/P1 AND NO
+PRODUCTION CODE CHANGE. CORRECTION COMMIT `f52a18a78e1842bf100f581e8c9c54018b6b98ee` ADDS TESTS ONLY
+(SI-CR28-001..006 AND -011..019); SI-CR28-007, -008, -010 AND -020..023 ARE P3
+AND OPEN. THE LANE STOPS ON AN OWNER QUESTION: WHERE EXISTING FIRSTRATE LICENCE,
+ENTITLEMENT, PURCHASE OR DOWNLOAD EVIDENCE FOR THIS ARCHIVE IS SAVED. UNTIL A
+LOCATION IS SUPPLIED AND AUTHENTICATED, SOURCE-ROW EXTRACTION AND ADMISSION,
+PROVIDER RECOVERY AND ANY EMPIRICAL RUN STAY STOPPED. THE USB EVIDENCE IS
+HISTORICAL METADATA ONLY AND ADMITS NO SOURCE, ROW, INPUT OR BACKTEST.
 SI-CR27-008 (THE OLD OPERATIONAL RUN PATH STILL MINTS THE FLOORLESS EIGHT-PART
 PLAN) IS A PRECONDITION OF ANY GATE REPLACEMENT. PRIOR COUNT RUN 13448
 UNRESOLVED (SI-BUILD-20261028-052 OPEN). SOURCE DISPATCH BLOCKED IN CODE ON ALL
@@ -267,6 +268,9 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-03 | Codex offline continuation publication (row added by Claude review, `SI-CR27-018`) | `33ab4da445536dc3ebfd86c084167c083d88339c` .. `2a6d34c063da17dadeb98874344b628dcd6594a7`, one non-force push at 18:05 UTC | Sections 134-135: journal actor attribution and read-only USB archive inspection | The USB custody refusal and blocked handoff are recorded as the blocker | Codex attributes focused selections per 134-135; no complete lane suite, QC or outcome look. | No ledger row was written for this push; Claude added this one. | Claude review (section 147). |
 | 2026-11-04 | Codex custody/attribution publication (row added by Claude review, `SI-CR27-018`) | `95c72ca85d7b3e082901a5ad3f6f0f0a6ccff07d` .. `a184a414c00cea327ef80d29837e3a8a2a3b4abe`, one non-force push at 01:44 UTC | Sections 136-146: local metadata and native custody proofs, durable Main receipt and anchor, conservative preflight, USB code windows, prepared passive Documents observer | Concrete owner-action blocker published, not pre-QC readiness | Codex attributes focused selections per 136-146 (Main 69 active-document checks after the record); no complete lane suite, QC or outcome look. | Codex's SI-*-20261103 pre-release findings. No ledger row was written for this push; Claude added this one. | Claude review (section 147); the prepared owner command is stale (147.6). |
 | 2026-11-04 | Claude review + corrections (macOS session) | `f27d836` -> `a184a41` reviewed after the push watcher fired; **correction commit `3a8f39211bb3e0ec2b68603e5ee91492a0265885`**; this record commit follows, so the round has two Claude commits, published in one push | Independent review of Codex sections 132 (second heading) and 133-146, the two Windows Claude commits and the same-lane merge | 37 dispositions; the merge kept every line of both parents; record hashes recomputed; four P2 defects corrected (loader catalogue, startup hold after ack1, PATH-resolved sudo, root Git under safe.directory) and three test gaps closed, each mutation-verified | Baseline at `a184a41`: the round's 42 changed test files 2,340 passed / 1 failed. Final tree: 2,378 passed, 0 failed in 163 s; record tests 29 passed in the three status-pin files plus 69 active-document checks passed, both after this record; network denied. No full lane suite (owner direction). **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | No P0/P1. `SI-CR27-001`..`-007` fixed or tested; `SI-CR27-008` (P2, gate-replacement precondition) and `SI-CR27-009` (P2, before the owner trace) open; `SI-CR27-010`..`-017` P3 open; `SI-CR27-018` fixed in the record. `SI-BUILD-20261028-052` unchanged. | Codex counter-reviews this round, fixes `SI-CR27-009` and regenerates the owner Documents command; 052 keeps every durable-count dispatch refused; QC stays paused. |
+| 2026-11-04 | Codex trace publication (row added by Claude review, `SI-CR28-009`) | `c2931abfa772290d908fedc69ef2ae1ace17bcb8` .. `af1d00f66a8d611997749c164a04c48e4eb635e4`, two commits, one non-force push at 23:45 UTC | Sections 148-149: counter-review, SI-CR27-009 fix and one authenticated passive Documents trace | Documents startup refusals made visible; custody hold retained | Codex's own attributed counts in sections 148-149. **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | SI-CR27-009 closed; `SI-BUILD-20261028-052` unchanged | Continue the attribution |
+| 2026-11-05 | Codex USB inspection publication (row added by Claude review, `SI-CR28-009`) | `2bf26233f7719f8c42bd03277fe142ff8d4584e9` .. `97cc10e7c421923fe9d57035f36b9729da59c6e5`, seven commits, one non-force push first seen at 06:48:09 UTC | Sections 150-156: synchronized code-read trace, one offline USB byte inspection, one retained metadata bridge and the owner-input gate | Historical metadata only; no source, row, input or backtest admission | Codex's own attributed counts in sections 150-156. **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | `SI-USBONCE-20261104-001`..`-007` and `SI-USBRETAIN-20261104-001`..`-005` per Codex; `SI-BUILD-20261028-052` unchanged | Owner evidence location |
+| 2026-11-05 | Claude review + test corrections (macOS session) | `219b701` -> `97cc10e` reviewed after the push watcher fired; **correction commit `f52a18a78e1842bf100f581e8c9c54018b6b98ee`**; this record commit follows, so the round has two Claude commits, published in one push | Independent review of Codex sections 148-156 | 9 dispositions; recorded hashes and anchor relationships recomputed from Git; no production defect; test-only corrections, each mutation-verified (new scripts: 32 of 157 mutants caught before, 129 after) | Final tree: 629 + 91 + 2 focused tests passed; 98 passed after this record; network and private paths denied, 2 real-sandbox tests under their own denial. No full lane suite (owner direction). **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | No P0/P1. `SI-CR28-001` P2 and `-002`..`-006`, `-009`, `-011`..`-019` P3 fixed; `-007`, `-008`, `-010`, `-020`..`-023` P3 open. `SI-CR27-008` and `SI-BUILD-20261028-052` unchanged. | Codex counter-reviews this round; the owner answers the evidence-location question |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -33430,3 +33434,177 @@ passed89/.86s with OS network denied; complete8cec historical prefix, finalLF
 and whitespace passed. Independent read-only peer found no material
 inconsistency in154–156; it performed no edits/tests or private/source access.
 All software/anchor bytes stayed frozen; only this lane record changed.
+
+## 157. Claude independent review — 2026-11-05 UTC (macOS session: `219b701..97cc10e`, Codex sections 148-156)
+
+### 157.1 Scope, trigger and method
+
+The owner asked Claude to review all unreviewed commits and push once when
+done. Claude's last review ended at `219b701c`, so the range is nine Codex
+commits. Codex was still working in this worktree when the request arrived. It
+had three unpushed commits, uncommitted work, and a registered one-shot bound to
+the exact HEAD and tracking ref, as 148.4, 150.5 and 151.4 describe. A push at
+that moment would have invalidated that one-shot, as `219b701` did to the 146.1
+Documents command. So Claude reviewed the first five commits read-only, armed a
+watcher on `af1d00f66a8d611997749c164a04c48e4eb635e4`, and delivered interim
+notes in chat.
+
+The watcher fired at 2026-11-05T06:48:09Z on
+`97cc10e7c421923fe9d57035f36b9729da59c6e5`. The worktree was clean, local HEAD
+equalled that origin, no USB or trace process was running, and section 156
+registers no further operation. Nothing was rebased or reset. Sections 152.6
+and 156 say the owner waived Claude review for Codex's round; the owner then
+asked for this review, so this section supersedes "no independent Claude
+review" for these nine commits.
+
+Test and mutation runs were made under `sandbox-exec` with `(deny network*)`,
+after an EPERM probe (errno 1). The new work's mutation runs, and the final run
+below, also denied `/Volumes` and `~/Library/Application Support/Codex*`, so the
+new test files demonstrably need no private artifact. Two real-sandbox tests
+cannot nest, so they ran outside the outer profile with their own denial. Claude
+did not read or touch a provider, credential, the Keychain, QuantConnect or
+Safari, the USB volume, the Documents directory, eslogger, sudo, launchctl,
+hdiutil, the private AppSupport reports, or the exec13448 namespace. No full
+lane suite ran, per the owner's standing preference.
+
+### 157.2 Per-commit dispositions
+
+| # | Commit | Record | Disposition |
+| --- | --- | --- | --- |
+| 1 | `c2931abf` | 148 | **Accepted.** The SI-CR27-009 fix holds: the five mutants against it were all caught. Its bootstrap test fixture needed `SI-CR28-006`. |
+| 2 | `af1d00f6` | 149 | **Accepted, record only.** The private report was not opened. No ledger row or status update (`SI-CR28-009`). |
+| 3 | `2bf26233` | 150.1-150.5 | **Accepted after test corrections** (`SI-CR28-001`..`-004`). |
+| 4 | `ce027c84` | 150.6 | **Accepted.** The null-device adapter is typed and narrow. |
+| 5 | `18983605` | 151 | **Accepted after a test correction** (`SI-CR28-005`). `SI-CR28-007`, `-008` and `-010` stay open. |
+| 6 | `3a0951e2` | 152 | **Accepted after test corrections** (`SI-CR28-018`, `-019`). |
+| 7 | `0dbe4aec` | 153 | **Accepted as a Main-attested record** (`SI-CR28-021`). |
+| 8 | `8cec0877` | 154 | **Accepted after test corrections** (`SI-CR28-011`..`-017`). `SI-CR28-020` stays open. |
+| 9 | `97cc10e7` | 155-156 | **Accepted, record only.** No ledger row or status update (`SI-CR28-009`). The owner gate is relayed in 157.6. |
+
+### 157.3 What was checked, and what could not be
+
+Checked against Git:
+
+- All 11 byte and SHA-256 rows in 152.5 and 154.2 match their commits, and those
+  files are unchanged at the head.
+- All hashes and byte counts for commits 1-5 (148.4, 150.5, 150.6, 151.4), the
+  nine-file mapping `a33f14bc…` and the sandbox text `f29a363f…`.
+- The anchor is canonical JSON plus one LF with the pinned SHA-256 `dc8518ff…`.
+  Its nine historical blobs match creator `3a0951e2`, and its mapping, list,
+  worker, proof, observation and five-code hashes all recompute. The anchor's
+  values for the 153 bindings agree with the record.
+- The pure model's policy hash `9408f0c4…` recomputes.
+- The pure model's accounting and pair rules follow from the original model's
+  `_scan` and `inspect_registered_pair`. That includes the less obvious ones: a
+  reported match implies no empty 2026 members and the same token commitments.
+- The record is append-only over this range (1,429 lines added, none removed).
+- Commits 1-5 change only the Documents trace and the new code-read trace and
+  helper, with their tests and the record. Commits 6-9 add only the five scripts,
+  the anchor, their tests and the record. `require_dispatch_allowed()` and the
+  original USB inspection files are unchanged across the range.
+- Codex's stated 202 and 181 selection totals agree with the per-file counts.
+
+Reading the five new scripts found no production defect, and no route from a
+retained observation to source, input or QC authority.
+
+Not checkable by Claude, and not claimed: anything private. That covers the v2
+trace report, the USB bytes, the two retained files, the private aggregate and
+assessment, and the actual process closures. The 152.1, 153 and 155 process
+facts remain Main's attestation, as the anchor's trust statement says.
+
+### 157.4 Findings ledger
+
+| ID | Priority | Status | Finding |
+| --- | --- | --- | --- |
+| `SI-CR28-001` | P2 | Fixed (test) | The coordinator's Root bootstrap hash check, the only check before Root executes owner-writable Python, had no regression. Removing it passed all 113 coordinator tests. |
+| `SI-CR28-002` | P3 | Fixed (test) | Root's own refusal of a closed packet with nonzero denials or a clean-exit incomplete packet, and the process-group check before signalling, had no test. |
+| `SI-CR28-003` | P3 | Fixed (test) | The final Root audit's dirty, moved-tracking, moved-HEAD and changed-commit refusals had no test. |
+| `SI-CR28-004` | P3 | Fixed (test) | The launcher digest and the final runtime and `/dev/null` rechecks had no test. |
+| `SI-CR28-005` | P3 | Fixed (test) | `test_independent_audit_guards…` took a `key` parameter and never asserted it, so removing the Python write denial went unnoticed. It now asserts the exact counter and adds a write to an allowed path. |
+| `SI-CR28-006` | P3 | Fixed (test) | The Documents bootstrap fixture replaced the wrong path, so outside the designated root it read the real lane files rather than its temp copy. |
+| `SI-CR28-007` | P3 | Open | The coordinator's `fixed_failure` turns Documents refusal codes into `code: None`, confirmed by experiment; framer refusals follow from the same type check. This repeats SI-CR27-009 in spent v2 code. Carry the fix into any successor. |
+| `SI-CR28-008` | P3 | Open | A malformed `setflags` or `utimes` detail raises in `framer.uint` or `framer.timestamp` and ends the capture, unlike `setattrlist` after SI-READ-013. Confirmed by reading. Spent v2 code; carry into any successor. |
+| `SI-CR28-009` | P3 | Fixed (record) | The status paragraph still described section 147 and neither Codex push had a ledger row, repeating SI-CR27-018. Fixed here. |
+| `SI-CR28-010` | P3 | Open | 16 of 64 mutants against commits 3-5 remain uncaught. 7 are in the coordinator: 2 are equivalent, 4 overlap each other and 1 is a boundary check. 9 are in the helper, including `_owned_git_pipe`'s individual conditions, which the USB one-shot reused; those 9 have no test of their own. |
+| `SI-CR28-011` | P3 | Fixed (test) | The pure model's tests combined changes, so a later check hid an earlier one, and they did not assert the refusal code. 31 of the 41 pure-model mutants survived; 7 remain, all explained in 157.5. |
+| `SI-CR28-012` | P3 | Fixed (test) | `test_strict_private_packet_relationships…`: its six packet cases changed the packet without re-signing the wrapper, so they stopped at the wrapper hash and none reached the check it names. It now re-signs and asserts the code. |
+| `SI-CR28-013` | P3 | Fixed (test) | The loader's first lane guard had no failure-direction test for toplevel, branch, HEAD, status, tracking or working directory. New cases also assert no private file was opened. |
+| `SI-CR28-014` | P3 | Fixed (test) | The checks on the code the loader executes (committed equality, hard link, group-writable) had no refusal test. |
+| `SI-CR28-015` | P3 | Fixed (test) | 21 anchor relationships, the anchor pin and the creator-ancestor check had no isolated refusal test. |
+| `SI-CR28-016` | P3 | Fixed (test) | The private file and directory checks had no case that reached them alone. |
+| `SI-CR28-017` | P3 | Fixed (test) | The loader's checks on a compiled model with another policy or input binding, and on a foreign caller of `_issue`, had no test. |
+| `SI-CR28-018` | P3 | Fixed (test) | The observer's acceptance rules behind the actual run had no isolated test: a closed status with a denial, failure or missing aggregate; a wrong aggregate or profile; stderr EOF; signalling an exited child's group. |
+| `SI-CR28-019` | P3 | Fixed (test) | The qualifier's and copier's matching rules had no isolated test: a swallowed denial, write flags on a registered path, a wrong driver hash, a dirty lane, a late HEAD move, and a closed copy with a nonzero exit or an incomplete producer. |
+| `SI-CR28-020` | P3 | Open | The loader issued its report after its own code file changed during the last `ls-remote`, confirmed by experiment. 154.1's `-003` re-audits private files after that guard but not code. The executed bytes were already verified, so this is narrow. Loader bytes stay frozen with their 155 evidence; carry the order change into any successor. |
+| `SI-CR28-021` | P3 | Open | The control plane behind the actual results is not in Git: the 153 dispatcher, the independent auditor behind `si-usb-private-copy-independent-audit-v1`, and the 155 supervisor. So the anchor's auditor receipt and 155's closure reasoning cannot be reviewed. Commit the code, or keep these facts labelled attestation only, before any admission relies on them. |
+| `SI-CR28-022` | P3 | Open | Tests are bound to this Mac with no skip: `/opt/homebrew/bin/node`, the fixed virtualenv path and `/usr/bin/eslogger`'s SHA-256. A Homebrew or OS update, or another host, turns them red without a code change. |
+| `SI-CR28-023` | P3 | Open | Sections 152-156 merge numbers and words (`Main202/16.05s`, `matchingAF1`, `Count84005START/4294967296bytes`), which makes them hard to read and to search by value. Use separated tokens from now on. |
+
+No P0 or P1. No finding concerns shared or app code. `SI-CR27-008`
+(gate-replacement precondition), `SI-CR27-010`(d/e) and `-011`..`-017` remain as
+section 147 left them; section 156 keeps `SI-CR27-008` open.
+
+### 157.5 Corrections, mutation evidence and validation
+
+Correction commit `f52a18a78e1842bf100f581e8c9c54018b6b98ee` changes eight test files only (443 insertions,
+10 deletions). No production, anchor or specification byte changed, so no pin,
+mapping or retained evidence moved.
+
+All mutants were on-disk, in scratch clones, with each run network-denied:
+
+| Set | Mutants | Caught by Codex's tests | Caught after corrections | Remaining |
+| --- | --- | --- | --- | --- |
+| Commits 3-5 and the SI-CR27-009 fix | 64 | 37 | 48 | 16 (`SI-CR28-010`) |
+| Five new scripts, commits 6 and 8 | 157 | 32 | 129 | 28 |
+
+The 64-mutant results come from `18983605`; those production and test files are
+byte-identical at `97cc10e` before the correction commit. Of the 28 remaining:
+
+- 24 overlap with another check that refuses the same input, or guard an input
+  that a tighter bound already excludes. Claude judged these by reading, not by
+  proof.
+- 1 needs a file owned by another user (`l_file_owner`).
+- 3 need a forged frame in spent one-shot code (`q_obs_sha`, `q_alias`,
+  `q_agg_bytes`).
+
+Validation at the correction commit, from the real worktree:
+
+- Ten focused files, network and private paths denied: 629 passed, 2 deselected.
+- The journal actor file, same denial: 91 passed.
+- The 2 deselected real-sandbox tests passed outside the outer profile.
+- Record and document tests, after this record: 98 passed.
+- `git diff --check` is clean. The tests that pass only from the designated
+  worktree ran there.
+
+These tests prove the behaviour they assert. They are fabricated-input software
+tests, not evidence about the actual USB run or any source.
+
+### 157.6 Owner gate and next steps
+
+Section 156 stops on one owner question: **where is existing FirstRate licence,
+entitlement, purchase or download evidence saved for this archive?** Codex did
+not search private disks or mail, and it does not claim the evidence is absent.
+Until a location is supplied and authenticated, source-row extraction and
+admission, provider recovery and any empirical or QC run stay stopped. No QC or
+Safari until further notice. Claude did not look for this evidence.
+
+This push moves the head, so no earlier exact-HEAD binding carries over; none is
+pending. Codex's counter-review of this round is next. Any later one-shot needs
+registering against the new head.
+
+### 157.7 Unchanged state
+
+| Item | State |
+| --- | --- |
+| `require_dispatch_allowed()` | Still refuses unconditionally (`scripts/short_interest_count_source_authority.py` is unchanged in the range) |
+| SI-BUILD-20261028-052 | Open |
+| Count ceiling | 84,005 STARTs / 4 GiB |
+| Permanent unknown-run debit | 8 START / 16,777,216 bytes, still charged |
+| DAILY residual | 36,837 / 3,327,988,047 / 71,468,572, separate |
+| Old claims, negatives, receipts and charges | Spent and immutable |
+
+The USB evidence is historical metadata only. It admits no source, row, input or
+backtest. This review made no provider or key request, created no claim, START or
+charged byte, made no QC or Safari access or purchase, and did no outcome join.
+Looks remain 0/0 canonical and 0 exploratory, alpha 0, permanent look IDs none,
+and QC attempts 0.

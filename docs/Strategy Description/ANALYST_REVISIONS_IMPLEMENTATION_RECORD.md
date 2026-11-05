@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–339 retain the milestone, review, preregistration, QC
+strategy. Sections 1–340 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -891,6 +891,9 @@ Review snapshot R337 is Claude's after-the-fact review of the eighteen Codex
 commits of sections 334–336: all accepted, one P3 price-format refusal-code
 defect corrected in `134fbbc4`, and a P2 timeout-taxonomy requirement
 recorded for successor callers.
+Section 340 is Claude's after-the-fact review of the eleven Codex commits of
+sections 337–339: all accepted, no P0 or P1, and two quarantine source defects
+held as pre-launch blockers, with new tests that run the real driver paths.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1296,6 +1299,18 @@ formula, while observed provider availability/history governs factual data
 claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
+
+Section 340 is Claude's independent after-the-fact review of the eleven Codex
+commits of sections 337–339 (`18e6d567..20b485ae`). All are accepted, with no
+P0 or P1. New `c2bca9ba` runs the real quarantine driver paths and holds two
+open defects as strict expected failures: a relabelled buy-path quote refusal
+(`ARV2R340-001`) and a forbidden `subprocess` import in a cloud module
+(`ARV2R340-002`). Both need a new versioned freeze before any QC upload,
+because spent run E is bound to those bytes. The 5,369 reference figure is not
+an upper bound (`ARV2R340-004`), and the 403 cannot separate entitlement from
+an edge rejection (`ARV2R340-006`). QC and Safari remain off limits. The
+immediate next step is that Codex counter-reviews section 340 and its new test
+file.
 
 The owner explicitly waives Claude review of section 339. Historical holdings discovery found Massive ETF Global daily history as the best documented calendar-fit candidate and SEC/FMP dated filings as partial crosschecks. Sole existing-account capability parent/validator at c6bfacad both actual0 authenticated the observation, but Massive first sample returned403 and FMP disclosure dates402;22later queries remain unobserved. No historical DATA was acquired and no expiry/tier cause is proved. Both uses are now SPENT. Daily-source access/completeness, historical caps/callback/identity semantics and actual strategy holdings remain concrete barriers. Keep QC/Safari prohibited and R338 inputs/sixsource variants/5369reference and836277holding-potential gaps unchanged. Section339.6–7 owns evidence, source decision and final single-push handoff; no purchase, capture, source substitution or readiness/attempt/run authority follows.
 
@@ -2549,8 +2564,8 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 336 (sections 328 and 330, then the snapshots
-R333 and R337); for section 250 the owner
+the pushed range through section 339 (sections 328, 330 and 340, and the
+snapshots R333 and R337); for section 250 the owner
 directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
@@ -4415,6 +4430,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-04 | Completed owner-directed exact-five quarantine for matched six/eight exploratory cells; section337 | `18e6d567` -> `864c9b97` -> this final record commit | Incoming two Claude commits accepted/qualified in337.3; new variant review expressly waived | Final post-tilt denied weight to own sleeve ETF; genuine vendor-only monetary/runtime/source chain; sole local preparation/validator both exit0 and spent | 727 distinct focused passes24.37s; 17 memory compiles; exact5bindings/73ranges authenticate; no full suite or QC/Safari contact; one final push | 0 new P0/P1; seven pre-use P2 corrected; historical open P2 retained | Hold QC/Safari; future genuine project/input/source/run binding and demanded coverage pending; 338/259/54/699 unchanged |
 | 2026-11-04 | Completed local full-input, conservative RAW coverage and six-cell source binding; section338 | `94c2030d` -> `754563a4` -> `c73c52d2` -> `ea6a7d90` -> `86b40aac` -> `0bff7256` -> `8d913778` -> this final handoff; SEVEN commits | Current owner waiver; no incoming review or independent acceptance claimed | A/B/C/D failures retained; B2 metadata and E sole local preparation/stdin validation accepted with actual0. Full input/73ranges/all71shards and6source variants bound | Final487distinctfocused35.34s; earlier passes and doc reruns overlap; initial323pass/157setup errors qualified. No full suite/QC/Safari | Technical serializer/container/path/framing/privacy fixes prospective;5369potential-reference/836277unique dense stock gaps remain, no actual callback/holding path | ONE matching nonforce final push. QC/Safari hold and source/formal/attempt gates retained;338/259/54/699 unchanged |
 | 2026-11-04 | Completed historical constituent/holdings source discovery and existing-account capability observation; section339 | `76c16160` -> `c6bfacad` -> this final handoff; TWO commits | Owner current explicit Claude waiver; no incoming review/independent acceptance | Primary sources/SEC examples found; sole parent/stdin validator actual0 authenticated OBSERVATION. Massive403/FMP402,2application intents,22unobserved; no historical DATA capture or inferred cause | Root415distinctfocused1.95s;4memorycompiles/native codeTLS/scope/omission checks; author/record runs overlap, initial fixture failure retained; no full suite | Pre-use I339-001..006 fixed/007qualified; source access/completeness/callback/cap/actualpath barriers remain ARV2S339-001/002 and I338-003 | ONE final matching nonforce push; no purchase/source change/QC/Safari/run;338/259/54/699 unchanged |
+| 2026-11-04 | Claude independent review of the eleven Codex commits `18e6d567..20b485ae` (sections 337–339), after the fact | `20b485ae` -> `c2bca9ba` (tests) -> this record commit | All eleven accepted; section 340 | New tests run the real quarantine driver paths and real result emission; two source defects held as strict expected failures and pre-launch blockers; reference-figure, outbound-profile and 403 qualifiers documented | 22 range test files 1,928 passed; 121 gates and regressions; new file 24 passed, 2 expected failures; 5/5 mutations caught; 86 record gates; no full suite, no QC/Safari/provider access; 0 looks, 338/259/54/699 unchanged | 0 P0, 0 P1, 5 P2 (one corrected for coverage, two blockers, two documented), 6 P3 | Codex counter-reviews section 340; a new freeze corrects `ARV2R340-001` and `-002` before any QC upload |
 
 
 
@@ -76607,3 +76623,151 @@ local state before push; afterward verify local/tracking/live agreement and
 status. Do not trigger any automation on this own push.
 
 Final record/redaction selection102passed1.21s, overlapping the102 within415, not additive. Four SPENT source/test hashes unchanged; final diff/status checks identify ONLY this intended lane-record edit. Actual HTTP200 parsing remains synthetic-only because both observed API responses were non200; no live holdings-row schema/identity/weight validation is claimed. Final record commit follows exactc6bfacad, then the one matching nonforce push after remote76c16160 recheck.
+
+## 340. Independent Claude review of `18e6d567..20b485ae`: the eleven Codex commits of sections 337–339, reviewed after the fact, 2026-11-04
+
+### 340.1 Scope, synchronization and method
+
+The owner directed: "Review all unreviewed commits, push once when done". The
+owner had waived Claude review of sections 337, 338 and 339 before that work,
+so this is an after-the-fact review, not a gate those rounds waited on.
+
+**Starting state.** A fetch showed local, tracking and live heads equal at
+`20b485ae`, with a clean worktree. The range after Claude's R337 push
+`18e6d567` holds eleven Codex commits and no Claude commit. Apart from the lane
+record, every change adds new files.
+
+**Method.** Four read-only reviewers each took one sub-range: the quarantine
+strategy code, input and coverage, input v2 and materialization, and the
+holdings probe. They ran no code, used no network and read nothing under
+`artifacts/`. Claude checked every finding above P3 personally against the
+source, ran all tests, and read Codex's section-337.3 counter-review of R337.
+
+**Access.** No QC, Safari, provider, credential or Keychain access occurred.
+Claude's artifacts census read `stat` metadata under `artifacts/` and no
+artifact content.
+
+### 340.2 Per-commit dispositions
+
+| Commit | Section | Disposition | Basis |
+|---|---|---|---|
+| `864c9b97` | 337 | Accepted with open blockers | Target arithmetic and preserved economics match the declared policy, including the owner's max(ask, engine price) bound. See `-001`, `-002` and `-003`. |
+| `94c2030d` | 337 | Accepted with notes | Record only, and its 17 file pins match. Two claims overreach (`-008`). |
+| `754563a4` | 338 | Accepted with notes | The dense demand is a sound superset. The reference count is not (`-004`). The wrong package path is already I338-009. |
+| `c73c52d2` | 338 | Accepted with notes | Metadata-only behavior and claim order hold. See `-009` and `-010`. |
+| `ea6a7d90` | 338 | Accepted with notes | The macOS exception is exact: one environment variable, compared with the current UID. See `-009`. |
+| `86b40aac` | 338 | Accepted with notes | The `input_v2` delta is exactly as declared. It froze the known path defect fixed in the next commit. |
+| `0bff7256` | 338 | Accepted | The 24-hex path and helper equality run before the claim. |
+| `8d913778` | 338 | Accepted with notes | The full-frame comparison is correct and the original header pin stays enforced. See `-010`. |
+| `76c16160` | 338 | Accepted with notes | Every number reproduces. "Authenticated" overclaims (`-007`). |
+| `c6bfacad` | 339 | Accepted with notes | No credential leak path found. The native profile is wider than recorded (`-005`). |
+| `20b485ae` | 339 | Accepted with notes | Every recomputed pin reproduces. See `-005`, `-006`, `-007`, `-008` and `-011`. |
+
+The reviewers reproduced these pins without running repository code:
+
+- every recorded file byte count and SHA-256 they checked in sections 337–339;
+- all 130–132 source pins of the preparation callers;
+- the native policies of A, B, B2, C, D and E, and of the holdings probe;
+- the probe's report, parent stdout and validator stdout, rebuilt from the
+  recorded 403 and 402.
+
+Profile pins that need Python execution were not recomputed, except where
+named.
+
+Claude accepts Codex's 337.3 corrections of R337. In particular, a double
+SHA-256 of a low-entropy value is still dictionary-comparable (`CR331-001`),
+and Codex corrected the timeout requirement of `ARV2R337-002` before first use.
+
+### 340.3 Findings ledger
+
+| ID | Severity | Finding and disposition |
+|---|---|---|
+| `ARV2R340-001` | P2 | **Open pre-launch blocker, held by a strict expected failure.** In `newrule_five_case_quarantine_runtime.py`, `require` raises `contract.Refused`, but the carried-over cash-bound clause re-raises only `targets.NewruleError`. A buy with no 09:31 QuoteBar therefore surfaces as `quote_execution_engine_price`, not `quote_execution_slice`; the clock, type, identity, period, fill-forward, spread and cache codes are relabelled the same way. W5 keeps these codes. It fails closed, but the likeliest real stop is misdiagnosed. Applying `except (targets.NewruleError, Refused)` in memory flips the strict xfail and leaves the other 113 selected tests passing. |
+| `ARV2R340-002` | P2 | **Open pre-launch blocker, held by a strict expected failure and a guard.** `newrule_five_case_quarantine_common_price.py` imports `TimeoutExpired` from `subprocess`, which the lane's `FORBIDDEN_IMPORTS` bans for cloud code. The R337 builder never runs that audit. No process is created, and QC's actual behavior is unverified, but if QC rejects the import, a launch fails at compile or initialization and could consume a frozen attempt. Scanning the 19 generated cloud files finds this one violation only; the new guard stops any further one. Nothing spawns a process on QC, so the import and its branch can simply be dropped. |
+| `ARV2R340-003` | P2 | **Corrected for coverage in `c2bca9ba`; no defect found.** The R337 tests stub or replace the constructor, the genuine initializer, `_price_identity`, `_common_guard`, `_quarantine_result`, `_common_result` and `on_end_of_algorithm`, so a first QC launch would have been their first run. New `tests/analyst_revisions_v2/test_r340_quarantine_driver_paths.py` runs those real bodies with synthetic data-loading seams, and real emission passes the real validators. A valued denied holding stops at the earlier `starting_cash` guard, and an unpriced one at `quarantine`. |
+| `ARV2R340-004` | P2 | **Documented record qualification; requirement for any successor.** In `arv2_r338_quarantine_coverage.py`, `refs` holds only membership-eligible decisions. The runtime census is weights plus holdings, so a stock bought at one decision whose membership ends before the next still needs that next prior close, and a null there hard-stops. That cell counts in the dense total but not the reference total. So 1,155,852 required and 5,369 missing are **not** upper bounds on reference demand, though 338.3 and 338.16 read that way. The direction is safe: the 836,277 dense figure stays a conservative superset, and no gap is reported as covered. A successor should add the prior close of the first decision after each eligible run. Restating the figures needs one new frozen read of private data, which is an owner decision. |
+| `ARV2R340-005` | P2 | **Documented record correction; requirement for any successor.** The holdings probe's `native_profile` has no outbound deny, so the key-holding parent and its `security` child could reach any host and port. Record 339.4 says it permits "outbound TLS"; its "not domain isolation" caveat does not cover ports. The code connected only to the two fixed hosts on 443, and no misuse is shown. The lane's own `verify_arv2_r329_qc_source_readback.py` limits outbound to 443, 53 and the resolver, and a successor should use that clause. `test_r330_resolver_profile_guard.py` passes vacuously here because it inspects only clauses it finds; it does not require one. |
+| `ARV2R340-006` | P3 | **Documented qualifier on `ARV2S339-001`.** The probe uses `http.client`, which sends no User-Agent, unlike the lane's earlier `requests`-based Massive callers. With bodies unread, the 403 cannot separate an entitlement refusal from an edge rejection. There is no evidence the header caused it. Do not rest a purchase decision on this one response. FMP's 402 is a more direct signal, but its exact reason is also unread. |
+| `ARV2R340-007` | P3 | **Documented; requirement for the next consumer.** 337.3 and 337.5 already define `output_authenticated` as a self-consistent envelope bound to the observed exit; a rehashed edited envelope still validates, and no validator reads the control. Sections 338.16–338.17, 339.6 and two commit subjects still use the bare word "authenticated". The code hashes the native profiles and the operator applies them: the parent policy is pinned, but no validator policy or exact command is recorded, so sandbox use cannot be verified from the repository. Run E's worker did recheck its on-disk bytes, and nothing suggests E is wrong. A consumer of E's outputs must hold-read the private files and compare them with the recorded pins. |
+| `ARV2R340-008` | P3 | **Documented record wording.** (a) 337.4's "All-six generated Main integration tests reach the concrete initializer": those tests swap in a capture class and only bind the constructor and initializer signatures, so no initializer body runs. (b) 337.5's validator "cannot reread the control or DATA" only through how the operator invokes it: the code runs in-process, and its policy is not pinned. (c) 337.4's "authenticates all remaining vendor data": startup covers manifest and catalog, and shards authenticate on first demand. (d) "necessary-condition superset" in 338.2 and the coverage module is backwards: complete coverage of a superset is sufficient. (e) 338.15's "Full frame and all 73 range pins precede retained interpretation": only the whole-archive pin precedes parsing. (f) 339.5's "each request<=10s": the timeout is per socket operation, so a slow-drip response could run to the 360 s deadline and leave FMP untried. |
+| `ARV2R340-009` | P3 | **Documented fail-closed items for successors.** (a) `result_duplicate_key` and `result_canonical` are caught and become `result_json`. (b) `_deny_order_symbol` reports an unknown symbol as `quarantine`. (c) `finite()` has no runtime caller and lacks the quote, order and initializer codes. (d) Failure-stage labels stay `retained_DATA` during genuine-input entry and read `materialization` for guard returns. (e) `support.mkdir` runs before its symlink check in the v4 caller. (f) B and B2 create the claim before ancestor checks. (g) B2 accepts a missing configured environment key. (h) Ancestor exemptions permit listing sibling directory names. |
+| `ARV2R340-010` | P3 | **Documented test gaps.** Forgery cases in the input-shape caller tests leave `report_pin` stale, so they refuse before the targeted guard. Coverage, input and shape tests use bare `pytest.raises`. The credential marker before lookup is untested. `'/Library/Keychains' in native` also matches the user path. Transport tests use only fakes. `CLAIM_STATE=='unallocated'` asserts a variable that is never written. `_native_scope_rehearsal` has no caller. The HTTP 200 decoders never met a real response and may be too strict. `test_r339_holdings_discovery.py` uses a real issuer's public identifiers under a "Synthetic" docstring. |
+| `ARV2R340-011` | P3 | **Owner confirmation requested.** The owner's section-339 instruction does not mention provider credentials; it rules out QC and Safari. 339.1 reads the task as allowing a bounded existing-account observation. That reading is reasonable: two requests, existing Keychain entries, no bodies read, full disclosure. The authority is still inferred, not quoted, and 338.1 had excluded credentials for its own round. Separately, 334.5 read another lane's chat read-only to judge resource use and sent nothing. |
+
+Overall: 0 P0, 0 P1, 5 P2 (one corrected for coverage, two open blockers, two
+documented), 6 P3. The open source, identity, PIT and formal gates,
+`ARV2S339-001`, `ARV2S339-002`, `I338-003` and `ARV2R328-011` are unchanged.
+
+**Why `-001` and `-002` are not corrected in place.** Both modules are pinned
+in the R337 projection and in all four preparation callers, and spent run E's
+retained six-cell output is bound to those exact bytes. An in-place edit would
+detach HEAD from E's recorded checkpoint and repeat `ARV2CR325-002`. No launch
+can happen while QC is prohibited and the source barrier is open, so there is
+no present risk. Both must be corrected by a new versioned freeze before any
+QC upload; when they are, the strict expected failures force their markers
+to be removed.
+
+Implementation-quality rating for this snapshot: **8/10**. Strengths: exact
+freezes, target arithmetic and economics that match the declared policy,
+honest stops at each refusal, and an absent credential leak path. Held back by
+two pre-launch defects that a built-in lane audit would have caught, and a
+reference figure that reads as a bound. This is not a strategy-efficacy or
+live-readiness rating.
+
+### 340.4 New test file
+
+`tests/analyst_revisions_v2/test_r340_quarantine_driver_paths.py` (15466 B,
+`29f96f8a39d94d766c09b35d91d790f698bd61c9a338b6bff4b8bbe84c59d5f7`). Its seams
+are the package load, FIGI resolution, the score runtime and the full 6151-row
+census check, which needs licensed rows. It is not LEAN or cloud evidence. No
+production source changes in this round.
+
+### 340.5 Validation
+
+All Python runs used `sandbox-exec`:
+
+- **Sandbox profile:** denies all network, `/usr/bin/security` and every
+  read or write under `artifacts/`.
+- **Python and pytest:** `env -i`, Python 3.13 venv, `-B`,
+  `--noconftest`, `--ignore=artifacts`, plugin autoload and cacheprovider
+  disabled.
+- **Scratch paths:** `TMPDIR`, `--basetemp` and the pycache prefix all
+  under `.pytest_cache/claude-review-340`.
+
+The owner's standing direction is not to run the complete lane suite; it was
+not run.
+
+| Stage | Result |
+|---|---|
+| The range's 22 new test files at the incoming head | **1,928 passed in 96.29 s.** |
+| Record gates with the section-330 and R337 regressions at the incoming head | **121 passed in 6.29 s.** |
+| New real-driver file | **24 passed, 2 expected failures, in 5.47 s.** |
+| In-memory mutations (no file changed) | **5 of 5 caught,** one failure each: open-order guard, catalog guard, census denial, ledger geometry and the transferred-weight sum. |
+| In-memory application of the `-001` fix with the R337 runtime file | The strict xfail flips (one strict failure, as designed); **113 others pass in 7.17 s.** |
+| Record gates after this section | **86 passed in 1.25 s.** |
+
+Range hygiene: `git diff --check` is clean. A scan of the 22,860 added lines
+found no credential, licensed row, backtest ID or new low-entropy fingerprint
+beyond the record's known items; the one credential-shaped string is a synthetic
+test constant.
+
+Artifacts metadata census by `stat` only, sorted: 9,163 entries before and after
+the review's test runs, identical in name, inode, size, mtime, ctime, mode and
+link count. These are two endpoint observations, not continuous stability.
+
+### 340.6 Handoff
+
+This review adds two commits, which go out in one push:
+
+- `c2bca9ba`, the new test file;
+- this record commit.
+
+No result cell, look or booking was added: 338/259/54/699 stays. QC and Safari
+remain off limits, and this review releases nothing.
+
+Before any QC upload of the quarantine variant, a new versioned freeze must
+correct `ARV2R340-001` and `-002`, run the lane's forbidden-import audit over
+the generated files, and re-prepare the six cells.
+
+The immediate next step is that Codex counter-reviews section 340 and its new
+test file.

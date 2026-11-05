@@ -174,9 +174,32 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     fundamental_universe_discovery_worker.py global_input_bundle.py
     global_input_schema.py historical_preopen_input_adapter.py
     in_qc_preopen_terminal_stream.py lean_source_assembly.py
-    matched_mia_recovery.py newrule_comparison_projection.py
+    legacy_six_october_reporting.py
+    matched_mia_recovery.py newrule_available_history_common_price_runtime.py
+    newrule_available_history_comparison_runtime.py
+    newrule_available_history_native_coverage.py
+    newrule_common_price_comparison_runtime.py
+    newrule_common_price_format.py
+    newrule_common_price_qc_runtime.py
+    newrule_comparison_projection.py
     newrule_comparison_qc_runtime.py newrule_comparison_submission.py
-    newrule_comparison_targets.py object_store_read_contract.py
+    newrule_comparison_targets.py newrule_firstrate_common_price_qc_runtime.py
+    newrule_firstrate_price_format.py
+    newrule_five_case_quarantine_common_price.py
+    newrule_five_case_quarantine_contract.py
+    newrule_five_case_quarantine_policy.py
+    newrule_five_case_quarantine_runtime.py
+    newrule_five_case_quarantine_targets.py
+    newrule_five_case_quarantine_vendor_book.py
+    newrule_native_price_book_publication.py
+    newrule_native_price_book_runtime.py
+    newrule_native_price_source_diagnostic.py
+    newrule_plain_comparison.py
+    newrule_plain_input_runtime.py
+    newrule_plain_projection.py
+    newrule_plain_transport.py
+    newrule_raw_vendor_price_book_runtime.py
+    object_store_read_contract.py
     owner_signature_authority.py physical_accepted_risk_archive.py
     physical_firm_ontology_candidate_archive.py
     physical_firm_ontology_review_packet.py
@@ -226,6 +249,49 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
 )
 
 _ZERO_EXTERNAL_IO_IMPORTS = {
+    "legacy_six_october_reporting.py": tuple(
+        """
+        hashlib json datetime decimal
+        """.split()
+    ),
+    "newrule_common_price_format.py": tuple(
+        """
+        datetime decimal hashlib json re time
+        """.split()
+    ),
+    "newrule_firstrate_price_format.py": tuple(
+        """
+        datetime decimal hashlib json re accepted_risk_preliminary_qc_figi
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi
+        """.split()
+    ),
+    "newrule_five_case_quarantine_contract.py": tuple(
+        """
+        hashlib json re datetime decimal types newrule_available_history_comparison_runtime
+        newrule_five_case_quarantine_common_price newrule_five_case_quarantine_vendor_book
+        newrule_five_case_quarantine_targets research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime
+        research.analyst_revisions_v2_qc.newrule_five_case_quarantine_common_price
+        research.analyst_revisions_v2_qc.newrule_five_case_quarantine_vendor_book
+        research.analyst_revisions_v2_qc.newrule_five_case_quarantine_targets
+        """.split()
+    ),
+    "newrule_five_case_quarantine_policy.py": tuple(
+        """
+        hashlib json
+        """.split()
+    ),
+    "newrule_five_case_quarantine_targets.py": tuple(
+        """
+        dataclasses hashlib json decimal newrule_comparison_targets
+        newrule_five_case_quarantine_policy accepted_risk_preliminary_qc_figi
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_comparison_targets
+        research.analyst_revisions_v2_qc.newrule_five_case_quarantine_policy
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi
+        """.split()
+    ),
     "accepted_risk_preopen_rating_score.py": tuple(
         """
         dataclasses collections decimal fractions accepted_risk_preliminary_rating_evaluator
@@ -500,6 +566,28 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "newrule_plain_comparison.py": tuple(
+        """
+        __future__ dataclasses json os threading weakref types research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_comparison_submission
+        research.analyst_revisions_v2_qc.newrule_plain_projection
+        """.split()
+    ),
+    "newrule_plain_projection.py": tuple(
+        """
+        __future__ ast dataclasses hashlib json os re threading types weakref scripts
+        scripts.arv2_r298_recovery_evidence research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_comparison_projection
+        research.analyst_revisions_v2_qc.newrule_plain_transport
+        """.split()
+    ),
+    "newrule_plain_transport.py": tuple(
+        """
+        __future__ dataclasses hashlib json os re threading weakref zlib
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
+        """.split()
+    ),
     "newrule_comparison_submission.py": tuple(
         """
         __future__ dataclasses hashlib http.client json os re stat time weakref
@@ -1803,6 +1891,9 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
 }
 
 _HOST_ONLY_ADAPTER_IO_SURFACE = {
+    "newrule_plain_comparison.py": ("import:os",),
+    "newrule_plain_projection.py": ("import:os",),
+    "newrule_plain_transport.py": ("import:os",),
     "newrule_comparison_submission.py": (
         "call:open", "call:read_bytes", "import:http", "import:os", "import:pathlib",
     ),
@@ -2145,7 +2236,147 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
     ),
 }
 
+# R343 registry completion records exact surfaces; it grants no cloud/run admission.
+# In particular, quarantine_common_price's subprocess import remains the known
+# R340-002 launch blocker, and the prospective FirstRate reader import is absent
+# from this host package. Neither is made cloud-safe by classification here.
 _QC_RUNTIME_IMPORTS = {
+    "newrule_available_history_common_price_runtime.py": tuple(
+        """
+        hashlib json re datetime decimal types newrule_available_history_comparison_runtime
+        newrule_common_price_qc_runtime newrule_native_price_book_runtime
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime
+        research.analyst_revisions_v2_qc.newrule_common_price_qc_runtime
+        research.analyst_revisions_v2_qc.newrule_native_price_book_runtime
+        """.split()
+    ),
+    "newrule_available_history_comparison_runtime.py": tuple(
+        """
+        hashlib itertools json datetime decimal zoneinfo newrule_legacy_primitives
+        newrule_comparison_targets accepted_risk_preopen_rating_score
+        accepted_risk_order_level_core accepted_risk_order_level_input_runtime
+        accepted_risk_preliminary_qc_figi accepted_risk_order_level_forced_exit
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime
+        research.analyst_revisions_v2_qc.newrule_comparison_targets
+        research.analyst_revisions_v2_qc.accepted_risk_preopen_rating_score
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_core
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_input_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_forced_exit
+        """.split()
+    ),
+    "newrule_available_history_native_coverage.py": tuple(
+        """
+        collections datetime decimal hashlib json math re time newrule_native_price_book_runtime
+        arv2_r327_available_history_period research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_native_price_book_runtime scripts
+        scripts.arv2_r327_available_history_period
+        """.split()
+    ),
+    "newrule_common_price_comparison_runtime.py": tuple(
+        """
+        hashlib json re datetime decimal types newrule_comparison_qc_runtime
+        newrule_common_price_qc_runtime newrule_native_price_book_runtime
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime
+        research.analyst_revisions_v2_qc.newrule_common_price_qc_runtime
+        research.analyst_revisions_v2_qc.newrule_native_price_book_runtime
+        """.split()
+    ),
+    "newrule_common_price_qc_runtime.py": tuple(
+        """
+        hashlib json collections datetime decimal types zoneinfo
+        newrule_native_price_source_diagnostic research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_native_price_source_diagnostic
+        newrule_native_price_book_runtime newrule_raw_vendor_price_book_runtime
+        research.analyst_revisions_v2_qc.newrule_native_price_book_runtime
+        research.analyst_revisions_v2_qc.newrule_raw_vendor_price_book_runtime
+        """.split()
+    ),
+    "newrule_firstrate_common_price_qc_runtime.py": tuple(
+        """
+        hashlib json collections datetime decimal types zoneinfo
+        newrule_native_price_source_diagnostic research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_native_price_source_diagnostic
+        newrule_native_price_book_runtime newrule_raw_vendor_price_book_runtime
+        newrule_firstrate_price_book_runtime
+        research.analyst_revisions_v2_qc.newrule_native_price_book_runtime
+        research.analyst_revisions_v2_qc.newrule_raw_vendor_price_book_runtime
+        research.analyst_revisions_v2_qc.newrule_firstrate_price_book_runtime
+        """.split()
+    ),
+    "newrule_five_case_quarantine_common_price.py": tuple(
+        """
+        hashlib json collections datetime decimal types subprocess zoneinfo
+        newrule_native_price_source_diagnostic newrule_common_price_format
+        newrule_five_case_quarantine_targets research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_native_price_source_diagnostic
+        research.analyst_revisions_v2_qc.newrule_common_price_format
+        research.analyst_revisions_v2_qc.newrule_five_case_quarantine_targets
+        newrule_five_case_quarantine_vendor_book
+        research.analyst_revisions_v2_qc.newrule_five_case_quarantine_vendor_book
+        """.split()
+    ),
+    "newrule_five_case_quarantine_runtime.py": tuple(
+        """
+        newrule_five_case_quarantine_contract research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_five_case_quarantine_contract
+        """.split()
+    ),
+    "newrule_five_case_quarantine_vendor_book.py": tuple(
+        """
+        collections datetime decimal json time newrule_common_price_format
+        newrule_native_price_source_diagnostic newrule_native_price_book_publication
+        newrule_five_case_quarantine_targets research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_common_price_format
+        research.analyst_revisions_v2_qc.newrule_native_price_source_diagnostic
+        research.analyst_revisions_v2_qc.newrule_native_price_book_publication
+        research.analyst_revisions_v2_qc.newrule_five_case_quarantine_targets
+        """.split()
+    ),
+    "newrule_native_price_book_publication.py": tuple(
+        """
+        hashlib json math re time collections datetime newrule_native_price_source_diagnostic
+        System research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_native_price_source_diagnostic
+        """.split()
+    ),
+    "newrule_native_price_book_runtime.py": tuple(
+        """
+        hashlib json math re time collections datetime decimal
+        newrule_native_price_source_diagnostic newrule_native_price_book_publication
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_native_price_source_diagnostic
+        research.analyst_revisions_v2_qc.newrule_native_price_book_publication
+        """.split()
+    ),
+    "newrule_native_price_source_diagnostic.py": tuple(
+        """
+        __future__ hashlib json re time collections datetime decimal zoneinfo
+        accepted_risk_order_level_input_runtime accepted_risk_preliminary_qc_figi
+        newrule_legacy_primitives research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_input_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime
+        """.split()
+    ),
+    "newrule_plain_input_runtime.py": tuple(
+        """
+        dataclasses hashlib itertools json re accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        """.split()
+    ),
+    "newrule_raw_vendor_price_book_runtime.py": tuple(
+        """
+        collections datetime decimal json time newrule_common_price_format
+        newrule_native_price_book_runtime research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.newrule_common_price_format
+        research.analyst_revisions_v2_qc.newrule_native_price_book_runtime
+        """.split()
+    ),
     "newrule_comparison_qc_runtime.py": tuple(
         """
         hashlib itertools json datetime decimal zoneinfo newrule_legacy_primitives
@@ -2408,7 +2639,45 @@ _QC_RUNTIME_IMPORTS = {
     ),
 }
 _QC_RUNTIME_IO_SURFACE = {
-    "newrule_comparison_qc_runtime.py": ("call:history", "call:set_summary_statistic"),
+    "newrule_available_history_common_price_runtime.py": ("call:set_summary_statistic",),
+    "newrule_available_history_comparison_runtime.py": (
+        "call:history",
+        "call:market_order",
+        "call:set_summary_statistic",
+    ),
+    "newrule_available_history_native_coverage.py": (),
+    "newrule_common_price_comparison_runtime.py": ("call:set_summary_statistic",),
+    "newrule_common_price_qc_runtime.py": (),
+    "newrule_firstrate_common_price_qc_runtime.py": (),
+    "newrule_five_case_quarantine_common_price.py": ("import:subprocess",),
+    "newrule_five_case_quarantine_runtime.py": (
+        "call:market_order",
+        "call:set_summary_statistic",
+    ),
+    "newrule_five_case_quarantine_vendor_book.py": ("call:read_bytes",),
+    "newrule_native_price_book_publication.py": (
+        "call:contains_key",
+        "call:read_bytes",
+        "call:save_bytes",
+    ),
+    "newrule_native_price_book_runtime.py": (
+        "call:add_security",
+        "call:read_bytes",
+    ),
+    "newrule_native_price_source_diagnostic.py": (
+        "call:add_security",
+        "call:history",
+    ),
+    "newrule_plain_input_runtime.py": (
+        "call:contains_key",
+        "call:read_bytes",
+    ),
+    "newrule_raw_vendor_price_book_runtime.py": ("call:read_bytes",),
+    "newrule_comparison_qc_runtime.py": (
+        "call:history",
+        "call:market_order",
+        "call:set_summary_statistic",
+    ),
     "accepted_risk_eight_universe_input_qc_runtime.py": (
         "call:set_summary_statistic",
     ),
@@ -2418,6 +2687,7 @@ _QC_RUNTIME_IO_SURFACE = {
         "call:read_bytes",
     ),
     "accepted_risk_qqq_order_level_qc_runtime.py": (
+        "call:add_security",
         "call:history",
         "call:market_on_open_order",
         "call:open",
@@ -2510,12 +2780,14 @@ _QC_RUNTIME_IO_SURFACE = {
         "call:set_summary_statistic",
     ),
     "accepted_risk_six_universe_order_qc_runtime.py": (
+        "call:add_security",
         "call:history",
         "call:market_on_open_order",
         "call:remove_security",
         "call:set_summary_statistic",
     ),
     "accepted_risk_six_universe_order_bridge_qc_runtime.py": (
+        "call:add_security",
         "call:set_summary_statistic",
     ),
     "accepted_risk_six_universe_order_tilt_qc_runtime.py": (),
@@ -2530,6 +2802,9 @@ research.analyst_revisions_v2_qc.formal_input_composer research.analyst_revision
 research.analyst_revisions_v2_qc.formal_runtime_projection research.analyst_revisions_v2_qc.formal_run_protocol
 research.analyst_revisions_v2_qc.power_calibration_runtime research.analyst_revisions_v2_qc.power_calibration_bridge
 research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2_qc.formal_run_protocol
+research.analyst_revisions_v2_qc.newrule_five_case_quarantine_contract research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime
+research.analyst_revisions_v2_qc.newrule_five_case_quarantine_contract research.analyst_revisions_v2_qc.newrule_five_case_quarantine_common_price
+research.analyst_revisions_v2_qc.newrule_five_case_quarantine_contract research.analyst_revisions_v2_qc.newrule_five_case_quarantine_vendor_book
 """.strip().splitlines()
 )
 
@@ -3486,6 +3761,8 @@ def _no_io_violations(source: str) -> tuple[str, ...]:
         "launch",
         "history",
         "add_equity",
+        "add_security",
+        "market_order",
         "market_on_open_order",
         "remove_security",
         "set_summary_statistic",
@@ -3557,6 +3834,18 @@ def test_no_io_closure_catches_aliased_market_on_open_order_capability():
         "    return submit('SPY', 1)\n"
     )
     assert _no_io_violations(source) == ("call:market_on_open_order",)
+
+
+@pytest.mark.parametrize("method", ("add_security", "market_order"))
+def test_no_io_closure_catches_subscription_and_immediate_order_aliases(method):
+    """Direct and literal alias forms stay visible in the exact runtime surface."""
+    for source in (
+        f"def hidden(runtime):\n    return runtime.{method}('x')\n",
+        f"def hidden(runtime):\n    submit = runtime.{method}\n    return submit('x')\n",
+        f"def hidden(runtime):\n    return getattr(runtime, '{method}')('x')\n",
+        f"def hidden(runtime):\n    return runtime.__getattribute__('{method}')('x')\n",
+    ):
+        assert _no_io_violations(source) == (f"call:{method}",)
 
 
 def _local_module_path(module_name: str) -> tuple[Path, bool] | None:
@@ -4171,6 +4460,82 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
             "preopen_terminal_semantics",
         ),
         (
+            "research.analyst_revisions_v2_qc.newrule_available_history_common_price_runtime",
+            "newrule_available_history_comparison_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_available_history_common_price_runtime",
+            "newrule_common_price_qc_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_available_history_common_price_runtime",
+            "newrule_native_price_book_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime",
+            "accepted_risk_order_level_core",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime",
+            "accepted_risk_order_level_forced_exit",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime",
+            "accepted_risk_order_level_input_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime",
+            "accepted_risk_preliminary_qc_figi",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime",
+            "accepted_risk_preopen_rating_score",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime",
+            "newrule_comparison_targets",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime",
+            "newrule_legacy_primitives",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_available_history_native_coverage",
+            "arv2_r327_available_history_period",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_available_history_native_coverage",
+            "newrule_native_price_book_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_available_history_native_coverage",
+            "scripts.arv2_r327_available_history_period",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_common_price_comparison_runtime",
+            "newrule_common_price_qc_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_common_price_comparison_runtime",
+            "newrule_comparison_qc_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_common_price_comparison_runtime",
+            "newrule_native_price_book_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_common_price_qc_runtime",
+            "newrule_native_price_book_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_common_price_qc_runtime",
+            "newrule_native_price_source_diagnostic",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_common_price_qc_runtime",
+            "newrule_raw_vendor_price_book_runtime",
+        ),
+        (
             "research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime",
             "accepted_risk_order_level_core",
         ),
@@ -4201,6 +4566,134 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
         (
             "research.analyst_revisions_v2_qc.newrule_comparison_submission",
             "research.quantconnect",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_firstrate_common_price_qc_runtime",
+            "newrule_firstrate_price_book_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_firstrate_common_price_qc_runtime",
+            "newrule_native_price_book_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_firstrate_common_price_qc_runtime",
+            "newrule_native_price_source_diagnostic",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_firstrate_common_price_qc_runtime",
+            "newrule_raw_vendor_price_book_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_firstrate_common_price_qc_runtime",
+            "research.analyst_revisions_v2_qc.newrule_firstrate_price_book_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_firstrate_price_format",
+            "accepted_risk_preliminary_qc_figi",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_common_price",
+            "newrule_common_price_format",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_common_price",
+            "newrule_five_case_quarantine_targets",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_common_price",
+            "newrule_five_case_quarantine_vendor_book",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_common_price",
+            "newrule_native_price_source_diagnostic",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_contract",
+            "newrule_available_history_comparison_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_contract",
+            "newrule_five_case_quarantine_common_price",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_contract",
+            "newrule_five_case_quarantine_targets",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_contract",
+            "newrule_five_case_quarantine_vendor_book",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_runtime",
+            "newrule_five_case_quarantine_contract",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_targets",
+            "accepted_risk_preliminary_qc_figi",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_targets",
+            "newrule_comparison_targets",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_targets",
+            "newrule_five_case_quarantine_policy",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_vendor_book",
+            "newrule_common_price_format",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_vendor_book",
+            "newrule_five_case_quarantine_targets",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_vendor_book",
+            "newrule_native_price_book_publication",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_vendor_book",
+            "newrule_native_price_source_diagnostic",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_native_price_book_publication",
+            "newrule_native_price_source_diagnostic",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_native_price_book_runtime",
+            "newrule_native_price_book_publication",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_native_price_book_runtime",
+            "newrule_native_price_source_diagnostic",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_native_price_source_diagnostic",
+            "accepted_risk_order_level_input_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_native_price_source_diagnostic",
+            "accepted_risk_preliminary_qc_figi",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_native_price_source_diagnostic",
+            "newrule_legacy_primitives",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_plain_input_runtime",
+            "accepted_risk_preliminary_rating_evaluator",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_plain_projection",
+            "scripts.arv2_r298_recovery_evidence",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_raw_vendor_price_book_runtime",
+            "newrule_common_price_format",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.newrule_raw_vendor_price_book_runtime",
+            "newrule_native_price_book_runtime",
         ),
         (
             "research.analyst_revisions_v2_qc.physical_accepted_risk_archive",
@@ -4567,6 +5060,55 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
 
 _PINNED_PROJECTED_SIBLING_IMPORTS = frozenset(
     {
+        ("research.analyst_revisions_v2_qc.newrule_available_history_common_price_runtime", "newrule_available_history_comparison_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_available_history_common_price_runtime", "newrule_common_price_qc_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_available_history_common_price_runtime", "newrule_native_price_book_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime", "accepted_risk_order_level_core"),
+        ("research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime", "accepted_risk_order_level_forced_exit"),
+        ("research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime", "accepted_risk_order_level_input_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime", "accepted_risk_preliminary_qc_figi"),
+        ("research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime", "accepted_risk_preopen_rating_score"),
+        ("research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime", "newrule_comparison_targets"),
+        ("research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime", "newrule_legacy_primitives"),
+        ("research.analyst_revisions_v2_qc.newrule_available_history_native_coverage", "arv2_r327_available_history_period"),
+        ("research.analyst_revisions_v2_qc.newrule_available_history_native_coverage", "newrule_native_price_book_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_common_price_comparison_runtime", "newrule_common_price_qc_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_common_price_comparison_runtime", "newrule_comparison_qc_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_common_price_comparison_runtime", "newrule_native_price_book_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_common_price_qc_runtime", "newrule_native_price_book_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_common_price_qc_runtime", "newrule_native_price_source_diagnostic"),
+        ("research.analyst_revisions_v2_qc.newrule_common_price_qc_runtime", "newrule_raw_vendor_price_book_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_firstrate_common_price_qc_runtime", "newrule_firstrate_price_book_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_firstrate_common_price_qc_runtime", "newrule_native_price_book_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_firstrate_common_price_qc_runtime", "newrule_native_price_source_diagnostic"),
+        ("research.analyst_revisions_v2_qc.newrule_firstrate_common_price_qc_runtime", "newrule_raw_vendor_price_book_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_firstrate_common_price_qc_runtime", "research.analyst_revisions_v2_qc.newrule_firstrate_price_book_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_firstrate_price_format", "accepted_risk_preliminary_qc_figi"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_common_price", "newrule_common_price_format"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_common_price", "newrule_five_case_quarantine_targets"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_common_price", "newrule_five_case_quarantine_vendor_book"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_common_price", "newrule_native_price_source_diagnostic"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_contract", "newrule_available_history_comparison_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_contract", "newrule_five_case_quarantine_common_price"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_contract", "newrule_five_case_quarantine_targets"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_contract", "newrule_five_case_quarantine_vendor_book"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_runtime", "newrule_five_case_quarantine_contract"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_targets", "accepted_risk_preliminary_qc_figi"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_targets", "newrule_comparison_targets"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_targets", "newrule_five_case_quarantine_policy"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_vendor_book", "newrule_common_price_format"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_vendor_book", "newrule_five_case_quarantine_targets"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_vendor_book", "newrule_native_price_book_publication"),
+        ("research.analyst_revisions_v2_qc.newrule_five_case_quarantine_vendor_book", "newrule_native_price_source_diagnostic"),
+        ("research.analyst_revisions_v2_qc.newrule_native_price_book_publication", "newrule_native_price_source_diagnostic"),
+        ("research.analyst_revisions_v2_qc.newrule_native_price_book_runtime", "newrule_native_price_book_publication"),
+        ("research.analyst_revisions_v2_qc.newrule_native_price_book_runtime", "newrule_native_price_source_diagnostic"),
+        ("research.analyst_revisions_v2_qc.newrule_native_price_source_diagnostic", "accepted_risk_order_level_input_runtime"),
+        ("research.analyst_revisions_v2_qc.newrule_native_price_source_diagnostic", "accepted_risk_preliminary_qc_figi"),
+        ("research.analyst_revisions_v2_qc.newrule_native_price_source_diagnostic", "newrule_legacy_primitives"),
+        ("research.analyst_revisions_v2_qc.newrule_plain_input_runtime", "accepted_risk_preliminary_rating_evaluator"),
+        ("research.analyst_revisions_v2_qc.newrule_raw_vendor_price_book_runtime", "newrule_common_price_format"),
+        ("research.analyst_revisions_v2_qc.newrule_raw_vendor_price_book_runtime", "newrule_native_price_book_runtime"),
         ("research.analyst_revisions_v2_qc.accepted_risk_preopen_rating_score", "accepted_risk_preliminary_rating_evaluator"),
         ("research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime", "accepted_risk_order_level_core"),
         ("research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime", "accepted_risk_order_level_forced_exit"),
@@ -5150,11 +5692,34 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.historical_preopen_input_adapter",
         "research.analyst_revisions_v2_qc.in_qc_preopen_terminal_stream",
         "research.analyst_revisions_v2_qc.lean_source_assembly",
+        "research.analyst_revisions_v2_qc.legacy_six_october_reporting",
         "research.analyst_revisions_v2_qc.matched_mia_recovery",
+        "research.analyst_revisions_v2_qc.newrule_available_history_common_price_runtime",
+        "research.analyst_revisions_v2_qc.newrule_available_history_comparison_runtime",
+        "research.analyst_revisions_v2_qc.newrule_available_history_native_coverage",
+        "research.analyst_revisions_v2_qc.newrule_common_price_comparison_runtime",
+        "research.analyst_revisions_v2_qc.newrule_common_price_format",
+        "research.analyst_revisions_v2_qc.newrule_common_price_qc_runtime",
         "research.analyst_revisions_v2_qc.newrule_comparison_projection",
         "research.analyst_revisions_v2_qc.newrule_comparison_qc_runtime",
         "research.analyst_revisions_v2_qc.newrule_comparison_submission",
         "research.analyst_revisions_v2_qc.newrule_comparison_targets",
+        "research.analyst_revisions_v2_qc.newrule_firstrate_common_price_qc_runtime",
+        "research.analyst_revisions_v2_qc.newrule_firstrate_price_format",
+        "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_common_price",
+        "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_contract",
+        "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_policy",
+        "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_runtime",
+        "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_targets",
+        "research.analyst_revisions_v2_qc.newrule_five_case_quarantine_vendor_book",
+        "research.analyst_revisions_v2_qc.newrule_native_price_book_publication",
+        "research.analyst_revisions_v2_qc.newrule_native_price_book_runtime",
+        "research.analyst_revisions_v2_qc.newrule_native_price_source_diagnostic",
+        "research.analyst_revisions_v2_qc.newrule_plain_comparison",
+        "research.analyst_revisions_v2_qc.newrule_plain_input_runtime",
+        "research.analyst_revisions_v2_qc.newrule_plain_projection",
+        "research.analyst_revisions_v2_qc.newrule_plain_transport",
+        "research.analyst_revisions_v2_qc.newrule_raw_vendor_price_book_runtime",
         "research.analyst_revisions_v2_qc.object_store_read_contract",
         "research.analyst_revisions_v2_qc.owner_signature_authority",
         "research.analyst_revisions_v2_qc.physical_accepted_risk_archive",
@@ -5280,6 +5845,8 @@ def test_no_io_guard_detects_transitive_and_attribute_call_mutants():
     ) == ("call:open",)
     for method in (
         "add_equity",
+        "add_security",
+        "market_order",
         "history",
         "remove_security",
         "save_bytes",

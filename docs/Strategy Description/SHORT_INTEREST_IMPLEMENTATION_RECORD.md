@@ -33003,3 +33003,105 @@ Staged whitespace checking caught one extra final blank line in the new producer
 test; Main removed only that blank line and verified identical parsed AST.
 The202 execution above preceded this whitespace-only test-file trim; source
 bytes and execution manifests are unchanged.
+
+## 153. Actual full offline USB inspection closed with original checks (2026-11-04)
+
+Under continuing SI-AUTH-20261104-01 / SI-DEC-20261104-04, Main invoked the
+registered si-usb-offline-once-20261104-v1 ONCE at clean
+3a0951e2c3a72c92c9af575eeb871943bb608d57, matching actual/tracking origin
+af1d00f66a8d611997749c164a04c48e4eb635e4. No old invocation or claim was
+restarted. The original Node observer, process objects, accepted closure and
+bounded private bytes were retained; no JSON status alone was accepted.
+
+Original worker2734 actually exited0, signalnull, both stdio EOF, stderr0,
+automatic shutdownfalse, no first/cleanup failure and test_seams_used=false.
+Original closure validation was50108ms. Genuine original five-code initial and
+terminal windows, ALL four source contexts and verified RAM execution closed;
+original code file10 stamps were equal. All four permanent Python denial
+counters were zero. No source/provider credentials, HTTP, new claim, START,
+charged byte, outcome or QC/Safari operation occurred.
+
+| Original binding | Actual authenticated value |
+| --- | --- |
+| Runtime HEAD | 3a0951e2c3a72c92c9af575eeb871943bb608d57 |
+| Worker7 mapping SHA256 | 3cbe45cf52f9374521e4cc630486f0d5d136270d1ff16e8feb4190b296a1620c |
+| Observer source SHA256 | a2eb9fb6040718112c6d6f11cf40e907983716c783a3fd388353b772132bb906 |
+| Original packet bytes/SHA256 | 6761 / 7d2e9dddb55252ccd858fe09b9457bdd1809af8d93336a156953694ea9231cd0 |
+| Private aggregate bytes/SHA256 | 3435 / 3bad39e192d6a2ce81f8f18238201b84b7f3791a563de158bccd11a9eaeef0c8 |
+| Original observation SHA256 | a050080f72b78346928fa7e884b2e6d9cbea546bbd2b27b8200f62452581cb07 |
+| Model policy SHA256 | a403579c17c31010ae26eaddf1350a7f1d313cbf6bdae9b6d815f1ccd83121fe |
+| Equal initial/terminal code-file10 SHA256 | 4362958295cba6f07a8893b4af05716c69b1c35e306d9482a22fa9b4967eab5d |
+| Source original10 SHA256 | 349b57ed1840007d7c8b0f9083c90a7d84789443aed255307202d6df0af51a88 |
+
+Private publication2977 and independent read-only auditor2978 each actually
+exited0, signalnull, both EOF and stderr0. The original acceptance getter ran
+AFTER publication, all fresh file/ancestry audits and process closures. Main's
+captured final controller elapsed was50175ms, within the SAME original180s;
+there was no clock extension or late initial acceptance. Copier status was
+private_observation_copy_closed, auditor original_private_files_authenticated,
+all first/cleanup failuresnull/empty, controller_failurenull.
+
+The fixed private run in AppSupport CodexShortInterestUSBObservation contains
+EXACTLY the two registered files. Original bytes and creator full10 seals were
+independently matched, with no source/row/usability values emitted:
+
+| Original private file | Bytes | SHA256 | Original file10 SHA256 |
+| --- | --- | --- | --- |
+| producer.stdout.private | 6761 | 7d2e9dddb55252ccd858fe09b9457bdd1809af8d93336a156953694ea9231cd0 | 9330e856059ef22204bc1bc04429f22345bab97d32602b4ed4ae82c6b7b51504 |
+| observation.private.json | 2049 | c54dedf84c08b4c550d24aefe8d7afa279b98965550549119df70e95f7651f8f | f32647fc98807933d0e54859fe8877dd35368d455523d95600084dca792f8373 |
+
+Original leaf5 SHA256
+e54fa308f06fcbff727c3d272ec7aa1c170f0aad77206105f321f7b9317fcd14;
+original ancestry5 SHA256
+79566f19568e980bf8f60f580004fb3996c12195b1ed7c483e46c4889a9184a2.
+Copier process claims remain explicitly caller-attested historical copies;
+the original Node owned-process witness established actual supervision.
+No other file was added to that run, no native-proof/profile base was changed,
+and all old negatives/data/claims remain intact.
+
+Before the real dispatch, the desktop REPL rejected dataURL imports, lacked a
+top-level process binding, and its cross-cell primitive bindings did not update
+an earlier closure clock. These were Main control-plane setup failures BEFORE
+any source process or publication, not source/custody refusals. Main verified
+the native immutable module loader using a source-free fixture, used supported
+perf_hooks/owned ChildProcess APIs and one retained mutable state object, then
+passed a real source-free transport/audit-syntax fixture: exit0, both EOF,
+stderr0. The actual observer/source7/copier files and checks were not changed.
+No failed setup was described as an actual USB run or reused spent namespace.
+
+This demonstrates a genuine full finite external-byte inspection with original
+checks; continuous shared-ancestor timestamps remain explicitlyfalse. It does
+not prove permanent environmental repair, vendor rights/upstream origin,
+historical availability, native/class/CIK/USD mapping, denominator, actual-input
+or backtest admission. Private aggregate values and source-usability conclusions
+stay out of Git/chat. All source/admission/readiness flags remainfalse, and the
+empirical runner's fabricated-only gate remains unchanged.
+
+Next authorized bounded work: authenticate the RETAINED private observation
+against a fixed committed actual anchor and historical code/control lineage,
+then derive a sealed source-only qualification catalogue without another USB
+scan/model replay. No aggregate-to-count iterator, vendor-page relabelling,
+CompactNativeSource/LatestRevisedBundle cast or input authority is allowed.
+Review existing protected rights/upstream evidence within its exact scope;
+a public false authority flag alone is not proof of an irreducible external
+blocker. Later native/class/date/own-class denominator/market/cash binders remain.
+The independently frozen latest-revised descriptive candidate may use its
+hypothetical schedule-next-open convention while remaining non-PIT; missing
+canonical original vintages alone must not automatically block that route.
+
+No active pinned source/publisher/auditor remains. All fixed new namespaces
+and this invocation are spent for their registered purpose: NEVER rerun/reset/
+overwrite/adopt them. Main may analyse the captured private historical bytes
+without claiming fresh live custody. No new provider retrieval before the USB
+qualification step, no QC/Safari or purchases. Count84005START/4294967296bytes,
+permanent unknown8START/16777216bytes and separate DAILY36837attempts/
+3327988047bytes/71468572rows remain exact; the old14000START/40229897bytes bound
+is historical, not a fresh re-audit. Looks0/0, exploratory0, alpha0, IDsnone,
+QCattempts0. The four local commits through3a0951 remain accumulated, with
+ZERO pushes this round. Continue toward the last step before QC/Safari and
+reserve the ONE final matching-lane nonforce push for the completed round or
+a concrete final owner/external blocker.
+
+Main post-result active-document/counter-review-record selection passed89/.91s;
+historical prefix, original committed software and whitespace checks remain
+intact. No full suite or independent Claude review was run.

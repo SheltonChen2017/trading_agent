@@ -312,6 +312,17 @@ def _publish(directory, name, raw):
         _fail()
     temporary = ".pending-" + uuid.uuid4().hex
     fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=directory)
+    failure = None
+
+    def retain(error):
+        nonlocal failure
+        # Cancellation wins; otherwise keep the first fatal stop. In
+        # particular, ordinary cleanup must not turn a stop into a refusal.
+        if (failure is None or not isinstance(failure, KeyboardInterrupt)
+                and (isinstance(error, KeyboardInterrupt)
+                    or isinstance(failure, Exception) and not isinstance(error, Exception))):
+            failure = error
+
     try:
         if not _file_ok(os.fstat(fd)):
             _fail()
@@ -324,14 +335,22 @@ def _publish(directory, name, raw):
         os.fsync(fd)
         os.link(temporary, name, src_dir_fd=directory, dst_dir_fd=directory, follow_symlinks=False)
         os.fsync(directory)
+    except BaseException as error:
+        retain(error)
+    try:
+        named, owned = os.stat(temporary, dir_fd=directory, follow_symlinks=False), os.fstat(fd)
+        if (named.st_dev, named.st_ino) == (owned.st_dev, owned.st_ino):
+            os.unlink(temporary, dir_fd=directory)
+            os.fsync(directory)
+    except BaseException as error:
+        retain(error)
     finally:
         try:
-            named, owned = os.stat(temporary, dir_fd=directory, follow_symlinks=False), os.fstat(fd)
-            if (named.st_dev, named.st_ino) == (owned.st_dev, owned.st_ino):
-                os.unlink(temporary, dir_fd=directory)
-                os.fsync(directory)
-        finally:
             os.close(fd)
+        except BaseException as error:
+            retain(error)
+    if failure is not None:
+        raise failure
 
 
 def _open_directory(path):
@@ -545,6 +564,10 @@ def execute_prepared_read(plan, capsule, directory, *, program_raw, native_read,
             # disclose a native/OS payload after a closed receipt was saved.
             # Never retry an uncertain close or invent a publication result.
             if final is not None:
+                if not publication_confirmed:
+                    final = validate_receipt({**final,
+                        "status": "cancelled" if cancelled or isinstance(error, KeyboardInterrupt) else "failed_or_uncertain",
+                        "failure_stage": _stop_stage(final)})
                 if cancelled or isinstance(error, KeyboardInterrupt):
                     raise ControllerCancelled(final, receipt_published=publication_confirmed) from None
                 if escaped is not None:

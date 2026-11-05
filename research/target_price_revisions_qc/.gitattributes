@@ -1,0 +1,7 @@
+# Exact-byte QC research sources and frozen artifacts (TPR-CR33-003). Their
+# builders, bundles and tests hash these working bytes against the committed
+# LF blobs, so Git for Windows must check them out as LF even when
+# core.autocrlf=true; otherwise every pin refuses on a Windows checkout.
+# This is the same lane-scoped pattern as research/target_price_revisions/
+# (TPR-CR4-001) and changes no committed blob.
+* text eol=lf

@@ -2,11 +2,12 @@
 
 Input is an explicit in-memory projection of RAW Tick.Quote / TradeBar fields.
 Prices are already native Decimal price units (NOT the CSV integer x10000).
-Each time_ny must carry the actual New York UTC offset. No receipt, SIP,
-participant clock, source sequence, NBBO certification or permission is inferred.
+Each time_ny must carry the actual New York UTC offset and retains native
+precision through .NET's 100ns ticks. No receipt, SIP, participant clock,
+source sequence, NBBO certification or permission is inferred.
 
 An observed-venue book is a structural diagnostic, not certified national BBO.
-Unknown withdrawals/flags and ambiguous same-millisecond updates refuse. The
+Unknown withdrawals/flags and ambiguous same-event-time updates refuse. The
 existing Massive parser and SYN-only order/native engines remain unchanged.
 """
 from __future__ import annotations
@@ -32,6 +33,19 @@ MAX_BYTES = 4_194_304
 MAX_TICKS = 16_384
 _MINUTE = 60_000_000_000
 _NY = ZoneInfo("America/New_York")
+# Native ExchangeCode values, not Tick.Exchange names or arbitrary SIP letters.
+# Inspected https://github.com/QuantConnect/Lean/blob/master/Common/Exchange.cs
+# defines these USA equity venues. This is not a complete historical registry
+# or proof of this deployed binding's quote mapping/delivered subset. Broker
+# routing objects and other markets are excluded; unknown codes require source
+# qualification rather than a fabricated historical activity interval.
+_EQUITY_EXCHANGE_CODES = frozenset({
+    "A", "B", "C", "D", "I", "J", "K", "L", "M", "N", "P", "Q", "S",
+    "W", "X", "Y", "Z", "BB", "IEX", "MM", "MP", "SIAC",
+})
+_NATIVE_CLOCK = re.compile(
+    r"([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2})"
+    r"(?:\.([0-9]{1,7}))?([+-][0-9]{2}:[0-9]{2})")
 _ENVELOPE = frozenset({"schema", "provider", "data_type", "security_id", "symbol", "role",
     "session_date", "session_open_utc", "session_close_utc", "normalization", "fill_forward",
     "ticks_complete", "minutes_complete", "ticks", "minutes"})
@@ -41,19 +55,25 @@ _BAR = frozenset({"time_ny", "end_time_ny", "open", "high", "low", "close", "vol
                   "is_fill_forward"})
 
 
-def _ny_clock(value: object) -> datetime:
-    if (type(value) is not str or re.fullmatch(
-            r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?[+-]\d{2}:\d{2}", value) is None):
+def _ny_clock_ns(value: object) -> int:
+    """Retain 100ns native event times without Python datetime truncation.
+
+    LEAN's Tick reader accepts fractional milliseconds. Its one-millisecond
+    Slice buckets do not imply millisecond precision for each Tick.Time.
+    https://github.com/QuantConnect/Lean/blob/master/Common/Data/Market/Tick.cs
+    """
+    matched = _NATIVE_CLOCK.fullmatch(value) if type(value) is str else None
+    if matched is None:
         raise InputError("explicit offset New York tick clock required")
     try:
-        at = datetime.fromisoformat(value)
+        at = datetime.fromisoformat(matched[1] + matched[3])
     except ValueError as exc:
         raise InputError("invalid native clock") from exc
     local = at.astimezone(_NY)
-    if (at.utcoffset() != local.utcoffset() or at.replace(tzinfo=None) != local.replace(tzinfo=None)
-            or at.microsecond % 1000):
-        raise InputError("native clock must match New York offset and millisecond precision")
-    return at.astimezone(timezone.utc)
+    if at.utcoffset() != local.utcoffset() or at.replace(tzinfo=None) != local.replace(tzinfo=None):
+        raise InputError("native clock must match New York offset")
+    fraction_ns = int((matched[2] or "").ljust(7, "0")) * 100
+    return instant_ns(at.astimezone(timezone.utc)) + fraction_ns
 
 
 def _shares(value: object) -> int:
@@ -64,8 +84,7 @@ def _shares(value: object) -> int:
 
 
 def _exchange(value: object) -> str:
-    # This validates a code shape, not an authentic historical venue mapping.
-    if type(value) is not str or re.fullmatch(r"[A-Z]", value) is None:
+    if type(value) is not str or value not in _EQUITY_EXCHANGE_CODES:
         raise InputError("explicit native exchange code required")
     return value
 
@@ -110,9 +129,9 @@ class QcNativeQuote:
     def __post_init__(self) -> None:
         identifier(self.security_id), identifier(self.symbol), digest(self.source_sha256)
         for stamp in (self.as_of_ns, self.observed_time_ns, self.bid_updated_ns, self.ask_updated_ns):
-            if type(stamp) is not int or not 0 <= stamp <= 253402300799999999000:
+            if type(stamp) is not int or not 0 <= stamp <= 253402300799999999900:
                 raise InputError("bounded exact native quote clock required")
-        if (self.as_of_ns % 1000 or any(stamp % 1_000_000 for stamp in (
+        if (self.as_of_ns % 1000 or any(stamp % 100 for stamp in (
                 self.observed_time_ns, self.bid_updated_ns, self.ask_updated_ns))
                 or not max(self.bid_updated_ns, self.ask_updated_ns) <= self.observed_time_ns <= self.as_of_ns
                 or self.as_of_ns - min(self.bid_updated_ns, self.ask_updated_ns) > _MINUTE):
@@ -131,7 +150,7 @@ class QcNativeQuote:
     def projection(self) -> dict:
         return {"schema": "gdr.qc-native-quote.v1", "security_id": self.security_id,
             "symbol": self.symbol, "source_sha256": self.source_sha256,
-            "clock_kind": "qc_exchange_event_time", "as_of_ns": self.as_of_ns,
+            "clock_kind": "qc_native_event_time", "as_of_ns": self.as_of_ns,
             "observed_time_ns": self.observed_time_ns, "bid_updated_ns": self.bid_updated_ns,
             "ask_updated_ns": self.ask_updated_ns, "bid": decimal_text(self.bid),
             "ask": decimal_text(self.ask), "bid_size": self.bid_size, "ask_size": self.ask_size,
@@ -182,7 +201,7 @@ def _decode(raw: bytes) -> tuple[dict, tuple[_Tick, ...], tuple[HistoricalMinute
     ticks, last = [], start
     for row in rows:
         row = keys(row, _TICK)
-        stamp = instant_ns(_ny_clock(row["time_ny"]))
+        stamp = _ny_clock_ns(row["time_ny"])
         if not start <= stamp <= end or stamp < last:
             raise InputError("native ticks must be nondecreasing inside supplied regular session")
         last = stamp
@@ -201,7 +220,7 @@ def _decode(raw: bytes) -> tuple[dict, tuple[_Tick, ...], tuple[HistoricalMinute
     source, unique = hash_bytes(raw), {}
     for row in bars:
         row = keys(row, _BAR)
-        begin, finish = (instant_ns(_ny_clock(row[key])) for key in ("time_ny", "end_time_ny"))
+        begin, finish = (_ny_clock_ns(row[key]) for key in ("time_ny", "end_time_ny"))
         if (row["is_fill_forward"] is not False or begin % _MINUTE
                 or finish - begin != _MINUTE or not start <= begin < finish <= end):
             raise InputError("raw unfilled aligned complete regular-session trade minute required")
@@ -282,7 +301,8 @@ class QcNativeQuoteBatch:
         if not instant_ns(utc(body["session_open_utc"])) <= cutoff <= instant_ns(utc(body["session_close_utc"])):
             raise InputError("native quote instant outside supplied regular session")
         # Each side is either its latest observation or explicitly unknown.
-        # Consume complete equal-time groups atomically: no invented tie order.
+        # Consume complete equal-event-time groups atomically: no invented tie
+        # order. A one-millisecond Slice can contain distinct 100ns event times.
         state, observed = {}, None
         for stamp, group in groupby(ticks, key=lambda row: row.at_ns):
             if stamp > cutoff:

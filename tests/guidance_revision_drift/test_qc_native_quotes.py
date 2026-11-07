@@ -53,6 +53,76 @@ def native_batch(body=None):
 
 
 class QcNativeQuoteTests(unittest.TestCase):
+    def test_native_100ns_precision_is_preserved_without_rounding(self):
+        body = native_body()
+        body["ticks"] = native_pair(DECISION - timedelta(seconds=1))
+        for tick in body["ticks"]:
+            tick["time_ny"] = "2025-04-04T09:59:59.0001234-04:00"
+        quote = native_batch(body).decision_quote(DECISION)
+        expected = instant_ns(DECISION - timedelta(seconds=1)) + 123400
+        self.assertEqual(quote.observed_time_ns, expected)
+        self.assertEqual((quote.bid_updated_ns, quote.ask_updated_ns), (expected, expected))
+        self.assertEqual(quote.observed_time_ns % 1000, 400)
+        for invalid in ("2025-04-04T09:59:59.00012345-04:00",
+                        "2025-04-04T09:59:59.000123456-04:00"):
+            with self.subTest(invalid=invalid), self.assertRaises(InputError):
+                native_batch(dict(body, ticks=[dict(tick, time_ny=invalid) for tick in body["ticks"]]))
+
+    def test_one_native_tick_after_decision_is_not_rounded_into_cutoff(self):
+        body = native_body()
+        body["ticks"] = native_pair(DECISION - timedelta(seconds=1))
+        future = native_pair(DECISION, bid="10", ask="10.02")
+        for tick in future:
+            tick["time_ny"] = "2025-04-04T10:00:00.0000001-04:00"
+        body["ticks"] += future
+        value = native_batch(body)
+        self.assertEqual(value.decision_quote(DECISION).bid, Decimal("9.99"))
+        self.assertEqual(value.quote_at(DECISION + timedelta(microseconds=1)).bid, Decimal("10"))
+
+    def test_native_precision_keeps_exact_60_second_freshness_boundary(self):
+        body = native_body()
+        body["ticks"] = native_pair(DECISION - timedelta(seconds=60))
+        self.assertEqual(native_batch(body).decision_quote(DECISION).bid, Decimal("9.99"))
+        for tick in body["ticks"]:
+            tick["time_ny"] = "2025-04-04T09:58:59.9999999-04:00"
+        with self.assertRaisesRegex(InputError, "stale"):
+            native_batch(body).decision_quote(DECISION)
+
+    def test_distinct_100ns_events_within_one_millisecond_are_not_a_tie(self):
+        body = native_body()
+        body["ticks"] = [dict(tick, time_ny="2025-04-04T09:59:59.0000001-04:00")
+                         for tick in native_pair(DECISION - timedelta(seconds=1))]
+        body["ticks"].append(native_tick(DECISION, price="9.98",
+                            time_ny="2025-04-04T09:59:59.0000002-04:00"))
+        quote = native_batch(body).decision_quote(DECISION)
+        self.assertEqual(quote.bid, Decimal("9.98"))
+        self.assertEqual(quote.bid_updated_ns - quote.ask_updated_ns, 100)
+
+    def test_exact_100ns_conflict_requires_a_strictly_later_refresh(self):
+        body = native_body()
+        body["ticks"] = [dict(tick, time_ny="2025-04-04T09:59:59.0000001-04:00")
+                         for tick in native_pair(DECISION - timedelta(seconds=1))]
+        body["ticks"].append(dict(body["ticks"][0], bid_price="9.98"))
+        for ticks in (body["ticks"], list(reversed(body["ticks"]))):
+            with self.subTest(reversed=ticks is not body["ticks"]), self.assertRaisesRegex(InputError, "ambiguous"):
+                native_batch(dict(body, ticks=ticks)).decision_quote(DECISION)
+        body["ticks"].append(native_tick(DECISION, price="9.98",
+                            time_ny="2025-04-04T09:59:59.0000002-04:00"))
+        self.assertEqual(native_batch(body).decision_quote(DECISION).bid, Decimal("9.98"))
+
+    def test_actual_native_exchange_codes_are_strict_but_not_single_letter(self):
+        for code in ("IEX", "MM", "MP", "SIAC", "BB", "Q", "P"):
+            body = native_body()
+            body["ticks"] = native_pair(DECISION, exchange=code)
+            with self.subTest(code=code):
+                quote = native_batch(body).decision_quote(DECISION)
+                self.assertEqual((quote.bid_exchange, quote.ask_exchange), (code, code))
+        for code in ("", "UNKNOWN", "FAKE", "ZZ", "E", "U", "V", "NASDAQ", "iex"):
+            body = native_body()
+            body["ticks"] = native_pair(DECISION, exchange=code)
+            with self.subTest(code=code), self.assertRaises(InputError):
+                native_batch(body)
+
     def test_input_bounds_and_declared_flags_are_not_measured_completeness(self):
         from research.guidance_revision_drift.qc_native_quotes import MAX_BYTES, MAX_TICKS
         body = native_body()
@@ -288,9 +358,12 @@ class QcNativeQuoteTests(unittest.TestCase):
         with self.assertRaises(InputError):
             value.subsequent_minute(submitted_at=DECISION, callback_at=CALLBACK, decision_quote=late)
 
-    def test_session_offset_millisecond_and_ordering_contracts_refuse(self):
+    def test_session_offset_native_precision_and_ordering_contracts_refuse(self):
+        # Earlier millisecond-only refusal was obsolete: LEAN's Tick reader
+        # retains fractional milliseconds. Reject finer than native100ns, not
+        # valid submillisecond events; the positive precision tests pin this.
         for stamp in ("2025-04-04T09:59:59.000-05:00", "2025-04-04T09:59:59.000",
-                      "2025-04-04T09:59:59.000001-04:00", "2025-04-04T09:29:59.000-04:00"):
+                      "2025-04-04T09:59:59.00000001-04:00", "2025-04-04T09:29:59.000-04:00"):
             body = native_body()
             body["ticks"][0]["time_ny"] = stamp
             with self.subTest(stamp=stamp), self.assertRaises(InputError):
@@ -369,6 +442,7 @@ class QcNativeQuoteTests(unittest.TestCase):
         body = native_body()
         value = native_batch(body)
         before = value.decision_quote(DECISION).projection()
+        self.assertEqual(before["clock_kind"], "qc_native_event_time")
         detached = value.decision_quote(DECISION).projection()
         body["ticks"][0]["bid_price"] = "99"
         detached["bid"] = "99"

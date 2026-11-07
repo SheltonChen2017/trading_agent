@@ -1311,24 +1311,23 @@ claims. Neither category is permitted to overwrite the other.
 ## 4. Exact next step
 
 The owner explicitly waives Claude review of section 347 for this recovery.
-The owner explicitly authorizes ONE additional A4 recovery for R343-AR100
-in existing project39054561 with the prepared plain files, waiving Claude
-review for section 347 and requesting running backtest/documentation/one
-final push (347.1). A1/A2/A3 remain spent; no A5 or budget reset is inferred.
-D1's separately frozen read-only diagnosis passed and is SPENT (347.3);
-now bind its actual source/access facts, current eight-leaf DATA/security
-checks, fresh properties-only storage admission, exact source/context and
-one-shot compile/launch protocol before mutation. All future gates still
-refuse drift; the Mia identifier is not an adopted edit context.
+The ONE additional A4 in project39054561 PASSED at clean1a5759f9, actual
+operator0 and exact original-output validation. QC reported In Progress...
+for R343-AR100 backtest007d4ab27c26d337ae53acb492a83410 (347.5), after
+all18 prepared source files and six plain-object metadata gates passed.
+This is observed running, NOT completed/performance evidence or readiness.
+A1/A2/A3/A4, D1 and R346 preparation remain SPENT; do not replay/read controls,
+renew attempts, relabel old admissions or infer A5. No other arm submitted.
 
-R346's preparation passed once and stays SPENT. Only its eight actual pinned
-DATA/proposal/report leaves may be consumed under a new committed scope;
-leave the unpinned historical claim/control unopened. No raw Object Store
-GET/download, stale admission, source-policy bypass or changed economics.
-The selected experiment is only QCOM-restored old SIX through2026-10-13;
-broad new-rule six/eight work is paused. No new operational call/strategy
-job/result yet this round; floor343/259/59/699. All formal/PIT/master/
-paper/live flags remain false. See347 for active authority and actual use.
+The current endpoint is documentation plus ONE final matching-lane push.
+Afterward the next substantive step needs a separate exact status/terminal
+and bounded result-read freeze for this known backtest, preserving provenance,
+financial/source gates and false flags; no automatic extra QC call/job or
+return comparison from this launch. Broad new-rule six/eight work stays paused.
+Current floor344shared/260development/59infrastructure/699accepted cells,
+ONE development look booked at the first A4compile dispatch, no new cell.
+See section 347 for exact source/profile/plan/result pins, qualifications,
+corrections, per-commit dispositions, exclusions and next admissible action.
 
 Sections 137–142 retain the owner-assisted cloud diagnoses, project cleanup,
 and mutable QC 79/81 source comparisons. Their `Completed.` statuses do not
@@ -4452,6 +4451,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-05 | Claude (Windows host) review of `4daba8b7..65dca9f3`: R343 old-six October extension code | `65dca9f3` -> `51666ff0` -> this record commit | Both Codex commits accepted, `2d8eafc8` after correction; section 343.6's seven profile and source-vector pins reproduced from public code | Generated end hook no longer turns a run_valid=false run into a Runtime Error; projection, inventory and caller repinned, caller moved to fresh leaf `R343-20261105-B`; leaf A stays spent and must not be uploaded | Focused only, by owner direction: projection and reporting 171 passed, quarantine audit **9 passed**, closure file **75 passed, 1 failed**, caller tests unchanged at 16 host-class failures and 73 passed, record gates **86 passed**; no complete suite | 0 P0, 0 P1. `ARV2R344-001` (P2, corrected). `ARV2R344-002` (P3, open): R343 keeps the gzip reader that QC's source policy refused in a sibling form for R298. Floor 338/259/54/699 unchanged | Codex counter-reviews section 344, runs the caller tests on the Mac and freezes one prepare at leaf B; QC and Safari hold remains; no launch, paper, live, broker, funded or real-order action |
 | 2026-11-07 | Codex Claude344 counter-review and owner-waived old-six QC recovery, section345 | `12889740` -> this final record commit; exactly9Codex commits | Corrected B passed; AR100 same-project A1/A2/A3 all spent; actual source-policy error retained; unbound plain-data proposal only | Library/technical-row predicates corrected;3sourcewrites acknowledged then fourth refused; no candidate backtest launched; Mia question not sent because input control fails;2displayed partial/default builds conservatively booked | Final300distinct focused passes (299+1closure);12expected omission failures; in-memory compile and historical-record equality; no full suite; all earlier overlaps/failures retained | ARV2D345-003/P2 OPEN; CR345006/007/008 corrected before pure proposal use; no independent acceptance; floor340/259/56/699,0newcells | One matching-lane nonforce final push; required controllable Mia checkpoint and partial-source reconciliation next; no fourth Codex attempt, production plain conversion, storage/QC retry or readiness clearance |
 | 2026-11-07 | Codex owner-triggered available-Safari/Mia checkpoint and offline plain preparation; section346 | `baf8e396` -> `8ee19d57` freeze -> this final result/handoff; exactly2commits | Qualified Mia diagnosis; six real plain-data objects and seven unchanged-economic source proposals retained locally | Sole committed local producer/collector actual0/0; original stdout validated; R346 nowSPENT; no QC upload/run; sourcepolicycauseUNKNOWN | 159distinct focused passes21.42s; cold170source/pubic-FD checks; expected13omission failures; initial9failed/33passed/38fixture-errors fixed before private use; no full suite | AR1003/3 exhausted; originalclaim pin omitted/CR346005 open for future scope;8data/report files pinned;3new displayed infrastructure builds bookfloor343/259/59/699,0newcells | One matching-lane final push; separately explicit post-three-failure recovery plus fresh current source/access/data/storage/run gates before any further candidate mutation; no rename/reset/Mia-run inference |
+| 2026-11-07 | Codex owner-authorized additional same-project A4 plain recovery; section347 | `67e1970d` -> `2befc75b` -> `1a5759f9` -> this final result/handoff; exactly3commits | Current source/access reconciliation, exact8leaf plaintext consumer, fresh own context,15source writes/3skips/mainlast/all18readback, one compile/launch | Sole A4actual0; observed In Progress... backtest007d4ab27c26d337ae53acb492a83410 in39054561; original output11501B/e0f7afb2... and report11390B/06b62d92... validated; no results read | Final373distinct focused passes1.51s; public176pin cold guard +169in-memory Python syntax checks; expected3red omission failures; all earlier fixture/doc failures qualified; no fullsuite | CR347002 resolved prospectively; prior3attempts and A4spent; source-policyhistoricalcauseUNKNOWN, metadataMD5notremoteSHA, allformalreadinessfalse; ONEshared+development look =>344/260/59/699,0newcells | Exactly one final matching-lane push; next separate exact terminal/result gate for this known run, no automatic rerun/other-arm/comparison/live action |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -79121,3 +79121,141 @@ on unexpected concurrent root/branch/HEAD/source/remote drift. Document actual
 result, corrections, exclusions and per-commit disposition; end with exactly
 one matching-lane final push. No Claude acceptance, source/PIT/master/formal
 readiness, broker/paper/live authority or old protocol renewal follows.
+
+
+### 347.5 Actual A4 success: observed running, no strategy result read
+
+SOLE A4 dispatched2026-11-07 20:27:48UTC; completion observed20:30:16UTC
+at clean D2 freeze1a5759f91ca43db2c5c3c17ee7e08c038edcf98b. These external
+second-resolution brackets are not exact provider timestamps/measured request
+duration. ACTUAL operator exit0. Original canonical11501B stdout+oneLF
+SHA256e0f7afb2f6e1c0add6cdd17af44254cbedbe47e7c8c18a9882e3fa613c686e62
+passed the exact PURE original-output validator under native all-network/
+artifact/USB/Keychain denial, using actual0 and D2 bindings. No private report/
+control or cloud result was read to validate it. Report11390B/SHA256
+06b62d924bd8be5e6bfb5a88b38ef1df7b52f54aa36b35791e8fe925def9c257.
+Public original-result fact scripts/arv2_r347_a4_running_fact.json
+12469B/992caae1f839b7228d65e0aed3d320b9d210d250d889755eb855cdbce5553278.
+
+Current authorized goal reached: authenticated API status observed
+**In Progress...**, running_observed=true, terminal_identity_observed=false.
+Project39054561, candidate R343-AR100, attempt4, name
+'ARV2 LEGACY SIX R343-AR100 OCT2026 A4'.
+Compile identity:
+251b7dbcc94a6db5740a3b83a83ec133-232313c1c0b6b9f62aae03cca921fd2f.
+Backtest identity:
+007d4ab27c26d337ae53acb492a83410.
+No terminal success, strategy return, accepted aggregate/cell, efficacy,
+historical/PIT/master admission or live readiness is inferred. The
+observation is bounded at that actual use, not a continuously current status.
+
+Actual0 plus the committed state machine establishes the current technical
+scope: fresh eight-input guard normal return before credentials; current
+owner-only initial state; ONE new own A4 lock ACK and strict/full-row
+transition; three exact modules skipped and FIFTEEN prepared create/update
+steps accepted (input stub/main replaced, thirteen missing modules created),
+main last; all18 exact readback before compile and launch; matching
+BuildSuccess; one backtest allocation/status observation. No file deletion,
+collaborator removal, permission/lock release, replacement project, retry,
+source-policy bypass, other-lane modification or other candidate submission.
+This accepted plain input loader corrects CR347-002 PROSPECTIVELY for this
+snapshot. The original A3 source-policy detector/root cause remains UNKNOWN;
+plain success is not proof of a past compressed/embedded-source cause.
+
+Both begin and launch-0 SIX-object properties phases matched all exact local
+plain sizes and casefoldMD5s. Current original result records all12 qualified
+metadata observations and local SHA256 pins; no raw Object Store bytes were
+downloaded or uploaded and no old admission was reused. Metadata is not
+remote SHA256 attestation. In Progress... alone does NOT prove every runtime
+read/hash/strategy decision has completed; contains_key/runtime coverage
+uncertainty and formal false flags remain for the later terminal/result gate.
+Access's initial node observation was2available/0busy; no continuous lease
+claimed and no other lane/job was touched. Source/access public flag remained
+absent/unproven, with established owner-only/empty-history/library/live checks
+and technical context enforced; no universal privacy assertion is added.
+
+130 application dispatches reported, not physical/server contact accounting.
+The first candidate evaluation dispatch is compile/create ordinal113.
+Book EXACTLY ONE shared+development look by this compile/backtest identity:
+**344shared /260development /59infrastructure /699accepted cells**.
+The later launch/status does not add another look/cell. The associated append-only shared-ledger update is recorded below under
+its explicitly applicable ACTIVE accounting rule; do not double-count it. The five earlier partial/
+default UI builds stay booked; no lower floor restored.
+
+A4 and its new control/claim/reader-free result path are now SPENT/frozen.
+D1 also spent. A1/A2/A3 refusals and R346 preparation/control remain preserved.
+No A5, renewed old claim, repeat publisher, old operational reader, result
+read, additional QC call/job or provider/USB/Safari/Mia operation followed.
+Original-output validation is scoped supplied-byte/self-consistency with
+observed actual exit, not independent process/disk/cloud attestation.
+All source/operator/profile/plan pins remained exact; actual source/DATA
+guards returned normally. No new code fix was applied during/after invocation.
+
+### 347.6 Concluded round, per-commit dispositions and final one-push endpoint
+
+|Commit after67e1970d baseline|Self-check disposition|Behavior/evidence and remaining limits|
+|---|---|---|
+|2befc75b886afb333cc81e92df8c8a83307f6f55|Retained|Exact read-only D1 freeze plus explicitly prospective DATA/engine groundwork;152distinct initial focused passes, original D1 actual0, current source/access facts in347.3. No A4 mutation authority from D1 alone.|
+|1a5759f91ca43db2c5c3c17ee7e08c038edcf98b|Retained after pre-use corrections/qualifications|Real A4 caller/176-pin plan/engine/pure output validator and exact run freeze.373distinct final focused passes1.51s, successful public cold source guard and169in-memory Python syntax checks; actual sole A4 exit0/running as347.5. CR347004/005 corrected before use; CR347006 diagnostic limitation remains.|
+|This final result/fact/handoff commit|Retained|Records actual observed running and report/input/source/look identities, all spent states, per-commit dispositions, exclusions and next gate; no extra QC/provider/result/private-control read.|
+
+These are Codex implementation/advisory self-check dispositions, NOT
+independent Claude acceptance. Claude review was owner-waived for this A4.
+CR347001 and004/005 corrected; CR347002 resolved prospectively only;
+CR347003 contextual qualification retained; CR347006 limited diagnostic
+detail remains documented. All historical P2s/false readiness flags and
+source/financial/licensing/privacy/security gates remain. No full suite,
+performance result/return comparison, formal acceptance or paper/live permit.
+
+Exactly THREE contiguous Codex commits in this concluded round, beginning
+after67e1970d7d5053022d0c7c66221261b2a64489d2. No remote Claude review
+range or own-push monitor trigger invented. Earlier root record repeat33pass
+0.55s pre-D2 and final repeats are overlap, not additive to373.
+Final result-fact binding/pin checks, lane record/redaction/diff/history/status
+checks follow; no new tests unless changed sources or concrete failures
+require them. No unchanged operational replay for finalization.
+
+Requested endpoint is observed running plus documentation/single push.
+Next admissible substantive work is a SEPARATE exact status/terminal and
+bounded aggregate/result-read contract for this known backtest, preserving
+A4/control spentness and source provenance; verify terminal/result source and
+financial validity before claiming any return or extending the other AR arms.
+Do not rerun A4 or use a launch/status as result acceptance. This round does
+not automatically start that next milestone, a comparison, a monitor, another
+job or a Mia session.
+
+Before final commit/push recheck designated root/branch/HEAD/status and live
+matching remote still67e1970d. If drift, stop/reassess without overwrite.
+Make exactly ONE successful nonforce final push from this worktree to ONLY
+origin refs/heads/codex/strategy-analyst-revisions-v2, including all three
+commits. Verify local/tracking/live agreement and clean status afterward.
+
+Final bookkeeping correction CR347-007/P3: initial post-result record check
+was1failed/32passed0.61s because the new backtest identity was absent from
+the shared active run ledger. CLAUDE documentation discipline and the
+ledger's explicit rule that every future execution appends its identity
+provide the specifically applicable append-only coordination scope under
+AGENTS, together with the owner's instruction to document this A4. The
+pre-use conservative wording deferring that append did not forbid the later
+associated record update once this applicable rule was verified. Root adds
+ONLY this Analyst A4 identity and the five already lane-booked own partial
+UI build identities needed to reconcile its floor; no historical entry,
+other lane or shared behavior changes. Those prior five are transferred,
+not re-counted. CR347-007 corrected by append; no operational protocol was
+weakened or retrospectively authorized. Shared ledger now owns344/260/59/699.
+
+The first final history comparison refused only the newly added exact
+section separator (blank line plus ---), with no old body difference;
+qualify equality to exclude that declared separator. Original-result fact,
+all176selected/caller/plan hashes and actual running validation had already
+passed before that comparison assertion. No private/QC read was repeated.
+
+Finalization: associated ledger now contains the exact A4 identity; final
+record/redaction selection33passed0.55s (overlap, not additive). Original
+result-fact/binding/status validation passed, all176selected sources plus
+caller/plan hashes remain exact, historical sections6–346 are byte-exact
+except the declared new section separator, and the shared ledger retains
+its ENTIRE prior byte prefix followed only by this Analyst append. No
+private/control/provider/QC/Safari/result read or backtest action followed
+the original In Progress... observation. Final diff/status/live-remote
+checks and the sole final push follow.

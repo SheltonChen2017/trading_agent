@@ -7391,3 +7391,47 @@ authenticated cells unchanged**. If a later push books this identity again,
 it must reconcile against this entry by identity rather than add it a second
 time. No formal alpha, efficacy, paper/live, broker, funded or real-order
 claim follows.
+
+## R-343-AR100 A4 — QCOM-restored legacy six extension through 2026-10-13 (RUNNING OBSERVED; NO RESULT READ) — 2026-11-07
+
+This is the narrowly associated run-ledger append required by this ledger's
+ACTIVE instruction that every future real-outcome execution appends its
+identity, and the owner's explicit A4 instruction to document progress.
+It records only Analyst-owned project39054561, preserving every historical
+entry and other lane. It changes no shared implementation, workflow, rights
+or readiness rule. Owner explicitly authorized ONE additional recovery with
+prepared plain files and waived Claude review for that recovery; A1/A2/A3
+remain spent and no A5 is inferred. Analyst implementation record347 owns
+the full source/profile/plan/attempt protocol and limitations.
+
+|Field|Observed identity or qualified status|
+|---|---|
+|Candidate/project|R343-AR100, ARV2 LEGACY SIX R343-AR100 OCT2026, project39054561|
+|Source/run freeze|1a5759f91ca43db2c5c3c17ee7e08c038edcf98b; operator d987c61f6eb125f5b360ce7015b42a7497864f7ef82c1a9723375c4c8e402a62; plan66f305b15fcf9cfef0a4ad4b5d6b74d376384384bf540f4cd980b746c9369243|
+|Compile|251b7dbcc94a6db5740a3b83a83ec133-232313c1c0b6b9f62aae03cca921fd2f; matching BuildSuccess before launch|
+|Backtest|007d4ab27c26d337ae53acb492a83410, ARV2 LEGACY SIX R343-AR100 OCT2026 A4|
+|Actual caller|Exit0; dispatched2026-11-07 20:27:48UTC, completion observed20:30:16UTC; external second-resolution brackets, not exact provider timestamps/duration|
+|Status scope|In Progress... observed by statistics-disabled bounded protocol; no terminal acceptance, statistics/log/chart/order/return/result read|
+|Source/input checks|All18 prepared files exact readback; three existing modules skipped,15writes/main last; eight local plain-DATA inputs authenticated before credentials, fresh six object properties both before mutation and before launch; metadataMD5 is not remoteSHA256; runtime must still check each payload|
+|Original evidence|stdout11501B/e0f7afb2f6e1c0add6cdd17af44254cbedbe47e7c8c18a9882e3fa613c686e62; report11390B/06b62d924bd8be5e6bfb5a88b38ef1df7b52f54aa36b35791e8fe925def9c257; public runningfact12469B/992caae1f839b7228d65e0aed3d320b9d210d250d889755eb855cdbce5553278|
+|Accounting|First candidate compile/create application dispatch ordinal113 books ONE shared+development look; later backtest/create/status do not add another.130application dispatches, not measured physical/server contacts;0accepted cells|
+|Interpretation|Current-vintage accepted-risk order-based old-six research; original financial rules/costs/guards unchanged. Running is not a return, formal/PIT/master admission, efficacy or paper/live/funded/broker/real-order permit|
+
+Carry forward the lane's preceding floor **343 shared /259 development /
+59 infrastructure /699 accepted cells**. This reconciles the five already
+lane-booked partial/default-source UI build identities from Analyst345–346
+which were not yet in this shared file:405be0-6a6dbc,1d73ad-6a6dbc,
+0620c0-6a6dbc,9079f8-6a6dbc,ebbd47-6a6dbc. Their actor/server times/engine
+execution were not independently established; the prior lane conservatively
+classified each once as infrastructure, not a strategy backtest or return.
+This append transfers that existing five-look accounting, NOT five new
+launches. The shared file's prior338/259/54/699 therefore reconciles to
+343/259/59/699 before A4. A4's single new development look makes the current
+minimum **344 shared /260 development /59 infrastructure /699 cells**.
+Reconcile these exact identities rather than counting any of them again.
+
+A4 is SPENT/frozen; no retry, result read, source-policy cause reconstruction,
+other candidate launch, source admission, live claim or other-lane change
+follows. Plain-source acceptance does not establish the original A3 detector
+cause. A future separately frozen terminal/result contract is required before
+accepting any performance statistic; no historical refusal is erased.

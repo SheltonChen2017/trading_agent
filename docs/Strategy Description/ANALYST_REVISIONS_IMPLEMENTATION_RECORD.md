@@ -62718,6 +62718,53 @@ beyond what the owner has already waived, replacement project, six/eight
 cell, stress successor, levered target, paper/live deployment, broker,
 funded-account, real-order or trading action is authorised by this review.
 
+### R323.9 Owner-directed corrections after the first push
+
+After the section-323 push at `dfc04152`, the owner directed that every
+finding of this review be fixed. Three were fixable and are fixed in the
+commits below; the other three (`-003`, `-005`, `-006`) have no artifact to
+change and stay documented.
+
+**`ARV2R323-001`, booked.** Status-only reads of all eight backtests in
+project `38364439` (name, status, progress, error text, creation time and
+engine window; no statistic) classify the seven un-pushed launches: five were
+configured for 2020-11-01 to 2026-10-13 but stopped early with runtime refusals
+(A12 and A14 at 2021-02-22 09:31 with `execution_price_not_current_minute`
+and `execution_price_end_not_current`; A16, A18 and A19 at 2022-10-24 09:20
+with the six-universe RAW reference price census incomplete), and two
+one-day input-presence probes completed (`N` on 2022-10-24, `P` on
+2022-10-25). The shared ledger's new R-298 entry books them conservatively
+as five development and two infrastructure looks, seven shared looks in all:
+**326 / 251 / 50 / 699 → 333 / 256 / 52 / 699**, no cell. The entry names
+every identity in full so that any related unpublished work reconciles by
+identity instead of adding them again. Attempt numbering, covering waivers
+and exact sources still require original-run evidence.
+
+**`ARV2R323-002`, corrected in place.** Each of the five files now ends
+with exactly one newline; nothing else changed, and the range
+`ef654b1d..HEAD` passes `git diff --check`. Because four of them are pinned
+by SHA-256 as the bytes that ran, the pins in sections 313, 315 and 322
+remain true of the runs and refer to the pre-correction bytes:
+
+| File | Pinned (pre-correction) SHA-256 | Corrected SHA-256 |
+|---|---|---|
+| `scripts/run_arv2_r298_plain_readiness.py` (A11 caller, 322.11) | `ec7f08b6483dcac360f1cffdaa54c956f9b734543ab6f7a7579c84b7253d94e3` | `b15ba88e8f233c81e779d0cf80301903ebec0912a0105fe35ba168775b26fb5f` |
+| `scripts/arv2_r298_plain_source_boundary.py` (322) | `3f0274b2ef618a1c…` | `587a81d3600c90e21869c9972374ecabe0792d5e37af9ee4e2693b89d1aa7f08` |
+| `scripts/observe_arv2_r298_collaborator_records.py` (312) | `0a4532af010699a6…` | `5421fdda7c2b5b27b9752e9ef412dbdcc98c643d80c8f36208840cb6e9849159` |
+| `tests/analyst_revisions_v2/test_r298_privacy_recovery_remote.py` (313) | `dce2765a698c8fa4…` | `93890115080ad8f8c8a52678040b3f537e4847ac4a392f75796fead60376ed86` |
+| `tests/analyst_revisions_v2/test_r298_plain_source_boundary.py` (unpinned) | `ca3e873959fb9e3a…` | `9637834d50c575a060c97abd92db9bcbfae940ec0a154dbe410568c452299d7a` |
+
+Corrected CLI digests alone do not make a future invocation admissible: the
+caller/observer dependency closure still pins old bytes, as detailed in 324.3.
+Any future authorized use requires a coherent prospective closure/freeze;
+the spent runs are not replayed and these pins are not silently rewritten.
+
+**`ARV2R323-004`** was already corrected in the first commit. The five files
+compile, the tree and the whole range pass `git diff --check`, and the
+record and active-document gates pass on the final bytes (**86 passed**).
+This round therefore makes a second single push: the whitespace commit
+`ad14e379`, the ledger commit `5751a487` and this record commit.
+
 ## 324. Codex counter-review of Claude's four section-323 commits, 2026-10-26
 
 ### 324.1 Exact scope, synchronization and per-commit dispositions
@@ -77642,50 +77689,10 @@ as operational defects. Diff check is clean; matching live remote remains
 staged. The submission caller draft is committed solely to preserve the
 complete clean tree and remains prohibited from invocation without its tests,
 exact B DATA/public plan and separate run freeze.
-
-### R323.9 Owner-directed corrections after the first push
-
-After the section-323 push at `dfc04152`, the owner directed that every
-finding of this review be fixed. Three were fixable and are fixed in the
-commits below; the other three (`-003`, `-005`, `-006`) have no artifact to
-change and stay documented.
-
-**`ARV2R323-001`, booked.** Status-only reads of all eight backtests in
-project `38364439` (name, status, progress, error text, creation time and
-engine window; no statistic) classify the seven un-pushed launches: five were
-configured for 2020-11-01 to 2026-10-13 but stopped early with runtime refusals
-(A12 and A14 at 2021-02-22 09:31 with `execution_price_not_current_minute`
-and `execution_price_end_not_current`; A16, A18 and A19 at 2022-10-24 09:20
-with the six-universe RAW reference price census incomplete), and two
-one-day input-presence probes completed (`N` on 2022-10-24, `P` on
-2022-10-25). The shared ledger's new R-298 entry books them conservatively
-as five development and two infrastructure looks, seven shared looks in all:
-**326 / 251 / 50 / 699 → 333 / 256 / 52 / 699**, no cell. The entry names
-every identity in full so that any related unpublished work reconciles by
-identity instead of adding them again. Attempt numbering, covering waivers
-and exact sources still require original-run evidence.
-
-**`ARV2R323-002`, corrected in place.** Each of the five files now ends
-with exactly one newline; nothing else changed, and the range
-`ef654b1d..HEAD` passes `git diff --check`. Because four of them are pinned
-by SHA-256 as the bytes that ran, the pins in sections 313, 315 and 322
-remain true of the runs and refer to the pre-correction bytes:
-
-| File | Pinned (pre-correction) SHA-256 | Corrected SHA-256 |
-|---|---|---|
-| `scripts/run_arv2_r298_plain_readiness.py` (A11 caller, 322.11) | `ec7f08b6483dcac360f1cffdaa54c956f9b734543ab6f7a7579c84b7253d94e3` | `b15ba88e8f233c81e779d0cf80301903ebec0912a0105fe35ba168775b26fb5f` |
-| `scripts/arv2_r298_plain_source_boundary.py` (322) | `3f0274b2ef618a1c…` | `587a81d3600c90e21869c9972374ecabe0792d5e37af9ee4e2693b89d1aa7f08` |
-| `scripts/observe_arv2_r298_collaborator_records.py` (312) | `0a4532af010699a6…` | `5421fdda7c2b5b27b9752e9ef412dbdcc98c643d80c8f36208840cb6e9849159` |
-| `tests/analyst_revisions_v2/test_r298_privacy_recovery_remote.py` (313) | `dce2765a698c8fa4…` | `93890115080ad8f8c8a52678040b3f537e4847ac4a392f75796fead60376ed86` |
-| `tests/analyst_revisions_v2/test_r298_plain_source_boundary.py` (unpinned) | `ca3e873959fb9e3a…` | `9637834d50c575a060c97abd92db9bcbfae940ec0a154dbe410568c452299d7a` |
-
-Corrected CLI digests alone do not make a future invocation admissible: the
-caller/observer dependency closure still pins old bytes, as detailed in 324.3.
-Any future authorized use requires a coherent prospective closure/freeze;
-the spent runs are not replayed and these pins are not silently rewritten.
-
-**`ARV2R323-004`** was already corrected in the first commit. The five files
-compile, the tree and the whole range pass `git diff --check`, and the
-record and active-document gates pass on the final bytes (**86 passed**).
-This round therefore makes a second single push: the whitespace commit
-`ad14e379`, the ledger commit `5751a487` and this record commit.
+Before operational use, a record-placement audit caught that the initial
+append matched an identical historical paragraph. The record-only correction
+restores all historical section bodies from12889740 and appends345 at EOF;
+only intended banner/live-navigation edits remain outside345. Record checks
+repeat33passes0.57s, not additive. Initial5a2f3989 is not an invocation
+snapshot; H is the subsequent clean record-correction commit. No control,
+credential or QC request had been used when this correction was made.

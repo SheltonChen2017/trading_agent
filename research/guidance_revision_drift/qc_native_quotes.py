@@ -53,6 +53,12 @@ _TICK = frozenset({"time_ny", "bid_price", "ask_price", "bid_size", "ask_size",
                    "exchange", "sale_condition", "suspicious", "is_fill_forward"})
 _BAR = frozenset({"time_ny", "end_time_ny", "open", "high", "low", "close", "volume",
                   "is_fill_forward"})
+_MANAGED_TICK = frozenset({"AskPrice", "AskSize", "BidPrice", "BidSize", "DataType",
+    "EndTime", "Exchange", "ExchangeCode", "IsFillForward", "LastPrice", "Price",
+    "Quantity", "SaleCondition", "Suspicious", "Symbol", "TickType", "Time", "Value"})
+_MANAGED_SYMBOL = frozenset({"id", "permtick", "value"})
+_MANAGED_NUMBERS = ("AskPrice", "AskSize", "BidPrice", "BidSize", "LastPrice", "Price",
+                    "Quantity", "Value")
 
 
 def _ny_clock_ns(value: object) -> int:
@@ -95,6 +101,78 @@ def _gates() -> dict:
         "historical_availability_verified": False, "calendar_verified": False,
         "reference_mapping_verified": False, "source_rights_verified": False,
         "backtest_ready": False}
+
+
+def decode_managed_quote_tick_json(raw: bytes, *, expected_native_sid: str,
+                                  expected_symbol: str, declared_time_zone: str) -> dict:
+    """Decode the observed managed Tick JSON shape without importing an SDK.
+
+    Callers supply exact public serializer bytes, not Python scalar getters.
+    The hash binds those received bytes, not provider originals or trustworthy
+    execution. Native unspecified clocks require an explicit NY declaration;
+    deriving its offset does not prove the actual subscription's time zone.
+    No market-data export permission or runner admission is granted here.
+    """
+    body = keys(decode_object(raw, 32768, provider_numbers=True), _MANAGED_TICK)
+    identifier(expected_symbol)
+    if (type(expected_native_sid) is not str or len(expected_native_sid) > 128
+            or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.: -]*", expected_native_sid) is None
+            or expected_native_sid != expected_native_sid.strip()):
+        raise InputError("bounded exact native SID required")
+    symbol = keys(body["Symbol"], _MANAGED_SYMBOL)
+    if symbol["id"] != expected_native_sid or symbol["value"] != expected_symbol:
+        raise InputError("managed native symbol identity mismatch")
+    identifier(symbol["permtick"])
+    # Public Common/Global.cs defines MarketDataType.Tick=2, TickType.Quote=1.
+    # https://github.com/QuantConnect/Lean/blob/master/Common/Global.cs
+    if (type(body["DataType"]) is not int or body["DataType"] != 2
+            or type(body["TickType"]) is not int or body["TickType"] != 1):
+        raise InputError("exact managed quote Tick enums required")
+    numbers = {}
+    for key in _MANAGED_NUMBERS:
+        if type(body[key]) not in (int, Decimal):
+            raise InputError("managed numeric JSON lexemes required")
+        numbers[key] = amount(body[key])
+    bid_size, ask_size = _shares(numbers["BidSize"]), _shares(numbers["AskSize"])
+    if ((numbers["BidPrice"] != 0 or bid_size != 0)
+            and (numbers["AskPrice"] != 0 or ask_size != 0)):
+        raise InputError("managed equity quote must be one-sided")
+    exchange = _exchange(body["ExchangeCode"])
+    name, flags = body["Exchange"], body["SaleCondition"]
+    if (type(name) is not str or not 1 <= len(name) <= 128
+            or any(not 32 <= ord(char) <= 126 for char in name)):
+        raise InputError("bounded managed exchange display name required")
+    if type(flags) is not str or re.fullmatch(r"[0-9a-fA-F]{1,8}", flags) is None:
+        raise InputError("explicit managed hexadecimal quote condition required")
+    if type(body["Suspicious"]) is not bool or type(body["IsFillForward"]) is not bool:
+        raise InputError("strict managed tick flags required")
+    native_time = body["Time"]
+    if (type(declared_time_zone) is not str or declared_time_zone != "America/New_York"
+            or type(native_time) is not str or native_time != body["EndTime"]
+            or re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{7}",
+                            native_time) is None):
+        raise InputError("equal unspecified seven-digit clocks and declared NY context required")
+    try:
+        wall = datetime.fromisoformat(native_time[:19])
+        local = wall.replace(tzinfo=_NY)
+        ambiguous = local.utcoffset() != local.replace(fold=1).utcoffset()
+        restored = local.astimezone(timezone.utc).astimezone(_NY).replace(tzinfo=None)
+    except (ValueError, OverflowError) as exc:
+        raise InputError("invalid managed native clock") from exc
+    if ambiguous or restored != wall:
+        raise InputError("ambiguous or nonexistent managed NY clock")
+    at = native_time + local.isoformat(timespec="seconds")[-6:]
+    _ny_clock_ns(at)
+    row = {"time_ny": at, "bid_price": decimal_text(numbers["BidPrice"]),
+           "ask_price": decimal_text(numbers["AskPrice"]), "bid_size": bid_size,
+           "ask_size": ask_size, "exchange": exchange, "sale_condition": flags,
+           "suspicious": body["Suspicious"], "is_fill_forward": body["IsFillForward"]}
+    # Adverse and zero rows stay present so the existing book invalidates old
+    # state. Never filter them into a convenient earlier executable quote.
+    return {"schema": "gdr.qc-managed-quote-tick.v1", "tick": row,
+            "native_symbol": expected_symbol, "native_sid": expected_native_sid,
+            "managed_json_sha256": hash_bytes(raw), "declared_time_zone": declared_time_zone,
+            "native_timezone_binding_verified": False, **_gates()}
 
 
 @dataclass(frozen=True, slots=True)

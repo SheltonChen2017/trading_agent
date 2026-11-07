@@ -3,12 +3,15 @@ from copy import deepcopy
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, localcontext
+import hashlib
+import json
 import unittest
 from zoneinfo import ZoneInfo
 
 from research.guidance_revision_drift.historical_market import instant_ns
 from research.guidance_revision_drift.input_contracts import InputError, canonical_bytes
 from research.guidance_revision_drift.qc_native_quotes import QcNativeQuoteBatch
+from research.guidance_revision_drift import qc_native_quotes
 
 
 NY = ZoneInfo("America/New_York")
@@ -452,6 +455,165 @@ class QcNativeQuoteTests(unittest.TestCase):
             self.assertIs(before[key], False)
         self.assertFalse(any("sip" in key or "participant" in key or "sequence" in key for key in before))
         self.assertEqual(value.sha256, QcNativeQuoteBatch.from_bytes(value.raw_bytes).sha256)
+
+
+def managed_tick_body(**changes):
+    """Invented public serializer shape; no market values or native SID."""
+    row = {"AskPrice": 0, "AskSize": 0, "BidPrice": 10, "BidSize": 100,
+           "DataType": 2, "EndTime": "2025-04-04T09:59:59.1234567",
+           "Exchange": "NASDAQ", "ExchangeCode": "Q", "IsFillForward": False,
+           "LastPrice": 10, "Price": 10, "Quantity": 0, "SaleCondition": "1",
+           "Suspicious": False,
+           "Symbol": {"id": "INVENTED SID0001", "permtick": "INVENTED", "value": "INVENTED"},
+           "TickType": 1, "Time": "2025-04-04T09:59:59.1234567", "Value": 10}
+    row.update(changes)
+    return row
+
+
+def managed_raw(body=None):
+    return json.dumps(managed_tick_body() if body is None else body,
+                      separators=(",", ":"), allow_nan=False).encode()
+
+
+def managed_projection(raw=None, **context):
+    arguments = {"expected_native_sid": "INVENTED SID0001", "expected_symbol": "INVENTED",
+                 "declared_time_zone": "America/New_York"}
+    arguments.update(context)
+    return qc_native_quotes.decode_managed_quote_tick_json(
+        managed_raw() if raw is None else raw, **arguments)
+
+
+class ManagedNativeTickJsonTests(unittest.TestCase):
+    def test_managed_numeric_lexemes_and_seven_digit_time_remain_exact(self):
+        raw = managed_raw()
+        for key in ("BidPrice", "LastPrice", "Price", "Value"):
+            raw = raw.replace(('"' + key + '":10,').encode(),
+                              ('"' + key + '":9.990000000000000000000000001,').encode())
+        # Value is last and therefore has a closing brace instead of a comma.
+        raw = raw.replace(b'"Value":10}', b'"Value":9.990000000000000000000000001}')
+        with localcontext() as context:
+            context.prec = 2
+            result = managed_projection(raw)
+        self.assertEqual(result["tick"]["bid_price"], "9.990000000000000000000000001")
+        self.assertEqual(result["tick"]["time_ny"], "2025-04-04T09:59:59.1234567-04:00")
+        self.assertEqual(result["tick"]["bid_size"], 100)
+        self.assertEqual(result["managed_json_sha256"], hashlib.sha256(raw).hexdigest())
+        canonical_bytes(result)
+
+    def test_managed_distinct_100ns_ticks_survive_existing_book(self):
+        body = native_body()
+        body["ticks"] = native_pair(DECISION - timedelta(seconds=1))
+        for fraction, price in (("1234567", 10), ("1234568", 9)):
+            stamp = "2025-04-04T09:59:59." + fraction
+            raw = managed_raw(managed_tick_body(Time=stamp, EndTime=stamp,
+                BidPrice=price, LastPrice=price, Price=price, Value=price))
+            body["ticks"].append(managed_projection(raw)["tick"])
+        value = native_batch(body).quote_at(DECISION)
+        self.assertEqual(value.bid, Decimal("9"))
+        self.assertEqual(value.bid_updated_ns % 1_000_000_000, 123456800)
+
+    def test_managed_payload_and_expected_identity_are_bounded(self):
+        for raw in (b"", b" " * 32769, "{}", b"[]", b"null", b"{", b"\xff"):
+            with self.subTest(raw_type=type(raw).__name__), self.assertRaises(InputError):
+                managed_projection(raw)
+        for context in ({"expected_native_sid": "OTHER SID"}, {"expected_symbol": "OTHER"},
+                        {"expected_native_sid": "x" * 129}, {"expected_native_sid": "bad\nSID"},
+                        {"expected_symbol": True}, {"declared_time_zone": "UTC"}):
+            with self.subTest(context=context), self.assertRaises(InputError):
+                managed_projection(**context)
+
+    def test_managed_full_and_symbol_field_inventory_is_frozen(self):
+        for body in (dict(managed_tick_body(), Extra=1),
+                     {key: value for key, value in managed_tick_body().items() if key != "Exchange"},
+                     managed_tick_body(Symbol={"id": "INVENTED SID0001", "value": "INVENTED"}),
+                     managed_tick_body(Symbol=dict(managed_tick_body()["Symbol"], Extra=1)),
+                     managed_tick_body(Symbol=dict(managed_tick_body()["Symbol"], permtick=None)),
+                     managed_tick_body(Symbol="INVENTED")):
+            with self.subTest(body_fields=tuple(body)), self.assertRaises(InputError):
+                managed_projection(managed_raw(body))
+        duplicate = managed_raw().replace(b'"TickType":1,', b'"TickType":1,"TickType":1,')
+        with self.assertRaisesRegex(InputError, "duplicate"):
+            managed_projection(duplicate)
+        for key in ("id", "value"):
+            body = managed_tick_body()
+            body["Symbol"][key] = "OTHER"
+            with self.subTest(symbol_key=key), self.assertRaises(InputError):
+                managed_projection(managed_raw(body))
+
+    def test_managed_tick_and_data_enums_are_exact_integers(self):
+        for key, bad in (("TickType", 0), ("TickType", True), ("TickType", "1"),
+                         ("TickType", 1.0), ("DataType", 0), ("DataType", True),
+                         ("DataType", 2.0), ("DataType", "2")):
+            with self.subTest(key=key, bad=bad), self.assertRaises(InputError):
+                managed_projection(managed_raw(managed_tick_body(**{key: bad})))
+
+    def test_managed_time_requires_exact_equal_unspecified_native_clocks(self):
+        for stamp in ("2025-04-04T09:59:59", "2025-04-04T09:59:59.123456",
+                      "2025-04-04T09:59:59.12345678", "2025-04-04T09:59:59.1234567Z",
+                      "2025-04-04T09:59:59.1234567-04:00", "2025-02-30T09:59:59.1234567",
+                      "2025-03-09T02:30:00.1234567", "2025-11-02T01:30:00.1234567",
+                      "9999-12-31T23:59:59.1234567"):
+            with self.subTest(stamp=stamp), self.assertRaises(InputError):
+                managed_projection(managed_raw(managed_tick_body(Time=stamp, EndTime=stamp)))
+        with self.assertRaises(InputError):
+            managed_projection(managed_raw(managed_tick_body(EndTime="2025-04-04T09:59:59.1234568")))
+        winter = "2025-02-05T09:59:59.1234567"
+        self.assertTrue(managed_projection(managed_raw(managed_tick_body(
+            Time=winter, EndTime=winter)))["tick"]["time_ny"].endswith("-05:00"))
+
+    def test_managed_money_types_sizes_and_aliases_refuse_bad_input(self):
+        for key in ("BidPrice", "AskPrice", "BidSize", "AskSize", "Price", "LastPrice", "Value", "Quantity"):
+            for bad in (True, "10", None, {}, []):
+                with self.subTest(key=key, bad_type=type(bad).__name__), self.assertRaises(InputError):
+                    managed_projection(managed_raw(managed_tick_body(**{key: bad})))
+        for fields in ({"BidSize": 0.5}, {"BidSize": 10**12 + 1},
+                       {"AskPrice": 11, "AskSize": 100}):
+            with self.subTest(fields=fields), self.assertRaises(InputError):
+                managed_projection(managed_raw(managed_tick_body(**fields)))
+        for token in (b"NaN", b"1e999", b"Infinity"):
+            raw = managed_raw().replace(b'"BidPrice":10,', b'"BidPrice":' + token + b',')
+            with self.subTest(token=token), self.assertRaises(InputError):
+                managed_projection(raw)
+        result = managed_projection(managed_raw(managed_tick_body(Quantity=1, LastPrice=9, Price=8, Value=7)))
+        self.assertEqual(result["tick"]["bid_price"], "10")
+
+    def test_managed_flags_and_code_have_no_permissive_aliases(self):
+        for fields in ({"Suspicious": 0}, {"IsFillForward": "false"}, {"SaleCondition": 1},
+                       {"SaleCondition": ""}, {"SaleCondition": "0x1"},
+                       {"SaleCondition": "100000000"}, {"ExchangeCode": "NASDAQ"},
+                       {"ExchangeCode": "UNKNOWN"}, {"Exchange": None}):
+            with self.subTest(fields=fields), self.assertRaises(InputError):
+                managed_projection(managed_raw(managed_tick_body(**fields)))
+        result = managed_projection(managed_raw(managed_tick_body(ExchangeCode="IEX", Exchange="IEX")))
+        self.assertEqual(result["tick"]["exchange"], "IEX")
+
+    def test_managed_adverse_latest_states_reach_existing_book_poisoning(self):
+        for fields in ({"SaleCondition": "0"}, {"SaleCondition": "2000"},
+                       {"Suspicious": True}, {"IsFillForward": True},
+                       {"BidPrice": 0, "BidSize": 0, "LastPrice": 0, "Price": 0, "Value": 0}):
+            stamp = "2025-04-04T09:59:58.1234567"
+            result = managed_projection(managed_raw(managed_tick_body(Time=stamp, EndTime=stamp, **fields)))
+            body = native_body()
+            body["ticks"] = native_pair(DECISION - timedelta(seconds=3))
+            body["ticks"] += [result["tick"], native_tick(DECISION - timedelta(seconds=1), "ask", "10.01")]
+            with self.subTest(fields=fields), self.assertRaises(InputError):
+                native_batch(body).decision_quote(DECISION)
+            body["ticks"].append(native_tick(DECISION))
+            self.assertEqual(native_batch(body).decision_quote(DECISION).bid, Decimal("9.99"))
+
+    def test_managed_projection_hash_context_and_gates_are_not_source_proof(self):
+        raw = managed_raw()
+        before = managed_projection(raw)
+        self.assertEqual(before["schema"], "gdr.qc-managed-quote-tick.v1")
+        self.assertEqual(before["native_symbol"], "INVENTED")
+        self.assertEqual(before["native_sid"], "INVENTED SID0001")
+        self.assertEqual(before["declared_time_zone"], "America/New_York")
+        for key in ("coverage_verified", "nbbo_verified", "point_in_time_data", "source_rights_verified",
+                    "native_timezone_binding_verified", "native_execution_evidence", "backtest_ready"):
+            self.assertIs(before[key], False)
+        self.assertNotEqual(before["managed_json_sha256"], managed_projection(b" " + raw)["managed_json_sha256"])
+        before["tick"]["bid_price"] = "999"
+        self.assertEqual(managed_projection(raw)["tick"]["bid_price"], "10")
 
 
 if __name__ == "__main__":

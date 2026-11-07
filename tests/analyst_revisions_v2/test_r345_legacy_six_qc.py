@@ -201,7 +201,7 @@ def test_new_project_mutation_gates(fake, field, value, code):
                    for name, _ in fake.calls)
 
 
-@pytest.mark.parametrize('field,code', [('public', 'private'), ('lastLiveDeployment', 'live'),
+@pytest.mark.parametrize('field,code', [('lastLiveDeployment', 'live'),
     ('leanEnvironment', 'live'), ('isLibrary', 'libraries'), ('libraries', 'libraries')])
 def test_new_project_missing_required_evidence(fake, field, code):
     original = fake.project
@@ -215,6 +215,88 @@ def test_new_project_missing_required_evidence(fake, field, code):
     with pytest.raises(module.Refused, match=code): result.begin_once()
     assert not any(name in ('files/create', 'files/update', 'files/delete', 'compile/create')
                    for name, _ in fake.calls)
+
+
+def test_new_missing_public_uses_actual_allocation_owner_and_empty_history(fake):
+    original = fake.project
+    def project(reference=False):
+        row = original(reference)
+        if not reference:
+            row.pop('public')
+        return row
+    fake.project = project
+    result = runner(fake)
+    assert result.begin_once()['state'] == 'compiling'
+    assert result._allocation is not None
+    assert fake.events['project-allocation']['project_id'] == result.project_id
+    for name in ('created', 'locked', 'compiled-preflight', *(f'write-{i:02d}' for i in range(18))):
+        assert name + '-privacy-history-observed' in fake.events
+    assert result.poll_compile(0)['state'] == 'BuildSuccess'
+    assert result.launch_once()['state'] == 'launched'
+    assert 'launch-000-privacy-history-observed' in fake.events
+
+
+@pytest.mark.parametrize('corruption', ['absent', 'foreign_id', 'foreign_request', 'refused_response'])
+def test_allocation_origin_cannot_be_asserted_or_reused(fake, corruption):
+    result = runner(fake)
+    def journal(marker, value):
+        fake.journal(marker, value)
+        if marker != 'project-allocation':
+            return
+        if corruption == 'absent':
+            result._allocation = None
+        elif corruption == 'foreign_id':
+            result._allocation = (result._allocation[0], module.canonical(
+                {'success': True, 'projects': [{'projectId': fake.project_id + 1}]}))
+        elif corruption == 'foreign_request':
+            result._allocation = (module.canonical({'name': 'unrelated project', 'language': 'Py',
+                                                    'organizationId': ORG}), result._allocation[1])
+        else:
+            result._allocation = (result._allocation[0], module.canonical(
+                {'success': False, 'projects': [{'projectId': fake.project_id}]}))
+    result.journal = journal
+    with pytest.raises(module.Refused): result.begin_once()
+    assert not any(name in ('files/create', 'files/update', 'files/delete', 'compile/create',
+                           'backtests/create') for name, _ in fake.calls)
+
+
+@pytest.mark.parametrize('stage', ['before_write', 'before_compile', 'before_launch'])
+def test_appearing_job_stops_new_project_mutation(fake, stage):
+    result = runner(fake)
+    def override(endpoint, payload):
+        writes = sum(name in ('files/create', 'files/update') for name, _ in fake.calls)
+        compiles = sum(name == 'compile/create' for name, _ in fake.calls)
+        target = ((stage == 'before_write' and writes == 0 and fake.source_id is not None)
+            or (stage == 'before_compile' and writes == 18 and compiles == 0)
+            or (stage == 'before_launch' and compiles == 1))
+        if endpoint == 'backtests/list' and target:
+            return {'success': True, 'backtests': [{'backtestId': 'foreign-run',
+                'projectId': fake.project_id, 'name': 'other run', 'status': 'Completed.'}], 'count': 1}
+        return None
+    fake.override = override
+    if stage == 'before_launch':
+        result.begin_once(); result.poll_compile(0)
+        with pytest.raises(module.Refused, match='history'): result.launch_once()
+        assert sum(name == 'compile/create' for name, _ in fake.calls) == 1
+    else:
+        with pytest.raises(module.Refused, match='history'): result.begin_once()
+        assert not any(name == 'compile/create' for name, _ in fake.calls)
+        expected = 0 if stage == 'before_write' else 18
+        assert sum(name in ('files/create', 'files/update') for name, _ in fake.calls) == expected
+    assert not any(name == 'backtests/create' for name, _ in fake.calls)
+
+
+def test_missing_public_after_launch_does_not_admit_result_read(fake):
+    result = completed(fake)
+    original = fake.project
+    def project(reference=False):
+        row = original(reference)
+        if not reference:
+            row.pop('public')
+        return row
+    fake.project = project
+    with pytest.raises(module.Refused, match='private'): result.read_statistics_once()
+    assert not any(name == 'backtests/read' for name, _ in fake.calls)
 
 
 @pytest.mark.parametrize('percent', module.AR_PERCENTS)
@@ -302,6 +384,7 @@ def test_project_id_retained_before_bad_response(fake):
     with pytest.raises(module.Refused, match='response'):
         result.begin_once()
     assert result.project_id == 812
+    assert result._allocation is None
     assert fake.events['project-created']['project_id'] == 812
 
 
@@ -466,6 +549,8 @@ def test_profile_exposes_no_operational_entrypoint_or_false_success():
     profile = module.profile_record()
     assert profile['pilot'] == 'R343-AR100'
     assert profile['result_reads'] == 1
-    assert profile['privacy_requires_explicit_false'] is True
+    assert profile['privacy_prelaunch'] == 'actual_new_allocation_current_owner_only_and_empty_history'
+    assert profile['privacy_after_launch_requires_explicit_false'] is True
+    assert profile['privacy_continuously_proven'] is False
     assert all(profile[name] is False for name in module.FALSE_FLAGS)
     assert not hasattr(module, 'main')

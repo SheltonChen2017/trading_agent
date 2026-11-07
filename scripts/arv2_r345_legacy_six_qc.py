@@ -170,7 +170,10 @@ def _project(packet, project_id, name, organization, user_id, *, idle, own_code_
     require(row.get('owner') is True and type(row.get('ownerId')) is int
             and row['ownerId'] == user_id, 'owner')
     if idle:
-        require(row.get('public') is False, 'private')
+        # This only observes the privacy field. The state machine separately
+        # requires an authenticated new allocation and empty current history;
+        # an absent field by itself supplies no privacy or action authority.
+        require('public' not in row or row['public'] is False, 'private')
         require(row.get('codeRunning') is False, 'idle')
         require('lastLiveDeployment' in row and row['lastLiveDeployment'] in (None, '')
             and type(row.get('leanEnvironment')) is int and row['leanEnvironment'] >= 0, 'live')
@@ -291,7 +294,12 @@ def profile_record():
         'status_polls': STATUS_POLLS, 'status_interval': STATUS_INTERVAL,
         'result_reads': 1, 'max_response_bytes': MAX_RESPONSE,
         'statistic_names': [*LEGACY_STATISTICS, PERIOD_STATISTIC],
-        'privacy_requires_explicit_false': True, 'input_publication_external': True,
+        'privacy_prelaunch': 'actual_new_allocation_current_owner_only_and_empty_history',
+        'privacy_after_launch_requires_explicit_false': True,
+        'privacy_semantics_sources': [
+            'https://www.quantconnect.com/docs/v2/cloud-platform/projects/getting-started',
+            'https://www.quantconnect.com/docs/v2/cloud-platform/projects/collaboration'],
+        'privacy_continuously_proven': False, 'input_publication_external': True,
         'claims_native_isolation_and_actual_exits_external': True, **FALSE_FLAGS}
 
 
@@ -321,6 +329,10 @@ class LegacySixQc:
         self._begun = self._lock = self._launch_spent = self._result_spent = False
         self._compile_success = False
         self.last_request = self.last_failure = None
+        # Only _call's successful projects/create dispatch can install this
+        # receipt. It is retained original request/response bytes, not an
+        # authorization flag, caller assertion, or receipt from an old project.
+        self._allocation = None
 
     def _now(self):
         value = self.clock()
@@ -399,16 +411,58 @@ class LegacySixQc:
         self._event(marker + '-observed', {'endpoint': endpoint, 'response_sha256': sha(raw),
                                          'response_bytes': len(raw)})
         _empty_errors(response)
+        if endpoint == 'projects/create':
+            rows = response.get('projects')
+            require(type(rows) is list and len(rows) == 1 and type(rows[0]) is dict
+                and type(rows[0].get('projectId')) is int and rows[0]['projectId'] == self.project_id,
+                'project_identity')
+            for field, wanted in (('name', self.name), ('organizationId', self.organization), ('language', 'Py')):
+                require(field not in rows[0] or rows[0][field] == wanted, 'project_identity')
+            self._allocation = (canonical(payload), raw)
+            self._event('project-allocation', {'candidate_id': self.candidate,
+                'project_id': self.project_id, 'request_sha256': sha(self._allocation[0]),
+                'response_sha256': sha(self._allocation[1])})
         self.last_failure = None
         return _copy(response)
 
+    def _require_allocation(self):
+        require(type(self._allocation) is tuple and len(self._allocation) == 2
+            and all(type(raw) is bytes for raw in self._allocation), 'private')
+        request_raw, response_raw = self._allocation
+        require(request_raw == canonical({'name': self.name, 'language': 'Py',
+            'organizationId': self.organization}) and 0 < len(response_raw) <= MAX_RESPONSE, 'private')
+        try:
+            response = json.loads(response_raw)
+        except (ValueError, UnicodeError, RecursionError):
+            raise Refused('private') from None
+        require(canonical(response) == response_raw, 'private')
+        _empty_errors(response)
+        rows = response.get('projects')
+        require(type(rows) is list and len(rows) == 1 and type(rows[0]) is dict
+            and type(rows[0].get('projectId')) is int and rows[0]['projectId'] == self.project_id,
+            'private')
+        for field, wanted in (('name', self.name), ('organizationId', self.organization), ('language', 'Py')):
+            require(field not in rows[0] or rows[0][field] == wanted, 'private')
+
     def _access(self, prefix):
+        self._require_allocation()
         packet = self._call(prefix + '-project', 'projects/read', {'projectId': self.project_id})
-        _, owner = _project(packet, self.project_id, self.name, self.organization, self.user_id,
+        row, owner = _project(packet, self.project_id, self.name, self.organization, self.user_id,
                             idle=True, own_code_source=self.code_source if self._lock else None)
         dedicated = self._call(prefix + '-collaborators', 'projects/collaboration/read',
                                {'projectId': self.project_id})
         _dedicated(dedicated, self.project_id, self.user_id, owner)
+        if self.launch_receipt is None and not self._launch_spent:
+            # QC documents new own projects as private until shared; sharing
+            # publicly requires a backtest. The joint evidence is this actual
+            # new allocation plus fresh sole ownership and EMPTY run history.
+            # It is an endpoint check, not proof against an intervening share.
+            self._history(prefix + '-privacy')
+        else:
+            # Once a backtest exists, empty-history semantics no longer apply.
+            # A future separately frozen result reader can establish privacy;
+            # this protocol refuses if the API still omits the public field.
+            require(row.get('public') is False, 'private')
 
     def _history(self, prefix, *, own=False):
         value = self._call(prefix + '-history', 'backtests/list',

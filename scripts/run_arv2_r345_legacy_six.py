@@ -41,7 +41,7 @@ SECONDS, MAX_PUBLIC, MAX_PLAN, MAX_JOURNAL = 3600, 2 * 1024 * 1024, 256 * 1024, 
 MAX_OUTPUT, MAX_EVENTS = 32768, 4096
 FIELDS = ('st_dev', 'st_ino', 'st_mode', 'st_uid', 'st_gid', 'st_nlink', 'st_size', 'st_mtime_ns', 'st_ctime_ns', 'st_flags')
 CREDENTIALS = ('QC_USER_ID', 'QC_API_TOKEN')
-STAGE, CLAIM = 'preflight', 'unallocated'
+STAGE, CLAIM, LAST_FAILURE = 'preflight', 'unallocated', None
 FLAGS = {'point_in_time_proven': False, 'formal_identity_admitted': False,
     'formal_forward_ready': False, 'paper_or_live_ready': False, 'result_read': False}
 FINITE = frozenset(('arguments', 'environment', 'git', 'plan', 'source_pin', 'source_changed',
@@ -203,8 +203,8 @@ class Sources:
             if current not in self.cache:
                 before = metadata(os.stat(part, dir_fd=row[0], follow_symlinks=False))
                 fd = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=row[0])
-                require(stat.S_ISDIR(before[2]) and metadata(os.fstat(fd)) == before, 'source_changed')
                 self.cache[current] = (fd, row[0], part, before)
+                require(stat.S_ISDIR(before[2]) and metadata(os.fstat(fd)) == before, 'source_changed')
             row = self.cache[current]
         before = metadata(os.stat(path.name, dir_fd=row[0], follow_symlinks=False))
         fd = os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=row[0])
@@ -407,7 +407,7 @@ class Store:
         finally: self.close()
 
 
-def object_admission(request, uploads, organization, journal):
+def object_admission(request, uploads, organization, journal, state):
     """Fresh exact metadata only; runtime independently checks payload SHA-256."""
     require(len(uploads) == 6 and callable(request), 'object_admission')
     result = []
@@ -418,10 +418,23 @@ def object_admission(request, uploads, organization, journal):
             and ('errors' not in response or response['errors'] == []), 'object_admission')
         row = response.get('metadata')
         local_md5 = hashlib.md5(item.payload, usedforsecurity=False).hexdigest()
+        observed_size = row.get('size') if type(row) is dict else None
+        observed_md5 = row.get('md5') if type(row) is dict else None
+        state['last_object_observation'] = {'ordinal': ordinal,
+            'key_sha256': pin(item.object_store_key.encode())['sha256'],
+            'metadata_present': type(row) is dict,
+            'key_exact': type(row) is dict and row.get('key') == item.object_store_key,
+            'size_type': 'int' if type(observed_size) is int else 'bool' if type(observed_size) is bool
+                else 'string' if type(observed_size) is str else 'null' if observed_size is None else 'other',
+            'observed_size': observed_size if type(observed_size) is int and 0 <= observed_size < 2**63 else None,
+            'expected_size': len(item.payload),
+            'md5_lower_hex': type(observed_md5) is str and re.fullmatch('[0-9a-f]{32}', observed_md5) is not None,
+            'md5_hex': type(observed_md5) is str and re.fullmatch('[0-9a-fA-F]{32}', observed_md5) is not None,
+            'md5_matches': type(observed_md5) is str and observed_md5.casefold() == local_md5}
         require(type(row) is dict and row.get('key') == item.object_store_key
             and type(row.get('size')) is int and row['size'] == len(item.payload)
-            and type(row.get('md5')) is str and re.fullmatch('[0-9a-f]{32}', row['md5'])
-            and row['md5'] == local_md5, 'object_admission')
+            and type(row.get('md5')) is str and re.fullmatch('[0-9a-fA-F]{32}', row['md5'])
+            and row['md5'].casefold() == local_md5, 'object_admission')
         result.append({'key_sha256': pin(item.object_store_key.encode())['sha256'],
             'byte_count': len(item.payload), 'local_sha256': pin(item.payload)['sha256'], 'metadata_md5': local_md5})
         journal(f'objects-{ordinal}-observed', result[-1])
@@ -429,7 +442,7 @@ def object_admission(request, uploads, organization, journal):
         'qualification': 'current_size_and_MD5_metadata_not_remote_SHA256_attestation_runtime_reader_rechecks_SHA256'}
 
 
-def operate(submission, candidate_id, *, engine, api, secret, store, deadline, sleep=time.sleep):
+def operate(submission, candidate_id, *, engine, api, secret, store, deadline, state, sleep=time.sleep):
     """Injected sequencing, exactly one create/compile/launch, no result read."""
     global STAGE
     candidates = [row for row in submission.candidates if row.candidate_id == candidate_id]
@@ -438,24 +451,26 @@ def operate(submission, candidate_id, *, engine, api, secret, store, deadline, s
         budget(deadline)
         require(type(endpoint) is str and (endpoint in engine.PAYLOAD_KEYS or endpoint == 'object/properties')
             and type(payload) is dict, 'request')
+        state['last_request'] = {'endpoint': endpoint, 'payload_sha256': pin(canonical(payload))['sha256']}
         api.deadline = min(deadline, time.monotonic() + 89)
         return api._exchange(endpoint, payload)
     STAGE = 'access'
     access = engine.access_capacity(request, user_id=int(secret['QC_USER_ID']), journal=store.journal)
     require(access['public']['capacity']['available_count'] > 0, 'capacity')
     STAGE = 'objects'
-    admitted = object_admission(request, submission.uploads, access['organization_id'], store.journal)
+    admitted = object_admission(request, submission.uploads, access['organization_id'], store.journal, state)
     operation = engine.LegacySixQc(candidates[0].cell_record(), organization_id=access['organization_id'],
         user_id=int(secret['QC_USER_ID']), attempt=1, request=request, journal=store.journal)
+    state['operation'] = operation
     STAGE = 'source_compile'
     begin = operation.begin_once()
     require(begin['state'] == 'compiling', 'capacity')
     for index in range(engine.COMPILE_POLLS):
         if index:
             require(budget(deadline) > engine.COMPILE_INTERVAL, 'deadline'); sleep(engine.COMPILE_INTERVAL)
-        state = operation.poll_compile(index)
-        require(state['state'] != 'BuildError', 'compile')
-        if state['state'] == 'BuildSuccess':
+        compile_state = operation.poll_compile(index)
+        require(compile_state['state'] != 'BuildError', 'compile')
+        if compile_state['state'] == 'BuildSuccess':
             break
     else:
         raise Refused('compile')
@@ -465,7 +480,7 @@ def operate(submission, candidate_id, *, engine, api, secret, store, deadline, s
             require(budget(deadline) > engine.CAPACITY_INTERVAL, 'deadline'); sleep(engine.CAPACITY_INTERVAL)
         # No project/source changes between these checks and launch_once. The
         # engine freshly rechecks its own project/access/source/compile/capacity.
-        admitted = object_admission(request, submission.uploads, access['organization_id'], store.journal)
+        admitted = object_admission(request, submission.uploads, access['organization_id'], store.journal, state)
         launched = operation.launch_once()
         if launched['state'] == 'launched':
             break
@@ -480,7 +495,7 @@ def operate(submission, candidate_id, *, engine, api, secret, store, deadline, s
 
 
 def run(args):
-    global STAGE
+    global STAGE, LAST_FAILURE
     deadline = time.monotonic() + SECONDS
     bound = preflight(args, deadline)
     with Sources(args, deadline) as sources:
@@ -489,6 +504,7 @@ def run(args):
                 'consumed_at': datetime.now(timezone.utc).isoformat()})
             store.write('events.jsonl', b'')
             api = None
+            state = {'api': None, 'operation': None, 'last_request': None, 'last_object_observation': None}
             try:
                 STAGE = 'data'
                 with sources.consumer.FreshSubmission(expected_pin=sources.plan['private_pin'],
@@ -501,22 +517,30 @@ def run(args):
                 STAGE = 'credentials'
                 secret = sources.transport.credentials({key: os.environ.get(key) for key in CREDENTIALS})
                 api = sources.transport.API(secret, store, min(deadline, time.monotonic() + 89))
+                state['api'] = api
                 result = operate(submission, args.candidate, engine=sources.engine, api=api,
-                    secret=secret, store=store, deadline=deadline)
+                    secret=secret, store=store, deadline=deadline, state=state)
+                # Preserve safe allocation/contact facts even if a subsequent
+                # final source/control verification or descriptor close fails
+                # outside this inner handler, before stdout can be emitted.
+                LAST_FAILURE = failure_evidence(state, sources, Refused('unknown'))
                 api.close(); api = None
                 sources.verify()
                 report = {'schema': SCHEMA + '-result', 'binding': bound, 'attempt_consumed': True, 'result': result}
                 report_pin = store.write('report.json', report)
                 store.verify()
             except BaseException as error:
+                LAST_FAILURE = failure_evidence(state, sources, error)
                 if api is not None:
                     api.close()
                 reason = finite(error, sources)
                 store.write('failure.json', {'schema': SCHEMA + '-failure', 'binding': bound,
                     'stage': STAGE, 'failure_code': reason, 'attempt_consumed': True,
-                    'application_dispatch_count': store.application_dispatch_count, **FLAGS})
+                    'application_dispatch_count': store.application_dispatch_count,
+                    'evidence': LAST_FAILURE, **FLAGS})
                 raise Refused(reason) from None
     STAGE = 'complete'
+    LAST_FAILURE = None
     return {**report, 'report_pin': report_pin}
 
 
@@ -531,6 +555,77 @@ def finite(error, sources=None):
             if type(error) is module.Refused:
                 return code
     return 'unknown'
+
+
+def failure_evidence(state, sources, error):
+    """Closed finite projection; never serialize opaque API/engine instances."""
+    allowed = set(sources.engine.PAYLOAD_KEYS) | {'object/properties'}
+    def endpoint(value):
+        return value if type(value) is str and value in allowed else None
+    def digest(value):
+        return value if type(value) is str and re.fullmatch('[0-9a-f]{64}', value) else None
+    def identity(value):
+        return value if type(value) is str and re.fullmatch('[A-Za-z0-9][A-Za-z0-9._:-]{0,127}', value) else None
+    def request(value):
+        if type(value) is not dict:
+            return None
+        result = {'endpoint': endpoint(value.get('endpoint')), 'payload_sha256': digest(value.get('payload_sha256'))}
+        marker, stage = value.get('marker'), value.get('stage')
+        if type(marker) is str and re.fullmatch('[a-z0-9-]{1,100}', marker): result['marker'] = marker
+        if stage in ('intent_or_request_unaccepted', 'response_unaccepted'): result['stage'] = stage
+        if digest(value.get('response_sha256')) is not None:
+            result['response_sha256'] = value['response_sha256']
+        count = value.get('response_bytes')
+        if type(count) is int and 0 < count <= 2 * 1024 * 1024: result['response_bytes'] = count
+        return result
+    module_error = {'module': 'unknown', 'code': 'unknown'}
+    for name, module in (('caller', sys.modules.get(__name__)), ('consumer', sources.consumer),
+            ('engine', sources.engine), ('transport', sources.transport)):
+        if module is not None and type(error) is getattr(module, 'Refused', None):
+            args = BaseException.args.__get__(error)
+            if len(args) == 1 and type(args[0]) is str and args[0] in module.FINITE:
+                module_error = {'module': name, 'code': args[0]}
+    api, operation = state.get('api'), state.get('operation')
+    statuses, responses = [], []
+    if api is not None:
+        for row in getattr(api, 'statuses', ()):
+            if type(row) is dict and endpoint(row.get('endpoint')) is not None \
+                    and type(row.get('http_status')) is int and 100 <= row['http_status'] <= 599:
+                statuses.append({'endpoint': row['endpoint'], 'http_status': row['http_status']})
+        for row in getattr(api, 'responses', ()):
+            if type(row) is dict and endpoint(row.get('endpoint')) is not None \
+                    and valid_pin({key: row.get(key) for key in ('byte_count', 'sha256')}, 2 * 1024 * 1024):
+                responses.append({key: row[key] for key in ('endpoint', 'byte_count', 'sha256')})
+    last_status = getattr(api, 'last_http_status', None)
+    project_id = getattr(operation, 'project_id', None)
+    receipt = getattr(operation, 'launch_receipt', None)
+    allocated = {'project_id': project_id if type(project_id) is int and 0 < project_id < 2**63 else None,
+        'compile_id': identity(getattr(operation, 'compile_id', None)),
+        'backtest_id': identity(receipt.get('backtest_id')) if type(receipt) is dict else None}
+    # Object observations were constructed solely from exact booleans, bounded
+    # integers, finite type names and an expected-key hash before refusal.
+    observation = state.get('last_object_observation')
+    object_keys = {'ordinal', 'key_sha256', 'metadata_present', 'key_exact', 'size_type',
+        'observed_size', 'expected_size', 'md5_lower_hex', 'md5_hex', 'md5_matches'}
+    if (type(observation) is not dict or set(observation) != object_keys
+            or type(observation.get('ordinal')) is not int or not 0 <= observation['ordinal'] < 6
+            or digest(observation.get('key_sha256')) is None
+            or not all(type(observation.get(key)) is bool for key in ('metadata_present', 'key_exact', 'md5_lower_hex', 'md5_hex', 'md5_matches'))
+            or observation.get('size_type') not in ('int', 'bool', 'string', 'null', 'other')
+            or not (observation.get('observed_size') is None or type(observation['observed_size']) is int and 0 <= observation['observed_size'] < 2**63)
+            or type(observation.get('expected_size')) is not int or not 0 < observation['expected_size'] <= 32 * 1024 * 1024):
+        observation = None
+    result = {'module_error': module_error,
+        'last_http_status': last_status if type(last_status) is int and 100 <= last_status <= 599 else None,
+        'http_status_count': len(statuses), 'http_status_vector_pin': pin(canonical(statuses)),
+        'last_http_statuses': statuses[-12:], 'response_pin_count': len(responses),
+        'response_pin_vector_pin': pin(canonical(responses)), 'last_response_pins': responses[-6:],
+        'last_request': request(state.get('last_request')),
+        'engine_last_request': request(getattr(operation, 'last_request', None)),
+        'engine_last_failure': request(getattr(operation, 'last_failure', None)),
+        'allocated_identities': allocated, 'object_observation': observation}
+    require(len(canonical(result)) <= 8192, 'output')
+    return result
 
 
 class Parser(argparse.ArgumentParser):
@@ -558,5 +653,5 @@ if __name__ == '__main__':
         require(len(raw) <= MAX_OUTPUT, 'output'); sys.stdout.buffer.write(raw)
     except BaseException as error:
         sys.stdout.buffer.write(canonical({'schema': SCHEMA + '-failure', 'stage': STAGE,
-            'claim_state': CLAIM, 'failure_code': finite(error), **FLAGS}) + b'\n')
+            'claim_state': CLAIM, 'failure_code': finite(error), 'evidence': LAST_FAILURE, **FLAGS}) + b'\n')
         raise SystemExit(2)

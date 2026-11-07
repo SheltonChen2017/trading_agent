@@ -1314,9 +1314,10 @@ The owner explicitly waives Claude review of section 345 for the current
 research recovery; it owns the November7 QC-hold release and resumption. Both
 Claude344commits are accepted after counter-review with documentary
 qualifications. Corrected projection/reporting/caller tests pass on the
-designated Mac (260 distinct). LeafA remains spent and excluded; leafB must
-be separately frozen and used once before its new DATA can enter a separately
-frozen submitter. The owner released QC; no permission or readiness follows
+designated Mac (260 distinct). LeafA remains spent and excluded; corrected B
+prepare/validator passed once with actual0/0 and are now spent. Its new DATA
+is bound to the separately frozen AR100/A1 pilot in345.5. The owner released
+QC; no permission or readiness follows
 for a funded/broker/paper/live operation. The six-universe old-rule AR80–200
 research extension remains the selected route, and the broad new-rule rebuild
 stays paused. Current operational results and exact next gates are in345.
@@ -1324,9 +1325,11 @@ stays paused. Current operational results and exact next gates are in345.
 Only the QCOM-restored SIX-universe old-rule extension through2026-10-13 is
 active, preserving AR80–200 arms and after-close/next-open MOO economics.
 The original R343A prepare/validator actual0/0 remains spent and its main.py
-files are superseded. Corrected B preparation and a four-request read-only
-QC observation require the separate exact clean freezes in345.2–345.3.
-New submitter/consumer support is prospective, not automatic launch authority.
+files are superseded. Corrected B preparation and the four-request read-only
+QC observation passed under their exact clean freeze; their results are345.4.
+Two idle backtest nodes were observed, not leased. New submitter/consumer
+support passed531focused tests and public-source bootstrap; only the separate
+AR100/A1 run freeze in345.5 may next be invoked, never an arbitrary callback.
 Fresh source/input/rights/account/privacy/idle/capacity/project/attempt/run
 gates precede any upload/compile/backtest. No old operation/control is replayed.
 The broad new-rule six/eight rebuild stays paused with its own blockers.
@@ -77696,3 +77699,178 @@ only intended banner/live-navigation edits remain outside345. Record checks
 repeat33passes0.57s, not additive. Initial5a2f3989 is not an invocation
 snapshot; H is the subsequent clean record-correction commit. No control,
 credential or QC request had been used when this correction was made.
+
+### 345.4 Actual B preparation and fresh QC observation
+
+At clean freeze1ca2973596b26dbcb02a63028a70323aa56bc6f7, sole corrected
+B preparation dispatched2026-11-07T17:23:14UTC; completion observed17:23:36UTC,
+ACTUAL exit0. Sole ORIGINAL-stdin validator dispatched17:23:58UTC; completion
+observed17:24:45UTC, controller0/ACTUAL validator0/stderr0, accepted=true and
+output_envelope_validated=true. These are external dispatch/poll brackets,
+not measured operation durations. Both B observations are now PASSED/SPENT;
+do not rerun either or inspect/repair its leaf. All used B producer/projection/
+reporting/source inventory bytes remain frozen.
+
+|Original observation|Bytes|SHA256|
+|---|---:|---|
+|B parent stdout|23981|d52605793f01ae2c5f735dbd915afaaeddf0bd71eb8ef6a969cd577b13f220e8|
+|B original-stdin validator stdout|23778|eaaceb5a83650bb39646ba404daf3a5819897b6efb787bb549baf6c2ee495d09|
+|B report.json|23870|e9e274721d17eff2d76676035bfe2a76794b756f44dff7bff6f2d50d282bc96f|
+|B submission-private.json|6814004|bdb70766a8bfa54a183c5c0e261ee7e01c7036071f43bd703b7fa4eb24a61413|
+|B canonical source_summary|22215|2a50dc81353758df2903b6ecef091c83432b54ca23f8b10cf82cbd85b8df1cd5|
+
+The validator's native policy is the same ALL-artifact/network/USB/Keychain/
+security-CLI denial described in343.6, with only r343-root support writes.
+Its original envelope/source bindings and actual parent0 were verified; it
+never opened B's report or DATA. A future new consumer may hold-read ONLY
+B/submission-private.json against the external pin above. Old A is never an
+input. Input/source guards returned before B publication, original output
+descriptors/native security/full metadata passed final checks, and the six
+original input objects remain2776584B with4631Bactivation last. No cloud
+object or constituent/price/runtime admission follows from this local result.
+
+The seven full canonical PROFILE JSON pins remain exactly343.6 (including
+their internal profile_sha256 member). Corrected ordered SOURCES vectors are:
+
+|Candidate|Source bytes /18files|Canonical SOURCES-vector SHA256|
+|---|---:|---|
+|R343-AR080|424287|b62c979b1bb943af9fdfc69d1bfd26cea86eae559f21ff875d18d48131f2da1d|
+|R343-AR100|424308|dd7ac17da831d807a96443d6cb0e84dab6580eb150dda0719bb370f9b4054f11|
+|R343-AR120|424308|1f281aca63ca3ca656bf592955a4a6a38126e5dcda9413521a98c59dab495bad|
+|R343-AR140|424308|a98bb10b81c6a0aa3f92272152bd10ad8e3dc1bddc1f8afb7220aa5a468716e1|
+|R343-AR160|424308|4efdafe64ece027e67c4a4e009751e9fad86f0414776fe89b1740aa6b1ad209c|
+|R343-AR180|424308|22329dd81d9104234c36a58386969dda16b86f5f9cb7a1e60fded505e7848594|
+|R343-AR200|424308|1b53c2d04a0b390bee367cf74c70f9afd706af0558f6edd55b94ac05f18dea74|
+
+The sole read-only QC observation dispatched17:25:04UTC; completion observed
+17:25:26UTC, controller0/ACTUAL child0/stderr0. Original double-LF stdout
+1908B/SHA83087e514e7f2ca653a466ecfa842b15aa82dd2d10d7e246c80969967e86e137
+and report1790B/SHAde46974c37a2b977057409b55ea789a70b6fb172dcfa42a3e696f6034bac107a
+validate against the original clean H/caller/profile bindings and actual exit.
+No report/claim read or output census followed. This observation is now
+PASSED/SPENT and its caller/security/CA/profile bindings remain frozen.
+
+All four application dispatches returned HTTP200: authenticate, fixed
+reference project metadata, dedicated collaborators and nodes. Account/
+organization/owner/Python scope matched, dedicated owner-only and reference
+editor idle were observed. Two backtest nodes, zero busy and two available
+with autoSelectNode=true were observed. This is a point-in-time availability
+observation, not a resource lease or permission to interfere with another lane.
+Request intents4/application dispatch attempts4 are not physical request
+accounting. API omitted public; privacy remains unproven from that response.
+No source/file/result/data read, upload, project/permission/lock change,
+compile or launch occurred. No new research look or result cell was added;
+338/259/54/699 remains the floor. Safari remains unused.
+
+Current next action: complete/tests/source-freeze the NEW bounded submitter
+and actual B DATA/public-plan bindings. Fresh input-object metadata, current
+project/account/access/privacy/idleness/capacity and exact-source/attempt gates
+still precede its pilot. No source-policy fallback, arbitrary callback,
+old operator/control or unchanged retry is authorized by these successes.
+
+### 345.5 Exact pilot submission decision (before use)
+
+The NEW operational caller is now implemented and tested, replacing only the
+UNINVOKED draft's status. Fixed pilot R343-AR100/A1 runs first; the other six
+AR arms remain frozen but have no invocation authority in this decision.
+No performance-based arm selection is permitted. Intended new project name:
+ARV2 LEGACY SIX R343-AR100 OCT2026; backtest name same plus A1. No historical
+project is reused or repaired.
+
+|Component|Bytes|SHA256|
+|---|---:|---|
+|run_arv2_r345_legacy_six.py|38408|0e2c2444a064a8d1c67b4b0b66e3d8abfd28c7fb49abab7508e9f613498bfc9d|
+|arv2_r345_legacy_six_plan.json|48321|489fa98fc6cc20d7f4be285515fd3bfab8de14b6622bd8ca6c0f093d8cd9f55b|
+|arv2_r345_legacy_six_submission_data.py|15084|e6e349e60f5a7afc3e6d43cb0e0e9a47ad82f7af807216933f9926d8a9095e88|
+|arv2_r345_legacy_six_qc.py|37228|1723edff07830ab3a246dec653055e3ff0efba1c23eba207702f8fdce9ee1ecf|
+|caller tests|17634|c09c3ffbb8370ca61025350f7857527726a447ce03aefe649dcdce93782778c8|
+
+AR100 canonical operation profile1484B/SHA
+e58e2e1ddd78f2ac5b34a3b072b503e0c97ae805ef6e7be6bc42444a39f931ce;
+native policy2084B/SHA
+3a72b0de57f131f81155e4e4daee09708fdf46cf6d3e1fbd906fb256ff8a19ef.
+The exact public plan binds B's actual producer H/caller/profile, external
+6814004B DATA pin, original canonical summary and160 selected source pins.
+All155 inherited inventory rows reproduce without refresh. The operation's
+own caller is separately CLI-bound; plan/self-circularity is excluded. Its
+sealed public bootstrap PASSED once under native ALL-artifact/network/
+USB/Keychain denial with160 selected files, no claim or private access.
+This establishes the reachable selected-code loading boundary, not integrity
+of the whole interpreter, system or unselected third-party libraries.
+
+Exclusive fixed control:
+artifacts/analyst_revisions_v2/legacy_six_runs/R345-20261107-AR100-A1.
+It has NOT been inspected/allocated. Allocation/claim/fsync precedes the sole
+fresh B DATA read and its normal guard return, then existing QC environment
+credential inspection/contact. No B report/claim or original package is read.
+The source/control descriptors/full metadata/security remain held through
+the operation and final close. Only immutable validated DATA buffers survive
+the fresh DATA guard; there is no stale-price/vendor-grid/source substitution.
+
+Fresh six-key object/properties checks compare exact key/size/case-normalized
+32-hex MD5 with the locally SHA256-authenticated payloads before project
+mutation and immediately before launch. MD5 metadata is qualified transport
+evidence, NOT remote SHA256 attestation; the unchanged cloud input reader
+must verify actual activation and all payload SHA256 before any use. No
+object/get, download, object/set, overwrite or other namespace is permitted.
+The API metadata preview is never retained/output. Existing processing scope
+is the same accepted-risk private QC research input; no new rights are granted.
+
+QC omits the project public field. A NEW project may therefore satisfy the
+prelaunch privacy predicate only jointly through this engine's actual
+successful projects/create request/response identity, current exact owner/
+dedicated owner-only access, no libraries/live metadata, and freshly EMPTY
+backtest inventory before every write/compile/launch. Missing public alone
+proves nothing; explicit contradictions, foreign/unaccepted allocation or any
+prior job refuse before source mutation. The current official project and
+collaboration documentation describe own projects as private until shared and
+backtest sharing as a separate Make Public action:
+https://www.quantconnect.com/docs/v2/cloud-platform/projects/getting-started
+https://www.quantconnect.com/docs/v2/cloud-platform/projects/collaboration
+This is scoped platform-semantics evidence, not continuous privacy proof.
+No share/public/permission endpoint is present. Missing privacy after launch
+still blocks this engine's result-read path; a later reader needs its own
+explicit current gate. This decision does NOT authorize a result read.
+
+The caller authenticates current fixed-reference account/org/owner/capacity;
+then the NEW own project, exact18 source files, initial inventory, own edit lock,
+source readback, main-last writes, zero previous jobs, one compile and fresh
+access/source/capacity before one launch. Only a new own default research.ipynb
+may be deleted. No other lane's project/job/session/control is changed.
+Compile polls30 at2s, capacity waits3 at60s are bounded and not duplicate
+launches. The3600s parent plus per-request native deadline retain host-
+suspension/uninterruptible-I/O limitations; only its own process is controlled.
+
+Pre-use corrections: advisory CR345-005/P2 confirmed a caller-local compile
+state shadow that made later failure evidence stale. Renaming compile_state
+and a reached post-compile object-refusal regression correct it. A descriptor
+registration failure leak, late-close allocation loss and MD5 representation
+compatibility were corrected before use and regression-covered. Closed failure
+evidence retains selected module/code, actual numeric HTTP status, bounded
+endpoint/response hash vectors, metadata shape/match flags and allocated
+project/compile/backtest IDs. Frozen transport still discards QC's arbitrary
+error text/numeric application codes; do not invent them from HTTP200 or a hash.
+No raw exception/credentials/market rows are printed. A late actual nonzero
+remains inadmissible even if a report says launched; retained IDs must reconcile
+before any further attempt. Never relaunch merely because final recording fails.
+
+Final focused selection531 DISTINCT passes24.62s; previous subsets overlap.
+Separate cold public bootstrap passed with160sources. No full suite ran.
+No operational source used by B or the availability check was changed.
+H2 is the subsequent clean commit containing THIS exact run decision, final
+caller/plan/source/test bytes and record. Verify root/branch/HEAD/status/live
+remote before dispatch. Run ONLY AR100 once with expected-head H2,
+caller-sha2560e2c2444a064a8d1c67b4b0b66e3d8abfd28c7fb49abab7508e9f613498bfc9d
+and plan-sha256489fa98fc6cc20d7f4be285515fd3bfab8de14b6622bd8ca6c0f093d8cd9f55b,
+under exact native policy and safe_env plus ONLY existing QC credential keys.
+Require ACTUAL exit0 and original canonical finite envelope/report-pin/source
+binding before calling it a launch. Partial/failed/ambiguous claim is spent;
+no unchanged retry, alternative control or fallback is permitted here.
+
+A1 consumes its candidate attempt even on upload/compile failure; original
+R260–266 and all other spent budgets stay unchanged. Book the actual new
+development look on the first compile/backtest dispatch, once by retained
+identity, never at local preparation/metadata-only observation. No efficacy
+or result cell follows from a launch. The pre-dispatch floor remains
+338shared/259development/54infrastructure/699cells. No paper/live/funded/
+broker/real-order action or formal source/PIT/master admission is authorized.

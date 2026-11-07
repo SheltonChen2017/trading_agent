@@ -1,12 +1,20 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Read-only native QC quote and Massive guidance suitability audit recorded in section 67, 2026-11-07.
+Status: **No-orders QC coverage and public guidance-sample audit recorded in section 68, 2026-11-07.
+Both research executions completed; zero backtests, orders, purchases or performance calculations.
+Explicit unfilled quote history returns 1,508 session and 10:00-boundary dates per sampled symbol in 2020--2025, matching the QC-calendar expected count.
+All 96 predeclared symbol/tick windows returned quotes; this is not full-universe or executable-NBBO acceptance.
+Two public Massive guidance examples are reaffirmations, not verified changed-revision chains.
+Native quote adapter semantics and usable guidance/correction/predecessor history remain open; the lane is not backtesting ready.
+One combined final matching-lane push is authorized, including the preceding local section-67 notes.
+Monitor remains PAUSED; synthetic recovery is not resumed.
+Read-only native QC quote and Massive guidance suitability audit recorded in section 67, 2026-11-07.
 The authenticated QC catalog lists free cloud US Equities access; actual stock/SPY history is not measured.
 The Data Explorer link redirects to the dataset page; no history request or compute job is substituted.
 Massive now displays Stocks Basic; Corporate Guidance is an unowned $99/month expansion.
 Neither product fit nor advertised history closes coverage, source semantics, integration or research gates.
 No purchase, project creation, upload, research deployment, compile, backtest or monitor rearm occurs.
-This audit is documented locally; no new push is requested or performed.
+Section 67 was documented locally without a push; section 68 carries the later publication direction.
 Codex counter-review of section 65 completed in section 66, 2026-11-04.
 Claude code commit `1870b9c9` is accepted; record commit `6375401b` is accepted after documentation clarification.
 Both new Claude commits are consumed once; no further implementation milestone starts in this round.
@@ -140,7 +148,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 67. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 68. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -10306,3 +10314,233 @@ project 37647834 remain untouched. Separate Mia recovery is still zero attempts
 project. Retained `c589b3dd` custody, original economics/null-false permissions,
 protected dates/family/look and funding/trading gates are unchanged. Monitor
 stays **PAUSED**; no automatic review loop or recovery rearms.
+
+## 68. No-orders native quote coverage and public guidance samples, 2026-11-07
+
+### 68.1 Scope, ownership and diagnostic class
+
+Owner: **"Proceed with the no-orders QC stock/SPY coverage audit and Massive
+guidance sample checks. Don't buy anything or launch backtests, and push once
+when done."** This permits the bounded research/data-quality work below and
+one completed-round publication. It does not authorize strategy evaluation,
+signal/return calculation, orders, purchases or another Mia recovery attempt.
+An order-based evaluation is not substituted: this is a structural `QuantBook`
+diagnostic with no portfolio or orders, as specifically requested, rather than
+a non-order-based strategy backtest.
+
+The mandatory root/branch/origin are verified at resumption. Clean local HEAD
+is `bd7747dbfa2c747106fe060412d8c3ee72df501d`; live matching remote is
+`a700f86f61f4dd1feba62a890febc3692eb1228b`. The single local commit contains
+section 67's notes. Its publication is included in this round, not a repeat of
+section 66's completed push. Claude `1870b9c9`/`6375401b` remain consumed once.
+
+Current [QC Security/IP Good Practices](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip)
+explicitly permit in-cloud validation that reports missing-day/check results
+instead of market values. Raw quotes stay in QC; only non-reconstructable
+coverage/shape counters are inspected and retained. No other projects' source,
+logs, outcomes or data, credentials, internal filesystem traversal, output-
+capacity tests or indirect data export occurs. Safari is untouched.
+
+### 68.2 Native project, code and execution ledger
+
+The existing authenticated isolated session creates project **39054018,
+Pensive Orange Zebra**, solely for this audit. It is distinct from the closed
+original project and the prospective recovery ledger. Its displayed engine is
+`master v18234`, automatic build label `LEAN 2.5.0.0.18234`, Foundation Default;
+research uses `Foundation-Py-Default` on the existing R1-4 resource. The resource
+had no In Use By displayed before launch. No node is bought, reassigned or
+taken from another lane. Research server selection displays
+`R-91242f48915138eee72f05a5145cef4e`. These observations do not establish an
+immutable engine Git, CLR/Python binding or historical data vintage.
+
+| Native event | Observation and disposition |
+|---|---|
+| Default new project/coding environment | QC automatically builds its template: `8589ad-6b0744`, successful. Template orders are never run. |
+| Readable `main.py` replacement | Prepared 6,445-byte source SHA-256 `a67e15d51072dde7a702a8dc76e7c7652ed5b589700eb4f73322205921659d92`; a sentinel refuses any accidental backtest initialization. No order methods remain. Automatic build `db756d-c877a9` succeeds. |
+| Source advisory | One Problems warning at line 81/column 13 discourages try/catch. The inspected handler emits ERROR/INCOMPLETE and returns on history failure; no failure is accepted. No platform compliance rejection is observed or suppressed. |
+| Notebook execution 1 | Only `from main import run_coverage` / `run_coverage()` replaces the plotting template. One execution completes 24 annual QuoteBar queries and 96 fixed tick queries, with a terminal COMPLETED counter and 50 summary records. |
+| Notebook execution 2 | Separate readable 2,100-byte cell SHA-256 `c07956a8e189278d73f09906d7862d782fdfd51a088618808e9d361878547699` repeats the 24 annual queries with explicit history options. Native execution `[2]` completes; UI duration 10.8 s. |
+
+No manual build, backtest/run ID, optimizer, live deployment or Mia prompt is
+created. The two incidental successful builds are not failed native attempts.
+There are **two research executions, 144 history requests, zero backtests and
+zero orders**. No failed research terminal is observed. Default notebook
+plots and default template trading code are not executed.
+
+Editor input and upload helpers initially fail; normal editor commands provide
+the eventual readable source insertion. No unsupported server/agent API or
+credential workaround is used. The first notebook display truncates its long
+summary; normal Copy Cell Output retrieves all 50 counter records (16,808
+bytes), not prices or source transport. No output limit is probed or enlarged.
+
+### 68.3 Measured coverage, fill-forward correction and interpretation
+
+Predeclared scope is AAPL, JNJ, ADBE and SPY, calendar years **2020--2025**.
+Annual minute QuoteBar requests measure session presence and the 10:00 New York
+bar boundary against **QC's own exchange calendar**. Tick queries use the first
+Wednesday of February/May/August/November each year, 09:58--10:02 New York: 24
+fixed dates, 96 symbol/windows. A closed predeclared session refuses rather
+than selecting a convenient replacement. No protected date is queried.
+
+The initial subscription specifies RAW, regular hours and `fill_forward=False`,
+but the typed minute-history requests still return flagged fill-forward bars:
+AAPL 56, JNJ 63, ADBE 178 and SPY 75, **372 total**. Consequently subscription
+settings alone are not accepted as proof of unfilled history. The follow-up
+sets `fill_forward=False`, `extended_market_hours=False` and RAW explicitly on
+each typed history call. That deployed binding succeeds in all 24 cases and
+removes all 372 flagged bars; none is silently counted as a fresh observation.
+This is a native history-call observation, not a generalized root-cause claim
+about every QC overload or cached/provider bar.
+
+| Symbol | Explicit unfilled minute bars | Sessions with bars / QC expected count | Sessions with 10:00 boundary | Tick windows with quotes / requested | Quote ticks in those windows |
+|---|---:|---:|---:|---:|---:|
+| AAPL | 585,904 | 1,508 / 1,508 | 1,508 | 24 / 24 | 848,358 |
+| JNJ | 585,897 | 1,508 / 1,508 | 1,508 | 24 / 24 | 116,452 |
+| ADBE | 585,782 | 1,508 / 1,508 | 1,508 | 24 / 24 | 63,998 |
+| SPY | 585,885 | 1,508 / 1,508 | 1,508 | 24 / 24 | 2,521,720 |
+
+Explicit history has **zero flagged fill-forward bars**. The 3,550,528 sampled
+quote ticks have no observed time decreases, outside-window observations,
+suspicious flags or fill-forward flags. They are one-sided: zero paired ticks,
+with equal bid-only/ask-only counts. There are 1,830,400 same-millisecond ties,
+and all sampled quote-condition strings are nonempty. Nonempty native regular
+flags are not equivalent to an invalid quote or to Massive's empty-condition
+contract. The positive-sized side-update recency diagnostic passes 96 windows;
+it ignores later invalid-side updates and is **not latest executable state or
+NBBO certification**. `zero_sided` means no positive-price/positive-size side,
+not necessarily that all raw fields are literal zero.
+
+The explicit follow-up retains session/boundary **counts**, not date membership
+or a cross-symbol intersection; its 1,508 per-symbol dates match the QC-calendar
+expected count. The first pass checks expected membership but includes filled
+bars. Do not infer an independently verified 1,508-date unfilled intersection
+or 6,032 independent observations. The tick sample unit is **24 dates**, not
+96 independent dates. This establishes the bounded per-symbol count/boundary
+and sampled-tick coverage. It does
+not prove every minute/tick, inactive firms, the strategy's full opportunity
+set, an independently dated calendar, vendor availability vintage, venue/
+withdrawal/condition semantics or executable paired NBBO. QuoteBar internal
+side carry and crossed-close normalization remain separate from generated
+fill-forward. The existing Massive-specific adapter is not relabelled or
+weakened; a QC-specific implementation and parity checks remain necessary.
+
+### 68.4 Guidance samples: two reaffirmations and concrete field limits
+
+Two openly published Massive JSON examples are checked against issuer sources:
+
+| Public example | Original source and disposition |
+|---|---|
+| BBWI, May 19, 2025 FY2025, [endpoint example](https://massive.com/docs/rest/partners/benzinga/corporate-guidance) | The [issuer CEO/preannouncement release](https://investors.bbwinc.com/news-releases/news-release-details/bath-body-works-appoints-daniel-heaf-chief-executive-officer) maintains the [February 27 outlook](https://investors.bbwinc.com/news-releases/news-release-details/bath-body-works-reports-2024-fourth-quarter-and-full-year/): a reaffirmation, not a raise. |
+| HD, May 20, 2025 FY2025, [partner example](https://massive.com/partners/benzinga) | The [May 20 issuer release](https://ir.homedepot.com/news-releases/2025/05-20-2025-110127912) reaffirms its [February 25 initial outlook](https://ir.homedepot.com/~/media/Files/H/HomeDepot-IR/press-release/q4-2024-earning-release.pdf). Prior revenue bounds are absent from this public example. |
+
+Prior EPS in these examples supports same-FY rather than prior-year-actual
+interpretation, but unchanged values cannot certify which predecessor record
+was linked. Neither is a verified changed-revision chain or a paid API receipt.
+The sample audit does not establish correction/withdrawal, inactive-issuer,
+complete off-cycle or six-year guidance coverage.
+
+Four exact Decimal source checks, independently recomputed by Codex, show that
+the vendor's absolute figures differ from literal source-based arithmetic
+projections: the examples include rounded conversions from issuer percentage
+outlooks. No guidance-revision percentage, eligibility, signal, return or order
+is calculated. Approximate percentage targets must not silently become exact
+point guidance. The BBWI adjusted-EPS label is not independently established by
+its issuer wording; this is unverified equivalence, not a proven vendor error.
+The HD marketing example's `prominance` key also differs from the endpoint's
+`positioning`; a documentation example is not proof of a paid-API schema defect.
+
+BBWI's [company-issued wire release](https://www.globenewswire.com/news-release/2025/05/19/3084002/0/en/bath-body-works-appoints-daniel-heaf-as-chief-executive-officer.html)
+shows 08:30 ET, matching the sample clock, while the current
+[issuer PDF](https://investors.bbwinc.com/node/22226/pdf) header says 12:30 PM
+EDT. No universal clock agreement, original subscriber receipt or immutable
+historical availability is claimed. These actual issuer disclosures predate
+the Expected Guidance feature announcement and do not settle that feature's
+inclusion elsewhere in today's product.
+
+Four fresh public HTTPS captures are retained: both Massive pages and both HD
+original surfaces. Four direct BBWI/wire/PDF captures return HTTP 403; their
+fact references remain qualified earlier web-tool rendered text, not newly
+captured full bytes or entitlement denials. Nine associated captured/sample/
+text files are hash-verified. Private field bindings stay ignored. No paid gate,
+account/API key or provider data API is accessed and no vendor message is sent.
+
+### 68.5 Source proof, validation and retained custody
+
+**Evidence correction:** the first clipboard equality check already had the
+prepared source in its buffer, so it did not establish fresh cloud readback.
+A later cleared-sentinel copy does not replace the sentinel. The native
+File: Compare Active File with Clipboard view shows matching text and disabled
+Previous Change/Next Change controls. This is a native text comparison, **not
+a byte-level API/file receipt or whitespace/EOL certificate**. The source
+hashes above identify prepared local source. The immutable initial intent's
+overstrong clipboard claim is superseded by `source-proof-correction-v1.json`.
+A named source download times out; an older Downloads/main.py is neither reused
+as this source nor overwritten. No source is exported through notebook output.
+
+Ignored base:
+`artifacts/guidance_revision_drift/no-orders-coverage-audit-20261107/`.
+
+| Receipt | Bytes | SHA-256 |
+|---|---:|---|
+| `qc/research-intent-v1.json` | 2,188 | `273f00d4cc4ec7b65c95960be444d3b64ba82165ff41fc0fe8977d787ccc5f63` |
+| `qc/author-probe-qa-v1.json` | 963 | `6cfeff292d6539011c9977a173eb7d9cfcb34ea4dd642c67d8869c4eff7d40a9` |
+| `qc/native-counter-output-v1.txt` | 16,808 | `d297758b343c053549b604571a12c8d751c8bf00efc307f02643f80c03bb3f82` |
+| `qc/native-counter-summary-v1.json` | 3,646 | `ffed4e1923a6eb3a2d2cd708a4f0400c0ded946fb1f4aaadfd75383153b82a9a` |
+| `qc/explicit-history-result-v1.json` | 4,994 | `0e9fabd8a90c4cc2c527297776d651bcdface703078a11191f5feb0c3508ab07` |
+| `qc/source-proof-correction-v1.json` | 1,049 | `291dd1c3df9a17caa6b2a3c2b1aa505a4bc0fa37e9919c83130823ea0fc54487` |
+| `qc/research-node-release-v1.json` | 771 | `ac050aacf19dfa9d02ddf0df5dfcc1d6f37697f5c6f1f6d213969a529ced986b` |
+| `qc/qc-resource-release-v2.jpg` | 61,757 | `16c698df900684b3b301265bf9a21a3d0f1ed6af2d6fe16e72f144769aae350e` |
+| `guidance/source-capture-v1.json` | 7,060 | `ac26f21130d61e0e3244bc8493090b87c7a3b2818f079ef70d284d030e69fc51` |
+| `guidance/sample-bindings-private-v1.json` | 8,287 | `3b8436499ece262a618979184e841e4a928c92fbe7489c9e801290c0f5d92534` |
+| `guidance/sample-audit-v1.json` | 2,650 | `6647fd6f71bd8000c7a3eacfcd815a493984c00423e0f4adf2fe89f44d5254c7` |
+| `guidance/root-verification-v1.json` | 316 | `c5511ad94695184f16f019843843d3cf27b80f7e0fe5796972500754b3f715a4` |
+
+Twelve invented author-QA methods pass, with zero failures/errors/skips; this
+is not independent Claude review or native SDK proof. Native execution then
+verifies the typed history bindings and explicit kwargs used here. Root checks
+verify all 50 original counters, all 24 explicit cases, four-symbol/year keys,
+the native totals, all retained anchors, nine source-associated files and four
+Decimal source checks. The existing focused active-document method passes
+(one method, 0.020 s, zero failures/errors/skips or reported warnings); sections
+1 through 67 below the active header are byte-preserved. Both readable audit
+sources compile in memory. Final historical-body/diff/ref/status checks are
+required again before publication. No full
+lane/repository suite is run. Production source, schemas, accepted fixtures and
+the exploratory Adobe corpus are unchanged; only this lane record is tracked.
+
+### 68.6 Outcome, resource cleanup and one-push handoff
+
+**Do not buy Stocks Advanced for this sampled QC-cloud route.** Native delivery
+is now observed; adapter/coverage expansion remains engineering work. Hold the
+Corporate Guidance purchase pending usable changed-revision/correction samples,
+predecessor/precision/method/time mappings and applicable source/processor terms.
+Existing Basic access is not a Guidance entitlement. The product remains
+plausible, not proven sufficient; no additional subscription is bought.
+
+Both research cells are terminal. Embedded stop-icon clicks initially fail and
+an owner stop request is raised. The visible Organization Resources row then
+provides a working Stop control: ownership is rechecked as Pensive Orange Zebra,
+and the resulting R1-4 node `9ef8bb0b` displays Project **-** and In Use By **-**.
+The audit resource is **released**; the earlier owner action is no longer
+needed and is withdrawn in commentary. No other node is stopped, purchased or
+reassigned. Incidental Organization Home/storage/account metadata surfaced
+during navigation is not used as research input. The first screenshot landed
+on that navigation page and is not used as result proof; the retained v2
+resource screenshot shows the confirmed release.
+
+The bounded audit outcome is complete with the stated coverage/source limits,
+not original GDR-0..6 or empirical readiness. The lane remains **not backtesting
+ready**: QC-specific quote semantics/parity, usable guidance/corrections/
+predecessors, common dated reference/action inputs, real-runner integration
+and original research/economic/date/look gates remain. No PIT/rights/strategy-
+input approval field is changed. Original CLOSED FAILED 3/3/project 37647834
+and separate Mia zero-attempt/zero-intent ceiling remain untouched; retained
+`c589b3dd` custody is not rebound.
+
+Finish with exactly **one guarded non-force push** from the mandatory worktree
+to only `codex/strategy-guidance-revision-drift`, including local `bd7747db` and
+this record. Recheck root/branch/HEAD/status, sole origin, staged path and live
+expected remote `a700f86f` immediately before commit/push. Retain the final
+commit, verified remote and publication receipt in the paused checkpoint.
+No intermediate push, PR/merge, shared-document change, automatic further
+round or monitor rearm is authorized. Monitor stays **PAUSED**.

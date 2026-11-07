@@ -166,6 +166,92 @@ def _storage():
     return physical, proof, {**proof, "storage_identity": dict(physical), "receipt_sha256": m.PINS["proof_complete"]["sha256"]}
 
 
+def test_storage_diagnostic_reports_changed_field_names_without_identity_values():
+    physical, proof, qualification = _storage()
+    physical.update(device=987654321, inode=987654322)
+    result = m.storage_difference(physical, proof, qualification)
+    assert result["binding_passed"] is False
+    assert result["current_vs_proof_changed_fields"] == ["device", "inode"]
+    assert result["current_vs_qualification_changed_fields"] == ["device", "inode"]
+    assert b"98765432" not in m.raw(result)
+    # A diagnostic does not weaken the original guard.
+    with pytest.raises(m.AuditRunnerError):
+        m.storage_binding(physical, proof, qualification)
+
+
+def test_storage_diagnostic_distinguishes_identity_match_from_wrong_receipt_pin():
+    physical, proof, qualification = _storage()
+    assert m.storage_difference(physical, proof, qualification)["binding_passed"] is True
+    qualification["receipt_sha256"] = "0" * 64
+    result = m.storage_difference(physical, proof, qualification)
+    assert result["binding_passed"] is result["qualification_receipt_pin_matches"] is False
+    assert result["current_vs_proof_changed_fields"] == result["current_vs_qualification_changed_fields"] == []
+
+
+def test_storage_diagnostic_reports_missing_or_wrong_typed_proof_without_private_text():
+    physical, proof, qualification = _storage()
+    proof["storage_identity"] = "PRIVATE SOURCE"
+    qualification["storage_identity"]["device"] = True
+    result = m.storage_difference(physical, proof, qualification)
+    assert result["current_vs_proof_changed_fields"] == ["storage_identity"]
+    assert result["current_vs_qualification_changed_fields"] == ["device"]
+    assert result["binding_passed"] is False and b"PRIVATE" not in m.raw(result)
+
+
+@pytest.mark.parametrize("cleanup_failure", (None, "held", "guard"))
+def test_storage_diagnostic_worker_reads_only_three_leaves_and_refuses_cleanup_failure(monkeypatch, capsysbinary, cleanup_failure):
+    physical, proof, qualification = _storage()
+    physical["inode"] += 1
+    reads, closes = [], []
+    complete = {"published_leaf_pins": {"storage-qualification.json": {"bytes": 2, "sha256": "1" * 64}}}
+    values = {(m.PROVIDER, "complete.json"): complete,
+              (m.PROOF, "complete.json"): proof,
+              (m.PROVIDER, "storage-qualification.json"): qualification}
+    bodies = {}
+    class Held:
+        def __init__(self, root):
+            assert root in {m.PROVIDER, m.PROOF}
+            self.root, self.leaves = root, {}
+        def read(self, name, pin, *, check):
+            check(); reads.append((self.root, name)); self.leaves[name] = pin
+            data = str(len(reads)).encode(); bodies[data] = values[self.root, name]
+            return data
+        def check(self, *, check):
+            check()
+        def close(self):
+            closes.append(self.root)
+            if cleanup_failure == "held": raise OSError("PRIVATE")
+    class Guard(_Guard):
+        def close(self):
+            if cleanup_failure == "guard": raise OSError("PRIVATE")
+    class Chain:
+        def __init__(self, *_): pass
+        def close(self): pass
+    monkeypatch.setattr(m, "Held", Held)
+    monkeypatch.setattr(m, "decode", lambda body, _pin: bodies[body])
+    monkeypatch.setattr(m, "_source_current", lambda _identity: None)
+    monkeypatch.setattr(m.stable.native, "_isolated", lambda: None)
+    monkeypatch.setattr(m.stable.native.batch.campaign.base, "_prove_isolation", lambda: None)
+    monkeypatch.setattr(m.stable.native, "_WorkerMemoryGuard", Guard)
+    monkeypatch.setattr(m.stable, "_HeldChain", Chain)
+    monkeypatch.setattr(m.stable, "_managed", lambda _held: None)
+    monkeypatch.setattr(m.stable, "_storage_identity", lambda *_a, **_k: physical)
+    if cleanup_failure:
+        with pytest.raises(SystemExit) as caught:
+            m.storage_diagnostic_worker(IDENTITY)
+        assert caught.value.code == 2
+    else:
+        m.storage_diagnostic_worker(IDENTITY)
+    wire = capsysbinary.readouterr().out
+    assert b"PRIVATE" not in wire and len(reads) == 3 and set(closes) == {m.PROVIDER, m.PROOF}
+    value = json.loads(wire)["value"]
+    assert value["completed"] is value["diagnostic_only"] is True
+    assert value["binding_passed"] is False and value["actual_input_leaves"] == 3
+    if cleanup_failure:
+        with pytest.raises(m.stable.source.FirstRateQualificationError):
+            m.stable.source._ipc_result(wire, b"", 2)
+
+
 @pytest.mark.parametrize(("field", "value"), (("schema", "invented"), ("root_kind", "fixture"), ("mode", 0o755),
     ("owner", os.geteuid() + 1 if hasattr(os, "geteuid") else 1), ("inode", 0), ("device", -1), ("group", "20")))
 def test_current_storage_identity_fields_are_each_required(field, value):

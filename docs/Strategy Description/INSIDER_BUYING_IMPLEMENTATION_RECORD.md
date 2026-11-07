@@ -45323,3 +45323,42 @@ Sharadar reply authorization is not used to send a redundant question.
 Massive/EODHD/FMP reply holds, no-purchase/no-QC holds and disarmed monitors
 remain. Public primary-document reads are separate from filing/source-data
 acquisition. This scope does not grant portfolio/outcome/QC readiness.
+
+### 376.4 Actual retained audit FAILED; diagnostic registered before use
+
+Correction/scope commit84a1be4d244902b1787b9085e51522a0094fce90 existed
+and remained clean during execution. No interim push. A fresh source-only
+native canary passed exit0,4.058s outer, stdout65B/stderr0,122 source images:
+allowed source readable, neighboring README and its data-volume alias denied,
+effective network/fork/all-write/security denial, isolated flags and real
+memory guard proved; ZERO actual DATA reads in the canary.
+
+The ONE registered full retained observer then FAILED: CLI exit2,4.058s outer,
+stdout194B/stderr0, completed=false, phase=storage_binding,
+failure_class=audit_control, refusal_code=storage_identity_refused.
+The semantic audit did not complete and no new audit/result digest or corrected
+category count exists. It stopped before reading Sharadar row projections.
+The old373 successful result is neither overwritten nor silently carried
+forward as a new result. No source operation/claim or namespace was repeated.
+
+IBDEC-376-06: diagnose the mismatch, do not weaken storage_binding or change
+old proofs. Add a finite storage_difference observer that reports only known
+field NAMES and boolean pin/proof status, never physical identity values.
+Its separate native worker may read EXACTLY THREE already-selected metadata
+leaves: provider completion70,190B/f52646ad..., proof completion23,187B/
+e8015245..., and storage-qualification1,145B/2335d59e... transitively pinned
+by the authenticated provider completion. No controls, reference completion,
+projection rows, ZIP, original body, provider/SEC/credential/USB/QC surface.
+Keep the unchanged seven-leaf maximum policy, full held-chain/hash/version/
+ownership checks, physical-root snapshot, source inventory and native/memory/
+IPC bounds; the diagnostic code reads only those three. Its completed=true
+would mean DIAGNOSTIC completion only, never binding_passed or full audit
+completion. Any cleanup/late serialization failure refuses the IPC result.
+
+Register ONE such read-only diagnostic after this additional source/test/scope
+commit exists and the designated tree is clean. No full audit retry follows,
+even if the changed fields can be named. Six added diagnostic regressions
+cover changed/missing/wrong-typed fields, missing receipt binding, unchanged
+original guard and three-leaf worker/cleanup failure semantics. Final focused
+selection294 PASS1.95s, zero skips/warnings (outer2.904s,stderr0).
+The earlier288-check result belongs to the preceding source image.

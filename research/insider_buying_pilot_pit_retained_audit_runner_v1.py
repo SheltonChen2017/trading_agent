@@ -244,6 +244,84 @@ def storage_binding(physical, proof, qualification):
          "storage_identity_refused")
 
 
+def storage_difference(physical, proof, qualification):
+    """Finite diagnostic only; never amend a proof or release the binding guard."""
+    need(all(type(value) is dict for value in (physical, proof, qualification)), "storage_identity_refused")
+    fields = ("schema", "root_kind", "device", "inode", "mode", "owner", "group")
+    def changed(expected):
+        if type(expected) is not dict:
+            return ["storage_identity"]
+        return [field for field in fields if field not in physical or field not in expected
+                or type(physical[field]) is not type(expected[field]) or physical[field] != expected[field]]
+    passed = True
+    try:
+        storage_binding(physical, proof, qualification)
+    except AuditRunnerError:
+        passed = False
+    return {"binding_passed": passed,
+            "current_vs_proof_changed_fields": changed(proof.get("storage_identity")),
+            "current_vs_qualification_changed_fields": changed(qualification.get("storage_identity")),
+            "qualification_receipt_pin_matches": qualification.get("receipt_sha256") == PINS["proof_complete"]["sha256"],
+            "proof_marked_actual_passed": proof.get("passed") is True and proof.get("fixture_only") is False,
+            "qualification_marked_actual_passed": qualification.get("passed") is True and qualification.get("fixture_only") is False}
+
+
+def storage_diagnostic_worker(identity):
+    """Read only three authenticated metadata leaves; no projection or recovery."""
+    guard, holders, phase = None, [], "native"
+    try:
+        stable.native._isolated()
+        stable.native.batch.campaign.base._prove_isolation()
+        guard = stable.native._WorkerMemoryGuard()
+        phase = "sources"; _source_current(identity)
+        phase = "open_provider"; provider = Held(PROVIDER); holders.append(provider)
+        phase = "open_proof"; proof = Held(PROOF); holders.append(proof)
+        phase = "provider_complete"
+        complete = decode(provider.read("complete.json", PINS["provider_complete"], check=guard.check), PINS["provider_complete"])
+        phase = "proof_complete"
+        old_proof = decode(proof.read("complete.json", PINS["proof_complete"], check=guard.check), PINS["proof_complete"])
+        pin = complete["published_leaf_pins"]["storage-qualification.json"]
+        phase = "provider_storage"
+        qualification = decode(provider.read("storage-qualification.json", pin, check=guard.check), pin)
+        phase = "storage_binding"
+        root_hold = stable._HeldChain(stable.PRIVATE_CUSTODY_ROOT, ())
+        try:
+            stable._managed(root_hold)
+            physical = stable._storage_identity(root_hold, fixture=False)
+            answer = storage_difference(physical, old_proof, qualification)
+        finally:
+            root_hold.close()
+        phase = "final_inputs"
+        for held in holders:
+            held.check(check=guard.check)
+        phase = "final_sources"; _source_current(identity); guard.check()
+        answer.update(completed=True, diagnostic_only=True, read_only=True,
+                      execution_head=identity["head"], source_inventory_sha256=identity["source_inventory_sha256"],
+                      actual_input_leaves=sum(len(held.leaves) for held in holders),
+                      new_requests=0, credential_reads=0, qc_accesses=0)
+        phase = "serialization"
+        wire = raw({"ok": True, "value": answer}) + b"\n"
+        need(len(wire) <= MAX_OUTPUT, "output_refused")
+        sys.stdout.buffer.write(wire); sys.stdout.buffer.flush(); guard.check()
+    except Exception as error:
+        sys.stdout.buffer.write(raw({"ok": True, "value": failure_info(phase, error)}) + b"\n")
+        sys.stdout.buffer.flush()
+    finally:
+        failed = False
+        for held in reversed(holders):
+            try:
+                held.close()
+            except Exception:
+                failed = True
+        if guard is not None:
+            try:
+                guard.close()
+            except Exception:
+                failed = True
+        if failed:
+            raise SystemExit(2)
+
+
 def _identity(head):
     need(type(head) is str and re.fullmatch(r"[0-9a-f]{40}", head), "source_refused")
     def git(*args):

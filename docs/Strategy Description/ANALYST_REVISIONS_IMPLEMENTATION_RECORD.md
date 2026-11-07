@@ -1311,34 +1311,35 @@ claims. Neither category is permitted to overwrite the other.
 ## 4. Exact next step
 
 The owner explicitly waives Claude review of section 346 for the current
-old-six research recovery. Its exact baseline is baf8e396; the owner reports
-Safari available. Mia's diagnosis-only checkpoint completed and withdrew its
-unsupported embedded-payload explanation. The exact QC source-policy trigger
-remains UNKNOWN (346.2). No strategy backtest is running and R343-AR100 has
-ALL THREE attempts SPENT. No fourth Codex attempt or retry/reset is granted.
+old-six research recovery. Mia's diagnosis-only checkpoint completed and
+retracted its unsupported embedded-payload claim; exact QC trigger UNKNOWN.
+The fixed local plain-DATA preparation PASSED once at8ee19d57, actual child0/
+collector0 with original output validated, and is now SPENT (346.5).
+Six genuinely plain objects total19164859B; the seven-arm source proposal is
+pinned. No new source, storage or backtest was submitted to QC.
 
-The immediate next step under section 346 is a separately frozen, bounded
-OFFLINE plain-DATA/source preparation from the fixed B data, using345.14's
-tested unbound bridge. Both original B producer/validator and all prior
-operations/readers stay spent; only its externally pinned DATA may be freshly
-read under the new exact contract. Keep new local outputs private, truly plain,
-immutably named and technically authenticated; no QC publication/admission,
-upload, compile, capacity, backtest or result call belongs to that preparation.
+The immediate next step under section 346 is a separately admissible exact
+post-Mia recovery decision for SAME project39054561 and the prepared plain
+source/input. R343-AR100 remains ALL THREE attempts SPENT; a fourth Codex
+candidate mutation/launch is not authorized by owner availability, the
+diagnosis or new transport. Do not rename/reset/retry. First reconcile current
+source/access/history/idle state; the Mia technical context is unverified.
+Fresh current rights/data/code/storage admission and exact one-use project/
+profile/protocol/terminal/accounting gates precede any later mutation.
 
-Mia reports current default main, three retained modules and an input-runtime
-one-byte stub; its panel context is now Mia, with mechanism unverified.
-Fresh exact source/access/history/idle reconciliation and a separately
-admissible recovery decision precede any later QC mutation. The task-created
-browser tab was closed; pre-existing other-lane tabs/jobs were left alone.
-The source-policy refusal remains open. Actual source/PIT/master/readiness/
-paper/live flags remain false; current conservative floor343shared/
-259development/59infrastructure/699cells, no new accepted cells.
+Do not rerun the R346 collector/producer or read/repair its control. Future
+read contracts must use the EIGHT observed DATA/proposal/report pins; its
+ninth claim has no external original byte pin (CR346-005,346.6). No historical
+claim timestamp/hash may be fabricated. All old B and prior operations/readers
+stay spent. The source-policy refusal is still OPEN; source/PIT/master/formal/
+paper/live readiness remains false. Floor343shared/259development/
+59infrastructure/699cells, no new accepted cell.
 
 Only the QCOM-restored SIX-universe old-rule extension through2026-10-13
 is selected: AR80–200, after-close/next-open MOO, frozen gates and costs.
-The broad new-rule six/eight rebuild stays paused. All other six R343 arms
-remain uninvoked. No source-policy evasion, automatic pin refresh, historical
-replay, new paid rights or funded/broker/real-order/paper/live action.
+The broad new-rule six/eight rebuild stays paused. The other six R343 arms
+are uninvoked. No new paid rights, provider/USB/funded/broker/real-order/
+paper/live action, source-stop bypass, pin refresh or other-lane change.
 
 Sections 137–142 retain the owner-assisted cloud diagnoses, project cleanup,
 and mutable QC 79/81 source comparisons. Their `Completed.` statuses do not
@@ -4461,6 +4462,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-05 | Completed offline old-six QCOM-restored October submission package and342counter-review; section343 | `4daba8b7` -> `2d8eafc8` freeze -> this final result/handoff; TWO commits | Both342commits accepted after exact-count test correction/qualification; current new implementation review waived | Sole local prepare/stdin validator actual0/0 and SPENT; seven18-file profiles/sources plus six genuine input uploads,6813640Bprivate package; no upload/launch | Root300distinctpasses31.68s; eight memory compiles; native scope/source/write/omission checks and overlapping doc repeats; no full suite | Quarantine remains frozen/blocked; all source/PIT/formal/current-cloud flags false; new offline output pins343.6 | Exactly ONE matching nonforce final push, no intermediate push; WAIT for QC/Safari release and fresh launch gates;338/259/54/699 unchanged |
 | 2026-11-05 | Claude (Windows host) review of `4daba8b7..65dca9f3`: R343 old-six October extension code | `65dca9f3` -> `51666ff0` -> this record commit | Both Codex commits accepted, `2d8eafc8` after correction; section 343.6's seven profile and source-vector pins reproduced from public code | Generated end hook no longer turns a run_valid=false run into a Runtime Error; projection, inventory and caller repinned, caller moved to fresh leaf `R343-20261105-B`; leaf A stays spent and must not be uploaded | Focused only, by owner direction: projection and reporting 171 passed, quarantine audit **9 passed**, closure file **75 passed, 1 failed**, caller tests unchanged at 16 host-class failures and 73 passed, record gates **86 passed**; no complete suite | 0 P0, 0 P1. `ARV2R344-001` (P2, corrected). `ARV2R344-002` (P3, open): R343 keeps the gzip reader that QC's source policy refused in a sibling form for R298. Floor 338/259/54/699 unchanged | Codex counter-reviews section 344, runs the caller tests on the Mac and freezes one prepare at leaf B; QC and Safari hold remains; no launch, paper, live, broker, funded or real-order action |
 | 2026-11-07 | Codex Claude344 counter-review and owner-waived old-six QC recovery, section345 | `12889740` -> this final record commit; exactly9Codex commits | Corrected B passed; AR100 same-project A1/A2/A3 all spent; actual source-policy error retained; unbound plain-data proposal only | Library/technical-row predicates corrected;3sourcewrites acknowledged then fourth refused; no candidate backtest launched; Mia question not sent because input control fails;2displayed partial/default builds conservatively booked | Final300distinct focused passes (299+1closure);12expected omission failures; in-memory compile and historical-record equality; no full suite; all earlier overlaps/failures retained | ARV2D345-003/P2 OPEN; CR345006/007/008 corrected before pure proposal use; no independent acceptance; floor340/259/56/699,0newcells | One matching-lane nonforce final push; required controllable Mia checkpoint and partial-source reconciliation next; no fourth Codex attempt, production plain conversion, storage/QC retry or readiness clearance |
+| 2026-11-07 | Codex owner-triggered available-Safari/Mia checkpoint and offline plain preparation; section346 | `baf8e396` -> `8ee19d57` freeze -> this final result/handoff; exactly2commits | Qualified Mia diagnosis; six real plain-data objects and seven unchanged-economic source proposals retained locally | Sole committed local producer/collector actual0/0; original stdout validated; R346 nowSPENT; no QC upload/run; sourcepolicycauseUNKNOWN | 159distinct focused passes21.42s; cold170source/pubic-FD checks; expected13omission failures; initial9failed/33passed/38fixture-errors fixed before private use; no full suite | AR1003/3 exhausted; originalclaim pin omitted/CR346005 open for future scope;8data/report files pinned;3new displayed infrastructure builds bookfloor343/259/59/699,0newcells | One matching-lane final push; separately explicit post-three-failure recovery plus fresh current source/access/data/storage/run gates before any further candidate mutation; no rename/reset/Mia-run inference |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -78663,3 +78665,161 @@ No fourth Codex QC attempt, Mia edit/run, new candidate/storage admission,
 job, result cell or financial readiness is authorized. All six other R343
 arms remain uninvoked. The current booked floor343/259/59/699 stays until an
 actual accountable QC event; this local preparation adds no look or cell.
+
+### 346.5 Sole actual local preparation — passed and SPENT
+
+At exact clean H346=8ee19d57e5bfe51d031331d429467cd298829021,
+the committed collector dispatched2026-11-07T19:43:16UTC; completion was
+observed19:43:48UTC. These external second-resolution brackets do not measure
+exact child processing timestamps/duration. Collector actual0, child ACTUAL0,
+stderr0; streams complete, reaped, no timeout/overflow/collection error.
+The collector's ORIGINAL-output validator accepted the exact external
+HEAD/caller/plan/profile bindings, report pin and all closed false flags.
+
+ORIGINAL collector stdout45297B/SHA
+e85a94e9a5050fbf690f3983f23efe0cafbae11c765cd8790daf2d3e08425b92;
+ORIGINAL child stdout42048B/SHA
+b7f294ec040ea736bb0a8b6da72c14c4040b80f7c147a96f273c74712e209941;
+report.json41926B/SHA
+9f594e9612199f79bcdb554e8a08f753a21cd227b8b03d35efd5c124a69cc3ed.
+The finite original result plus external observed exits/bindings/pins is
+durably retained in scripts/arv2_r346_preparation_result_fact.json,
+43136B/SHA
+c7b22ba9e82558e23097d3d0802f864a87f6ae56d1ef9d415045f4d9cb68b4cd.
+Its public facts contain no licensed rows, credentials or raw exceptions.
+A native ALL-network/artifact-denied pure parser revalidated ONLY the
+original captured channel; no on-disk private output reader was invoked.
+
+Both B/source guards normal-returned; two complete object/proposal/summary
+buffers compared equal before post-claim publication. Producer retained and
+checked all nine normal files through original descriptors/native metadata/
+security and final close. Actual local preparation technically PASSED and
+is now SPENT. Do not rerun its collector/producer, inspect/reuse/repair its
+control, overwrite outputs or rename a retry. Future consumers need their
+own exact read scope; none is invoked here. Local source-read success does
+not grant immutable history, formal source/security/PIT admission or QC use.
+
+Six genuinely uncompressed private objects total19164859B, within the
+32MiB per-object/44MiB aggregate bounds. Their external original-channel pins:
+
+|Private output basename|Bytes|SHA256|
+|---|---:|---|
+|evaluator-manifest.json|3020|06ebade9821c112726daed1f14a61144905c588242733a9d30c44aaefa3749e3|
+|session_axis-0000.jsonl|317762|3e976a6e9df64472fcbc0d0dd775eab52d68fe0b1d2d665709ac03b18dc55a98|
+|memberships-0000.jsonl|1876147|6da39a900784aea5f0be81a9a329b28a1399d8dc5d95ec60b3951f55e31f40cd|
+|contributions-0000.jsonl|9077887|fe1412b460c60d2600f9999e307ba7ab47f3574652af2b1c6c468ae844407904|
+|runtime_symbol_bindings-0000.jsonl|7884142|73ba4ac73c0485b2d274c31b5ec740a97a64de27a4f6dfbfb9cb63bc8e7cd15f|
+|transport-manifest.json|5901|ffdc80e1b6e76410ddd4840e5a21e49aea1dbdd5c735b6bcbd88bfe832e0233b|
+
+source-proposal.json3055714B/SHA
+7149931d0ff1c02427b197058d90aa0b59629a9b805b7c8467f2c31d538b033a
+contains all seven old-six candidates, exact unchanged B profiles/ancestry,
+the new physical plain transport/activation/parent proof and the complete
+eighteen-file source proposals. Exactly sixteen source files are unchanged;
+only the narrow reader and THREE main activation literals differ. This is
+the constrained format/source proposal, not a new economic candidate.
+Actual emitted loader16093B/SHA
+b3f48e1b1c6fc6cc665d9f8b475292260074feec5571eab6e8f0d1c1a091fd35
+is AST-normalized from selected raw16429B/bc07...; those pins deliberately
+differ. Do not silently substitute raw-source bytes for emitted source.
+
+New source-vector pins below hash canonical(the eighteen source_files
+metadata rows), WITHOUT LF; each vector is2775B. Source file bytes are
+separate from this metadata-vector length.
+
+|Candidate|Total emitted source bytes|New source-vector SHA256|
+|---|---:|---|
+|R343-AR080|417631|83b3f41b7543729481513dae516f855d957646ec197c8b46a1799f215f6f151b|
+|R343-AR100|417652|71857bac63298b6b9dd4221ffc180ca4a59f10574edd109220a335d9370a232c|
+|R343-AR120|417652|3fa3f5fcbf0418a45377dc7434e8c8a2b19157974aa7ab1d568b7dabba3c073e|
+|R343-AR140|417652|8ecfe2e43bd211c2b22da3369b415806a2a5a99637408b221724395593bbfe80|
+|R343-AR160|417652|59b5b16816c1744ca1ea28591c4d9d5b75bb1d4aeb6b58124c7c6ce1afa69db6|
+|R343-AR180|417652|b1d0d91c513829619362423365b7feeb5449ec85cd31804d0bfddb28c4e626ae|
+|R343-AR200|417652|153811048e9b82b70a801f541eb4a9962308f76caeebac249b49047b9632f7b9|
+
+All original profile byte/hash pins in B are unchanged, with the full
+per-file/proof/mapping vectors retained in the original finite public fact.
+All15 contact/admission/readiness/attempt-reset flags remain false.
+R343-AR100 is still3of3/exhausted with A4_permitted=false. The other six
+candidates remain uninvoked, with no submission authority. No QC storage
+admission/publication, file upload, edit/lock/permission change, compile,
+backtest, capacity request, result read or provider/USB access followed.
+This local preparation adds NO look or accepted cell:343/259/59/699 stays.
+
+### 346.6 Output-pin qualification and concrete remaining submission gate
+
+CR346-005/P3 OPEN (future-consumer contract): the original producer reports
+pins for the six object files, source proposal and report — EIGHT files.
+It did NOT return an external claim.json byte pin. Producer-local nine-file
+FD/security verification and actual0 are recorded, but they are not an
+external immutable-byte pin or current authentication of the ninth claim.
+No claim timestamp/hash is fabricated or backfilled. Do not replay a reader
+or reopen/repair the claim to pretend it was historically pinned.
+
+This qualifies the prospective346.4 phrase about all nine external pins:
+future contracts may authenticate ONLY the eight actual DATA/proposal/report
+inputs against their observed pins, leaving the old spent claim unopened,
+or separately define a narrow current claim-consistency read with its
+limited provenance. They must preserve the original claim/control and never
+use unpinned claim bytes/timestamps to grant a retry, readiness or admission.
+No future consumer, claim read or QC publication is implemented/authorized
+by this qualification. Actual preparation/data-buffer equivalence remains
+accepted within its technical scope; nine-file independent current-byte
+authentication is NOT claimed.
+
+Current barrier is now the separately admissible post-Mia QC recovery.
+The UI blocker is resolved and diagnosis complete, but its exact source-
+policy cause remains unknown. The actual private plain-DATA/source proposal
+is available with above pins. It has not been uploaded or accepted by QC.
+The old compressed-object admission cannot admit these new physical bytes;
+even if identical plain keys already exist from an older run, no old
+admission/read may be replayed or treated as current by relabeling.
+
+Before later QC mutation: independently bounded current project/source/
+access/history/idleness reconciliation (Mia technical context is unverified),
+fresh exact data/code/rights/processing/storage authentication/admission,
+and an exact one-use source/project/profile/protocol/terminal/accounting
+freeze remain mandatory. No defaults, quotes, scalar-price fallback, row
+dropping, hidden decoder, classifier probing or source-policy evasion.
+R343-AR100's three-attempt stop is still binding: owner availability and
+diagnosis-only Mia assistance do NOT authorize a fourth Codex operation.
+A separate explicit post-three-failure continuation is needed before any
+further candidate mutation/launch; no new name or plain transport resets it.
+The proposed recovery target is SAME project39054561, original old-six
+financial rules and the exact prepared plain source/input, not a replacement
+project or an unconstrained Mia edit/run.
+
+All old modules now operationally used by R346, this new producer/collector/
+plan and original result stay frozen. No formal immutable/PIT/master,
+source-admission, efficacy, funded/broker/real-order/paper/live permit is
+created. The broad new-rule six/eight rebuild stays paused; no new dataset
+purchase is identified by this format-only diagnostic.
+
+### 346.7 Concluded round and one-push handoff
+
+This round has exactly TWO contiguous Codex commits after baseline
+baf8e396dec458dbd6b5c172057bd7f42e74349f:
+8ee19d57e5bfe51d031331d429467cd298829021 (Mia/current-scope record, new
+offline producer/plan/collector/tests and exact pre-use freeze) and this
+final result/fact/handoff commit. First is retained after159focused passes,
+public cold checks and original actual0 result; second records those actual
+facts/limitations and the concrete attempt gate. These are self-checked
+implementation dispositions, not independent Claude acceptance. No new
+Claude review range or monitor trigger was invented.
+
+All code/source pins stayed exact through actual use; no old operational
+source/control was changed. Final record/redaction/diff/status/history-source
+checks follow. The original159passes21.42s are the distinct focused final
+code selection; subsequent record repeats are overlap, not additive.
+Initial9failures/33passes/38fixture errors and all expected mutations remain
+recorded in346.4. No full suite, new operational read, capture, source census,
+QC job, outcome or accepted result cell is run for finalization.
+
+Accumulate these two commits and make exactly ONE successful nonforce final
+push from the designated root/branch to ONLY its matching remote. Require
+live remote still baf8e396 and exact clean local state before push; stop on
+concurrent drift, never overwrite. Verify local/tracking/live equality and
+clean status afterward. No own-push trigger, extra acknowledgement round,
+automatic monitor rearm or next implementation is initiated by this handoff.
+
+Finalization evidence: record/redaction repeat33passes0.58s (not additive). All170 selected source pins and the producer/collector/plan pins remain exact after actual use. Historical sections6–345 still equal baf8e396 except separator whitespace; no private output/control was read for this check. Final diff/status clean checks precede the single push.

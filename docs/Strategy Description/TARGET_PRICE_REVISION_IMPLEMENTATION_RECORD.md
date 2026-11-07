@@ -1,16 +1,18 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
 **Current section120 continuation (2026-11-07):** The in-app browser opens
-own OFF independently of native Safari, and genuine saved Mia final answer
-confirms no verified input fix. QC refused the compressed public helper
-before saving; all12savedfiles remained exactly06155bec..., no explicit
-compile/new job/financial attempt. The NEW readable plaintext successor
-is independently judged and locally verified by325focused checks (120.12).
-Its exact private rendering and native acceptance remain pending until
-sourcecommit and fresh serialized activation. Sameheartbeat isPAUSED.
-20REMXrows stay quarantined; financial0/5accepted/metricsNULL.
-RoutineClaude skipped. This round has made0successfulpushes;
-solefinalnonforce matching-lane push remains reserved.
+own OFF independently of native Safari. Readable plaintext source at
+e805d413 passed325focused checks, native upload/all13sourceguard/BuildSuccess,
+and jobfb506cb363a915439998cf53ce419560 reachedCompleted./TRUE. Its tagged
+log is cut at exactly8192bytes and failed strictJSON projection, so NOnew
+delivery counts/inputrepair are admitted.120.13 retains exactjob/source/
+negativeevidence;120.14 freezes a one-shot readonly whole-log recovery reader
+before implementation, with no source/job rerun. Sameheartbeat appPAUSED
+before resultprocessing. GenuineMia recoverydraft is verified but remains
+unsubmitted after keyboard/pointer failures. NativeSafari untouched.
+20REMXrows quarantined; financial0/5accepted/metricsNULL. RoutineClaude
+skipped. This round has made0successfulpushes; solefinalnonforce matching-
+lane push remains reserved. Source/input/rights/accounting limits remain.
 
 **Current code review, section119 (2026-11-05):** Claude has independently reviewed every
 Codex commit in `3cf9636e..16655093` in section 119 at the owner's direct request, as a code
@@ -35714,3 +35716,254 @@ and NULL/0of5financial outcomes remain exact. Next: commit newsource, then
 fresh actualrender and fixed serializedhelper/create→mainupload→compile→
 nativeBuildSuccess→launch under one sameHEAD and freshbounded claims.
 Native plaintextacceptance and inputrecovery remain unproved. No pushyet.
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"attempt_id":"TPR-CACHE-ATTEMPT-PLAIN-OFF-001","bytes_max":6703,"helper_module_bytes":17368,"helper_module_sha256":"8ab9c6dd9bbeb57c4e29dc88f4b0131046cba15a90899ddc44382ed73e13a98a","input_name":"artifacts/target_price_qc_mia_20261104/TPR-R118-PARENT-CONFIG-001.config.json","look_id":"TPR-CACHE-LOOK-PLAIN-OFF-001","main_and_helper_each_max_bytes":60000,"native_requests":0,"private_reads_max":1,"probe_operation_id":"TPR-CACHE-20261104-PLAIN-OFF-001","public_helper_bytes":17338,"public_helper_sha256":"6539ae749aefb4884ed52258fc2f0f77c9481a5e8ee37ea80ec7065218f0da95","purpose":"actual two-file plaintext rendering from exact retained source-onlyparent afterverifiedsourcecommit; no oldpacket/SID/providerdata","sha256":"8292239f62e01d20a221fe49f76b3c29a23e9089eed3d6468f0a0953cbbb02b3"},"manifest":{"bytes":4170,"name":"TPR-R120-PLAIN-ACTUAL-RENDER-001.claim.json","sha256":"004900af2517440b8d58be1b568119efceed376537a7ff7b0c21dfcf4aae0085"},"operation_id":"TPR-R120-PLAIN-ACTUAL-RENDER-001"}
+
+120plain exact private parent-source rendering {"config_sha256":"88517aa2505f74601ff8190de0ba6e294c3719f12ac542334248b453cb01fad4","financial_acceptance":false,"head":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","native_requests":0,"proofs":{"build":{"bytes":3139,"name":"TPR-R120-PLAIN-ACTUAL-RENDER-001.build.json","sha256":"26d3daa044af47e7ee111b58c6115e34a67335d300d206d5c88aa41203b8b681"},"helper":{"bytes":17368,"name":"TPR-R120-PLAIN-ACTUAL-RENDER-001.helper.py","sha256":"8ab9c6dd9bbeb57c4e29dc88f4b0131046cba15a90899ddc44382ed73e13a98a"},"main":{"bytes":44864,"name":"TPR-R120-PLAIN-ACTUAL-RENDER-001.main.py","sha256":"b54aaefb3f498bc569e6f8d7e9c3093974b670c90738fa22542682b5a7a49dc0"}},"source_epoch":"TPR-NATIVE-PARENT-DELIVERY-PLAIN-20261107-v1","status":"actual_plain_source_rendered"}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"attempt_id":"TPR-CACHE-ATTEMPT-PLAIN-OFF-001","compile_requests":0,"look_id":"TPR-CACHE-LOOK-PLAIN-OFF-001","main_mutations":0,"native_requests_max":6,"new_file_bytes":17368,"new_file_sha256":"8ab9c6dd9bbeb57c4e29dc88f4b0131046cba15a90899ddc44382ed73e13a98a","new_filename":"tpr_public_parent_source_20261107.py","new_files_max":1,"new_jobs":0,"parent_sha256":"8292239f62e01d20a221fe49f76b3c29a23e9089eed3d6468f0a0953cbbb02b3","phase":"helper","phase_seconds_max":240,"private_bytes_max":10276,"private_reads_max":2,"project_id":38609822,"purpose":"create ONLY fixed visibleplaintext publichelper afterfreshowner/privacy/noactivejobs/absence+all12sourcechecks; preservemain+all11oldnonmain; retirecompressedpath","registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","request_seconds_max":20,"response_total_max_bytes":8388608,"source_before_inventory_sha256":"06155bec30d24df0eea2d1398b618c3ff4936b5a72f2afd411c092db411ab858"},"manifest":{"bytes":4318,"name":"TPR-R120-PLAIN-HELPER-001.claim.json","sha256":"257d5b02efc7e6b84513875b0f5063b6ec47a514eab56ad4ff01025577092c7f"},"operation_id":"TPR-R120-PLAIN-HELPER-001"}
+
+120plain fixedaction PREeffect {"expected_inventory_sha256": "c07b19bfe7104501b1a0f7c016412325b5fed05f651d509e2f50c356449a542b", "phase": "helper", "proof": {"bytes": 35434, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-HELPER-001.prepared.json", "sha256": "61ffe155ec696dd8cf1bfae5ce3fffaed514063cd69a4207a666a4e4e7a67e90"}, "source_head": "e805d413bcbc00f1221275d8db28a1dc3cf8a89a"}
+
+120plain fixedaction result {"new_jobs": 0, "observed_job_ids": [], "phase": "helper", "proof": {"bytes": 4333, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-HELPER-001.safe.json", "sha256": "a82c940a294129ea2cead72259b5357985caab8ec52a0d0e11ac7efc3b2c3132"}, "receipt": {"bytes": 8643, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-HELPER-001.result.json", "sha256": "bb3aa914f9587c42c49178563e00f8e356c75dccb2f04caadf6aa9f707ff199d"}, "status": "completed", "transport_calls": 6}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"attempt_id":"TPR-CACHE-ATTEMPT-PLAIN-OFF-001","compile_requests":0,"helper_bytes":17368,"helper_creator_receipt":{"bytes":8643,"name":"TPR-CMP29-API-CACHE-R120-PLAIN-HELPER-001.result.json","sha256":"bb3aa914f9587c42c49178563e00f8e356c75dccb2f04caadf6aa9f707ff199d"},"helper_sha256":"8ab9c6dd9bbeb57c4e29dc88f4b0131046cba15a90899ddc44382ed73e13a98a","look_id":"TPR-CACHE-LOOK-PLAIN-OFF-001","main_bytes":44864,"main_sha256":"b54aaefb3f498bc569e6f8d7e9c3093974b670c90738fa22542682b5a7a49dc0","main_updates_max":1,"native_requests_max":6,"new_files":0,"new_jobs":0,"phase":"upload","phase_seconds_max":240,"private_bytes_max":10276,"private_reads_max":2,"project_id":38609822,"purpose":"oneexactplaintextmainupdate withgenuinefixedroute, freshowner/privacy/noactivejob/all13before-after; preservecreatedpublichelper andall11historicalnonmainfiles; no codec/history/data/economicchange","request_seconds_max":20,"response_total_max_bytes":8388608,"source_before_inventory_sha256":"c07b19bfe7104501b1a0f7c016412325b5fed05f651d509e2f50c356449a542b"},"manifest":{"bytes":4404,"name":"TPR-R120-PLAIN-UPLOAD-001.claim.json","sha256":"aecceb46701499366eebda7f35af3cd17beecbf5538727742989afee3275f573"},"operation_id":"TPR-R120-PLAIN-UPLOAD-001"}
+
+120plain fixedaction PREeffect {"expected_inventory_sha256": "d309d29377b8d68c6841d2e56d0e8a77be90a0ab0bdf2abddb78cbec125b6826", "phase": "upload", "proof": {"bytes": 81675, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-UPLOAD-001.prepared.json", "sha256": "d71afd4529fb189cc8ee4e52be9814e8a82704a56ccdf2a70320590eca2d2e76"}, "source_head": "e805d413bcbc00f1221275d8db28a1dc3cf8a89a"}
+
+120plain fixedaction result {"new_jobs": 0, "observed_job_ids": [], "phase": "upload", "proof": {"bytes": 4315, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-UPLOAD-001.safe.json", "sha256": "17915a8f37b0ceda6a787d36c81ca1aebd6a87bc148d2acab30a3d6981c3cb2f"}, "receipt": {"bytes": 8748, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-UPLOAD-001.result.json", "sha256": "e4b9e34a342c146bb6cae8e84c75c08d78765f3e95a4636c4d698b3093bf5864"}, "status": "completed", "transport_calls": 6}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"attempt_id":"TPR-CACHE-ATTEMPT-PLAIN-OFF-001","compile_requests_max":1,"expected_all13_inventory_sha256":"d309d29377b8d68c6841d2e56d0e8a77be90a0ab0bdf2abddb78cbec125b6826","helper_creator_receipt":{"bytes":8643,"name":"TPR-CMP29-API-CACHE-R120-PLAIN-HELPER-001.result.json","sha256":"bb3aa914f9587c42c49178563e00f8e356c75dccb2f04caadf6aa9f707ff199d"},"look_id":"TPR-CACHE-LOOK-PLAIN-OFF-001","native_requests_max":6,"new_jobs":0,"phase":"compile","phase_seconds_max":240,"private_bytes_max":10276,"private_reads_max":2,"project_id":38609822,"purpose":"compile exactnewcommittedplaintext OFF nonfinancialsensor afterfreshprivacy/owner/noactivejob/all13sourcechecks; nativeBuildSuccessneededseparately; no financialadmission","request_seconds_max":20,"response_total_max_bytes":8388608,"source_updates":0,"upload_receipt":{"bytes":8748,"name":"TPR-CMP29-API-CACHE-R120-PLAIN-UPLOAD-001.result.json","sha256":"e4b9e34a342c146bb6cae8e84c75c08d78765f3e95a4636c4d698b3093bf5864"}},"manifest":{"bytes":4337,"name":"TPR-R120-PLAIN-COMPILE-001.claim.json","sha256":"eff4344b37d77527ce656c6a4c1d759282d6be9180a943fc262c98838f9738ca"},"operation_id":"TPR-R120-PLAIN-COMPILE-001"}
+
+120plain fixedaction PREeffect {"expected_inventory_sha256": "d309d29377b8d68c6841d2e56d0e8a77be90a0ab0bdf2abddb78cbec125b6826", "phase": "compile", "proof": {"bytes": 34334, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-COMPILE-001.prepared.json", "sha256": "95a971736dbdab6e25c331faccac04878662c9f260d4390bfeb9d5212cb99cff"}, "source_head": "e805d413bcbc00f1221275d8db28a1dc3cf8a89a"}
+
+120plain fixedaction result {"new_jobs": 0, "observed_job_ids": [], "phase": "compile", "proof": {"bytes": 4404, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-COMPILE-001.safe.json", "sha256": "065468ff26fe639dd7cb090099bddfc746d06bc78cb1e3a4a841237c8c0b1acb"}, "receipt": {"bytes": 8842, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-COMPILE-001.result.json", "sha256": "8b2c58d6a296296c8b772a397e232842ed6b9ef83c760f9969b694b3628f1410"}, "status": "completed", "transport_calls": 6}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"attempt_id":"TPR-CACHE-ATTEMPT-PLAIN-OFF-001","compile_id":"db7faba5200a5c26f363b00ef8a1af40-017991a8d6ee56d413741bf62720755a","endpoint":"compile/read","look_id":"TPR-CACHE-LOOK-PLAIN-OFF-001","native_requests_max":1,"new_compiles":0,"new_jobs":0,"phase":"build","phase_seconds_max":240,"private_bytes_max":10276,"private_reads_max":2,"project_id":38609822,"purpose":"fresh genuineexactcompile BuildSuccess observation; APIreadcompletion notjobcompletion, no relaunch","request_seconds_max":20,"response_bytes_max":131072,"source_inventory_sha256":"d309d29377b8d68c6841d2e56d0e8a77be90a0ab0bdf2abddb78cbec125b6826"},"manifest":{"bytes":3973,"name":"TPR-R120-PLAIN-BUILD-001.claim.json","sha256":"545ddce70322a5f0cb4af9bd30cdd2f165309ded1fbffe393f70888be96a9942"},"operation_id":"TPR-R120-PLAIN-BUILD-001"}
+
+120plain fixedaction PREeffect {"expected_inventory_sha256": "d309d29377b8d68c6841d2e56d0e8a77be90a0ab0bdf2abddb78cbec125b6826", "phase": "build", "proof": {"bytes": 33791, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-BUILD-001.prepared.json", "sha256": "2be2b4d51d83e004f040d38b68ce4122e6ba7f555e9e5f80ef25b25a07f5f2a2"}, "source_head": "e805d413bcbc00f1221275d8db28a1dc3cf8a89a"}
+
+120plain fixedaction result {"new_jobs": 0, "observed_job_ids": [], "phase": "build", "proof": {"bytes": 2708, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-BUILD-001.safe.json", "sha256": "5c799f9e5776f33d45d035ead3712ba78f15385dac4f8ef937ef58c66bc10dbc"}, "receipt": {"bytes": 1954, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-BUILD-001.result.json", "sha256": "e5747840423bb4da8080f32bcbb78474c592b44c5c107e253665e7fa8d7bccaf"}, "status": "completed", "transport_calls": 1}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"attempt_id":"TPR-CACHE-ATTEMPT-PLAIN-OFF-001","compile_id":"db7faba5200a5c26f363b00ef8a1af40-017991a8d6ee56d413741bf62720755a","compile_proofs":{"build_plan":{"bytes":33791,"name":"TPR-CMP29-API-CACHE-R120-PLAIN-BUILD-001.action.spent.json","sha256":"2be2b4d51d83e004f040d38b68ce4122e6ba7f555e9e5f80ef25b25a07f5f2a2"},"build_response":{"bytes":2434,"name":"TPR-CMP29-API-CACHE-R120-PLAIN-BUILD-001.build.response.raw","sha256":"3f449435c38f8d1d9e5084a99aec3554cc7cfd7173ba324793853a237196fd14"},"build_result":{"bytes":1954,"name":"TPR-CMP29-API-CACHE-R120-PLAIN-BUILD-001.result.json","sha256":"e5747840423bb4da8080f32bcbb78474c592b44c5c107e253665e7fa8d7bccaf"},"compile_plan":{"bytes":34334,"name":"TPR-CMP29-API-CACHE-R120-PLAIN-COMPILE-001.action.spent.json","sha256":"95a971736dbdab6e25c331faccac04878662c9f260d4390bfeb9d5212cb99cff"},"compile_response":{"bytes":631,"name":"TPR-CMP29-API-CACHE-R120-PLAIN-COMPILE-001.compile.response.raw","sha256":"b560562ac57ac830f9d2293be25b2ea8f02c12fe194eafd090847ceb034d330e"},"compile_result":{"bytes":8842,"name":"TPR-CMP29-API-CACHE-R120-PLAIN-COMPILE-001.result.json","sha256":"8b2c58d6a296296c8b772a397e232842ed6b9ef83c760f9969b694b3628f1410"},"source_after":{"bytes":348498,"name":"TPR-CMP29-API-CACHE-R120-PLAIN-COMPILE-001.after.response.raw","sha256":"892835a109b8b929ef76d944f6f26b9fa1b1235d0c72b535f2b35b00a6c58c63"},"source_before":{"bytes":348498,"name":"TPR-CMP29-API-CACHE-R120-PLAIN-COMPILE-001.before.response.raw","sha256":"892835a109b8b929ef76d944f6f26b9fa1b1235d0c72b535f2b35b00a6c58c63"}},"compile_requests":0,"look_id":"TPR-CACHE-LOOK-PLAIN-OFF-001","native_requests_max":6,"new_job_name":"TPR-DELIVERY-PLAIN-20261107-OFF-D1","new_jobs_max":1,"phase":"launch","phase_seconds_max":240,"private_compile_proof_reads_max":8,"private_compile_proofs_total_max":12582912,"private_input_bytes":10276,"private_reads_max":10,"probe_operation_id":"TPR-CACHE-20261104-PLAIN-OFF-001","project_id":38609822,"purpose":"one non-order fixed5session delivery/cache sensor underretained8nativeproofs and freshowner/privacy/noactivejob/all13sourcechecks; no financialreturn/economic acceptance; no unchangedfailedcandidate retry","request_seconds_max":20,"response_total_max_bytes":8388608,"source_inventory_sha256":"d309d29377b8d68c6841d2e56d0e8a77be90a0ab0bdf2abddb78cbec125b6826","source_mutations":0},"manifest":{"bytes":5711,"name":"TPR-R120-PLAIN-LAUNCH-001.claim.json","sha256":"079e64ab88529e79875fd681b05219b58ca4c8a7f98a545a1922ed43ee83863a"},"operation_id":"TPR-R120-PLAIN-LAUNCH-001"}
+
+120plain fixedaction PREeffect {"expected_inventory_sha256": "d309d29377b8d68c6841d2e56d0e8a77be90a0ab0bdf2abddb78cbec125b6826", "phase": "launch", "proof": {"bytes": 35936, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-LAUNCH-001.prepared.json", "sha256": "d0fb82ae69eec7f950f30bb5d5c91587cc80a9b0e916d8a61663ab292639ec34"}, "source_head": "e805d413bcbc00f1221275d8db28a1dc3cf8a89a"}
+
+120plain fixedaction result {"new_jobs": 1, "observed_job_ids": ["fb506cb363a915439998cf53ce419560"], "phase": "launch", "proof": {"bytes": 4371, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-LAUNCH-001.safe.json", "sha256": "d6dba093399642a47755ae8e6d286ae89ad789b9c3ac3b4d48b31bdcf4790882"}, "receipt": {"bytes": 10753, "name": "TPR-CMP29-API-CACHE-R120-PLAIN-LAUNCH-001.result.json", "sha256": "438c773ebe785e97c27f3452a186f80579a805950ac59181e08b30bd50676d21"}, "status": "completed", "transport_calls": 6}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"backtest_id":"fb506cb363a915439998cf53ce419560","cancellations":0,"endpoint":"backtests/read","financial_interpretation":false,"metadata_only":true,"native_requests_max":1,"private_bytes":3573,"private_registry_reads_max":1,"project_id":38609822,"purpose":"one freshlyclaimed exactnewdiagnostic job status observation; do not change running source/project; actualterminal triggerssameheartbeatpausebeforeconsuminglogs","response_bytes_max":4194304,"seconds_max":30,"source_mutations":0},"manifest":{"bytes":3846,"name":"TPR-R120-PLAIN-STATUS-001.claim.json","sha256":"dc7e7063a680694e35050c5a871178a46ba87edfa2fa969a0f38619a75acec32"},"operation_id":"TPR-R120-PLAIN-STATUS-001"}
+
+120plain exactjob status PREeffect {"name": "TPR-CMP29-API-R120-PLAIN-STATUS-001.prepared.json", "bytes": 6183, "sha256": "963270a0471e1f6478a8c070e55e2cc3591fd7544c06799c365cb72c620744dc"}
+
+120plain exactjob metadata status {"metadata": {"backtest_completed": true, "backtest_id": "fb506cb363a915439998cf53ce419560", "backtest_status": "Completed.", "credential_echo_refused_before_retention": true, "economics_accepted": false, "entire_wire_validated": true, "financial_fields_projected": false, "json_value_nodes": 463, "max_json_depth": 32, "max_json_nodes": 4194304, "native_origin_independently_attested": false, "original_wire_bytes": 11965, "original_wire_sha256": "cd0edba17b7b53ed3dd7450e975d462508d1d05105e6443435b8e52ab6118755", "project_id": 38609822, "schema": "tpr-cmp30-job-status-projection-v1"}, "proof": {"bytes": 1222, "name": "TPR-CMP29-API-R120-PLAIN-STATUS-001.safe.json", "sha256": "e168c88e87f5e811cb53a7bd3563f077440d77558d83333a4216118567bdba8b"}, "receipt": {"bytes": 1710, "name": "TPR-CMP29-API-R120-PLAIN-STATUS-001.result.json", "sha256": "bd0f00e4f827b4efcc16721f3410365f45c49be9beba37a923240c9978260391"}, "status": "completed"}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"appconfig_reads_max":1,"bytes_max":131072,"id":"target-price-qc-job-remaining-backtests","purpose":"preserveexactexistingmonitorfields before apppause foractualterminaljobfb506cb363a915439998cf53ce419560; no result/log/nativeprocessing"},"manifest":{"bytes":3648,"name":"TPR-R120-PLAIN-TERMINAL-MONITOR-FIELDS-001.claim.json","sha256":"154ee63853dd35338d18195fef1b30f5a74f26d8bd4319e3d6d8a5cbdaabb6a0"},"operation_id":"TPR-R120-PLAIN-TERMINAL-MONITOR-FIELDS-001"}
+
+120terminal exactmetadata observed Completed/TRUE forfb506cb363a915439998cf53ce419560; before any log/resulttransition processing retain current ownmonitor fields for apppause, bytes10701/SHA0e57e3bd962a855ac8de6da38349c7d66ab7d65db6de08cdcd6b301689a31fae. Existing statusPAUSED; no nativecontinuation untilappPAUSED.
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"actual_job_id":"fb506cb363a915439998cf53ce419560","actual_project_id":38609822,"app_mutations_max":1,"automation_id":"target-price-qc-job-remaining-backtests","preserve_existing_name_prompt_rrule_target":true,"purpose":"pauseTHISsameheartbeat BEFOREconsumingterminalresults; no parallelcontroller/newautomation","status":"PAUSED"},"manifest":{"bytes":3714,"name":"TPR-R120-PLAIN-TERMINAL-PAUSE-001.claim.json","sha256":"57e07062ae2efe62bcdfcf17144f94a7183efb2deb82ec817c6f750a3b378f9d"},"operation_id":"TPR-R120-PLAIN-TERMINAL-PAUSE-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"backtest_id":"fb506cb363a915439998cf53ce419560","bytes_each_max":2097152,"bytes_total_max":4194304,"endpoints":["files/read","backtests/read/log"],"log_filter":"TPR_PARENT_CACHE_PROBE_RESULT","log_lines_range":[0,200],"native_requests_max":2,"private_bytes":3573,"private_registry_reads_max":1,"project_id":38609822,"purpose":"retain exactall13source+taggedownnonfinancialreport afteractualterminalandappheartbeatpause; no sourceeffect/newjob/performanceinterpretation","same_heartbeat_app_verified_PAUSED":true,"seconds_each_max":20,"source_expected_inventory_sha256":"d309d29377b8d68c6841d2e56d0e8a77be90a0ab0bdf2abddb78cbec125b6826","terminal_metadata_proof":{"bytes":1222,"name":"TPR-CMP29-API-R120-PLAIN-STATUS-001.safe.json","sha256":"e168c88e87f5e811cb53a7bd3563f077440d77558d83333a4216118567bdba8b"}},"manifest":{"bytes":4198,"name":"TPR-R120-PLAIN-TERMINAL-CAPTURE-001.claim.json","sha256":"a870ad320c58675e25093141d174fca309c23ee99ea6b481918bb4f3e454c063"},"operation_id":"TPR-R120-PLAIN-TERMINAL-CAPTURE-001"}
+
+120plain terminal capture PREeffect {"name": "TPR-CMP29-API-R120-PLAIN-TERMINAL-CAPTURE-001.prepared.json", "bytes": 6276, "sha256": "f6de93e887781f829e8e9bb60ccc9ff43aa7fbcd295f805b404a4b6dcf875354"}; sameheartbeatappPAUSED beforecontinuation.
+
+120plain terminal capture {"proof": {"bytes": 1024, "name": "TPR-CMP29-API-R120-PLAIN-TERMINAL-CAPTURE-001.safe.json", "sha256": "17b5e1c67448b62c18efc241cba659ddbb7b5df14399f80f5b3aa06e119c1b4f"}, "result": {"actual_new_backtests": 0, "financial_acceptance": false, "lock_cleanup_complete": true, "operation_id": "TPR-CMP29-API-R120-PLAIN-TERMINAL-CAPTURE-001", "receipt": {"bytes": 4444, "name": "TPR-CMP29-API-R120-PLAIN-TERMINAL-CAPTURE-001.result.json", "sha256": "9d9660b1ae0e6d6fae4911fa1ccc395cf852c4bc69585cf131a1af01b2fbf148"}, "receipt_published": true, "requests": [{"endpoint": "files/read", "http_status": 200, "id": "source", "raw_response": {"bytes": 348498, "name": "TPR-CMP29-API-R120-PLAIN-TERMINAL-CAPTURE-001.source.response.raw", "sha256": "892835a109b8b929ef76d944f6f26b9fa1b1235d0c72b535f2b35b00a6c58c63"}, "source_inventory_sha256": "d309d29377b8d68c6841d2e56d0e8a77be90a0ab0bdf2abddb78cbec125b6826", "status": "succeeded"}, {"endpoint": "backtests/read/log", "http_status": 200, "id": "logs", "raw_response": {"bytes": 8865, "name": "TPR-CMP29-API-R120-PLAIN-TERMINAL-CAPTURE-001.logs.response.raw", "sha256": "5a46e24c144c221bdb9fbf87f0c9e0811b655ae82a13a3e054c456ecf1f61543"}, "source_inventory_sha256": null, "status": "succeeded"}], "status": "completed"}}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"backtest_id":"fb506cb363a915439998cf53ce419560","bytes_max":8865,"file":"TPR-CMP29-API-R120-PLAIN-TERMINAL-CAPTURE-001.logs.response.raw","log_lines_max":200,"outputs":"pricefree delivery/cache metadata only; no OHLC/volume/SID/returns","per_role_cells":4,"private_reads_max":1,"processing_max":1,"project_id":38609822,"purpose":"strictduplicate/nonfinite/depth/type/header/guard/cap verification and independent perdaycensus projection; source/import/nativeorigin/financial acceptance remainFALSE","report_depth_max":16,"report_json_bytes_max":16384,"report_nodes_max":4096,"same_heartbeat_PAUSED":true,"sessions":5,"sha256":"5a46e24c144c221bdb9fbf87f0c9e0811b655ae82a13a3e054c456ecf1f61543","tagged_reports_max":1},"manifest":{"bytes":4109,"name":"TPR-R120-PLAIN-NATIVE-PROJECTION-001.claim.json","sha256":"5d5432108adb2e15ecdb721eeda286cf30ab42511ff2fa1b884b356150fd4ca2"},"operation_id":"TPR-R120-PLAIN-NATIVE-PROJECTION-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"bytes_max":8865,"native_requests":0,"private_reads_max":1,"projection":"framing/types/lengths/noticeflags only, no partial report admission","purpose":"diagnose local strictJSONrefusal of capturednative log; retain Completed separatelyfromcompleteevidence","sha256":"5a46e24c144c221bdb9fbf87f0c9e0811b655ae82a13a3e054c456ecf1f61543"},"manifest":{"bytes":3708,"name":"TPR-R120-PLAIN-LOG-FRAMING-001.claim.json","sha256":"e7fae4ab077509aaabdbcfdeeae4a10065813079a61bff8775d5270b42538122"},"operation_id":"TPR-R120-PLAIN-LOG-FRAMING-001"}
+
+120first projection refused incomplete serializedlog beforeanycensusadmission; originalclaim retained. Fresh framing-onlyanalysis {"proof": {"bytes": 399, "name": "TPR-R120-PLAIN-LOG-FRAMING-001.safe.json", "sha256": "18f4f6b433c7f113f298aa34007531a5bf7db5e9124219e9c2f4984b22d30cf5"}, "safe": {"contains_truncation_notice": false, "ends_with_json_close": [false], "json_refusal_char": 8139, "length": 1, "line_bytes": [8192], "line_chars": [8192], "log_line_count": 1, "payload_bytes": 8142, "payload_chars": 8142, "payload_json_valid": false, "success": true, "tag_count": 1, "top_fields": ["length", "logs", "success"], "trailer_has_ellipsis": false, "trailer_is_whitespace": false, "trailer_last_character_class": "other"}}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"bytes_max":11965,"native_requests":0,"private_reads_max":1,"projection":"fieldnames/loglocation URL host only; no metrics/financialvalues/credentials or URLs inchat","purpose":"seek full-log recovery from alreadyretained exactcurrentjobresponse without anotherjob or unchangedfailingparser","sha256":"cd0edba17b7b53ed3dd7450e975d462508d1d05105e6443435b8e52ab6118755"},"manifest":{"bytes":3760,"name":"TPR-R120-PLAIN-LOG-LINK-METADATA-001.claim.json","sha256":"b949b65643dbdbfb9bb42268196d88935c6bb7ca34496cd315c6d9a02337871d"},"operation_id":"TPR-R120-PLAIN-LOG-LINK-METADATA-001"}
+
+120bounded currentjob log-location metadata {"metadata": {}, "private_log_fields": null, "proof": {"bytes": 529, "name": "TPR-R120-PLAIN-LOG-LINK-METADATA-001.safe.json", "sha256": "3fb518ecd7860f6c65cb95aef221278f175383530489ec10ef3aa0f33244dce4"}}; no URL/token/value exposed.
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"financial_provider_queries":0,"private_values_in_query":false,"public_search_requests_max":1,"purpose":"primaryQuantConnect/LEAN source or officialdocs for 8192-character logmessage/API clipping and full-log recovery; no account/terms acceptance","queries_max":2},"manifest":{"bytes":3629,"name":"TPR-R120-LOG-LIMIT-DOCS-001.claim.json","sha256":"2f695b89156e1650494227283cf60d9336af1b4c120650054b472bf6b6c93847"},"operation_id":"TPR-R120-LOG-LIMIT-DOCS-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"private_data_in_request":false,"public_page_reads_max":1,"purpose":"verify official whole-log export request/response without rerunning diagnostic or widening retiredgeneric API","url":"https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/logs"},"manifest":{"bytes":3661,"name":"TPR-R120-LOG-EXPORT-DOCS-001.claim.json","sha256":"085aa27136c975e6e939643b7edef861e697043dd54b830a1b901038f7aba0a6"},"operation_id":"TPR-R120-LOG-EXPORT-DOCS-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"browser":"iab","dom_iframe_metadata_reads_max":1,"handoff_mark_max":1,"new_jobs":0,"owned_tab":"1","project_id":38609822,"purpose":"locate genuineMia in sameownedinappOFF for readonly existingjob full-log recovery; nativeSafariuntouched","source_mutations":0},"manifest":{"bytes":3664,"name":"TPR-R120-IAB-MIA-LOG-RECOVERY-LOCATE-001.claim.json","sha256":"1b8e01f8d90e64e3a0b12cb0bb5497008187abb4838f0ff166085f10f8285d7a"},"operation_id":"TPR-R120-IAB-MIA-LOG-RECOVERY-LOCATE-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"browser":"iab","owned_tab":"1","project_id":38609822,"purpose":"locatecurrentgenuineMiaframe before readonlylog-recoveryprompt; no source/input/jobs effects","rendered_iframe_metadata_reads_max":1},"manifest":{"bytes":3572,"name":"TPR-R120-IAB-MIA-LOG-FRAME-001.claim.json","sha256":"d31147cc0962051ed5184ce4879e654d1122ae97c3e530e6b5d66fe406e223c6"},"operation_id":"TPR-R120-IAB-MIA-LOG-FRAME-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"browser":"iab","form_metadata_only":true,"output_chars_max":5000,"owned_tab":"1","project_id":38609822,"purpose":"inspectgenuineMia lateststate andexactentry beforeone readonly full-log recovery message; no source/input/jobs effect","rendered_Mia_body_reads_max":1},"manifest":{"bytes":3640,"name":"TPR-R120-IAB-MIA-LOG-ENTRY-001.claim.json","sha256":"7eb91e691b64a17aa28933dd523af2b35070990cd1d13e4160645f5e432db95a"},"operation_id":"TPR-R120-IAB-MIA-LOG-ENTRY-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"Mia_draft_fills_max":1,"actual_job_id":"fb506cb363a915439998cf53ce419560","browser":"iab","button_metadata_reads_max":1,"draft_chars":1088,"draft_value_reads_max":1,"field_placeholder":"Start the conversation by typing a message...","owned_tab":"1","project_id":38609822,"purpose":"prepareone genuineMia readonly full-log recovery request inownOFF; atmost2existingjob/log lookups authorized on later submission; no source/compile/jobs/provider/account effects","submits":0},"manifest":{"bytes":3848,"name":"TPR-R120-IAB-MIA-LOG-DRAFT-001.claim.json","sha256":"64fe770c38ba0fafb2bce273dd5213b4c371500cbf3c5571b327fb3e9cba3595"},"operation_id":"TPR-R120-IAB-MIA-LOG-DRAFT-001"}
+
+120genuineMia log-recovery preparedprompt {"name": "TPR-R120-MIA-LOG-RECOVERY-001.prompt.txt", "bytes": 1088, "sha256": "173abfaea6c3560da7dfb6a28500c7c5c2f830a71917372f0c81686b864035e9"}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"Mia_submissions_max":1,"actual_job_id":"fb506cb363a915439998cf53ce419560","authorized_Mia_native_readonly_lookups_max":2,"browser":"iab","output_chars_max":5000,"owned_tab":"1","prohibited":"source/notebook edits, compiles, launches/reruns/cancels, provider/otherproject reads, resources/account/subscriptions","project_id":38609822,"prompt_chars":1088,"prompt_name":"TPR-R120-MIA-LOG-RECOVERY-001.prompt.txt","purpose":"genuineQC builtinMia full-log recovery/read-only diagnosis; preserveallattempts anddo notresubmit002/003","scope":"exactexistingjob/log only","verification_reads_max":1},"manifest":{"bytes":3962,"name":"TPR-R120-IAB-MIA-LOG-SEND-001.claim.json","sha256":"05e5f7b1ba21d325a26679527f4720e30c055d4e7c596e7b9d6397a662d2fa8b"},"operation_id":"TPR-R120-IAB-MIA-LOG-SEND-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"browser":"iab","button_attribute_chars_max":6000,"owned_tab":"1","purpose":"keyboardaction failed before verifiedsubmission; inspectcurrentdraft/message marker and actualvisible sendbutton forsemanticclick; no repeatkeypress/no sourceeffects","rendered_reads_max":1,"tail_chars_max":1800},"manifest":{"bytes":3681,"name":"TPR-R120-IAB-MIA-LOG-SEND-VERIFY-001.claim.json","sha256":"22c0a3c7a7470ae7dda3cb3ba93fec663c0eb039249d5c6a047e7890d7dff379"},"operation_id":"TPR-R120-IAB-MIA-LOG-SEND-VERIFY-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"Mia_submissions_max":1,"actual_job_id":"fb506cb363a915439998cf53ce419560","authorized_readonly_native_lookups_max":2,"browser":"iab","draft_verified_chars":1088,"method":"observedbutton.ac-input-send semanticclick","output_chars_max":5000,"owned_tab":"1","postsend_reads_max":1,"prior_keyboard_attempt":"failed; draftintact andhistorymarkerabsent verified","project_id":38609822,"purpose":"submitpreparedgenuineMia readonly full-log recovery once viaworkingDOMclick; no source/compile/jobs/provider/account effects"},"manifest":{"bytes":3906,"name":"TPR-R120-IAB-MIA-LOG-SEND-CLICK-001.claim.json","sha256":"5ded5c28bb0ae70b062ad055b765e9446b43bf7c8d270a75c23b691caae337ca"},"operation_id":"TPR-R120-IAB-MIA-LOG-SEND-CLICK-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"e805d413bcbc00f1221275d8db28a1dc3cf8a89a","bounds":{"browser":"iab","output_chars_max":6000,"owned_tab":"1","projection":"visiblepanel/buttonlayout and smallUIlabelsonly","purpose":"identify ::before overlay blockingverifiedMia sendbutton; inspectactualUIbeforeanychangedaction, no forceclick/edit/source/job effects","rendered_Mia_reads_max":1},"manifest":{"bytes":3661,"name":"TPR-R120-IAB-MIA-OVERLAY-001.claim.json","sha256":"bd838fa62790a3a47885a9c58fea3bbdfd1cfc8c1d7ad3069d7c35ddb5b022ee"},"operation_id":"TPR-R120-IAB-MIA-OVERLAY-001"}
+
+### 120.13 Plaintext native completion; clipped report is NOT accepted evidence
+
+Actual source commit e805d413bcbc00f1221275d8db28a1dc3cf8a89a (localonly)
+rendered main44864B/SHAb54aaefb3f498bc569e6f8d7e9c3093974b670c90738fa22542682b5a7a49dc0,
+helper17368B/SHA8ab9c6dd9bbeb57c4e29dc88f4b0131046cba15a90899ddc44382ed73e13a98a,
+config88517aa2505f74601ff8190de0ba6e294c3719f12ac542334248b453cb01fad4.
+New fixed helperphase6calls succeeded, preservingoldmain+11nonmainfiles;
+13inventoryc07b19bfe7104501b1a0f7c016412325b5fed05f651d509e2f50c356449a542b.
+Separate mainupload6calls succeeded; all13inventory
+d309d29377b8d68c6841d2e56d0e8a77be90a0ab0bdf2abddb78cbec125b6826.
+Exacthelpercreatorreceipt8643B/SHAbb3aa914f9587c42c49178563e00f8e356c75dccb2f04caadf6aa9f707ff199d;
+uploadreceipt8748B/SHAe4b9e34a342c146bb6cae8e84c75c08d78765f3e95a4636c4d698b3093bf5864.
+One explicitcompile6calls returned actualID
+db7faba5200a5c26f363b00ef8a1af40-017991a8d6ee56d413741bf62720755a;
+freshone-callBuild001 verifiedBuildSuccess, receipt1954B/SHAe5747840423bb4da8080f32bcbb78474c592b44c5c107e253665e7fa8d7bccaf.
+8retainednativeproofs passed before launch6calls; all13before/afterexact.
+One NEWnonfinancialjob fb506cb363a915439998cf53ce419560, name
+TPR-DELIVERY-PLAIN-20261107-OFF-D1; launchreceipt10753B/SHA438c773ebe785e97c27f3452a186f80579a805950ac59181e08b30bd50676d21.
+
+Fresh STATUS001 exactjob metadata observednativeCompleted./TRUE, entire
+11965Bwire validated/SHAcd0edba17b7b53ed3dd7450e975d462508d1d05105e6443435b8e52ab6118755.
+The SAMEheartbeat was paused throughapp automation_update (actual returned
+statusPAUSED, full priorfields preserved) BEFORE terminal source/log capture.
+Two freshreadonlyrequests retained all13source and taggedlogs. Source raw
+348498B/SHA892835a109b8b929ef76d944f6f26b9fa1b1235d0c72b535f2b35b00a6c58c63
+matched d309... exactly; logs raw8865B/SHA5a46e24c144c221bdb9fbf87f0c9e0811b655ae82a13a3e054c456ecf1f61543.
+No sourcechange/cancel while running. Newnative directround120requests38:
+10prior+helper6+main6+compile6+build1+launch6+status1+terminalcapture2.
+Acceptedsourcecreates1/mainupdates1,explicitcompiles1,newdiagnostics1,
+financialattempts/outcomelooks0. Otherarmprojects remaineduntouched.
+
+STRICTprojection001 refused JSON before admitting any counts. Fresh
+framing-onlyscope proved APIreturned one EXACT8192ASCII-byte logline,
+containing one tag; its8142Bpayload is invalid/truncated atchar8139,
+withoutclosingJSON or truncationnotice. Allpartialpayload,failedreadclaim
+and completejob/source proofs retained. No missing tail is invented, no
+partialcount/absence/freshness/readiness promoted. NativeCompleted is
+separate from complete evidence and from financial acceptance. Existing
+backtestresponse has no log URL field; boundedmetadata-only check read no
+financial values and found no alternate link.
+
+Official QC primary log API documentation explicitly points to fixed
+POST/backtests/export/logs {projectId,backtestId}, returning wholelogs as
+plaintext: https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/logs
+This is a prospective one-shot recovery option, not proof fullstorageexists:
+8192B truncation may already be in storedlogs. No newjob/source rerun is
+authorized merely to retry an unchanged failing reader. No paidtier/account
+change,agreement acceptance or market/dataset export is authorized.
+All retained/exported artifacts stay owner-private and price-free; no public
+licensed data or rawSID export. FinancialmetricsNULL/0of5accepted.
+
+GenuineMia log-recovery001 draft1088chars is verified in ownIAB OFF textarea.
+Keyboardsend failed; verifieddraftintact/historymarkerabsent. Changed
+semanticclick on exactvisible sendbutton was intercepted by ::before.
+No successful submission/newMialookup is claimed. InnerMia DOM shows no
+visibleconfigdialog; existinggenuinefinal remains120.6 evidence. Do not
+blindlyresend or touch nativeSafari. NativeSafari has remaineduntouched.
+
+### 120.14 Prospective fixed readonly full-log recovery contract
+
+Before implementation freeze a NEWversioned readonlyexport module/tests,
+leaving genericENDPOINTS/WRITE_FILES/mutation paths and all oldfiles exact.
+One literal endpoint backtests/export/logs and exactprotectedOFF38609822/
+existingjobfb506cb363a915439998cf53ce419560 only. Original native snapshot
+sourceHEADe805d413/config88517aa2/inventoryd309.../plainoperation+attempt+look
+are fixed immutable provenance, distinct from currentcommittedreaderHEAD.
+Use genuineowner-bound projects._native_request, no callback/endpoint/URL/
+credential override, redirect, pagination or automaticretry. Fresh exact
+registry3573B/SHA154e8... with immutableEA2Dcreationauthority and separate
+latesttaskauthority; verify full committed sourceclosure/actualimportpaths.
+Own privatefolder/sharedcomparison-api.lock/O_EXCL/fsyncedoperation+request
+claims/guardafterclaimbeforeeffect/clock+HEAD+source+custody+receipts, spendon
+uncertainty preserved. Deadline<=240s; one20srequest, entirewire<=262144B.
+
+Strict UTF8(noBOM),boundedtext and ENTIREwire credential echo validation
+BEFORE anyraw retention/hash/publication. Reuse proven textsecret scanner
+where appropriate, and supplement its gap for JSONsimpleescapes including
+slash/backslash; mixed unicode/hex/URL/HTML/simpleescape forms must fail
+closed in bounded normalization. Matchcredentials in everyline,not onlytag.
+No arbitrary decoder/parser seam. HTTPnon200/JSONcontrol/error/HTML/URLbody/
+missing or duplicate tag/truncated or malformedJSON/wrongjob/sourceheader
+are refusals with retainedsafe privatewire/body-free receipts only when
+echoscan passed. Never follow URLs, repair/padpartialJSON,quote rawerrors
+or claim transportheaders/framing not exposed by fixedtransport. Source
+transport suppliesraw/status/token/owner only; full-log completeness is
+therefore NOT attested byHTTP200. Readsuccess grants no deliverycounts,
+financial/nativeorigin/importorigin/atomicity/coverage acceptance. Require
+fresh independently strict complete taggedreport projection before any
+per-day conclusions. All financial flagsFALSE/metricsNULL,20REMXquarantined.
+Focused isolation/independentCodexsourcejudgment/committednewsource required
+before this one newreadonly request. No fullsuite or routineClaudecheckpoint.
+Solefinal matchinglane nonforcepush stillreserved; round120pushes0.
+
+### 120.15 Verified readonly-reader credential-screen defect caught before effect
+
+Root isolated focused run of ONLY newlogexport tests atreader22350B/
+SHA08b524da8e4883e1bd183bcda11418ca3b0ef3da2829c70b35cb9619d90a1ccd and
+tests24700B/SHA5fb3f4a18fd653970f93ee8f5a3041e36c02cc4637244437b6ccc858b13115f8
+produced139passed/8failed0.66s/0.77s orchestration,Python3.13.15/Mac.
+Preimport49/52runtime+syntheticDB/socketDNSdenial plus realQCcredential
+capability denial; no native/provider/privatecredential effect. Bothhashes
+stable. No fullsuite. This negative is software evidence, not eight
+backtest/runtime failures or financial looks.
+
+| ID | Priority | Status | Location / evidence | Reason and correction |
+|---|---|---|---|---|
+| CMP120-EXPORT-001 | P1 | Confirmed, open before activation | Newreader _safe_text at08b524da can destructively normalize nestedJSON-escaped keys/values before credential comparison. Existing tests fail for discarded/key unicode,hex,mixed,html-unicode cases(variants2,3,6,8),8exactred cases. | A backend credential echo in those forms could otherwise reach private raw retention. Fix bounded RFCJSON-string decoding/recursive decoded strings and checks at individual transformation boundaries; preserve all8regressions, add adversarial backslash/punctuation variants; independent source judgment and exact focused rerun required before commit/effect. |
+
+Initial source-only accepted judgment is retained as pre-test history and
+is superseded by this confirmed rootcounter-review, not proof of a safe
+reader. No actual credential was read/exposed and NOwhole-log export request
+has occurred. Nativejobfb506... and all13QCfiles remain untouched; partial
+report remains unadmitted. Current codebranchHEADe805d413, sole record plus
+newreader/test uncommitted. Preserve oldsource/tests/pins; no routineClaude
+checkpoint or ownerpermission question is needed for this verified local fix.
+Continue correctedreader validation, then committedsource/freshone-shot
+recovery. Financial0of5/metricsNULL;20REMXquarantine; finalpushstill0.
+
+### 120.16 Corrected readonly log recovery verified before one native read
+
+CMP120-EXPORT-001 is CONFIRMED/CLOSED before activation at reader24208B/
+SHAf6f0e079b1bbbb234527b214c70b46e00299531eadc890d0072bc0ebe4d8b761;
+focusedtests27595B/SHA70ecf84d3c5f4612badece31949b555130ef33bf516a9ca5329d3eac5c025543.
+Corrected scanner first preserves original RFCquotedstring lexemes and
+recursively decoded children/keys/values, then retains each independent
+simple/unicode-hex/URL/HTML representation and checks credential immediately
+at each boundary. Parents are never destroyed beforecomparison. Bounds:
+64levels,8192candidates/quotedlexemes,16MiBaggregate,262144Beach.
+Ambiguous/malformedquotedfreetext and budgetexhaustion refuse conservatively
+before response hash/write. Existingproven scanner stays an unchanged
+precheck, not soleproof of JSONescape safety.
+
+Root original50echo cases passed/241deselected0.45s/0.56sorchestration,
+including all8unchangedred cases. Fullnewfocusedmodule291passed0.71s/0.78s,
+allhashes stable before/after,Python3.13.15/Mac/no warnings shown. Original
+147cases retained;144additional adversarialcases cover literal-backslash
+n/f/b/r/t/quote/slash/combinedtokens in both encoding forms/6locations,
+including48executioncases proving echo refusal BEFORErawhash/publication.
+All tests preimport-isolated49/52runtime/syntheticDB/socketDNSdenial and
+realQCcredential capability denial. No fullsuite/private/native/provider
+effects. Original139green/8red and erroneous initial source-onlyaccepted
+judgment remain explicit superseded history; no real token was accessed.
+Independent Codexsource judgment is now acceptedAFTERcorrection at exact
+f6f0e079/70ecf84d, no otherconfirmedissue. Reviewer/author made no tests,
+private/native/UI/provider effects or commits. Root read full newreader
+and testsource and verified AST/compile/singleLF/noCR/diff and oldfilesexact.
+MatchingactualTarget remote remainsd127746e92fd7051a08b6efa66a12ede0ade568e.
+
+Newschemas tpr-delivery-log-export-{plan,result,validation}-v1; privatefolder
+delivery-log-export-20261107;12sourceclosure includes unchangedscanner/probe/
+sourceaudit/packageinit pins and actualimportpaths. Newreadonlysource reuses
+fixedTLS/sharedlock/custody/clock+HEAD/O_EXCL/fsync/receipts, no oldallowlist
+change. Deliberate NEWreader preclaim protocol follows committedstatusroute:
+if initial durableclaim publication does not return, stop immediately with
+no lock/credential/TLS/receipt; preserveanypartialclaim and previousreceipts.
+This is not a retroactive defectclaim about oldacceptedactionclients.
+
+Exactlyone fixed20s/262144B whole-log read ofexistingOFFjobfb506... remains
+pending until this correctedsource is committed plusfreshregistry/request
+claims. Native sourceHEADe805/config88517/inventoryd309 are immutable
+provenance, separate from currentreaderHEAD. Whole-log storage/transport
+framing remainsunproved; capturegateprojects no counts/metrics/origins or
+financialacceptance. No native code/job rerun. All fivefinancialmetricsNULL,
+20REMXrowsquarantined, sameheartbeatPAUSED. Round120pushes0; finalonepush
+reserved. Continue exactreadonlyrecovery, then independently complete
+pricefree report validation; no partialtail repair or invented outcome.

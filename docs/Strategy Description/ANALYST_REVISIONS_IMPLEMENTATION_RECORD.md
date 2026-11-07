@@ -1311,40 +1311,34 @@ claims. Neither category is permitted to overwrite the other.
 ## 4. Exact next step
 
 The owner explicitly waives Claude review of section 345 for the current
-research recovery; it owns the November7 QC-hold release and resumption. Both
-Claude344commits are accepted after counter-review with documentary
-qualifications. Corrected projection/reporting/caller tests pass on the
-designated Mac (260 distinct). LeafA remains spent and excluded; corrected B
-prepare/validator passed once with actual0/0 and are now spent. Its new DATA
-is bound to the separately frozen AR100/A1 pilot in345.5. A1 stopped at the
-local libraries predicate after allocating project39054561, before any
-upload/compile/job; it is spent. The same-project v2/A2 recovery is separately
-frozen in345.7, after140focused checks and162-source cold bootstrap. A2 is
-now spent at its post-lock collaborator predicate; no upload/compile/job
-followed. The bounded read-only lock diagnosis passed in345.9 and identifies
-the opaque-publicId mismatch. The third/final same-project v3/A3 decision
-is frozen in345.10, with185focused checks and168-source cold bootstrap. The owner released
-QC; no permission or readiness follows
-for a funded/broker/paper/live operation. The six-universe old-rule AR80–200
-research extension remains the selected route, and the broad new-rule rebuild
-stays paused. Current operational results and exact next gates are in345.
+research recovery and released QC access on November7. Both Claude344
+commits are accepted after counter-review with documentary qualifications.
+Corrected B preparation/validator passed once and are spent. R343-AR100
+A1/A2/A3 are now ALL SPENT: unsupported library-field and opaque technical
+publicId predicates were corrected prospectively; A3 reached uploads and QC
+refused the fourth input-runtime file under its source-code policy.
+No strategy backtest launched. Exact retained evidence and source-policy
+limitations are345.11. Three acknowledged source writes leave a partial
+project39054561; main remains default, and the failed write's effect is unknown.
 
-Only the QCOM-restored SIX-universe old-rule extension through2026-10-13 is
-active, preserving AR80–200 arms and after-close/next-open MOO economics.
-The original R343A prepare/validator actual0/0 remains spent and its main.py
-files are superseded. Corrected B preparation and the four-request read-only
-QC observation passed under their exact clean freeze; their results are345.4.
-Two idle backtest nodes were observed, not leased. New submitter/consumer
-support passed531focused tests and public-source bootstrap; only the separate
-AR100/A3 decision in345.10 may next be invoked, never an arbitrary callback.
-Fresh source/input/rights/account/privacy/idle/capacity/project/attempt/run
-gates precede any upload/compile/backtest. No old operation/control is replayed.
-The broad new-rule six/eight rebuild stays paused with its own blockers.
-No new data purchase is inherently needed for the previously exercised native
-QC route. Formal/PIT/permanent-master/paper/live flags stay false. Actual
-operational results and accountable look changes, if any, are recorded below;
-the pre-use floor is338/259/54/699. Provider/USB/broker access remains excluded.
+The immediate next step under section 345 is the REQUIRED Mia diagnostic
+checkpoint, then a separately coherent exact recovery decision if admissible.
+Safari exposes Mia but native input is currently unavailable; no question was
+sent and no Mia response exists (345.12). Safe offline work may prepare
+genuinely plain input data/source with new transport identities and exact
+economic/parent equivalence. Such preparation is not a fourth attempt,
+QC acceptance, a budget renewal or permission to retry refused source.
+Do not invoke any old caller/control/reader or refresh pins automatically.
 
+Only the QCOM-restored SIX-universe old-rule extension through2026-10-13
+is active: AR80–200, after-close/next-open MOO, frozen gates and costs.
+The broad new-rule six/eight rebuild stays paused. All other six R343 arms
+remain uninvoked. The two formerly idle nodes were observed, not leased;
+fresh ownership/access/idleness/capacity/source/input/rights/attempt/run
+gates precede any later admissible contact. The product auto-build is counted
+conservatively at339shared/259development/55infrastructure/699cells, no new
+result cell. Formal/PIT/permanent-master/paper/live flags stay false.
+No funded/broker/real-order/paper/live or provider/USB action is authorized.
 
 Sections 137–142 retain the owner-assisted cloud diagnoses, project cleanup,
 and mutable QC 79/81 source comparisons. Their `Completed.` statuses do not
@@ -78182,3 +78176,99 @@ IDs must reconcile before any action. Remaining six arms/result reads are
 not authorized by this decision. Before first compile/backtest dispatch the
 floor is338/259/54/699; book any actual new development look once by identity.
 Formal/PIT/permanent-master/paper/live flags remain false.
+
+### 345.11 A3 source-policy refusal, exhausted attempts and Mia checkpoint
+
+At clean H5=f2c5984f7314ff857fdd7b694b8751997b07694f the sole A3
+parent dispatched2026-11-07T18:14:29UTC; completion observed18:15:02UTC,
+controller0/ACTUAL parent2/stderr0. These are external second-resolution
+dispatch/completion brackets, not exact QC/provider request times.
+A3 is SPENT and R343-AR100 has consumed ALL THREE attempts. No fourth Codex
+launch, renamed retry or reset is authorized. The other six arms remain
+uninvoked. No original control/report was reopened, repaired or removed.
+
+ORIGINAL failure stdout5550B/SHA
+4b0d61cce0f60a25f28feeb9f422b597d7fc3dfaee481afa9cd7062374332797
+is retained with external actual-exit/source/profile/HEAD bindings in
+scripts/arv2_r345_ar100_a3_failure_fact.json6261B/SHA
+f2378ad12bde90eefb17d12210d5e10f358cd52993fbecb02e41d996e33643de.
+Its43 application dispatches all returned HTTP200; this is application
+dispatch accounting, not a physical transport/contact census. Current exact
+owner-only/dedicated/general-row/library/history/source predicates passed,
+resolving ARV2D345-002 PROSPECTIVELY for the pinned A2 technical context only.
+
+Three source file creations were acknowledged: accepted_risk_matched_diagnostics.py,
+accepted_risk_order_level_core.py and accepted_risk_order_level_forced_exit.py.
+The fourth write, accepted_risk_order_level_input_runtime.py, was REFUSED:
+files/create, marker write-03-source, request SHA
+3a08f3a91b518c067f9001315d5dab8c40d865a397b43181587198b99763366e,
+HTTP200/success=false, exactly one477B error string. Response body508B/SHA
+e23514ef4b4552e853a41bf2c2fe3f28f8e6c92cd5f3349f6d5a533fdd547b30;
+error string SHA
+bdd055d302cd830352764fc9143aa54d6468ea0707e076cc29d8187ab7164c34.
+Original finite redaction retains the source-policy refusal: encoded or
+obfuscated source is prohibited, source files must be plain, and lengthy
+files/data should be split or moved to storage. No raw response/error,
+credential or licensed row is retained in this public record.
+
+ARV2D345-003/P2 is OPEN: actual QC source-policy refusal prevents candidate
+source completion. The exact detector trigger is UNKNOWN. Public runtime
+inspection shows gzip decompression of DATA records followed by strict JSON,
+not encoded/compressed Python execution. Its re.compile calls compile fixed
+validation regexes; there is no builtin compile/exec/eval/code-loader path
+in this runtime. Host projection renders readable Python using literal/AST
+rewrites. This evidence neither proves a QC false positive nor identifies a
+subscription/data gap. Do not conceal gzip calls, rename compressed objects,
+or route the same refused bytes through another interface to evade policy.
+
+No compile/backtest API call or ID was returned by A3. The fourth write's
+remote effect is UNKNOWN; it must not be treated as absent or safely unspent.
+Current partial project39054561/default main must be reconciled afresh under
+any later admissible recovery; no unconditional rewrite/delete is permitted.
+All old used source, DATA and controls stay frozen. No strategy return,
+successful candidate build or new accepted result cell exists.
+
+### 345.12 Authenticated Safari/Mia access attempt and product auto-build
+
+After3failures the standing Mia checkpoint was attempted in Safari using a
+NEW tab for ONLY project39054561, preserving existing other-lane tabs.
+QC authenticated and displayed the correct own project, owner and exact A2
+technical identifier. Its main.py still visibly contained the default
+BasicTemplateAlgorithm. The editor was read-only under the existing A2
+context; no Request Edit Control, collaborator, permission, lock, build,
+backtest or live button was used.
+
+Opening the project automatically produced this cloud-terminal event:
+Built project ARV2 LEGACY SIX R343-AR100 OCT2026, LEAN2.5.0.0.18234,
+build identity405be0-6a6dbc, UI label6:16:05, observed on2026-11-07 around
+18:16UTC. This product auto-build occurred despite no explicit API compile
+dispatch. It is partial/default-source infrastructure evidence, not a build
+of the candidate or a strategy backtest. Conservatively book ONE additional
+shared+infrastructure look by that unique build identity: floor now
+339shared/259development/55infrastructure/699cells. No other attempt, cell or
+earlier count is reset. The shared run ledger is frozen outside its existing
+bounded R298 append authority; this new identity/floor is retained HERE for
+later coordinated shared-ledger reconciliation, not silently omitted.
+
+Mia was visible and Ask Before Edits selected. A diagnosis-only prompt was
+prepared forbidding source/permission/lock changes, builds and launches.
+Accessibility focus attempts reached the read-only editor; visible main
+remained the default. Native coordinate input then returned
+noWindowsAvailable; renewed Safari binding still exposed the project tree
+but coordinate input failed again, and accessibility setValue did not
+populate the Mia field. No send action was taken. Mia therefore has NOT
+received the question, returned a diagnosis, edited code or completed a run.
+The runtime's generic window error does not prove the Mac was locked.
+A concise availability question was sent to the owner while safe offline
+work continued. This is a concrete controllable-UI barrier to the required
+Mia checkpoint, not a reason to renew the exhausted launch budget.
+
+Root validation qualification: an initial live-navigation replacement removed
+an unrelated historical navigation segment in the uncommitted buffer. The
+33 record/redaction checks passed despite that omission; diff review caught
+it, and the entire segment was restored byte-for-byte from exact H5 before
+commit. Those checks therefore do not prove complete historical preservation;
+the explicit HEAD segment comparison supplies that narrower proof. A first
+public failure-fact canonicality check used a literal backslash-n instead of
+LF and failed; corrected LF comparison passes without changing the evidence.
+No historical source/control was replayed. Final record checks follow restoration.

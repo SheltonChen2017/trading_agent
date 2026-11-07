@@ -1,12 +1,13 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **376 COUNTER-REVIEWS BOTH PUSHED CLAUDE COMMITS; THE REMAINING
-RUNTIME-PREFIX/PHYSICAL-ALIAS ISOLATION DEFECT IS CORRECTED WITH12 RED
-REGRESSIONS AND288 FOCUSED PASSES.229 BOUNDARY CHECKS PASS NATIVELY.
-THE AUTHORIZED RETAINED-COVERAGE/ARCHIVE FEASIBILITY AUDIT FOLLOWS ONLY
-ON THE CLEAN COMMITTED CORRECTION. SHARADAR NOW CONFIRMS ITS HISTORICAL
-ARCHIVE IS UNAVAILABLE AND ACCOUNT IS VERIFIED. NO PURCHASES OR QC.
-FIFTEEN CARRIED P2s/PRIOR RESOLVED SCOPES REMAIN; NOT BACKTEST-READY.**
+Status: **376-378 COMPLETE COUNTER-REVIEW AND THE BOUNDED COVERAGE/ARCHIVE
+FEASIBILITY REPORT. RUNTIME PREFIX/PHYSICAL-ALIAS SAFETY IS CORRECTED.
+THE FRESH FULL RETAINED AUDIT FAILED AT STORAGE BINDING; A THREE-LEAF
+DIAGNOSTIC CONFIRMS ONLY DEVICE DIFFERS. OLD PROOFS/FAILURES ARE PRESERVED.
+SHARADAR CONFIRMS NO HISTORICAL ARCHIVE; ALL60 PILOT EARNINGS MONTHS HAVE
+PRIOR SEALED RECEIPTS, BUT HISTORICAL PUBLIC-KNOWN-BY/PIT AND OTHER FACTUAL
+GATES REMAIN UNMET.15 CARRIED P2s RETAINED; NOT BACKTEST-READY.
+NO PURCHASES, NEW SOURCE REQUESTS, VENDOR REPLY OR QC. HANDOFF378.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -334,6 +335,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-04 | Codex Sharadar archive follow-up and retained PIT evidence audit | Clean9b12e0eb ->9aa1a4fe ->c2d34967 ->ab7eb151; separate374 handoff, incoming EMPTY | Existing-thread Sharadar reply and source-bound read-only audit; existing inputs only, no QC/purchases | One reply sent/read back; supplier again asks subscriber email, no sample. First two read-only observations FAILED/preserved; corrected15.439s audit PASS accounts74,150/698,455 metadata rows,12 controls/11 issuers, current candidates8 single/3 multiple/1 none and309 action discovery rows. No PIT/source/public-known-by/rights/population promotion. | Final181 focused PASS1.41s; preactivation229 boundary/platform PASS25.53s; native exact-leaf/alias canary, RED/GREEN and physical/CJA reversals, compiled/frozen hash checks. Final document checks below; no full suite. |15 carried P2s and seven369 P3 groups OPEN at exact scopes; IBPIT-READ-37301 correctedab7eb151, diagnostic observability37302 correctedc2d34967. Historical facts remain missing. | Owner's registered Sharadar email is required to unblock supplier verification; qualify a genuine historical sample if supplied. No inferred purchase, QC, extra provider query, alias capture retry or monitor rearm. One final matching-lane push after374. |
 | 2026-11-05 | Claude review (Windows session) and corrections | `19060da1` -> `c77e9fb9` -> this review record | Code-only review of `f99c66eb..19060da1` (six commits, zero merges): the retained PIT audit module and runner, finite failure diagnostics, the basename fix, and the CRLF fixture correction | Fixed a fail-open interpreter-prefix read grant in the runner's sandbox policy, the action-category mapping, the convention test's raw-byte comparison on autocrlf checkouts, and 32 unpinned module guards. Full detail in section 375, including the required 1-10 rating. | Under process-level network denial: focused selection 231 passed, 45 skipped, 1 harness artifact that passes without the harness; module mutants 43 of 47 and runner mutants 19 of 20 caught, survivors redundant; no full lane or repository suite, per owner direction. The runner ran under import stand-ins here, and its filesystem and worker paths were read, not executed. No SEC, provider, QC, credential, custody, or trading access; **0 research looks**. | All code commits accepted, `9aa1a4fe` after correction; the 15 open P2s are unchanged and no P0/P1 is open. | Codex counter-reviews and runs the two new review files natively; substantive blockers unchanged from 374. |
 | 2026-11-07 | Codex counter-review and retained-coverage audit scope | 19060da12a7e006a57cc7bd4eb1f1742f04aefe8..52f4e490bebfdee77bf9f52c35afe6e337cc672b; correction/scope commit follows | Both incoming commits reviewed; correct nested/physical-alias runtime grants before retained audit | ACCEPTED AFTER CORRECTION and append-only qualifications376; no new independent acceptance of Codex work. Supplier account verified/no historical archive. |12 genuine RED,288 focused PASS1.85s,229 boundary PASS26.44s, category reversal9 caught/14 controls; four compiled images/17 frozen tests/four frozen v3 exact | IBPIT-POLICY-CCR37601 P2 corrected in this candidate;15 carried P2s and old seven369 P3 groups retained;375 Windows observation retained | Execute exactly one read-only seven-leaf audit on clean committed candidate, finish matrix/feasibility record and separate final handoff, then ONE final matching-lane push; no purchases/QC/source acquisition. |
+| 2026-11-07 | Codex counter-review and retained-data/archive feasibility audit | Incoming19060da1..52f4e490; correction84a1be4d; diagnostica99f1e4c; separate378 handoff | Both incoming commits dispositioned; exact-leaf native safety corrected; documentary coverage audit completed at factual blocker | Fresh full audit FAILED storage_binding4.058s; actual three-leaf diagnostic PASS4.285s with bindingfalse/device-only difference. Sharadar archive route unavailable; existing pilot earnings60months retained, no PIT promotion. |294 focused PASS1.95s;229 boundary PASS26.44s before diagnostic addition; final source/docs checks below;12 real REDs and category9caught/14controls; no full suite |15 carried P2s/seven369 P3 groups retained; new runtimeP2 resolved84; current storage P3 OPEN;375 observation retained | Need genuine historical archive/PIT evidence and qualified future custody transition if reused. No purchase/QC/capture/reply or automatic continuation. ONE final matching-lane push only after378. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -45362,3 +45364,233 @@ cover changed/missing/wrong-typed fields, missing receipt binding, unchanged
 original guard and three-leaf worker/cleanup failure semantics. Final focused
 selection294 PASS1.95s, zero skips/warnings (outer2.904s,stderr0).
 The earlier288-check result belongs to the preceding source image.
+
+## 377. Retained-data coverage and archive feasibility audit (2026-11-07)
+
+### 377.1 Observed custody diagnosis; do not manufacture a successful audit
+
+The additional diagnostic source/test/scope commit is
+a99f1e4cf15f0028065c16cc8c546fc0c9660b9c, already existing and clean
+during its ONE registered execution. Diagnostic exit0,4.285s outer, stdout528B/
+stderr0. completed=true means DIAGNOSTIC ONLY; binding_passed=false.
+Exactly three authenticated metadata leaves were read. Both old proof and
+provider qualification are marked actual/passed, and the qualification's
+receipt pin matches the exact old proof. Against BOTH records, the only
+changed physical-root field is device. Schema/root-kind/inode/mode/owner/group
+agree; no raw physical identity value is published. Source inventory is
+05b02fe5ff0d95dc8ad0b22c25eb897b95e6fefc5426c7e9f069eb90ef4cd22b.
+New source requests/credential reads/QC accesses remain0/0/0.
+
+IBPIT-STORAGE-OBS37602, P3 OPEN observation: the historical storage proof no
+longer matches the present device identity. This does NOT establish corrupt
+bytes, a moved root, a device replacement, a remount/reboot cause or an
+unauthorized actor. The old proof is historical evidence, not rewritten with
+today's device. The original strict binding guard remains unchanged. No
+full-audit rerun, old receipt replacement, new custody epoch, namespace reset
+or relaxed provenance claim follows. A later use needs an explicit qualified
+current-custody/transition contract if old physical equality is no longer
+true. That engineering question is separate from the missing historical
+publication evidence; repairing it alone would not make the lane ready.
+
+The new full12-control audit therefore remains FAILED, with no new corrected
+category/result digest. Old373.6's successful15.439s/cb4354e6 result and
+8 single/3 multiple/1 missing CURRENT candidate distribution remain attributed
+to that old source/execution, not fresh observations or PIT identities.
+The diagnostic does not promote its negative result into a successful audit.
+Its counts/hash facts were stdout-only; there is no new private result file
+or independent file readback to claim.
+
+### 377.2 Source-family coverage matrix
+
+This audit inventories the already-recorded captures, controls and processing
+limits. It is NOT a new USB/full-history scan, a full corpus replay or an API
+coverage census. Historical observations below retain their original source
+and execution lineage; fresh377.1 only authenticates three custody metadata
+leaves and names the binding difference.
+
+| Existing family | Retained/current or previously observed evidence | Historical/PIT limitation and disposition |
+|---|---|---|
+| Supplied Sharadar FullHistory reference/SF1 |145.2/169.1 bind the same94251ffd... manifest:74,150 TICKERS,698,455 ACTIONS and3,216,551 FUNDAMENTALS rows. Lane-native metadata projections are pinned373.3. | The supplied THREE-file capture has no SF2 insiders or SEP/SFP price archive. Current export/as-reported reference dates are not contemporaneous delivery/identifier snapshots. Do not reopen the original Analyst sibling capture. |
+| Separate Sharadar prices/delist qualification |212.3/213.2-4 record the9.838s complete-reference observer and one dates-only stock response:HTTP200/28,199B with ticker/date/lastupdated, no OHLCV. | The old observed2021-10-25 floor does not authorize dropping early2021. Terminal consideration/elections/CVRs, true historical listing/class identity and warm-up price coverage remain unresolved. Current rolling5-Year new downloads cannot cover the entire frozen pilot/warm-up. |
+| EODHD pilot earnings |221.2's actual374-leaf read-only audit binds67 buffered months2020-10..2026-04; ALL60 pilot months2021-01..2025-12 have sealed HTTP200 receipts. The60 pilot months' producer totals are706,559 source/reported rows =473,599 metadata accepted +232,960 quarantined, including232,735 unknown timing. | Receipt/month coverage is not issuer-complete actual-release admission or either completed diagnostic. Preserve source/status/identity/refusal accounting and BOTH prescribed diagnostics. Unknown timing alone is not a universal new failure gate. The truthful current-source-version local retrospective earnings policy remains; do not impose a new universal earnings revision-archive requirement. |
+| Old EODHD earnings gaps |January2006/August2018 bodies remain missing; separate February2019/2020 supplement retains its own partial lineage213.1. | Those older gaps are outside this distinct2021-2025 pilot and do NOT block its pilot-month receipt coverage. No spent month is requested again. |
+| EODHD price/identity observations |216.2 has a12-byte2006 date scalar, not prices;366.8 has11 current-mapping queries/33 rows corroborating12 controls. | Date capability is not a full-cohort OHLCV/adjustment/delisting archive. Current crosswalk values cannot be reconstructed from aggregate counters, and no dated validity/knowledge intervals are established. |
+| Massive reference/SEC samples |221.3/336.3 retain bounded dated-reference and one-row index/Form4 observations; later filing samples have unfollowed cursors and DIFFERENT accessions.352 records support's latest-corrected-only response. | No complete population, matched original-parent/version/public-known-by archive or genuine historical delivery sample.353-355's failed actual readback and separate consumed2018 Benzinga403 remain failed/spent. Do not retry or infer a universal provider refusal beyond the requested route. |
+| FMP SEC/insider qualification |366.8/371.3 record12 SEC queries/71 metadata rows and all12 accession+CIK controls corroborated. C/J/A guarantees AT LEAST ONE agreeing joint row for form in6 controls and naive acceptance in4. Insider planned5/invoked1,100 out-of-day rows refused scope,4 unattempted. | No raw response rows retained for rebuilding crosswalks; no original-body equivalence, historical delivery/clock/timezone or PIT identity proof. Those guarantees need not concern the same row and do not cover all joint rows. No repeated ordinary-current-table probe. |
+| Supplied USB daily/actions/earnings |360-361 record69 fixed inputs/21,638 daily members/47,802,869 daily rows and distinct earnings buffers, with original failure and corrected230.497s qualification preserved. | Candidate daily/action/earnings data and complete descriptive date masks exist, with all quality/refusal/missing accounting. Labels/last bars do not establish historical identities or delisting cashflows; EPS candidates do not establish actual release authenticity. No new USB scan/catalog decode occurred. |
+| Original SEC bodies and prior Feed/NC work |Required21 eight originals/20,052-accession consumption chain and later lexical source/version joins stay preserved. Prior carrier requests and failed claims remain as recorded291-301/336-337/371. | Authentic source/version joins are useful; the historical public-available-by bound, complete all-six-form admission and correction/coverage chain remain missing. No re-dispatch of completed/ambiguous/claimed or archive-exposed requests. |
+
+The USB public qualification pins remain historical: qualification-result
+19,339B/fdd67221402d208b243f86f2a000ce95379e790fb1e08738bef1e2204439905c,
+complete487B/4c5563a407966f11a4c0f33807053ff3d70ba748fb4cde734c0e2dbfd6180105.
+The private37,210,827B coverage catalog is NOT decoded or rehashed this round.
+The whole supplied source tree was not searched again. No present membership
+or completeness is inferred from an absent new scan.
+
+### 377.3 Sharadar answer, rights deadline and feasible archive routes
+
+Connected Gmail readback confirms the same substantive supplier reply:
+the owner supplied the subscriber identity, and Sharadar verified Personal
+Bundle5Years paid through2026-11-24, scheduled to end. Prior FullHistory
+ended2026-10-14. No private mail/account values enter Git. There is no sample,
+attachment or pending account question to repeat.
+
+Supplier explicitly does NOT keep historical SF2 delivery files, dated
+snapshots, ingestion logs, accessions, original filing bytes, version
+manifests or dated identifier archives. The current insiders table's date is
+a filing date, and its daily02:00 Eastern schedule is not a historical
+09:28/09:30 available-by timestamp. Current permanent share-class IDs/issuer
+CIK URLs/actions can corroborate candidates; no reporting-owner CIK or dated
+identifier archive is supplied. This requested Sharadar archive route is
+UNAVAILABLE, not unknown or merely awaiting a sample. Buying FullHistory
+would not create an archive the supplier says it does not retain.
+
+The rolling plan's lower bound moves with query date; the supplier's
+2021-11-06 bound is dated to ITS reply, not asserted to remain today's bound.
+Already-downloaded FullHistory data remains usable during the current paid
+term according to the reply. Published personal terms permit the owner's
+personal nonprofessional research, while excluding redistribution/entity use.
+At termination, stop use and delete covered raw/reconstructive data within
+30days; qualifying non-reconstructive outputs may remain. No automatic renewal,
+purchase, deletion, cloud transfer, acceptance of changed terms, new email
+or scheduler action occurred.
+Primary terms: https://sharadar.com/terms .
+Current reference schemas: https://sharadar.com/docs/tickers and
+https://sharadar.com/docs/actions . These support reference semantics, not
+a historical observation archive.
+
+Public primary-source feasibility review:
+
+| Route | Evidence and limitation | Disposition |
+|---|---|---|
+| Free SEC Feed/Oldloads | SEC describes daily carriers and public complete submissions; prior daily/feed/oldload indexes do not incorporate later removals, whereas full/quarterly indexes are rebuilt for corrections. Exact old carrier/version material plus authentic historical observation and correction/deletion chain could be useful. | Candidate family in principle, NOT a qualified available-by archive. The already-consumed carrier attempts are not an untried solution or permission for another blind request. No new carrier/body/index acquisition this round. |
+| SEC acceptance plus fixed lag | SEC explicitly distinguishes acceptance and website availability and does not guarantee the lag under load. | Refused inference. No arbitrary lag or typical schedule releases the frozen09:28/09:30 gate. |
+| SEC PDS | Official subscriber guide describes daily audit lists and a rolling five-business-day FTP window; older audits require helpdesk assistance, without proof of a2020-2025 backfill. | Useful lineage model, not an obtained historical archive. No PDS purchase/subscription/contact or guaranteed historical entitlement. |
+| Existing FMP/EODHD current endpoints | Current SEC/insider links, dates, CIK/mapping fields can corroborate original/candidate identity. No reviewed documentation or existing qualified input establishes the required ownership historical observation/version chain. | Capability UNESTABLISHED for the needed archive, not a support-confirmed blanket refusal. Another ordinary current-row call is not justified as archive evidence. |
+| Prospective observation | A future authenticated receipt/version journal could establish future known-by evidence under a separately frozen study. | Cannot backfill2020Q4-2025 or silently replace this pilot. No prospective collector/study started. |
+
+Primary sources checked:
+https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data ;
+https://www.sec.gov/about/webmaster-frequently-asked-questions ;
+https://www.sec.gov/files/edgar-pds-new-subscriber-document.pdf .
+Public documentation browsing is separate from data acquisition; no archive
+payload, filing body, credential, licensed-row endpoint or outcome was fetched.
+Search results from non-primary sites were not used as authority.
+
+IBDEC-377-01: finish the audit at the factual blocker; do not invent another
+current-table download, favorable exclusion, zero-event proxy, source window,
+publication lag or purchase to make the report green. A genuine small
+original-version-linked historical public observation/delivery archive is
+still required, with clock/timezone, corrections/deletions/backfills,
+coverage/refusal accounting and applicable research use. Exact first-public
+seconds are NOT mandatory; an authenticated historical upper bound before
+the actual frozen cutoff can suffice. A sample alone would not prove full
+required-window coverage.
+
+### 377.4 Remaining readiness gates and next action
+
+The coverage/feasibility REPORT is complete at a concrete blocker.
+The newly attempted full retained-control derivation FAILED; it is not
+reported as completed because the documentary matrix is useful.
+Existing inputs do not establish the required historical public-known-by/PIT
+facts. Other carried gates remain full required21/all-six-form original
+admission, genuine older target-affecting lots, dated issuer/share-class/
+listing/PIT identity and actual pre-entry price/volume/liquidity/factor/RF/
+maturity contexts, issuer-complete actual earnings with both diagnostics,
+applicable processing rights and permanent population/look/engine-parity
+bindings. Current credentials, one candidate, sealed month receipts or tests
+cannot release these facts. No backtesting readiness is claimed.
+
+Next required input is a genuine archival evidence path/sample or a separately
+authorized change to a prospectively observed research design. No purchase
+has yet been shown to solve the gap. Do not renew the soon-ending subscription
+or delete data by inference; the owner retains that license-lifecycle decision.
+Within this round no owner answer is needed to finish recording the blocker
+and perform the already-authorized final push.
+
+## 378. Separate durable handoff — counter-review and bounded audit
+
+Prepared2026-11-07 owner-local. Review incoming range is
+19060da12a7e006a57cc7bd4eb1f1742f04aefe8..
+52f4e490bebfdee77bf9f52c35afe6e337cc672b, TWO commits, zero merges;
+each disposition is376.1. Exact outgoing implementation/diagnostic commits
+EXIST before this separate final handoff:
+
+| Commit | Final behavior/evidence |
+|---|---|
+| 84a1be4d244902b1787b9085e51522a0094fce90 | Bidirectional lexical/physical interpreter-prefix refusal with12 actual REDs and288 focused PASS; accepted counter-review/scope376. New source-only canary passed. Full retained audit then FAILED at storage_binding4.058s; no new projection result. |
+| a99f1e4cf15f0028065c16cc8c546fc0c9660b9c | Finite read-only three-leaf storage diagnosis,294 focused PASS1.95s and72 record/active checks1.41s. Actual diagnostic PASS4.285s on this existing clean commit, binding_passed=false, ONLY device differs against both historical records. No full rerun or proof rewrite. |
+
+The present final record commit follows those exact hashes; no later commit
+is portrayed as already existing during either observation. Three advisory
+agents performed read-only source/document research; their work is not new
+independent Claude review. Root independently ran the reported validations.
+No full suite, Windows execution, historical root replay or market outcome.
+Quality assessment8/10 for this bounded correction/audit: meaningful native
+sensitivity/alias safety and precise diagnosis, with an expected strict
+custody refusal and irreducible historical evidence gaps clearly retained.
+
+No open P0/P1. All15 carried P2s and seven369 P3 groups remain at371.4's
+exact scopes. IBPIT-POLICY-CCR37601 P2 is RESOLVED in84a1be4d;375's
+covering-prefix fix stays accepted at that narrow scope. Its category/test/
+custody-fixture findings retain their scoped resolutions. IBWIN-OBS37505 P3
+remains an attributed Windows/POSIX support observation. New
+IBPIT-STORAGE-OBS37602 P3 stays OPEN as a present proof-freshness/binding
+observation, not an unproved corruption finding. Old373 failures and current
+full-audit failure remain failures; all older resolved scopes are preserved.
+
+No source operation, provider/API/SEC filing/archive-data request, credential
+read, licensed-row download, body/price/financial/USB interpretation, vendor
+reply, purchase/upgrade/trial/paid export/renewal, QC/Safari/API/SDK/history/
+upload/job/look/backtest, broker/operator-database/scheduler/deployment/
+capital/funded/paper/live/order/trading action. Existing3 metadata leaves
+only were read by the successful diagnosis; its prior failed audit read
+metadata before the physical binding and no Sharadar row projection.
+Public documentation and existing-thread readback are explicitly separate.
+All new data-request/credential/QC/look counters remain zero.
+Monitors stay disarmed; no duplicate automation/other-chat message.
+
+Frozen IB1C v1/scale/pilot and four current-byte-hashed v3 sources remain
+unchanged; historical validatoraa0d635d is not replayed. Stoppedv3 stays
+1,846 completed/1,847 starts unresolved. Separate7,373B/report
+206e6db9677fb169455f62357ce966384926080b6eba582094e9536e88d705b7 does
+not resolve unmatched-start/authenticity/PIT/rights. Required21 original eight,
+20,052 consumption chain, unexecuted8 NON-DISPATCH candidates, legacy
+19,846/99,394 with79,548 unattempted and strictD23 seven nonexact/no82-quarter
+promotion digest stay preserved. Frozen82-quarter study and distinct2021-2025
+pilot/2020Q4warm-up/economics/causal refusal accounting/both diagnostics
+remain. The two nonretroactive incident classifications stay distinct:
+372 older requests have historical authorization provenance not established;
+the reviewer incident is reviewer-reported probable unintended SEC access,
+exact request count and transferred bytes not established.
+
+Final native document/record/import/platform/EXACT, in-memory compilation,
+frozen/source hashes and narrow diff/secret/status/origin checks follow this
+record. Shared/project documents, Action Plan and root Session Handoff stay
+frozen. Reverify exact designated root/branch/HEAD/expected status and matching
+origin before this separate commit and final publication; stop on unexpected
+advancement. Make exactly ONE final push of this completed/blocked round only
+to origin/codex/strategy-insider-buying, then independently verify exact remote
+tip and clean/synced state. No interim push occurred; no automatic next build,
+collector, vendor reply, monitor rearm, purchase or QC follows.
+
+Final validation on the complete376-378 record and unchanged a99f1e4c code:
+229 boundary/platform/lane-import/ML-import/active-document/record/EXACT checks
+PASS27.44s, zero skips/warnings (outer28.412s,stderr0), with inherited native
+network/security/DATA/write fences and required fork allowed. Final focused
+code selection remains294 PASS1.95s; no source change followed it or the
+diagnostic. Four images compile in memory, seventeen frozen test pins/four
+historical v3 images remain exact. Current runtime prefixes pass the physical/
+lexical disjointness check; no historical interpreter claim is inferred.
+Final code pins: runner28,330B/
+4a161a41e0f4319b0629daff1bd9d47e7eb33625a99ad573caf63f7e8d7374f0;
+pure audit28,325B/a0dc51f7abb2baa763d5f3755144d55d84807d797f787578a26e2909e5a2e249;
+runner review tests13,855B/
+97e81962780d454294139768433598b4d5ab2541c0ce5cc6c3b8d79d83025f79;
+pure review tests11,354B/
+b130b1bc115ac2317fdd15a1954a6b545e4954581713b86f89b26bd1f878fe1a.
+Diff, narrow mail/account/credential-shape scan and expected-only record status
+pass; no private artifacts are staged. This validation tail changes no code,
+contract, readiness assertion or evidence result. Matching-only fetch before
+the separate record commit/final push and independent exact-tip verification
+follow; no second successful publication is authorized.

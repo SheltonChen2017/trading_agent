@@ -99,6 +99,8 @@ import research.guidance_revision_drift.controls
 import research.guidance_revision_drift.events
 import research.guidance_revision_drift.fixtures
 import research.guidance_revision_drift.qc_adapter
+import research.guidance_revision_drift.qc_native_quotes
+import research.guidance_revision_drift.qc_quote_parity
 import research.guidance_revision_drift.reporting
 import research.guidance_revision_drift.scenario
 import research.guidance_revision_drift.simulation

@@ -1,11 +1,11 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **379 CURRENT-STORAGE QUALIFICATION AND12-CONTROL ORIGINAL-IDENTITY
-DOSSIER COMPLETED ON EXISTING CLEAN cbd2897c; ACTUAL79.077s AND INDEPENDENT
-FIVE-LEAF READBACK9.082s BOTH PASS.514 FOCUSED CHECKS PASS. CURRENT BYTE
-EQUIVALENCE IS QUALIFIED; OLD PROOFS/GUARDS/FAILED AUDIT STAY UNCHANGED.
-HISTORICAL AVAILABILITY/PIT SHARE-CLASS EVIDENCE IS STILL MISSING; ALL
-READINESS GATES REMAIN FALSE. NO PURCHASES OR QC.380 IS THE FINAL HANDOFF.**
+Status: **381 FMP THEN EODHD EXISTING-PLAN ARCHIVE-SAMPLE INQUIRIES SENT AND
+INDEPENDENTLY READ BACK; ZERO REPLIES/SAMPLES AT EACH CHECK.382 IS THE FINAL
+OUTREACH HANDOFF.379 CURRENT-STORAGE/12-CONTROL DOSSIER AND FIVE-LEAF READBACK
+REMAIN COMPLETED ON cbd2897c; OLD PROOFS/GUARDS/FAILED AUDIT STAY PRESERVED.
+HISTORICAL AVAILABILITY/PIT EVIDENCE AND ENTITLEMENT FOR ANY NEW SAMPLE ARE
+STILL UNESTABLISHED; ALL READINESS GATES REMAIN FALSE. NO PURCHASES OR QC.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -335,6 +335,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-07 | Codex counter-review and retained-coverage audit scope | 19060da12a7e006a57cc7bd4eb1f1742f04aefe8..52f4e490bebfdee77bf9f52c35afe6e337cc672b; correction/scope commit follows | Both incoming commits reviewed; correct nested/physical-alias runtime grants before retained audit | ACCEPTED AFTER CORRECTION and append-only qualifications376; no new independent acceptance of Codex work. Supplier account verified/no historical archive. |12 genuine RED,288 focused PASS1.85s,229 boundary PASS26.44s, category reversal9 caught/14 controls; four compiled images/17 frozen tests/four frozen v3 exact | IBPIT-POLICY-CCR37601 P2 corrected in this candidate;15 carried P2s and old seven369 P3 groups retained;375 Windows observation retained | Execute exactly one read-only seven-leaf audit on clean committed candidate, finish matrix/feasibility record and separate final handoff, then ONE final matching-lane push; no purchases/QC/source acquisition. |
 | 2026-11-07 | Codex counter-review and retained-data/archive feasibility audit | Incoming19060da1..52f4e490; correction84a1be4d; diagnostica99f1e4c; separate378 handoff | Both incoming commits dispositioned; exact-leaf native safety corrected; documentary coverage audit completed at factual blocker | Fresh full audit FAILED storage_binding4.058s; actual three-leaf diagnostic PASS4.285s with bindingfalse/device-only difference. Sharadar archive route unavailable; existing pilot earnings60months retained, no PIT promotion. |294 focused PASS1.95s;229 boundary PASS26.44s before diagnostic addition; final source/docs checks below;12 real REDs and category9caught/14controls; no full suite |15 carried P2s/seven369 P3 groups retained; new runtimeP2 resolved84; current storage P3 OPEN;375 observation retained | Need genuine historical archive/PIT evidence and qualified future custody transition if reused. No purchase/QC/capture/reply or automatic continuation. ONE final matching-lane push only after378. |
 | 2026-11-07 | Codex owner-authorized offline current-storage/dossier implementation | Clean5a0ecb0c, incoming EMPTY;08794595/64ec64af/1c6908d6/cbd2897c then separate380 handoff | Current byte-equivalence qualification and exact12-control original-identity/title dossier COMPLETE; existing inputs only | Committed health PASS34.502s/zero DATA; actual PASS79.077s,20-leaf scope; independent five-leaf readback PASS9.082s.12 originals/37 title occurrences. Historical availability/PIT/readinessfalse. |514 focused PASS6.26s;229 boundary PASS27.27s before final record; eight compile/17 frozen tests/four v3 pins exact; final record checks below; two meaningful reversal groups retained |15 carried P2s and prior scoped observations retained; old storage mismatch/failed audit not rewritten; no new openP0/P1 | Bounded engineering task complete. Need genuine historical available-by and dated issuer/share-class/PIT evidence from existing retained/subscription sources; do not invent it. ONE final push after380; no purchases/QC/acquisition/outreach. |
+| 2026-11-07 | Codex owner-authorized FMP then EODHD archive-sample outreach | Clean747f3db8, incoming EMPTY; prospective scope abeb2542 then separate382 handoff | ONE existing-plan/no-charge archive/identity sample inquiry per provider, in order; no attachments/private-data export | Both sends and separate exact HTML/recipient/subject/SENT readbacks verified;27 seconds apart. No supplier answer/sample at each check; entitlement/rights/coverage unestablished |135 prospective record/active/import/EXACT PASS12.18s under native fences; final record checks below; no source change/full suite/data replay |15 carried P2s/seven369 P3 groups and scoped375/376 observations unchanged; no factual readiness gate closure | Continue in these existing conversations if genuine reply arrives; qualify actual entitlement/rights/sample against retained originals before broader use. ONE final lane push only; no purchase/QC or automatic monitor. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -46161,3 +46162,138 @@ artifact/private/USB/Keychain/sibling DATA is denied, initial isolation and
 real Darwin VM/readback plus sampled RSS guard are live, test writes are
 fresh TMP and /dev/null only. No full lane/repository suite or data replay.
 Whitespace and expected record-only checks precede the prospective commit.
+
+### 381.3 Observed sends and independent saved-message verification
+
+Prospective scope commitabeb2542ea750b87b45a8dd63c117dd81b9261e1 ALREADY
+EXISTED before these external actions. Its tree was clean; no interim push.
+Both unique recipient/subject searches remained empty before their respective
+send. Connected Gmail sends occurred sequentially and exactly once per named
+provider, with FMP's independent readback verified BEFORE sending EODHD.
+
+| Order / public recipient | Sent time | Observed UTF-8 HTML identity |
+|---|---|---|
+| 1 / info@financialmodelingprep.com | 2026-11-07 11:11:34 PST /19:11:34 UTC | 2803 bytes; SHA-256 `5955bdb48aaf13210ca66c27db5708b78ab34e67e98a4b6a56698c5326b524bb` |
+| 2 / support@eodhistoricaldata.com | 2026-11-07 11:12:01 PST /19:12:01 UTC | 2960 bytes; SHA-256 `b7de4db42465eca6b44acb03533b777b5d6efed1d37464232167e4ba9dcd715e` |
+
+Subjects are exactly381.2's prepared table. Each send returned a message/
+thread identity and SENT label. Independent per-thread readback verified
+exact recipient, exact subject, text/html MIME type, exact authored HTML
+content, SENT label, empty attachment filename and no multipart children.
+The read-back HTML equals the prepared bytes without line-ending or terminal
+newline normalization. The27-second send ordering is observed from each
+saved message's internal date, not inferred from draft/source times.
+
+At each readback, its thread has ONE outgoing message and ZERO inbound
+messages/attachments. These are Gmail acceptance/saved-state observations,
+not proof the provider received/read the request, owns an archive, accepts
+research rights, or will supply a sample. No supplier response, attachment,
+sample, entitlement, rights or historical coverage is manufactured from SENT.
+Mail/thread IDs, private sender/account values, transport headers, full mail
+bodies and licensed/control values stay out of Git. The public recipient,
+unique subject and date identify the EXISTING threads for any later readback;
+do not create duplicate inquiries when a reply arrives.
+
+The requests explicitly make availability and identity separate questions,
+ask for actual historical/version/clock/validity/known-by evidence, require
+existing-plan/no-charge and local research-use confirmation before licensed
+material, and forbid purchases/upgrades/trials/renewals/paid exports/charges.
+They describe the completed twelve-control dossier without attaching it or
+claiming those originals supplied historical availability/PIT proof. The
+minimal public accession/date/hash control list is NOT exported/sent yet;
+it can be matched prospectively after an actual archive route is confirmed.
+
+Technical completion: the two precisely scoped sample/capability requests
+are sent and independently verified with exact message identities while
+preserving all data/rights/readiness gates and privacy/no-purchase/QC bounds.
+
+Plain-language result: both remaining suppliers have been asked whether
+the subscriptions already paid for can provide the missing historical proof.
+The messages do not buy anything or make the lane backtest-ready. Actual
+answers and genuine samples are still needed before the historical claims
+can be tested.
+
+## 382. Separate durable handoff — FMP/EODHD existing-plan archive inquiries
+
+This handoff follows already-existing exact scope commit
+abeb2542ea750b87b45a8dd63c117dd81b9261e1 and both observed381.3 sends.
+Captured round baseline is747f3db8334da764c163c6a5425b352fb2e1b5c6;
+incoming range is EMPTY. This is owner-authorized outreach, not new Claude
+counter-review or independent review of Codex implementation. No code/schema/
+CLI/test or live-assistant behavior changed. Only this lane record changes;
+shared/project-wide records, Action Plan and root handoff remain frozen.
+
+Completed: contact FMP first and EODHD second using the twelve-control
+dossier's verified public summary, existing subscriptions/no charge only,
+independent exact saved-message readbacks, public body-hash/time/recipient
+receipts and precise pending evidence limits. One advisory agent checked
+source schema/disclosure scope read-only; root performed all reported mail
+actions and checks. No private dossier/original/reference row or attachment
+was opened, exported or uploaded for this task. No credential or provider
+data endpoint was accessed. Public support-document browsing is separate
+from licensed-data acquisition; official contact references are381.2.
+
+Current status: both requests are SENT with zero inbound replies/samples at
+their recorded checks. No evidence or response is accepted by implication.
+Next action is a substantive answer in those SAME conversations: first verify
+existing-plan/no-additional-charge access and applicable research retention/
+processing rights; then use a bounded genuine sample with public accession/
+body/version links and dated identity/clock semantics against retained
+originals. If one capability is unavailable, record that exact scope rather
+than treating it as a blanket provider refusal. A generic current-row answer
+is not historical proof; a small sample is not full2020Q4-2025 coverage.
+No new archive endpoint, control export, bulk download, parser/executor or
+monitor is activated automatically by this handoff.
+
+No purchases/upgrades/trials/renewals/paid exports/account changes, QC/Safari/
+API/SDK/jobs/uploads/history/outcome looks/backtests, broker/operator-database/
+scheduler/deployment/capital/funded/paper/live/order/trading actions. Normal
+Gmail sender identity is the only account context used; no subscriber email,
+key or account number is separately guessed/shared. Other provider threads
+and old reply holds outside these named inquiries stay unchanged. All
+monitors remain disarmed; no duplicate automation or other-chat message.
+
+No new P0/P1 or verified code defect. The15 carried P2s/seven369 P3 groups,
+scoped375 Windows observation and376 historical storage-binding observation
+retain380's exact dispositions. The qualified379 current selected-input path
+and successful dossier/readback remain accepted at their limited observed
+scope; old strict guard/proofs/failed claims are not repaired or rewritten.
+Frozen IB1C v1/scale/pilot and four v3 custody sources remain unchanged;
+aa0d635d historical validator is not replayed, stoppedv3 remains1846/1847
+unresolved, and the separate7373B/report206e6db9 diagnostic is not a resolution.
+Required21 eight originals/20,052 consumed chain/eight NON-DISPATCH cases,
+legacy19,846/99,394 with79,548 unattempted and strictD23 seven nonexact/no
+82-quarter digest remain. Both frozen study/pilot windows/economics/earnings
+diagnostics/refusal accounting and the two nonretroactive incident
+classifications remain380's exact scopes. All source/PIT/rights/canonical/
+population/look/QC/backtest/execution readiness gates remain FALSE.
+
+Relevant final record/active-document/import/EXACT checks, narrow
+private-value/whitespace/scope/status checks and matching-only origin
+reverification follow. No source changed, so no new source compilation,
+mutant/data replay, full lane/repository suite or result validation is claimed.
+Commit this durable handoff separately after the scope hash exists; reverify
+fixed root, branch, exactHEAD and expected record-only status before committing.
+Fetch ONLY matching origin again before the ONE final push, stop on unexpected
+advancement, verify exact finalHEAD and clean status, then independently verify
+remote tip and zero ahead/behind. Do not push an interim checkpoint or rearm
+a monitor. The completed deliverable is verified outreach with pending
+factual inputs, not completed archive qualification or backtesting readiness.
+
+Final precommit readback of the SAME two threads still finds one outgoing/
+zero inbound messages and zero attachments per provider. No message was
+resent. Initial final checks:134 PASS/1 FAIL12.14s (outer13.089s,stderr0).
+The active-document guard caught two malformed printed digest tokens because
+the SHA-256 label was concatenated directly with the64-character hash. P3
+IBDOC-381-01 is resolved here by delimiting the two unchanged hashes; no
+message bytes, payload hash or test is changed. Corrected final checks follow.
+
+Corrected final selection135 PASS11.95s, zero skips/warnings
+(outer12.855s,stderr0), under the same native network/security/DATA/write/
+isolation/memory fences. IBDOC-381-01 is verified resolved. Cumulative diff
+whitespace passes; exact round scope is this ONE record only. Narrow added-
+line scan finds only the two public support addresses, no private-mail-ID
+shape, raw HTML copy, private-key block or bearer/API-token pattern. All
+source/test/frozen files remain unchanged from747f3db8. Root/branch/exact
+abeb2542 HEAD and expected record-only modification are verified. Matching
+origin remains747f3db8; final matching-only fetch/commit/push/tip checks follow.

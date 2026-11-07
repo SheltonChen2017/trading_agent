@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–347 retain the milestone, review, preregistration, QC
+strategy. Sections 1–348 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -1310,24 +1310,23 @@ claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
 
-The owner explicitly waives Claude review of section 347 for this recovery.
-The ONE additional A4 in project39054561 PASSED at clean1a5759f9, actual
-operator0 and exact original-output validation. QC reported In Progress...
-for R343-AR100 backtest007d4ab27c26d337ae53acb492a83410 (347.5), after
-all18 prepared source files and six plain-object metadata gates passed.
-This is observed running, NOT completed/performance evidence or readiness.
-A1/A2/A3/A4, D1 and R346 preparation remain SPENT; do not replay/read controls,
-renew attempts, relabel old admissions or infer A5. No other arm submitted.
+The owner explicitly waives Claude review of section 348 for A4 validation
+and conditional remaining old-six AR continuation. Baseline4117c1a4 is
+synchronized and clean. First freeze and execute a NEW bounded read-only
+terminal/results contract for A4 project39054561/backtest007d4ab27c26d337ae53acb492a83410;
+all old launch/read/preparation controls remain spent, no A5 or AR100 rerun.
+Only accepted Completed. source-bound/financially valid A4 results permit
+the six remaining predeclared AR80/120/140/160/180/200 first attempts through
+2026-10-13, with unchanged economics/input/profiles and fresh per-run gates.
+No new-rule six/eight rebuild or return-based arm selection is authorized.
 
-The current endpoint is documentation plus ONE final matching-lane push.
-Afterward the next substantive step needs a separate exact status/terminal
-and bounded result-read freeze for this known backtest, preserving provenance,
-financial/source gates and false flags; no automatic extra QC call/job or
-return comparison from this launch. Broad new-rule six/eight work stays paused.
-Current floor344shared/260development/59infrastructure/699accepted cells,
-ONE development look booked at the first A4compile dispatch, no new cell.
-See section 347 for exact source/profile/plan/result pins, qualifications,
-corrections, per-commit dispositions, exclusions and next admissible action.
+Current floor344shared/260development/59infrastructure/699accepted cells.
+A4 was observed running, no terminal/result accepted yet; no new QC contact
+this round before the separately committed source/profile/run freeze.
+See section 348 for current scope, exact contracts, actual outcomes and
+qualification. Document progress, preserve failed/spent evidence and make
+ONE final matching-lane push at this round endpoint. All formal/PIT/master/
+paper/live flags remain false; other lanes and shared implementation frozen.
 
 Sections 137–142 retain the owner-assisted cloud diagnoses, project cleanup,
 and mutable QC 79/81 source comparisons. Their `Completed.` statuses do not
@@ -79259,3 +79258,194 @@ its ENTIRE prior byte prefix followed only by this Analyst append. No
 private/control/provider/QC/Safari/result read or backtest action followed
 the original In Progress... observation. Final diff/status/live-remote
 checks and the sole final push follow.
+
+
+---
+
+## 348. A4 terminal/results validation and conditional remaining old-six AR runs (in progress)
+
+### 348.1 Owner scope and exact starting state
+
+Owner: "Check whether A4 has completed and validate its results. If it passes,
+continue the remaining six-universe AR runs through October 13, 2026. Skip
+Claude review, document progress, and push once when done." Claude review is
+waived for this bounded results/continuation round; no independent acceptance
+is claimed. "Passes" means actual Completed. identity, source/input/profile
+continuity and the frozen financial/coverage/execution/run_valid checks;
+profitability is NOT a new gate or a reason to select/omit a predeclared arm.
+
+Exact baseline4117c1a409cb4a2c2a71c06397b40238804a5962, clean matching
+Code worktree/branch/local/tracking/live remote. ONLY
+/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2 on
+codex/strategy-analyst-revisions-v2, explicit cwd for every command/edit/test/
+commit/push; no other checkout/branch/worktree, reset/rebase/force/overwrite.
+Preserve concurrent state; stop unexplained drift. Accumulate commits and
+make exactly ONE successful final matching-lane push at the concluded round.
+
+A4 is the known project39054561/backtest007d4ab27c26d337ae53acb492a83410,
+compile251b7dbcc94a6db5740a3b83a83ec133-232313c1c0b6b9f62aae03cca921fd2f.
+A1/A2/A3/A4 launch protocols, D1 and R346 preparation/readers remain SPENT;
+none may be replayed. A new read-only results contract must be independently
+versioned, focused-checked and separately committed at an exact clean freeze
+before private DATA, credentials or QC contact. Owner instruction supplies
+current review/run sequencing authority, not technical authentication or A5.
+
+If and ONLY if A4's result is accepted within this qualified current-vintage
+research scope, execute the already prepared SIX remaining arms:
+R343-AR080,AR120,AR140,AR160,AR180,AR200. Their original profiles, sources,
+input/date window, ordering, whole-share execution, costs and validity gates
+remain unchanged. Each new candidate begins with one separately frozen A1
+and new own project/control; three-attempt default still applies and no
+automatic retry exists. No AR100 reallocation, source/price fallback,
+alternative date/name to evade a stop, changed economics or selection by
+observed return. The broad new-rule six/eight reconstruction remains paused.
+
+No funded/broker/real-order/paper/live action, new paid rights, provider/USB
+capture, other-lane/project/job changes, unbounded polling, evidence cleanup,
+marker repair, source-pin refresh, or false readiness flag is authorized.
+Use current product capacity evidence only after local gates; never interrupt
+another lane. Starting floor344shared/260development/59infrastructure/
+699accepted cells; A4's look is already booked. A result read adds no look;
+a technically accepted result cell is separate from a launch/status, and
+periods are overlapping slices, not independent new tests.
+
+### 348.2 Prospective implementation and pre-contact checks
+
+New R348 eight-leaf all-seven DATA consumer preserves fixed R346 byte pins,
+claims/control left unopened, all hash checks before private parsing, full
+held/named/native endpoint checks and normal return before credentials.
+It derives1451 evaluation sessions/302 decisions from the actual authenticated
+3466-session axis/SHA4ac84a2d01e18691a152812851857195ef56dac16b82ceb72bcf7dd068f86585.
+This extends DATA access under a NEW contract, not replay of R347's used
+operational entry or renewed preparation authority. All original selected
+source/profile vectors and historical attempt-state snapshots stay intact.
+
+New read-only A4 reader will authenticate exact current project/dedicated
+owner/access and all18 source bytes before a statistics-disabled fixed-job
+status query. Only matching Completed. allows one bounded backtests/read
+and projection to the original three legacy summaries plus period summary
+(valid runs require all four). API responses may contain unselected metadata/
+statistics fields parsed ephemerally; no claim that only selected source
+bytes were downloaded is made. No chart/order/trade/log/export/raw data/
+Object Store/capacity/mutation endpoint is in the reader scope. Missing public
+field remains qualified unknown, not a fabricated private flag. Source-read
+uses projectId ONLY and never refreshes an edit context.
+
+Native denied-network/private-artifact/USB/Keychain synthetic consumer+engine
+groundwork:84passes3.82s. No private/credential/QC call yet in this round.
+Final reader/semantic/caller contracts, source/profile/plan pins, focused
+verification and exact one-use freeze remain prospective until recorded below.
+All old v1–R347 operational code remains frozen; additions only.
+
+
+### 348.3 Exact one-shot A4 status/result read freeze (D1)
+
+Invoke ONLY the new read_arv2_r348_ar100_result.py once, candidateR343-AR100,
+from the NEXT clean commit containing this decision and all exact sources,
+with that actual40-character HEAD via --expected-head, exact caller and plan
+SHA256 below. Owner's current result-validation instruction supplies the
+scope and Claude waiver; this is not independent acceptance or launch renewal.
+
+Reader59358B/d358ba396714685a6547bcb4c2108dc78b36398c0b7f8521c2440fc112c0d5dc;
+plan39811B/165de7a174f3c4b0cf873a2aae0e434bcbee0a92f9e0c8a533526c006b8e6a9c.
+Canonical profile2702B/216da6ed4fcb55457e3eda975be84b95261304b1f1034672062a788408b02186;
+native policy9094fa182d2ae5fdecbf5aa1bc3f2faf3c9a9b44f9623b9748e903ee4eb0ab71.
+New DATAconsumer8604B/f31257edf0d7b56d968818ad59820f7ba1cf3edac4be0a620bab5e87e85682f2;
+semantic helper14530B/b4342adf1786b0312329e57156888a753cc59812690aec0097d834ad97e6d6de.
+A4 runningfact retains12469B/992caae1f839b7228d65e0aed3d320b9d210d250d889755eb855cdbce5553278.
+ParentR347plan28396B/66f305b15fcf9cfef0a4ad4b5d6b74d376384384bf540f4cd980b746c9369243.
+Selected210public sources = EXACT176 unchanged inherited pins plus34new
+explicit additions:31existing adapter/study/transport dependencies, baseline
+runningfact and two R348 modules. All32 existing additions match baseline
+4117c1a4 Git bytes; no ancestor refresh, shared source edit or old operation.
+Importing network-capable class definitions is not network authorization;
+only the new six-endpoint callsite permits contact. Pure private function-
+global copies reuse unchanged financial parsers with the exact current
+flat-source1451/302 runtime and fixed actual plain transport identity; no
+frozen module globals/registries/manifests/old operational claims are changed.
+
+New control, NOT inspected/allocated:
+artifacts/analyst_revisions_v2/legacy_six_results/R348-20261107-AR100-RESULT-A.
+Exclusive directory/claim/fsync spends this read even if no contact; partial
+allocation ambiguous/spent. No retry, alternate control, cleanup/repair or
+old control/report read. Claim precedes fresh EIGHT R346 DATA/proposal/report
+reads; all eight external hashes before private parsing, original held/named/
+native metadata/security until normal DATA guard return, then immutable data
+buffers only, then existing environment credentials. Original R346 claim is
+not opened/enumerated. Newscope never invokes a used R347 operational reader.
+Native allows only eight fixed DATA leaves, ancestor metadata and own new
+control, with writes own control/support only; USB/Keychain/securityCLI denied.
+Exact designated Darwin/POSIX Python3.13 interpreter, -I -B, native_profile and
+safe_env plus ONLY inherited QC_USER_ID/QC_API_TOKEN. Support/temp/cache under
+.pytest_cache/r348-ar100-result. Parent180s/allstages, DATAphase≤179s,
+bounded request client; uninterruptible I/O/host suspension remain limitations.
+
+Maximum SIX application requests, each once: authenticate; exact owned
+project39054561; dedicated collaborators39054561; files/read39054561 with
+projectId ONLY; backtests/list39054561(includeStatistics=false); and ONLY if
+matching A4 Completed. one backtests/read for007d4ab27c26d337ae53acb492a83410.
+No capacity/storage/raw provider/data GET, lock, file/project mutation,
+permissions, compile/launch, logs/charts/orders/trades/export endpoint.
+The API's full bounded JSON may include unselected metadata/results parsed
+ephemerally before retaining the selected strings; no "no other bytes read"
+claim. Fixed CA/TLS/client authentication and selected source checks remain;
+native allowed ports are not a whole-host/whole-interpreter domain sandbox.
+
+Current project/dedicated owner must match fixed organization/owner pins,
+libraries/live-deployment predicates and explicit privacy contradictions.
+An absent public field stays unknown. General owner-only or owner plus ONE
+strict UIDnull/A4-name own technical row is readable; names alone never grant
+write access. No A4 edit-context renewal/adoption. Exact all18 current source
+bytes and metadata vector2775B/71857bac63298b6b9dd4221ffc180ca4a59f10574edd109220a335d9370a232c
+(sourcebyte total417652) precede any status/outcome request. Require sole
+known history entry/name/backtest and matching compile when supplied.
+Pending/Runtime Error/unknown identity refuses and retains finite known
+status; it never reads results or renews A4. Missing compile field in the
+result is bound by exact original launch fact plus fresh current source/
+known job; it is not a newly invented compile identity.
+
+If Completed., retain only original canonical META/AGGREGATES/DIAGNOSTICS
+and, for valid runs, PERIODS. Each original string is separately fsynced in
+the new journal BEFORE semantic checks, hard per-event bound; invalid run_valid
+false may legitimately emit only the three legacy strings. Source/input
+profile, actual plain package1ab48... and activationffdc... META, ancestral
+profile411c... and unchanged role/hash are checked distinctly, not relabeled.
+All1451 sessions/302decisions, fills/cancels/invalids, exact modeled/actual
+fees, cash/settlement/gross/tracking and fallback/coverage censuses must pass.
+DIAG hash, annual/current geometry and actual arm precede only the private
+label normalization already used by the frozen score-floor1 parser.
+All five ordered same-job period boundaries/account returns/legacy path
+and profile digests validate. Subperiod daily paths/volatility/drawdown
+are NOT independently recomputed without raw daily rows. These overlapping
+slices are not independent cells or pristine as-of history.
+
+Actual integer0 AND exact original canonical one-LF output/report pin/D1
+bindings/source/input/job/accepted+run_valid semantic flags are mandatory.
+Pure validate_original_stdout handles only ORIGINAL captured bytes+observed
+exit, no artifact reader; it is output self-consistency, not independent
+process/disk/cloud attestation. Actual2 retains only unaccepted finite
+evidence, including request/response/selected-result truth separately; no
+fabricated zero or invented cause. Report-looking output after a late
+source/control/close failure stays inadmissible. Output≤64KiB, semantic
+projection≤16KiB. Preserve raw selected aggregate strings once; never raw
+exceptions, credentials, unselected metadata or licensed/provider rows.
+Result reading adds no look. A qualified accepted parameter cell is booked
+externally ONLY after original exit/output acceptance, not from status alone.
+
+Final pre-D1 focused selection251distinct passes5.90s (all new DATA/engine/
+semantic/reader/prospective-caller +record/redaction). Earlier84passes3.82s,
+83passes4.93s and77readerpasses0.17s are overlapping subsets, not additive.
+One cold native-all-network/artifact-denied -I source bootstrap authenticated
+all210selected FD/byte/native pins and normal-returned, importing real
+consumer/semantic/transport without private/contact. All202selected Python
+files compiled in memory; other eight selected JSON pins checked, no bytecode.
+No full suite. Source-vs-vector byte-count distinction, result-read truth
+flags, bounded per-stat journal and small semantic projection were corrected
+prospectively before use; no actual output was discarded to learn these.
+
+The remaining-arm engine/caller/tests are prospective groundwork in this
+clean commit. A4_RESULT_FACT_PIN is deliberately None and preflight refuses
+before private DATA/contact; NO remaining-arm run freeze or factual A4
+acceptance exists yet. Only actual D1 acceptance can select its genuine fact
+under a later exact committed continuation freeze. All sources used by D1
+become frozen; any later defect needs a separately versioned correction.

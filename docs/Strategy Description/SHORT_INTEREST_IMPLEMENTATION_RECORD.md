@@ -1,35 +1,30 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE (WINDOWS SESSION) HAS READ THE CODE OF THE 48 COMMITS
-`4be7c1e..7e5f079` (SECTION 158). NO P0/P1. CORRECTION COMMIT `36ef4fd1` FIXES
-BUGS THE EARLIER REVIEWS LEFT OPEN OR MISSED: THE SOURCE LEASE NOW REFUSES THE
-FLOORLESS EIGHT-PART PLAN (SI-CR27-008 NARROWED: WIRING THE NINE-PART PLAN AND
-A COMPLETE OPERATIONAL CATALOGUE STILL NEED THE NEWLY FROZEN PROTOCOL OF
-SECTION 141.2), THE CHECKPOINT LOADER NOW REFUSES A RETAINED START NO ATTEMPT
-CHARGES AND TAKES RETRY LEGALITY FROM THE SEALED RECEIVED RECORD, THE MAIN
-RECEIPT KEEPS ITS PRIMARY REFUSAL, STALLED GIT CALLS ARE BOUNDED, AND THE WINDOWS
-LANE COLLECTS AND NO LONGER HANGS. THESE PRODUCTION CHANGES RAN ON THIS HOST ONLY
-UNDER LOCAL STUBS FOR resource AND fcntl: THEIR TEST FILES STILL NEED A MACOS RUN.
-THE LANE STOPS ON AN OWNER QUESTION: WHERE EXISTING FIRSTRATE LICENCE,
-ENTITLEMENT, PURCHASE OR DOWNLOAD EVIDENCE FOR THIS ARCHIVE IS SAVED. UNTIL A
-LOCATION IS SUPPLIED AND AUTHENTICATED, SOURCE-ROW EXTRACTION AND ADMISSION,
-PROVIDER RECOVERY AND ANY EMPIRICAL RUN STAY STOPPED. THE USB EVIDENCE IS
-HISTORICAL METADATA ONLY AND ADMITS NO SOURCE, ROW, INPUT OR BACKTEST.
-PRIOR COUNT RUN 13448 UNRESOLVED (SI-BUILD-20261028-052 OPEN). SOURCE DISPATCH
-BLOCKED IN CODE ON ALL THREE DURABLE-COUNT ENTRY ROUTES, WITH NO CALLER RELEASE.
-84005 CUMULATIVE COUNT STARTS / UNCHANGED 4GiB CEILINGS; THE PERMANENT
-UNKNOWN-RUN DEBIT 8 START / 16777216 BYTES STAYS CHARGED; THE PRIOR BASELINE
-13992 START / 23452681 CHARGED BYTES IS NOT A VERIFIED CURRENT BALANCE, AND
-PERMANENT FULL-PAGE ACCOUNTING WOULD ALLOW AT MOST 2036 NEW SLOTS FROM THAT
-BASELINE, NOT A RELEASE. ALL OLD CLAIMS, NEGATIVES, RECEIPTS AND CHARGES REMAIN
-SPENT/IMMUTABLE; NO OLD FILE IS ADOPTED. LOCAL BACKTEST READINESS FALSE; NOT
-PRE-QC READY. QUANTCONNECT PAUSED BY OWNER. NO QC/SAFARI/MIA, INCLUDING
-CAPACITY/METADATA, SETUP, UPLOAD, COMPILE OR JOB. TWO HISTORICAL QC METADATA
-REQUESTS REMAIN ACCOUNTED FOR. NO PURCHASE, NEW TERMS/CREDENTIAL, BROKER/
-OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDER OR TRADING ACTION. NO
-OUTCOME JOIN OR BACKTEST. CANONICAL ACTUAL LOOKS 0/0, EXPLORATORY ACTUAL LOOKS
-0, ALPHA 0, PERMANENT LOOK IDS NONE, QC LAUNCH ATTEMPTS0. CODEX COUNTER-REVIEW
-OF THIS ROUND, INCLUDING A MACOS RUN OF ITS CHANGED TEST FILES, IS NEXT.**
+Status: **CODEX COUNTER-REVIEW OF ALL FOUR CLAUDE COMMITS THROUGH
+f17b68d30e25d1960bc9ae41108b947d87ec1566 IS COMPLETE (SECTION 159), ACCEPTED
+AFTER TWO APPENDED P3 RECORD QUALIFICATIONS. NO ADDITIONAL PRODUCTION DEFECT
+WAS CONFIRMED. THE CHANGED COUNT/RECEIPT CONTRACTS NOW HAVE 451 FOCUSED MACOS
+PASSES FROM A READ-ONLY REVIEWER; MAIN'S TRACE/IMPORT/RECORD SELECTION PASSED
+269 PLUS TWO SEPARATE REAL-SANDBOX CASES. FABRICATED CHECKS DO NOT ADMIT SOURCE
+DATA. THE ONE BOUNDED HISTORICAL WORKER-CLEANUP FIELD AUTHENTICATION DID NOT
+QUALIFY; ITS NEGATIVE AND UNKNOWN CAUSE ARE PRESERVED, NOT RETRIED OR
+REBASELINED. THE OWNER'S EXISTING FIRSTRATE RIGHTS/PROVENANCE DOCUMENT-LOCATION
+QUESTION REMAINS PENDING. SOURCE-ROW EXTRACTION/ADMISSION, PROVIDER RECOVERY
+AND EMPIRICAL RUNS STAY STOPPED; RETAINED USB EVIDENCE IS HISTORICAL METADATA
+ONLY. SI-BUILD-20261028-052 AND THE NINE-PART OPERATIONAL WIRING/CATALOGUE GATE
+REMAIN OPEN; EVERY DURABLE SOURCE-DISPATCH ROUTE STILL REFUSES IN CODE.
+COUNT 84,005 CUMULATIVE STARTS / 4 GiB, INCLUDING PERMANENT UNKNOWN 8 START /
+16,777,216 BYTES, AND SEPARATE DAILY RESIDUAL BUDGETS REMAIN FIXED. HISTORICAL
+BALANCES ARE NOT A CURRENT SOURCE-BUDGET AUDIT. ALL OLD DATA, CLAIMS, NEGATIVES,
+RECEIPTS AND CHARGES STAY IMMUTABLE; NO OLD FILE IS ADOPTED. LOCAL BACKTEST
+READINESS FALSE; NOT PRE-QC READY. QUANTCONNECT PAUSED BY OWNER INCLUDING
+CAPACITY/METADATA. NO QC/SAFARI/MIA, PURCHASE, NEW TERMS OR
+CREDENTIAL, BROKER/OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE OR ORDER ACTION.
+NO OUTCOME JOIN OR BACKTEST. CANONICAL ACTUAL LOOKS 0/0,
+EXPLORATORY ACTUAL LOOKS 0, ALPHA 0,
+PERMANENT LOOK IDS NONE, CURRENT QC LAUNCH ATTEMPTS0; TWO HISTORICAL QC
+METADATA REQUESTS REMAIN SEPARATELY ACCOUNTED FOR. NEXT: AUTHENTICATE THE
+OWNER'S IDENTIFIED EXISTING RIGHTS/PROVENANCE EVIDENCE BEFORE SOURCE ADMISSION.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -275,6 +270,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-05 | Codex USB inspection publication (row added by Claude review, `SI-CR28-009`) | `2bf26233f7719f8c42bd03277fe142ff8d4584e9` .. `97cc10e7c421923fe9d57035f36b9729da59c6e5`, seven commits, one non-force push first seen at 06:48:09 UTC | Sections 150-156: synchronized code-read trace, one offline USB byte inspection, one retained metadata bridge and the owner-input gate | Historical metadata only; no source, row, input or backtest admission | Codex's own attributed counts in sections 150-156. **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | `SI-USBONCE-20261104-001`..`-007` and `SI-USBRETAIN-20261104-001`..`-005` per Codex; `SI-BUILD-20261028-052` unchanged | Owner evidence location |
 | 2026-11-05 | Claude review + test corrections (macOS session) | `219b701` -> `97cc10e` reviewed after the push watcher fired; **correction commit `f52a18a78e1842bf100f581e8c9c54018b6b98ee`**; this record commit follows, so the round has two Claude commits, published in one push | Independent review of Codex sections 148-156 | 9 dispositions; recorded hashes and anchor relationships recomputed from Git; no production defect; test-only corrections, each mutation-verified (new scripts: 32 of 157 mutants caught before, 129 after) | Final tree: 629 + 91 + 2 focused tests passed; 98 passed after this record; network and private paths denied, 2 real-sandbox tests under their own denial. No full lane suite (owner direction). **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | No P0/P1. `SI-CR28-001` P2 and `-002`..`-006`, `-009`, `-011`..`-019` P3 fixed; `-007`, `-008`, `-010`, `-020`..`-023` P3 open. `SI-CR27-008` and `SI-BUILD-20261028-052` unchanged. | Codex counter-reviews this round; the owner answers the evidence-location question |
 | 2026-11-05 | Claude review + corrections (Windows session) | `4be7c1e` -> `7e5f079` reviewed after a fast-forward; **correction commit `36ef4fd116ee022c8ee474a65b9028ee50374b04`**; this record commit follows, so the round has two Claude commits | Independent code read of everything since section 132: the 44 Codex commits and the macOS session's four | Three read-only reviewers and the lead read the production code; every reported finding was checked against the code before any fix; each production fix has a regression that fails without it | Windows, on the corrected tree: 32 test files 599 passed, 1,080 skipped, 0 failed, no hangs; lane collection 6,561 tests, 0 errors; 27 of 27 mutations caught; **95 passed, 3 skipped** after this record. The loader, receipt and driver test files ran only under local stubs for `resource` and `fcntl`, so their macOS run is owed. No full lane suite (owner direction). **Canonical actual looks 0/0, exploratory 0, alpha 0, QC attempts 0.** | No P0/P1. `SI-CR29-001`..`-004` P2 fixed; `-005`..`-008` P3 fixed; `-009` P3 open (spent, pinned code). `SI-CR27-008` narrowed; `SI-BUILD-20261028-052` unchanged. | Codex counter-reviews this round and runs the changed test files on macOS; the owner answers the evidence-location question |
+| 2026-11-07 | Codex counter-review of both Claude rounds | Exact pushed range `97cc10e7c421923fe9d57035f36b9729da59c6e5..f17b68d30e25d1960bc9ae41108b947d87ec1566`; this record-only commit follows, one matching-lane push at completion | Section 159: all four commits accepted after append-only P3 record qualifications; no production change | Verified floor, sealed accounting, receipt diagnostics, timeout and cleanup vetoes; retain scratch-clone attribution erratum and unverified historical field | Delegated production 451 passed / 16.57 s; Main 269 passed / 22.65 s plus 2 real-sandbox passes / .46 s; RAM reversals restored; no full suite or source operation | SI-CCR-20261107-001 and -002 closed by record qualifications; 052, factual rights gate and historical-field authentication remain unresolved | Owner identifies existing rights/provenance documents; no QC/Safari, downloads or input admission |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -33749,3 +33745,163 @@ QC attempts 0.
 3. The owner's section-156 question still stands: where is the FirstRate licence, entitlement, purchase or download evidence saved?
 
 This push moves the head, so no earlier exact-HEAD binding carries over; none is pending.
+
+## 159. Codex counter-review of both Claude rounds (2026-11-07)
+
+### 159.1 Exact snapshot, scope and dispositions
+
+The owner identified the new commits as Claude's review and explicitly asked
+Codex to counter-review. The designated physical/Git root remains
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest`,
+branch `codex/strategy-short-interest`. Initial clean local HEAD was
+`7e5f07997cffc15bf3c193891a2e1f00c5b82c51`; the matching actual remote was newer.
+A matching-ref-only, no-tags/no-submodules fetch and fast-forward deliberately
+synchronized to `f17b68d30e25d1960bc9ae41108b947d87ec1566`, equal to tracking
+and actual origin before review. No other ref, checkout, branch, reset, rebase
+or history rewrite was used.
+
+The complete ordered review range is
+`97cc10e7c421923fe9d57035f36b9729da59c6e5..f17b68d30e25d1960bc9ae41108b947d87ec1566`.
+Main and three read-only subagents divided the complete commit diffs, final
+production context, failure-direction tests and records. Delegated validation
+below is separately attributed; it is not independent Claude review of Codex.
+
+| Exact Claude commit | Codex disposition and reason |
+| --- | --- |
+| f52a18a78e1842bf100f581e8c9c54018b6b98ee | Accepted. Test-only changes reach the named checks by re-signing dependent wrappers/receipts; bootstrap fixtures use their fabricated ROOT; no valid assertion was weakened. |
+| 7e5f07997cffc15bf3c193891a2e1f00c5b82c51 | Accepted after the append-only process qualification in 159.2. Its historical process/data assertions remain Claude-attributed or Main-attested as originally labelled, not a new private-evidence audit. |
+| 36ef4fd116ee022c8ee474a65b9028ee50374b04 | Accepted. No further confirmed production defect. The floor check precedes context/storage/claim/key entry; exact catalogue, producer/claim/received/hash/retry bindings match the original serializers; failed receipt capabilities stay failed while primary diagnostics survive cleanup. Git timeouts and worker cleanup vetoes remain fail-closed. |
+| f17b68d30e25d1960bc9ae41108b947d87ec1566 | Accepted after the wording qualification in 159.2. Its Windows-stub limitations remain explicit; actual macOS fabricated tests are now attributed below. The historical worker cleanup-field request is not falsely marked satisfied. |
+
+No implementation milestone or source gate was released. The six changed
+production scripts and all test/software bytes remain exactly the reviewed
+Claude tip; this counter-review changes only this lane record.
+
+### 159.2 P0-P3 ledger and retained errata
+
+No new P0, P1 or P2 code defect was confirmed.
+
+| ID | Priority | Status | Commit/location and evidence | Disposition/correction and reason |
+| --- | --- | --- | --- | --- |
+| SI-CCR-20261107-001 | P3 | Closed by this record qualification | 7e5f0799,157.5 explicitly attributes on-disk mutation runs to scratch clones. The owner's hard lane rule requires every validation from the designated existing worktree. | Preserve the original historical counts and methodological description; they are Claude-attributed evidence, not proof of compliance with the same-worktree rule. This round's checks and RAM-only reversals ran solely in the designated lane. No clone or side worktree was created. |
+| SI-CCR-20261107-002 | P3 | Closed by this record qualification | f17b68d3, SI-CR29-009 begins with a blanket Confirmed label, while subitem(d)'s result-level interpretation is expressly probably/unverified. | The suspected native result-level interpretation remains an OPEN UNVERIFIED concern, not a confirmed defect. Retain the separately statically checkable executable-path-versus-binary hash limitation. No unverified parser rewrite or actual native trace was performed. |
+
+SI-CR29-001's Windows collection guard and markers preserve the macOS
+assertions; static import-graph coverage is not proof of every Windows runtime
+path. SI-CR29-002 narrows the floorless-plan issue but does not finish the
+nine-part operational wiring or authorize replacing 052. SI-CR29-003..005's
+catalogue and sealed-record checks are accepted, including conservative
+unknown-body charges. SI-CR29-006's skipped re-audit of an already-latched
+component never revives it: the receipt remains failed and later validation
+refuses. SI-CR29-007's bounded Git calls are prospective software behaviour,
+not proof that any old deadline or invocation succeeded.
+
+A considered false alarm was rejected: the closed source-free child interval
+may carry its genuine expected StopBeforeSnapshot negative in first_failure.
+That controlled stop is distinct from a later unexpected cleanup failure,
+which SI-CR29-008 correctly vetoes. Do not require the expected original stop
+to disappear to make that software test pass.
+
+All prior open items remain as 157-158 qualified them, including052,
+SI-CR27-008's operational remainder, spent-code concerns and source/rights/
+coverage gates. Historical trace/USB code changes do not rewrite any original
+proof, pin, negative or closure; no earlier exact-HEAD operation is replayed.
+
+### 159.3 Current-lane fabricated validation
+
+All checks below ran from the same designated worktree on exact f17b68d3.
+No complete lane or repository suite ran. Tests use fabricated inputs; passes
+prove their asserted software behaviour, not source fitness, custody history,
+rights, market edge or readiness.
+
+| Executor/check | Actual result and boundary |
+| --- | --- |
+| Read-only production reviewer: count checkpoint, durable capture, native Main receipt, lane guard, native anchor cache and Windows collection guard (six files) | 451 passed in 16.57 s on macOS, OS network denied; no private/source/USB operation. This is delegated verification, not a Main rerun. |
+| Main: code-read actor/interval, import boundary, counter-review record and active documents | 269 passed, 2 deselected in 22.65 s; network and USB/retained USB-report reads denied, repository artifact data reads denied. |
+| Main: the two deselected real-sandbox capability tests | 2 passed in 0.46 s outside the outer sandbox; their actual child profiles independently deny networking. Only fabricated local files and matching local Git metadata were used. |
+| Read-only test reviewer: selected f52 changed/additional behavioural cases | 127 passed, 331 deselected in 4.95 s, OS network denied. Windows static collection guard separately2 passed in 1.79 s; this overlaps the production reviewer's file and is not added into a unique-test total. |
+| Test reviewer, RAM-only packet-denial predicate removal | 1 expected failure, 94 deselected/.63s; finally-restored original case 1 passed/.40s. No source file changed. |
+| Main, RAM-only negative-exposure-floor removal | The full fabricated source-lease regression failed as expected:1 failure/.43s, reaching a forbidden floorless lease. Finally-restored original1 passed/.10s. |
+| Main, RAM-only exact-membership removal | All four orphan-file cases failed as expected:4 failures/.19s, then finally-restored4 passed/.10s. |
+| Main, all changed Python source/test files | 25 files parsed and compiled in memory. The source-dispatch gate and committed historical USB anchor are byte-identical to97cc10e7; whitespace passed. |
+
+Main's first outer sandbox denied even metadata on the repository artifacts
+directory; pytest's collection-directory stat therefore failed before tests
+ran (exit 4, one collection error). The corrected test harness permits that
+directory metadata but continues denying artifact DATA reads, USB reads and
+networking. This is an explicitly retained harness setup error, not a
+production failure or permission to access protected rows. No test predicate
+or production guard was changed to obtain the passing result.
+
+### 159.4 Bounded historical cleanup-field authentication did not qualify
+
+SI-CR29-008 asked whether the original spent v2 worker report had an empty
+cleanup_failures list. Main attempted ONE read-only check of the FIXED original
+`/Users/sheltonchen/Library/Application Support/CodexShortInterestCodeReadAttribution/code-read-20261104-v2/report.private.json`, not a source
+archive or new trace. It required the original directory-identity hash,
+original ten-field file-stamp hash, 118264 bytes and original raw SHA256
+`391fcd8f5b69528affa42fe7bbb23d90f81dfc64ce4d6469d19e78afae7c2b5d`
+before accepting that single nested worker field. Networking, USB and writes
+were OS-denied.
+
+The actual checker exited 2 and emitted only
+original_report_bytes_and_stamp_authenticated=false,
+historical_field_not_admitted=true and source_authority=false. Its generic
+negative did not retain the failing stage or errno, so the exact reason is
+UNKNOWN. It does not establish a changed stamp, missing file, permission
+failure, corruption, actor or nonempty cleanup list. Main did not rebaseline,
+retry/reopen to guess, rerun the trace, request sudo or substitute another file.
+
+Consequently the nested worker cleanup field remains UNVERIFIED in this
+counter-review. The owner's previously supplied OUTER v2 terminal packet has
+cleanup_failures=[], but that is not silently substituted for the nested
+worker field. The original Main-attested historical observation remains
+labelled historical/attested; no fresh live closure or source authority is
+claimed, and this negative authentication attempt is retained here. The
+prospective software veto and its passing macOS regression are accepted
+independently of this unresolved historical-field audit.
+
+### 159.5 Handoff, exclusions and single publication
+
+The source dispatch gate still refuses unconditionally on all durable routes.
+Count 84,005 cumulative STARTs/4,294,967,296 bytes remains fixed, including the
+permanent unknown 8 START/16,777,216-byte charge; no old claim, refusal, raw
+body, unknown reservation or receipt is reset/refunded/adopted. Separate DAILY
+residual 36,837 attempts/3,327,988,047 bytes/71,468,572 rows is unchanged.
+Historical balances are not presented as a current source-budget audit.
+
+The USB mount/archive was observed present during the owner's reconnect
+notice; that presence is not custody, identity, rights or usability proof.
+This round did not open the USB archive, extract source rows or run a model.
+The existing FirstRate rights/acquisition-provenance evidence-location question
+remains pending; no new approval phrase or broad permission can create those
+facts. No source-row extraction/admission, provider recovery, empirical run,
+actual outcome join, S1/ranking/strategy evaluation, QC/Safari/Mia, purchase,
+new terms/credentials, email, other lane, broker/operator DB, deployment,
+paper/live/real order or scheduler change occurred.
+
+Canonical looks 0/0, exploratory 0, alpha 0, permanent look IDs none and current
+QC launch attempts 0. Historical QC metadata requests remain separately
+accounted for. Local backtest readiness remains FALSE; not pre-QC ready.
+
+The next authorized factual step is protected review of the owner's identified
+EXISTING FirstRate rights/provenance documents; the public source gate and
+historical-field authentication limits remain explicit. No new implementation
+milestone begins through this owner-input gate. Preserve all historical rows;
+this section and the current-status/publication index are the only record
+updates. No active operation or unknown process remains in this round.
+
+At completion, verify physical/Git roots, branch, exact HEAD/status and actual
+matching origin immediately before this documentation commit and the ONE
+successful nonforce matching-lane push, with follow-tags/submodule pushes
+disabled. Stop on concurrent advancement; never overwrite Claude. The record
+commit's full hash is reported after publication, without a recursive rewrite.
+No other monitor is changed or new monitor armed.
+
+The first post-record check had88 passes/1 failure because the new status
+summary omitted the existing literal pause/accounting assertions; the valid
+regression was retained and those explicit status tokens restored. The
+historical-body check also caught one inserted blank before the new index row;
+it was removed without changing any historical row or assertion. Final
+post-record active-document/counter-review selection: 89 passed in .87 s.
+Historical-body comparison and whitespace passed; no software bytes changed.

@@ -277,6 +277,32 @@ def _source_current(identity):
         need(hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest, "source_refused")
 
 
+def _directory_ancestors(path):
+    """Metadata only: include firmlink/mount aliases that resolve() leaves lexical."""
+    identities = {}
+    for ancestor in (path, *path.parents):
+        try:
+            info = ancestor.stat()
+        except FileNotFoundError:
+            continue
+        except OSError:
+            raise AuditRunnerError("source_refused") from None
+        need(stat.S_ISDIR(info.st_mode), "source_refused")
+        identities[ancestor] = (info.st_dev, info.st_ino)
+    return identities
+
+
+def _disjoint_runtime_directories(directories, protected):
+    paths = {path: _directory_ancestors(path) for path in (*directories, *protected)}
+    for directory in directories:
+        for path in protected:
+            need(not (path.is_relative_to(directory) or directory.is_relative_to(path)), "source_refused")
+            directory_id, protected_id = paths[directory].get(directory), paths[path].get(path)
+            need(not (directory_id is not None and directory_id in paths[path].values())
+                 and not (protected_id is not None and protected_id in paths[directory].values()),
+                 "source_refused")
+
+
 def policy(python=None, *, sources=()):
     executable = Path(python or sys.executable).resolve()
     targets = [executable]
@@ -293,12 +319,10 @@ def policy(python=None, *, sources=()):
     directories = (Path("/System/Library"), Path("/usr/lib"), Path("/usr/share"),
                    Path("/private/var/db/dyld"), Path(sys.base_prefix).resolve(),
                    Path(sys.executable).parent.parent.resolve(), Path("/usr/share/zoneinfo").resolve())
-    # A subtree grant covers everything beneath it. An interpreter installed
-    # directly under the home directory or the lane root would otherwise turn
-    # the exact DATA allowlist below into read access to every retained input.
+    # Runtime subtrees must neither cover nor sit inside protected DATA trees.
+    # Physical ancestry also catches macOS data-volume aliases of those trees.
     protected = tuple(path.resolve() for path in (ROOT, stable.PRIVATE_CUSTODY_ROOT, *FILES))
-    need(not any(path.is_relative_to(directory) for path in protected for directory in directories),
-         "source_refused")
+    _disjoint_runtime_directories(directories, protected)
     leaves = (*fixed_input_paths(), *(ROOT / name for name in sources), *targets,
               Path("/dev/null"), Path("/dev/urandom"), Path("/dev/random"),
               Path("/etc/localtime"), Path("/private/etc/localtime"))

@@ -34,6 +34,68 @@ def test_unrelated_interpreter_prefix_keeps_the_native_denials(monkeypatch):
     assert "(deny file-read-data)" in policy and "(deny network*)" in policy
 
 
+@pytest.mark.parametrize("attribute", ("base_prefix", "executable"))
+@pytest.mark.parametrize("nested", ("lane-data", "custody-epoch", "fixed-input"))
+def test_interpreter_prefix_inside_a_protected_tree_cannot_grant_extra_data(monkeypatch, attribute, nested):
+    prefix = {"lane-data": m.ROOT / "artifacts" / "invented-other-epoch",
+              "custody-epoch": m.stable.PRIVATE_CUSTODY_ROOT / "invented-other-epoch",
+              "fixed-input": m.SHARADAR / "invented-runtime"}[nested]
+    value = prefix / "bin" / "python" if attribute == "executable" else prefix
+    monkeypatch.setattr(m.sys, attribute, str(value))
+    with pytest.raises(m.AuditRunnerError, match="source_refused"):
+        m.policy(sources=m.OWN)
+
+
+@pytest.mark.parametrize("attribute", ("base_prefix", "executable"))
+@pytest.mark.parametrize("location", ("lane", "nested-lane", "nested-custody"))
+def test_data_volume_runtime_alias_cannot_bypass_protected_directory_identity(monkeypatch, attribute, location):
+    original = {"lane": m.ROOT, "nested-lane": m.ROOT / "artifacts" / "invented-runtime",
+                "nested-custody": m.stable.PRIVATE_CUSTODY_ROOT / "invented-runtime"}[location]
+    prefix = m.Path("/System/Volumes/Data" + str(original))
+    value = prefix / "bin" / "python" if attribute == "executable" else prefix
+    monkeypatch.setattr(m.sys, attribute, str(value))
+    with pytest.raises(m.AuditRunnerError, match="source_refused"):
+        m.policy(sources=m.OWN)
+
+
+def test_runtime_directory_metadata_refuses_a_regular_file(tmp_path):
+    path = tmp_path / "invented-runtime"
+    path.write_bytes(b"invented")
+    with pytest.raises(m.AuditRunnerError, match="source_refused"):
+        m._directory_ancestors(path)
+
+
+def test_runtime_directory_metadata_failure_is_finite(monkeypatch, tmp_path):
+    path = tmp_path / "invented-runtime"
+    original = m.Path.stat
+    def refused(self, *args, **kwargs):
+        if self == path:
+            raise PermissionError("PRIVATE PATH AND ACCOUNT")
+        return original(self, *args, **kwargs)
+    monkeypatch.setattr(m.Path, "stat", refused)
+    with pytest.raises(m.AuditRunnerError) as caught:
+        m._directory_ancestors(path)
+    assert str(caught.value) == "source_refused"
+
+
+@pytest.mark.parametrize("relation", ("covers", "nested", "shared-ancestor-only"))
+def test_runtime_physical_ancestry_checks_endpoints_not_a_common_root(monkeypatch, relation):
+    runtime, protected = m.Path("/invented-runtime"), m.Path("/invented-private")
+    root = m.Path("/")
+    runtime_chain = {runtime: (1, 10), root: (1, 1)}
+    protected_chain = {protected: (1, 20), root: (1, 1)}
+    if relation == "covers":
+        protected_chain[m.Path("/invented-private-parent")] = (1, 10)
+    if relation == "nested":
+        runtime_chain[m.Path("/invented-runtime-parent")] = (1, 20)
+    monkeypatch.setattr(m, "_directory_ancestors", lambda p: {runtime: runtime_chain, protected: protected_chain}[p])
+    if relation == "shared-ancestor-only":
+        m._disjoint_runtime_directories((runtime,), (protected,))
+    else:
+        with pytest.raises(m.AuditRunnerError, match="source_refused"):
+            m._disjoint_runtime_directories((runtime,), (protected,))
+
+
 def _launched(monkeypatch, value, *, identities=(IDENTITY, IDENTITY)):
     remaining = iter(identities)
     monkeypatch.setattr(m, "_identity", lambda *_: next(remaining))

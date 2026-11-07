@@ -1,15 +1,12 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 375 (CLAUDE, WINDOWS SESSION, CODE-ONLY) REVIEWS `f99c66eb..19060da1`. THE
-RETAINED PIT AUDIT CODE IS ACCEPTED AFTER CORRECTIONS IN `c77e9fb9`: THE RUNNER'S SANDBOX POLICY NO
-LONGER GRANTS AN INTERPRETER PREFIX COVERING THE LANE OR CUSTODY ROOTS, ACTION CATEGORIES COUNT
-DIRECTIONAL CODES, THE CONVENTION TEST ACCEPTS AUTOCRLF CHECKOUTS, AND 32 UNPINNED MODULE GUARDS
-ARE PINNED. THE RUNNER'S FILESYSTEM AND WORKER PATHS WERE READ, NOT EXECUTED, ON THIS HOST; CODEX
-COUNTER-REVIEW AND A NATIVE MACOS RUN OF THE TWO NEW REVIEW FILES ARE NEXT. A RERUN OF THE AUDIT
-WILL PRODUCE A NEW RESULT HASH. EXISTING 15 OPEN P2s RETAINED; NO OPEN P0/P1. THE REGISTERED
-SHARADAR SUBSCRIBER EMAIL IS STILL UNCONFIRMED AND NO ARCHIVE SAMPLE EXISTS. NO PURCHASE, QC,
-PROVIDER REQUEST OR FROZEN SOURCE CHANGE IN THIS ROUND; LOOKS 0/0/0. NOT BACKTEST-READY. NO
-FUNDED/PAPER/LIVE/CAPITAL/REAL-ORDER/TRADING AUTHORITY.**
+Status: **376 COUNTER-REVIEWS BOTH PUSHED CLAUDE COMMITS; THE REMAINING
+RUNTIME-PREFIX/PHYSICAL-ALIAS ISOLATION DEFECT IS CORRECTED WITH12 RED
+REGRESSIONS AND288 FOCUSED PASSES.229 BOUNDARY CHECKS PASS NATIVELY.
+THE AUTHORIZED RETAINED-COVERAGE/ARCHIVE FEASIBILITY AUDIT FOLLOWS ONLY
+ON THE CLEAN COMMITTED CORRECTION. SHARADAR NOW CONFIRMS ITS HISTORICAL
+ARCHIVE IS UNAVAILABLE AND ACCOUNT IS VERIFIED. NO PURCHASES OR QC.
+FIFTEEN CARRIED P2s/PRIOR RESOLVED SCOPES REMAIN; NOT BACKTEST-READY.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -336,6 +333,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-04 | Codex counter-review only | `2d0972d690ba7fe22e537628a561ba7977e056ff..f99c66eb1f7f428190e7cf1b868f4f015bdc03f2`; correction `cf82f573e4d3a76fcaa44ecf7fa0b6d4c6ae4c90`, separate372 handoff | Review249dcb9d, ee818ad6 and f99c66eb individually; no next milestone | Accepted after CRLF fixture correction and append-only qualifications371. All12 accession+CIK/6 form/4 naive timestamp guarantees independently confirmed from hash-authenticated receipt; original failed claims and source images unchanged. | Observed536 focused PASS/1 skip/21 warnings under strict denial;102 platform/EXACT PASS with inherited network/security denial and fork allowed. Genuine fixture RED1/GREEN, two helper mutants caught; final record/import checks below. No full suite or historical replay. |15 carried P2s OPEN; new IBWIN-CCR37101 P3 RESOLVED in cf82f573; all seven369 P3 groups retained with precise dispositions | Genuine historical archive/PIT/population evidence remains missing. Vendor-reply, purchase and QC holds stay active; monitors disarmed. Exactly one final matching-lane push after372. |
 | 2026-11-04 | Codex Sharadar archive follow-up and retained PIT evidence audit | Clean9b12e0eb ->9aa1a4fe ->c2d34967 ->ab7eb151; separate374 handoff, incoming EMPTY | Existing-thread Sharadar reply and source-bound read-only audit; existing inputs only, no QC/purchases | One reply sent/read back; supplier again asks subscriber email, no sample. First two read-only observations FAILED/preserved; corrected15.439s audit PASS accounts74,150/698,455 metadata rows,12 controls/11 issuers, current candidates8 single/3 multiple/1 none and309 action discovery rows. No PIT/source/public-known-by/rights/population promotion. | Final181 focused PASS1.41s; preactivation229 boundary/platform PASS25.53s; native exact-leaf/alias canary, RED/GREEN and physical/CJA reversals, compiled/frozen hash checks. Final document checks below; no full suite. |15 carried P2s and seven369 P3 groups OPEN at exact scopes; IBPIT-READ-37301 correctedab7eb151, diagnostic observability37302 correctedc2d34967. Historical facts remain missing. | Owner's registered Sharadar email is required to unblock supplier verification; qualify a genuine historical sample if supplied. No inferred purchase, QC, extra provider query, alias capture retry or monitor rearm. One final matching-lane push after374. |
 | 2026-11-05 | Claude review (Windows session) and corrections | `19060da1` -> `c77e9fb9` -> this review record | Code-only review of `f99c66eb..19060da1` (six commits, zero merges): the retained PIT audit module and runner, finite failure diagnostics, the basename fix, and the CRLF fixture correction | Fixed a fail-open interpreter-prefix read grant in the runner's sandbox policy, the action-category mapping, the convention test's raw-byte comparison on autocrlf checkouts, and 32 unpinned module guards. Full detail in section 375, including the required 1-10 rating. | Under process-level network denial: focused selection 231 passed, 45 skipped, 1 harness artifact that passes without the harness; module mutants 43 of 47 and runner mutants 19 of 20 caught, survivors redundant; no full lane or repository suite, per owner direction. The runner ran under import stand-ins here, and its filesystem and worker paths were read, not executed. No SEC, provider, QC, credential, custody, or trading access; **0 research looks**. | All code commits accepted, `9aa1a4fe` after correction; the 15 open P2s are unchanged and no P0/P1 is open. | Codex counter-reviews and runs the two new review files natively; substantive blockers unchanged from 374. |
+| 2026-11-07 | Codex counter-review and retained-coverage audit scope | 19060da12a7e006a57cc7bd4eb1f1742f04aefe8..52f4e490bebfdee77bf9f52c35afe6e337cc672b; correction/scope commit follows | Both incoming commits reviewed; correct nested/physical-alias runtime grants before retained audit | ACCEPTED AFTER CORRECTION and append-only qualifications376; no new independent acceptance of Codex work. Supplier account verified/no historical archive. |12 genuine RED,288 focused PASS1.85s,229 boundary PASS26.44s, category reversal9 caught/14 controls; four compiled images/17 frozen tests/four frozen v3 exact | IBPIT-POLICY-CCR37601 P2 corrected in this candidate;15 carried P2s and old seven369 P3 groups retained;375 Windows observation retained | Execute exactly one read-only seven-leaf audit on clean committed candidate, finish matrix/feasibility record and separate final handoff, then ONE final matching-lane push; no purchases/QC/source acquisition. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -45187,3 +45185,141 @@ new review files natively on macOS.
 
 Codex counter-reviews `c77e9fb9` and this section. The substantive blockers stay as
 374 states them. Nothing is started by inference.
+
+## 376. Codex counter-review and retained-coverage audit scope (2026-11-07)
+
+### 376.1 Captured incoming range and per-commit dispositions
+
+The owner's latest direction is to counter-review, then audit retained-data
+coverage and archive feasibility using existing data/subscriptions, with no
+purchase or QC access and ONE final push. Matching-only fetch captured clean
+local19060da12a7e006a57cc7bd4eb1f1742f04aefe8 and exact origin
+52f4e490bebfdee77bf9f52c35afe6e337cc672b. The complete ordered incoming
+range contains TWO commits, zero merges. The same designated Insider
+worktree/branch was clean and a strict ancestor, then fast-forwarded to that
+exact origin. No local-only work, alternative checkout, side branch/worktree,
+merge, cherry-pick, reset, forced history or concurrent write was bundled.
+
+| Incoming commit | Counter-review disposition | Reason and independently observed limits |
+|---|---|---|
+| c77e9fb90844ed670dc20d404ac1387822540e89 | ACCEPTED AFTER CORRECTION in this round's runner/test commit | The category lookup, additional authority/schema/accounting tests and lane-owned custody-platform fixture treatment are sound within their scopes. The interpreter-prefix guard rejects covering prefixes but still admits nested protected paths and physical macOS aliases;376.2 corrects this before any actual input. Native review-file execution is observed below. |
+| 52f4e490bebfdee77bf9f52c35afe6e337cc672b | ACCEPTED WITH APPEND-ONLY QUALIFICATIONS376 | Its complete diff is documentation-only. Claude explicitly reviewed code only:9b12e0eb and19060da1 documentation was NOT independently accepted by that review. Windows tests/mutation sweeps/import stand-ins and source-only worker inspection stay attributed evidence. Codex does not repeat the full sweep or Windows execution. Later supplier facts supersede the old account-pending status at their own observation time. |
+
+Read-only advisory source checks assisted this counter-review; they are not
+independent Claude acceptance of Codex's new correction. Claude's old
+ab7eb151 audit result remains frozen at its own source/result hashes.
+The earlier execution-time interpreter path was not bound in that result;
+today's measured disjoint interpreter does not retroactively establish it.
+No claim is made that source review or mocked Windows imports exercised Held
+or the native worker. Those material paths are tested natively here.
+
+### 376.2 Verified lane-owned correction and evidence
+
+IBPIT-POLICY-CCR37601, P2, corrected in this round: a runtime subtree inside
+ROOT/artifacts, a different private custody epoch or a fixed input root was
+not an ancestor of the protected roots and bypassed375's one-way test.
+The /System/Volumes/Data spelling also bypassed lexical ancestor checks.
+This violates the exact seven-leaf DATA scope even without a provider call.
+
+Six descendant regressions are genuinely RED on375:6 failed0.93s; six
+data-volume alias regressions are independently RED:6 failed0.96s.
+The smallest correction checks BOTH lexical directions and physical
+device/inode endpoint ancestry. It rejects covering/nested aliases without
+rejecting unrelated runtime/data trees merely because they share / or /Users.
+Missing invented components retain lexical/ancestor checks; existing regular
+files or failed metadata checks refuse with finite source_refused.
+Only stat metadata is used; no neighboring DATA is opened. Runtime subtrees
+and the seven allowed leaves are not broadened. The four frozen custody
+sources and seventeen frozen test images remain untouched.
+
+Five further helper regressions pin regular-file refusal, sanitized metadata
+PermissionError, physical covering/nested aliases and the common-root positive
+control. Final focused pure/runner/original-and-review/provider-projector/EXACT
+selection:288 PASS1.85s, zero skips/warnings; outer2.875s, stderr0.
+The earlier283 PASS1.54s preceded those five added tests. A process-local
+reversal restoring the old action classifier gives9 expected failures/14
+positive controls1.11s; no on-disk mutation. The exact category-code table is
+a descriptive classification, not independently established corporate-action
+or historical identity truth. A new real audit must conserve the rows and
+report a NEW digest; no old count or receipt is rewritten.
+
+Boundary/platform/lane-import/ML-import/active-document/record/EXACT selection:
+229 PASS26.44s, zero skips/warnings; outer27.431s, stderr0. Required Git/
+fresh-import children inherit native network/security denial, with fork
+permitted. Initial boundary harness mistakenly denied the shared .git
+administrative directory and had41 failures/185 passes/3 skips22.79s;
+granting ONLY administrative metadata corrects the harness, not product code
+or a test. No sibling checkout SOURCE is read.
+
+All tests use Python3.13.15, initial -I -S -B and fixed empty-cache prefix,
+minimal credential-free environment, disabled plugin autoload/cache, fresh
+TMP-only writes, native process-tree network/security denial and real Darwin
+4GiB additional-VM/readback plus sampled4GiB peak-RSS guard. Strict focused/
+mutant groups also deny fork and all actual artifact/private/USB/Keychain DATA,
+including data-volume aliases. No test patch authorizes source acquisition.
+The temporary test orchestration is not claimed to close IBTEST-OBS36901's
+committed-harness gap. Four changed/review images compile in memory; seventeen
+frozen test pins and four exact historical aa0d635d custody bytes match.
+A first AST pin checker refused MappingProxyType's wrapper; inspecting its
+literal argument fixed only that source-only checker. No full suite,
+historical-root replay, Windows execution, acquisition or outcome look.
+
+### 376.3 Delegated decisions and prospective retained audit
+
+IBDEC-376-01: accept/correct counter-review FIRST, then execute the owner's
+bounded retained-coverage/archive-feasibility audit. Do not restart an older
+continuous build, claim required21 admission, activate eight NON-DISPATCH
+requests or use another Claude checkpoint as a routine approval requirement.
+
+IBDEC-376-02: reuse the existing373 read-only observer AFTER this correction
+and scope are committed and the designated tree is clean. ONE corrected
+observer run may read exactly373.3's seven externally pinned metadata leaves,
+same12 controls and all74,150/698,455 reference rows. Preserve held-chain/
+private-mode/single-link/content/version/physical-storage checks, native
+exact-leaf/fork/write/network/exec controls, isolation, actual memory guards,
+bounded IPC and180s budget. The observed execution HEAD/source inventory and
+new result digest must be recorded AFTER execution. No new output namespace,
+source claim, credential read, provider/SEC request, ZIP/body/original financial
+row, sibling capture, private USB catalog or USB scan is involved. This is a
+new read-only derivation, never a retry/resume of a source operation.
+
+IBDEC-376-03: make the coverage matrix from that new observation PLUS clearly
+attributed historical source-bound records145/169,212/213,220/221,336,
+352-355,360/361,366 and371. Do not reopen original FullHistory ZIPs in the
+Analyst sibling, repeat the230s USB scan, reconstruct raw FMP/EOD rows from
+counters or call ordinary current-row endpoints merely to avoid the blocker.
+The supplied three-file FullHistory capture has TICKERS/ACTIONS/FUNDAMENTALS,
+not a retained SF2 or SEP/SFP archive. Separate USB daily/action/earnings and
+EOD pilot-window evidence retain their exact independent scopes.
+
+IBDEC-376-04: evaluate free SEC Feed/Oldloads/PDS documentation as feasibility,
+not an untried collector or proven historical public observation. Prior
+June18/June16/October7/December3 carrier operations and unknown memberships
+remain spent/preserved. Current directory advertisements, source/version
+matches, acceptance fields or a scheduled daily publication time cannot
+manufacture an authenticated historical available-by bound. Before ANY future
+capture,371.4's intervening-capture/archive-exposure/complete-census and
+committed-controller requirements remain binding. No carrier request this round.
+
+IBDEC-376-05: record Sharadar's substantive existing-thread answer without
+private mail IDs, account/subscriber addresses, headers or message bodies.
+The account is now verified; do not ask the owner for that email again.
+Supplier confirms no retained SF2 deliveries/snapshots/logs/accessions/
+original bodies/version manifest or dated identifier archive. Treat that
+requested route as provider-confirmed unavailable, not merely unanswered.
+Existing Personal5-Year paid access ends2026-11-24; earlier FullHistory
+downloads may be used during the paid term, but new downloads follow the
+rolling five-year limit and miss2020Q4/early2021. Supplier confirmation supports
+personal research on owner-controlled local/cloud machines while paid; it
+does not bind every source version to a canonical rights/readiness contract.
+Stop-use at termination and raw/reconstructive-data deletion within30days
+must be tracked; do not renew, charge, delete, schedule a job or copy rows by
+inference. Qualifying non-reconstructive research outputs may be retained
+under the published terms. No purchase/upgrade is a remedy for the archive
+that the supplier says it does not keep.
+
+No vendor correspondence is needed/sent by this audit task. The prior explicit
+Sharadar reply authorization is not used to send a redundant question.
+Massive/EODHD/FMP reply holds, no-purchase/no-QC holds and disarmed monitors
+remain. Public primary-document reads are separate from filing/source-data
+acquisition. This scope does not grant portfolio/outcome/QC readiness.

@@ -124,7 +124,7 @@ def test_parent_policy_limits_publication_to_the_new_epoch_and_git_metadata(monk
 
 def test_git_frontend_chain_has_only_the_exact_apple_executable_and_runtime_grants(monkeypatch):
     monkeypatch.setattr(m.subprocess, "check_output", lambda *_a, **_k: b"/invented-admin/.git\n")
-    for profile in (m.baseline_policy(), m.policy(_bound(), parent=True)):
+    for profile in (m.policy(_bound(), parent=True),):
         assert '(literal "' + str(m.GIT_IMAGE) + '")' in profile
         assert '(subpath "/Library/Developer/CommandLineTools")' not in profile
         assert '(subpath "' + str(m.ROOT) + '")' not in profile
@@ -288,13 +288,23 @@ def _run_setup(monkeypatch, value, bound, *, storage=None, collision=False):
     metadata = _metadata()
     monkeypatch.setattr(m, "identity", lambda _head: deepcopy(bound))
     monkeypatch.setattr(m, "policy", lambda *_a, **_k: "invented policy")
-    monkeypatch.setattr(m, "install_parent_policy", lambda _profile: None)
+    monkeypatch.setattr(m, "install_parent_policy", lambda _profile: events.append("parent-policy"))
     monkeypatch.setattr(m, "prove_parent", lambda: None)
     monkeypatch.setattr(m.stable.native, "_WorkerMemoryGuard", Guard)
     def launch(function, *_a, **_k):
         events.append(function)
         return {"completed": True, "metadata": metadata, "metadata_pin": value["metadata_pin"]} if function == "discovery_worker" else value
     monkeypatch.setattr(m, "launch", launch)
+    def prepare(role, *_a, **_k):
+        events.append("prepare-" + role)
+        class Worker:
+            def activate(self, payload):
+                assert set(payload) == {"discovered"}
+                events.append("dossier_worker")
+                return value
+            def close(self): events.append("worker-close")
+        return Worker()
+    monkeypatch.setattr(m, "prepare_worker", prepare)
     class Epoch:
         def __init__(self, *_a, **_k):
             events.append("epoch")
@@ -315,6 +325,9 @@ def test_parent_publishes_once_in_order_after_validating_the_result(monkeypatch)
     assert result["completed"] is True and len(instances) == 1
     assert [item for item in events if item.endswith(".json")] == ["observation-started.json", "transition.json", "dossier.json", "complete.json"]
     assert result["complete_sha256"] == instances[0].pins["complete.json"]["sha256"]
+    assert events.index("prepare-dossier") < events.index("parent-policy") < events.index("epoch")
+    assert events.index("observation-started.json") < events.index("dossier_worker")
+    assert events.count("parent-policy") == 1 and "worker-close" in events
 
 
 def test_parent_storage_mismatch_refuses_before_transition_or_dossier_publication(monkeypatch):
@@ -328,6 +341,14 @@ def test_namespace_collision_does_not_dispatch_or_resume_an_observation(monkeypa
     value, bound = _worker_result(); events, instances = _run_setup(monkeypatch, value, bound, collision=True)
     with pytest.raises(m.StorageDossierError): m.run(bound["head"])
     assert events.count("discovery_worker") == 1 and "dossier_worker" not in events and not instances
+    assert "worker-close" in events
+
+
+def test_no_new_sandbox_launch_or_preparation_after_parent_profile(monkeypatch):
+    monkeypatch.setattr(m, "_PARENT_SANDBOX_APPLIED", True)
+    monkeypatch.setattr(m.subprocess, "Popen", lambda *_a, **_k: pytest.fail("late Popen"))
+    with pytest.raises(m.StorageDossierError): m.prepare_worker("health", _bound())
+    with pytest.raises(m.StorageDossierError): m.launch("discovery_worker", _bound())
 
 
 def test_original_join_refuses_short_case_list_before_opening_or_parsing(monkeypatch):

@@ -21,6 +21,7 @@ from research import insider_buying_pilot_fmp_eod_qualification_v2 as producer
 from research import insider_buying_pilot_provider_controls_v1 as controls
 from research import insider_buying_pilot_storage_transition_v1 as transition
 from research import insider_buying_pilot_historical_dossier_v1 as dossier
+from research import insider_buying_pilot_dossier_prepared_v1 as prepared_io
 
 stable, ROOT, BRANCH = prior.stable, prior.ROOT, prior.BRANCH
 SELF = "research/insider_buying_pilot_storage_dossier_runner_v1.py"
@@ -28,7 +29,9 @@ OWN = (SELF, "tests/test_insider_buying_pilot_storage_dossier_runner_v1.py",
        "research/insider_buying_pilot_storage_transition_v1.py",
        "tests/test_insider_buying_pilot_storage_transition_v1.py",
        "research/insider_buying_pilot_historical_dossier_v1.py",
-       "tests/test_insider_buying_pilot_historical_dossier_v1.py", *prior.OWN)
+       "tests/test_insider_buying_pilot_historical_dossier_v1.py",
+       "research/insider_buying_pilot_dossier_prepared_v1.py",
+       "tests/test_insider_buying_pilot_dossier_prepared_v1.py", *prior.OWN)
 SCHEMA = "insider-pilot-storage-dossier-runner-v1"
 AUDIT_ID = "ib-storage-transition-dossier-v1-20261107-once"
 OUTPUT = stable.PRIVATE_CUSTODY_ROOT / AUDIT_ID
@@ -37,6 +40,7 @@ OUTPUT_NAMES = ("reservation.json", "observation-started.json", "transition.json
 MAX_IPC = 1024 * 1024
 GIT_IMAGE = Path("/Library/Developer/CommandLineTools/usr/bin/git")
 GIT_LIBRARIES = Path("/Library/Developer/CommandLineTools/usr/lib")
+_PARENT_SANDBOX_APPLIED = False
 
 
 class StorageDossierError(ValueError):
@@ -93,12 +97,20 @@ def selected_paths(metadata):
     return result
 
 
-def policy(identity_value, *, metadata=None, parent=False, readback=False):
+def policy(identity_value, *, metadata=None, parent=False, readback=False, role=None):
     paths = () if metadata is None else selected_paths(metadata)
     prior._disjoint_runtime_directories((Path(sys.base_prefix).resolve(), Path(sys.executable).parent.parent.resolve()),
                                        (controls.WARM_ROOT, controls.RECENT_ROOT))
     result = prior.policy(sources=identity_value["source_sha256"])
     leaves = [METADATA_PATH, *paths]
+    if readback or role == "health":
+        for path in prior.fixed_input_paths():
+            result = result.replace('(literal ' + json.dumps(str(path)) + ')', '')
+        leaves = []
+    elif role == "discovery":
+        for path in prior.fixed_input_paths():
+            if path != prior.PROVIDER / "complete.json":
+                result = result.replace('(literal ' + json.dumps(str(path)) + ')', '')
     if parent:
         result = result.replace("(deny process-fork)", "")
         result += '(allow process-exec (literal "/usr/bin/git") (literal "/usr/bin/sandbox-exec") (literal ' + json.dumps(str(GIT_IMAGE)) + '))'
@@ -120,21 +132,15 @@ def policy(identity_value, *, metadata=None, parent=False, readback=False):
 
 
 def install_parent_policy(profile):
+    global _PARENT_SANDBOX_APPLIED
+    need(_PARENT_SANDBOX_APPLIED is False, "parent_isolation_refused")
+    _PARENT_SANDBOX_APPLIED = True
     library = ctypes.CDLL("/usr/lib/libsandbox.dylib", use_errno=True)
     call = library.sandbox_init
     call.argtypes = [ctypes.c_char_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_char_p)]
     call.restype = ctypes.c_int
     error = ctypes.c_char_p()
     need(call(profile.encode(), 0, ctypes.byref(error)) == 0, "parent_isolation_refused")
-
-
-def baseline_policy():
-    targets = [Path(sys.executable).resolve(), Path("/usr/bin/git"), GIT_IMAGE, Path("/usr/bin/sandbox-exec")]
-    relaunch = targets[0].parents[1] / "Resources/Python.app/Contents/MacOS/Python"
-    if relaunch.is_file(): targets.append(relaunch.resolve())
-    return ('(version 1)(allow default)(deny network*)(deny process-exec)(deny file-write*)'
-            '(allow file-write* (subpath ' + json.dumps(str(OUTPUT)) + ') (literal "/dev/null"))'
-            '(allow process-exec ' + ' '.join('(literal ' + json.dumps(str(path)) + ')' for path in targets) + ')')
 
 
 def prove_parent():
@@ -317,16 +323,54 @@ def dossier_worker(identity_value, discovered):
 
 
 def launch(function, identity_value, argument=None, *, readback=False):
-    need(function in {"health_worker", "discovery_worker", "dossier_worker", "readback_worker"}, "worker_refused")
+    # Standalone read-only preparation only, before the controller is sandboxed.
+    need(_PARENT_SANDBOX_APPLIED is False and function == "discovery_worker"
+         and argument is None and readback is False, "worker_refused")
     code = "import sys;sys.path.insert(0," + repr(str(ROOT)) + ");from research import insider_buying_pilot_storage_dossier_runner_v1 as m;m." + function + "(" + repr(identity_value)
     if argument is not None: code += "," + repr(argument)
     code += ")"
-    metadata = argument["metadata"] if function == "dossier_worker" else None
-    command = ("/usr/bin/sandbox-exec", "-p", policy(identity_value, metadata=metadata, readback=readback), sys.executable,
+    command = ("/usr/bin/sandbox-exec", "-p", policy(identity_value, role="discovery"), sys.executable,
                "-I", "-S", "-B", "-X", "pycache_prefix=" + stable.native.EMPTY_CACHE_PREFIX, "-c", code)
     value = stable.source._launch(command, timeout=240)
     need(type(value) is dict and value.get("completed") is True, "worker_refused")
     return value
+
+
+def prepare_worker(role, bound, metadata=None):
+    need(_PARENT_SANDBOX_APPLIED is False and role in {"health", "dossier", "readback"}, "worker_refused")
+    code = "import sys;sys.path.insert(0," + repr(str(ROOT)) + ");from research import insider_buying_pilot_storage_dossier_runner_v1 as m;m.prepared_worker(" + repr(role) + "," + repr(bound) + ")"
+    command = ("/usr/bin/sandbox-exec", "-p", policy(bound, metadata=metadata, readback=role == "readback", role=role),
+        sys.executable, "-I", "-S", "-B", "-X", "pycache_prefix=" + stable.native.EMPTY_CACHE_PREFIX, "-c", code)
+    ready = {"schema": SCHEMA + "/ready", "role": role, "identity_sha256": sha(raw(bound)),
+             "ready": True, "data_operations": 0}
+    return prepared_io.Prepared(role, bound, command, ready, cwd=ROOT)
+
+
+def prepared_worker(role, bound):
+    guard = None
+    try:
+        need(role in {"health", "dossier", "readback"}, "worker_refused")
+        stable.native._isolated(); stable.native.source_runner._prove_isolation()
+        guard = stable.native._WorkerMemoryGuard(); prior._source_current(compact(bound))
+        ready = {"schema": SCHEMA + "/ready", "role": role, "identity_sha256": sha(raw(bound)),
+                 "ready": True, "data_operations": 0}
+        sys.stdout.buffer.write(raw(ready) + b"\n"); sys.stdout.buffer.flush(); guard.check()
+        frame = sys.stdin.buffer.read(prepared_io.MAX_ACTIVATION + 1)
+        supplied = prepared_io.validate_activation(frame, role, bound)
+        if role == "health":
+            need(supplied == {}, "activation_refused"); health_worker(bound)
+        elif role == "dossier":
+            need(type(supplied) is dict and set(supplied) == {"discovered"}, "activation_refused")
+            dossier_worker(bound, supplied["discovered"])
+        else:
+            need(type(supplied) is dict and set(supplied) == {"complete_sha256"}
+                 and type(supplied["complete_sha256"]) is str
+                 and re.fullmatch(r"[0-9a-f]{64}", supplied["complete_sha256"]), "activation_refused")
+            readback_worker(bound, supplied["complete_sha256"])
+    except Exception:
+        if guard is not None: _send({"completed": False, "code": "activation_refused"}, guard)
+    finally:
+        if guard is not None: guard.close()
 
 
 def validate_result(value, bound, metadata_pin, physical):
@@ -360,21 +404,25 @@ def validate_result(value, bound, metadata_pin, physical):
 
 
 def run(head):
-    install_parent_policy(baseline_policy()); prove_parent()
-    guard, epoch, phase = stable.native._WorkerMemoryGuard(), None, "identity"
+    # Trusted bootstrap routes source/metadata preparation only. Each reader
+    # has its own native profile; the writing controller installs ONCE after
+    # the original-reader is restrictive and READY, before claiming output.
+    guard, epoch, worker, phase = stable.native._WorkerMemoryGuard(), None, None, "identity"
     result = None
     try:
         bound = identity(head)
         phase = "metadata_discovery"
         discovered = launch("discovery_worker", bound)
         selected_paths(discovered["metadata"])
+        worker = prepare_worker("dossier", bound, discovered["metadata"])
         profile = policy(bound, metadata=discovered["metadata"], parent=True)
         install_parent_policy(profile); prove_parent(); guard.check()
         phase = "reservation"
         epoch = stable.Epoch(bound, registration())
         epoch.publish("observation-started.json", {"schema": SCHEMA + "/started", "metadata_pin": discovered["metadata_pin"], "authority": transition.authority()})
         phase = "dossier_worker"
-        value = launch("dossier_worker", bound, discovered)
+        value = worker.activate({"discovered": discovered})
+        need(type(value) is dict and value.get("completed") is True, "worker_refused")
         need(identity(head) == bound and value["source_inventory_sha256"] == bound["source_inventory_sha256"]
              and value["current_storage_identity"] == epoch.storage_identity, "identity_refused")
         validate_result(value, bound, discovered["metadata_pin"], epoch.storage_identity)
@@ -402,7 +450,9 @@ def run(head):
         try:
             if epoch is not None: epoch.close()
         finally:
-            guard.close()
+            try:
+                if worker is not None: worker.close()
+            finally: guard.close()
     return result
 
 
@@ -460,16 +510,23 @@ def main():
     args = parser.parse_args()
     try:
         if args.health:
-            install_parent_policy(baseline_policy()); prove_parent()
             bound = identity(args.expected_head)
-            install_parent_policy(policy(bound, parent=True)); prove_parent()
-            value = launch("health_worker", bound)
-            need(identity(args.expected_head) == bound, "source_refused")
+            worker = prepare_worker("health", bound)
+            try:
+                install_parent_policy(policy(bound, parent=True, role="health")); prove_parent()
+                value = worker.activate({})
+                need(type(value) is dict and value.get("completed") is True
+                     and identity(args.expected_head) == bound, "source_refused")
+            finally: worker.close()
         elif args.run:
             value = run(args.expected_head)
         else:
-            install_parent_policy(baseline_policy()); prove_parent()
-            value = launch("readback_worker", identity(args.expected_head), args.readback_hash, readback=True)
+            bound = identity(args.expected_head); worker = prepare_worker("readback", bound)
+            try:
+                install_parent_policy(policy(bound, parent=True, readback=True)); prove_parent()
+                value = worker.activate({"complete_sha256": args.readback_hash})
+                need(type(value) is dict and value.get("completed") is True, "readback_refused")
+            finally: worker.close()
         print(raw(value).decode())
     except Exception:
         print('{"completed":false,"code":"storage_dossier_refused"}')

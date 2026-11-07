@@ -45797,3 +45797,54 @@ chain and keeps the parent publication scope/refusals intact. This is a
 pre-input health correction; the registered new actual namespace remains
 unused. No old proof-bound helper/source is patched and no actual attempt
 is relabelled successful. Requalify the next committed source before inputs.
+
+### 379.5 Second source-only health refusal and prepared native readers
+
+Correction64ec64afe663cf55655c9ced933f8157db6782b3 existed clean for the
+second --health. It FAILED exit2 in7.732s, stdout53B/stderr55B; native
+sandbox-exec reported sandbox initialization Operation not permitted. This
+was still source-only, before retained DATA discovery or output creation.
+It matches the macOS nested-Seatbelt restriction independently established
+in367.4-367.6; it is not an input failure, epoch attempt or successful health.
+
+IBDEC-379-08 prospectively corrects the new controller architecture using the
+existing prepared-worker pattern. This SUPERSEDES379.2/IBDEC-379-06's planned
+controller-baseline-before-discovery sequence; that old design never reached
+retained DATA. The trusted isolated bootstrap first binds committed sources
+and starts an independently native read-only TWO-leaf metadata-discovery
+worker. The bootstrap routes bounded private IPC and does not itself open
+those retained leaves. It then prepares the independently native exact20-leaf
+original/dossier reader; that reader proves native/source/memory controls,
+sends exact READY and waits without a DATA operation. Only then does the
+writing controller install its own native profile ONCE and prove denial,
+reserve the fresh epoch, publish observation-started, and explicitly activate
+the prepared reader. No nested sandbox-exec or worker preparation occurs
+after controller installation; only exact Git children remain for identity.
+The bootstrap preceding discovery is NOT claimed already kernel-sandboxed.
+Every actual retained-file reader is independently native-restricted and the
+production controller is fenced before output state/original activation.
+Prepared and inner role memory guards both remain live; these are two sampled
+guards, not a claim of one monitor or a hard instantaneous RSS limit.
+
+Additive insider_buying_pilot_dossier_prepared_v1 and invented tests bring
+the new scope to EIGHT source/test images. READY/activation bind exact role
+and full source identity through canonical bounded one-use pipes; EOF,
+duplicate/late/malformed activation, stderr, extra output, timeout and cleanup
+failure refuse. A failed invocation is consumed. Preparation and readback
+have separate fresh processes/profiles; neither health nor readback can open
+the original input leaves. Full parent/dossier/readback semantic validation
+remains mandatory after transport decoding. No old helper/frozen file changes.
+
+Corrected native focused selection513 PASS5.74s (outer6.671s,stderr0), zero
+skips/warnings, including new transport, ordering/activation and existing
+semantic refusal tests. Boundary/platform/record/active-document/import/EXACT
+selection229 PASS27.27s (outer28.226s,stderr0), zero skips/warnings. Eight
+images compile under native actual-DATA fences; all17 frozen tests and four
+v3 pins remain exact. Changed/new source pins: runner25e371bedd14337dcae5dc9f464832c3e18d88b11fe15ea98575d5f6deba8a15;
+prepared helperb7d2fd088af6aaac867fa20817fc94a4f3c6df3013ddc79f41453657cd790408;
+runner testsa1604ed152006ed0a8af71ebf0be602aa3f329a4e4c4aa7772b68ed83e0a5236;
+prepared testse806d9bf9752aa3a578c81b7f4c5274ae3bfb2253691b973b470e4bae10e952c.
+All other379.3 pure-contract/test pins are unchanged. Commit this qualified
+correction before fresh source-only health, then proceed only if health is
+positive. Neither failed health consumed or created the prospective epoch;
+no retained DATA observation, new acquisition or push has yet occurred.

@@ -69,17 +69,28 @@ def test_pinned_but_inadmissible_fact_never_supplies_acceptance(monkeypatch,chan
     with pytest.raises(m.Refused,match='a4_result'):m.validate_a4_result_fact(bind_fact(monkeypatch,fact))
 
 
-def test_pure_plan_adds_only_four_selected_public_inputs_after_accepted_fact(monkeypatch):
+def test_pure_plan_preserves_all_210_closure_pins_and_only_adds_engine_and_fact(monkeypatch):
     root=Path(__file__).resolve().parents[2]
-    parent=(root/'scripts/arv2_r347_legacy_six_plan_a4.json').read_bytes()
+    parent=(root/'scripts/arv2_r348_ar100_result_plan.json').read_bytes()
     raw=bind_fact(monkeypatch,a4_fact())
-    additions={m.CONSUMER_PATH:(root/m.CONSUMER_PATH).read_bytes(),m.ENGINE_PATH:b'# synthetic engine\n',
-        m.VALIDATOR_PATH:b'# synthetic validator\n',m.A4_RESULT_FACT.relative_to(m.ROOT).as_posix():raw}
+    additions={m.ENGINE_PATH:b'# synthetic engine\n',m.A4_RESULT_FACT.relative_to(m.ROOT).as_posix():raw}
     plan=json.loads(m.build_plan(parent,additions));old=json.loads(parent)['source_pins']
-    assert len(old)==176 and len(plan['source_pins'])==180
+    assert m.pin(parent)==m.PARENT_PLAN_PIN
+    assert len(old)==210 and len(plan['source_pins'])==212
     assert all(plan['source_pins'][name]==value for name,value in old.items())
-    additions[m.CONSUMER_PATH]+=b'# drift\n'
-    with pytest.raises(m.Refused,match='source_pin'):m.build_plan(parent,additions)
+    assert plan['source_pins'][m.CONSUMER_PATH]==m.CONSUMER_PIN
+    assert m.VALIDATOR_PATH in old
+    assert set(plan['source_pins'])-set(old)==set(additions)
+    additions[m.CONSUMER_PATH]=b'# forbidden consumer refresh\n'
+    with pytest.raises(m.Refused,match='plan'):m.build_plan(parent,additions)
+
+
+def test_parent_closure_cannot_be_replaced_with_the_old_176_pin_inventory(monkeypatch):
+    root=Path(__file__).resolve().parents[2]
+    old=(root/'scripts/arv2_r347_legacy_six_plan_a4.json').read_bytes()
+    raw=bind_fact(monkeypatch,a4_fact())
+    additions={m.ENGINE_PATH:b'# synthetic engine\n',m.A4_RESULT_FACT.relative_to(m.ROOT).as_posix():raw}
+    with pytest.raises(m.Refused,match='plan'):m.build_plan(old,additions)
 
 
 class Candidate:

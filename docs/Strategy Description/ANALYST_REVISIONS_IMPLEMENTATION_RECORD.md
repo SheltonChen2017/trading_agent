@@ -1311,22 +1311,21 @@ claims. Neither category is permitted to overwrite the other.
 ## 4. Exact next step
 
 The owner explicitly waives Claude review of section 348 for A4 validation
-and conditional remaining old-six AR continuation. Baseline4117c1a4 is
-synchronized and clean. First freeze and execute a NEW bounded read-only
-terminal/results contract for A4 project39054561/backtest007d4ab27c26d337ae53acb492a83410;
-all old launch/read/preparation controls remain spent, no A5 or AR100 rerun.
-Only accepted Completed. source-bound/financially valid A4 results permit
-the six remaining predeclared AR80/120/140/160/180/200 first attempts through
-2026-10-13, with unchanged economics/input/profiles and fresh per-run gates.
-No new-rule six/eight rebuild or return-based arm selection is authorized.
+and conditional remaining old-six AR continuation. Actual D1 atbf8e6064
+returned2 with authenticated known A4 status Runtime Error, current18source
+files exact and fresh8DATAguard returned. No selected result request/read,
+no new launch/look/cell. D1 and all previous A4 controls remain spent.
+The remaining-arm condition is FALSE: none of AR80/120/140/160/180/200
+is submitted, and A4_RESULT_FACT_PIN stays None. No A5 authority inferred.
 
+Next perform only a separately frozen bounded read-only failed-job diagnostic
+to retain a safe actual error category/source frame, then document the barrier
+and make this round's ONE final matching-lane push. No raw error/traceback,
+licensed row, source/price fallback, new rights or other-lane modification.
 Current floor344shared/260development/59infrastructure/699accepted cells.
-A4 was observed running, no terminal/result accepted yet; no new QC contact
-this round before the separately committed source/profile/run freeze.
-See section 348 for current scope, exact contracts, actual outcomes and
-qualification. Document progress, preserve failed/spent evidence and make
-ONE final matching-lane push at this round endpoint. All formal/PIT/master/
-paper/live flags remain false; other lanes and shared implementation frozen.
+See section 348 for actual source/status/evidence pins, the unaccepted failure,
+contract limitations, exclusions and next step. All formal/PIT/master/
+paper/live flags remain false; broad new-rule six/eight rebuild stays paused.
 
 Sections 137–142 retain the owner-assisted cloud diagnoses, project cleanup,
 and mutable QC 79/81 source comparisons. Their `Completed.` statuses do not
@@ -79449,3 +79448,160 @@ before private DATA/contact; NO remaining-arm run freeze or factual A4
 acceptance exists yet. Only actual D1 acceptance can select its genuine fact
 under a later exact committed continuation freeze. All sources used by D1
 become frozen; any later defect needs a separately versioned correction.
+
+
+### 348.4 D1 actual terminal refusal: A4 Runtime Error, continuation blocked
+
+Sole D1 read dispatched2026-11-07 21:14:36UTC; completion observed21:14:58UTC
+at clean freeze bf8e6064fb1eafdf099a697876a2406edd6e90e7. Actual exit2.
+These are external second-resolution brackets, not provider timestamps or
+measured duration. Original2869B canonical stdout SHA256
+a0828cd273e6a41f7cff5ecc59272b252906508e9abda7a39e69d63f021ef10f
+passed the exact pure original-output failure validator with actual2 and
+D1 external bindings; unaccepted, not a forged0 or independent attestation.
+Public failurefact scripts/arv2_r348_ar100_failure_fact.json3820B/
+9666a1e0adc92599cc49586a714dba4b5eea79a7cb347c3c16fe5d6be54085ac.
+
+Fresh eight-DATA guard returned normally before credentials; fixed project
+and dedicated owner checks passed, current general owner plus exact A4 own
+technical row observed, editor not running, public field still unproven.
+All18 source files/417652B matched fixed2775B metadata vector71857...232c.
+The fixed known A4 status is **Runtime Error**, not Completed. Five actual
+application dispatches, allHTTP200: authenticate, project, collaborators,
+files, stats-disabled backtests/list. Job response3606B/
+6b1bad1b23c33a0fe989bec571cbda1281aff85adcb4c65d6826b8700e10c72b.
+No backtests/read/statistics request was dispatched, no selected aggregate
+was read, no semantic result was accepted and no launch/look/cell was added.
+The top finite failure_code is output, while retained original evidence
+unambiguously preserves Runtime Error and stage=status. Do not treat that
+wrapper category as the algorithm's cause or invent a subscription problem;
+its masking/retention limitation is separately audited below.
+
+D1/control are now SPENT, no rerun/reader repair or failure-leaf inspection.
+All A4 launch attempts remain spent and existing source/input preserved.
+The owner's conditional remaining-arm gate is FALSE. AR080/120/140/160/
+180/200 remain uninvoked with no new projects/compiles/jobs; the prospective
+caller keeps A4_RESULT_FACT_PIN=None and refuses before DATA/contact.
+Floor344/260/59/699 unchanged. No financial return, accepted result or formal/
+PIT/master/paper/live readiness claim follows.
+
+A new narrow read-only diagnostic may retrieve only this failed job's bounded
+error/stacktrace fields under a separate exact contract and committed freeze.
+It will retain only public-whitelisted literals/filenames, bounded line
+numbers/types/hashes and finite grammar matches, never raw exception text,
+traceback, credentials, licensed rows or arbitrary suffix/substring disclosure.
+This is the first controlled cause observation, not replay of D1 or A4.
+No new candidate attempt/A5 or automatic retry is authorized; after diagnosis,
+document the concrete barrier and conclude this round's one final push.
+
+### 348.5 Owner-requested Mia consultation: coding-session barrier
+
+Owner's subsequent direction: "consult mia". Diagnosis only in the existing
+project39054561; no Mia source edits, save, compile or relaunch is authorized
+by that request. Safari inventory incidentally showed another lane's active
+project; no interaction with its source, chat, job or controls followed.
+Codex opened a separate own tab for project39054561. QC redirected to its
+code page and displayed "No Coding Session Available": both organization
+coding sessions were occupied by other projects. No Stop, Upgrade, resource,
+permission or other-lane action was taken. ONLY this newly opened blocked tab
+was closed; the pre-existing tabs/sessions were preserved.
+
+No Mia prompt or reply occurred, so no Mia diagnosis is claimed. Owner was
+asked to report a free coding session; no release has yet been received.
+Do not busy-poll or assume that a completed backtest releases an IDE coding
+session. A separate bounded API error observation can proceed without an IDE
+session under the D1-failure diagnosis scope; it neither fixes A4 nor grants
+another launch. If an own coding session later becomes available, use Mia
+in Ask Before Edits mode for the known A4 failure only, with no source change
+or run. Otherwise preserve this concrete external consultation barrier.
+
+### 348.6 D2 exact read-only runtime-error observation freeze
+
+Run ONLY the new observe_arv2_r348_ar100_runtime_error.py ONCE from the NEXT
+clean commit containing this decision. Bind that actual HEAD, caller SHA and
+plan SHA via its three required CLI arguments. This is the narrow cause
+observation permitted by348.4 and the owner's "consult mia" diagnosis scope,
+under this round's review waiver; no independent review or A5 is claimed.
+
+Observer29662B/0fd07fe4928e67493378695263f28e22dc7065c23eaf7d3d47e244c51783f137;
+plan34515B/133fc7f9c2eba0fb826b70fc8b05627ba51cfdd11ea15013e0b8c34a3686c553;
+canonical profile1460B/56cdb3ba9f7e2bf85c1bf54c440b2164134e4de207b68d3a133826e0953ee259;
+native policy231bc59546cb23ea703d0eba296bbabedbb194c6df8897674fbfa40c7b590fea.
+Public inventory76451B/9b46b2566a5f351044a47dd25ff0441d96f7fd205bfa1649b865896fa351df52
+contains484 exact public literal hints from17 pinned public host modules,
+18 allowed flat basenames,668 static attribute names,191 static keys and27
+exception classes. It is NOT a complete description of possible exceptions;
+generated, formatted, forwarded and unrecognized text remains hash-only.
+Plan preserves all210 D1 pins unchanged and adds only the frozen D1 custody
+module, public actual failurefact and public inventory:213 selected sources.
+The new observer is externally SHA-bound, not silently inserted into an old
+pin chain. No source/profile/ancestor refresh occurs.
+
+Fixed new control, NOT inspected or allocated:
+artifacts/analyst_revisions_v2/legacy_six_results/R348-20261107-AR100-ERROR-A.
+Exclusive claim/fsync precedes inherited environment credentials/contact;
+partial claim is ambiguous/spent, no retry, alternate name, cleanup/repair.
+No private DATA or spent control/report read is permitted. Reuse ONLY frozen
+D1 Sources.hold/verify/close custody methods and fixed TLS transport, never
+an old operator entry point or global mutation. Own original source/control
+FDs, full held/named metadata and native security remain checked through
+normal close. Selected pins are not whole-interpreter integrity.
+
+Designated Mac root/branch and exact Darwin/POSIX Python3.13 interpreter,
+-I -B, native_profile() and safe_env() plus ONLY inherited QC_USER_ID and
+QC_API_TOKEN. All support/temp/cache paths under .pytest_cache/r348-runtime-error.
+Native denial excludes all private artifacts/old controls except own new
+control and necessary ancestor metadata; USB, Keychains and security CLI
+denied. HTTPS/DNS transport scope is not whole-host domain authentication;
+pinned TLS exchange still enforces the fixed QC host. Parent180s, bounded
+request client; host suspension/uninterruptible I/O remain qualifications.
+
+At most TWO application dispatches, each once: authenticate and backtests/read
+for EXACT project39054561/backtest007d4ab27c26d337ae53acb492a83410. Require
+the fixed name, Runtime Error and matching compile if supplied. Full bounded
+JSON is ephemerally parsed; retain ONLY safe projections of error/stacktrace,
+response hashes/sizes/statuses and exact identities. No claim that other
+response bytes were never received. No chart/order/log/trade/export, Object
+Store/raw price, capacity/editor, mutation, compile/launch or provider call.
+
+Never retain raw error/traceback. Exact whole public literals or their closed
+exception wrappers may be named. AttributeError admits only eight fixed type
+names and a pinned public attribute; KeyError admits only a pinned public key.
+Everything else is size/hash-only. Frames retain only whitelisted basenames,
+bounded line1..20000 and function-name hashes, with ≤64 frames. No arbitrary
+suffix/substring, path, unknown identifier, credential or licensed row is
+disclosed. These are diagnostic matches, not authenticated causality. Output
+≤32KiB; per error field≤64KiB. Six normal control leaves retain claim, two
+intents, two dispatches and report. Original actual integer0 AND canonical
+one-LF output, report pin, exact bindings and pure validator acceptance are
+required for a completed observation. Nonzero/unknown/late-close/malformed
+output remains unaccepted even if a report exists; partial safe evidence may
+be retained honestly. Application counts are not measured physical contacts.
+
+Root supplemental focused selection122distinct passes0.77s (new observer,
+changed unused caller and record/redaction); preceding89passes0.18s and
+42passes0.09s overlap and are not additive. Earlier pre-D1 selection251passes
+5.90s remains separately scoped and overlapping, not a new full-suite total.
+Native all-network/private-artifact/USB/Keychain denial applied to all checks,
+plugin autoload/conftest/cache disabled, support paths in-root. Root cold -I
+bootstrap authenticated all213 source FD/byte/native pins and returned,
+203 selected Python files compiled in memory, ten JSON pins checked; no
+private/control/credential/contact path. No full suite.
+
+Two memory-only mutations (actual-exit dispatch and frame whitelist removal)
+were each caught by their focused regression assertion; original disk sources
+unchanged and test-module bindings restored in finally. These expected red
+checks are not additional passing test cases or operational evidence.
+
+|Finding|Priority/status|Evidence and disposition|
+|---|---|---|
+|I348-001|P2 confirmed; historical used reader frozen, continuation blocked|D1 Store.journal requires lowercase marker, but operate submits known-A4-status after preserving observed_status and before terminal predicates. Root pure public-method reproduction raises output before any artifact method. This masks Runtime Error's category; failure.json is allowed and is not the cause. Preserve original refusal/fact, never repair/replay D1. New D2 has no such journal path; a future result-reader version must correct it before use.|
+|I348-002|P2 confirmed; corrected prospectively in UNUSED caller|Remaining caller inherited old176 pins while the semantic dependency closure needs210. Changed only unused caller/test to preserve exact D1 plan210 plus new engine/future acceptedfact (212); rejects old parent and consumer refresh. No fact is selected, A4_RESULT_FACT_PIN remains None and no operation is revived.|
+|I348-003|P2 open actual runtime failure|Current source/DATA checks passed but A4 Runtime Error has no accepted statistics. Error cause not yet observed; no subscription/coverage/QC-cause assertion. Remaining six arms blocked.|
+|I348-004|P2 external Mia consultation barrier|Both coding sessions occupied; own blocked tab closed, other lanes unchanged. No Mia answer or diagnosis obtained.|
+
+No P0/P1 finding identified in this bounded work; this is not a whole-repository
+security review or independent final acceptance. Observation adds no launch attempt,
+look or accepted cell. Floor344/260/59/699 unchanged. After original D2 result
+validation, record its actual finite evidence, limitations and next action,
+append only associated A4 terminal accounting, and conclude ONE final push.

@@ -32,8 +32,8 @@ BRANCH = 'codex/strategy-analyst-revisions-v2'
 PYTHON = '/Users/sheltonchen/.venvs/trading_agent-py313/bin/python'
 SOURCE = ROOT / 'scripts/run_arv2_r348_remaining_six.py'
 PLAN = ROOT / 'scripts/arv2_r348_remaining_six_plan.json'
-PARENT_PLAN = ROOT / 'scripts/arv2_r347_legacy_six_plan_a4.json'
-PARENT_PLAN_PIN = {'byte_count':28396,'sha256':'66f305b15fcf9cfef0a4ad4b5d6b74d376384384bf540f4cd980b746c9369243'}
+PARENT_PLAN = ROOT / 'scripts/arv2_r348_ar100_result_plan.json'
+PARENT_PLAN_PIN = {'byte_count':39811,'sha256':'165de7a174f3c4b0cf873a2aae0e434bcbee0a92f9e0c8a533526c006b8e6a9c'}
 SUPPORT = ROOT / '.pytest_cache/r348-remaining-six'
 DATA_DIRECTORY = ROOT / 'artifacts/analyst_revisions_v2/legacy_six_plain/R346-20261107-A'
 DATA_NAMES = ('evaluator-manifest.json','session_axis-0000.jsonl','memberships-0000.jsonl',
@@ -266,11 +266,12 @@ def build_plan(parent_raw, additional_buffers):
     require(pin(parent_raw)==PARENT_PLAN_PIN,'plan')
     parent=loads(parent_raw,MAX_PLAN)
     require(type(parent) is dict and type(parent.get('source_pins')) is dict
-        and len(parent['source_pins'])==176,'plan')
-    keys={CONSUMER_PATH,ENGINE_PATH,VALIDATOR_PATH,A4_RESULT_FACT.relative_to(ROOT).as_posix()}
+        and len(parent['source_pins'])==210,'plan')
+    require(parent['source_pins'].get(CONSUMER_PATH)==CONSUMER_PIN
+        and VALIDATOR_PATH in parent['source_pins'],'source_pin')
+    keys={ENGINE_PATH,A4_RESULT_FACT.relative_to(ROOT).as_posix()}
     require(type(additional_buffers) is dict and set(additional_buffers)==keys
         and all(type(raw) is bytes and 0<len(raw)<=MAX_PUBLIC for raw in additional_buffers.values()),'plan')
-    require(pin(additional_buffers[CONSUMER_PATH])==CONSUMER_PIN,'source_pin')
     validate_a4_result_fact(additional_buffers[A4_RESULT_FACT.relative_to(ROOT).as_posix()])
     pins=dict(parent['source_pins'])
     require(not (set(pins)&keys),'inventory')
@@ -326,9 +327,9 @@ class Sources:
                 and type(self.plan['source_pins']) is dict, 'plan')
             parent = loads(self.hold(PARENT_PLAN,PARENT_PLAN_PIN),MAX_PLAN)
             require(type(parent) is dict and type(parent.get('source_pins')) is dict
-                and len(parent['source_pins'])==176, 'plan')
+                and len(parent['source_pins'])==210, 'plan')
             fact_path=A4_RESULT_FACT.relative_to(ROOT).as_posix()
-            additional = {CONSUMER_PATH,ENGINE_PATH,VALIDATOR_PATH,fact_path}
+            additional = {ENGINE_PATH,fact_path}
             require(set(self.plan['source_pins'])==set(parent['source_pins'])|additional
                 and all(self.plan['source_pins'].get(key)==value for key,value in parent['source_pins'].items())
                 and self.plan['source_pins'].get(CONSUMER_PATH)==CONSUMER_PIN

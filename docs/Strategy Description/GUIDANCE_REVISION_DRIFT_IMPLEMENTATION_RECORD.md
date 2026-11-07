@@ -1,6 +1,13 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Codex counter-review of section 65 completed in section 66, 2026-11-04.
+Status: **Read-only native QC quote and Massive guidance suitability audit recorded in section 67, 2026-11-07.
+The authenticated QC catalog lists free cloud US Equities access; actual stock/SPY history is not measured.
+The Data Explorer link redirects to the dataset page; no history request or compute job is substituted.
+Massive now displays Stocks Basic; Corporate Guidance is an unowned $99/month expansion.
+Neither product fit nor advertised history closes coverage, source semantics, integration or research gates.
+No purchase, project creation, upload, research deployment, compile, backtest or monitor rearm occurs.
+This audit is documented locally; no new push is requested or performed.
+Codex counter-review of section 65 completed in section 66, 2026-11-04.
 Claude code commit `1870b9c9` is accepted; record commit `6375401b` is accepted after documentation clarification.
 Both new Claude commits are consumed once; no further implementation milestone starts in this round.
 Independent Claude review of `fc07b099..01b856be` recorded in section 65, 2026-11-04.
@@ -133,7 +140,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 66. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 67. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -10130,3 +10137,172 @@ Current observed Massive Starter access does not supply historical stock/SPY
 NBBO; no purchase or purported Corporate Guidance sufficiency is inferred.
 The next step requires a separately bounded continuation, not an automatic
 evaluation or another synthetic recovery round.
+
+## 67. Native QC quotes and Massive guidance suitability, 2026-11-07
+
+### 67.1 Owner scope and exact baseline
+
+Owner: **"Proceed with verifying QC's native stock/SPY quote coverage and
+whether Massive Corporate Guidance fills the remaining gap. Don't buy
+anything or launch backtests yet."** This authorizes the relevant read-only
+QC/provider checks in this section, superseding the older no-QC direction only
+for this scope. It does not reopen synthetic recovery or empirical evaluation.
+The owner signs into the isolated in-app QC tab when its existing session is
+unavailable. Safari, credentials and other lanes' projects remain untouched.
+
+Initial mandatory root, branch, clean local HEAD and live matching remote are
+verified: `/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+`codex/strategy-guidance-revision-drift`,
+`a700f86f61f4dd1feba62a890febc3692eb1228b`, origin
+`https://github.com/SheltonChen2017/trading_agent.git`. Section 66's one push is
+complete. Claude commits `1870b9c9` and `6375401b` remain consumed once; this
+audit does not repeat their counter-review or start a source-changing milestone.
+
+### 67.2 QC native quote route: product fit, not measured history
+
+The public and signed-in [AlgoSeek US Equities listing](https://www.quantconnect.com/data/algoseek-us-equities)
+both display **Free** cloud access, full historical SIP coverage and listed/
+delisted equities plus ETFs. SPY belongs to this product class; no separate ETF
+quote subscription is identified. The companion
+[Security Master](https://www.quantconnect.com/data/quantconnect-us-equity-security-master)
+is also listed free in cloud. These are catalog observations, not a successful
+history request, actual account data-delivery test or per-symbol completeness
+certificate. Compute and local-download costs are separate.
+
+The signed-in About page exposes a Supported Assets Data Explorer link to
+`/datasets/algoseek-us-equities/explorer`. Following that displayed link returns
+to `/datasets/algoseek-us-equities` with the About/Pricing sections and no
+symbol/date inspection controls. Only control/heading metadata is inspected
+during that navigation; no market-value table, data API, project, notebook or
+compute job is used as an alternative. Consequently actual common stock/SPY
+dates, missing sessions and six usable years remain **unmeasured**.
+
+The [current native format](https://www.quantconnect.com/docs/v2/lean-engine/data-format/us-equity)
+documents one-sided quote ticks, millisecond New York time, share sizes,
+exchange/condition/suspicious flags and second/minute QuoteBars. It does not
+document separate participant/SIP/receipt clocks. The
+[official LEAN equity reference](https://github.com/QuantConnect/Lean/blob/master/Data/equity/readme.md)
+distinguishes post-2007 quotes from earlier trade-only history. This moving
+reference is not an immutable current-cloud boundary: **January 1998 in the
+aggregate catalog must not be claimed as the quote-history start**.
+
+[Bar-building documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/securities/asset-classes/us-equity/data-preparation)
+describes carrying prior sides/sizes within the day and normalizing a crossed
+closing pair by copying one side to the other. It also filters ticks by sizes,
+conditions and other rules. A QuoteBar close is therefore not proof of two
+fresh, untouched executable observations. Native tick delivery/ordering and
+conditions still require binding to the actual engine and dataset version.
+
+The existing `historical_market.py` explicitly accepts provider `massive`,
+paired prices/sizes, separate SIP and participant clocks, sequence and
+conditions. Native QC ticks cannot be relabelled to satisfy that contract.
+The original plan requires latest completed quotes no older than 60 seconds,
+uncrossed positive prices, the spread gate and later execution observations;
+it does **not** prescribe Massive or two vendor clocks. A dedicated QC adapter
+could preserve strategy rules, but must prove paired side state/age, clock and
+ordering semantics, sizes, conditions, missing-data refusal and stock/SPY
+parity. No missing clock or sequence may be fabricated. No adapter is changed
+in this audit.
+
+### 67.3 Massive: current entitlement and unresolved guidance semantics
+
+The authenticated subscriptions page now displays **Stocks Basic**, plus
+Currencies/Futures/Indices/Options Basic. This supersedes November 4's latest
+observed Stocks Starter status; the prior cancellation was pending November 6.
+Corporate Guidance is absent from owned plans and appears under Available
+expansions at **$99/month**. No Add/checkout, agreement, key or API request is
+used. An actual API denial or hidden grant is not inferred.
+
+[Massive's endpoint](https://massive.com/docs/rest/partners/benzinga/corporate-guidance)
+documents optional current/prior EPS and revenue bounds, methodology, currency,
+fiscal period/year, dates and update metadata. Its sample supports FY; analyst
+consensus fields are not issuer guidance. Advertised history begins September
+12, 2011, while the [partner page](https://massive.com/partners/benzinga) says
+2012. Neither establishes complete common history or an immediate predecessor.
+
+Two concrete semantic risks prevent treating the product as a closed gap:
+
+- Massive describes prior values for the same fiscal period, whereas
+  [Benzinga's product page](https://www.benzinga.com/apis/cloud-product/corporate-guidance/)
+  describes year-prior/YoY values. Actual rows must be reconciled against the
+  immediately preceding original disclosure; neither description proves that
+  relationship. Its EST label also leaves daylight-saving interpretation open.
+- A [Benzinga-authored February 2026 announcement](https://www.prnewswire.com/news-releases/benzinga-adds-forward-looking-estimates-across-datasets-302688256.html)
+  introduces algorithmically generated Expected Guidance Records before issuer
+  announcements. Their inclusion in Massive's endpoint is **unknown**, not
+  presumed. A sample must distinguish actual management disclosures from
+  anticipated records.
+
+The inspected schema does not establish immutable first availability or a
+complete correction/withdrawal/version chain. Optional fields must actually
+support comparable FY GAAP revenue and adjusted EPS, currency/units, fiscal
+end dates, share/accounting scope and dated permanent identities. Current-
+vintage reconstruction may remain exploratory/PIT-false as the original plan
+allows; original/version evidence is required for confirmation claims. Buying
+the product alone would not confer those evidence properties.
+
+### 67.4 Rights and bounded next evidence
+
+Current [QC Security/IP rules](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip)
+keep raw/reconstructable Platform Data inside QC and prohibit extraction via
+outputs, screenshots, filesystem traversal or indirect channels. Its
+[download licence](https://www.quantconnect.com/docs/v2/cloud-platform/datasets/licensing)
+is separate and limited to internal LEAN use. Free cloud quotes do not supply
+an export licence for the local FirstRate/GDR pipeline. A later native audit
+must use permitted QC data methods and permissible summary findings; no raw
+quote output, log-capacity experiment or source transport is proposed.
+
+Massive's current November 3
+[Market Data Terms](https://massive.com/legal/market-data-terms-of-service) and
+[Individual Terms](https://massive.com/legal/individuals-terms-of-service)
+permit personal research/storage and conditional processing solely on the
+subscriber's behalf. They do not create a blanket non-display/cloud ban.
+Source-specific supplements and QC's actual processing/data-use fit still
+control before guidance upload. Paid-product raw-use rights do not become
+perpetual after one month's purchase; applicable termination/deletion rules
+remain. The expansion is offered to this Basic account, but no final base-plan
+charge or contract version is certified without checkout; no checkout is used.
+
+**Purchase disposition: hold both purchases.** QC-native ticks are a credible
+route to avoid an external quote subscription for cloud evaluation. Corporate
+Guidance is the relevant structured product class, but its lack of existing
+entitlement and unresolved semantics prevent an account-specific coverage
+sample here. No provider message is sent and no formal sign-off requirement is
+invented.
+
+The next bounded work is (1) an in-cloud, no-orders coverage/semantics check of
+stock and SPY ticks, with only permitted non-reconstructable findings; and
+(2) a pre-purchase vendor sample/definition check against known ordinary,
+off-cycle, reaffirmation, correction/withdrawal and inactive-issuer examples.
+Verify the common history intersection and processor/source terms. Six usable
+years is the proposed planning floor, not statistical sufficiency or an
+approved date allocation. The real runner, canonical reference inputs and
+the documented timezone/FY bridge limits in CR65-015/016 remain separate work.
+There is no strategy signal, return, order or portfolio calculation here.
+
+### 67.5 Custody, verification and handoff
+
+Ignored sanitized receipt:
+`artifacts/guidance_revision_drift/native-quotes-guidance-audit-20261107/audit-v1.json`,
+4,610 bytes, SHA-256
+`ba06a529263b377ba2ea6499860a2fe0904f62b872da787394b24bd04cb8bc3d`.
+It retains selected plan/catalog observations, primary references, exclusions
+and qualifications; no keys, account identifiers, market rows or source
+datasets. Source/schema/fixtures and section 66's accepted code remain
+unchanged. Only this lane record changes; shared documents stay frozen.
+
+Focused verification: the existing active-document method passes (one method,
+0.020 s, zero failures/errors/skips or reported warnings). Historical sections
+1 through 66 below the active header are byte-preserved. Receipt length/hash,
+attempt/paused gates, diff/path and root/branch/status checks pass. No full
+lane/repository suite or source build is run for this documentation-only audit.
+Recheck the final record and refs before the local notes commit. No push
+is requested in this continuation and none is performed; prior completed
+publications are not repeated.
+
+The lane remains **not backtesting ready**. Original CLOSED FAILED 3/3 and
+project 37647834 remain untouched. Separate Mia recovery is still zero attempts
+/ zero intents, maximum three unsuccessful attempts, with no new journal or
+project. Retained `c589b3dd` custody, original economics/null-false permissions,
+protected dates/family/look and funding/trading gates are unchanged. Monitor
+stays **PAUSED**; no automatic review loop or recovery rearms.

@@ -244,7 +244,17 @@ def test_percentile_policy_binds_committed_verbatim_owner_approval():
         capture_output=True,
     ).stdout
     assert sha256(committed_bytes).hexdigest() == payload["owner_directive_sha256"]
-    assert (repository_root / directive_path).read_bytes() == committed_bytes
+    head_bytes = subprocess.run(
+        ["git", "show", f"HEAD:{directive_path}"],
+        cwd=repository_root,
+        check=True,
+        capture_output=True,
+    ).stdout
+    assert head_bytes == committed_bytes
+    worktree_bytes = (repository_root / directive_path).read_bytes()
+    assert worktree_bytes.replace(b"\r\n", b"\n") == committed_bytes.replace(
+        b"\r\n", b"\n"
+    )
     directive = committed_bytes.decode("utf-8")
     assert (
         "> yes this works. Approved. Freeze the proposed defaults and implement "

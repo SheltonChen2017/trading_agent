@@ -1,15 +1,21 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **No-orders QC coverage and public guidance-sample audit recorded in section 68, 2026-11-07.
+Status: **Offline QC-native quote adapter and structural parity checks recorded in section 69, 2026-11-07.
+Implementation `bda3a4c0` is an unreviewed engineering candidate; no strategy rule or native runner changes.
+Sixty-five focused code checks pass; native source qualification and usable guidance history still block backtesting.
+No authenticated QC access, research execution, upload, compile, backtest, purchase or order occurs in section 69.
+Section 68 was published once as `aa06cf6e`; this new implementation round has its own one-final-push direction.
+Monitor stays PAUSED; original and separate recovery attempt ledgers are unchanged.
+Historical no-orders QC coverage and public guidance-sample audit recorded in section 68, 2026-11-07.
 Both research executions completed; zero backtests, orders, purchases or performance calculations.
 Explicit unfilled quote history returns 1,508 session and 10:00-boundary dates per sampled symbol in 2020--2025, matching the QC-calendar expected count.
 All 96 predeclared symbol/tick windows returned quotes; this is not full-universe or executable-NBBO acceptance.
 Two public Massive guidance examples are reaffirmations, not verified changed-revision chains.
-Native quote adapter semantics and usable guidance/correction/predecessor history remain open; the lane is not backtesting ready.
-One combined final matching-lane push is authorized, including the preceding local section-67 notes.
+Native quote source qualification and usable guidance/correction/predecessor history remain open; the lane is not backtesting ready.
+The section-67/68 combined matching-lane publication is finished; it is not repeated in section 69.
 Monitor remains PAUSED; synthetic recovery is not resumed.
 Read-only native QC quote and Massive guidance suitability audit recorded in section 67, 2026-11-07.
-The authenticated QC catalog lists free cloud US Equities access; actual stock/SPY history is not measured.
+The section-67 authenticated QC catalog lists free cloud US Equities access; section 68 measures the bounded history sample.
 The Data Explorer link redirects to the dataset page; no history request or compute job is substituted.
 Massive now displays Stocks Basic; Corporate Guidance is an unowned $99/month expansion.
 Neither product fit nor advertised history closes coverage, source semantics, integration or research gates.
@@ -148,7 +154,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 68. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 69. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -10544,3 +10550,206 @@ expected remote `a700f86f` immediately before commit/push. Retain the final
 commit, verified remote and publication receipt in the paused checkpoint.
 No intermediate push, PR/merge, shared-document change, automatic further
 round or monitor rearm is authorized. Monitor stays **PAUSED**.
+
+## 69. Offline QC-native quote adapter and parity checks, 2026-11-07
+
+### 69.1 Scope, exact source and publication custody
+
+Owner: **"Proceed with building the QC-native quote adapter and parity checks
+without changing strategy rules. Don't buy anything or launch backtests, and
+push once when done."** This round implements the bounded offline quote seam
+identified in 68.3. It is neither a strategy evaluation nor another native
+coverage probe. Public primary documentation is checked; the authenticated QC
+account, project 39054018 and its released research resource are untouched.
+No SDK installation, provider/account/credential access, upload, compile,
+research execution, backtest, Mia prompt, purchase or order occurs.
+
+Mandatory worktree `/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+branch `codex/strategy-guidance-revision-drift` and sole origin/push URL
+`https://github.com/SheltonChen2017/trading_agent.git` are verified. Starting
+local and live matching remote are both clean
+`aa06cf6e6f003de8400fa7b82adffc7452fe3fdc`. Its section-67/68 publication is
+already complete once. No additional Claude commit appears; `1870b9c9` and
+`6375401b` remain consumed, not triggers for another counter-review.
+
+Source/test implementation commit:
+`bda3a4c0a82b0e79ba9953642859fc77873534aa`. It is an **implementation candidate
+awaiting independent review**, not Codex acceptance of its own work. This
+record follows in the same round before the single authorized final push.
+Parallel assistants provide author QA and invented tests only. No shared
+document, other lane, branch/worktree topology or frozen plan is changed.
+
+### 69.2 Native tick contract and conservative state reconstruction
+
+New `research/guidance_revision_drift/qc_native_quotes.py` exposes immutable
+`QcNativeQuoteBatch`, `QcNativeQuote` and `QcNativeExecutionInput` contracts.
+`gdr.qc-native-quotes.v1` is a strict, explicitly supplied JSON projection of
+native `Tick.Quote` and raw completed `TradeBar` fields, bounded to 4 MiB,
+16,384 tick rows and 390 minutes. It is a bounded window, not a full-session
+streaming/history acquisition service. Unknown fields, malformed clocks,
+float/bool monetary aliases, non-finite values, fractional share counts,
+conflicting minute identities and invalid session/RAW/completeness declarations
+refuse. Numeric JSON lexemes decode directly to Decimal. Completeness metadata
+remains a supplied claim, with all coverage/rights/PIT/readiness gates false.
+
+The [QC equity data format](https://www.quantconnect.com/docs/v2/lean-engine/data-format/us-equity)
+documents one-sided ticks, New York data time, share sizes and CSV price scaling.
+This contract takes **already scaled native prices**, not CSV integers: no
+second multiplication/division by 10,000 occurs. Explicit-offset `time_ny`
+must agree with New York DST and millisecond precision, then converts exactly
+to UTC nanoseconds. The adapter preserves each selected side's actual event
+time; it invents no SIP, participant, receipt or sequence clock. An eventual
+SDK projection must bind the dated security/symbol and native ExchangeCode;
+the present parser does not inspect a live SDK object or guess its timezone.
+Exchange validation is a single uppercase code **shape**, not an authenticated
+historical venue registry. Supplied session bounds are not calendar certification.
+
+The structural book keeps latest bid and ask state separately **per observed
+venue**. Zero fields on the unused side do not withdraw the remembered opposite
+side. A zero-sized/nonpositive updated side remains invalid; an all-zero row
+has unknown side/withdrawal meaning and invalidates both venue sides. Native
+hexadecimal quote flags follow the [LEAN field descriptions](https://github.com/QuantConnect/Lean/blob/master/Data/equity/readme.md):
+this deliberately narrow diagnostic permits only exact Regular flag `1`.
+Other flags, suspicious or filled ticks invalidate both sides until strictly
+later regular observations refresh them. This is a conservative source-
+qualification restriction, not a claim that every other native flag is
+non-executable or that QC's QuoteBar filter is the strategy's filter.
+
+Complete same-millisecond groups apply atomically. Independent opposite-side
+updates commute; identical duplicates add no liquidity. Conflicting updates
+of one venue/side have no invented source order and remain ambiguous until a
+later refresh. A bad, absent, crossed or stale known venue is never discarded
+to reveal a convenient older/other quote. All remembered sides must be valid
+and no older than 60 seconds before selecting the maximum observed bid and
+minimum observed ask. Equal-priced venues choose deterministically using the
+older time; displayed size comes from one venue per side, never a sum. A
+crossed observed pair refuses rather than being healed.
+
+This is an **observed-venue BBO model, not certified NBBO**: unseen venues,
+coverage gaps, true withdrawals, participant-state semantics and completeness
+remain unresolved. Conservative refusal can exceed that of a subsequently
+qualified consolidated source. No such refusal is hidden as an accepted fill.
+QuoteBars are not substituted for ticks, so their internal carry/healing does
+not manufacture a fresh paired observation.
+
+`decision_quote` enforces the existing 10:00 New York decision, positive
+uncrossed sides, independent side ages at the exact 60-second boundary and
+exact full-spread/midpoint <= 0.50%. `subsequent_minute` requires an actual
+wholly post-submission completed raw trade minute, callback at its end, a
+decision belonging to the same source/session when supplied, and **both
+selected executable sides** updated after submission and within that minute.
+The returned `volume // 100` remains the existing completed-minute 1% capacity
+proxy, not evidence of individual trades, an order, fill or displayed-depth
+capacity. Stock and explicit SPY benchmark roles use identical rules.
+
+### 69.3 Parity surface and unchanged strategy boundary
+
+New `qc_quote_parity.compare_native_quote_parity` compares exact native and
+existing Massive batches for the same security, symbol, role and session.
+Source hashes and exact decision/submission/callback instants bind the report.
+Decision and subsequent-input acceptance are checked independently, retaining
+both sources when a stage refuses. Accepted shared bid/ask/sizes, complete
+minute OHLC/volume/interval and participation cap must match. Missing or changed
+values produce explicit mismatches; matched refusals are never usable parity.
+The versioned report contains hashes/statuses/booleans, not source rows or
+price values. No clock-equivalence or real-market parity claim is made.
+
+Equivalent invented stock/SPY streams also feed the **unchanged** existing
+`_affordable`, `execution_price` and `commission_total` functions in base and
+stress modes. Both sides' impacted prices, whole-share sizing, fees and minute
+capacity agree. No alternate financial formulas or strategy parameters are
+introduced. Original event/selection thresholds, fees, impact, limits, cash,
+settlement, SPY budget parity, simulator, order planner and multi-session
+engine remain byte-identical to the starting snapshot.
+
+The Massive schema is preserved. Existing exact-type guards in
+`input_preparation`, `order_planning` and `multi_session` still refuse this new
+native batch; it is **not wired into a real-data/order runner** before source
+qualification. It never converts native event times into fake Massive fields.
+Neither new module enters the frozen SYN native closure. No CLI acquisition,
+SDK driver, cloud-output transport or automatic data/evaluation path is added.
+In-memory quote projections are not an approved market-data export channel.
+
+### 69.4 Author findings, corrections and focused verification
+
+| ID | Priority / disposition | Evidence, correction and verification |
+|---|---|---|
+| GDR-ENG69-001 | P2, corrected before publication | Adding the two review modules creates 63 source members plus sidecar/manifest, exceeding the previous 64-member archive bound. The existing real-source build/round-trip test fails before correction. Explicit inventory adds only these files and its bound becomes 65; round-trip and inventory checks pass. |
+| GDR-ENG69-002 | P3, corrected before publication | A forged public quote clock produces OverflowError/TypeError rather than InputError. A focused red regression reproduces three malformed-clock errors; strict snapshot validation and exact in-session 10:00 membership avoid unsafe datetime conversion. Malformed/non-finite money, clock, identity and size cases now refuse cleanly. |
+| GDR-ENG69-003 | P2, corrected before publication | Unary Decimal negation in a candidate bid-sort key rounds under low ambient precision and can choose a lower bid. The old key is independently reproduced choosing P over the higher Q bid at precision 2. Selection now compares exact values without negation; a price/venue regression pins the correct result. |
+| GDR-ENG69-004 | P3, corrected before publication | A batch summary's declared no-fill setting must not conceal flagged rows retained for refusal. It now labels the declaration and separately counts suspicious/fill-forward ticks; an invented contradictory-row test verifies both counts. |
+
+Final focused **code** run: **65 methods pass in 0.559 s**, zero
+failures/errors/skips or reported warnings: 30 new native-adapter methods,
+12 new parity methods, 18 existing Massive methods and five selected bundle/
+native-closure/transitive-import/inventory/fresh-process checks. No full lane
+or repository suite is run. Six changed Python files compile in memory.
+The separate active-document method passes in 0.022 s, zero failures/errors/
+skips or reported warnings: **66 distinct focused methods** in total.
+The earlier deliberate red run is two methods/four errors, corrected above;
+these are local regression failures, not QC launch attempts.
+
+Two in-memory mutants disable spread checking and ignore parity quote values.
+Each is detected by one expected assertion failure, zero errors, and the patch
+context restores the original function. No disk mutant remains. Author QA is
+not independent Claude review or native SDK/market execution validation.
+
+Current full source SHA-256 is
+`dffc74183393de324503b7df1f0e964e6803a0a53a0595bfda87ff03c95aa2b4`
+(63 members), versus starting
+`14b2b69c104d28dd26242438c67589cdbe30ce2544a8a76c2d39c4a1ecdaa030`
+(61). The latter is independently reconstructed from the exact starting Git
+bytes. Only `bundle.py` and the two new modules change production source.
+All **20 native source members** compare byte-exact to that starting commit;
+the selected native-payload regression also passes. The immutable semantic
+draft remains `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`
+and the invented fixture remains
+`8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458`.
+A changed offline full-review identity does not rebind retained `c589b3dd`
+custody, create another accepted native candidate or reset an attempt ledger.
+
+Ignored receipt:
+`artifacts/guidance_revision_drift/qc-native-quotes-20261107/verification-v1.json`,
+2,160 bytes, SHA-256
+`4fbe289222e063feb7d643910d6ad03d5df49bff92997c3884705d1cdd835f53`.
+It binds file hashes/sizes, the source comparison, compile/test/mutation facts
+and attempt status. Its `qc_access=false` means no authenticated account,
+project or compute action; the public documentation lookups above occurred.
+New adapter source is 18,829 bytes,
+SHA-256 `664aa85b3a0faf6fbe271fdfe3d4d23d3d8938675a955fb151c6e9421d92a918`;
+parity source is 5,926 bytes,
+SHA-256 `b063b9edf25579e15f5a98643a41e8a74202d6a15d10266b0670375fee3fcdd0`.
+Historical section bodies 1 through 68 are preserved; only the active header
+and this new handoff change documentation.
+
+### 69.5 Outcome, remaining gates and single final publication
+
+This requested offline adapter/parity implementation is complete as an
+**unreviewed software candidate**. The lane is still **not backtesting ready**.
+Remaining work is native venue/withdrawal/condition/NBBO qualification and
+coverage expansion beyond four survivors, an actual bound native projection
+and real-runner integration, usable guidance revision/correction/predecessor
+history with source/time/precision/rights evidence, common dated reference/
+action inputs, equity cash/settlement and SPY execution parity, and the
+original research/economic/date/family/look freeze and evaluation gates.
+Sections 65's issuer-timezone/FY-label bridge limits are not resolved here.
+No purchase is justified or made by this implementation. Independent review
+of the exact pushed implementation is the next review step; any later native
+data validation or order-based evaluation remains separately scoped work.
+
+Original `GDR-base372-approved-20261008` remains CLOSED FAILED 3/3, zero manual
+attempts, with exhausted project 37647834 untouched. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` remains zero attempts / zero
+intents, maximum three unsuccessful attempts; no journal, recovery project or
+launch is created. The completed section-68 research audit is not another
+recovery attempt. Original immutable null/false permissions, protected dates,
+family/look allocation, funding and trading gates remain unchanged.
+
+After final root/branch/HEAD/status, diff/path, staged-record and live remote
+checks, publish exactly **one non-force push** containing implementation
+`bda3a4c0` and this handoff, from the mandatory worktree to only the matching
+lane branch. Expected pre-push remote is `aa06cf6e`; unexpected work must be
+preserved and reconciled, never overwritten. Retain exact final refs and the
+successful publication receipt in the paused checkpoint. No intermediate
+push, prior-round republication, PR/merge, monitor rearm or automatic next
+implementation/recovery is authorized. Monitor stays **PAUSED**.

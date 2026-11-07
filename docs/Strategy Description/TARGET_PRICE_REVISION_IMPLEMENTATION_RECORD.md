@@ -1,5 +1,17 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
+**Current section120 continuation (2026-11-07):** Genuine built-in Mia received
+the exact OFF diagnosis request and retrieved its existing job log. No verified
+input fix or final diagnosis has been admitted. Three fresh read-only source
+captures match all12 OFF files; no new financial job was launched. Safari
+then switched to an unattributed foreign fifth tab and displayed exhausted
+coding-session capacity. UI input stopped to protect that work. The own OFF
+Mia conversation must be available before continuation; no other session is
+stopped, no source restored and no unchanged failure relaunched. The20REMX
+rows remain quarantined, financial0/5 accepted/metricsNULL, and the one final
+lane push for this ongoing round remains reserved. Section120.5 is the latest
+bounded handoff; prior118/119 results and all attempts remain historical.
+
 **Current code review, section119 (2026-11-05):** Claude has independently reviewed every
 Codex commit in `3cf9636e..16655093` in section 119 at the owner's direct request, as a code
 review, and accepts the round after correction. The terminal input-blocked claim holds. No
@@ -35161,3 +35173,116 @@ NewrounddirectnativeQCrequests1, sourceuploads0, compiles0, jobs0, Miasends0, fi
 
 
 120continuation remainsawaitingthemanualMiafocusrequest; no native/sourceeffecthasoccurred since120.4. The pendingrecord iscommittedlocalonlytomakeverification/provenance resumable, withfinalpublicationreserved untiltheauthorizedworkisdone. No secondsection118pushandnonewroundpush. No changedproductionbytes require retesting.
+
+120ownerfocusconfirmation received: Cursor is in the newest OFF tab’s Mia box. Confirmation SHA c5099bd55245dc4191a34fe98166b4b31eebd6939bd4ccbccc0b6395ce8cc4fe; latest manualfocus supersedes the earlier pendinginput. No repeatedpermission needed.
+
+Fresh120 claim BEFORE effect {"HEAD":"29abd2030c4c31f1f8082d97bb9525a6f6471ef5","bounds":{"AX_snapshots_max":1,"app":"Safari","owner_focus_confirmed":true,"project_id":38609822,"purpose":"verify actualownOFF/Mia context before manualfocus paste; do not click,navigate,changefocus,type orSend"},"manifest":{"bytes":2839,"name":"TPR-R120-MIA-MANUAL-FOCUS-VERIFY-001.claim.json","sha256":"60732f53bcd2fbff2e8f5aa22aa0c34091bdee4ad039ef7017376da75f591804"},"operation_id":"TPR-R120-MIA-MANUAL-FOCUS-VERIFY-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"29abd2030c4c31f1f8082d97bb9525a6f6471ef5","bounds":{"endpoint":"files/read","expected_source_inventory_sha256":"06155bec30d24df0eea2d1398b618c3ff4936b5a72f2afd411c092db411ab858","native_requests_max":1,"private_registry":"artifacts/target_price_qc_recovery_20261028/TPR-CMP28-R107-PROJECT-BINDINGS-001.json","project_id":38609822,"purpose":"retain/verify all own cloudfiles before genuineMia readonlydiagnosis; no upload/compile/job/sourcechanges; candidateconfig/attemptmetadata is historicaldiagnosticlineageonly","registry_bytes":3573,"registry_reads_max":1,"registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","response_bytes_max":2097152,"seconds_max":20},"manifest":{"bytes":3258,"name":"TPR-R120-SOURCE-BEFORE-MIA-002.claim.json","sha256":"097c4b9fe3ca596cb8fe0cee77c4553ff4403db0828649a2828aed18ce4c5ce4"},"operation_id":"TPR-R120-SOURCE-BEFORE-MIA-002"}
+
+120nativeexactsourceplan PREeffect {"name": "TPR-CMP29-API-R120-SOURCE-BEFORE-MIA-002.plan.json", "bytes": 5938, "sha256": "00c4ee09b999f099bc60b0857439422206e435d2cac280e35b40a757486609c2"}; latestowneraccessSHAseparatefromimmutableEA2Dregistrycreationauthority.
+
+120readonlysourcepreflight {"native_requests": 1, "new_jobs": 0, "proof": {"bytes": 2120, "name": "TPR-CMP29-API-R120-SOURCE-BEFORE-MIA-002.safe.json", "sha256": "952727fcda0f5206e3a284332dfc0f1d26bcb97e72a8a9b0e367472bbb6a7763"}, "receipt": {"bytes": 3446, "name": "TPR-CMP29-API-R120-SOURCE-BEFORE-MIA-002.result.json", "sha256": "0ea96cc1f6d9acf0165f9b6bc08f23b8406e106037d2b320a846ab0c1b0f210e"}, "source_inventory_sha256": "06155bec30d24df0eea2d1398b618c3ff4936b5a72f2afd411c092db411ab858", "status": "completed"}
+
+Fresh120 claim BEFORE effect {"HEAD":"29abd2030c4c31f1f8082d97bb9525a6f6471ef5","bounds":{"AX_snapshots_max":1,"Mia_sends":0,"app":"Safari","manual_focus_confirmation_sha256":"c5099bd55245dc4191a34fe98166b4b31eebd6939bd4ccbccc0b6395ce8cc4fe","paste_max":1,"project_id":38609822,"prompt_bytes":1135,"prompt_sha256":"8810bb75cbbc8e0358af32942faccc54202a6fb1270408254040eb99444f026f","purpose":"pasteonceonlyintoownerconfirmedMiafocus; do not click/reposition; verifyexactliteralentrybeforeSend; sourcefreshmatch001/002","source_edits":0},"manifest":{"bytes":3060,"name":"TPR-R120-MIA-MANUAL-DRAFT-001.claim.json","sha256":"61a21787d21376962122e0e740c3b126ffaa729ccca2e088b156f76bc5d7e8a2"},"operation_id":"TPR-R120-MIA-MANUAL-DRAFT-001"}
+
+120manualfocuspaste verified exact1135Bprompt002 literallyinsideMiaentry; editorunchangedinAX. OnlynowSendonce. AskBeforeEditsconfigured, genuineMiaidentityvisible; currentall12cloudinventorymatchedimmediatelybeforepaste.
+
+Fresh120 claim BEFORE effect {"HEAD":"29abd2030c4c31f1f8082d97bb9525a6f6471ef5","bounds":{"AX_snapshots_max":1,"Mia_allowed_scope":"read-onlyexistingown12savedsourcefiles and existinglogsfor187b4319537bce77c3a8ea519ba87764; reportonlysafepricefreemetadata; rawSIDstaysINQC","Return_send_max":1,"app":"Safari","compile_jobs_resource_otherprojects":0,"new_data_History_provider_requests":0,"project_id":38609822,"prompt_sha256":"8810bb75cbbc8e0358af32942faccc54202a6fb1270408254040eb99444f026f","purpose":"single genuinebuilt-inMia diagnosis submission afterliteralentryverification; no retries or acceptanceofunverifiedsource/economicchange","source_edits_saves":0},"manifest":{"bytes":3165,"name":"TPR-R120-MIA-SEND-001.claim.json","sha256":"061f37fba042d2e8126f8f65d24607d6579d9d7d81493b29bd9d512b7e6211cd"},"operation_id":"TPR-R120-MIA-SEND-001"}
+
+120MiaSend001 Returnexecutedonce; verifieddraftcleared, Configure/Mia/AskBeforeEditsdisabled andLoadingobserved. This is a deliveredsubmission attempt awaitingactualuser-message/answer verification; no replay. NoFinancialresultaccepted.
+
+Fresh120 claim BEFORE effect {"HEAD":"29abd2030c4c31f1f8082d97bb9525a6f6471ef5","bounds":{"AX_snapshots_max":1,"app":"Safari","project_id":38609822,"purpose":"observe pending genuineMia reply to single002submission; no typing/send/navigation or newjob/sourceeffect"},"manifest":{"bytes":2776,"name":"TPR-R120-MIA-OBSERVE-001.claim.json","sha256":"fc9861efa253c118f6957bf52dca853190f74d5f11e1f9868b6c8bb2141252be"},"operation_id":"TPR-R120-MIA-OBSERVE-001"}
+
+120Miasubmission VERIFIED: exactprompt002 appears asuser message and genuineMia searchedexisting187b...logs. OneMiaSendthisround, noautomaticreplay. Mia component holdseditcontrolbutAskBeforeEdits/read-onlyprompt; do not RequestEditControl/cancel/overwrite. Existinglogprovescanary4/5 andnotfinancialcompletion; finalMiaanswerpending.
+
+Fresh120 claim BEFORE effect {"HEAD":"29abd2030c4c31f1f8082d97bb9525a6f6471ef5","bounds":{"AX_snapshots_max":1,"app":"Safari","project_id":38609822,"purpose":"read pendingMia finalanswer after verifiedexactjoblogread; passiveownconversation only; no typing/Send/source/job/resourceeffects"},"manifest":{"bytes":2800,"name":"TPR-R120-MIA-OBSERVE-002.claim.json","sha256":"acee1293dae4ba6ae9908320d038e1473b1632bf405c0bba4125837aab2de588"},"operation_id":"TPR-R120-MIA-OBSERVE-002"}
+
+Fresh120 claim BEFORE effect {"HEAD":"29abd2030c4c31f1f8082d97bb9525a6f6471ef5","bounds":{"AX_snapshots_max":1,"app":"Safari","project_id":38609822,"purpose":"check for finalanswer after boundedMiawait; passiveexactownconversation only, no typing or effect; don't repeat request"},"manifest":{"bytes":2790,"name":"TPR-R120-MIA-OBSERVE-003.claim.json","sha256":"497359ef414c5fa64232c54fdbc2defaf98f33eec439f2b3a6568f4ee2f266a3"},"operation_id":"TPR-R120-MIA-OBSERVE-003"}
+
+120firstMiaturn displayedonlyexact187b...logtoolresult; passiveobservations002/003unchanged, no finalanswerseen. One distinctfinal-onlyfollowup isprepared to useONLYalready-readsource/log, forbiddingfurthereffects; no duplicatelaunch/requestreplay. NativeMiaservicecompletionstateisnot independentlyattested.
+
+Fresh120 claim BEFORE effect {"HEAD":"29abd2030c4c31f1f8082d97bb9525a6f6471ef5","bounds":{"AX_snapshots_max":1,"Mia_further_tools_reads_edits_jobs":0,"Send_max":0,"app":"Safari","paste_max":1,"project_id":38609822,"prompt_bytes":477,"prompt_sha256":"78cd98b90c6c93a6829f2ef32b967f23808fef2bedea49a4db4b425465fb3617","purpose":"draftdistinctfinal-onlyfollowup fromalreadyobservedexactjoblogafterinitialturnhasnotshownfinalanswer; verifiedMiafocusretained; no mouse/focuschange"},"manifest":{"bytes":2999,"name":"TPR-R120-MIA-FINAL-DRAFT-001.claim.json","sha256":"012b8bb5724f526ba6cd72dd803ec3b4bd0d9af966b4a3ae644bf66ce993d5d9"},"operation_id":"TPR-R120-MIA-FINAL-DRAFT-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"29abd2030c4c31f1f8082d97bb9525a6f6471ef5","bounds":{"AX_snapshots_max":1,"Return_Send_max":1,"app":"Safari","further_read_tool_edit_compile_job_resource_effects":0,"project_id":38609822,"prompt_sha256":"78cd98b90c6c93a6829f2ef32b967f23808fef2bedea49a4db4b425465fb3617","purpose":"one distinct final-onlycontinuation afterliteralMiadraftverification; existingevidenceonly; no repeatoforiginalreadrequest"},"manifest":{"bytes":2961,"name":"TPR-R120-MIA-FINAL-SEND-001.claim.json","sha256":"83e2c409f0e767b48b1d10972ee5680d50ca8a9413e549d564d820eafd7e6a46"},"operation_id":"TPR-R120-MIA-FINAL-SEND-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"29abd2030c4c31f1f8082d97bb9525a6f6471ef5","bounds":{"AX_snapshots_max":1,"app":"Safari","project_id":38609822,"purpose":"verify final-only003delivery and read any genuineMia finalresponse; no other effects"},"manifest":{"bytes":2773,"name":"TPR-R120-MIA-FINAL-OBSERVE-001.claim.json","sha256":"43d6b58c966047f947f0864f2d7981ae5f3467e4d3d3b01ec65910a50f3321ab"},"operation_id":"TPR-R120-MIA-FINAL-OBSERVE-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"29abd2030c4c31f1f8082d97bb9525a6f6471ef5","bounds":{"AX_snapshots_max":1,"app":"Safari","project_id":38609822,"purpose":"fullownpage snapshot becausepreviousdiffshowedbootstrap/navigationchromechanges andnoanswer; verifyMiaactivity/currentURLwithoutinput"},"manifest":{"bytes":2816,"name":"TPR-R120-MIA-FINAL-STATE-001.claim.json","sha256":"43f395f456e7a5bff0575d7a0e1b2a341da0425e909807c6d3c3603b2b4704d3"},"operation_id":"TPR-R120-MIA-FINAL-STATE-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"29abd2030c4c31f1f8082d97bb9525a6f6471ef5","bounds":{"endpoint":"files/read","expected_source_inventory_sha256":"06155bec30d24df0eea2d1398b618c3ff4936b5a72f2afd411c092db411ab858","native_requests_max":1,"private_registry":"artifacts/target_price_qc_recovery_20261028/TPR-CMP28-R107-PROJECT-BINDINGS-001.json","project_id":38609822,"purpose":"retain/verify all own cloudfiles after genuineMia readonlydiagnosis submission and observed foreign active-tab change; no upload/compile/job/sourcechanges; candidateconfig/attemptmetadata is historicaldiagnosticlineageonly","registry_bytes":3573,"registry_reads_max":1,"registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","response_bytes_max":2097152,"seconds_max":20},"manifest":{"bytes":3304,"name":"TPR-R120-SOURCE-AFTER-MIA-001.claim.json","sha256":"345eef52411c529ebd375f03b96531bf74834c7fc0e9f4426adec037838d0cbe"},"operation_id":"TPR-R120-SOURCE-AFTER-MIA-001"}
+
+120nativeexactsourceplan PREeffect {"name": "TPR-CMP29-API-R120-SOURCE-AFTER-MIA-001.plan.json", "bytes": 5937, "sha256": "81c53ae3d61dcc2f943106386ce3bf98c93c1991cdeb630a0c78a52b739bf827"}; latestowneraccessSHAseparatefromimmutableEA2Dregistrycreationauthority.
+
+120readonlysourcepreflight {"native_requests": 1, "new_jobs": 0, "proof": {"bytes": 2117, "name": "TPR-CMP29-API-R120-SOURCE-AFTER-MIA-001.safe.json", "sha256": "52a82e0d9ba535e7be4e067ed5cd89ccb8d916976883268ba1596c8768a252b5"}, "receipt": {"bytes": 3442, "name": "TPR-CMP29-API-R120-SOURCE-AFTER-MIA-001.result.json", "sha256": "0eb4fb8ff7ecef9528b5e59ad1400774e5a7f063d5cc631b1adb897b3c5746bd"}, "source_inventory_sha256": "06155bec30d24df0eea2d1398b618c3ff4936b5a72f2afd411c092db411ab858", "status": "completed"}
+
+### 120.5 Genuine Mia submission and external UI contention
+
+The owner's manual-focus confirmation allowed one paste of prompt
+TPR120-MIA-DIAG-002. Its exact 1135-byte text was verified in the genuine
+Mia composer before one Return submission. The user message and Mia's
+existing-log lookup for exact job187b4319537bce77c3a8ea519ba87764 were then
+visible. This is one verified submitted Mia turn, not a financial job or
+a verified repair. The retrieved price-free result still reports target
+freshness4/5, including the prior-day Feb10cache; no final diagnosis was
+visible in the bounded observations. No source edit, compile, notebook,
+new-data query or backtest was requested.
+
+A distinct final-only prompt TPR120-MIA-FINAL-003 was pasted and verified
+literally, then Return was submitted once. It explicitly forbids further
+tools/reads/edits/jobs and asks only for the final answer from the already
+read evidence. Its draft cleared and Loading appeared. Its persisted user
+message and final answer have NOT been verified. Retain this as a second
+submission attempt with uncertain final delivery/result; do not replay it.
+
+During passive observation, Safari's active view changed to a fifth tab
+for project39054561/code, whose page reports No Coding Session Available
+and lists two occupied sessions. Root created only the earlier fourth
+OFF tab; the additional tab/navigation is unattributed. No typing,
+navigation, tab selection/closure, Stop, upgrade or resource change was
+performed after detecting this foreign active context. Actual shared-UI
+contention is observed; this is not a conclusion based merely on another
+monitor's existence. Do not infer that OFF's existing session or backtest
+compute is unavailable from the foreign project's coding-session page.
+The owner was asked to leave OFF's Mia conversation foreground only when
+Safari is free. No renewed task permission is needed.
+
+An independent read-only native postflight succeeded under a fresh claim:
+all12 OFF files still match inventory
+06155bec30d24df0eea2d1398b618c3ff4936b5a72f2afd411c092db411ab858.
+The before001, before002 and after001 captures all retain the same
+346396-byte wire SHA70d79b20a03930fab6704bd1bb06053c9c5ae7ac7e49893a2953cb94913411af.
+The after safe proof is2117B/
+SHA52a82e0d9ba535e7be4e067ed5cd89ccb8d916976883268ba1596c8768a252b5;
+before002 is2120B/
+SHA952727fcda0f5206e3a284332dfc0f1d26bcb97e72a8a9b0e367472bbb6a7763.
+No cloud correction was admitted or ported. Read-only source equality
+does not establish exclusive custody or financial/native-input acceptance.
+
+This round now has3 direct native API requests, all files/read;
+sourceuploads0/compiles0/newjobs0/financialattempts0/outcomelooks0.
+Mia:1 verified submitted diagnosis plus1 final-only submission attempt
+whose persisted delivery/answer is unverified;1 existing-job log read
+observed. Mia/UI internal requests are separate and not asserted complete.
+Financial acceptance remains0/5; all financial metrics NULL. No current
+other-arm native status was inspected. The20REMXrows stay quarantined.
+
+A read-only Codex design audit identified an unclosed metadata gap: the
+existing OnData counts are global, while the close observation reads the
+security cache. They do not distinguish no exact-target Slice delivery
+from a Slice-to-cache issue. This is a prospective diagnostic question,
+not an input fix. A public synthetic renderer feasibility check reports
+59897B for current119-corrected v5, or59140/58984B under proposed pure
+whitespace compactions preserving the entire significant token sequence
+and AST. These are unimplemented synthetic proposals; the real source
+configuration and a delivery hook have NOT been built or verified.
+The60000B source cap, every guard and all historical epochs remain
+unchanged. No speculative new source was uploaded or launched.
+
+Next action is a fresh bounded read of the own OFF Mia conversation after
+the shared Safari surface is released, then independent verification of
+any actual correction. Do not send either prompt again, take control from
+another lane/Mia, restore source, or relaunch unchanged financial failures.
+The source/input/full-window prerequisites for OFF and the remaining arms
+remain unresolved. This is a resumable external-input handoff, not a
+finished research result; the final single lane push remains reserved.

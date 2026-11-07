@@ -1,16 +1,16 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current section120 continuation (2026-11-07):** Genuine built-in Mia received
-the exact OFF diagnosis request and retrieved its existing job log. No verified
-input fix or final diagnosis has been admitted. Three fresh read-only source
-captures match all12 OFF files; no new financial job was launched. Safari
-then switched to an unattributed foreign fifth tab and displayed exhausted
-coding-session capacity. UI input stopped to protect that work. The own OFF
-Mia conversation must be available before continuation; no other session is
-stopped, no source restored and no unchanged failure relaunched. The20REMX
-rows remain quarantined, financial0/5 accepted/metricsNULL, and the one final
-lane push for this ongoing round remains reserved. Section120.5 is the latest
-bounded handoff; prior118/119 results and all attempts remain historical.
+**Current section120 continuation (2026-11-07):** The in-app browser now
+opens the own OFF session independently of native Safari. Genuine saved Mia
+final answer claims no input fix and confirms the missing per-target Slice
+delivery evidence. The new bounded delivery-census source is locally verified
+by272focused checks and independent Codex judgment after correction, but no
+new native job is launched yet. Section120.8 owns exact hashes, negative
+history, source-budget/packing limits and the next serialized activation.
+Actual private rendering, source/owner/resource preconditions and native
+input recovery remain unproved.20REMXrows stay quarantined; financial0/5
+accepted/metricsNULL. Routine Claude review is skipped. The final single
+lane push for this ongoing round remains reserved; none has occurred.
 
 **Current code review, section119 (2026-11-05):** Claude has independently reviewed every
 Codex commit in `3cf9636e..16655093` in section 119 at the owner's direct request, as a code
@@ -35286,3 +35286,226 @@ another lane/Mia, restore source, or relaunch unchanged financial failures.
 The source/input/full-window prerequisites for OFF and the remaining arms
 remain unresolved. This is a resumable external-input handoff, not a
 finished research result; the final single lane push remains reserved.
+
+120ownersteering: use the app's built in browser to access safari. Interpret this as using the Codex in-appbrowser for the ongoingQC/OFFMia task, leaving nativeSafari's activeforeigncontext untouched. No newfinancial/source/resource authority or repeatMiasend is inferred.
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"URL":"https://www.quantconnect.com/project/38609822","browser":"iab","initial_UI_snapshot_max":1,"own_new_tab_max":1,"project_id":38609822,"purpose":"open ownOFF directlyinappbrowser after ownerexplicitpreference; inspectIABdocumentation/authentication/Mia capability; do not accessnativeSafari's tabs, stopcodingresources, edit source, compile or launch","visible":true},"manifest":{"bytes":2975,"name":"TPR-R120-IAB-OFF-OPEN-001.claim.json","sha256":"70201d01a2b83ed1c45294f4fab8f6d6b542e93335bebbe57135472d7f07eb83"},"operation_id":"TPR-R120-IAB-OFF-OPEN-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"AX_snapshots_max":1,"QC_login_navigation_max":1,"browser":"iab","handoff_mark_max":1,"owned_tab":"1","purpose":"open visibleQuantConnectSignIn link innewownIABtabandkeepitforownerlogin; IABcurrentlyunauthenticated; no credentialread/copy/entry, noSafariaccess/noaccountsettings"},"manifest":{"bytes":2892,"name":"TPR-R120-IAB-SIGNIN-OPEN-001.claim.json","sha256":"1e614590e0d7f9a7f1ef7fb27dce5e06f79ca74a0f79c10c0363fb813faf1c83"},"operation_id":"TPR-R120-IAB-SIGNIN-OPEN-001"}
+
+120IABSignInnavigation resolved toauthenticatedQC/lab Connectedasowner withoutanycredentialentry/copiedSafaricookies/securitychange. Earlierunauthenticatedinitialsnapshotwastransient; noownerloginquestionisneeded. ContinuewithonlyownOFFinIAB. NativeSafariuntouched.
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"AX_snapshots_max":1,"URL":"https://www.quantconnect.com/project/38609822","browser":"iab","navigate_max":1,"owned_tab":"1","project_id":38609822,"purpose":"openonlyownOFFafterIABauthentication andreadexistingMia conversation; do not resend002/003, stopresources, edit/save/compile or createjobs"},"manifest":{"bytes":2906,"name":"TPR-R120-IAB-OFF-RESUME-001.claim.json","sha256":"024c1f05cc3b88ed44f81a22a11f0158cc16f38eb75f24ee8933a0870cec3ed6"},"operation_id":"TPR-R120-IAB-OFF-RESUME-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"AX_snapshots_max":1,"browser":"iab","owned_tab":"1","project_id":38609822,"purpose":"observe SPA authentication/projectbootstrap afterdirectOFFnavigation; no repeatedlogin or other effects"},"manifest":{"bytes":2800,"name":"TPR-R120-IAB-OFF-LOADED-001.claim.json","sha256":"d48f748398ab498b174f7557e05d189e51ba2a6397cbe460971e9287b6e1a20f"},"operation_id":"TPR-R120-IAB-OFF-LOADED-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"AX_snapshots_max":1,"browser":"iab","owned_tab":"1","purpose":"resolveoldprojectroute'ssign-inplaceholder throughsite'svisibleProjectsHome navigation; labpreviouslyauthenticated; noURLguessing/cookies/credentials/settings orsourceeffects","visible_Projects_link_click_max":1},"manifest":{"bytes":2900,"name":"TPR-R120-IAB-LAB-PROJECT-NAV-001.claim.json","sha256":"79a7ec1f0dbaf991b280358dc8a9f782d91d89ecfa692f35cd6dde7b7e008d4b"},"operation_id":"TPR-R120-IAB-LAB-PROJECT-NAV-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"DOM_snapshots_max":1,"browser":"iab","owned_tab":"1","purpose":"resolveinconsistentQCrouteauthenticationusingdocumentedrenderedDOMonly; no cookie/storage/networkinternalintrospection, noeffects"},"manifest":{"bytes":2784,"name":"TPR-R120-IAB-DOM-001.claim.json","sha256":"c20aac1a57be7d60254557602b178af8f40410e4543b409b2e7c1132cf12e9ca"},"operation_id":"TPR-R120-IAB-DOM-001"}
+
+120IABauthentication correction: one earlierAXsnapshot brieflyshowedConnectedasowner atlab/, butsubsequentexactOFFandlabDOMshowSignIn/QuantDeveloperplaceholder. Therefore IABauthenticatedsessionisNOTestablished. UsefreshsemanticSignInlink ratherthaninferSafarisharedcookies; no credentialvaluesreadorcopied.
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"DOM_snapshots_max":1,"browser":"iab","handoff_mark_max":1,"owned_tab":"1","purpose":"openexactvisibleQCSignInlinkafterDOMverifiedsignedoutstate; prepareconcretesigninformforownerifneeded; no credentialinput/cookies/accountchanges","semantic_SignIn_click_max":1},"manifest":{"bytes":2871,"name":"TPR-R120-IAB-LOGIN-FORM-001.claim.json","sha256":"427676a1d6eb4317c7ba16003c1a99009a4155b7cad4135c277bfc21ef5d06b7"},"operation_id":"TPR-R120-IAB-LOGIN-FORM-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"DOM_snapshots_max":1,"Projects_tab_click_max":1,"browser":"iab","owned_tab":"1","purpose":"useauthenticatedlab'svisibleProjects tab tolocateexactOFF viaUI ratherthanrepeatdirectlegacyURL; projectmetadataonly,nosource/resource/job effects"},"manifest":{"bytes":2858,"name":"TPR-R120-IAB-PROJECTS-LIST-001.claim.json","sha256":"f845ca25a700391f469e653eab53b4305d834091c24fe870cbe22758e6e1fdb1"},"operation_id":"TPR-R120-IAB-PROJECTS-LIST-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"DOM_snapshots_max":1,"browser":"iab","owned_tab":"1","purpose":"readcurrentlabafteroldProjects-tablocatorresolvednomatches; inspectactualSPAloadedworkspace UI beforeanynextaction; noretry/guessing/effects"},"manifest":{"bytes":2813,"name":"TPR-R120-IAB-LAB-READY-001.claim.json","sha256":"a41a872ac5fc07064db35ab5e2f8949cc573305f75f57dd8cb48125abfe1c02d"},"operation_id":"TPR-R120-IAB-LAB-READY-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"DOM_snapshots_max":1,"browser":"iab","exact_project":"TPR-CMP28-R107-20261029A-OFF","owned_tab":"1","project_id":38609822,"purpose":"openownOFFusingloadedauthenticatedworkspace'sexactexistingOFFlink; reuseitsownsession,neverstoporchangeothercodingresources; no source/edit/compile/job/Miasend","visible_existing_OFF_link_click_max":1},"manifest":{"bytes":2959,"name":"TPR-R120-IAB-OPEN-ACTIVE-OFF-001.claim.json","sha256":"703b67ff7efa272fabe551f665472e862e02d69f4670151ea45a506feec174a5"},"operation_id":"TPR-R120-IAB-OPEN-ACTIVE-OFF-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"DOM_snapshots_max":1,"browser":"iab","output_characters_max":30000,"owned_tab":"1","project_id":38609822,"purpose":"observeexistingOFFsessionaftervisiblelinkselection; waitthroughserverbootstrapwithoutresourcecancellation or duplicateopens; no input/effects"},"manifest":{"bytes":2890,"name":"TPR-R120-IAB-OFF-SESSION-READY-001.claim.json","sha256":"b2967a9df29ed59d67f672c144e7005d49324b8f5079a50508d6d250a3ed227c"},"operation_id":"TPR-R120-IAB-OFF-SESSION-READY-001"}
+
+120IAB now loaded exactOFFexistingcodingiframe throughauthenticatedworkspaceOFFlink; projectname/sourcev5 metadata visible. No other session stopped. EarlierProjectstabnomatcheswasSPAtransitiontonewhome, notprovedauthfailure. NativeSafari remains untouched. InspectonlyMiarenderedDOM inobservednestedframe.
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"browser":"iab","implementation_limit":"SDKpreallocation/hiddenbodybyteboundnotproven; visibleDOMreadcountandoutputbounded","observed_Mia_outer_frame_name":"9a25cef3-6574-4b22-923a-bdc21aa51f82","output_characters_max":24000,"owned_tab":"1","project_id":38609822,"purpose":"retrievepersisted002/003messages/finalresponsefromgenuineMia onlyusingvisibleDOM; ignoreoldhistory/otherframes; no toolsends/source/data/job effects","rendered_Mia_body_reads_max":1},"manifest":{"bytes":3059,"name":"TPR-R120-IAB-MIA-READ-001.claim.json","sha256":"9f69d20341c6f55847d23c6a7c6401cda0492b2dd7e84cf36d8db136af990611"},"operation_id":"TPR-R120-IAB-MIA-READ-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"browser":"iab","output_characters_max":10000,"owned_tab":"1","project_id":38609822,"purpose":"currentreopenedMiaconversationdoesnotshowrequest002marker; inspectonlysavedtailtoidentifylatestpersistedturn andcontrols before anyhistoryselection; no resubmission/effects","rendered_Mia_body_reads_max":1},"manifest":{"bytes":2904,"name":"TPR-R120-IAB-MIA-TAIL-001.claim.json","sha256":"1ed8de4d8be23816c3942736250a942d12c686c21e438a30c8cc65dde81b3366"},"operation_id":"TPR-R120-IAB-MIA-TAIL-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"input":"alreadyreturnedgenuineMia renderedsafefinaltextfromIAB-MIA-TAIL-001","input_chars_max":3000,"private_output_max":1,"processing_max":1,"purpose":"retainverbatimpricefreeMiafinalforindependentcounter-review; nonewUI/privatecapture/providerread, nopromotiontofinancialevidence"},"manifest":{"bytes":2899,"name":"TPR-R120-MIA-FINAL-RETAIN-001.claim.json","sha256":"5b2516106f11abe620c8ca077ff1cbb36f6fb2978e3ca44102a50cdf4a676112"},"operation_id":"TPR-R120-MIA-FINAL-RETAIN-001"}
+
+120genuineMiapersistedfinalreply verifiedinIABconversationandretained {"bytes": 1974, "name": "TPR-R120-MIA-FINAL-VERIFIED-001.txt", "sha256": "8be491c95d72bfa683cf33671ec7f195c96797436501bcadcf05b4d405f8f7bf"}. Request002markerwasnotpresentinrenderedbody, butexact187b...logandfinalanswerarepresent; doNOTassert003persistedmessageorresend. FinalclaimsNOinputfix/readiness. Rootqualifiesmappingasretainedhistoricaltraceonly, notnewnativeorigin/readerpathproof; cachealonecannotcountallSliceevents andnoSDKtree-resolverAPIwillbeinvented.
+
+### 120.6 Prospective delivery-census epoch; local build before any native effect
+
+Owner's in-app-browser preference recovered an independent authenticated
+OFF view and genuine saved Mia final answer without native Safari input.
+Current authoritative limit is unchanged: no verified same-session input
+repair. The final answer confirms the per-target Slice-delivery evidence gap.
+Its proposed cache-count/tree-resolver sensor is not accepted as an existing
+or sufficient SDK implementation. Historical mapping agreement does not
+prove the reader's selected row, and isolated cache failure proves neither
+no trading nor provider-wide absence.
+
+Freeze a new nonfinancial diagnostic source epoch before implementation:
+fixed existing five sessions2021-02-08..12, protectedOFF38609822 only, same
+QC-only hashed parent/SID bootstrap, targetRAW/minute/noFF policy, fixed
+SPY control configuration, source/custody/clock/reference guards and
+existing callback/bar bounds. Add per-role/per-session TradeBar-delivery
+event counts and safe last-end metadata, separate counts before versus
+after the existing fixed cache observation. No OHLC/price/volume reads,
+rawSID/export, History, provider market-data request, order, cache update,
+subscription removal, resource-cap change, date extension or financial
+admission. Measured zero requires complete successful observation coverage;
+otherwise label unknown/incomplete. Preserve first failure and never
+backfill the earlier cache observation with later delivery.
+
+Use NEW versioned builder/action/schema files, preserving119-corrected
+and historical source/test pins. An exact significant-token/AST-preserving
+whitespace compaction may be newly verified to meet the unchanged60000B
+source cap. If all required metadata/guards cannot fit, stop this proposal
+rather than prune guards, raise the cap, or launch an incomplete sensor.
+Public synthetic feasibility is not production fit proof. Native activation
+requires focused isolated tests, independent Codex source judgment, exact
+actual source rendering/pins committed, fresh ownership/source/no-active-job
+preconditions and a new fixed-route attempt/look claim. No routine Claude
+checkpoint, unchanged failing financial relaunch or override flag.
+
+Order-based evaluation remains the financial default. This exception is
+a non-order native-input delivery sensor: it reads no market values and
+cannot support return/P&L, held-mark or strategy-readiness conclusions.
+All financial metrics remainNULL;20REMXrows remain quarantined. This local
+build grants no native effect until its reviewed source epoch is committed.
+
+
+Fresh120 claim BEFORE effect {"HEAD":"5abfdb2c3f9ddce0f4842a71da53f37a12579870","bounds":{"financial_provider_requests":0,"private_reads":0,"public_page_reads_max":2,"public_urls":["https://github.com/QuantConnect/Lean/blob/master/Common/Data/Slice.cs","https://github.com/QuantConnect/Lean/blob/master/Common/Data/Market/TradeBar.cs"],"purpose":"verifyprimarynativeSliceTradeBarAPIforprospectivepricefreeeventcensus; no privateidentity ormarketdataqueries"},"manifest":{"bytes":2989,"name":"TPR-R120-LEAN-DELIVERY-DOCS-001.claim.json","sha256":"659c2e96495012050f51e7f50e0eb6100d79c76b8ab756d2a68f54599e75e4a6"},"operation_id":"TPR-R120-LEAN-DELIVERY-DOCS-001"}
+
+### 120.7 Verified source-budget refusal and public-helper representation amendment
+
+The complete proposed delivery sensor measured61845B with the old compactor
+and60801B after a prospective significant-token/AST-preserving compaction,
+801B above the unchanged60000Bcap before final labels. This was a public
+synthetic local feasibility refusal, not a cloud launch/financial attempt.
+No required guard or metadata was removed and no larger cap was used.
+
+A separate root public-source measurement verified the exact17338B helper
+SHA6539ae749aefb4884ed52258fc2f0f77c9481a5e8ee37ea80ec7065218f0da95
+roundtrips byte-for-byte through fixed zlib compression. Its escaped plain
+literal18333B versus a5218Bbase85 literal saves13115B before decoder guards.
+No private witness/SID or market input was read. Root therefore explicitly
+amends only the prospective source representation, BEFORE implementation
+or native effect: the NEW builder may encode/compress this exact public
+helper, accepting the original exact helper_source bytes and SHA as before.
+Prefer strict base64 validation; a modestly larger encoding is acceptable.
+Use bounded decompression with maximum output17339B, require exactly17338B,
+EOF, no unused/trailing/multistream or unconsumed data, and the unchanged
+helper SHA BEFORE compile/exec. All decode/hash failures must stop before
+helper execution. No arbitrary helper/decoder/source/transport input is added.
+
+This is an explicit NEW representation contract, not a claim that the old
+outer-source AST/string literals are unchanged by packing. The reconstructed
+helper's entire bytes/AST/logic must remain exact. Any whitespace compactor
+still proves its own input/output significant token sequence and AST equal.
+If packing fits with the existing compactor, omit unnecessary additional
+OP minification. Keep the60000B cap, all parent/config/source/custody/clock/
+reference/firstfailure guards, native policies, epochs and all old files.
+New builder/action/schema hashes and exact generated-main bytes must be
+focused-tested, independently judged and committed before production use.
+
+New Slice-bar metadata samples are a separate bounded sensor: maximum
+12000 observed delivery events and24000 endpoint metadata samples under
+the existing6000delivered-slice/12000bar-row and6400entry caps. They are
+not cache SDK reads, provider requests or share volumes. Retain existing
+parentObjectStore2/configquery37/cachemetadata41/simulatedquantity10 caps;
+do not add per-callback configuration queries. Report metadata absence only
+with complete successful coverage; all financial/readiness flags stayFALSE.
+No tree-resolver/private-data API, new provider query or financial retry.
+
+### 120.8 New delivery source epoch verified locally; activation pending
+
+Final new files (all old source/tests remain exact):
+- native_cache_delivery_probe_20261107.py18537B/SHA27f08e82823219fcf4ec4af945f8de826f6daad46806d0779ff52af7d5886c1c.
+- test_qc_native_cache_delivery_probe_20261107.py19076B/SHA20d7438eb281bc1f0d707042b176f8da911637bacf993d0a58686427a32664bf.
+- native_cache_delivery_actions_20261107.py40151B/SHA8f4ba12b2daa0b395b0a8c6b45a37071c59923e9308408f1ab3c7a12aff9cef0.
+- test_qc_native_cache_delivery_actions_20261107.py52086B/SHA06adfc9b492b49cc9c570181eb07b29edcebcca186687e4bb225bb107251ccc6.
+
+Root final focused verification, Python3.13.15/Mac:63builder tests passed
+7.57s (7.69s orchestration) and209action tests passed170.36s
+(170.48s orchestration); final source/test hashes stable before/after.
+Total272 final focused tests; no fullsuite. All tests used syntheticDB
+and preimport-isolated49/52runtime, socket/DNS denial and brokercredential
+envunset without printing; no operatorDB/stopflag/provider/native effects.
+Earlier provisionala28a8c9f builder +a7005ba7 tests gave59passed6.47s;
+that result is retained at its exact old hashes and is not final validation.
+
+| Finding | Priority | Disposition | Correction and proof |
+|---|---|---|---|
+| CMP120-DELIVERY-001 | P2 | Confirmed, closed before activation | Initial same-reference Slice metadata could mutate after its first sample. Final27f08e82 resamples full metadata and reference at endpoint, within24000samples; root in-memory reversal of ONLY that guard produced4failed/59deselected1.19s (1.31s orchestration), all4 expected in-place time/end/FF/SID cases. Original constant restored in finally, filehash unchanged. Final63green covers the correction. |
+| CMP120-DELIVERY-002 | P3 | Confirmed, closed before activation | Incomplete initial counters needed an explicit provisional label. Final delivery_counts_status is measured_events_only only with complete successful guards/per-day pre/post callback coverage; otherwise provisional_unproved/diagnostic_failed. No metadatazero is promoted from incomplete observations. |
+
+Independent read-only Codex source judgment accepted all4 final hashes
+after those corrections. Reviewer ran no tests/private/native/UI/provider
+effects and made no edits. Root reviewed the complete newbuilder and
+minimal prior-to-new action diff: fixed genuine ownerTLS, shared API lock,
+8nativecompile-proof chain, O_EXCL/fsync/spend, source/HEAD/deadline/echo,
+retention and publication-failure safeguards remain. New actions add the
+prior-builder module path guard; no generic mutation path/override exists.
+The old fixed action and every historical source/test pin are unchanged.
+
+NewbuilderEPOCH TPR-NATIVE-PARENT-DELIVERY-20261107-v1; config/build/
+observation schemas tpr-native-delivery-cache-{config,build,observations}-v1.
+Action/result schemas tpr-fixed-cache-delivery-action-v1 and
+tpr-fixed-cache-delivery-action-result-v1. Newprivate action root is
+native-cache-delivery-actions-20261107; historical API operation/attempt/
+look prefixes remain lineage, not financial acceptance. Newnativejob name
+when actually launched will be TPR-DELIVERY-20261107-OFF-D1, with distinct
+probeTPR-CACHE-20261104-DELIVERY-OFF-001 and attempt/lookDELIVERY-OFF-001.
+No actual jobID exists yet; do not fabricate one or reset earlier counts.
+
+Final public synthetic main is50703B under unchanged60000B. Exact real
+parent config/rendering remains untested until a fresh private claim AFTER
+this source is committed. The inherited prior renderer's intermediate
+60000B refusal remains fail-closed, as does the final source cap. The fixed
+public helper is strictbase64/limitedzlib decoded, exact17338B/SHA checked
+beforeexec; complete helper/guard logic is preserved. Old compactor plus
+full significant-token/AST equality checks avoids extra OP minification.
+No native mapper/file-resolver or calendar API was invented. Delivery is
+counted only after successful registration; no full premarket/trade/provider
+absence claim is made. before/after means the existing cache-observation
+ATTEMPT, not proof of a fresh mark or a successful cache cell.
+
+Next authorized step: commit these exact new source bytes, then freshly
+claim only exact registry3573B and source-only parent config6703B plus
+public helper, verify actual generated main fit and current source/owner/
+Mia/no-active-OFF-job conditions. Use ONLY the new fixed serialized route
+for one upload, compile, native BuildSuccess proof and diagnostic launch;
+retain8proofs and all negatives. Stop on source/HEAD/remote drift or actual
+contention without cancellation/overwrite. No financial launch is ready
+merely because local272checks pass.20REMXrows remain quarantined, all
+financial metricsNULL/0of5accepted. No push has occurred in this ongoing
+round; final one-lane nonforce publication remains reserved.
+
+120.8 final active-document validation: root-delegated independent Codex check
+ran ONLY test_document_consistency.py -k "section118 or section_119":
+256passed/635deselected/0failed/no warnings shown,5.12s pytest/5.23s
+harness onPython3.13.15/Mac. Preimport-isolated49/52runtime,syntheticDB,
+socket+DNSdenial. HEAD5abfdb2c and recordSHAa302d40b80a653d7a616448b9aaa39505e4a5770d533d3ed065f722e68703f9c
+stable before/after. This recovers the prior lost/truncated tool result by
+a fresh bounded rerun; no fullsuite or private/native/UI/provider effects.
+Final four new source/test pins, AST/compile/LF and git diff --check pass.
+Actual matching Target remote remainsd127746e92fd7051a08b6efa66a12ede0ade568e.
+Commit the source epoch locally now; final push remains reserved.
+
+#### 120.8.1 Final pureLF source normalization before commit
+
+Staging made git diff --cached --check inspect the new untracked files for
+the first time and exposed one excess blank EOF line in builder and its
+test. Earlier unstaged diff --check did not cover those untracked additions;
+its prior claim is limited accordingly. Removed exactly oneLFbyte from
+each, preserving completeAST; updated exactly one builderSHA literal in
+actions and actiontests. Independent Codex comparison to retained staged
+oldblobs accepted: every other byte unchanged. Historical hashes/results
+in120.8 are preserved; the following are the actual committed-source pins:
+
+| File | Bytes | SHA256 |
+|---|---:|---|
+| native_cache_delivery_probe_20261107.py |18536|2b6f1225c1e7296f79db831d464a1fbabaa4bfccf80eaaf5267dd35eba3cc6d8|
+| native_cache_delivery_actions_20261107.py |40151|1a561b43f0f9bb9450f4d2da93f45d951ba00bbaeac60a97b4410048082c3c65|
+| test_qc_native_cache_delivery_probe_20261107.py |19075|db6af2664ae34c8eb98e0b767a3ea7eda07a6166d53078a6d844f1df1f8b4e0e|
+| test_qc_native_cache_delivery_actions_20261107.py |52086|0cbccf0d22a8c8bc0913bedadad571ef6f8ab17967de4ec05c46794a66c35ac1|
+
+Root reran ONLY those two focused modules on exact normalizedbytes:
+272passed165.85s/165.95s orchestration,Python3.13.15/Mac,no warnings shown;
+all4 hashes stable before/after. Same preimport-isolated49/52runtime,
+syntheticDB, socket+DNSdenial. No fullsuite/private/native/provider effects.
+Source/schema/diagnostic policy unchanged. Keep newsource local until final
+single publication; commit it before the first actual private rendering.

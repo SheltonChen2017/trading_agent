@@ -40,6 +40,7 @@ OUTPUT_NAMES = ("reservation.json", "observation-started.json", "transition.json
 MAX_IPC = 1024 * 1024
 GIT_IMAGE = Path("/Library/Developer/CommandLineTools/usr/bin/git")
 GIT_LIBRARIES = Path("/Library/Developer/CommandLineTools/usr/lib")
+GIT_CONFIG = Path("/Library/Developer/CommandLineTools/usr/share/git-core/gitconfig")
 _PARENT_SANDBOX_APPLIED = False
 
 
@@ -68,8 +69,11 @@ def compact(identity):
 def identity(head):
     value = producer._identity(head)
     sources = dict(value["source_sha256"])
-    for name in OWN:
+    frozen = stable.native.source_runner.FROZEN
+    for name in (*OWN, *frozen):
         data = (ROOT / name).read_bytes()
+        if name in frozen:
+            need(sha(data) == frozen[name], "source_refused")
         blob = subprocess.check_output(["git", "--no-optional-locks", "show", head + ":" + name], cwd=ROOT,
             env={"PATH": "/usr/bin:/bin:/usr/sbin:/sbin"}, stderr=subprocess.DEVNULL)
         need(data == blob, "source_refused")
@@ -122,7 +126,7 @@ def policy(identity_value, *, metadata=None, parent=False, readback=False, role=
         result += '(allow file-read-data (subpath ' + json.dumps(str(common)) + '))'
         prior._disjoint_runtime_directories((GIT_LIBRARIES,), (ROOT, stable.PRIVATE_CUSTODY_ROOT, controls.RECENT_ROOT))
         result += '(allow file-read-data (subpath ' + json.dumps(str(GIT_LIBRARIES)) + '))'
-        leaves.extend((ROOT / ".git", ROOT / ".gitignore", GIT_IMAGE))
+        leaves.extend((ROOT / ".git", ROOT / ".gitignore", GIT_IMAGE, GIT_CONFIG))
     if parent or readback:
         leaves.extend(OUTPUT / name for name in (*OUTPUT_NAMES, "failure.json"))
     ancestors = {ancestor for leaf in leaves for ancestor in leaf.parents}

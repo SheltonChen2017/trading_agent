@@ -130,6 +130,8 @@ def test_git_frontend_chain_has_only_the_exact_apple_executable_and_runtime_gran
         assert '(subpath "' + str(m.ROOT) + '")' not in profile
     parent = m.policy(_bound(), parent=True)
     assert '(subpath "' + str(m.GIT_LIBRARIES) + '")' in parent
+    assert '(literal "' + str(m.GIT_CONFIG) + '")' in parent
+    assert '(subpath "' + str(m.GIT_CONFIG.parent) + '")' not in parent
 
 
 def test_identity_uses_a_git_verified_legacy_shape_and_includes_every_new_image(monkeypatch):
@@ -139,6 +141,8 @@ def test_identity_uses_a_git_verified_legacy_shape_and_includes_every_new_image(
     monkeypatch.setattr(m.subprocess, "check_output", lambda args, **_k: (m.ROOT / args[-1].split(":", 1)[1]).read_bytes())
     value = m.identity(base["head"])
     assert set(value) == {"root", "branch", "head", "clean", "source_sha256", "source_inventory_sha256"}
+    assert set(m.stable.native.source_runner.FROZEN) <= set(value['source_sha256'])
+    assert all(value['source_sha256'][name] == digest for name, digest in m.stable.native.source_runner.FROZEN.items())
     assert set(m.OWN) <= set(value["source_sha256"])
     assert value["source_inventory_sha256"] == m.sha(m.raw(value["source_sha256"]))
     assert seen == [value] and m.compact(value)["sources"] == value["source_sha256"]
@@ -147,6 +151,15 @@ def test_identity_uses_a_git_verified_legacy_shape_and_includes_every_new_image(
 def test_identity_refuses_working_image_that_differs_from_committed_blob(monkeypatch):
     monkeypatch.setattr(m.producer, "_identity", lambda _head: _bound())
     monkeypatch.setattr(m.subprocess, "check_output", lambda *_a, **_k: b"different committed image")
+    with pytest.raises(m.StorageDossierError, match="source_refused"):
+        m.identity("b" * 40)
+
+
+def test_identity_refuses_frozen_bytes_even_when_git_blob_matches(monkeypatch):
+    monkeypatch.setattr(m.producer, "_identity", lambda _head: _bound())
+    monkeypatch.setattr(m.producer, "_current", lambda _value: None)
+    monkeypatch.setattr(m.stable.native.source_runner, "FROZEN", {m.SELF: "0" * 64})
+    monkeypatch.setattr(m.subprocess, "check_output", lambda args, **_k: (m.ROOT / args[-1].split(":", 1)[1]).read_bytes())
     with pytest.raises(m.StorageDossierError, match="source_refused"):
         m.identity("b" * 40)
 

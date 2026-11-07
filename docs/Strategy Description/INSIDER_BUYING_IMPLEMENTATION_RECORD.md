@@ -45848,3 +45848,43 @@ All other379.3 pure-contract/test pins are unchanged. Commit this qualified
 correction before fresh source-only health, then proceed only if health is
 positive. Neither failed health consumed or created the prospective epoch;
 no retained DATA observation, new acquisition or push has yet occurred.
+
+### 379.6 Third source-only health and complete legacy source inventory
+
+Prepared-worker correction1c6908d6fc4f910653a96083291cf626777c2fec existed
+clean for --health: exit2,9.342s,stdout53B/stderr0. A source-only granular
+diagnostic on that same source proves identity, worker READY, parent profile,
+native denial and explicit health activation PASS; health reports zero actual
+input leaves and176 source images. The final parent identity reconstruction
+then refuses. No retained input discovery or epoch creation was reached.
+
+Exact native Git diagnostics establish a missing read grant for the concrete
+CommandLineTools/usr/share/git-core/gitconfig; granting ONLY that literal
+makes Git root/status return0. Temporary SDK/cache writes remain denied, not
+authorized as a repair. The next refusal is independently localized to the
+legacy current-byte check of the frozen recovery union: its string-named v3
+source is absent from the176-image inventory even though legacy._current
+explicitly rehashes source_runner.FROZEN. This is a source allowlist omission,
+not missing financial DATA or evidence of an altered frozen file.
+
+IBDEC-379-09 adds ONLY that exact Git configuration literal and all four
+source_runner.FROZEN images to the NEW runner's identity. Each frozen source
+must equal its existing byte pin AND committed Git blob before native policy
+construction. This supplies the exact legacy checker source closure without
+editing its behavior, frozen bytes or Data/write guards. The old identity/
+proof/failed epoch remain unchanged. Tests pin those exact grants/inventory.
+
+A narrow record/active-document recheck was accidentally launched with fork
+denial:69 PASS/3 failed because Git children could not start. This is a test
+harness selection error, not three document defects; no shared tests changed.
+Rerun with the same native network/DATA/write/memory controls and required
+Git-child capability:72 PASS1.41s (outer2.380s,stderr0). The earlier229-test
+boundary run already used the correct child capability. Keep both results.
+
+Final focused514 PASS6.26s (outer7.242s,stderr0), including the negative
+where a working image matches Git but differs from its immutable frozen pin.
+Eight images compile;17 frozen tests/four v3 pins remain exact. Corrected
+runner30944B/SHA86692ea1f6a9508b4af46b12c8e9e00bdd29ebcd19205fe4ee43241cfa7ad26a;
+runner tests24350B/SHAa329a08aed32323e938d675fa37340a3e0ca5ad82caab6117c406797f55f8077.
+All other379.3/379.5 source pins stay exact. Commit before native health;
+actual discovery and epoch remain unattempted pending that qualification.

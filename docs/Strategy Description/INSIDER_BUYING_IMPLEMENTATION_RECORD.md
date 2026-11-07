@@ -46060,3 +46060,104 @@ Quality assessment8/10 for this bounded engineering result: actual native
 qualification and independent saved-output verification are observed, with
 all failed source-only health lineage retained. This is not a readiness score
 or a claim that missing historical evidence has been supplied.
+
+## 381. Owner-authorized FMP then EODHD archive-sample inquiries (2026-11-07)
+
+### 381.1 Authorization, captured snapshot and bounded definition of done
+
+Latest owner direction: "Proceed with FMP first, then EODHD. You may contact
+support for historical availability and PIT identity samples using the
+12-control dossier. Existing subscriptions only; no purchases or QC access.
+Document everything and push once."
+
+Matching-only fetch captures exact clean local/origin
+747f3db8334da764c163c6a5425b352fb2e1b5c6, incoming EMPTY, in the designated
+Insider worktree on codex/strategy-insider-buying. This is an outreach round,
+not a new incoming Claude review, current-table acquisition or backtest. The
+prior379 actual dossier/independent readback remains bound to its actual
+cbd2897c execution; no private dossier or original is reopened for this task.
+
+Definition of done: send ONE narrowly scoped inquiry to each named provider
+in order, independently read back exact sent recipient/subject/body/SENT
+state, document observed dispositions and evidence limits, then make ONE
+final matching-lane push with a separate durable handoff. If sending is
+ambiguous, search/read the unique existing message before any retry; do not
+manufacture sent state or issue a duplicate. A sent inquiry is not an archive
+answer, sample, entitlement, rights confirmation or readiness result.
+
+### 381.2 Decisions, disclosure and prepared message identities
+
+IBDEC-381-01: latest explicit contact authorization releases the old FMP and
+EODHD correspondence hold ONLY for these two archive-sample inquiries. It
+does not authorize another provider, purchase/upgrade/trial/renewal/paid
+export, account change, new data/credential/API/SEC operation, QC/Safari or
+outcome look. Connected Gmail supplies the normal sender identity; no account
+email or credential is guessed, read from Keychain or separately disclosed.
+
+IBDEC-381-02: use a capability-first request derived from the completed
+twelve-control dossier and its source schema. State that twelve retained
+Form4/4-A originals have validated hashes/issuer identities; this is not a
+historical/PIT claim. The required ARCHIVE window is2020-10-01..2025-12-31,
+not an assertion that every selected control has those dates. After an actual
+existing-plan archive route is confirmed, a minimal public accession/issuer-
+CIK/date/original-hash manifest can match a small sample. This round sends
+NO attachment, private dossier, accession list, reporting-owner/title values,
+licensed reference candidates/actions/permatickers, paths, source inventory,
+private account/mail identifiers or secrets. No private-data export/read or
+new schema/CLI/code/test change is required for the initial inquiry.
+
+IBDEC-381-03: ask about availability and identity as SEPARATE capabilities,
+allowing a precise partial answer. Availability needs original bytes OR
+verifiable exact accession/body/version linkage plus authenticated historical
+public/customer-available-by evidence, distinct from SEC acceptance and private
+ingestion, with clock/timezone/daylight-saving meaning before09:28/09:30
+US Eastern. Exact first-public seconds are unnecessary. Identity needs dated
+issuer-CIK/share-class/permanent-ID/ticker/listing relationships with effective
+AND known-by intervals, renamed/dead/reused tickers and gaps. Ask both about
+correction/deletion/backfill/version lineage and Forms3/3-A,4/4-A,5/5-A scope.
+Current regenerated rows or a typical delivery schedule cannot answer this.
+
+IBDEC-381-04: ask providers to confirm existing-plan/no-additional-charge
+eligibility and local personal research retention/processing/end-of-term
+restrictions BEFORE supplying licensed material. If archive not retained or
+outside existing access, request an explicit scoped unavailable answer; no
+order, quote acceptance, plan change, trial or charge is authorized. Receiving
+a future reply/attachment does not itself permit broad download/processing.
+
+IBDEC-381-05: send FMP first, verify sent state, THEN send EODHD and verify.
+Public primary sources verify info@financialmodelingprep.com via
+https://site.financialmodelingprep.com/faqs and
+support@eodhistoricaldata.com via https://eodhd.com/ . A bounded combined
+provider/Insider/archive-keyword Gmail search returns no matching prior
+inquiry; this is not a full-mailbox absence claim. Recheck each unique subject
+before sending. No unrelated lane correspondence is read/replied to.
+
+Prepared UTF-8 HTML payload identities (NOT yet a sent-state claim):
+
+| Order / recipient | Exact subject | Bytes / SHA-256 |
+|---|---|---|
+| 1 / info@financialmodelingprep.com | Insider Buying historical availability and PIT archive sample - FMP existing subscription only | 2803 / 5955bdb48aaf13210ca66c27db5708b78ab34e67e98a4b6a56698c5326b524bb |
+| 2 / support@eodhistoricaldata.com | Insider Buying historical availability and PIT archive sample - EODHD existing subscription only | 2960 / b7de4db42465eca6b44acb03533b777b5d6efed1d37464232167e4ba9dcd715e |
+
+Original authored mail text, private headers/message IDs and sender/account
+values remain outside Git. Body hashes identify the canonical payload; later
+readback must state any transport-only line-ending normalization precisely.
+One read-only advisory source/schema check assisted scope preparation; it is
+not independent Claude review. No mail has been sent at this prospective
+entry. Scope/source/record checks precede sending; actual observations follow.
+
+The fifteen carried P2s/seven369 P3 groups and scoped375/376 observations
+remain unchanged; no open P0/P1 or factual gate closure. Frozen sources,
+proofs, failed claims, consumed requests, stoppedv3, both populations/windows,
+economics, incident classifications and all readiness gates remain as380.
+No acquisition runtime, retained input, provider data, credential or QC
+surface is activated. Shared/project-wide records and root handoff stay
+frozen; this lane record is the durable handoff. Monitors stay disarmed.
+
+Prospective record/active-document/lane-import/ML-import/EXACT guard selection:
+135 PASS12.18s, zero skips/warnings (outer13.166s,stderr0). Required Git/import
+children inherit native process-tree network/security denial; all actual
+artifact/private/USB/Keychain/sibling DATA is denied, initial isolation and
+real Darwin VM/readback plus sampled RSS guard are live, test writes are
+fresh TMP and /dev/null only. No full lane/repository suite or data replay.
+Whitespace and expected record-only checks precede the prospective commit.

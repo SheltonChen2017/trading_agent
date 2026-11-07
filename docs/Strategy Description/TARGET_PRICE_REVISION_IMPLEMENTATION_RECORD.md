@@ -1,16 +1,16 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current section120 continuation (2026-11-07):** The in-app browser now
-opens the own OFF session independently of native Safari. Genuine saved Mia
-final answer claims no input fix and confirms the missing per-target Slice
-delivery evidence. The new bounded delivery-census source is locally verified
-by272focused checks and independent Codex judgment after correction, but no
-new native job is launched yet. Section120.8 owns exact hashes, negative
-history, source-budget/packing limits and the next serialized activation.
-Actual private rendering, source/owner/resource preconditions and native
-input recovery remain unproved.20REMXrows stay quarantined; financial0/5
-accepted/metricsNULL. Routine Claude review is skipped. The final single
-lane push for this ongoing round remains reserved; none has occurred.
+**Current section120 continuation (2026-11-07):** The in-app browser opens
+own OFF independently of native Safari, and genuine saved Mia final answer
+confirms no verified input fix. QC refused the compressed public helper
+before saving; all12savedfiles remained exactly06155bec..., no explicit
+compile/new job/financial attempt. The NEW readable plaintext successor
+is independently judged and locally verified by325focused checks (120.12).
+Its exact private rendering and native acceptance remain pending until
+sourcecommit and fresh serialized activation. Sameheartbeat isPAUSED.
+20REMXrows stay quarantined; financial0/5accepted/metricsNULL.
+RoutineClaude skipped. This round has made0successfulpushes;
+solefinalnonforce matching-lane push remains reserved.
 
 **Current code review, section119 (2026-11-05):** Claude has independently reviewed every
 Codex commit in `3cf9636e..16655093` in section 119 at the owner's direct request, as a code
@@ -35509,3 +35509,208 @@ all4 hashes stable before/after. Same preimport-isolated49/52runtime,
 syntheticDB, socket+DNSdenial. No fullsuite/private/native/provider effects.
 Source/schema/diagnostic policy unchanged. Keep newsource local until final
 single publication; commit it before the first actual private rendering.
+
+Fresh120 claim BEFORE effect {"HEAD":"d3e9441123288429c10fa06348f171afbe7311fc","bounds":{"attempt_id":"TPR-CACHE-ATTEMPT-DELIVERY-OFF-001","candidate":"TPR-DELIVERY-20261107-OFF-001","input_name":"artifacts/target_price_qc_mia_20261104/TPR-R118-PARENT-CONFIG-001.config.json","input_sha256":"8292239f62e01d20a221fe49f76b3c29a23e9089eed3d6468f0a0953cbbb02b3","look_id":"TPR-CACHE-LOOK-DELIVERY-OFF-001","native_requests":0,"private_bytes_max":6703,"private_reads_max":1,"probe_operation_id":"TPR-CACHE-20261104-DELIVERY-OFF-001","public_helper_bytes":17338,"public_helper_sha256":"6539ae749aefb4884ed52258fc2f0f77c9481a5e8ee37ea80ec7065218f0da95","purpose":"fresh actualsource fit proof from exact retained parentconfig only; no marketvalues/rawSID/oldproviderpackets","render_max":1,"source_bytes_max":60000},"manifest":{"bytes":3806,"name":"TPR-R120-DELIVERY-ACTUAL-RENDER-001.claim.json","sha256":"d033d4a4cd63db717d586597b61d2fa64251a43b29ca052396bcfa1dda472711"},"operation_id":"TPR-R120-DELIVERY-ACTUAL-RENDER-001"}
+
+120.9 actual private parent-source rendering {"config_sha256":"50ead6317e50460e7ef3a4878e600ac22d5246484ebad0f8aca172c0dec043f2","financial_acceptance":false,"head":"d3e9441123288429c10fa06348f171afbe7311fc","native_requests":0,"proofs":{"build":{"bytes":2782,"name":"TPR-R120-DELIVERY-ACTUAL-RENDER-001.build.json","sha256":"bde951e5c798f7ec072ab33ff8de468c1720e5c79d3deb8c8ba474abd7c3a44a"},"main":{"bytes":50744,"name":"TPR-R120-DELIVERY-ACTUAL-RENDER-001.main.py","sha256":"7e08ce884c393e53b113a3554d47560bbe1d262f369b38055672fb0aab3a9529"}},"source_epoch":"TPR-NATIVE-PARENT-DELIVERY-20261107-v1","status":"actual_source_rendered"}
+
+120.9 claim metadata correction: ACTUAL-RENDER-001 retained a Python bytes-literal Unicode escape in owner_current_sha256; its current-owner text and standing task SHA were correct, but that convenience digest did not encode the actual apostrophe. No financial/native effect occurred. Correct owner text SHA is cb157c5fd86da498ed5bc021439ac34f52de31b2fdc04762fa235cd7f3806570. Preserve the original claim/render proofs; all later fresh scopes use corrected literal bytes. Exact committed actual rendered source remains50744B/SHA7e08ce884c393e53b113a3554d47560bbe1d262f369b38055672fb0aab3a9529/config50ead6317e50460e7ef3a4878e600ac22d5246484ebad0f8aca172c0dec043f2; no raw SID or marketvalues processed.
+
+Fresh120 claim BEFORE effect {"HEAD":"d3e9441123288429c10fa06348f171afbe7311fc","bounds":{"app_reads_max":1,"automation_id":"target-price-qc-job-remaining-backtests","fields":"own heartbeat status/current provenance only","mutations":0,"purpose":"verify samecontrollerpaused before newserializeddiagnostic; no duplicate heartbeat"},"manifest":{"bytes":3319,"name":"TPR-R120-HEARTBEAT-PREFLIGHT-001.claim.json","sha256":"722802cedfb3e6b7c39fda93beb8e3177a3cd427bba7452c9fd04039b0ba1c90"},"operation_id":"TPR-R120-HEARTBEAT-PREFLIGHT-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"d3e9441123288429c10fa06348f171afbe7311fc","bounds":{"mutations":0,"path":"~/.codex/automations/target-price-qc-job-remaining-backtests/automation.toml","private_bytes_max":131072,"private_reads_max":1,"projection":"exact id/status/kind/name plus bytehash","prompt_processing":"parse bounded TOML only; no replay prompt/targets","purpose":"verify actual pausedownheartbeat becauseappview renderedcardwithoutmachine-readable status"},"manifest":{"bytes":3448,"name":"TPR-R120-HEARTBEAT-STATUS-001.claim.json","sha256":"04461c5193b50cfe0a09cab2e5fd53281cd3a387c630f081ba187ff8b0c86207"},"operation_id":"TPR-R120-HEARTBEAT-STATUS-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"d3e9441123288429c10fa06348f171afbe7311fc","bounds":{"app_config_reads_max":1,"bytes_max":131072,"custody":"nofollow/stable owneruid+nlink1; app-owned normal mode not privateinput evidence","mutations":0,"path":"~/.codex/automations/target-price-qc-job-remaining-backtests/automation.toml","projection":"only id/status/kind/hash","purpose":"inspect exact own monitor status without alteringpermissions or retrying privateinputreader"},"manifest":{"bytes":3450,"name":"TPR-R120-HEARTBEAT-STATUS-002.claim.json","sha256":"a1d721c40a6fd83c11fa13e071def7ab8bc5bcb57fc0aa98d142a2a22127dff8"},"operation_id":"TPR-R120-HEARTBEAT-STATUS-002"}
+
+120automationmetadata: firstSTATUS-001 private-inputreader refused appdirectory permissions before content read; retained claim. FreshSTATUS-002 used only bounded nofollow/stableowneruid+nlink regular-appconfig read, not a private-evidence custody exception or permissionchange. {"bytes": 10701, "metadata": {"id": "target-price-qc-job-remaining-backtests", "kind": "heartbeat", "status": "PAUSED"}, "sha256": "0e57e3bd962a855ac8de6da38349c7d66ab7d65db6de08cdcd6b301689a31fae"}
+
+Fresh120 claim BEFORE effect {"HEAD":"d3e9441123288429c10fa06348f171afbe7311fc","bounds":{"endpoint":"files/read","expected_source_inventory_sha256":"06155bec30d24df0eea2d1398b618c3ff4936b5a72f2afd411c092db411ab858","native_requests_max":1,"private_registry":"artifacts/target_price_qc_recovery_20261028/TPR-CMP28-R107-PROJECT-BINDINGS-001.json","project_id":38609822,"purpose":"fresh allfileownOFF baseline before reviewed delivery activation; retiredgenericmutation route unused; no compile/upload/job","registry_bytes":3573,"registry_reads_max":1,"registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","response_bytes_max":2097152,"seconds_max":20},"manifest":{"bytes":3657,"name":"TPR-R120-DELIVERY-SOURCE-001.claim.json","sha256":"c24470cb7c345a82783e0085e2b83d6cfc78f221dad01e0054da002dae0a3da0"},"operation_id":"TPR-R120-DELIVERY-SOURCE-001"}
+
+120delivery readonlysource PREeffect {"name": "TPR-CMP29-API-R120-DELIVERY-SOURCE-001.plan.json", "bytes": 5936, "sha256": "fe77cef5e1b9b365ef438908648b7d71eab12554d9e9c4820412787257fab9b8"}
+
+120delivery readonlysource result {"native_requests": 1, "new_jobs": 0, "proof": {"bytes": 2114, "name": "TPR-CMP29-API-R120-DELIVERY-SOURCE-001.safe.json", "sha256": "63d56445c50f414638143a7d82066191183eb26c7c5ef4ded52e56bfdaa70986"}, "status": "completed"}
+
+Fresh120 claim BEFORE effect {"HEAD":"d3e9441123288429c10fa06348f171afbe7311fc","bounds":{"attempt_id":"TPR-CACHE-ATTEMPT-DELIVERY-OFF-001","before_inventory_sha256":"06155bec30d24df0eea2d1398b618c3ff4936b5a72f2afd411c092db411ab858","compile_requests":0,"input_parent_bytes":6703,"input_parent_sha256":"8292239f62e01d20a221fe49f76b3c29a23e9089eed3d6468f0a0953cbbb02b3","input_registry_bytes":3573,"input_registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","look_id":"TPR-CACHE-LOOK-DELIVERY-OFF-001","main_bytes":50744,"main_sha256":"7e08ce884c393e53b113a3554d47560bbe1d262f369b38055672fb0aab3a9529","native_requests_max":6,"native_response_total_max":8388608,"new_jobs":0,"phase":"upload","phase_deadline_seconds":240,"private_bytes_max":10276,"private_reads_max":2,"project_id":38609822,"purpose":"new committed fixed OFF delivery sensor only; freshprivacy/owner/authorizedMia/noactivejob/before-after exactsourceguards; preserve11nonmainfiles/allhistory","request_seconds_max":20,"source_mutations_max":1},"manifest":{"bytes":4016,"name":"TPR-R120-DELIVERY-UPLOAD-001.claim.json","sha256":"0925688ea4611920f093e7f7c860dc046f4b54d4229a93c45e64258e06aaa7a1"},"operation_id":"TPR-R120-DELIVERY-UPLOAD-001"}
+
+120delivery fixedaction PREeffect {"expected_inventory_sha256": "8e0c088dddc402c4694ed0a644c96167c01ee1c290266d8a310f0bad23a5c0c4", "phase": "upload", "proof": {"bytes": 87157, "name": "TPR-CMP29-API-CACHE-R120-DELIVERY-UPLOAD-001.prepared.json", "sha256": "54f95138ce8fb5e322b92181480be06613d0ef29cc643637f6b5bdf2de2e6365"}, "source_head": "d3e9441123288429c10fa06348f171afbe7311fc"}
+
+120delivery fixedaction result {"new_jobs": 0, "observed_job_ids": [], "phase": "upload", "proof": {"bytes": 3584, "name": "TPR-CMP29-API-CACHE-R120-DELIVERY-UPLOAD-001.safe.json", "sha256": "6ca450183da8297367d04725941f269a2dbf21f6e516e49108edae08da1f293f"}, "receipt": {"bytes": 6549, "name": "TPR-CMP29-API-CACHE-R120-DELIVERY-UPLOAD-001.result.json", "sha256": "e52575412a74a15b5a08493ddd306054843487376490a769f950457c91b60b43"}, "status": "failed_or_uncertain", "transport_calls": 5}
+
+Fresh120 claim BEFORE effect {"HEAD":"d3e9441123288429c10fa06348f171afbe7311fc","bounds":{"bytes_max":473,"file":"TPR-CMP29-API-CACHE-R120-DELIVERY-UPLOAD-001.write.response.raw","native_requests":0,"output":"body-free fieldtypes/errorcategories only","private_read_root":"native-cache-delivery-actions-20261107","private_reads_max":1,"processing_max":1,"purpose":"classify exact retained QC file-update refusal before any changed recovery","sha256":"4deb932b0a2e9519815f3e95f5106ed6d150f13c129c9d6e49942180a5c4e7aa"},"manifest":{"bytes":3517,"name":"TPR-R120-DELIVERY-UPLOAD-REFUSAL-001.claim.json","sha256":"b7e78160c0e197846848f26757f2c45a3cdeddf929905f2cb0d927083165493d"},"operation_id":"TPR-R120-DELIVERY-UPLOAD-REFUSAL-001"}
+
+120delivery upload refusal classification {"metadata": {"categories": {"active_lock": false, "field_size": true, "not_found": false, "permission": false, "plan_limit": true, "project": true, "rate": false, "validation": false}, "error_count": 1, "error_type": "list", "raw": {"bytes": 473, "name": "TPR-CMP29-API-CACHE-R120-DELIVERY-UPLOAD-001.write.response.raw", "sha256": "4deb932b0a2e9519815f3e95f5106ed6d150f13c129c9d6e49942180a5c4e7aa"}, "success": false, "top_fields": ["errors", "success"]}, "proof": {"bytes": 411, "name": "TPR-R120-DELIVERY-UPLOAD-REFUSAL-001.safe.json", "sha256": "8fd0980ed329503c702f9e6f2dd76912c77397504d9c41d5aaad6f2b2db1468c"}}; no new compile/job; do not repeat unchanged upload.
+
+Fresh120 claim BEFORE effect {"HEAD":"d3e9441123288429c10fa06348f171afbe7311fc","bounds":{"bytes_max":473,"native_requests":0,"private_reads_max":1,"projection":"non-sensitive numeric limits and fixed keyword flags only","purpose":"distinguish perfile/projecttotal/code-plan limits from exact retained response; no unchanged native retry"},"manifest":{"bytes":3333,"name":"TPR-R120-DELIVERY-UPLOAD-LIMIT-001.claim.json","sha256":"b2493113d5464318b7e385b20ef5b278edf3710c4eb9a9e9b6b874045082c264"},"operation_id":"TPR-R120-DELIVERY-UPLOAD-LIMIT-001"}
+
+120QCcontrol refusal limit metadata {"metadata": {"error_bytes": 442, "error_sha256": "8a7a12874f4f7c001fcec8c5947e50caf9c09bdcc5e9bb9977d13f67380f00fc", "matched_terms": ["file", "project", "limit", "mb", "code", "coding"], "numeric_limits": []}, "proof": {"bytes": 185, "name": "TPR-R120-DELIVERY-UPLOAD-LIMIT-001.safe.json", "sha256": "5e97a1d2301182e0710d39af5b9331ade0b46d593332e8b94c641feab0aa6f2a"}}
+
+Fresh120 claim BEFORE effect {"HEAD":"d3e9441123288429c10fa06348f171afbe7311fc","bounds":{"bytes_max":473,"native_requests":0,"private_reads_max":1,"purpose":"resolve inconclusive substring categories by exact digit-free credential-screened QC control diagnosis; do not quote body in chat"},"manifest":{"bytes":3284,"name":"TPR-R120-DELIVERY-CONTROL-DIAG-001.claim.json","sha256":"724894c39f895d12ceea543971d3d42358bc8bd886507d5b27971382faeb89bf"},"operation_id":"TPR-R120-DELIVERY-CONTROL-DIAG-001"}
+
+120exact native control refusal privately inspected under freshCONTROL-DIAG scope; no body/exception/private values are quoted in owner-facing response, no repeatnativewrite.
+
+Fresh120 claim BEFORE effect {"HEAD":"d3e9441123288429c10fa06348f171afbe7311fc","bounds":{"endpoint":"files/read","expected_inventory_sha256":"06155bec30d24df0eea2d1398b618c3ff4936b5a72f2afd411c092db411ab858","native_requests_max":1,"private_reads_max":1,"project_id":38609822,"purpose":"fresh allsavedfiles verification after explicitQCplaintext-sourcepolicy refusal; no retry/upload/compile/job/cancel","registry_bytes":3573,"registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","response_bytes_max":2097152,"seconds_max":20},"manifest":{"bytes":3558,"name":"TPR-R120-DELIVERY-REFUSAL-SOURCE-001.claim.json","sha256":"f96c7b391119955ef6021369095cd1785d94301a72ae43aa88660861daa69dcc"},"operation_id":"TPR-R120-DELIVERY-REFUSAL-SOURCE-001"}
+
+120delivery readonlysource PREeffect {"name": "TPR-CMP29-API-R120-DELIVERY-REFUSAL-SOURCE-001.plan.json", "bytes": 5944, "sha256": "a16b05cce36789ef89df711f54fdfad9745d597b08df389b56aca64a80928986"}
+
+120delivery readonlysource result {"native_requests": 1, "new_jobs": 0, "proof": {"bytes": 2138, "name": "TPR-CMP29-API-R120-DELIVERY-REFUSAL-SOURCE-001.safe.json", "sha256": "b6db9eb6e613da6585da62ff8021dab4493a45161ae4d15a2880fda6089c0b9e"}, "status": "completed"}
+
+### 120.10 Native plaintext-source refusal; no source change or new job
+
+Committed diagnostic source epoch isd3e9441123288429c10fa06348f171afbe7311fc,
+localonly; remote remainsd127746e. Fresh actual parent-only rendering
+produced50744B/SHA7e08ce884c393e53b113a3554d47560bbe1d262f369b38055672fb0aab3a9529,
+config50ead6317e50460e7ef3a4878e600ac22d5246484ebad0f8aca172c0dec043f2.
+The root's fixed new upload route verified owner/authorizedMia/privacy,
+no-active-OFF-job and exactbeforeinventory06155bec... under a fresh scope.
+Its fifth request(files/update) returnedHTTP200/successFALSE and refused
+the public compressedhelper. QC requires readable plaintext source and
+directs source splitting instead of compression/encoding/obfuscation.
+This is a concrete platform source-policy limit, not an authentication,
+file-bytecap, provider-input, compile or backtest runtime failure. Earlier
+substring-only limitcategories are inconclusive and superseded by exact
+control diagnosis; they are NOT proof of a paid-plan/account limit.
+No new agreement/upgrade/purchase/account change was made.
+
+Upload001 is spent and must never be replayed. Retained write response
+473B/SHA4deb932b0a2e9519815f3e95f5106ed6d150f13c129c9d6e49942180a5c4e7aa,
+receipt6549B/SHAe52575412a74a15b5a08493ddd306054843487376490a769f950457c91b60b43,
+safe result3584B/SHA6ca450183da8297367d04725941f269a2dbf21f6e516e49108edae08da1f293f.
+Five nativecalls were attempted,0explicitcompiles/0newjobs, ownedlockcleaned,
+receipt retained. A fresh sixth round120source read after refusal proved
+all12 savedfiles remain exactly06155bec30d24df0eea2d1398b618c3ff4936b5a72f2afd411c092db411ab858;
+main remains59671B/SHA2f083e9fe67be20a792ade417777667fa0244116f7716296c68ec58d351ee50d.
+Postrefusal safe2138B/SHAb6db9eb6e613da6585da62ff8021dab4493a45161ae4d15a2880fda6089c0b9e,
+receipt3470B/SHA c62cd9eaf321f44fa41b29b883ff710fdbe0a4e1113fd808697928799b4a7243.
+The phrase sixthsource read means round120files/read requests only;
+round120directnative total10 (3prior+1freshbaseline+5uploadroute+1postflight).
+Sourceuploads accepted0, explicitcompiles0,newdiagnosticjobs0,financial
+attempts/outcomelooks0 thisround. UI-internal compile count remains unmeasured.
+
+The same heartbeat is freshly verifiedPAUSED via appview plus bounded exact
+appconfig metadata,10701B/SHA0e57e3bd962a855ac8de6da38349c7d66ab7d65db6de08cdcd6b301689a31fae.
+First privateinputreader refused appconfig directory custody before bytes;
+that failedclaim is retained. Successor appmetadata-only read used bounded
+nofollow/stableownedregularfile checks without changingpermissions or
+weakening privateinput custody. NativeSafari remains untouched.
+
+Next: public-source design of a NEW readable plaintextsplit epoch, preserving
+all historical code/pins/refusals. No compressed/encoded source is retried.
+Freeze exact newfile/write/read/accounting bounds before implementation;
+commit focused-verified source before private/native activation. All frozen
+economics,20REMXquarantine and NULL/0of5financial outcomes remain unchanged.
+
+### 120.11 Prospective readable plaintext split epoch; contract frozen before build
+
+Native source-policy refusal is retained; do not retry compression,encoding,
+binaryembedding or account changes. Root/public-source independent judgment
+verified that exact helper17338B/SHA6539ae749aefb4884ed52258fc2f0f77c9481a5e8ee37ea80ec7065218f0da95
+contains no backslash,triple-single delimiter,CR orNUL and endsLF. A NEW
+fixed tpr_public_parent_source_20261107.py may contain exactly one ordinary
+PUBLIC_PARENT_SOURCE triple-singlequoted string assignment with EVERY
+original helper line physically visible/verbatim. No repr/unparse/escape
+codec,minification,compression,extra leading newline or executable module
+logic. AST must be exactly one fixed-name Constant assignment whose value
+re-encodes to identical original helper bytes. This is readable source
+splitting, not a bypass retry or claim of Terms/platform approval; actual
+QC acceptance remains unproved.
+
+NEW versioned plainbuilder/main replaces only the prior helper literal
+assignment with the fixed import alias to PARENT_HELPER_SOURCE; original
+helperSHA check remains BEFORE compile/exec into original validatornamespace.
+The complete delivery sensor, old parent/SID/bootstrap/config/cache/clock/
+reference/firstfailure/coverage guards and fixed five sessions remain.
+Keep individual60000B filecaps and no new native metadata/market reads.
+Pin all oldsource exact, all newmodule bytes and generatedmain/modulehashes;
+source/compile proofs include BOTH generatedfiles/all13cloudfiles. Do not
+claim import/source atomicity or native-origin/financial acceptance.
+
+NEW fixed action route uses a separate helper phase: metadata,collaborators,
+no-activejobs,before(all12),exactliteral newhelper files/create,after(all13).
+Require the fixed helper filename ABSENT before create; no caller filename/
+source/endpoint/transport override or unknownfile overwrite. Derive that one
+create outside the api_plan's readonly before/after snapshots, as explicit
+fixed native requests. The retired generic WRITE_FILES/mutation executor,
+shared files and historical clients stay unchanged. Subsequent upload phase
+requires exactly matching helperbytes present, changes main only and reads
+back all13, preserving every11 historical nonmainfile. Root performs helper
+then main serialized at same sourceHEAD; retain exact creator receipt and
+both inventories. An incomplete/failedphase stops with all successful native
+effects and claims preserved; no replay,rollback,delete,restoreloop or
+silent partialsuccess. Later recovery needs fresh exactsource evidence and
+new bounded authority, never an override.
+
+Compile/build/launch phases require matching main AND plaintexthelper, all13
+sourceproofs and unchanged8proof compile chain/reservations/privacy/shared
+lock/fsync/deadline/custody/receipt safeguards. Each phase6nativecalls max
+(except build1),20s percall/240sdeadline; response/outputcaps unchanged.
+No new financial candidate,provideraccess,ETFsubstitution,stale mark,
+dateextension,quarantine relaxation or order. Newjob when actuallycreated:
+TPR-DELIVERY-PLAIN-20261107-OFF-D1; probeTPR-CACHE-20261104-PLAIN-OFF-001;
+diagnosticattempt1 and attempt/lookPLAIN-OFF-001. These new identities do
+not reset or promote spentcompressedUPLOAD001 or historical jobs/looks.
+Require newfocused isolated checks/independent Codexsource judgment, exact
+actual private rendering and committed source before native activation.
+RoutineClaude skipped;20REMXrows quarantined; financialmetricsNULL/0of5;
+round120successfulpushes0, solefinalnonforce lane push reserved.
+
+120.11 import dependency qualification before activation: fixed specific
+project-localhelper name, exactcreator/all13source/compileproofs and unchanged
+valueSHA-before-validator-exec support ONLY conditional cooperative provenance
+for this nonfinancial sensor. They do not prove Python resolved that project
+file or exclude sys.modules/path shadowing: import executes before valuehash,
+and hypothetical foreign code could return matchingtext after sideeffects.
+QC's project loader remains an explicit unproved runtime dependency, as with
+AlgorithmImports/backend trust. Do not invent SDK/path attestation. Stop on
+observed foreignmodule/hash/import failure; retain all source/origin/atomicity/
+financial flagsFALSE. This scope does not promote financial source acceptance.
+
+### 120.12 Readable plaintext successor locally verified before activation
+
+| Final new file | Bytes | SHA256 |
+|---|---:|---|
+| native_cache_delivery_plain_probe_20261107.py |7793|818304661420287e6b9b3fc900d597a233f83254978e1fd3755cf426e4fdee46|
+| test_qc_native_cache_delivery_plain_probe_20261107.py |21624|146f57f3e1d073a7fade053abc49f8fac1c2787b69c8b2eb826327dc0c637252|
+| native_cache_delivery_plain_actions_20261107.py |42202|f675bed84910ffa9891f8e2ba9dd46fe41fb6b1e6881a57aabb7c750b8c6dd02|
+| test_qc_native_cache_delivery_plain_actions_20261107.py |62015|b8194f7b82a8459462252f7c538900b127ef4f3ed807dacce34b1c629e4880ec|
+
+Root final focused tests:65builderpassed7.33s/7.43sorchestration and
+260actionpassed186.03s/186.15s, total325, source/test hashes stable.
+Active-document selection ONLY -k "section118 or section_119":256passed/
+635deselected5.46s/5.60s; record0b725073652639c8e1eae5fee4ffaa50bd6af149017a7a637ce5b8865a27d6a0
+stable before/after. Python3.13.15/Mac; no warnings shown. All used preimport
+isolated49/52runtime,syntheticDB,socket+DNSdenial. No fullsuite,private/native/
+provider effects. Mac checks prove no Windows custody.
+Root in-memory reverse mutation removing ONLY exacthelperdigest comparison
+produced4expectedfailed/256deselected1.96s/2.04s inupload/compile/build/launch
+negativecases. Original function restored in finally, sourceSHAf675bed8
+unchanged. This is sensitivity proof, not four native/backtest failures.
+
+Independent Codexsource judgment accepted all4 exactfinalhashes, no new
+confirmeddefect. Author/reviewer ran no tests/private/native/UI/provider
+effects or commits. Root reviewed fullbuilder and complete old-to-new
+action/test diffs. Generic WRITE_FILES/retiredmutation executor unchanged.
+New helper phase is readonly nestedplan plus one derivedliteral files/create;
+require12files and absenthelper/casealias; after13 includesexacthelper.
+Every laterphase requires13files/exacthelper; upload changesmainonly.
+All13compileproofs retain8proofchain, sharedlock/custody/fsync/receipts.
+Explicit240s totalphase/deadline,6calls*20smax (build1). Guard verifies
+actual imported builder.delivery path as well as prior/base/reader/custody.
+Partialeffects remain spent/retained with no automaticrollback/replay.
+
+NewbuilderEPOCH TPR-NATIVE-PARENT-DELIVERY-PLAIN-20261107-v1; schemas
+tpr-native-delivery-plain-cache-{config,build,observations}-v1. Newaction/
+result tpr-fixed-cache-delivery-plain-action{,-result}-v1; privatefolder
+native-cache-delivery-plain-actions-20261107. Exactordinarymultiline helper
+file tpr_public_parent_source_20261107.py is17368B/SHA8ab9c6dd9bbeb57c4e29dc88f4b0131046cba15a90899ddc44382ed73e13a98a.
+It exposes all17338original sourcebytes visibly and reconstructs the same
+fixedvalue, with no codec. Main's fixedimport/type+length preguard precedes
+the unchanged helperSHA check/compile/exec namespace. Conditional import
+provenance/atomicity limits in120.11 remain; no financial promotion.
+
+Public synthetic planned-op main44821B, helper17368B, eachunder unchanged
+60000Bcap; exact private rendering is still pending until sourcecommit.
+All historical sources/tests/pins, QCfiles/jobs/refusals,20REMXquarantine
+and NULL/0of5financial outcomes remain exact. Next: commit newsource, then
+fresh actualrender and fixed serializedhelper/create→mainupload→compile→
+nativeBuildSuccess→launch under one sameHEAD and freshbounded claims.
+Native plaintextacceptance and inputrecovery remain unproved. No pushyet.

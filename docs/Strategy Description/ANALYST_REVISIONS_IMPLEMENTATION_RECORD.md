@@ -1321,8 +1321,9 @@ local libraries predicate after allocating project39054561, before any
 upload/compile/job; it is spent. The same-project v2/A2 recovery is separately
 frozen in345.7, after140focused checks and162-source cold bootstrap. A2 is
 now spent at its post-lock collaborator predicate; no upload/compile/job
-followed. Only the bounded read-only lock-shape freeze in345.8 is next;
-the third/final attempt needs a separate exact technical decision. The owner released
+followed. The bounded read-only lock diagnosis passed in345.9 and identifies
+the opaque-publicId mismatch. The third/final same-project v3/A3 decision
+is frozen in345.10, with185focused checks and168-source cold bootstrap. The owner released
 QC; no permission or readiness follows
 for a funded/broker/paper/live operation. The six-universe old-rule AR80–200
 research extension remains the selected route, and the broad new-rule rebuild
@@ -1335,7 +1336,7 @@ files are superseded. Corrected B preparation and the four-request read-only
 QC observation passed under their exact clean freeze; their results are345.4.
 Two idle backtest nodes were observed, not leased. New submitter/consumer
 support passed531focused tests and public-source bootstrap; only the separate
-lock-shape observation in345.8 may next be invoked, never an arbitrary callback.
+AR100/A3 decision in345.10 may next be invoked, never an arbitrary callback.
 Fresh source/input/rights/account/privacy/idle/capacity/project/attempt/run
 gates precede any upload/compile/backtest. No old operation/control is replayed.
 The broad new-rule six/eight rebuild stays paused with its own blockers.
@@ -78064,3 +78065,120 @@ actual diagnostic evidence to authenticate only our own A2 technical row,
 preserve real-collaborator refusal, remain on project39054561, and bind all
 source/input/rights/privacy/idle/capacity/default-source/attempt gates.
 No lock deletion, release, cancellation or other-lane change is authorized.
+
+### 345.9 Actual lock diagnosis and verified A2 mismatch
+
+At cleanb342c8417baa08d68d912189dffecc2d596e822e the sole lock-shape
+observation dispatched2026-11-07T18:02:05UTC; completion observed18:02:22UTC,
+controller0/ACTUAL child0/stderr0. Original3734B double-LF stdout SHA
+937c4d4f7c647e54629c39fc04c5f97e0fcfe42c6ebdedbe7e8cbccfd28f185c
+and report3616B/SHAd89f2461e1c6ad59c4ce8c33adab33a0b097e6107da14d2f8a258c338bd17962
+validate against exact source/profile/HEAD bindings and actual0. The new
+public fact arv2_r345_lock_diagnostic_fact.json4360B/SHA
+2bd366feb5ad4533e0c754dfc8f7596378077970fddf620c5d60c34c3b5f3cc3
+contains ONLY original finite output and external observed bindings/exits.
+The observation is PASSED/SPENT; no old control/report or response body was read.
+
+Exact owned project39054561/Python/org matched; editor idle, dedicated
+owner-only and zero current jobs were observed. Four dispatch attempts were
+HTTP200; no mutation/source/result/data/lock change occurred. General rows:
+
+|Role|Canonical row bytes|SHA256|Finite observed shape|
+|---|---:|---|---|
+|General owner|264|44596e5982d76ec302240171c2b3496f518ada401487d71eef24e02f4541c1ff|UID exact authenticated owner, owner=true, write/liveControl=true|
+|A2 technical row|258|055600ea47d9f03afac3d324d0ea427bb8d5c8091c3720c84da86316766f33f2|UID=null, owner=false, permission=write, liveControl=true, name matches exact A2 identifier, publicId string does NOT match it, codeSourceId field absent, unknown-key count0|
+
+Dedicated owner265B/SHA707a30618e122e49fe6fa75364451b5b7c50e1019a68a89ffc0cd3ae3c8e0b78
+uses canonical(owner)+LF; the general owner uses canonical(owner) WITHOUT LF.
+The different digests do not prove different owner objects. Current general/
+dedicated semantic equality remains required in any successor.
+
+The current project response pin1568B/e10cfbe8704fc4ecebed0f10a11273bbaa4670ff5f5068ff2ff9d31319b5ac73
+is exactly the original A2 locked-project response pin. The row types/flags
+and used v2 source therefore identify the failing publicId==codeSourceName
+assumption. ARV2D345-002 is CONFIRMED for that exact represented case; its
+prospective correction must pin the WHOLE exact technical row and retain
+current dedicated owner-only checks. Name match alone is never acceptance.
+Equal endpoint body hashes are not continuous stability or an exclusive lease.
+
+A3 may be implemented as the THIRD/FINAL same-project recovery, with a new
+exact run freeze, ORIGINAL A1/A2/diagnostic fact pins and current gates.
+It must retain the original A2 codeSource identifier, adopt ONLY the exact
+verified technical context and prohibit new project/lock/permission mutation.
+No A3 invocation is authorized yet by this result paragraph. If the exact
+row or current ownership/history/source changes, refuse rather than refresh.
+All used v1/v2/B/diagnostic code remains frozen. No look/cell was added;
+338/259/54/699 stays. No current subscription, strategy return, formal/PIT/
+security-master/paper/live readiness is established by these metadata results.
+
+### 345.10 Exact third/final AR100 recovery decision (before use)
+
+NEW v3 caller/engine/plan preserve all used v1/v2/B/observation sources.
+Only R343-AR100 attempt3 on project39054561 is supported. The exact A1,
+A2 and accepted diagnostic facts from345.6/345.8/345.9 are byte-pinned;
+the engine freshly requires the exact general-owner and A2 technical row
+pins, current dedicated owner-only/equality, organization/Py/idleness/no-live/
+empty-library/empty-history/default-source predicates. It retains the SAME
+A2 source identifier and adopts its verified current context only after
+fresh checks. No project creation, global project listing, lock acquire/
+release, permission change, replacement name or other-lane action exists.
+The publicId field stays opaque; no server value is fabricated or normalized.
+Whole-row drift refuses, never automatically refreshes.
+
+|NEW component|Bytes|SHA256|
+|---|---:|---|
+|run_arv2_r345_legacy_six_v3.py|42844|adf9b60673f802f8c73a1767988748c3127f9986a49b9fb1e3929e323345f263|
+|arv2_r345_legacy_six_qc_v3.py|48790|25232a2a80519040433129aa28121eb980d46eae0492c6cdefb500ca883dcf24|
+|arv2_r345_legacy_six_plan_v3.json|49439|9cdf7743561da0e9ec4554b3a03d687a5b0f0c4ed9e349b3199429f1381073b4|
+|arv2_r345_qc_error_transport_v3.py|8250|b9f277d7cdc154651868444109b9f8f4502a01ae65f82a2b1fa0d64bc8a54ec5|
+
+AR100/A3 canonical operation profile2277B/SHA
+9373c40464ea9489fd18ebb74922332cf728f49c33465ab3ec2f5f0a1ffd0a92;
+native policy2087B/SHA
+3fc0042406999ad08b3179f7cdae04e36b9848fde5b3934b293e7a15d36b0c6f.
+Plan binds168selected sources: every prior162pin reproduces unchanged,
+plus v3 engine, new transport, both existing pure error projectors, A2 fact
+and diagnostic fact. Cold sealed bootstrap PASSED under native ALL-artifact/
+network/USB/Keychain denial with168sources, normal return and no claim/DATA/
+credential/contact. Final v3 engine/caller/error-transport plus record/redaction
+selection185passes1.11s; early90engine selection overlaps. No complete suite.
+
+The new response boundary retains finite original error evidence before
+discarding an unsuccessful QC response. It uses unchanged pinned pure
+response projector12294B/d8088312fac7879e3489780429c5a2e1247cd3a237ed6e331a51df134e0804f3
+and lossy redactor18136B/a0942586f49c7055d178e4ffc1d94ce8d7433e68812ef6527c54f21430d92ddb.
+The ACTUAL token/user/timestamp/signature/header and request/source context
+are supplied privately for redaction. Numeric HTTP status, typed response
+fields, bounded vocabulary and hashes may be retained; raw body/source/
+credential/exception never is. This is not universal secret detection or an
+authenticated root cause and cannot recover earlier discarded responses.
+For this prospective diagnostic boundary ONLY, an unsuccessful non-200 body
+may be read if identity-encoded application/json and at most64KiB, before
+strict projection; other types/oversize refuse before body read. HTTP200
+responses keep the existing1MiB bound. No redirect, object download, price,
+licensed-row, log or new endpoint is admitted. Native TLS443/DNS53/resolver
+is not domain isolation; program fixes the exact host/CA and selected paths.
+V3 stdout64KiB/failure48KiB/diagnostic24KiB are separately bounded; reached
+large-projection tests cover the former8KiB evidence-cap failure direction.
+
+Fixed prospective control:
+artifacts/analyst_revisions_v2/legacy_six_runs/R345-20261107-AR100-A3.
+It has NOT been inspected/allocated. H5 is the clean commit containing
+THIS exact decision and final sources/tests/plan/diagnostic fact.
+Verify root/branch/HEAD/status/live remote; bind expected-head H5,
+caller-sha256adf9b60673f802f8c73a1767988748c3127f9986a49b9fb1e3929e323345f263
+and plan-sha2569cdf7743561da0e9ec4554b3a03d687a5b0f0c4ed9e349b3199429f1381073b4.
+Invoke ONCE using designated native policy/-I-B Python3.13/v3safe_env plus
+ONLY existing QC environment keys. Claim/fsync before fresh B DATA guard
+normal return, then credentials/contact. All source/input/rights/object/
+privacy/idleness/capacity/exact18-source/main-last/compile/launch checks remain.
+Use original observed actual0 and matching finite output/report/source bindings;
+a report or allocated ID alone is not acceptance. No unchanged retry/fallback.
+
+A3 is FINAL for this candidate, not a reset of attempts1/2. Any further
+failure or ambiguity requires the standing Mia diagnostic/recovery checkpoint
+and owner report, not a fourth Codex attempt or renamed successor. Allocated
+IDs must reconcile before any action. Remaining six arms/result reads are
+not authorized by this decision. Before first compile/backtest dispatch the
+floor is338/259/54/699; book any actual new development look once by identity.
+Formal/PIT/permanent-master/paper/live flags remain false.

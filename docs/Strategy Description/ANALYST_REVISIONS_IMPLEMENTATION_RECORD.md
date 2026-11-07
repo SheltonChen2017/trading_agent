@@ -1319,7 +1319,10 @@ prepare/validator passed once with actual0/0 and are now spent. Its new DATA
 is bound to the separately frozen AR100/A1 pilot in345.5. A1 stopped at the
 local libraries predicate after allocating project39054561, before any
 upload/compile/job; it is spent. The same-project v2/A2 recovery is separately
-frozen in345.7, after140focused checks and162-source cold bootstrap. The owner released
+frozen in345.7, after140focused checks and162-source cold bootstrap. A2 is
+now spent at its post-lock collaborator predicate; no upload/compile/job
+followed. Only the bounded read-only lock-shape freeze in345.8 is next;
+the third/final attempt needs a separate exact technical decision. The owner released
 QC; no permission or readiness follows
 for a funded/broker/paper/live operation. The six-universe old-rule AR80–200
 research extension remains the selected route, and the broad new-rule rebuild
@@ -1332,7 +1335,7 @@ files are superseded. Corrected B preparation and the four-request read-only
 QC observation passed under their exact clean freeze; their results are345.4.
 Two idle backtest nodes were observed, not leased. New submitter/consumer
 support passed531focused tests and public-source bootstrap; only the separate
-AR100/A2 run freeze in345.7 may next be invoked, never an arbitrary callback.
+lock-shape observation in345.8 may next be invoked, never an arbitrary callback.
 Fresh source/input/rights/account/privacy/idle/capacity/project/attempt/run
 gates precede any upload/compile/backtest. No old operation/control is replayed.
 The broad new-rule six/eight rebuild stays paused with its own blockers.
@@ -78000,3 +78003,64 @@ No fourth Codex launch is authorized: after three unsuccessful attempts use
 the standing diagnostic/Mia checkpoint and report it. This decision grants
 A2 only; other arms/results/reads remain gated. Current source-accounting
 floor338/259/54/699 and all false formal/PIT/paper/live flags remain.
+
+### 345.8 A2 actual refusal and one read-only lock-shape decision
+
+At clean4f9dde693f948f2b9998dc06ceaeeec733572310, A2 dispatched
+2026-11-07T17:54:01UTC; completion observed17:54:23UTC,
+controller0/ACTUAL parent2/stderr0. A2 is SPENT; no source upload, compile
+or job followed. Original3294B stdout SHA
+54efb25beae96f6f4bc60815a5c4cc6428afb42e929a729f96e6fb20d2972461
+and external actual-exit/source bindings are frozen in public
+arv2_r345_ar100_a2_failure_fact.json4004B/SHA
+a79d4d0cfa0bf37aa182cf287e60458095bc07553d70c1c75abe0039b57499f4.
+No old control or response body was reopened.
+
+The current metadata explicitly observed isLibrary ABSENT, libraries=list
+count0, owner=true, codeRunning=false, no live deployment and nonnegative
+integer leanEnvironment. The revised library predicate passed, resolving
+ARV2D345-001 PROSPECTIVELY; A1's exact missing conjunct stays unknown.
+A2 freshly checked dedicated owner-only/zero history and PASSed its initial
+default-source inventory (files/read2205B/SHA
+6aa061d5f420914687cffae5d7193be8efba1b0cfb2e627496f1fac79e1d0be6).
+It acquired its own A2 codeSource lock with HTTP200/success, then refused
+the general-collaborator predicate on locked-project metadata. That response
+1568B/SHAe10cfbe8704fc4ecebed0f10a11273bbaa4670ff5f5068ff2ff9d31319b5ac73
+had two general rows. The exact failing field is unknown from this output.
+ARV2D345-002/P2 remains OPEN; no row may be treated as harmless by name alone.
+All20 application dispatches were HTTP200; no compile/backtest ID exists.
+AR100 has2of3 attempts consumed. Look floor338/259/54/699 stays unchanged.
+
+Before any third attempt, separately freeze ONE new read-only lock-shape
+observation at legacy_six_lock_shape/R345-20261107-A (uninspected/unallocated).
+New observe_arv2_r345_lock_shape.py32305B/SHA
+f24ddb4ec51d25af0d2f9ff6ea440e4cc81fb1fe18b89a987d0fd75117c63822;
+canonical profile2193B/SHA
+a7a263b88fb88e666fb1a961ada86a097ba44e2198c075bb7d7db4dbf462ac28;
+native policy1628B/SHA
+d053e03f94a8a08cabbd7107d98e60dd96fde85ac59c1c84776591f81d4f48b1.
+Same fixed CA/security/host constraints as345.3, new exact source/control.
+H4 is the clean commit containing this decision, source/test and A2 fact.
+Bind expected-head H4 plus exact caller/profile hashes, safe_env and only
+existing QC environment keys. Native isolation denies Keychains/securityCLI,
+USB, unrelated artifacts and outside own-control/support writes.
+
+Only authenticate, fixed39054561 project metadata, dedicated collaborators,
+and statistics-disabled backtests/list are allowed (maximum4). No source,
+result, log, price, input DATA, lock/permission/project mutation or launch.
+The output is closed field presence/types, exact boolean classes, known A2
+codeSource match booleans, whole canonical row pins, unknown-key COUNT only,
+owner equality and zero-job verification. No unexpected UID, names, email,
+URLs, arbitrary keys or row values are output. False lock-acquire/release/
+permission-change flags describe THIS probe's actions, not absence of A2's
+previous lock. Diagnostic78passes0.13s under native all-network/artifact denial;
+the earlier74subset overlaps. Compile/record/diff/status checks precede H4.
+Require ACTUAL child0 and ORIGINAL double-LF envelope/report-pin/binding
+validation. Failure/ambiguity spends this observation; no replay or old-leaf
+inspection. This is not a candidate launch attempt or new research look.
+
+No third attempt is authorized yet. Its new exact contract must use the
+actual diagnostic evidence to authenticate only our own A2 technical row,
+preserve real-collaborator refusal, remain on project39054561, and bind all
+source/input/rights/privacy/idle/capacity/default-source/attempt gates.
+No lock deletion, release, cancellation or other-lane change is authorized.

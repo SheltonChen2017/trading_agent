@@ -1,21 +1,21 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current section120 continuation (2026-11-07):** The in-app browser opens
-own OFF independently of native Safari. The plaintext diagnostic job
-fb506cb363a915439998cf53ce419560 reached Completed./TRUE, but both tagged and
-whole-log exports contain the same truncated8192byte report. No new counts
-or inputrepair are admitted. Corrected readonly recovery source is committed
-locally at6b5dab76;120.17 preserves its exact negative result and freezes a
-chunked-output-only successor. Root374focused checks and independent Codex
-source judgment accepted that successor before any new native effect
-(120.18). It preserves all census/cache/SID/price policies and exacthelper.
-Next: commit the new source, fresh actualrender and guarded serialized
-nonfinancial diagnostic, then independently validate complete observations.
-Sameheartbeat remainsPAUSED; genuineMia recoverydraft remains unsubmitted
-after documented input-control failures. NativeSafari untouched.
-20REMXrows quarantined; financial0/5accepted/metricsNULL. RoutineClaude
-skipped. Round120successfulpushes0; solefinalnonforce matchinglane push
-reserved. Source/input/rights/accounting limits remain.
+**Current section120 continuation (2026-11-07):** The in-app browser is
+authenticated on own OFF38609822/code; nativeSafari remains untouched.
+Changed chunked-output diagnostic a86d8fdc57cf8a3e1bd8613262ac0a32 completed,
+all13source files matched and its whole8787byte report passed strict3part/
+SHA/JSON plus independent5session/counter/cache/custody checks. Feb10 exact
+target TradeBar events are0before/0after the cache-check ATTEMPT while
+control664/231 and callbacks718/239 were observed; target cache remains
+Feb9close. Target exactclose freshness passes4/5; control tolerance passes5/5.
+This proves narrow sensor non-delivery, not provider-wide absence or a
+verified inputfix.120.19 records exactsource/job/counts and retained negatives.
+Financial0/5accepted/allmetricsNULL; no unchangedfinancial relaunch.
+The new genuineMia read-only diagnosis1359chardraft is verified unsent after
+the appbrowser Send button intercepted automation. Owner was asked to click
+Send once; no extraMia reads/response are assumed. Sameheartbeat appPAUSED
+before terminalprocessing.20REMXrows remain quarantined; routineClaude skipped.
+Round120successfulpushes0; solefinalnonforce matchinglane push reserved.
 
 **Current code review, section119 (2026-11-05):** Claude has independently reviewed every
 Codex commit in `3cf9636e..16655093` in section 119 at the owner's direct request, as a code
@@ -153,7 +153,7 @@ owner-answer checkpoint is added by this factual blocked handoff.
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **SECTION118 OWNER-AUTHORIZED GENUINE MIA/OFF CONTINUATION; SAFARI AUTHENTICATED; EDITOR/SAVED SOURCE VERIFIED; FIRST CACHE CANARY BOOTSTRAP UNPROVED; MIA GUARD REPLY UNVERIFIED; REVIEWED DIAGNOSTIC CONTINUATION;20REMXROWS QUARANTINED; SKIP CLAUDE REVIEW; SOLE FINAL PUSH RESERVED. NATIVE INPUT/SOURCE/RESOURCE AND ACCOUNTING PREREQUISITES REMAIN;0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
+Status: **SECTION120 CHUNKED DIAGNOSTIC COMPLETED/WHOLE REPORT VERIFIED; FEB10 EXACT-TARGET DELIVERY0/0 AND PRIOR-DAY CACHE; APPBROWSER GENUINE MIA DRAFT UNSENT/OWNER SEND ACTION PENDING; NATIVE SAFARI UNTOUCHED;20REMXROWS QUARANTINED; SKIP CLAUDE REVIEW; SOLE FINAL PUSH RESERVED. NATIVE INPUT REPAIR/FULL-WINDOW ACCOUNTING/RIGHTS REMAIN UNPROVED;0/5 ACCEPTED FULL-WINDOW RESULTS; ALL FINANCIAL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
 in106 remains accepted after its document/current-routing correction.
 Historicalsection105 review/disposition/fullrange remains intact in105.
 
@@ -551,6 +551,22 @@ exact topology and checks.
 QC and Safari access are released for this bounded preflight and serialized backtest continuation.
 Authentication is a required input, not renewed task permission.
 The frozen same-session native RAW/SID policy is unchanged.
+
+Section120 latest bounded diagnostic supersedes the earlier118snapshot below:
+actualOFFjob a86d8fdc57cf8a3e1bd8613262ac0a32 isCompleted with exactall13source/
+whole8787byte3partSHA+strictJSON/5session/counter/custody verification.
+Feb10 exacttarget deliveryevents0/0 before/after cache-checkattempt, despite
+control664/231 and callbacks718/239; prior-daytargetcache and4/5targetfreshness
+remain. This is observed sensor non-delivery, not provider-wide absence.
+Native/source/importorigin/atomicity/fullfinancialacceptance remainFALSE.
+20REMXquarantine unchanged; no remainingfinancialarm launched in120.
+GenuineMia latest1359chardraft isprepared butunsent because the appbrowser
+Send button intercepts automation; ownerSend action requested, no newMia
+diagnosis claimed. NativeSafari untouched; sameheartbeatPAUSED.
+Next is verified authoritative native-input correction, with genuineMia
+when controllable; rerun financialOFF then remainingarms only after recovery.
+The following118details remain prior diagnostic history, not current12file
+source or latestjob identity; see120.19 for current13file/source/job snapshot.
 
 Every private read/processing and native effect needs a fresh bounded
 source/HEAD/access/operation/attempt/look manifest and fsynced durable claim.
@@ -36107,3 +36123,280 @@ mainupdateonly, nohelpercreate. Nativeactivation pending committedsource+
 freshprivateactualrender/sourceguards+240sclaims. Actualremote lastd127746e;
 round120nativeQCrequests39, newdiagnosticjobs1, financialattempts/looks0,
 pushes0. SameheartbeatPAUSED;20REMXquarantined; no routineClaudecheckpoint.
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"helper_bytes":17368,"main_bytes_max":60000,"native_requests":0,"parent_config_bytes_max":6703,"parent_config_sha256":"8292239f62e01d20a221fe49f76b3c29a23e9089eed3d6468f0a0953cbbb02b3","private_reads_max":1,"purpose":"render committed chunked diagnostic from exact source-only parent config before any QC upload; no licensed packet/raw SID/native request","source_epoch":"TPR-NATIVE-PARENT-DELIVERY-CHUNKED-20261107-v1"},"manifest":{"bytes":4754,"name":"TPR-R120-CHUNKED-RENDER-001.claim.json","sha256":"70a606bc2d03799c1d3f0d59de5f28ae9e86d46da8f960e2e7bc145a66370394"},"operation_id":"TPR-R120-CHUNKED-RENDER-001"}
+
+120chunked exact private parent-source rendering {"config_sha256":"e781a322f5467c5fc35e8a9b35b58d5d737f84cdc04f4594a0014dbe53105059","financial_acceptance":false,"head":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","native_requests":0,"proofs":{"build":{"bytes":3538,"name":"TPR-R120-CHUNKED-ACTUAL-RENDER-001.build.json","sha256":"0665897b1c10dd18f1ffea24d842fdadbcf5737e62855e9066fd808fc64aaf13"},"helper":{"bytes":17368,"name":"TPR-R120-CHUNKED-ACTUAL-RENDER-001.helper.py","sha256":"8ab9c6dd9bbeb57c4e29dc88f4b0131046cba15a90899ddc44382ed73e13a98a"},"main":{"bytes":45370,"name":"TPR-R120-CHUNKED-ACTUAL-RENDER-001.main.py","sha256":"ffa1b52c3d9aeda75ce812aeb486854ff5bb02a61e6200ef6e7f41e3dd4e96eb"}},"source_epoch":"TPR-NATIVE-PARENT-DELIVERY-CHUNKED-20261107-v1","status":"actual_chunked_source_rendered"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"compile_requests":0,"config_sha256":"e781a322f5467c5fc35e8a9b35b58d5d737f84cdc04f4594a0014dbe53105059","deadline_seconds_max":240,"expected_prior_inventory":"d309d29377b8d68c6841d2e56d0e8a77be90a0ab0bdf2abddb78cbec125b6826","helper_creates":0,"main_updates_max":1,"native_requests_max":6,"new_jobs":0,"new_main":{"bytes":45370,"sha256":"ffa1b52c3d9aeda75ce812aeb486854ff5bb02a61e6200ef6e7f41e3dd4e96eb"},"parent_bytes":6703,"parent_reads_max":1,"phase":"upload","private_registry_reads_max":1,"project_id":38609822,"purpose":"update only own OFF main to verified committed changed-output diagnostic; exactexistinghelper/all11historicalfiles unchanged","registry_bytes":3573,"request_seconds_max":20},"manifest":{"bytes":5034,"name":"TPR-R120-CHUNKED-UPLOAD-001.claim.json","sha256":"3ea33e2099dbfa13acf8eaccb3a7166902c92b3ad6165472e296593477bfec86"},"operation_id":"TPR-R120-CHUNKED-UPLOAD-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"compile_requests":0,"config_sha256":"e781a322f5467c5fc35e8a9b35b58d5d737f84cdc04f4594a0014dbe53105059","deadline_seconds_max":240,"helper_creates":0,"main_updates_max":1,"native_requests_max":6,"new_jobs":0,"new_main":{"bytes":45370,"sha256":"ffa1b52c3d9aeda75ce812aeb486854ff5bb02a61e6200ef6e7f41e3dd4e96eb"},"parent_bytes":6703,"parent_reads_max":1,"phase":"upload","prior_inventory_sha256":"d309d29377b8d68c6841d2e56d0e8a77be90a0ab0bdf2abddb78cbec125b6826","private_registry_reads_max":1,"project_id":38609822,"purpose":"correct orchestrator operation-id to existing fixedCACHE prefix; prior001 refused pureprepare beforeactionclaim/TLS (0native); retain spentprivateclaim and2reads","registry_bytes":3573,"request_seconds_max":20},"manifest":{"bytes":5069,"name":"TPR-R120-CHUNKED-UPLOAD-002.claim.json","sha256":"2175fd2c4181ad9dc778421433d9ad617e9eea33bd3fc557a3f3db7b8574fe10"},"operation_id":"TPR-R120-CHUNKED-UPLOAD-002"}
+
+120chunked fixedaction PREeffect {"expected_inventory_sha256": "e0ef224b373d649fd31f0aad28b9f5e3220be30bd30d482e1cd0346070a7ed8f", "phase": "upload", "proof": {"bytes": 82357, "name": "TPR-CMP29-API-CACHE-R120-CHUNKED-UPLOAD-002.prepared.json", "sha256": "48f8363636a00eb385fba9a355d5a1785a7a8e67aa978b1a997b75168d655dc3"}, "source_head": "8f2a0dc53edf23e8b9b9250c590d4e65acf68407"}
+
+120chunked fixedaction result {"new_jobs": 0, "observed_job_ids": [], "phase": "upload", "proof": {"bytes": 4333, "name": "TPR-CMP29-API-CACHE-R120-CHUNKED-UPLOAD-002.safe.json", "sha256": "4fd74004661be9ac2c466f4be5a7583d2bb8534839e79299bfed7f978cb17bbb"}, "receipt": {"bytes": 8776, "name": "TPR-CMP29-API-CACHE-R120-CHUNKED-UPLOAD-002.result.json", "sha256": "e404f579d16b4bcd58f6903ea331d581a848cdf375c693b5b77f3e4f28c5e43e"}, "status": "completed", "transport_calls": 6}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"compile_requests_max":1,"config_sha256":"e781a322f5467c5fc35e8a9b35b58d5d737f84cdc04f4594a0014dbe53105059","deadline_seconds_max":240,"inventory_sha256":"e0ef224b373d649fd31f0aad28b9f5e3220be30bd30d482e1cd0346070a7ed8f","native_requests_max":6,"new_jobs":0,"parent_bytes":6703,"parent_reads_max":1,"phase":"compile","private_registry_reads_max":1,"project_id":38609822,"registry_bytes":3573,"request_seconds_max":20,"source_mutations":0},"manifest":{"bytes":4775,"name":"TPR-R120-CHUNKED-COMPILE-001.claim.json","sha256":"9558864baea04a343990f033b5086017b106079475bf2d45a143dec71fa0fc8f"},"operation_id":"TPR-R120-CHUNKED-COMPILE-001"}
+
+120chunked fixedaction PREeffect {"expected_inventory_sha256": "e0ef224b373d649fd31f0aad28b9f5e3220be30bd30d482e1cd0346070a7ed8f", "phase": "compile", "proof": {"bytes": 34502, "name": "TPR-CMP29-API-CACHE-R120-CHUNKED-COMPILE-001.prepared.json", "sha256": "154bb8e07da9bf9c7578b92eeb24841d1104ab0d816b3bceb34c4b10cc5ae575"}, "source_head": "8f2a0dc53edf23e8b9b9250c590d4e65acf68407"}
+
+120chunked fixedaction result {"new_jobs": 0, "observed_job_ids": [], "phase": "compile", "proof": {"bytes": 4422, "name": "TPR-CMP29-API-CACHE-R120-CHUNKED-COMPILE-001.safe.json", "sha256": "36bbffc59d558c179e732671de2910f9544d6040e8578c88c3e7fbd1ec593419"}, "receipt": {"bytes": 8870, "name": "TPR-CMP29-API-CACHE-R120-CHUNKED-COMPILE-001.result.json", "sha256": "6a6f5f7d5381eb775022cdc6db1d81d31f8b0999cbff03e18be2cc76e2e6707e"}, "status": "completed", "transport_calls": 6}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"compile_id":"f0430b88aa39e77cf6fad480e45226ab-c1bd3061c7d6d1e5babf283e60f78666","config_sha256":"e781a322f5467c5fc35e8a9b35b58d5d737f84cdc04f4594a0014dbe53105059","deadline_seconds_max":240,"native_requests_max":1,"new_jobs":0,"parent_bytes":6703,"parent_reads_max":1,"phase":"build","private_registry_reads_max":1,"project_id":38609822,"registry_bytes":3573,"request_seconds_max":20,"source_mutations":0},"manifest":{"bytes":4737,"name":"TPR-R120-CHUNKED-BUILD-001.claim.json","sha256":"0dead8df8a575e9ff9820d599cb85e6380f6e0141b4896d38e420648052bbd86"},"operation_id":"TPR-R120-CHUNKED-BUILD-001"}
+
+120chunked fixedaction PREeffect {"expected_inventory_sha256": "e0ef224b373d649fd31f0aad28b9f5e3220be30bd30d482e1cd0346070a7ed8f", "phase": "build", "proof": {"bytes": 33955, "name": "TPR-CMP29-API-CACHE-R120-CHUNKED-BUILD-001.prepared.json", "sha256": "90a1b0b42ba9998b2c2066504c33d5bf3409afd8b41125fd63ef6b76494f8e0f"}, "source_head": "8f2a0dc53edf23e8b9b9250c590d4e65acf68407"}
+
+120chunked fixedaction result {"new_jobs": 0, "observed_job_ids": [], "phase": "build", "proof": {"bytes": 2716, "name": "TPR-CMP29-API-CACHE-R120-CHUNKED-BUILD-001.safe.json", "sha256": "19ff0772e955e3336cc1290d2968363a34dac28bb9fbfb97fc08cabfeddfb859"}, "receipt": {"bytes": 1962, "name": "TPR-CMP29-API-CACHE-R120-CHUNKED-BUILD-001.result.json", "sha256": "2a22c15ea4dca8e2aa999afe1387ab5dabdaadc35fc083840982f94114da006f"}, "status": "completed", "transport_calls": 1}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"app_effects_max":1,"automation_id":"target-price-qc-job-remaining-backtests","purpose":"serialize own pendingchangeddiagnostic launch; preserve previouslyverifiedfullsameautomationfields; no newcontroller/privateTOMLread","status":"PAUSED"},"manifest":{"bytes":4602,"name":"TPR-R120-CHUNKED-PRELAUNCH-PAUSE-001.claim.json","sha256":"2b931cb19a8597386cef0d4df62065cafedae2a6010c1c2ee2577454cba71776"},"operation_id":"TPR-R120-CHUNKED-PRELAUNCH-PAUSE-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"compile_proof_reads_max":8,"compile_proofs":{"build_plan":{"bytes":33955,"name":"TPR-CMP29-API-CACHE-R120-CHUNKED-BUILD-001.action.spent.json","sha256":"90a1b0b42ba9998b2c2066504c33d5bf3409afd8b41125fd63ef6b76494f8e0f"},"build_response":{"bytes":2410,"name":"TPR-CMP29-API-CACHE-R120-CHUNKED-BUILD-001.build.response.raw","sha256":"cc5dda8754c78f2189dc885411da65e4102675536aaa35195a49d9d0b78b73ad"},"build_result":{"bytes":1962,"name":"TPR-CMP29-API-CACHE-R120-CHUNKED-BUILD-001.result.json","sha256":"2a22c15ea4dca8e2aa999afe1387ab5dabdaadc35fc083840982f94114da006f"},"compile_plan":{"bytes":34502,"name":"TPR-CMP29-API-CACHE-R120-CHUNKED-COMPILE-001.action.spent.json","sha256":"154bb8e07da9bf9c7578b92eeb24841d1104ab0d816b3bceb34c4b10cc5ae575"},"compile_response":{"bytes":631,"name":"TPR-CMP29-API-CACHE-R120-CHUNKED-COMPILE-001.compile.response.raw","sha256":"39136a3e361b9ddca41e8b278c685e8ef2c492f25b5dc189a5eef15639b0131c"},"compile_result":{"bytes":8870,"name":"TPR-CMP29-API-CACHE-R120-CHUNKED-COMPILE-001.result.json","sha256":"6a6f5f7d5381eb775022cdc6db1d81d31f8b0999cbff03e18be2cc76e2e6707e"},"source_after":{"bytes":349013,"name":"TPR-CMP29-API-CACHE-R120-CHUNKED-COMPILE-001.after.response.raw","sha256":"d62e4cc8da14550961053e6caf217895a1e69c9ad21e9f7122ad1c05103f1b48"},"source_before":{"bytes":349013,"name":"TPR-CMP29-API-CACHE-R120-CHUNKED-COMPILE-001.before.response.raw","sha256":"d62e4cc8da14550961053e6caf217895a1e69c9ad21e9f7122ad1c05103f1b48"}},"config_sha256":"e781a322f5467c5fc35e8a9b35b58d5d737f84cdc04f4594a0014dbe53105059","deadline_seconds_max":240,"financial_attempts":0,"heartbeat_verified_paused":true,"inventory_sha256":"e0ef224b373d649fd31f0aad28b9f5e3220be30bd30d482e1cd0346070a7ed8f","job_name":"TPR-DELIVERY-CHUNKED-20261107-OFF-D1","native_requests_max":6,"new_diagnostic_jobs_max":1,"parent_bytes":6703,"parent_reads_max":1,"phase":"launch","private_registry_reads_max":1,"project_id":38609822,"registry_bytes":3573,"request_seconds_max":20,"source_mutations":0},"manifest":{"bytes":6339,"name":"TPR-R120-CHUNKED-LAUNCH-001.claim.json","sha256":"f5a3d1733c75f4509cb81c538fe4b2a852dd047e609a17cd700d388dd1662fae"},"operation_id":"TPR-R120-CHUNKED-LAUNCH-001"}
+
+120chunked fixedaction PREeffect {"expected_inventory_sha256": "e0ef224b373d649fd31f0aad28b9f5e3220be30bd30d482e1cd0346070a7ed8f", "phase": "launch", "proof": {"bytes": 36122, "name": "TPR-CMP29-API-CACHE-R120-CHUNKED-LAUNCH-001.prepared.json", "sha256": "1c25864d5434360455345677071c70fca6f0adfbf75edf7d6d6b538e8a7f9faa"}, "source_head": "8f2a0dc53edf23e8b9b9250c590d4e65acf68407"}
+
+120chunked fixedaction result {"new_jobs": 1, "observed_job_ids": ["a86d8fdc57cf8a3e1bd8613262ac0a32"], "phase": "launch", "proof": {"bytes": 4389, "name": "TPR-CMP29-API-CACHE-R120-CHUNKED-LAUNCH-001.safe.json", "sha256": "16cd7b2289073814910a35f24a6ca23d8e57f3adcac1fe424199cd3d753e6195"}, "receipt": {"bytes": 10797, "name": "TPR-CMP29-API-CACHE-R120-CHUNKED-LAUNCH-001.result.json", "sha256": "5cff644f48ebe946c0287e48e77da2f74c9854dedf9f3955ab7a44d748a46deb"}, "status": "completed", "transport_calls": 6}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"Mia_effects":0,"UI_reads_max":1,"browser":"iab","native_calls":0,"owned_tab":"1","project_id":38609822,"projection":"ownOFF/title/iframeids only; no editor/source/metrics","purpose":"verify requested in-app browser remainsonownOFF and preservehandoff; nativeSafariuntouched"},"manifest":{"bytes":4622,"name":"TPR-R120-IAB-RESUME-CHUNKED-001.claim.json","sha256":"9aa23a273e796a326ecd4585bebc3e46b03ea8212facaf680a6f9796455890ee"},"operation_id":"TPR-R120-IAB-RESUME-CHUNKED-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"backtest_id":"a86d8fdc57cf8a3e1bd8613262ac0a32","deadline_seconds_max":120,"native_requests_max":1,"private_registry_reads_max":1,"project_id":38609822,"projection":"exactmatchingjobstatusmetadataonly; no financial interpretation","registry_bytes":3573,"request_seconds_max":30,"retries":0,"source_mutations":0,"wire_bytes_max":4194304},"manifest":{"bytes":4671,"name":"TPR-R120-CHUNKED-STATUS-001.claim.json","sha256":"3ca3d1e899de1ab513f63b112593770a73de38f3b157343d819aa4e6344e24c9"},"operation_id":"TPR-R120-CHUNKED-STATUS-001"}
+
+120chunked exactjob status PREeffect {"name": "TPR-CMP29-API-R120-CHUNKED-STATUS-001.prepared.json", "bytes": 6185, "sha256": "e719f5e5964241514725cf1c419dd878e0c2e300611a0df3d105bfc16e4313f6"}
+
+120chunked exactjob metadata status {"metadata": {"backtest_completed": true, "backtest_id": "a86d8fdc57cf8a3e1bd8613262ac0a32", "backtest_status": "Completed.", "credential_echo_refused_before_retention": true, "economics_accepted": false, "entire_wire_validated": true, "financial_fields_projected": false, "json_value_nodes": 463, "max_json_depth": 32, "max_json_nodes": 4194304, "native_origin_independently_attested": false, "original_wire_bytes": 11968, "original_wire_sha256": "25f8ddca71147a3e6a87617568620fea7babce740981461e121564d41c631197", "project_id": 38609822, "schema": "tpr-cmp30-job-status-projection-v1"}, "proof": {"bytes": 1230, "name": "TPR-CMP29-API-R120-CHUNKED-STATUS-001.safe.json", "sha256": "b3c50d61c31e866720036c62d59bf422ef857442aa9a647d7447a5f9b24ee5ae"}, "receipt": {"bytes": 1718, "name": "TPR-CMP29-API-R120-CHUNKED-STATUS-001.result.json", "sha256": "7a8f75fb03349b91db274106b8a962ee681d7a2ac1438007af74dadf72d3a0af"}, "status": "completed"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"actual_job_id":"a86d8fdc57cf8a3e1bd8613262ac0a32","app_effects_max":1,"automation_id":"target-price-qc-job-remaining-backtests","purpose":"pause SAMEheartbeat before any terminalresult/sourceprocessing/nativecontinuation; preservepriorfields; noTOMLread/newcontroller","status":"PAUSED","terminal_metadata":"Completed./TRUE"},"manifest":{"bytes":4684,"name":"TPR-R120-CHUNKED-TERMINAL-PAUSE-001.claim.json","sha256":"fd8e57032d3c037454439e71af5647c6bde3f82de159406a2a887e8be3e77f7c"},"operation_id":"TPR-R120-CHUNKED-TERMINAL-PAUSE-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"actual_job":"a86d8fdc57cf8a3e1bd8613262ac0a32","financial_interpretation":false,"heartbeat_actual_app_paused_before_transition":true,"inventory_sha256":"e0ef224b373d649fd31f0aad28b9f5e3220be30bd30d482e1cd0346070a7ed8f","log_range":[0,200],"native_requests_max":2,"new_jobs":0,"private_registry_reads_max":1,"project_id":38609822,"query":"TPR_PARENT_CACHE_PROBE_PART","registry_bytes":3573,"request_seconds_max":20,"source_mutations":0,"terminal":"Completed./TRUE","total_wire_bytes_max":4194304,"wire_bytes_each_max":2097152},"manifest":{"bytes":4890,"name":"TPR-R120-CHUNKED-TERMINAL-CAPTURE-001.claim.json","sha256":"61a8def7acb7d9a578cc161de3638a7f87a27b1f531063b876e5653632293ec4"},"operation_id":"TPR-R120-CHUNKED-TERMINAL-CAPTURE-001"}
+
+120chunked terminal capture PREeffect {"name": "TPR-CMP29-API-R120-CHUNKED-TERMINAL-CAPTURE-001.prepared.json", "bytes": 6277, "sha256": "e6ba3cefa5ac20a9f6dde41ff9ecb36b352614cb2286ba3046c5a5b7014446a4"}
+
+120chunked terminal capture result {"proof": {"bytes": 1248, "name": "TPR-CMP29-API-R120-CHUNKED-TERMINAL-CAPTURE-001.safe.json", "sha256": "7f7c8e15fe8bd844772f229fe06738a053ccd808d2043b99bc2b8eafdb6a778d"}, "receipt": {"bytes": 4459, "name": "TPR-CMP29-API-R120-CHUNKED-TERMINAL-CAPTURE-001.result.json", "sha256": "19cea8fa4493e6601a0c691014aaeb71b79e3cc64cc3cc2d7240f812bad7c8e7"}, "status": "completed"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"actual_job":"a86d8fdc57cf8a3e1bd8613262ac0a32","financial_acceptance":false,"input":{"bytes":9870,"name":"TPR-CMP29-API-R120-CHUNKED-TERMINAL-CAPTURE-001.logs.response.raw","sha256":"929c079e24f941b4b66355f1a26cb1961a67a7034d2bdd24c399f2e2cbe5756d"},"json_depth_max":16,"json_nodes_max":4096,"missing_incomplete_as_zero":false,"native_requests":0,"parts_max":3,"piece_bytes_max":3000,"private_reads_max":1,"purpose":"strictwholechunk reassembly then independent five-session pricefree count/cache guards; no prices/SID/newQC/privatepacket","root":"api.PRIVATE_ROOT","source_head":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","whole_json_bytes_max":9000},"manifest":{"bytes":5019,"name":"TPR-R120-CHUNKED-NATIVE-PROJECTION-001.claim.json","sha256":"442218a514df888eef67baf0e5505123682e39de1f00ea05eb68e482854f2042"},"operation_id":"TPR-R120-CHUNKED-NATIVE-PROJECTION-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"actual_job":"a86d8fdc57cf8a3e1bd8613262ac0a32","financial_acceptance":false,"input":{"bytes":9870,"name":"TPR-CMP29-API-R120-CHUNKED-TERMINAL-CAPTURE-001.logs.response.raw","sha256":"929c079e24f941b4b66355f1a26cb1961a67a7034d2bdd24c399f2e2cbe5756d"},"json_depth_max":16,"json_nodes_max":4096,"missing_incomplete_as_zero":false,"native_requests":0,"parts_max":3,"piece_bytes_max":3000,"private_reads_max":1,"purpose":"correct only local projection labelenum to publiccommitted quantity_type() function: python_float/int/decimal/fraction/system_decimal/unknown; prior001 correctlyrefused beforeoutput withwrongenum, no countsadmitted; allnative/reportbytes unchanged","source_head":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","whole_json_bytes_max":9000},"manifest":{"bytes":5119,"name":"TPR-R120-CHUNKED-NATIVE-PROJECTION-002.claim.json","sha256":"6119101419d69df2f606c8b95f13a8ed4ba6948a9c67910bfcb098190ed45d42"},"operation_id":"TPR-R120-CHUNKED-NATIVE-PROJECTION-002"}
+
+120chunked independent complete pricefree report projection {"checks": {"bootstrap_custody": true, "bounded_cache_observations": true, "caps_no_skips": true, "complete_callbacks": true, "complete_status": true, "count_types_and_bounds": true, "exact_sessions": true, "no_first_failure": true, "non_order": true, "private_calls": true, "reconciled_totals": true, "target_freshness_count": true, "zero_prohibited_effects": true}, "complete": true, "counts": {"close_checks": 5, "delivered_bar_rows": 5950, "delivered_slices": 4790, "object_store_calls": 2, "on_data_entries": 4790, "parent_contains_calls": 1, "parent_read_calls": 1, "preopen_empty_slices": 0, "target_close_canary_days": 4}, "financial_acceptance": false, "proof": {"bytes": 8248, "name": "TPR-R120-CHUNKED-NATIVE-PROJECTION-002.json", "sha256": "15584279ff54f08a24349c0ac6db25fb68e9c31eefe1a2a5e798c320ab28fb2f"}, "report": {"bytes": 8787, "name": "TPR-R120-CHUNKED-NATIVE-REPORT-002.json", "sha256": "984f2e7c6c5610be56ca62f6ea92f4e9e7181fcbb23936f821fa63d7f4a64e1f"}}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"Mia_effects":0,"UI_reads_max":1,"browser":"iab","native_requests":0,"owned_tab":"1","project_id":38609822,"purpose":"locate genuineMia in currentrenderedUI after exactnative census; no message/source/jobaction","source_mutations":0},"manifest":{"bytes":4582,"name":"TPR-R120-IAB-MIA-CHUNKED-DOM-001.claim.json","sha256":"5a136ea6070b6a28f8c2617a73b3e7beac0f18838cad29765f6b970a0892281c"},"operation_id":"TPR-R120-IAB-MIA-CHUNKED-DOM-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"Mia_effects":0,"UI_reads_max":1,"browser":"iab","native_requests":0,"owned_tab":"1","projection":"rendered iframeid/name only in observedcodeframe; priorcontentDocumentblockedcrossorigin, noavailabilityinference","source_mutations":0},"manifest":{"bytes":4593,"name":"TPR-R120-IAB-MIA-CHUNKED-FRAMES-001.claim.json","sha256":"c1dde2188d11d82328c29c7cadfd5cca89a270b9cda2014606e8fab4a513956e"},"operation_id":"TPR-R120-IAB-MIA-CHUNKED-FRAMES-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"Mia_effects":0,"UI_reads_max":2,"browser":"iab","native_requests":0,"owned_tab":"1","projection":"inneriframeids/textareachars+exactowndraftboolean/sendbuttonvisibility-disabled-label only","source_mutations":0},"manifest":{"bytes":4567,"name":"TPR-R120-IAB-MIA-CHUNKED-FIELD-001.claim.json","sha256":"b9c3acdba972563839ff45f7f4530c081946e09cd72e26a2224b23aca101ff64"},"operation_id":"TPR-R120-IAB-MIA-CHUNKED-FIELD-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"Mia_effects":0,"UI_reads_max":2,"browser":"iab","draft_chars":1088,"native_requests":0,"owned_tab":"1","projection":"exactknownownprompt equality/publicnonce only","source_mutations":0},"manifest":{"bytes":4553,"name":"TPR-R120-IAB-MIA-CHUNKED-OWNERSHIP-001.claim.json","sha256":"999703fa1337e8b20d04701fdd3ecc70db5d46785a971d844793277a75177696"},"operation_id":"TPR-R120-IAB-MIA-CHUNKED-OWNERSHIP-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"Mia_provider_objectstore_reads":0,"UI_reads_max":3,"authorized_Mia_read_lookups_max":2,"browser":"iab","compiles":0,"draft_replacements_max":1,"existing_job":"a86d8fdc57cf8a3e1bd8613262ac0a32","mode":"Ask Before Edits","new_jobs":0,"old_draft_chars":1088,"old_draft_exact_verified":true,"owned_tab":"1","project_id":38609822,"prompt_chars":1359,"purpose":"genuineMia precisecompleted-native-delivery diagnosis before anyfinancialrun; preserveinputpolicy and20REMXquarantine","send_clicks_max":1,"source_mutations":0},"manifest":{"bytes":4872,"name":"TPR-R120-IAB-MIA-DELIVERY-DIAG-001.claim.json","sha256":"ae8a153ac5b833895a5247f29346defb49725c6a58d4eb0e9a12aaf1fa1936fa"},"operation_id":"TPR-R120-IAB-MIA-DELIVERY-DIAG-001"}
+
+### 120.19 Changed chunked diagnostic completed; full native report recovered
+
+Implementation committed BEFORE effect at8f2a0dc53edf23e8b9b9250c590d4e65acf68407.
+Actual committed render main45370B/SHAffa1b52c3d9aeda75ce812aeb486854ff5bb02a61e6200ef6e7f41e3dd4e96eb,
+helper unchanged17368B/SHA8ab9c6dd9bbeb57c4e29dc88f4b0131046cba15a90899ddc44382ed73e13a98a;
+confige781a322f5467c5fc35e8a9b35b58d5d737f84cdc04f4594a0014dbe53105059,
+all13inventorye0ef224b373d649fd31f0aad28b9f5e3220be30bd30d482e1cd0346070a7ed8f.
+All11historicalnonmain files plus exacthelper unchanged. Fresh parent-source
+read6703/SHA8292239f... only; no oldD0/USB/provider/signalpacket reopened.
+
+Root orchestrator UPLOAD001 used wrong operationprefix without CACHE;
+pureprepare refused BEFOREactionclaim/TLS/sourceeffect. Its freshprivate
+claim+2inputreads remain spent,0native. Corrected002 used requiredfixedCACHE
+prefix under NEWclaim. No code/pin/guard change or native retry was involved.
+Actual upload002 verified ownership/privacy/noactivejobs/all13before/after,
+one mainupdate/6TLSrequests. Compile0016requests preserved all13bytes and
+returned f0430b88aa39e77cf6fad480e45226ab-c1bd3061c7d6d1e5babf283e60f78666.
+FreshBuild001one request verifiedBuildSuccess. All8retainedcompile/build
+proofs checked under NEWlaunchclaim, samecommittedsourceHEAD. Sameheartbeat
+appPAUSED verified beforelaunch; launch0016requests created exactlyone
+nonfinancial joba86d8fdc57cf8a3e1bd8613262ac0a32,
+TPR-DELIVERY-CHUNKED-20261107-OFF-D1. All13sourcebefore/after matched.
+Launchreceipt10797B/SHA5cff644f48ebe946c0287e48e77da2f74c9854dedf9f3955ab7a44d748a46deb.
+No financialcandidate/attempt/outcomelook created, no source/helper overwrite
+outside exactmain update, no otherarmproject touched.
+
+FreshStatus001one request verified actualCompleted./TRUE, HTTP20011968B/
+SHA25f8ddca71147a3e6a87617568620fea7babce740981461e121564d41c631197.
+Readsuccess is distinct from jobstatus and no financialfields projected.
+Sameheartbeat actualappPAUSED again BEFOREterminal/source/logprocessing.
+Fresh terminalcapture0012requests retained source349013B/SHA
+d62e4cc8da14550961053e6caf217895a1e69c9ad21e9f7122ad1c05103f1b48
+and taggedlogs9870B/SHA929c079e24f941b4b66355f1a26cb1961a67a7034d2bdd24c399f2e2cbe5756d,
+queryTPR_PARENT_CACHE_PROBE_PART/range0..200. All13source exacte0ef...;
+no rawsource/price/SID/financialmetrics emitted to chat. OldplainCompleted/
+clipped8192tag/read+wholeexport refusal remain unadmitted, never pooled.
+
+Fresh nativeprojection001 strictly reassembled report but correctly refused
+before output at root's wrong localquantitylabel enum. Publiccommitted
+quantity_type() uses python_float/python_int/python_decimal/python_fraction/
+system_decimal/unknown, not int/float/decimal/unknown. Corrected ONLYthis
+projectionenum under fresh002privateprocessing claim; native/source unchanged.
+No count admitted from001. No source/test/policy guard weakened.
+
+Projection002 verified all3orderedrawparts, each<=3000ASCII, whole8787B/
+SHA984f2e7c6c5610be56ca62f6ea92f4e9e7181fcbb23936f821fa63d7f4a64e1f BEFORE
+strictfullJSON and exactexternaloperation/sourceHEAD/job/schema/17falseflags.
+Privatefullreport8787B/hashsame; safeprojection8248B/SHA
+15584279ff54f08a24349c0ac6db25fb68e9c31eefe1a2a5e798c320ab28fb2f.
+Independent checks allpassed: exact5sessions bothmaps, completecache/terminal/
+delivery/measured-event status; parenthash/schema/SID/bootstrappreopen/
+terminalcustodyTRUE; firstfailure3fieldsNULL; contains1/read1/objectstore2;
+no caps/disabledskips/prohibitedeffects; exactinteger/time/eventbounds,
+all10cacheobservationsbounded/stable, positivepre/postcallbacks all5days,
+roleevents<=callbacks, zeroevents iff lastendNULL, nondecreasingendmetadata,
+and alltotalreconciliations. on_data_entries=delivered_slices4790,
+preopenempty0; delivered_bar_rows5950=allroleeventsum. These are observed
+callback/TradeBar deliveryEVENTS, not distinct trades, sharevolume or prices.
+
+| SessionNY | Callbacks before/after attempt | Control events before/after | Exacttarget events before/after | Target lastbefore EndTimeNY | Target closecanary |
+|---|---:|---:|---:|---|---|
+|2021-02-08|720/240|692/236|369/0|16:00|TRUE|
+|2021-02-09|719/239|679/227|319/0|16:00|TRUE|
+|2021-02-10|718/239|664/231|0/0|NULL|FALSE|
+|2021-02-11|720/238|672/223|369/0|16:00|TRUE|
+|2021-02-12|720/237|656/229|384/0|16:00|TRUE|
+
+Buckets are before/after cache-check ATTEMPT, not proof of successfulmark.
+Allcontrolprelast16:00/postlast20:00; controlfreshness5/5<=60stolerance,
+not exactclose equality. Targetexactclose4/5. Feb10 targetcache observation
+was exactSID/RAW/noFF/minute/unchanged butnot same-session; close-minus-end
+86400000000us/now-minus-end86460000000us proves retainedFeb9close at16:01.
+No exacttargetTradeBar deliveryevent was observed by this hook onFeb10
+after successfulpreopenregistration while957callbacks/control895events
+were observed. This distinguishes narrow delivery absence from merely a
+successfulOnData callback count. It does NOTprove no trading/provider-wide
+absence/QuoteBarabsence/fullnative-sourcepathcause. No same-session price
+or volume was fabricated, no stale/future/cache mark admitted.
+
+Round120 directroot nativeQCrequests61 (=prior39+upload6+compile6+build1+
+launch6+status1+capture2), acceptedhelpercreates1/mainupdates2/
+explicitcompiles2/newnonfinancialdiagnosticjobs2/financialattempts+looks0.
+Mia/UI-internal nativecalls are not measured by this count; no newMia
+submission or newlook was verified. Allpriorattempts/looks/reservations,
+failedpreparations/processings/retainedraw/refusals remain immutablehistory.
+No cleanup/newaccount/purchase/subscription/security/Terms effect.
+
+### 120.20 Genuine Mia input-control block and exact financial readiness
+
+OwnIAB path is /project/38609822/code, verified OFFprojectidentity; root
+path-only equalitycheck omitted /code and returnedFALSE, not an auth/source
+failure. CrossorigincontentDocument returnednull; documented frameLocator
+resolved genuineMia. An initialfreeidentifier draftcomparison returnedFALSE;
+explicitexpected-text argument then verified exactown1088chardraftTRUE.
+Only that verifiedown staleLOG-RECOVERY draft was replaced with1359char
+TPR120-DELIVERY-DIAG-001 diagnosis containing currentcompletepricefreefacts.
+AskBeforeEdits retained. Scope: atmost2existing projectsource/currentjoblog
+readlookups total, no provider/History/ObjectStore/source/compile/job/order/
+account effects, rawSIDstaysinQC, onlyverifiedsame-sessionnativeRAW fix.
+Newdraft exactequality verified; one Sendclick intercepted by page::before.
+Freshstate provednonceoccurrences0/own1359draftintact/stopdisabled. Thus
+NOsend/newMiaresponse/lookups claimed. No blindforce/keyboard/reload loop or
+genericagentAPI/impersonation fallback. Ownerasked to clickSendonce inapp;
+this is a concrete input-control step, not renewed scope permission.
+Prior genuineMia final120.6 remains the last verifiedreply; no verified
+economic-preserving code/inputfix has been supplied. NativeSafari untouched.
+
+| Frozenfinancialarm | Protectedproject | Newfinancialjobs in120 | Accepted full-window outcome/metrics | Readiness |
+|---|---:|---:|---|---|
+|OFF|38609822|0|NULL/unaccepted|Blocked by exactsame-sessionnativeinput; diagnosticCompleted doesnotacceptfinancialrun|
+|TPR50%|38609834|0|NULL/unaccepted|Await verifiedinput/source/fullaccounting prerequisite|
+|TPR100%|38609836|0|NULL/unaccepted|Await verifiedinput/source/fullaccounting prerequisite|
+|TPR200% long-only|38609837|0|NULL/unaccepted|Await verifiedinput/source/fullaccounting prerequisite|
+|PureTPR|38609840|0|NULL/unaccepted|Await verifiedinput/source/fullaccounting prerequisite|
+
+Historical8financialRuntimeErrors and later owner/Miaobserved100source/jobs
+remain separately classified/unaccepted, not reset or pooled with2new
+nonfinancialCompleted diagnostics. Source/economicacceptance, native/import
+origin/atomicity/rights/PIT/canonicalTR0-I/TPR-1/TPR-0B and fullnative
+orders/fills/fees/cash/actions/NAV/exposure/clock/coverage remain unproved.
+0/5accepted financialresults, allfinancialmetricsNULL.20REMXfractionalrows
+stayquarantined2026-02-23..2026-03-20; USBrepair isdiagnostic only, no fallback.
+
+Nexttechnicalstep is genuineMia/currentexact-source authoritative native-input
+diagnosis and a verifiedinput/source correction under a NEWreviewedbuilder
+epoch; unchangedfinancialpath cannot repair missingFeb10exacttargetdata.
+IfMia supplies no verifiedfix, precise native-data availability/routing
+evidence from QC is required. Only after source/input/accounting readiness:
+financialOFF then50/100/200/pure serialized, retainingallnegativehistory.
+No routineClaudecheckpoint/secondcontroller/cleanup or policyoverride.
+SameheartbeatPAUSED; finalone nonforce matchinglane push isreserved for
+stablecompleted or concreteexternal/inputblocked handoff; no push yet in120.
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"Mia_effects":0,"UI_reads_max":1,"browser":"iab","native_requests":0,"owned_tab":"1","purpose":"verify pendingMiadraft/submissionstate beforeconcretehandoff; retainownerproject view","screenshots_max":1,"source_mutations":0},"manifest":{"bytes":4588,"name":"TPR-R120-IAB-MIA-DELIVERY-HANDOFF-001.claim.json","sha256":"a7de09cdc46e8ab0045e4c4923e3c3359264f673316fd77dd579d28e6b7b149f"},"operation_id":"TPR-R120-IAB-MIA-DELIVERY-HANDOFF-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"Mia_effects":0,"UI_reads_max":2,"browser":"iab","dismiss_own_completed_backtest_toast_max":1,"native_requests":0,"owned_tab":"1","purpose":"resolve actualscreenshotvisible notificationcoveringMiasend atbottomright, notblind inputretry","source_mutations":0},"manifest":{"bytes":4634,"name":"TPR-R120-IAB-MIA-NOTIFICATION-BLOCKER-001.claim.json","sha256":"e3f08250f2852ff0a5345565c91017cfbb0d00ee0486be94af83e6adf96b54fe"},"operation_id":"TPR-R120-IAB-MIA-NOTIFICATION-BLOCKER-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"Mia_provider_objectstore_reads":0,"Mia_read_lookups_max":2,"UI_reads_max":3,"actual_job":"a86d8fdc57cf8a3e1bd8613262ac0a32","browser":"iab","compiles":0,"mode":"Ask Before Edits","new_jobs":0,"owned_tab":"1","project_id":38609822,"prompt_chars":1359,"purpose":"changedUIpath after exactvisibletoast dismissed; checkunsentnonce beforeclick, no duplicate","send_clicks_max":1,"source_mutations":0},"manifest":{"bytes":4751,"name":"TPR-R120-IAB-MIA-DELIVERY-SEND-002.claim.json","sha256":"143d097e7fe4c4267444f12cf9151993ae59e22d6dd7c3aefc6982dc10d5859a"},"operation_id":"TPR-R120-IAB-MIA-DELIVERY-SEND-002"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"Mia_effects":0,"UI_reads_max":2,"browser":"iab","native_requests":0,"owned_tab":"1","projection":"own1359draft/nonce/stop and DOMpointerblockeridentity only","source_mutations":0},"manifest":{"bytes":4559,"name":"TPR-R120-IAB-MIA-DELIVERY-BLOCK-VERIFY-001.claim.json","sha256":"11889584fdedec6c1ce757fd38c01e95bd9d62be5957bfea0f46f9e82d7bc61f"},"operation_id":"TPR-R120-IAB-MIA-DELIVERY-BLOCK-VERIFY-001"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"Mia_provider_objectstore_reads":0,"Mia_read_lookups_max":2,"UI_reads_max":2,"browser":"iab","compiles":0,"new_jobs":0,"owned_tab":"1","purpose":"changedsemantic target basedfreshDOMhit evidence, notblindbuttonretry; currentnonceabsent andexactowndraftrequired","send_icon_child_clicks_max":1,"source_mutations":0},"manifest":{"bytes":4684,"name":"TPR-R120-IAB-MIA-DELIVERY-ICON-SEND-003.claim.json","sha256":"6fdc072a4ec4b86f68821a81ca04366bc3d3f5d04ce9eeb0b8cbf868e28630db"},"operation_id":"TPR-R120-IAB-MIA-DELIVERY-ICON-SEND-003"}
+
+Fresh120 claim BEFORE effect {"HEAD":"8f2a0dc53edf23e8b9b9250c590d4e65acf68407","bounds":{"actual_completed_job":"a86d8fdc57cf8a3e1bd8613262ac0a32","app_effects_max":1,"automation_id":"target-price-qc-job-remaining-backtests","purpose":"update SAMEpausedheartbeat obsolete100target to exactcompletedOFF/custody/inputblock/unsentMia/provenance andcurrentrecord; no rearm/newcontroller","status":"PAUSED"},"manifest":{"bytes":4680,"name":"TPR-R120-HEARTBEAT-CURRENT-HANDOFF-001.claim.json","sha256":"95f5029b137b094e46fab2909355411e6a4235d3f8651d8910e69613d07b9606"},"operation_id":"TPR-R120-HEARTBEAT-CURRENT-HANDOFF-001"}
+
+
+### 120.21 Stable native-input/UI-blocked publication snapshot
+
+No additionalnative request/job/source change followed120.19: rootdirectQC61,
+2newnonfinancialCompleted diagnostics, financialattempts/looks0; all5financial
+outcomesNULL/unaccepted. Same20REMXquarantines unchanged. NativeSafari
+untouched; ownIABOFF/code remainsavailable for ownerhandoff. Whole3part report
+and exact13files are retained at the immutable120.19descriptors/sourceHEAD8f2.
+Public builder/actions tests374green on exactsource, correctedlogexport291
+green at6b5, priorincoming119Macpreflight813green attributed to their exact
+earlier trees. Focusedcurrent/preamble documentchecks371passed/520deselected
+8.22s/8.34sorchestration on recordSHA52402bb448623d55a2e275aa3404278fd7360fbad0ff37157bfa96e75aa96ccf,
+Python3.13.15/pytest9.1.1, samepreimport49/52syntheticDB/socketDNS/realcredential
+denial. No warnings shown/fullsuite/nativeeffects. Subsequentappend-only
+claim/evidence notes do not change activepreamble/section8 testedwording.
+
+FinalUIrecovery history is retained: screenshot showed own completed-backtest
+toast nearSend. Exactnotification-onlyClear action succeeded; it didNOT
+resolve Send interception. Freshunsent/idle/AskBeforeEdits check preceded
+one post-dismissalbuttonclick, stillintercepted. DOMhit test showedbutton
+contains ownarrowspan, no button::beforecontent; one newlytargeted observed
+arrowchildclick alsointercepted. Finalstate verifiednonce0/exactown1359draft/
+stopdisabled. Thus no newMia request/response/toolreadcount is claimed;
+precise cause of browserpointer rejection remainsunproved. No JSactions,
+security/CSS/DOMchanges, forcedloop or broaderpermissions used. Earlier
+keyboard/force methods and notoolsWebMCP result remainnegativehistory.
+OwnerSend question remainspending; no routineowner/Claudereview checkpoint
+is created. GenuineMia technicalinput is inaccessible to this controller
+until that UIstep; currentnativeinputblock independentlyremainseven if
+messagecontrol is fixed. No unchangedfinancial rerun is justified.
+
+SAMEheartbeat target-price-qc-job-remaining-backtests was actually appupdated
+PAUSED with latestexactcompletedOFFjob/source/config/report/countlimits,
+unsentMiadraft/currentrecord120 instructions, replacing stale100target.
+Kind/name/schedule/thread andquietnotificationintent retained, no duplicate/
+parallelcontroller/rearm. Beforefuturepublication reconcile ACTUALlocal/
+remote and whether root120finalpush wasalreadyconsumed; never push120twice.
+
+| Local120 commit before final record-only handoff | Disposition / concrete result |
+|---|---|
+|29abd2030c4c31f1f8082d97bb9525a6f6471ef5|Retained QCaccess recovery/Macpreflight; softwareproof only|
+|5abfdb2c3f9ddce0f4842a71da53f37a12579870|Retained earlierverifiedgenuineMiasubmission/UIcontention; no verifiedinputfix|
+|d3e9441123288429c10fa06348f171afbe7311fc|Softwareverified deliverycensus; packednative source refused byQCpolicy, neveracceptedfinancially; retained/retiredhistory|
+|e805d413bcbc00f1221275d8db28a1dc3cf8a89a|Readablehelper/main verified/compiled/plainD1Completed;8192clippedreport unadmitted|
+|6b5dab769a614068b66880d83a3fe75f60e13742|Readonlywholelogrecovery acceptedafterconfirmedcredential-screen correction; actualsafewire retained butreportstillclipped/refused|
+|8f2a0dc53edf23e8b9b9250c590d4e65acf68407|Chunkedoutput softwareverified beforeeffects; actualD1Completed/fullwholeSHA report+independentcensus verified; inputblockremains|
+|Following root record-only commit|Currentexactnativehistory/per-armNULLs/MiaUIblock/onepushhandoff; no code/economicchange|
+
+This is stable completeddiagnostic + concrete native-input/externalUIblocked
+handoff, not completion of financialfive-arm study. Technicaldeliverable:
+boundedreadable outputframing recovers whole8787byte census with allguard/
+source/counter checks. Plainlanguage: the program sees controlbars throughout
+Feb10 but receives no exacttargetbars; its targetprice remains the previous
+day, so the frozenfinancialrun cannot continue honestly with this input.
+
+Publication boundary: startingremoteactuald127746e92fd7051a08b6efa66a12ede0ade568e,
+all6listedlocalcommits plus this followingrecordcommit on ONLYexistinglane.
+Alltrackedsource/tests/record retained; no artifacts/credentials/licensed
+rows/database/cache/environmentfiles staged. Currentactivewording/history/
+AST/compile/LF/diff/scope andremote guards mustpass beforecommit/push.
+ExactlyONEsuccessful nonforce finalpush is authorized to
+HEAD:refs/heads/codex/strategy-target-price-revisions, with followtags/
+recursesubmodules disabled. Actuallocal/remoteequality+cleanstatus are checked
+afterward and reported in chat; no postpushtrackededit or secondpush is
+planned. This entry is prepublication authority, not a fabricated pushreceipt.
+FutureMia/inputwork is a new freshlyclaimed continuation from actualHEAD,
+preserving native8f2source provenance and everynegativeattempt/look/history.

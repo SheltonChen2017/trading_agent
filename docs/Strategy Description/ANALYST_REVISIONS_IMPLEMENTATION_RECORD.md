@@ -1316,7 +1316,10 @@ Claude344commits are accepted after counter-review with documentary
 qualifications. Corrected projection/reporting/caller tests pass on the
 designated Mac (260 distinct). LeafA remains spent and excluded; corrected B
 prepare/validator passed once with actual0/0 and are now spent. Its new DATA
-is bound to the separately frozen AR100/A1 pilot in345.5. The owner released
+is bound to the separately frozen AR100/A1 pilot in345.5. A1 stopped at the
+local libraries predicate after allocating project39054561, before any
+upload/compile/job; it is spent. The same-project v2/A2 recovery is separately
+frozen in345.7, after140focused checks and162-source cold bootstrap. The owner released
 QC; no permission or readiness follows
 for a funded/broker/paper/live operation. The six-universe old-rule AR80–200
 research extension remains the selected route, and the broad new-rule rebuild
@@ -1329,7 +1332,7 @@ files are superseded. Corrected B preparation and the four-request read-only
 QC observation passed under their exact clean freeze; their results are345.4.
 Two idle backtest nodes were observed, not leased. New submitter/consumer
 support passed531focused tests and public-source bootstrap; only the separate
-AR100/A1 run freeze in345.5 may next be invoked, never an arbitrary callback.
+AR100/A2 run freeze in345.7 may next be invoked, never an arbitrary callback.
 Fresh source/input/rights/account/privacy/idle/capacity/project/attempt/run
 gates precede any upload/compile/backtest. No old operation/control is replayed.
 The broad new-rule six/eight rebuild stays paused with its own blockers.
@@ -77874,3 +77877,126 @@ identity, never at local preparation/metadata-only observation. No efficacy
 or result cell follows from a launch. The pre-dispatch floor remains
 338shared/259development/54infrastructure/699cells. No paper/live/funded/
 broker/real-order action or formal source/PIT/master admission is authorized.
+
+### 345.6 AR100 A1 actual refusal, retained evidence and recovery scope
+
+At clean H2=05d1bd53e2a777f0364762d96f1af4f870175f79 the sole pilot caller
+dispatched2026-11-07T17:39:11UTC; completion observed17:39:24UTC,
+controller0/ACTUAL parent2/stderr0. The attempt/control is SPENT. Its
+2708B ORIGINAL failure stdout SHA
+b24612a1a89f6d3e3698f2b2de19da2b3917a8c9998134f6a23d513ab09342a2
+is retained as a public finite fact with external actual-exit/source bindings:
+scripts/arv2_r345_ar100_a1_failure_fact.json3418B/SHA
+20d65921c14bf10577f01f87dde381cbec829cd5ba8c79b3ceb9562c97126823.
+This is FAILURE evidence, not an accepted launch or permission to retry A1.
+No original control/report read, census, repair or cleanup followed.
+
+Fresh B DATA authentication normal-returned before credentials/contact.
+All six current object/properties observations matched exact keys, sizes
+and case-normalized MD5; the final activation observation was4631B, exact.
+Six-key transport metadata success does not authenticate remote SHA256 or
+formal/PIT data. Sixteen application dispatch attempts returned HTTP200.
+The engine created new own project39054561 named
+ARV2 LEGACY SIX R343-AR100 OCT2026 and retained that identity immediately.
+It then refused in the local libraries predicate on the first created-project
+metadata read. Last marker created-project, stage source_compile, selected
+module engine/code libraries. No source/file/lock/compile/backtest dispatch
+is on that executed program path; no compile/backtest ID was returned.
+
+The last created-project response was1304B/SHA
+2ae13c71704c7b0327596d58a3e72bd166ee7fdfced5d6c1a7cf048884beb1b2;
+the earlier successful create response1003B/SHA
+67edc278be8912baf090c00289ce736aeba54bb151f1cb5cfd445e57962d698e.
+These are original response pins, not recoverable response bodies or proof
+of continuous cloud state. The complete16-status vector803B/SHA
+7b0e87a4221a7eba912ef42e05a8b29a9b1ea0d6604a746172cae2904dc33d93
+and response-pin vector2010B/SHA
+d1d3321cdeacceada912e13193d5153ea3cd8d95832ceedf0660110c161a2299
+were captured by the original finite evidence. No exact failed metadata
+field/value can be recovered from hashes. No numeric application error,
+upload refusal, subscription expiry or price-coverage conclusion follows.
+
+ARV2D345-001/P2: actual local libraries-predicate refusal, OPEN pending
+verified prospective recovery. The used v1 demanded isLibrary=false even
+though the current official Project model documents libraries[] but not
+isLibrary. This unsupported additional negative-field requirement is a
+verified compatibility defect; which conjunct failed in A1 remains unknown.
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/read-project
+A separately versioned v2 will retain explicit contradiction refusal, require
+current libraries=[], actual owner/org/Py/idleness/no-live scope, dedicated
+owner-only access, zero backtests and the original bounded default source
+inventory. It must observe field presence/types before validation, never
+insert a fabricated isLibrary=false into a server response.
+
+Recovery stays on project39054561 and SAME candidate R343-AR100 at attempt2,
+not a replacement project/name or reset budget. The new v2 must bind the exact
+public A1 failure fact above, reauthenticate the CURRENT project and expected
+default files before any source write, use a NEW exact A2 control/run freeze,
+and leave all used v1/B/availability sources and old controls untouched.
+The owner already waived current review and delegated verified lane fixes;
+no routine permission or vendor acknowledgment is needed. No v2 invocation
+is yet authorized by this result record alone. The other six arms remain
+uninvoked. No compile/backtest dispatch occurred, so the actual research-look
+floor remains338/259/54/699; the AR100 attempt count is now1of3 consumed.
+
+### 345.7 Separately versioned same-project A2 recovery freeze (before use)
+
+NEW v2 caller/engine/plan leave every used v1 file unchanged. The exact A1
+failure fact20d659... binds project39054561/candidateR343-AR100/attempt1
+and observed failure, not a fabricated successful allocation response.
+A2 is fixed to SAME project/name and attempt2; project creation/global
+project listing/foreign project IDs are mechanically prohibited. This is a
+verified verifier-compatibility correction plus reconciliation, not an
+unchanged retry, renamed candidate or restored budget.
+
+Current libraries must be an explicit empty list. isLibrary, if supplied,
+must be exact false; absence stays UNKNOWN, accepted only jointly with the
+pinned own algorithm-allocation failure fact, exact current ownership/org/Py/
+no-live/idleness, dedicated owner-only access, zero backtests and known
+initial default source bytes. Closed field-presence/type/count observations
+are retained BEFORE validation and included in original success/failure
+output. They contain no remote strings, owner IDs, credentials or rows.
+Missing/contradictory other library evidence still refuses. The existing
+project's initial main must match the pinned BasicTemplateAlgorithm default
+or exact # stubs, with no unexpected files; a changed main stops before
+lock/source mutation. Only its optional initial default notebook may be
+removed. No other project/user session or resource is changed.
+
+|NEW component|Bytes|SHA256|
+|---|---:|---|
+|run_arv2_r345_legacy_six_v2.py|40155|3da67e2d53f4270116f5327e0753fa95c22240390a77dbea0228a16897584621|
+|arv2_r345_legacy_six_qc_v2.py|43291|d9a355bf101ca02ff9634b932436eabb14320c69fcecb6e140a1cbb2cfdefe89|
+|arv2_r345_legacy_six_plan_v2.json|48601|5c3c2793ab3cbc988f6edae219a998085315e88d8d1890fd3a1ad11876005cea|
+
+AR100/A2 canonical operation profile1723B/SHA
+4bed8b5d6be6a4e147517a1faf02b3ae3fe4f4ca56b26b671901c61e8a0e0b80;
+native policy2087B/SHA
+df247c0309643e6892d43f8d48530b2261fe9c89e72a327c3818e9081c22474c.
+Public plan binds162selected sources, preserving all160previous pins without
+refresh and adding only v2 engine and the actual A1 public fact. Separate
+all-artifact/network-denied cold bootstrap PASSED with162sources and normal
+return, no DATA/claim/credential/contact. V2 engine/caller plus record/redaction
+selection140passes0.84s; earlier108selection overlaps and is not additive.
+The v1 source/economics/private input/transport/metadata policies remain as
+345.5, with original18 B source files and no fallback/quote/grid mutation.
+No complete suite ran.
+
+Fixed prospective control:
+artifacts/analyst_revisions_v2/legacy_six_runs/R345-20261107-AR100-A2.
+It has NOT been inspected or allocated. H3 is the clean commit containing
+THIS run freeze and exact final v2 bytes. Verify root/branch/HEAD/status/live
+remote, bind expected-head H3, caller-sha256
+3da67e2d53f4270116f5327e0753fa95c22240390a77dbea0228a16897584621
+and plan-sha2565c3c2793ab3cbc988f6edae219a998085315e88d8d1890fd3a1ad11876005cea.
+Invoke ONCE under exact native policy, designated -I-B Python3.13 and v2
+safe_env plus ONLY existing QC credential keys. Require observed actual0 and
+matching original finite envelope/report pin/source bindings. No v1 replay,
+original B producer/validator replay or old-control inspection is permitted.
+
+As before, claim consumes this numbered attempt even if a later gate stops
+before compile/launch; unknown/nonzero/spent state never becomes success.
+An observed allocated job must be reconciled before any further attempt.
+No fourth Codex launch is authorized: after three unsuccessful attempts use
+the standing diagnostic/Mia checkpoint and report it. This decision grants
+A2 only; other arms/results/reads remain gated. Current source-accounting
+floor338/259/54/699 and all false formal/PIT/paper/live flags remain.

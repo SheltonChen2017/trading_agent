@@ -1,11 +1,19 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Native quote qualification and owned EODHD guidance samples recorded in section 70, 2026-11-07.
+Status: **Managed native JSON precision and bounded guidance-timeline follow-up recorded in section 71, 2026-11-07.
+The owner explicitly skips review for this round; implementation remains independently unreviewed.
+The invented serializer witness passes; two in-cloud history requests observe exact decimal fields and native 100ns clocks on 91,762 AAPL/SPY quote ticks.
+The research node is released; no raw market rows, prices, sizes or clocks leave QC.
+Six scheduled guidance releases, four supplied links and two intervening filing dispositions are retained; complete issuer history remains unverified.
+NBBO/withdrawal semantics, processing rights, full guidance coverage and real-runner/settlement/SPY parity still block backtesting.
+No backtest, order, purchase or Mia recovery occurs; monitor remains PAUSED.
+Section 70 was published once as `b98fc45d`; this follow-up does not repeat that publication.
+Earlier native quote qualification and owned EODHD guidance samples recorded in section 70, 2026-11-07.
 Compatibility fixes `5f5cbb70` preserve 100ns input precision and inspected native exchange codes; strategy rules are unchanged.
 Three no-orders research diagnostics made six history requests; the research node is released.
 The native Python getters return floats and clr_datetime clocks; lossless decimal/100ns projection and NBBO semantics remain unqualified.
 Five EODHD historical-news requests return 157 validated rows and five release-body candidates; complete guidance history remains unverified.
-No backtest, order or purchase occurs. One final matching-lane push is authorized; monitor stays PAUSED.
+No backtest, order or purchase occurs in section 70; its one matching-lane publication is finished and monitor stays PAUSED.
 Section 69 was published once as `5b980352`; this qualification round does not repeat that publication.
 Earlier offline QC-native quote adapter and structural parity checks recorded in section 69, 2026-11-07.
 Implementation `bda3a4c0` is an unreviewed engineering candidate; no strategy rule or native runner changes.
@@ -161,7 +169,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 70. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 71. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -11091,3 +11099,281 @@ guarded non-force push** containing `5f5cbb70` and this record to only the
 matching lane branch. Retain exact final refs/publication receipt in the
 paused checkpoint. Do not repeat the already-published section-69 round or
 silently overwrite unexpected work. Monitor stays **PAUSED**.
+
+
+## 71. Managed native JSON precision and bounded guidance timeline, 2026-11-07
+
+### 71.1 Owner scope and serialized ownership
+
+After the proposed review / no-orders quote check / guidance-history sequence,
+the owner directs **"skip the review. then proceed"**. This waives review for
+this bounded round; it does not create independent acceptance or authorize a
+strategy backtest, purchase, changed strategy, protected outcome look or
+trading. Existing subscriptions and public originals are used first. The
+monitor remains disarmed, with no automatic next review or recovery.
+
+Starting clean local and independently observed live matching remote are
+`b98fc45d3089e4dc5041bc98adb2b7dc9c95853c`. Every repository operation uses
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+branch `codex/strategy-guidance-revision-drift`, sole origin
+`https://github.com/SheltonChen2017/trading_agent.git`. No new Claude commit
+appears; consumed `1870b9c9` / `6375401b` and older reviews remain consumed
+once. Section 70's successful publication is finished, not a new trigger.
+Parallel assistants provide implementer source research and QA, not Claude
+review. Only the native quote module, its focused tests and this lane record
+may change in tracked Git; project-wide documents and other lanes stay frozen.
+
+### 71.2 Public precision path and native execution ledger
+
+The inspected [LEAN Tick](https://github.com/QuantConnect/Lean/blob/master/Common/Data/Market/Tick.cs)
+has native decimal price/size properties. Serializing the **whole managed
+object before Python scalar getters** avoids their observed float conversion.
+[Json.NET's managed writer](https://github.com/JamesNK/Newtonsoft.Json/blob/master/Src/Newtonsoft.Json/JsonTextWriter.cs)
+writes native decimal text and native DateTime through explicit formatting.
+`JsonSerializer.Create(settings)` avoids process-global default settings;
+invariant culture, seven fractional date digits, RoundtripKind and
+TypeNameHandling.None are explicit. Python parses numeric lexemes as Decimal.
+No codec reconfiguration, C# compilation, installation, reflection or internal
+traversal is used. All native JSON stays inside QC memory.
+
+The ordinary authenticated UI is restored without copying credentials. An
+older browser handle fails; a fresh isolated tab and normal sign-in route
+restore controllable access. Resources first shows existing R1-4 node
+`9ef8bb0b` with Project / In Use By **- / -**. Only existing lane audit
+project **39054018, Pensive Orange Zebra**, is opened. Its automatic build
+is **0978c9-c877a9**, LEAN **2.5.0.0.18234**, displayed master v18234 /
+Foundation Default. Research selects **Foundation-Py-Default**, server
+**R-32204237fedce37f9f25abc4d9508cf6**. These are observed labels, not an
+immutable engine Git/CLR/Python binding. No main.py edit or manual compile
+occurs; the suffix is not complete main.py byte proof.
+
+Two new ordinary readable notebook cells are inserted. Each complete source
+is retrieved with normal **Notebook: Copy Cell** after a clipboard sentinel,
+then byte-compared before execution. This proves these two source texts,
+not the full notebook container or all project files. Old cells and Run All
+are not executed. An initial keyboard action does not start the first cell;
+the visible play control starts exactly one execution. The local market
+probe v1 is never uploaded or executed; v2 tightens the pre-execution quote
+ceiling before advancing the iterator. No cloud retry is hidden by the name.
+
+| Native execution | Fixed scope | Terminal |
+|---|---|---|
+| Invented serializer witness | Two literal SYN-GDR Tick fixtures, exact decimal values and sizes beyond float integer precision, clocks 100ns apart; zero history calls | **PASS**, all 12 checks, both distinct clocks retained |
+| Native market counter probe | Exactly two RAW/RTH/no-fill history calls, AAPL and SPY, February 5, 2025, 09:58--10:02 NY; January 1/2, 2026 reference context requests no market history there | **COMPLETED**, two requests completed, five complete counter records |
+
+Initial AX extraction sees only the first line of a multiline output. Normal
+output navigation reveals all five records; **no extra execution or request**
+is made to recover them. There are **two research executions, two history
+requests, one already-sampled independent date, zero backtests/orders/
+purchases/Mia actions**. These data diagnostics are not non-order strategy
+evaluations and do not consume or reset either retained backtest ledger.
+
+| Observation | AAPL | SPY |
+|---|---:|---:|
+| All native records / quote ticks | 25,325 / 18,554 | 82,010 / 73,208 |
+| Exact Decimal price/size occurrences on quotes | 74,216 | 292,832 |
+| Valid native 100ns clocks | 18,554 | 73,208 |
+| Clocks with sub-microsecond remainder | 16,682 | 65,554 |
+| Clocks with sub-millisecond remainder | 18,554 | 73,200 |
+| Time decreases / outside requested window | 0 / 0 | 0 / 0 |
+| Equal-time groups / maximum group rows | 9,277 / 2 | 35,653 / 8 |
+| Multi-character venue-code occurrences | 2,198 | 2,507 |
+| Non-Regular condition occurrences | 0 | 16 |
+
+Both streams contain one-sided quote rows with equal bid/ask counts. There
+are no observed all-zero, paired, suspicious, fill-forward, negative-money,
+fractional-size or malformed-condition rows in this window. Absence does not
+qualify withdrawals. The whole native JSON path delivers **367,048 Decimal
+occurrences and 91,762 exact native clocks**. It resolves this bounded
+precision-access question, not original AlgoSeek nanoseconds, historical
+availability or exchange/SIP/receipt clock origin. NY interpretation follows
+the documented QC equity convention; unspecified DateTime is never relabeled
+UTC. Public property names establish the observed 18-field Tick inventory and
+lowercase Symbol fields `id`, `permtick`, `value`, without exporting their
+market values.
+
+The [QC format](https://www.quantconnect.com/docs/v2/lean-engine/data-format/us-equity)
+omits AlgoSeek's venue/NBBO event marker. The [vendor guide](https://us-equity-market-data-docs.s3.amazonaws.com/algoseek.US.Equity.TAQ.pdf)
+distinguishes those events and includes Regular-zero closes and zero-filled
+Resume messages. Public moving-master
+[TickQuoteBarConsolidator](https://github.com/QuantConnect/Lean/blob/master/Common/Data/Consolidators/TickQuoteBarConsolidator.cs)
+carries prior side state; matching QuoteBar cannot independently certify
+fresh executable NBBO. Further counters cannot recover a discarded event
+designation. **NBBO, withdrawal semantics and source clock origin remain
+unverified.** No normalization or strategy rule changes to make the data fit.
+
+After both terminals, the normal Resources **(Stop)** action is applied only
+to the unique R1-4 / Pensive Orange Zebra row. The same node then shows
+Project / In Use By **- / -**, with screenshot proof retained. No other node
+is stopped, bought or reassigned. Log quota labels are incidental metadata;
+no logs are read/deleted and no quota experiment or recovery launch occurs.
+
+### 71.3 Guidance census, source custody and rights
+
+The bounded public census covers only **CRM and HUBS, January 1--August 31,
+2023**, forms 8-K, 8-K/A, 10-K and 10-Q. Three complete current SEC submissions
+responses list **19 filings, including 13 Form 8-Ks and zero 8-K/A listings**.
+That denominator is this selected form/issuer/interval scope, not every
+issuer communication. Six scheduled release events are retained:
+
+- CRM March 1, May 31 and August 30, FY2024;
+- HUBS February 16, May 3 and August 2, FY2023.
+
+Four same-FY supplied links remain explicitly **unverified as immediate
+guidance predecessors**. Both intervening June 12 8-Ks are retained separately:
+the inspected primary text concerns shareholder voting/compensation, with no
+guidance table observed. That does not rule out conference, investor,
+press-only, off-cycle, correction or withdrawal disclosures.
+
+Four new issuer-furnished Ex99.1 sources are connected through ordinary SEC
+web pages. Seven ordinary direct captures return HTTP403; no header, path or
+access-control bypass follows. Retained webtool text is hashed as a rendered
+excerpt, **not complete original HTML**. The two complete CRM issuer HTML
+captures from section 70 are rehashed independently. All 15 timeline source
+artifacts verify. The source-bound nonnumeric timeline contains six events,
+four supplied links and two intervening filing dispositions; it is not a
+complete numeric guidance dataset or an approved event corpus.
+
+SEC acceptance clocks are distinct from issuer first publication, historical
+subscriber receipt or provider availability. Fiscal labels alone do not close
+fiscal-calendar, currency, adjustment/share-basis, scope or permanent-security
+mapping. No guidance-revision arithmetic, eligibility, return, performance
+calculation or protected outcome join occurs; no existing production guidance
+corpus is silently enlarged.
+
+The [SEC Website Dissemination policy](https://www.sec.gov/about/privacy-information)
+permits copying/further distribution of sec.gov information, with attribution
+requested. This supports the inspected SEC route, not every source's rights.
+[EODHD terms](https://eodhd.com/financial-apis/terms-conditions)
+permit private storage/manipulation/analysis and restrict redistribution or
+granting access. No explicit QC processor grant is established. No provider
+news or issuer text is uploaded to QC. Existing private samples are reused;
+**zero new authenticated provider API requests or credential reads** occur.
+The owner's existing-key continuation direction from section 70 is preserved;
+the EODHD key is neither replaced nor reproduced. It is not a waiver for other
+provider credentials, processing rights or evaluation gates.
+
+### 71.4 Receipt custody and remaining gates
+
+Ignored base:
+`artifacts/guidance_revision_drift/quote-guidance-followup-20261107/`.
+
+| Receipt | SHA-256 |
+|---|---|
+| `technical/serializer_bridge_v1.py` | `33076f08e592c892f242eaa79d58a4cbab34e878ba4c1ce1794f5de301c5543c` |
+| `technical/serializer_market_probe_v2.py` | `310b646b0b09f5193dbeb2ff3aa5e65edf9c095be0bf4c4c74acb9e908587b6c` |
+| `technical/native-execution-ledger-v1.json` | `2191d08a5c32b09fe32e788f0eed6aa02a85c1d4245e0e5d586432a050e9808c` |
+| `technical/research-node-released-v1.png` | `5a08d2fd01779294679c80d80bffe1ef63efa0d8ebc8f31d0b1601892fb885b8` |
+| `guidance/timeline-v1.json` | `b1edc2d37052870693ee80c23e19323886567886189dfd2e9520129946a076c3` |
+| `guidance/timeline-receipt-v1.json` | `b1e4406ee226b2bb486b4171c8ce92bde30231458efe1eeef31ea3b3499b6f43` |
+| `guidance/timeline-verification-v1.json` | `ba5154d87e262a570617c899398734171e08946cbf3561f831779bf2a7ac12ea` |
+| `semantics/semantic-assessment-v1.json` | `8df54780a9d0e76ad4c18bc6f38d705fee016b50cdb07555b3278048d061c5dd` |
+
+The native ledger binds both complete own-cell readbacks, exact terminal
+records, all launches and cloud changes, reference context, engine labels and
+release. It does not substitute for complete provider-byte lineage or an
+immutable deployed engine binding. No licensed/raw-market data is committed.
+
+Backtesting remains blocked by documented delivered venue/NBBO/withdrawal
+mapping and wider native coverage; complete source-bound guidance/predecessor/
+correction/withdrawal history with historical version/delivery evidence and
+required identity/fiscal/currency/method mappings; applicable processing
+rights; and real-runner integration, equity settlement and matched-SPY
+execution parity. Research/economic/date/family/look freeze and evaluation
+authorization remain separate gates. No new subscription is recommended from
+this bounded audit. No original GDR-0..6 stage is declared complete.
+
+Original `GDR-base372-approved-20261008` remains **CLOSED FAILED 3/3**, zero
+manual attempts, project 37647834 untouched. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` remains **zero attempts / zero
+intents**, maximum three unsuccessful attempts, no recovery project/journal.
+Neither the observed quota nor the new serializer/source identity rebinds
+retained `c589b3dd` custody. Monitor stays **PAUSED**.
+
+### 71.5 Bounded decoder implementation, focused verification and publication
+
+Source/test commit **`37c9ea77cc2aa5300ce21c505a585ab174cb9cf0`** adds
+`decode_managed_quote_tick_json` to the existing `qc_native_quotes.py` and ten
+invented behavioral methods to its existing test file. No SDK/client import,
+data acquisition, runner admission, additional source member or native-engine
+change is introduced. The exact 18-field Tick / three-field Symbol inventory
+is frozen; unknown/missing/duplicate fields refuse. Public
+[Global.cs](https://github.com/QuantConnect/Lean/blob/master/Common/Global.cs)
+defines exact integer TickType.Quote=1 / MarketDataType.Tick=2. Native SID and
+ticker must match explicit context; the native SID is not equated with the
+lane's permanent security ID, and permtick need not equal today's ticker.
+
+Strict numeric JSON is decoded with existing exact Decimal helpers. Integer
+size bounds remain; unused numeric aliases are type/bounds checked without
+inventing price relationships. Time and EndTime must match as unspecified
+seven-digit timestamps. An explicit declared NY context permits deriving an
+offset, retaining all 100ns digits; DST ambiguity/nonexistence and overflow
+refuse. Malformed rows refuse the whole projection. Non-Regular, suspicious,
+filled and all-zero states are **retained**, so downstream book poisoning
+cannot reveal a convenient older quote. The returned wrapper binds received
+managed JSON SHA separately from a later normalized batch SHA, and leaves
+every readiness/rights/NBBO gate false, including a separate false native
+timezone-binding flag. A hash proves neither source authenticity nor lawful
+market-data export.
+
+This new pure decoder is tested offline on invented input; **the complete
+production helper is not uploaded or executed in QC**. The two native cells
+establish the inspected managed serialization path, not final real-runner
+integration or independent acceptance of this new source.
+
+Current full source SHA-256:
+`a91368303bbfddf5b5c1e52a1e1c0f058216a65648bd54095e2921e7d57aa312`
+(63 members), from prior
+`793ab9d0003367c8f9c8200ae7d23adbb909213025d5c4c062225ef747ed4685`.
+Only `qc_native_quotes.py` changes production source; all **20 native source
+members** compare byte-exact to starting `b98fc45d`. Semantic candidate
+`b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`
+is unchanged. Raw draft JSON file SHA
+`1dd9b5969853924d7682b4b566734ea7e90f061340d6378912118fb93d132110`
+is explicitly a different identity; source-identity v2 clarifies v1's raw-file
+label without overwriting it. No new accepted runtime/recovery candidate or
+review bundle is minted. The review inventory remains 63 source / 65 total
+members. Strategy rules, economics, settlement/SPY rules and native order
+engine remain unchanged.
+
+Root focused verification passes **61 methods in 0.488s**: 46 native quote,
+12 quote parity, and three transitive/fresh-process/source-inventory checks.
+One distinct active-document method passes in 0.021s, for **62 distinct
+repository methods**. Author checks are not additional independent methods:
+the native module's 46 methods also pass in 0.099s; three deliberately broken
+in-memory mutations are detected (float round-trip, truncated 100ns digit,
+cleared adverse flags), then all ten new methods pass restored. Initial
+missing-API reds and a precision-test fixture hitting the unchanged spread
+rule are retained as development dispositions. The year-9999 overflow case
+first errors, then the narrow conversion to InputError passes. Fourteen
+diagnostic-helper assertions and in-memory source compilation are separate
+QA, not native acceptance or extra suite counts. No full lane/repository
+suite is run. Validation uses existing Python **3.13.15**; system Python
+3.9.6 is not used for these tests and no environment is installed.
+
+Additional ignored receipts:
+
+- `source-identity-v2.json`, SHA
+  `dc135bde1540440cd3975bbe87be4f443265e1d1b541322a559385762f5d0d6c`;
+- `semantics/managed-decoder-author-qa-v1.json`, SHA
+  `fa748e459050141c660d6aedf10da33da6c413e806a8b9baba58a0324ae20f06`;
+- `semantics/managed-decoder-mutation-qa-v1.json`, SHA
+  `7cd19186afabc1c9c4593f17b2dec7d10933df0d69ac7b56510ba0bcc3201761`.
+- `closing-verification-v1.json`, SHA
+  `0ce7d9be0ac78f7f67674f38f35b4500a66dddad46a8887099fdc2e094508fe0`,
+  anchors 46 preceding ignored artifacts; five source files compile in memory.
+
+Closing checks bind source/receipt hashes, ignored custody, historical record
+body preservation, exact changed paths, compilation, active documentation,
+diff and status. Ignored local capture artifacts are **not transferred by a
+Git push**; another machine needs a separately permitted custody transfer to
+reproduce private/source-byte evidence. No provider data or credentials enter
+Git. No P0/P1 or shared/main correction is made; the data/rights/evaluation
+blockers above remain unresolved, not reclassified as completed milestones.
+
+Recheck root/branch/HEAD/status, sole origin and independently live matching
+remote `b98fc45d` before the final record commit and push. Make exactly **one
+guarded non-force end-of-round push**, including `37c9ea77` and this record,
+only to the matching lane branch. Preserve the exact final refs/publication
+receipt in the paused checkpoint. Do not republish sections 69/70, rearm the
+monitor, start a backtest or automatically begin another round.

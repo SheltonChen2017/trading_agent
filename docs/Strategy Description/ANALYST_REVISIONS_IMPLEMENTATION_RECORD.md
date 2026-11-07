@@ -1310,12 +1310,13 @@ claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
 
+The owner explicitly waives Claude review of section 347 for this recovery.
 The owner explicitly authorizes ONE additional A4 recovery for R343-AR100
 in existing project39054561 with the prepared plain files, waiving Claude
-review for this recovery and requesting running backtest/documentation/one
+review for section 347 and requesting running backtest/documentation/one
 final push (347.1). A1/A2/A3 remain spent; no A5 or budget reset is inferred.
-First execute the separately frozen read-only current-state diagnosis347.2;
-then bind its actual source/access facts, current eight-leaf DATA/security
+D1's separately frozen read-only diagnosis passed and is SPENT (347.3);
+now bind its actual source/access facts, current eight-leaf DATA/security
 checks, fresh properties-only storage admission, exact source/context and
 one-shot compile/launch protocol before mutation. All future gates still
 refuse drift; the Mia identifier is not an adopted edit context.
@@ -78915,3 +78916,208 @@ current capacity availability or continuous exclusive resource lease claimed.
 Prospective DATA/engine groundwork focused tests:85passed0.27s, synthetic
 only with the same native denial; these are distinct from67observer nodes
 (152distinct). Engine mutation entry remains deliberately unavailable.
+
+### 347.3 D1 actual result, source/access facts and dispositions
+
+D1 dispatched2026-11-07 20:10:26UTC; completion observed20:10:33UTC,
+actual exit0. These are external second-resolution brackets, not exact
+server times/duration. At clean freeze2befc75b886afb333cc81e92df8c8a83307f6f55,
+exact five requests each returnedHTTP200, five application dispatches
+(physical contacts not measured). Original7051B double-LF stdout was
+validated under native network/artifact denial using its observed exit and
+exact bindings. No new private control read. Retained report6933B/SHA256
+fc6e3c8ba21805ac4c7af5d256c3d70686c7c864b2fd386a139eca636b65e6aa.
+Public original-output fact scripts/arv2_r347_current_project_fact.json
+7353B/9193129dc41eba2c7ee735e740b9310f69c14fca7a63e84e4eab7caa49307608.
+D1/control/claim are now SPENT and preserved; do not replay or inspect them.
+
+Current project39054561 is the exact owned Python project, codeRunning=false,
+empty backtests/list without statistics. Both general and dedicated lists
+contain ONLY the same owner row, canonical264B/44596e5982d76ec302240171c2b3496f518ada401487d71eef24e02f4541c1ff;
+each whole list266B/17629cbf0728da4646158efdc2251d502b969c112d962231105fe8b6b11c80af.
+No A2/Mia technical row currently appears. This fresh observation supersedes
+the stale technical-context assumption for future gates; it does not
+retroactively prove continuous exclusivity or explain its removal. Project
+public/isLibrary fields absent, libraries list, leanEnvironment int,
+lastLiveDeployment null. Absence is not false or universal privacy proof;
+future access must retain established owner-only/libraries/environment
+predicates and explicitly qualified privacy rather than invent a field.
+
+Exactly FIVE current source files, whole metadata vector728B/SHA256
+82b9b3ea518911e7cbe57e2d270da0b6693d8ee1bbc5e758ad4a7d6fa743bb6c.
+Three prior B modules are byte-exact, the input loader is one-byte '#'
+334359b90efed75da5f0ada1d5e6b256f4a6bd0aee7eb39c0f90182a021ffc8b,
+main.py406B/215476644fd846a1488ca4c45876ed21c9c736faa79b31a59fcaaa1643aac608
+is the known default. No unknown name/source. Returned UTF8 text hashes are
+not remote-at-rest attestation. No uploads, edits, locks, compile, capacity,
+storage, job, result, provider or private DATA read happened in D1.
+
+|ID|Priority|Status|Evidence, reason and disposition|
+|---|---|---|---|
+|CR347-001|P3|Corrected before contact|Observer test used project_path for an API fixture whose field is name; root corrected the fixture, initial1failed/66passed0.16s then67passed0.14s. No production defect inferred.|
+|CR347-002|P2|Confirmed/open pending A4|Fresh source inventory confirms input stub/default main and thirteen missing modules. Exact prepared replacement/readback/compile gates are required before launch; no old ACK is treated as full source acceptance.|
+|CR347-003|P3|Qualified|No current technical row. Future A4 must acquire a new OWN exact context from the observed owner-only state, verify ACK and strict controlled row transition, then pin the whole resulting rows. Neither stale A2 nor Mia identity is adopted.|
+
+The first commit2befc75b is self-checked implementation, retained after
+152distinct focused passes and actual original D1 success. It contains no
+operational A4 entry point and no independent-review acceptance. No build/
+strategy look/cell added: floor343/259/59/699 remains. A4 is authorized but
+UNINVOKED; exact consumer/engine/caller/source/data/storage/run freeze follows.
+
+Prospective record validation initially2failed/31passed0.55s, then1failed/
+32passed0.55s because live navigation lacked the standing literal section347
+review-waiver wording. Root corrected the wording;33passed0.53s. These
+repeat the same33nodes, not additional passes. All170 inherited public
+source pins still exact; no private input/control was accessed for this check.
+The frozen plain reader contains_key precheck remains a runtime uncertainty
+qualified by346.3; no current descriptor incompatibility/verified new defect
+was found, so the prepared emitted loader stays unchanged.
+
+
+### 347.4 A4 implementation, corrections and exact one-shot run freeze (D2)
+
+The owner supplies ONE additional A4, not a budget renewal. Execute only
+R343-AR100 in existing39054561, original unchanged AR100 profile
+c8ecb6ba6feae4dddb1eb9c7d36c9c3d74c99e95d603f699687f970eb5b115d0.
+Prepared18-source vector71857bac63298b6b9dd4221ffc180ca4a59f10574edd109220a335d9370a232c,
+417652source bytes, emitted plain loader16093B/b3f48e1b1c6fc6cc665d9f8b475292260074feec5571eab6e8f0d1c1a091fd35.
+All financial rules, QCOM restoration, end-hook guard, missing-data stops,
+costs, original profiles and current-vintage qualifications stay unchanged.
+Seven source proposals do not authorize seven runs: other arms stay uninvoked.
+
+New exact operator scripts/run_arv2_r347_legacy_six_a4.py47043B/SHA256
+d987c61f6eb125f5b360ce7015b42a7497864f7ef82c1a9723375c4c8e402a62;
+plan scripts/arv2_r347_legacy_six_plan_a4.json28396B/
+66f305b15fcf9cfef0a4ad4b5d6b74d376384384bf540f4cd980b746c9369243.
+Plan carries EXACT170 unchanged parent pins plus6selected additions.
+ParentR346plan49839B/699788fa6d53f0bf4cd8048986e78d96e7c0a4cb0cbcd729fe5fa4a45600849a
+is separately held. No automatic pin refresh. Consumer16956B/
+7ec4ae3a10a8733f20b4649b531e8c31017dfb561c09cb4b3bdfff50099aeb13;
+engine26167B/90256edbfce58a16480700397f45414efb7b2e5ef49060112ff8e907c9cb1418.
+Pure original-output validator16962B/
+7f227bcc5ca00b706c80c915572bb8cd2b08d4008019fd435d2c24f2f0ca8d67.
+Original D1 and R346 public facts retain347.3/346.5 exact pins.
+Canonical operator profile2684B/
+65a83361837343ff166cb8acc0e894eed445177d0a1d115c325ddb5eed07f2c5;
+native policy e42a8fb8deed48ddbe5cbf2e7a0b7b450f9b85b7770e0b0b54f8b4acadc71bdb.
+Frozen operator tests16037B/df2a4851dc0600befe6d4998ce0a8ddfbc70051c312c7caae7dd83096cf0b455;
+engine tests24715B/2d0fd6a39ab696dea3c72e8581177aa2e6726ec92c47d6847694690b14912ca8;
+output tests13613B/5cb4374ae068f5587c2daa45aaf9b067615f8e05c0bcf8193f332078776d3b1a.
+
+D2 is the NEXT clean commit containing this exact decision/source/plan/tests.
+Dispatch ONLY once with actual D2 HEAD40 via --expected-head, candidate
+R343-AR100, --caller-sha256 d987c61f6eb125f5b360ce7015b42a7497864f7ef82c1a9723375c4c8e402a62
+and --plan-sha25666f305b15fcf9cfef0a4ad4b5d6b74d376384384bf540f4cd980b746c9369243.
+Require root/branch/HEAD/status and unchanged live matching remote before
+dispatch. Compatible host/interpreter exactly designated Mac Darwin/POSIX
+Python3.13 /Users/sheltonchen/.venvs/trading_agent-py313/bin/python -I -B.
+Use operator native_profile('R343-AR100') and safe_env, plus ONLY inherited
+QC_USER_ID/QC_API_TOKEN and allowed OS bookkeeping; no Keychain/source reader.
+In-root support .pytest_cache/r347-operation-a4 and cache/pycache; no outside
+temporary/log/plugin path. Parent alarm3600s includes preflight through final
+publication; API deadlines remain bounded89s/underlying TLS request bounds.
+No deadline bounds uninterruptible I/O/host suspension; this is not a
+whole-interpreter/host-wide sandbox or continuous resource/security proof.
+
+Fixed prospective control:
+artifacts/analyst_revisions_v2/legacy_six_runs/R347-20261107-AR100-A4,
+NOT inspected/allocated before D2. Exclusive allocation/claim/fsync consumes
+A4 even on local failure/no provider dispatch; partial allocation ambiguous/
+spent. No duplicate invocation, retry, cleanup, marker repair, alternate
+leaf/name/project, legacy builder/caller operation or fallback callback.
+Selected176public files and caller/plan held on original FDs with bytes/full
+metadata/native ACL/xattr endpoint checks through normal source-guard return.
+No whole-interpreter integrity claimed. New claim precedes private reads;
+all EIGHT fixed R346 DATA/proposal/report pins pass BEFORE any private JSON
+parse. No claim.json read/listdir or source corpus census. All held/named/
+native checks and DATA guard NORMAL RETURN precede credentials and contact;
+only frozen immutable buffers survive. DATA phase bounded to179s.
+
+Existing rights/processing decisions in the exact original source/profile
+remain binding, qualified current-vintage research only. Actual package
+1ab48d0b9c87710b05e109f234795a6bfbf5ea1b756664f8b58305dcb41173f2 and
+activation5901B/ffdc80e1b6e76410ddd4840e5a21e49aea1dbdd5c735b6bcbd88bfe832e0233b
+are new physical plain transport, distinct from ancestral411c2734...0bad.
+No false old storage admission is copied. Fresh SIX object/properties calls
+authenticate exact key/size/casefoldMD5 against those local buffers before
+any lock/source write, and again before each launch-capacity decision.
+This is qualified metadata, NOT remote SHA256 or immutable historical proof.
+Cloud reader must check exact sizes/SHA256 before parsing/using each object.
+No object/get/download/read_object/set/delete/list is permitted. Missing/
+mismatched objects refuse; no overwrite, alternate prefix or contact retry.
+
+Fresh project/ownership/libraries/no-live-deployment/editor-idle/empty-history
+and exact observed five-file inventory precede the SOLE new own
+projects/collaboration/lock/acquire with codeSourceId
+'Codex R347 R343-AR100 A4'. Authenticated success ACK is insufficient alone:
+immediately require unchanged sole owner/dedicated whole-row pin plus exactly
+one strict nine-field UIDnull/ownerfalse/write/liveControltrue own-name
+technical row with bounded opaque publicId. Pin the resulting WHOLE general
+vector; later drift refuses. No adoption of A2/Mia ID, collaborator removal,
+lock release, permission change or exclusivity claim. Dedicated owner stays
+the sole account collaborator, and no other lane's job/project/control changes.
+
+Before each source step, freshly recheck current access and the ENTIRE
+evolving source inventory. Skip three already-exact modules; each other
+prepared file may be created/updated at most once, main.py LAST. No delete,
+notebook repair or unknown source overwrite. Require all18exact readback
+before one compile/create. At most30compile polls at2s, matching project/
+compile identity, only BuildSuccess advances. Before single backtests/create,
+require full current access/empty history/eighteen files/BuildSuccess and
+six input properties again, plus fresh available capacity. Capacity wait
+at most3checks/60s intervals, no other-lane cancellation. If capacity races
+away at begin, the begun operation conservatively refuses/spends rather than
+re-entering/resetting it. Node observations never create a continuous lease.
+
+One launch ONLY; capture any well-typed allocated identity before later
+validation can fail. Initial In Queue... is not running: at most30 stats-
+disabled status checks at60s until In Progress... or Completed. identity.
+Runtime Error/BuildError/unknown/timeout/nonzero/missing/malformed output
+is NOT success; preserve actual finite evidence and spent attempt. No result,
+statistics/log/market/provider rows or other candidate run. Matching Completed.
+is identity-only and never an accepted strategy result or readiness permit.
+
+Bound original stdout64KiB canonical+ONE LF. Record actual tool exit and
+external dispatch/completion brackets; exact provider timestamps/duration/
+physical request counts are unknown. Use the separately pinned PURE
+arv2_r347_a4_output.validate_original_stdout ONLY on original captured bytes
+and actual observed exit, exact D2 bindings. No artifact reader/replay.
+Actual integer0 plus matching canonical report pin, source/input identity,
+qualified metadata, A4project/compile/backtest/name and observed running/
+Completed. required. Actual2 can retain validated finite failure evidence
+ONLY; failure stdout lacks complete external binding, explicitly qualified.
+Late source/control/close/publication failure remains nonzero even if a job
+was allocated or a report looks successful. Never fabricate0 or relaunch to
+repair ambiguous output. Raw responses, exceptions, credentials, licensed rows
+and opaque API objects never reach output. Existing selected redacted error
+transport remains lossy, not universal secret detection or root-cause proof.
+
+Accounting follows345.5: ONE shared+development look on the first actual
+candidate compile/create OR backtests/create application dispatch, once by
+identity; compile then launch is not two. Pre-dispatch343/259/59/699; if it
+occurs floor344/260/59/699. No new accepted cell from launch/status. Shared
+ledger and other-lane files stay frozen; lane record books this bounded event.
+
+|ID|Priority|Status|Correction/qualification and verification|
+|---|---|---|---|
+|CR347-004|P2|Corrected before D2|New access copy omitted inherited libraryIds contradiction refusal. Restored exact absent-or-empty-list rule; negative/positive regressions. Memory omission with correct shared module globals yields3expected failures/11passes0.20s because malformed/foreign library IDs otherwise reach begin. First mutation3failures/11passes0.17s used copied globals, hit collaborators instead, and is RETIRED as a mis-targeted harness; no unsafe-escape claim from it. Original source bytes restored/unchanged.|
+|CR347-005|P3|Corrected before D2|Pure failure validator lacked exact-string guards before frozenset membership; malformed classification lists could raise TypeError. Exact type checks and15regressions added; fails closed/finite, no operational incident.|
+|CR347-006|P3|Qualified/open diagnostic limit|Unused caller.object_admission helper has richer closed comparison observations; real engine path leaves state.last_object_observation=None. Actual properties refusal retains finite input_objects, endpoint/response pin and partial progress, not numeric comparison/physical cause. Do not claim the unused helper ran or expose raw metadata to fill the gap.|
+
+Final focused selection373 DISTINCT passes1.51s:
+67observer+58DATAconsumer+85engine+36caller+94output+33record/redaction,
+no failures/skips/warnings. One separate cold -I native-network/artifact-denied
+public bootstrap holds/authenticates all176selected sources and
+imports the compiled real consumer/engine/transport from verified buffers; successful
+normal source guard return, no private/control/credential/contact. Changed
+source/test compilation and all169selected Python syntax checks done in
+memory, no bytecode. Earlier85groundwork,
+85engine,36caller,79pre-hardening-output and33record subsets/repeats overlap
+these nodes, not additive. Preserve earlier fixture/doc failures in347.2–3
+and historical full-suite/platform/isolation qualifications. No full suite.
+
+D1 spent; D2/A4 still UNINVOKED until exact clean commit and dispatch. Stop
+on unexpected concurrent root/branch/HEAD/source/remote drift. Document actual
+result, corrections, exclusions and per-commit disposition; end with exactly
+one matching-lane final push. No Claude acceptance, source/PIT/master/formal
+readiness, broker/paper/live authority or old protocol renewal follows.

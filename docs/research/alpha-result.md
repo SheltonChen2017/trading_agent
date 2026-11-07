@@ -7435,3 +7435,42 @@ other candidate launch, source admission, live claim or other-lane change
 follows. Plain-source acceptance does not establish the original A3 detector
 cause. A future separately frozen terminal/result contract is required before
 accepting any performance statistic; no historical refusal is erased.
+
+## R-343-AR100 A4 terminal update — Runtime Error, no accepted result — 2026-11-07
+
+Append-only terminal reconciliation of the SAME already-booked project39054561/
+backtest007d4ab27c26d337ae53acb492a83410. No new execution, look or result cell
+is counted. The prior running observation above remains historical truth.
+Owner requested A4 validation and conditional remaining-six continuation,
+with Claude review waived and progress documented. Analyst348 owns this new
+bounded read-only contract and all exact source/input/output limitations.
+
+D1 at clean freeze bf8e6064fb1eafdf099a697876a2406edd6e90e7 dispatched
+2026-11-07 21:14:36UTC, completion observed21:14:58UTC, actual exit2. Fresh
+eight-leaf input guard returned, current18source files matched the frozen
+candidate, and the exact known A4 job reported Runtime Error. Five HTTP200
+application dispatches; NO backtests/read/statistics request followed, no
+selected result was read or accepted. Public failurefact3820B/
+9666a1e0adc92599cc49586a714dba4b5eea79a7cb347c3c16fe5d6be54085ac.
+The reader's top output category is masked by a confirmed uppercase journal
+marker defect; retained Runtime Error is unambiguous, algorithm cause unknown.
+
+Separate D2 at clean freeze e55d217573c7bc624a9340a8589e6caf638c9cef
+dispatched21:30:09UTC, completion observed21:30:13UTC, actual exit2 with finite
+unknown/observation=null. No usable error detail, source frame or application
+request count was returned; absence of evidence does not establish zero
+contact. Both time pairs are external second-resolution brackets, not exact
+provider timestamps/durations. Public D2failurefact1733B/
+8ade970f80f6229b78c6663a9e8210f2cd06e8eaaf9eec49cd36b7a301a5835e.
+Both one-use readers are spent/ambiguous and not replayed or repaired.
+
+Owner also asked for Mia. The own project tab was blocked by "No Coding
+Session Available" because two other projects held the organization's
+sessions. No Stop/Upgrade/resource/permission/source/job change or Mia prompt
+occurred; only the new blocked tab was closed. Consultation remains pending
+a free session. This separate resource barrier is not asserted to be A4's
+runtime cause. No return, source/subscription diagnosis or valid cell follows.
+Remaining AR80/120/140/160/180/200 were NOT submitted because A4 failed the
+conditional gate. Floor remains **344 shared /260 development /
+59 infrastructure /699 accepted cells**; no double-counting of A4. All source,
+financial, formal/PIT/master and paper/live gates remain unchanged.

@@ -1318,10 +1318,15 @@ no new launch/look/cell. D1 and all previous A4 controls remain spent.
 The remaining-arm condition is FALSE: none of AR80/120/140/160/180/200
 is submitted, and A4_RESULT_FACT_PIN stays None. No A5 authority inferred.
 
-Next perform only a separately frozen bounded read-only failed-job diagnostic
-to retain a safe actual error category/source frame, then document the barrier
-and make this round's ONE final matching-lane push. No raw error/traceback,
-licensed row, source/price fallback, new rights or other-lane modification.
+New D2 at e55d2175 also exited2, finite unknown/observation=null; no usable
+error detail or request count was returned. D2 is spent/ambiguous, never
+replayed or inspected to repair it. Mia consultation was attempted but QC
+has no free coding session; ONLY our new blocked tab was closed, other
+sessions untouched. Wait for the owner's coding-session release, then consult
+Mia on this known failed job in diagnosis-only/Ask Before Edits mode. No
+source save, compile/relaunch or A5 is inferred. Complete the current record
+and ONE final matching-lane push; no raw error/traceback, licensed row,
+source/price fallback, new rights or other-lane modification.
 Current floor344shared/260development/59infrastructure/699accepted cells.
 See section 348 for actual source/status/evidence pins, the unaccepted failure,
 contract limitations, exclusions and next step. All formal/PIT/master/
@@ -4450,6 +4455,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-07 | Codex Claude344 counter-review and owner-waived old-six QC recovery, section345 | `12889740` -> this final record commit; exactly9Codex commits | Corrected B passed; AR100 same-project A1/A2/A3 all spent; actual source-policy error retained; unbound plain-data proposal only | Library/technical-row predicates corrected;3sourcewrites acknowledged then fourth refused; no candidate backtest launched; Mia question not sent because input control fails;2displayed partial/default builds conservatively booked | Final300distinct focused passes (299+1closure);12expected omission failures; in-memory compile and historical-record equality; no full suite; all earlier overlaps/failures retained | ARV2D345-003/P2 OPEN; CR345006/007/008 corrected before pure proposal use; no independent acceptance; floor340/259/56/699,0newcells | One matching-lane nonforce final push; required controllable Mia checkpoint and partial-source reconciliation next; no fourth Codex attempt, production plain conversion, storage/QC retry or readiness clearance |
 | 2026-11-07 | Codex owner-triggered available-Safari/Mia checkpoint and offline plain preparation; section346 | `baf8e396` -> `8ee19d57` freeze -> this final result/handoff; exactly2commits | Qualified Mia diagnosis; six real plain-data objects and seven unchanged-economic source proposals retained locally | Sole committed local producer/collector actual0/0; original stdout validated; R346 nowSPENT; no QC upload/run; sourcepolicycauseUNKNOWN | 159distinct focused passes21.42s; cold170source/pubic-FD checks; expected13omission failures; initial9failed/33passed/38fixture-errors fixed before private use; no full suite | AR1003/3 exhausted; originalclaim pin omitted/CR346005 open for future scope;8data/report files pinned;3new displayed infrastructure builds bookfloor343/259/59/699,0newcells | One matching-lane final push; separately explicit post-three-failure recovery plus fresh current source/access/data/storage/run gates before any further candidate mutation; no rename/reset/Mia-run inference |
 | 2026-11-07 | Codex owner-authorized additional same-project A4 plain recovery; section347 | `67e1970d` -> `2befc75b` -> `1a5759f9` -> this final result/handoff; exactly3commits | Current source/access reconciliation, exact8leaf plaintext consumer, fresh own context,15source writes/3skips/mainlast/all18readback, one compile/launch | Sole A4actual0; observed In Progress... backtest007d4ab27c26d337ae53acb492a83410 in39054561; original output11501B/e0f7afb2... and report11390B/06b62d92... validated; no results read | Final373distinct focused passes1.51s; public176pin cold guard +169in-memory Python syntax checks; expected3red omission failures; all earlier fixture/doc failures qualified; no fullsuite | CR347002 resolved prospectively; prior3attempts and A4spent; source-policyhistoricalcauseUNKNOWN, metadataMD5notremoteSHA, allformalreadinessfalse; ONEshared+development look =>344/260/59/699,0newcells | Exactly one final matching-lane push; next separate exact terminal/result gate for this known run, no automatic rerun/other-arm/comparison/live action |
+| 2026-11-07 | Codex A4 terminal validation, failed-job diagnosis and Mia resource barrier; section348 | `4117c1a4` -> `bf8e6064` -> `e55d2175` -> this final result/handoff; exactly3commits | New source/DATA-bound D1 status/result contract; separate D2 error-only observer; unused continuation closure corrected, A4 acceptance remains unselected | D1actual2, known A4Runtime Error/all18sources exact; no selected statistics. D2actual2 unknown/no usable error projection. Mia blocked by occupied coding sessions, other projects untouched | Pre-D1 focused251passes5.90s; supplemental122passes0.77s overlap, not summed; native cold213-source guard/203Python compile and two expected red mutations; no fullsuite | I348001 masked logging category confirmed/spent reader frozen; unused closure fixed; runtime cause and Mia consultation remain OPEN. No new launch/look/cell;344/260/59/699 | ONE final matching-lane push, then coding-session release for diagnosis-only Mia; no A5, remaining-six launch, result acceptance or next milestone |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -79261,7 +79267,7 @@ checks and the sole final push follow.
 
 ---
 
-## 348. A4 terminal/results validation and conditional remaining old-six AR runs (in progress)
+## 348. A4 Runtime Error; remaining old-six runs held, Mia coding session blocked
 
 ### 348.1 Owner scope and exact starting state
 
@@ -79605,3 +79611,92 @@ security review or independent final acceptance. Observation adds no launch atte
 look or accepted cell. Floor344/260/59/699 unchanged. After original D2 result
 validation, record its actual finite evidence, limitations and next action,
 append only associated A4 terminal accounting, and conclude ONE final push.
+
+### 348.7 D2 actual unclassified failure; cause and Mia remain blocked
+
+Sole new D2 dispatched2026-11-07 21:30:09UTC; completion observed21:30:13UTC
+at clean freeze e55d217573c7bc624a9340a8589e6caf638c9cef. Actual exit2.
+External second-resolution brackets only, not exact provider timestamps or
+measured request duration. Original311B canonical one-LF stdout SHA256
+a3a3e09ea3abfaf79ef3cbc71f5c154fb3c4dca217747502cdea58ac4bf2d361
+has finite failure_code=unknown and observation=null. Pure original-byte/
+actual2 validation accepted only this FAILURE envelope, diagnostic_complete=false;
+not successful diagnosis, independent attestation, or accepted A4 evidence.
+Public scripts/arv2_r348_runtime_error_failure_fact.json1733B/
+8ade970f80f6229b78c6663a9e8210f2cd06e8eaaf9eec49cd36b7a301a5835e.
+Expected source/run bindings in that fact are externally supplied; a failure
+envelope with no binding does not prove internal preflight/claim completion.
+
+No usable QC error field, frame, request count or report pin was returned.
+Application and physical request counts are UNKNOWN, not0. No inference of
+no contact, authentication, source guard return, missing credentials, DNS,
+server fault, subscription or algorithm cause. The original failure category
+cannot retrospectively be recovered by guessing. D2/control are now spent
+or ambiguous and will NOT be inspected/replayed, reset, cleaned or renamed.
+No A4 source upload, compile/launch or remaining-arm run followed.
+
+I348-005/P2 OPEN: D2 has no progress evidence before its final known-identity
+SAFE projection, so an early exception loses stage/contact details. Its
+finite classifier recognizes only its own Refused class; frozen custody/TLS
+classes can map to unknown. This is a confirmed diagnostic limitation, not
+proof that either class caused this actual failure. Root's injected API/Store
+fixtures and successful cold source check did not exercise the operational
+failure. Used D2 stays frozen; any future observer must be separately
+versioned and justify observability and finite adapter-error translation
+before contact. No unchanged retry is authorized here.
+
+Mia remains the concrete external barrier: own code page cannot open without
+a coding session; owner has been asked to report availability. No Mia prompt
+or reply, no other-lane session interruption, no repeated capacity/UI polling.
+Coding-session scarcity NOW is not asserted to have caused A4's Runtime Error.
+When released, consult Mia in the existing39054561, diagnosis-only/Ask Before
+Edits. Do not save, compile/relaunch, consume A5, alter financial rules or
+submit the conditional remaining arms. A4 must genuinely pass source/input/
+runtime/result checks before the owner's remaining-six condition can pass.
+
+The associated alpha-result.md update is ONLY an append for the already
+booked A4 terminal status and D2 diagnosis limitation. Prior running evidence
+and entire prior ledger byte prefix are preserved; no other lane is edited.
+No new launch/look/accepted cell:344/260/59/699 remains the floor.
+
+### 348.8 Per-commit disposition and final handoff
+
+Implementation self-audit under the owner's current waiver, NOT independent
+Claude acceptance or a review of any new Claude push. Exact continuous round:
+4117c1a409cb4a2c2a71c06397b40238804a5962 ->
+bf8e6064fb1eafdf099a697876a2406edd6e90e7 ->
+e55d217573c7bc624a9340a8589e6caf638c9cef -> this final record commit.
+
+|Commit|Disposition|Final behavior, limitations and next action|
+|---|---|---|
+|bf8e6064fb1eafdf099a697876a2406edd6e90e7|Retained as spent failure evidence; future result use blocked|New all-seven DATA consumer, financial/result validation and D1 exact freeze. Actual current18source checks passed, known A4 Runtime Error refused. I348001 logs category incorrectly; I348002 unused continuation closure corrected in next commit. No accepted result or remaining-arm authority.|
+|e55d217573c7bc624a9340a8589e6caf638c9cef|Unused closure correction retained; actual D2 incomplete, frozen|210-pin continuation inheritance/regressions preserve ancestors and A4fact=None. New read-only error observer/source plan/inventory passed focused/cold checks, but sole actual use2/unknown/null; I348005 remains open. No cause claim, renewed claim or operational readiness.|
+|This final record commit|Record-only handoff|Retains exact original failure facts, terminal ledger append, Mia resource barrier, issue statuses, validation/exclusions and one-push ledger. No operation or new contract.|
+
+I348001/003/004/005 remain open with the scopes above; I348002 corrected only
+prospectively in an unused caller. All older unresolved findings/refusals,
+source/rights/identity/price gates and false formal/PIT/master/paper/live flags
+remain. No raw QC data/Object Store downloads, provider/USB capture, chart/
+order/log export, new paid rights, other-lane change, funded/broker/real-order/
+paper/live or efficacy claim. The broad new-rule six/eight rebuild stays paused.
+No A5 or additional reader operation is inferred. No full Codex suite ran.
+
+Before final push, run focused record/redaction/diff checks, verify original
+source pins and exact append-only ledger prefix, root/branch/HEAD/status and
+unchanged matching live remote4117c1a4. Accumulate all THREE commits and make
+exactly ONE successful nonforce matching-lane final push; verify local,
+tracking and live agreement and clean worktree. Next action is the external
+coding-session release and diagnosis-only Mia, not another launch/milestone.
+
+Final root focused checks191distinct passes1.38s (observer, changed unused
+caller, lane-record/redaction and active-document checks), no failures/skips/
+warnings. Earlier122passes0.77s and89passes0.18s overlap this selection; do
+not sum them or add them to the separate251 pre-D1 selection. All213 selected
+source pins still match; four used entry/helper sources equal their exact
+bf8/e55 Git freezes. The complete542146B old alpha-result ledger prefix
+retains SHA78b1ff5f2dc1c7b614d5a46e4af630e09ba9e8db7b4ab230846eaaa1f59d8176;
+ONLY2510B own A4 terminal append added. Native denial remained active for
+all focused/static checks; no private/control/credential/QC/Safari operation
+followed D2. Diff check clean; matching live remote still4117c1a4 before
+final record commit. Source checks are endpoint observations, not continuous
+whole-tree/host integrity or proof of no earlier effects.

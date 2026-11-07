@@ -35,6 +35,8 @@ OUTPUT = stable.PRIVATE_CUSTODY_ROOT / AUDIT_ID
 METADATA_PATH = prior.PROVIDER / "controls-metadata.json"
 OUTPUT_NAMES = ("reservation.json", "observation-started.json", "transition.json", "dossier.json", "complete.json")
 MAX_IPC = 1024 * 1024
+GIT_IMAGE = Path("/Library/Developer/CommandLineTools/usr/bin/git")
+GIT_LIBRARIES = Path("/Library/Developer/CommandLineTools/usr/lib")
 
 
 class StorageDossierError(ValueError):
@@ -99,14 +101,16 @@ def policy(identity_value, *, metadata=None, parent=False, readback=False):
     leaves = [METADATA_PATH, *paths]
     if parent:
         result = result.replace("(deny process-fork)", "")
-        result += '(allow process-exec (literal "/usr/bin/git") (literal "/usr/bin/sandbox-exec"))'
+        result += '(allow process-exec (literal "/usr/bin/git") (literal "/usr/bin/sandbox-exec") (literal ' + json.dumps(str(GIT_IMAGE)) + '))'
         result += '(allow file-write* (subpath ' + json.dumps(str(OUTPUT)) + ') (literal "/dev/null"))'
         common = subprocess.check_output(["git", "rev-parse", "--git-common-dir"], cwd=ROOT,
             env={"PATH": "/usr/bin:/bin"}, stderr=subprocess.DEVNULL).decode().strip()
         common = (ROOT / common).resolve()
         # Administrative Git objects/config only, never sibling checkout source.
         result += '(allow file-read-data (subpath ' + json.dumps(str(common)) + '))'
-        leaves.extend((ROOT / ".git", ROOT / ".gitignore"))
+        prior._disjoint_runtime_directories((GIT_LIBRARIES,), (ROOT, stable.PRIVATE_CUSTODY_ROOT, controls.RECENT_ROOT))
+        result += '(allow file-read-data (subpath ' + json.dumps(str(GIT_LIBRARIES)) + '))'
+        leaves.extend((ROOT / ".git", ROOT / ".gitignore", GIT_IMAGE))
     if parent or readback:
         leaves.extend(OUTPUT / name for name in (*OUTPUT_NAMES, "failure.json"))
     ancestors = {ancestor for leaf in leaves for ancestor in leaf.parents}
@@ -125,7 +129,7 @@ def install_parent_policy(profile):
 
 
 def baseline_policy():
-    targets = [Path(sys.executable).resolve(), Path("/usr/bin/git"), Path("/usr/bin/sandbox-exec")]
+    targets = [Path(sys.executable).resolve(), Path("/usr/bin/git"), GIT_IMAGE, Path("/usr/bin/sandbox-exec")]
     relaunch = targets[0].parents[1] / "Resources/Python.app/Contents/MacOS/Python"
     if relaunch.is_file(): targets.append(relaunch.resolve())
     return ('(version 1)(allow default)(deny network*)(deny process-exec)(deny file-write*)'

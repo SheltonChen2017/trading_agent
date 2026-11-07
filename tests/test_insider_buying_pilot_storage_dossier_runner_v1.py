@@ -122,6 +122,16 @@ def test_parent_policy_limits_publication_to_the_new_epoch_and_git_metadata(monk
     assert '(allow file-read-data (subpath "/invented-admin/.git"))' in profile
 
 
+def test_git_frontend_chain_has_only_the_exact_apple_executable_and_runtime_grants(monkeypatch):
+    monkeypatch.setattr(m.subprocess, "check_output", lambda *_a, **_k: b"/invented-admin/.git\n")
+    for profile in (m.baseline_policy(), m.policy(_bound(), parent=True)):
+        assert '(literal "' + str(m.GIT_IMAGE) + '")' in profile
+        assert '(subpath "/Library/Developer/CommandLineTools")' not in profile
+        assert '(subpath "' + str(m.ROOT) + '")' not in profile
+    parent = m.policy(_bound(), parent=True)
+    assert '(subpath "' + str(m.GIT_LIBRARIES) + '")' in parent
+
+
 def test_identity_uses_a_git_verified_legacy_shape_and_includes_every_new_image(monkeypatch):
     base = _bound(); seen = []
     monkeypatch.setattr(m.producer, "_identity", lambda _head: deepcopy(base))

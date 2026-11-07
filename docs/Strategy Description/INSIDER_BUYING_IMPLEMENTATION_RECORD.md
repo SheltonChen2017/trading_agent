@@ -45775,3 +45775,25 @@ these checks. Exact root/branch/HEAD/expected status and matching-only origin
 checks precede the implementation/scope commit; native committed health then
 actual observation remain strictly sequenced. Final handoff follows exact
 implementation/result hashes, rather than backdating later commits.
+
+### 379.4 First committed health refusal and exact Git runtime correction
+
+Implementation/scope08794595c309818bc49233e1b0c711fbe39727e7 existed and
+was clean for the first source-only health. Health FAILED exit2,0.754s,
+stdout53B/stderr0; no actual DATA, discovery, output namespace or input/body
+operation was reached. A bounded source-only phase diagnostic locates the
+failure at Git identity construction. The baseline allowed /usr/bin/git but
+macOS's launcher executes /Library/Developer/CommandLineTools/usr/bin/git;
+the native exec refusal returned71. No credential/data problem or corruption
+is inferred from that launcher refusal.
+
+Correct ONLY the new runner's exact runtime allowlist: permit that concrete
+Git image in the baseline/parent exec lists, its exact DATA image and the
+CommandLineTools/usr/lib runtime directory in the parent. The runtime
+directory is checked disjoint from lane/private/recent source trees. No
+whole CommandLineTools, home, lane or data directory grant, broad exec,
+credential tool or wider write scope is added. A regression pins the frontend
+chain and keeps the parent publication scope/refusals intact. This is a
+pre-input health correction; the registered new actual namespace remains
+unused. No old proof-bound helper/source is patched and no actual attempt
+is relabelled successful. Requalify the next committed source before inputs.

@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–346 retain the milestone, review, preregistration, QC
+strategy. Sections 1–347 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -1310,36 +1310,24 @@ claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
 
-The owner explicitly waives Claude review of section 346 for the current
-old-six research recovery. Mia's diagnosis-only checkpoint completed and
-retracted its unsupported embedded-payload claim; exact QC trigger UNKNOWN.
-The fixed local plain-DATA preparation PASSED once at8ee19d57, actual child0/
-collector0 with original output validated, and is now SPENT (346.5).
-Six genuinely plain objects total19164859B; the seven-arm source proposal is
-pinned. No new source, storage or backtest was submitted to QC.
+The owner explicitly authorizes ONE additional A4 recovery for R343-AR100
+in existing project39054561 with the prepared plain files, waiving Claude
+review for this recovery and requesting running backtest/documentation/one
+final push (347.1). A1/A2/A3 remain spent; no A5 or budget reset is inferred.
+First execute the separately frozen read-only current-state diagnosis347.2;
+then bind its actual source/access facts, current eight-leaf DATA/security
+checks, fresh properties-only storage admission, exact source/context and
+one-shot compile/launch protocol before mutation. All future gates still
+refuse drift; the Mia identifier is not an adopted edit context.
 
-The immediate next step under section 346 is a separately admissible exact
-post-Mia recovery decision for SAME project39054561 and the prepared plain
-source/input. R343-AR100 remains ALL THREE attempts SPENT; a fourth Codex
-candidate mutation/launch is not authorized by owner availability, the
-diagnosis or new transport. Do not rename/reset/retry. First reconcile current
-source/access/history/idle state; the Mia technical context is unverified.
-Fresh current rights/data/code/storage admission and exact one-use project/
-profile/protocol/terminal/accounting gates precede any later mutation.
-
-Do not rerun the R346 collector/producer or read/repair its control. Future
-read contracts must use the EIGHT observed DATA/proposal/report pins; its
-ninth claim has no external original byte pin (CR346-005,346.6). No historical
-claim timestamp/hash may be fabricated. All old B and prior operations/readers
-stay spent. The source-policy refusal is still OPEN; source/PIT/master/formal/
-paper/live readiness remains false. Floor343shared/259development/
-59infrastructure/699cells, no new accepted cell.
-
-Only the QCOM-restored SIX-universe old-rule extension through2026-10-13
-is selected: AR80–200, after-close/next-open MOO, frozen gates and costs.
-The broad new-rule six/eight rebuild stays paused. The other six R343 arms
-are uninvoked. No new paid rights, provider/USB/funded/broker/real-order/
-paper/live action, source-stop bypass, pin refresh or other-lane change.
+R346's preparation passed once and stays SPENT. Only its eight actual pinned
+DATA/proposal/report leaves may be consumed under a new committed scope;
+leave the unpinned historical claim/control unopened. No raw Object Store
+GET/download, stale admission, source-policy bypass or changed economics.
+The selected experiment is only QCOM-restored old SIX through2026-10-13;
+broad new-rule six/eight work is paused. No new operational call/strategy
+job/result yet this round; floor343/259/59/699. All formal/PIT/master/
+paper/live flags remain false. See347 for active authority and actual use.
 
 Sections 137–142 retain the owner-assisted cloud diagnoses, project cleanup,
 and mutable QC 79/81 source comparisons. Their `Completed.` statuses do not
@@ -78823,3 +78811,107 @@ clean status afterward. No own-push trigger, extra acknowledgement round,
 automatic monitor rearm or next implementation is initiated by this handoff.
 
 Finalization evidence: record/redaction repeat33passes0.58s (not additive). All170 selected source pins and the producer/collector/plan pins remain exact after actual use. Historical sections6–345 still equal baf8e396 except separator whitespace; no private output/control was read for this check. Final diff/status clean checks precede the single push.
+
+---
+
+## 347. Owner-authorized same-project A4 plain-DATA recovery (in progress)
+
+### 347.1 Exact scope, baseline and unchanged boundaries
+
+Owner: "Yes, use one additional recovery attempt in project 39054561 with
+the prepared plain-data files. Skip Claude review, proceed until the backtest
+is running, document progress, and push once when done. consult mia when
+necessary". This explicitly supplies ONE additional A4 for R343-AR100 in
+the SAME project after the completed Mia checkpoint. A1/A2/A3 remain spent.
+It does not reset another candidate or grant A5, another project, changed
+economics, source-policy evasion, new rights or paper/live/funded/broker action.
+The selected work remains QCOM-restored old SIX through2026-10-13;
+the broad new-rule six/eight rebuild is paused. Claude review is waived for
+this recovery; Codex/subagent checks are not independent acceptance.
+
+Exact round baseline67e1970d7d5053022d0c7c66221261b2a64489d2, section346's
+final pushed handoff. Root/branch/HEAD/status and live matching remote verified
+there, with clean worktree before this round. All commands/edits/tests and
+commits stay in /Users/sheltonchen/Code/trading_agent__analyst_revisions_v2,
+branch codex/strategy-analyst-revisions-v2. No other lane is inspected/changed.
+Accumulate commits and make exactly ONE successful final matching-lane push
+at the concluded endpoint, with live remote/current-state checks first.
+
+No R346 producer/collector or old operational reader/control is replayed.
+Its claim remains unopened and unpinned; only the EIGHT actual externally
+pinned DATA/proposal/report leaves may later be consumed under a new freeze.
+No private artifact, credential or QC call has occurred yet in this round.
+
+### 347.2 Separate one-use READ-only current-state freeze (D1)
+
+Before candidate mutation, dispatch ONLY the new
+scripts/observe_arv2_r347_plain_recovery.py once from the clean commit
+containing this freeze, binding that actual40-character HEAD via
+--expected-head, and exact --caller-sha256/--profile-sha256 below.
+Fixed uninspected/unallocated control:
+artifacts/analyst_revisions_v2/legacy_six_recovery_state/R347-20261107-A.
+Its exclusive allocation consumes this diagnostic even if no contact happens;
+any failure/ambiguity is spent, no cleanup/repair/retry/alternate leaf.
+
+Selected source44205B/SHA256
+0b8db07fba169b2dcad9676fbf7c1ff40e0a5bcc96552aa30ea63099cf14bfb1;
+tests17435B/42ec5c963ced20cf340443b61bcaaffa57888f5aa03c8cc17bf27451049819de.
+Canonical profile5571B/a44c33e4bed8e288dbaf855db35788983e8d1e02af84bb44cbba33284aae0d35;
+native policy93de3809735f1684cbfcd4ff5d4feab376da872646c107a6246fa1cf918ce23d.
+Security helper3435bc07573697d682f25ea15fd2bfd10c5baf8220c184f73ae877016bae4a30;
+CA240216B/9cc2a774b5198dcff14d9be1e66091f538975d867ce029a96bce15a55dfd730f.
+Exact designated Darwin/POSIX Python3.13 interpreter
+/Users/sheltonchen/.venvs/trading_agent-py313/bin/python, -I -B, closed
+environment and in-root support .pytest_cache/r347-recovery-state.
+Native policy limits outbound to TLS443/DNS and blocks private artifacts
+except its own new control/ancestor metadata, USB, Keychains and security CLI.
+TLSclient authenticates the fixed QC host/CA; native port allowance is not
+a whole-interpreter or host-wide domain sandbox.
+
+Parent90s/alarm, request15s/DNS5s; uninterruptible I/O/host suspension remain
+qualifications. At most FIVE one-use requests in exact order: authenticate,
+projects/read39054561, projects/collaboration/read39054561,
+backtests/list39054561(includeStatistics=false), files/read39054561
+(projectId ONLY, no codeSourceId). No capacity, storage, result/log/provider,
+lock/permission mutation, source write, compile, launch or other project.
+Existing QC credential environment values are read only after exclusive
+fsynced claim; none are printed or persisted. Response bodies/code stay
+ephemeral; finite public output retains validated types/counts/booleans and
+canonical row/source hashes, never opaque owner fields or raw source.
+
+Diagnosis may return0 with readable mismatched source/access; ALL candidate
+write/access/source-context/admission/reset/readiness flags remain FALSE.
+Unknown filenames are hash-only evidence then refusal. Original stdout must
+have exact closed canonical double-LF envelope and matching report pin;
+actual observed integer exit0 plus validate_output are mandatory for a
+usable observation. No reread of this new leaf is authorized. Output
+self-consistency is not independent process/disk attestation. Record original
+tool exit and external dispatch/completion brackets; never infer exact server
+timestamps/duration, physical request count or continuous exclusivity.
+
+Focused native-all-network/production-artifact/USB/Keychain-denied synthetic
+observer tests:67passed0.14s, no skips/warnings. Initial1failed/66passed0.16s
+was a test fixture using project_path instead of API name, corrected before
+contact; repeat counts overlap. No full suite or actual operation ran.
+The new prospective DATA consumer and engine groundwork in this commit are
+UNINVOKED and provide no operational caller/authority. Their complete A4
+protocol, actual current context/source facts and separate exact freeze
+remain required before any private DATA use, credential/contact or mutation.
+
+Official QC Object Store policy distinguishes metadata properties from raw
+downloads: Institution/derived-data restrictions mean this recovery will NOT
+call object/get, read_object or download raw rows, including our own uploads.
+Any future new plain-object admission uses fresh exact properties key/size/
+casefoldMD5 against authenticated local bytes, explicitly metadata only;
+the cloud runtime must hash each payload SHA256 before use. Missing objects
+need a separately frozen bounded object/set-only branch, never an overwrite,
+alternate prefix or a falsely relabeled old admission. This freeze grants
+none of those storage calls.
+
+Current floor343shared/259development/59infrastructure/699cells remains.
+D1 is current source/access diagnosis, no build/strategy look/cell. No
+current capacity availability or continuous exclusive resource lease claimed.
+
+Prospective DATA/engine groundwork focused tests:85passed0.27s, synthetic
+only with the same native denial; these are distinct from67observer nodes
+(152distinct). Engine mutation entry remains deliberately unavailable.

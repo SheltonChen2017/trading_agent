@@ -80070,3 +80070,37 @@ execution/kill-switch internals are out of scope and not re-proven here.
 Diff clean; exact matching live remote remained29b0aebc before the correction
 commit. No unrelated dirty work was present or overwritten. Final handoff
 will name the correction commit, recheck local/live state and push once.
+
+### 350.6 Final handoff and exact local correction range
+
+Incoming Claude range30b7d161..29b0aebc disposed per350.2, accepted after
+test corrections/documentary qualifications, with operational blockers kept.
+This concluded Codex round contains exactly TWO local commits after
+29b0aebcb999581709235cf0862d7805f779ab21:
+
+|Commit|Disposition and validation|
+|---|---|
+|69f69eb503a9eab468711bbdac459a56c59e073c|Counter-review corrections retained. Only unused continuation, its tests,349guards,new synthetic composition test and lane record change. Final478passes/2historicalxfails2.61s;7red checks;public213pin/in-memory compile checks as350.5. No actual operation.|
+|This final handoff commit|Record only. Names the exact correction, incoming dispositions, findings, tests, exclusions, barriers and one-push endpoint. No extra contract/run or operational claim.|
+
+At the correction snapshot the worktree was clean and matching live remote
+still29b0aebc. Source freeze/pins, shared ledger, all used controls and private
+evidence preserved. Final record/diff/status checks follow, then exactly ONE
+successful matching nonforce push from the designated root/branch. Verify
+local HEAD, tracking ref and live remote equality plus clean status; no
+intermediate push or own-push review trigger.
+
+Next: Claude should review the exact section350 corrections. Do not replay349,
+begin a new milestone, assume coding resources released, run a reader, make
+provider/QC calls, renew A4/A5, or submit remaining six arms from this handoff.
+The owner-requested diagnosis-only Mia consultation is still pending actual
+coding-session availability, not a source fix or backtest permission. Actual
+A4 Runtime Error cause remains unknown, no accepted A4/statistic/return/cell
+exists, and AR80/120/140/160/180/200 stay blocked. Review acceptance and these
+synthetic tests do not supply technical readiness, formal/PIT/master/source
+admission or paper/live authority. Floor344/260/59/699 remains unchanged.
+
+Final handoff-only record/document repeat102passes1.32s, overlapping the
+478selection and not additive; no failures/skips/warnings. No code changed
+after its final focused selection. Diff clean and designated root/branch/
+69f69eb5 HEAD reverified before this record commit.

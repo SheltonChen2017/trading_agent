@@ -1,31 +1,34 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current section123 single-base startup correction:**
-The owner's genuine Mia diagnosis was submitted and read. All13 saved cloud
-files match the pre-Mia snapshot. Mia located the class-assembly failure but
-could not retrieve the terminal exception; unverified base-order suggestions
-and its erroneous10REMX count are rejected. The actual saved native error and
-QuantConnect's published Python bridge confirm multiple-inheritance refusal.
-The separate SID-to-cash study keeps the one excluded stock's final allocation
-in cash with no redistribution; original study/failures remain unpooled.
+**Current section123 OFF attempt2 / status unknown:**
+The single-base correction is committed LOCALLY at
+5f47205aad43015f1c64981cf15200ae7482919e. Genuine Mia was consulted and all13
+saved files were compared; its unverified suggestions were not ported.
+Focused software checks passed; native runtime/financial acceptance is pending.
 
-Four NEW single_base source modules and four tests implement the fixed
-TPR-SID-CASH-SINGLE-BASE-20261107-v2 source epoch, preserving every financial/
-cash/census method body, cooperative callback order, v1 policy/calendar/input
-bytes and only Main visible to the loader. Focused software checks passed:
-builder46unchanged cases plus5corrected-fixture cases; financialactions59;
-resultchecker80; nativeverifier/observer84. Independent source judgment
-accepted. Oldsource/tests, failedOFFattempt1 and every claim/receipt remain.
-This is software verification; native single-base compatibility is pending.
-The exact source must be committed LOCALLY before fresh OFFattempt2 preflight,
-compile and launch. No second financialjob has been launched yet.
+Corrected OFF project38609822 job46b3b10ca11481a9d6d8352e6602ac7b was actually
+created as SID-CASH-SINGLE-BASE-20261107-OFF-A2, financial attempt2, config
+a01f769b4e712453956c64f8f2945c8b4c404f788bbf32490ce026852164b6ab.
+All13 source files matched before/after compile and launch, inventory
+86d421a10ec6ccfb8059a8336983e2bf92a592e829f19810399eb56765f06a76.
+The first exact-job status read returned HTTP200/1319B but failed local
+whole-wire validation before retention. Metadata/raw/projection are NULL.
+CURRENT NATIVE STATUS IS UNKNOWN; neither completion, failure nor successful
+initialization is inferred. No second request in the launching turn.
 
-OFF38609822 jobba19f090efb3c9370292a7737f650823 remains retained Runtime Error/
-completedTRUE at class construction. Other four new variant arms are not
-launched. All accepted full-window metrics remain NULL; native accounting/
-chart/origin/rights/PIT/canonical gates remain unproved. The same heartbeat
-is appPAUSED. Keep all20REMX rows quarantined, skip Claude and make
-NO ADDITIONAL PUSH; round120 push041a54db is already consumed.
+The SAME heartbeat is appACTIVE and its exact new job/prompt/same-chat binding
+was freshly read back. Next wake permits one fresh bounded metadata request;
+pause this heartbeat BEFORE processing an actual terminal transition.
+Preserve current job/source/notebooks untouched while waiting. Section123.2
+records full provenance, failed-read receipt and body-free diagnostic limits.
+
+The separate fixed-SID-to-cash study keeps exactly one excluded stock's final
+allocation in cash, with no redistribution. Failed OFF attempt1 and original
+study/history remain separate and unpooled. Other four new variant arms are
+not launched. All accepted full-window metrics remain NULL; native accounting,
+chart/origin/rights/PIT/canonical gates remain unproved. Keep all20REMX rows
+quarantined, skip Claude, and make NO ADDITIONAL PUSH. Round120 push041a54db
+is already consumed; the source and this handoff remain LOCAL ONLY.
 
 **Published section120 handoff before the current owner continuation (2026-11-07):** The in-app browser is
 authenticated on own OFF38609822/code; nativeSafari remains untouched.
@@ -37422,6 +37425,8 @@ sharedlock/privacy/collaborator/zeroactive/sourcebeforeafter and eight native
 compileproofs remain prerequisites. No unchanged failing retry, dateextension,
 additional stock exclusion, financial result admission or verification waiver.
 
+Historical pre-implementation snapshot, retained from BEFORE source commit5f47205
+and the actual effects in123.2 (not the current job/monitor state):
 No further QC effect beyond the one sourcecapture yet in123; no second
 financiallaunch. Existing heartbeat remains explicitlyPAUSED. Skip Claude;
 NO ADDITIONAL PUSH. User-facing date follows America/Los_Angeles2026-11-07;
@@ -37499,3 +37504,171 @@ Fresh122 claim BEFORE effect {"HEAD":"b834af1576e7619848ee89388d32c00425a550ed",
 123 precommit remote scope observation {"QC_requests": 0, "actual_remote_head": "041a54dbd53d54ba02a42f8740580eba7be3f298", "expected_remote_head": "041a54dbd53d54ba02a42f8740580eba7be3f298", "operation_id": "TPR-R123-GIT-PRECOMMIT-REMOTE-READ-001", "proof": {"bytes": 248, "name": "TPR-R123-GIT-PRECOMMIT-REMOTE-READ-001.safe.json", "sha256": "4fe1c1f25ac63f3ef3ad161859f79c539a1c61b251e08e310ab6345b928c1949"}, "pushes": 0, "requests": 1, "scope_matches": true}
 
 123 final precommit QA passed onall8newfiles/frozenhashes withLF/inmemorycompile; old10source/tests andpublished3534430B history remainexact. Targetremote041a54dbd53d54ba02a42f8740580eba7be3f298 freshlyverifiedunchanged throughboundedreadonlyGitclaim; no push. The following LOCALONLYcommitcontains exactly4newsource/4newtests+sole record. Core source nowrequiresfixedsinglebasepreflight/nativeattempt2; no nativecompatibility/financialcompletion claimed.
+
+123 local source commit5f47205aad43015f1c64981cf15200ae7482919e verifiedclean. One functions orchestration syntax error occurred BEFORE evaluation/claim/private/nativeeffect and was corrected; no spent scope or financialattempt was reused. Fresh committed40source claim follows.
+
+Fresh123 claim BEFORE effect {"HEAD":"5f47205aad43015f1c64981cf15200ae7482919e","bounds":{"arm":"cap_off","compiles":0,"credential_access":"fixed genuine TLS existing environment only; no logging or fallback","financial_attempt":2,"jobs":0,"native_requests_max":16,"native_response_each_bytes_max":2097152,"native_total_response_bytes_max":33554432,"operation_seconds_max":600,"privacy_owner_collaborator_zero_active_preflight":true,"private_packet_reads":0,"private_reads_max":1,"project_id":38609822,"registry_bytes":3573,"registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","source_compare_all13_before_after":true,"source_epoch":"TPR-SID-CASH-SINGLE-BASE-20261107-v2","source_writes_max":11},"manifest":{"bytes":7184,"name":"TPR-R123-OFF-V2-UPLOAD-EFFECT-001.claim.json","sha256":"73f5e94abbae9c5d7a5fb7cd28ccf175ed82798cf93ce1fc0399de92e419f3c9"},"operation_id":"TPR-R123-OFF-V2-UPLOAD-EFFECT-001"}
+
+123 OFFv2upload PREeffect {"compiles": 0, "history": {"bytes": 1432, "name": "TPR-R123-SINGLE-BASE-PRIOR-HISTORY-001.json", "sha256": "9305b79769b792144cf3104cee9f7ae523002948391d6972bbe8048687bf0bae"}, "inventory": {"bytes": 1515, "name": "TPR-R123-OFF-SINGLE-BASE-EXPECTED-INVENTORY-001.json", "sha256": "86d421a10ec6ccfb8059a8336983e2bf92a592e829f19810399eb56765f06a76"}, "jobs": 0, "native_requests_max": 16, "new_financial_attempt": 2, "prepared": {"bytes": 350244, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-UPLOAD-001.prepared.json", "sha256": "5abb9e58e9f55dfd3e98163bb92f638494504cbfd7c37986ad4ca4006efb4416"}, "report": {"bytes": 13120, "name": "TPR-R123-OFF-SINGLE-BASE-REPORT-001.json", "sha256": "d55fc7193d0b810185c2fbee2ae3ff12a4700d6c2f3364c2c2ff1cd6831c2cbb"}, "source_HEAD": "5f47205aad43015f1c64981cf15200ae7482919e", "source_epoch": "TPR-SID-CASH-SINGLE-BASE-20261107-v2", "source_writes_max": 11, "spec": {"bytes": 296, "name": "TPR-R123-OFF-SINGLE-BASE-SPEC-001.json", "sha256": "068248e0a93476d0f7520b260eff2ec4618b14e1b50665ed4917f0ea99ab49c8"}}
+
+123 OFFv2upload result {"economics_accepted": false, "new_financial_jobs": 0, "proof": {"bytes": 6678, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-UPLOAD-001.safe.json", "sha256": "489d10bf4ada14d98641ff1e9e71f1f3cabdbf16ec74e38c831371abe9115423"}, "receipt": {"bytes": 19095, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-UPLOAD-001.result.json", "sha256": "3aba4967cfb7380acc91a27de78b3e2f846897d25fb27ea46ab5e1ffac13e6f4"}, "status": "completed", "transport_calls_attempted": 16}
+
+Fresh123 claim BEFORE effect {"HEAD":"5f47205aad43015f1c64981cf15200ae7482919e","bounds":{"all13_source_compare_before_after":true,"compiles_max":1,"financial_attempt":2,"jobs":0,"native_requests_max":6,"operation_seconds_max":240,"privacy_owner_collaborator_zero_active_preflight":true,"private_packet_reads":0,"private_reads_max":1,"project_id":38609822,"registry_bytes":3573,"registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","response_each_bytes_max":2097152,"source_epoch":"TPR-SID-CASH-SINGLE-BASE-20261107-v2","source_writes":0},"manifest":{"bytes":7030,"name":"TPR-R123-OFF-V2-COMPILE-EFFECT-001.claim.json","sha256":"e1619a524bd7a6758c859cc0bd52efc9cc49fdb05367254ba3fb6232695da581"},"operation_id":"TPR-R123-OFF-V2-COMPILE-EFFECT-001"}
+
+123 OFFv2compile PREeffect {"compile_evidence": {}, "compile_requests_max": 1, "financial_attempt": 2, "jobs_max": 0, "native_requests_max": 6, "plan_descriptor": {"bytes": 9948, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.operation.spent.json", "sha256": "20b09ec9eca4b8850614a60607feaa3dc44b93a63f90716e8d2f73c5ff8dc934"}, "prepared": {"bytes": 13865, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.prepared.json", "sha256": "0fa04e403268c39c120e06de0b52bea34631fec546e77ce9526d1fd3c093ed1c"}, "private_proof_bytes_max": 0, "private_proof_reads_max": 0, "project_id": 38609822, "source_HEAD": "5f47205aad43015f1c64981cf15200ae7482919e", "source_epoch": "TPR-SID-CASH-SINGLE-BASE-20261107-v2"}
+
+123 OFFv2compile result {"accepted_metrics": null, "actual_job_ids": [], "actual_new_backtests": 0, "compile_requests_attempted": 1, "economics_accepted": false, "proof": {"bytes": 3370, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.safe.json", "sha256": "ecbf745a985ccf8f2fd492c5ca7778600c6e6b1c3bcc3ade821a7c66e67cc340"}, "receipt": {"bytes": 13111, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.result.json", "sha256": "581bfe5171665e10b3e2ab75d54387a8bd0507a05f7c252b24390b1db6d85666"}, "status": "completed", "transport_calls_attempted": 6}
+
+Fresh123 claim BEFORE effect {"HEAD":"5f47205aad43015f1c64981cf15200ae7482919e","bounds":{"QC_requests":0,"exact_file":"$CODEX_HOME/automations/target-price-qc-job-remaining-backtests/automation.toml","private_bytes_max":65536,"private_reads_max":1,"purpose":"fresh exact same-chat heartbeat fields/PAUSED verification before eventualnewactualjob rearm; no newautomation or currentmutation"},"manifest":{"bytes":6868,"name":"TPR-R123-APP-HEARTBEAT-CONFIG-READ-001.claim.json","sha256":"47b3cdae64dd0593e1f3568da398e0a313f39f2212f5e056b6401f53f30f369c"},"operation_id":"TPR-R123-APP-HEARTBEAT-CONFIG-READ-001"}
+
+123 existing heartbeat bounded configuration read {"id": "target-price-qc-job-remaining-backtests", "keys": ["created_at", "id", "kind", "name", "prompt", "rrule", "status", "target_thread_id", "updated_at", "version"], "kind": "heartbeat", "name": "Target-Price QC job \u2192 remaining backtests", "prompt_sha256": "9f842bc819714f16850b26de660377d3910cf6028ac0efcc9b72a2a8f85bc0ae", "proof": {"bytes": 7196, "name": "TPR-R123-APP-HEARTBEAT-CONFIG-001.safe.json", "sha256": "e5b14553c0f488bd2599d0d6880ae351f8ab6f47b73fdcde801d2df09efae5bc"}, "status": "PAUSED", "target_thread_id": "01a0fd4c-ebeb-72b0-863d-33bd1f7affeb", "version": 1}
+
+Fresh123 claim BEFORE effect {"HEAD":"5f47205aad43015f1c64981cf15200ae7482919e","bounds":{"compile_id":"144cf34e28345e32373af8865548923e-7150f87774657feca2354d6a77b32d59","compiles":0,"financial_attempt":2,"jobs":0,"native_requests_max":4,"operation_seconds_max":180,"privacy_owner_collaborator_zero_active_preflight":true,"private_reads_max":1,"project_id":38609822,"registry_bytes":3573,"registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","request_each_seconds_max":20,"response_each_bytes_max":2097152,"source_epoch":"TPR-SID-CASH-SINGLE-BASE-20261107-v2","source_writes":0},"manifest":{"bytes":7063,"name":"TPR-R123-OFF-V2-BUILD-EFFECT-001.claim.json","sha256":"ce95e203a02054d38bbe9cbf4318dda12c4f81b429a7efa6cedfad062bde2adf"},"operation_id":"TPR-R123-OFF-V2-BUILD-EFFECT-001"}
+
+123 OFFv2build PREeffect {"compile_evidence": {}, "compile_requests_max": 0, "financial_attempt": 2, "jobs_max": 0, "native_requests_max": 4, "plan_descriptor": {"bytes": 9304, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-BUILD-001.operation.spent.json", "sha256": "22404fc6c6a855e8d531bd375db556d284423cfe114b66acca4309d1dec1aa77"}, "prepared": {"bytes": 13282, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-BUILD-001.prepared.json", "sha256": "e5a23d80d4c36480fbf3728549aa97a0428069819be1b4104873732f113f68a9"}, "private_proof_bytes_max": 0, "private_proof_reads_max": 0, "project_id": 38609822, "source_HEAD": "5f47205aad43015f1c64981cf15200ae7482919e", "source_epoch": "TPR-SID-CASH-SINGLE-BASE-20261107-v2"}
+
+123 OFFv2build result {"accepted_metrics": null, "actual_job_ids": [], "actual_new_backtests": 0, "compile_requests_attempted": 0, "economics_accepted": false, "proof": {"bytes": 2528, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-BUILD-001.safe.json", "sha256": "1c2b82c0bb5ed392a2f3b3d268116936e51a9037877e542d9ff3750ed551eb66"}, "receipt": {"bytes": 5440, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-BUILD-001.result.json", "sha256": "50cc18c23dfe2ebc9ea69af149aeae8a747f61704c391015dfb3c507668e1761"}, "status": "completed", "transport_calls_attempted": 4}
+
+Fresh123 claim BEFORE effect {"HEAD":"5f47205aad43015f1c64981cf15200ae7482919e","bounds":{"QC_native_research_journal_cap_bytes":268435456,"QC_native_research_journal_cap_records":300000,"all13_source_compare_before_after":true,"all_frozen_dates_capital_timing_policy_calendar_preserved":true,"arm":"cap_off","candidate_config_sha256":"a01f769b4e712453956c64f8f2945c8b4c404f788bbf32490ce026852164b6ab","compile_evidence":{"build_plan":{"bytes":9304,"name":"TPR-CMP29-API-R123-SINGLE-BASE-OFF-BUILD-001.operation.spent.json","sha256":"22404fc6c6a855e8d531bd375db556d284423cfe114b66acca4309d1dec1aa77"},"build_response":{"bytes":2447,"name":"TPR-CMP29-API-R123-SINGLE-BASE-OFF-BUILD-001.build.response.raw","sha256":"a55ef25416943136f27436fcb20a220515ca23e3f0e4d762ff01b89590843eb7"},"build_result":{"bytes":5440,"name":"TPR-CMP29-API-R123-SINGLE-BASE-OFF-BUILD-001.result.json","sha256":"50cc18c23dfe2ebc9ea69af149aeae8a747f61704c391015dfb3c507668e1761"},"compile_plan":{"bytes":9948,"name":"TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.operation.spent.json","sha256":"20b09ec9eca4b8850614a60607feaa3dc44b93a63f90716e8d2f73c5ff8dc934"},"compile_response":{"bytes":631,"name":"TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.compile.response.raw","sha256":"6f1689183a4e5658f8764c522c9a607aa70031723a4d517983f6e3dc2a1b86bc"},"compile_result":{"bytes":13111,"name":"TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.result.json","sha256":"581bfe5171665e10b3e2ab75d54387a8bd0507a05f7c252b24390b1db6d85666"},"source_after":{"bytes":352351,"name":"TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.after.response.raw","sha256":"5c17247407d3873f1e98ea6b648fab6985188199b739cb9fc15b57149f539602"},"source_before":{"bytes":352351,"name":"TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.before.response.raw","sha256":"5c17247407d3873f1e98ea6b648fab6985188199b739cb9fc15b57149f539602"}},"compile_proof_total_bytes":745583,"compiles":0,"financial_attempt":2,"jobs_max":1,"local_private_packet_reads":0,"native_requests_max":6,"operation_seconds_max":300,"privacy_owner_collaborator_zero_active_preflight":true,"private_reads_max":9,"project_id":38609822,"registry_bytes":3573,"registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","response_each_bytes_max":2097152,"source_epoch":"TPR-SID-CASH-SINGLE-BASE-20261107-v2","source_writes":0},"manifest":{"bytes":8805,"name":"TPR-R123-OFF-V2-LAUNCH-EFFECT-001.claim.json","sha256":"02ed8840988aa3ffe751e12e838cb716d0189bbbfb856bb24289518ca643e2c3"},"operation_id":"TPR-R123-OFF-V2-LAUNCH-EFFECT-001"}
+
+123 OFFv2launch PREeffect {"compile_evidence": {"build_plan": {"bytes": 9304, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-BUILD-001.operation.spent.json", "sha256": "22404fc6c6a855e8d531bd375db556d284423cfe114b66acca4309d1dec1aa77"}, "build_response": {"bytes": 2447, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-BUILD-001.build.response.raw", "sha256": "a55ef25416943136f27436fcb20a220515ca23e3f0e4d762ff01b89590843eb7"}, "build_result": {"bytes": 5440, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-BUILD-001.result.json", "sha256": "50cc18c23dfe2ebc9ea69af149aeae8a747f61704c391015dfb3c507668e1761"}, "compile_plan": {"bytes": 9948, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.operation.spent.json", "sha256": "20b09ec9eca4b8850614a60607feaa3dc44b93a63f90716e8d2f73c5ff8dc934"}, "compile_response": {"bytes": 631, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.compile.response.raw", "sha256": "6f1689183a4e5658f8764c522c9a607aa70031723a4d517983f6e3dc2a1b86bc"}, "compile_result": {"bytes": 13111, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.result.json", "sha256": "581bfe5171665e10b3e2ab75d54387a8bd0507a05f7c252b24390b1db6d85666"}, "source_after": {"bytes": 352351, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.after.response.raw", "sha256": "5c17247407d3873f1e98ea6b648fab6985188199b739cb9fc15b57149f539602"}, "source_before": {"bytes": 352351, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-COMPILE-001.before.response.raw", "sha256": "5c17247407d3873f1e98ea6b648fab6985188199b739cb9fc15b57149f539602"}}, "compile_requests_max": 0, "financial_attempt": 2, "jobs_max": 1, "native_requests_max": 6, "plan_descriptor": {"bytes": 10069, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-LAUNCH-001.operation.spent.json", "sha256": "8604cd044465fe84f07d69e5c5eab1c6b16d566e0db54438c43617da4484ebf1"}, "prepared": {"bytes": 15498, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-LAUNCH-001.prepared.json", "sha256": "5786225dcff24adee59097b467076ea9f6667569d5d0adc9ea62a30f6f407e44"}, "private_proof_bytes_max": 745583, "private_proof_reads_max": 8, "project_id": 38609822, "source_HEAD": "5f47205aad43015f1c64981cf15200ae7482919e", "source_epoch": "TPR-SID-CASH-SINGLE-BASE-20261107-v2"}
+
+123 OFFv2launch result {"accepted_metrics": null, "actual_job_ids": ["46b3b10ca11481a9d6d8352e6602ac7b"], "actual_new_backtests": 1, "compile_requests_attempted": 0, "economics_accepted": false, "proof": {"bytes": 3933, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-LAUNCH-001.safe.json", "sha256": "56517fa38d900a9e1ddea6c8fb8f7983320bb4227ffdf335d0266811c541b8f8"}, "receipt": {"bytes": 15003, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-LAUNCH-001.result.json", "sha256": "53107d2b58ab315bcedc9dd659f29ef5b042ff1515973c2661f0ca0cc76f903a"}, "status": "completed", "transport_calls_attempted": 6}
+
+Fresh123 claim BEFORE effect {"HEAD":"5f47205aad43015f1c64981cf15200ae7482919e","bounds":{"JSON_depth_max":32,"JSON_nodes_max":4194304,"backtest_id":"46b3b10ca11481a9d6d8352e6602ac7b","candidate_config_sha256":"a01f769b4e712453956c64f8f2945c8b4c404f788bbf32490ce026852164b6ab","compiles":0,"endpoint":"backtests/read","financial_attempt":2,"jobs":0,"native_requests_max":1,"private_reads_max":1,"project_id":38609822,"registry_bytes":3573,"registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","request_seconds_max":30,"response_bytes_max":4194304,"retention":"entire raw plus everydecodedkey/string credential screening BEFORE owner-only full safe wire retention; only exactjobstatus/completedmetadata projected; no performance interpretation","source_epoch":"TPR-SID-CASH-SINGLE-BASE-20261107-v2","source_writes":0},"manifest":{"bytes":7304,"name":"TPR-R123-OFF-V2-STATUS-EFFECT-001.claim.json","sha256":"12a0ae481e022b3c23de79e260547a6c66f4811f5e2dd0fcb995a00a550ea495"},"operation_id":"TPR-R123-OFF-V2-STATUS-EFFECT-001"}
+
+123 OFFv2 exact-job STATUS PREeffect {"financial_projection_or_performance_interpretation": false, "job": "46b3b10ca11481a9d6d8352e6602ac7b", "project_id": 38609822, "proof": {"bytes": 6193, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-STATUS-001.prepared.json", "sha256": "2fffdeeb25166e475008d214ae6af4264632925fb6ef5c27c5de050336186c2f"}, "requests": 1, "response_bound": 4194304, "screened_full_wire_retained_privately": true}
+
+123 OFFv2 exact-job status result {"economics_accepted": false, "lock_cleanup_complete": true, "metadata": null, "projection": null, "proof": {"bytes": 1066, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-STATUS-001.safe.json", "sha256": "d69879b0650688ea1c6ae92ddb61ba95e39468f0622cfe3c2f3337a82111da55"}, "receipt": {"bytes": 899, "name": "TPR-CMP29-API-R123-SINGLE-BASE-OFF-STATUS-001.result.json", "sha256": "bdc7bce7db534e0c9064666ffe3c323d90686b2d87e37e3b63017461a1d55cda"}, "receipt_published": true, "status": "failed_or_uncertain"}
+
+Fresh123 claim BEFORE effect {"HEAD":"5f47205aad43015f1c64981cf15200ae7482919e","bounds":{"QC_requests":0,"exact_file":"$CODEX_HOME/automations/target-price-qc-job-remaining-backtests/automation.toml","private_bytes_max":65536,"private_reads_max":1,"purpose":"fresh exact same-chat heartbeat fields before actual OFF46b3 rearm; no new automation"},"manifest":{"bytes":6824,"name":"TPR-R123-APP-HEARTBEAT-CONFIG-READ-002.claim.json","sha256":"1978b6ba2a4ca509a1cefe443a7a687a850c7e189ab5853e8c3d92aec3afdc73"},"operation_id":"TPR-R123-APP-HEARTBEAT-CONFIG-READ-002"}
+
+123 existing heartbeat bounded configuration read {"id": "target-price-qc-job-remaining-backtests", "keys": ["created_at", "id", "kind", "name", "prompt", "rrule", "status", "target_thread_id", "updated_at", "version"], "kind": "heartbeat", "name": "Target-Price QC job \u2192 remaining backtests", "prompt_sha256": "9f842bc819714f16850b26de660377d3910cf6028ac0efcc9b72a2a8f85bc0ae", "proof": {"bytes": 7196, "name": "TPR-R123-APP-HEARTBEAT-CONFIG-002.safe.json", "sha256": "e5b14553c0f488bd2599d0d6880ae351f8ab6f47b73fdcde801d2df09efae5bc"}, "status": "PAUSED", "target_thread_id": "01a0fd4c-ebeb-72b0-863d-33bd1f7affeb", "version": 1}
+
+Fresh123 claim BEFORE effect {"HEAD":"5f47205aad43015f1c64981cf15200ae7482919e","bounds":{"QC_requests":0,"app_updates_max":1,"exact_automation":"target-price-qc-job-remaining-backtests","job":"46b3b10ca11481a9d6d8352e6602ac7b","new_automations":0,"notification_intent":"quiet unchanged/nonactionable; only material change or owner action","project_id":38609822,"purpose":"replace obsolete monitor target with actually created OFF attempt2 and honest UNKNOWN status; preserve existing schedule/name/chat","status_from":"PAUSED","status_to":"ACTIVE","target_thread":"01a0fd4c-ebeb-72b0-863d-33bd1f7affeb"},"manifest":{"bytes":7058,"name":"TPR-R123-APP-HEARTBEAT-REARM-001.claim.json","sha256":"855acb6c8300dae8b44fdc5f17db7d08fdaa80af2cf5bfdd6816484eb0d96c50"},"operation_id":"TPR-R123-APP-HEARTBEAT-REARM-001"}
+
+Fresh123 claim BEFORE effect {"HEAD":"5f47205aad43015f1c64981cf15200ae7482919e","bounds":{"QC_requests":0,"exact_file":"$CODEX_HOME/automations/target-price-qc-job-remaining-backtests/automation.toml","private_bytes_max":65536,"private_reads_max":1,"purpose":"verify actual ACTIVE existing same-chat monitor with exact new OFF46b3 prompt and unchanged name/schedule/creation"},"manifest":{"bytes":6854,"name":"TPR-R123-APP-HEARTBEAT-CONFIG-READ-003.claim.json","sha256":"9f795a618d15c51728b94b642d6f1e81b3344182e8bcfe05db06b1da6daa02df"},"operation_id":"TPR-R123-APP-HEARTBEAT-CONFIG-READ-003"}
+
+123 existing heartbeat bounded configuration read {"id": "target-price-qc-job-remaining-backtests", "keys": ["created_at", "id", "kind", "name", "prompt", "rrule", "status", "target_thread_id", "updated_at", "version"], "kind": "heartbeat", "name": "Target-Price QC job \u2192 remaining backtests", "prompt_sha256": "ade420231608edbd186ec74f012672f2aa47da444712add0f4ea04fdc16d70c4", "proof": {"bytes": 10705, "name": "TPR-R123-APP-HEARTBEAT-CONFIG-ACTIVE-003.safe.json", "sha256": "e4a8058491b02e0df6cfa15777f02de8ae668f8e53458e22058d7792e209c7e1"}, "status": "ACTIVE", "target_thread_id": "01a0fd4c-ebeb-72b0-863d-33bd1f7affeb", "version": 1}
+
+### 123.2 Actual corrected OFF launch / unknown status / same monitor rearmed
+
+Source commit5f47205aad43015f1c64981cf15200ae7482919e is LOCAL ONLY and was
+verified clean before the fixed production sequence. No source/test bytes
+changed afterward. New fixed financial route execute_action performed fresh
+privacy/owner/collaborator/zero-active preflight, all13 source-before/after
+comparisons, committed source guards, shared lock, deadlines and eight actual
+native compile proofs. It did not use the retired generic mutation executor.
+
+Study TPR-SIX-UNIVERSE-FIVE-ARM-SID-CASH-20261107-v1;
+source epoch TPR-SID-CASH-SINGLE-BASE-20261107-v2.
+Actual OFF project38609822/job46b3b10ca11481a9d6d8352e6602ac7b,
+name SID-CASH-SINGLE-BASE-20261107-OFF-A2,
+financial operation TPR-CMP28-OFF-SID-CASH-20261107-SINGLE-BASE-FULL-A2,
+attempt2/configa01f769b4e712453956c64f8f2945c8b4c404f788bbf32490ce026852164b6ab.
+Compile144cf34e28345e32373af8865548923e-7150f87774657feca2354d6a77b32d59.
+Main47192B/SHA750205cf1432fb020147c93f6d5bb8e54187d79e2b400202d07af21e89cbd04d;
+all13 inventory86d421a10ec6ccfb8059a8336983e2bf92a592e829f19810399eb56765f06a76;
+source response352351B/SHA5c17247407d3873f1e98ea6b648fab6985188199b739cb9fc15b57149f539602
+matched before/after compile AND launch. Notebook/helper unchanged.
+Report13120B/SHAd55fc7193d0b810185c2fbee2ae3ff12a4700d6c2f3364c2c2ff1cd6831c2cbb.
+Policyfb4c367ad935ec3d358899da31f109f13c4e1ae3f1c7c8755a80701b09a16760;
+calendare90224db6b12210e7b7250853190137efcfe7e336ce34ab0356cc4f4ab358a3c.
+Prior-history reference1432B/SHA9305b79769b792144cf3104cee9f7ae523002948391d6972bbe8048687bf0bae
+points to exact committed record/all prior retained history; it is not a
+private financial-body reread, outcome reset or reclassification of eight100jobs.
+
+Actual fixed production receipts under the new financial NATIVE_ROOT:
+TPR-CMP29-API-R123-SINGLE-BASE-OFF-UPLOAD-001.result.json,
+19095B/SHA3aba4967cfb7380acc91a27de78b3e2f846897d25fb27ea46ab5e1ffac13e6f4;
+COMPILE-001.result.json,13111B/SHA581bfe5171665e10b3e2ab75d54387a8bd0507a05f7c252b24390b1db6d85666;
+BUILD-001.result.json,5440B/SHA50cc18c23dfe2ebc9ea69af149aeae8a747f61704c391015dfb3c507668e1761;
+LAUNCH-001.result.json,15003B/SHA53107d2b58ab315bcedc9dd659f29ef5b042ff1515973c2661f0ca0cc76f903a.
+All suffixes use the same preceding TPR-CMP29-API-R123-SINGLE-BASE-OFF- prefix.
+Launch safe copy3933B/SHA56517fa38d900a9e1ddea6c8fb8f7983320bb4227ffdf335d0266811c541b8f8.
+Eight native proof objects/745583B were freshly claimed/read before launch;
+distinct operation/attempt/look/candidate reservations retained; all lock
+cleanup and receipts published. Compile/build success proves build only.
+
+This123 turn made34 direct native API requests: one post-Mia all-file capture,
+16upload-stage calls/11writes,6compile-stage calls/one explicitcompile,
+4build-stage calls,6launch-stage calls/one actualjob,one status read.
+Two financial variant launches now exist across122/123: retained failedA1 and
+thisA2. Other four financial arms and native child verifier are NOT launched.
+No financial acceptance or additional outcome count is silently inferred.
+
+The first exact-job metadata request was freshly claimed:
+TPR-R123-OFF-V2-STATUS-EFFECT-001.claim.json,7304B/
+SHA12a0ae481e022b3c23de79e260547a6c66f4811f5e2dd0fcb995a00a550ea495.
+Actual status op TPR-CMP29-API-R123-SINGLE-BASE-OFF-STATUS-001 used committed
+f3e463c22b8a4ae0cb37474456b2215ef0c333e5e43a7b504aeddc55aca9c199
+dedicated status route and one fixed backtests/read request. HTTP200/1319B
+failed local whole-wire validation BEFORE retention. Result failed_or_uncertain;
+metadata/projection/raw_response NULL, receipt published/lock cleanup TRUE.
+Failed receipt899B/SHAbdc7bce7db534e0c9064666ffe3c323d90686b2d87e37e3b63017461a1d55cda
+is in the fixed old status root; safe1066B/
+SHAd69879b0650688ea1c6ae92ddb61ba95e39468f0622cfe3c2f3337a82111da55
+is in the bounded private output directory. The PREeffect
+screened_full_wire_retained_privately=true described intended screened
+retention, NOT actual success: this refused response was NOT retained.
+CURRENT NATIVE STATUS UNKNOWN. This is not proof of native failure, completion
+or successful initialization. No raw body, economics or exception text was
+admitted, and no second status request was made in this launching turn.
+
+Independent readonly public-source judgment accepts optional NEXT-WAKE
+body-free CALL-only diagnostic, without any native effect in that review.
+Freshly preclaim exact operator body/source/currentHEAD/registry/owner/time/
+attempt/look before its ONE exact-job request. Pin exact status._fail.__code__;
+precompute allowlisted same-module caller code identities, record at most12
+immediate-caller public basename/function/line records, return None (no line/
+exception tracing), refuse replacing an existing sys.gettrace() hook and
+restore the prior hook in finally. Never read frame locals/arguments/raw
+values/exception strings/credentials or walk arbitrary stack frames.
+Core fixed execute_plan/TLS/parser/admission and 4MiB/depth32/node4194304
+bounds remain unchanged. Line193 identifies only combined completed-type/
+known-status refusal; line206 only a broad caught-parser-failure gate. Neither
+reveals actual values/job status; zero hits may leave API/transport failure
+unlocated. Refused bytes cannot be retained. Repeated concrete reader faults
+require a verified committed local correction, not an unchanged failing loop,
+a bypass flag or cloud-job relaunch. Async job state may change between wakes.
+
+The SAME existing heartbeat target-price-qc-job-remaining-backtests was rearmed
+through app tool only, under fresh claim
+TPR-R123-APP-HEARTBEAT-REARM-001.claim.json,7058B/
+SHA855acb6c8300dae8b44fdc5f17db7d08fdaa80af2cf5bfdd6816484eb0d96c50.
+Actual app response ACTIVE; exact TOML freshly read back under
+TPR-R123-APP-HEARTBEAT-CONFIG-READ-003.claim.json,6854B/
+SHA9f795a618d15c51728b94b642d6f1e81b3344182e8bcfe05db06b1da6daa02df.
+Readback10705B/SHAe4a8058491b02e0df6cfa15777f02de8ae668f8e53458e22058d7792e209c7e1;
+promptSHAade420231608edbd186ec74f012672f2aa47da444712add0f4ea04fdc16d70c4.
+Actual ACTIVE/samechat01a0fd4c-ebeb-72b0-863d-33bd1f7affeb/newjob46b3/
+unchanged name/schedule/creation verified. No duplicate automation/controller.
+The prompt replaces obsolete100-job target and old promise of another push.
+It preserves quiet unchanged/nonactionable behavior, one fresh read per wake,
+unknown status, pause BEFORE terminal transition, fixed v2 continuation and
+NO ADDITIONAL PUSH. Active controller means no duplicate work; actual other-lane
+contention means wait without changing/cancelling resources.
+
+Keep this job/project/source/notebooks untouched while waiting. On accepted
+terminal metadata, pause THIS heartbeat through app tool before processing.
+Native Completed alone is insufficient. Independent inQC journal/native order/
+ticket census/fees/cash/actions/NAV/exposure/clock/1449valuations/301decisions
+remain required through fixed v2 results/native_results. Raw SID/journal stayQC;
+safe screened aggregates/digests only. Keep ONE actualHEAD from child upload
+through observe, defer commits during that sequence. Parent financial source
+HEAD5f47205 remains distinct from this following local record-only handoff
+commit and any later collector HEAD. Every new manifest uses actual currentHEAD.
+
+Then other arms50/100/200/pure proceed serialized when independently ready,
+with fresh all-file/source/input/custody/native proof checks. No extra stock
+exclusions, refill/renormalization, stale/future marks, financial policy/input
+changes or date extension. Old100 Mia economic changes remain unaccepted.
+The original study and failedA1 remain unpooled; all accepted full-window
+metrics NULL/native financial acceptance FALSE, chart/origin/rights/PIT/
+canonical gates unclosed. All20REMX fractional rows remain quarantined;
+skip Claude. Last freshly observed remote041a54dbd53d54ba02a42f8740580eba7be3f298
+is intentionally behind; NO ADDITIONAL PUSH. This handoff is LOCAL ONLY.
+
+123.2 final record audit identified the initial123 pre-implementation PAUSED/no-second-launch paragraph as unlabeled historical state. Labeled it explicitly BEFORE source5f/effects123.2, preserving all words/history. Current preamble/123.2 remain actual OFF46b3 created, statusUNKNOWN, sameheartbeatACTIVE. First final current-document run371passed/520deselected8.01s/8.10s onrecord49021bcb3ca892a7bcede45959f18da5419f3c389a707095920be24bddce9506; final labeled-record check follows. All8newsource/test hashes/LF/inmemorycompile, old10source/test bytes and published3534430B history verified unchanged; no source/native/push effect.
+
+123.2 final labeled-record focused current/preamble/exact-next-step validation371passed/520deselected8.43s/8.53s onrecord87609e58ffa79d5eea41b9fb0b68b1f88ead96702ec4efd998090bdb295a20e2, unchanged before/after; all tests isolated49/52runtime+syntheticDB with network/DNS/realQCcredential denial. Final readonly record audit accepted after explicitly labeling stale pre-implementation123 paragraph; no further findings. All8newsource/tests and old10source/tests plus3534430B published history remain byteexact; no fullsuite. Native requests remain34, job46b3 statusUNKNOWN, SAMEmonitor actualACTIVE,20REMXquarantined, no additionalpush. Following LOCAL record-only handoff commit changes no production source; future claims use actual resulting HEAD and retain financial source5f separately.

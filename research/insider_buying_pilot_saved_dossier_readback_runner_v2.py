@@ -307,6 +307,7 @@ def snapshot(head, names, admin, tree):
                 "source_sha256": sources, "source_inventory_sha256": sha(raw(sources))}
     receipt.source_identity(identity)
     need(tree_plan(head, admin) == tree, "tree_changed")
+    isolation.attribute_controls(names)
     isolation.check_admin(admin); git_position(head, admin, clean=True)
     return {"identity": identity, "versions": versions, "admin": admin,
             "tree": tree, "runtime_pins": runtime_pins(),
@@ -331,6 +332,7 @@ def source_current(manifest):
         data, observed = code_bytes(name)
         need(sha(data) == digest and observed == manifest["versions"][name], "source_changed")
     need(runtime_pins() == manifest["runtime_pins"], "runtime_changed")
+    isolation.attribute_controls(identity["source_sha256"])
 
 
 def validate_manifest(manifest):

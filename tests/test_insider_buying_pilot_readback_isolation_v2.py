@@ -88,6 +88,7 @@ def test_health_profile_has_zero_data_and_no_write_or_fork_grant(monkeypatch):
         "(deny process-exec)", "(deny file-write*)", "(deny file-read-data)"))
     assert "(allow file-write" not in profile
     assert str(m.EPOCH_ROOT) not in profile
+    assert str(m.RECORD_SOURCE) not in profile
     assert '(subpath "' + str(m.ROOT) + '")' not in profile
     assert '(literal "' + str(m.GIT_IMAGE) + '")' in profile
     executable_grants = profile.split("(allow process-exec ", 1)[1].split("(allow file-read-data", 1)[0]
@@ -141,6 +142,10 @@ def test_git_profile_only_adds_exact_admin_and_directory_literals(monkeypatch):
     assert '(subpath "' + str(m.ROOT) + '")' not in profile
     assert '(literal "' + str(m.ROOT / "research") + '")' in profile
     assert '(literal "' + str(m.ROOT / ".gitignore") + '")' in profile
+    assert '(literal "' + str(m.RECORD_SOURCE) + '")' in profile
+    assert '(subpath "' + str(m.RECORD_SOURCE.parent) + '")' not in profile
+    assert '(literal "' + str(m.ROOT / ".gitattributes") + '")' in profile
+    assert '(literal "' + str(m.ROOT / "research/.gitattributes") + '")' in profile
     assert '(literal "' + str(m.GIT_IMAGE) + '")' in profile
     assert "(deny process-fork)" not in profile
     assert profile.count("(allow file-write") == 1
@@ -162,6 +167,14 @@ def test_unknown_runtime_extension_is_not_an_arbitrary_read_grant(monkeypatch):
         m.policy(sources=("research/invented.py",), runtime_directories=(Path("/opt/unqualified"),))
 
 
+def test_existing_attribute_configuration_is_refused_instead_of_trusted(monkeypatch):
+    target = m.ROOT / "tests/.gitattributes"
+    original = Path.lstat
+    monkeypatch.setattr(Path, "lstat", lambda path: object() if path == target else original(path))
+    with pytest.raises(m.IsolationError, match="attribute_config_refused"):
+        m.attribute_controls(("tests/invented.py",))
+
+
 def test_admin_discovery_reads_fixed_pointers_and_config_without_git(monkeypatch):
     observed = []
     values = {m.ROOT / ".git": ("gitdir: " + str(m.EXPECTED_GITDIR) + "\n").encode(),
@@ -169,6 +182,7 @@ def test_admin_discovery_reads_fixed_pointers_and_config_without_git(monkeypatch
         m.EXPECTED_GITDIR / "gitdir": (str(m.ROOT / ".git") + "\n").encode(),
         m.EXPECTED_COMMON / "config": b"[core]\n", m.EXPECTED_GITDIR / "config.worktree": None}
     values[m.EXPECTED_COMMON / "info/exclude"] = None
+    values[m.EXPECTED_COMMON / "info/attributes"] = None
     def read(path, *, optional=False):
         observed.append((path, optional)); body = values[path]
         return body, {"present": False} if body is None else {

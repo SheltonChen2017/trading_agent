@@ -47082,3 +47082,44 @@ of14 is a current candidate inventory expansion, not a claimed measured
 count of missing historical images. The next qualified readback still must
 prove the exact original177 subset and every original/current Git byte.
 No overlap guard, old anchor, source hash or receipt is relaxed or rewritten.
+
+### 386.9 Native status SOURCE/config correction
+
+Ordinary zero-DATA health on1189457ef50d4deef83dc49b30db3167507b114d refuses
+exit2 in5.045s, same52B aggregate refusal/hash,stderr0. Source-only native
+classification establishes ONE tracked status row, prefix M, for the lane
+record, with status stdout hash
+5ccdbfa9baead508fcd2d38a0c58d319f441e635231ca6f0ed1166a053e5b6d3.
+It is not an untracked tmp/PDF or original-data change. Git needs to hash the
+record on some index/stat paths but the old source profile denies its body.
+Allow ONLY the exact lane-record SOURCE leaf to the Git role, with no-follow
+regular/owner/link/mode/4MiB metadata checks. Controller/readback never gain
+that record body; no shared document or private DATA leaf is added.
+
+Native control then removes the record's false M while preserving real new
+source modifications, and exposes a Git attribute-lookup warning (68B/hash
+0c72b68d24c1f861e84aaafbc2b3dff359f8b0b2fd736dcf53e13c3e07d0b584).
+Review the existing root/research .gitattributes SOURCE, not a vendor input:
+598B/hash30b497a6499409e0813720ea145a5211fa2d5d4536b9a208db7d02b905a6ce13
+and207B/hash7bb2eae20b5655161dd0a87b0d79c473e523c06a977576d3c81e80bd351ceff8.
+They contain existing binary/LF materialization rules, no newly accepted
+filter command. Keep their bytes frozen; the new helper pins both exact
+contents under held source checks. These TWO SOURCE-config leaves are
+available to current-source rechecks in every role. Other exact ancestor
+.gitattributes lookup names are required ABSENT; only Git may open those
+names to get normal ENOENT. No attribute/source subtree grant or ordinary
+DATA-body permission is added. Global attributes use /dev/null, system
+attributes stay disabled, and optional shared Git info/attributes joins the
+seven-entry pinned admin/absence inventory. No global or shared config is
+edited. An unexpected non-pinned source attribute file refuses.
+
+Initial absence-only qualification correctly refuses the TWO existing reviewed
+attribute controls (2testFAIL/479PASS3.30s); qualify their exact pinned bytes
+rather than bypassing their role. Corrected focused481 PASS3.39s
+(outer4.260s,stderr0); another final green follows after the admin pin addition.
+Source-only native control now reports only the actual new-source edits,
+NO record false-M and stderr0 (1.046s). An independent native fenced Git
+name-only comparison finds ZERO modified old captured source images from
+originalcbd2897c through currentHEAD (outer2.445s,stderr0); new additions are
+not mislabelled modifications. All8 new images compile, frozen17/four pins
+remain exact (outer0.695s,stderr0). Commit before final native qualification.

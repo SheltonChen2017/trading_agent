@@ -24,6 +24,10 @@ SUPPORTED_PYTHON = USER / ".venvs/trading_agent-py313/bin/python3.13"
 SUPPORTED_BASE = Path("/opt/homebrew/Cellar/python@3.13/3.13.15/Frameworks/Python.framework/Versions/3.13")
 GIT_IMAGE = Path("/Library/Developer/CommandLineTools/usr/bin/git")
 GIT_LIBRARIES = Path("/Library/Developer/CommandLineTools/usr/lib")
+RECORD_SOURCE = ROOT / "docs/Strategy Description/INSIDER_BUYING_IMPLEMENTATION_RECORD.md"
+ATTRIBUTE_SOURCE_PINS = {
+    ".gitattributes": {"bytes": 598, "sha256": "30b497a6499409e0813720ea145a5211fa2d5d4536b9a208db7d02b905a6ce13"},
+    "research/.gitattributes": {"bytes": 207, "sha256": "7bb2eae20b5655161dd0a87b0d79c473e523c06a977576d3c81e80bd351ceff8"}}
 EPOCH_ROOT = USER / "Library/Application Support/trading_agent/insider_buying/custody/ib-storage-transition-dossier-v1-20261107-once"
 OUTPUT_NAMES = ("reservation.json", "observation-started.json", "transition.json", "dossier.json", "complete.json")
 MAX_ADMIN = 128 * 1024
@@ -180,7 +184,7 @@ def _read_admin(path, *, optional=False):
 def _admin_paths():
     return (ROOT / ".git", EXPECTED_GITDIR / "commondir", EXPECTED_GITDIR / "gitdir",
             EXPECTED_COMMON / "config", EXPECTED_GITDIR / "config.worktree",
-            EXPECTED_COMMON / "info/exclude")
+            EXPECTED_COMMON / "info/exclude", EXPECTED_COMMON / "info/attributes")
 
 
 def _admin_locations():
@@ -196,7 +200,8 @@ def _admin_locations():
 
 
 def _optional_admin(path):
-    return path in {EXPECTED_GITDIR / "config.worktree", EXPECTED_COMMON / "info/exclude"}
+    return path in {EXPECTED_GITDIR / "config.worktree", EXPECTED_COMMON / "info/exclude",
+                    EXPECTED_COMMON / "info/attributes"}
 
 
 def discover_admin():
@@ -277,6 +282,7 @@ def git_command(arguments, layout):
             "--git-dir=" + str(EXPECTED_GITDIR), "--work-tree=" + str(ROOT),
             "-c", "core.fsmonitor=false", "-c", "core.hooksPath=/dev/null",
             "-c", "core.excludesFile=/dev/null", "-c", "core.untrackedCache=false",
+            "-c", "core.attributesFile=/dev/null",
             "-c", "core.preloadIndex=false", "-c", "maintenance.auto=false",
             "-c", "gc.auto=0", "-c", "credential.helper=", *tail)
 
@@ -333,6 +339,31 @@ def _ignore_leaves(paths):
     return tuple(result)
 
 
+def attribute_controls(sources):
+    """Two reviewed pinned SOURCE configs; every other lookup stays absent."""
+    directories = {ROOT}
+    for path in (*[ROOT / name for name in sources], RECORD_SOURCE):
+        need(path.is_relative_to(ROOT), "source_refused")
+        directories.update(parent for parent in path.parents if parent.is_relative_to(ROOT))
+    paths = tuple(sorted(directory / ".gitattributes" for directory in directories))
+    for path in paths:
+        name = path.relative_to(ROOT).as_posix()
+        if name in ATTRIBUTE_SOURCE_PINS:
+            _body, pin = _read_admin(path)
+            need({key: pin[key] for key in ("bytes", "sha256")} == ATTRIBUTE_SOURCE_PINS[name],
+                 "attribute_config_refused")
+            continue
+        try:
+            path.lstat()
+        except FileNotFoundError:
+            pass
+        except OSError:
+            raise IsolationError("attribute_config_refused") from None
+        else:
+            raise IsolationError("attribute_config_refused")
+    return paths
+
+
 def policy(*, sources, data_leaves=(), admin=None, git=False, controller=False, source_directories=(),
            gitignore_leaves=(), runtime_directories=None, python=None):
     """Build from exact sets; never narrow a broad policy by string replacement."""
@@ -354,14 +385,21 @@ def policy(*, sources, data_leaves=(), admin=None, git=False, controller=False, 
     if git:
         _layout(admin)
         _admin_locations()
+        record = RECORD_SOURCE.stat(follow_symlinks=False)
+        need(RECORD_SOURCE.resolve() == RECORD_SOURCE and stat.S_ISREG(record.st_mode)
+             and record.st_uid == os.geteuid() and record.st_nlink == 1
+             and not stat.S_IMODE(record.st_mode) & 0o022
+             and 0 < record.st_size <= 4 * 1024 * 1024, "source_refused")
         require_disjoint((*directories, GIT_LIBRARIES), (*protected_roots(), EXPECTED_COMMON))
         directories = (*directories, GIT_LIBRARIES)
     need(GIT_IMAGE.resolve() == GIT_IMAGE and GIT_IMAGE.is_file(), "runtime_refused")
-    leaves = (*[ROOT / name for name in names], *data, *images, *libraries, GIT_IMAGE,
+    attributes = attribute_controls(names)
+    leaves = (*[ROOT / name for name in names], *(ROOT / name for name in ATTRIBUTE_SOURCE_PINS),
+              *data, *images, *libraries, GIT_IMAGE,
               Path("/dev/null"), Path("/dev/urandom"), Path("/dev/random"),
               Path("/etc/localtime"), Path("/private/etc/localtime"), *ignores)
     if git:
-        leaves = (*leaves, ROOT / ".git", GIT_IMAGE)
+        leaves = (*leaves, ROOT / ".git", GIT_IMAGE, RECORD_SOURCE, *attributes)
     ancestors = {Path("/")}
     for path in (*leaves, *directories, *dirs):
         ancestors.update(path.parents)

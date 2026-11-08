@@ -1,6 +1,11 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Existing-source gap-closure audit documented in section 75, 2026-11-07; the lane is not backtesting ready.
+Status: **Exploratory backtest preparation implemented in section 76, 2026-11-08; no backtest is launched.
+A separate draft pilot records proposed history/quote assumptions while preserving original source facts, refusals and permissions.
+All 17 profiles remain represented: three baseline placeholders, five pair placeholders and nine exclusions; these are not qualifying signals.
+Continuous market data and a real-data execution adapter are still absent; the preparation package is not runnable.
+No QC access, purchases or outcome calculations occur. Monitor remains PAUSED.
+Existing-source gap-closure audit documented in section 75, 2026-11-07; the lane is not backtesting ready.
 Nine additional reconstruction bindings are verified locally: six CUSIP references and three CRM forecast-EPS definitions; all six profiles remain refused.
 Six existing-account EODHD conference-news requests succeed with 73 scoped rows; no new predecessor link is verified.
 The owner confirms only FirstRate USB bars/actions are owned; that inventory does not supply historical quotes.
@@ -195,7 +200,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 75. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 76. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -12411,3 +12416,175 @@ review/recovery continuation follows this handoff. The scoped audit concludes
 with a single guarded non-force publication from the mandatory worktree to
 `origin/codex/strategy-guidance-revision-drift`; the external publication
 receipt/memory binds its eventual exact commit without a recursive record edit.
+
+## 76. Separate exploratory backtest preparation with declared assumptions, 2026-11-08
+
+### 76.1 Owner request and bounded preparation scope
+
+Owner: **"start preparing a backtest with these issues bypassed"**, following
+the section-75 finding summary. This authorizes preparing a separate exploratory
+model with explicit exceptions to evidence-quality requirements. It does not
+make absent source fields or market data exist. Existing no-QC/no-purchase
+instructions persist: no provider request, credential read, market-data
+acquisition, cloud upload/compile/research/backtest, order or outcome calculation
+occurs. The monitor stays **PAUSED**.
+
+Starting clean local HEAD and independently observed live matching remote:
+`b424e939b2a390dd555ea4c580babb3b014e7fcd`. Mandatory root remains
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+branch `codex/strategy-guidance-revision-drift`, sole origin
+`https://github.com/SheltonChen2017/trading_agent.git`. No other worktree,
+branch, shared behavior or project-wide document changes. The standing
+one-successful-final-push-per-round instruction applies to this bounded
+preparation increment; section 75's one publication is finished, not repeated.
+No new Claude commit is present; consumed `1870b9c9` / `6375401b` and older
+reviews remain consumed once. Author/subagent QA is not independent acceptance.
+
+### 76.2 Concrete preparation behavior and proposed exceptions
+
+New lane module `exploratory_preparation.py` consumes the existing canonical,
+hash-verified `GuidanceDataset` and pinned base candidate. It emits a detached
+`gdr.exploratory-backtest-preparation.v1` report, with no execution dispatcher.
+Every original profile hash, decision, refusal reason, supplied predecessor,
+publication date/instant and actual capture clock is preserved. Missing expected
+IDs remain visible. The original dataset and its all-false gates are unchanged.
+The report is not a `GuidanceDataset`, `GuidanceDocument`, candidate approval,
+look receipt or QC input.
+
+The draft **2023-01-01 through 2025-12-31** pilot covers supplied events only,
+not a historical full-universe or six-year feasibility study. These proposed
+study dates, partitions and look allocation are **not frozen for launch**.
+No outcomes are inspected. The original six-usable-year planning requirement
+is disclosed as unverified rather than claimed satisfied by this pilot.
+
+Proposed exceptions are explicit and **unapplied at preparation time**:
+
+- Use the supplied CRM disclosure sequence as a model assumption while retaining
+  incomplete intervening correction/withdrawal history.
+- Treat retained, equal, non-null CRM definitions/share/scope and reconstructed
+  identities as comparable within the named pilot; no historical verification
+  or universe-wide continuity claim.
+- Use a separately labelled date-only third-session availability model, without
+  fabricating source publication instants or historical receipt timestamps.
+- In a future separate quote model, treat unknown original conditions as regular
+  only as an exploratory assumption. Original `?`, recovered=false and
+  execution-qualified=false states remain intact. Valid numeric/clock checks
+  and known adverse-condition handling are still required.
+- Defer native parity certification, preserving dated settlement lags, settled
+  cash, fees, order/cash reconciliation and matched-SPY budgets/timing/costs.
+  Immediate settlement or daily SPY-return vectors are not substitutes.
+
+No rule in the base signal, universe, timing, portfolio, execution, exits or
+statistics payload changes. Known incompatible definitions, missing fiscal or
+metric fields, unsupported accounting bases/units, control events and new
+unrecognized source issues remain exclusions. A bounded issue allowlist replaces
+the evidence refusals only in the proposed roster; no `ignore_all_issues` switch
+or truth-changing source overlay is introduced.
+
+### 76.3 Actual source-bound roster and physical data requirements
+
+The retained **17 profiles** produce **three baseline placeholders, five pair
+placeholders and nine exclusions**. No revision percentages, threshold decisions
+or qualifying signals are computed.
+
+| Current disclosure | Supplied predecessor | Preparation role |
+|---|---|---|
+| ADBE FY2025 March 18, 2025 | March 12, 2025 | Existing structural pair placeholder |
+| ADBE FY2025 June 12, 2025 | March 18, 2025 | Existing structural pair placeholder |
+| ADBE FY2025 September 11, 2025 | June 12, 2025 | Existing structural pair placeholder |
+| CRM FY2024 May 31, 2023 | March 1, 2023 | Pair placeholder under explicit history/context assumptions |
+| CRM FY2024 August 30, 2023 | May 31, 2023 | Pair placeholder under the same assumptions |
+
+CRM March 1 is an assumed first-supplied baseline, not a verified first
+management disclosure. The two original Adobe baselines remain. HUBS's three
+profiles remain excluded because forecast revenue basis/adjustment definitions
+are null; no values are invented. Adobe's incompatible/missing disclosures and
+historical target republication remain in the denominator. An excluded
+intervening row is never skipped to choose a convenient earlier predecessor.
+
+The Alpaca audit did **not retain its raw quote rows**. Ninety-six four-minute
+coverage windows cannot supply continuous entry/holding-period stock/SPY
+quotes, volumes or native timestamps. The preparation binds the coverage and
+condition-overlay receipts as references, explicitly not a price tape. A
+separate unexecuted data plan names CRM/ADBE and SPY, existing FirstRate raw
+bars/actions, Alpaca historical quotes and EODHD payment dates as candidate
+sources. Dated symbol mapping, continuous coverage, precise request boundaries
+and processing rights remain unverified. No source is queried in this increment.
+
+Existing simulation/native seams accept invented SYN-GDR fixtures only.
+`GuidanceDocument` also requires a precise UTC publication instant, while all
+17 retained profiles have date-only publication fields. Existing single-session
+input preparation cannot load this whole corpus, and its preparation function
+would invoke arithmetic/replay. Those paths are not called or weakened. The
+remaining engineering work is a real-data/model-input adapter, continuous market
+data binding, separate quote-condition model, and order/cash/settlement/SPY
+reconciliation. This report has **runnable=false / backtest_ready=false**.
+
+### 76.4 Source epoch, author findings and focused verification
+
+The new module is deliberately added to `bundle.py`'s explicit review inventory;
+64 source members plus sidecar/manifest require capacity 66. No generated
+release or native project is saved or uploaded. Full producing source SHA-256
+is now `a76bb78771e00abe31188bb9c040671d07584b70905e77fac1477e597a27e186`;
+the prior `a9136830` epoch remains retained. Semantic draft
+`b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`
+and raw draft
+`1dd9b5969853924d7682b4b566734ea7e90f061340d6378912118fb93d132110`
+are unchanged. Full-source changes are not acceptance or a rebind of RP33.
+
+| ID | Priority / disposition | Evidence, correction and verification |
+|---|---|---|
+| GDR-76-001 | P2 / corrected before publication | An unsupported but non-null baseline could receive a baseline placeholder because pair-only source checks did not reject it. The new helper now checks FY/USD/supported units/GAAP revenue/adjusted EPS for every roster row. Five unsupported-baseline subcases fail before the fix and pass afterward. Author helper only; authoritative compiler unchanged. |
+| GDR-76-002 | P2 / corrected before publication | A literal unknown issue using a compiler-style `predecessor_issue_` prefix could impersonate an allowlisted assumption. Exact source-issue pre-screening now excludes it. Focused regression fails before the fix and passes afterward. No source issue is renamed or cleared. |
+
+Supported Python **3.13.15**: the initial ten focused methods pass in 0.291s;
+the two new regression methods then fail as intended, **six assertion failures /
+0.026s**. After both corrections, **12 focused methods pass / 0 failed /
+0 skipped / 0.297s**, covering ten preparation methods and two source-inventory/
+transitive-import checks. Two additional focused bundle reconstruction/epoch-
+refusal methods pass in **0.090s**. No warnings are reported. No full lane or
+repository suite is run. Separate author QA verifies the corrected logic;
+this is not independent Claude review.
+
+Root rehashes actual dataset/quote references, reproduces the exact 17-row
+accounting, original row/decision hashes and unchanged retained dataset bytes, verifies
+all date-only publication instants remain null, and compiles **63 Python source files in
+memory** across 64 source members. Final active-document, diff, status,
+source-history and exact-ref checks accompany handoff.
+
+Ignored local base:
+`artifacts/guidance_revision_drift/exploratory-backtest-preparation-20261108/`.
+
+| Artifact / input | SHA-256 |
+|---|---|
+| `pilot-preparation-private-v1.json` | `7dbcc356dfaaacadd08d7a878441aa48a42050af11602acefdcd9b421bf64571` |
+| `market-data-requirements-v1.json` | `0466f96f1f10a4e84549f33377375a6e1bb3253996f121b7bb107541655ad3c4` |
+| `build-receipt-v1.json` | `301552d7e5828746cdc9a7ee594a32f7937b05e871fb8103edd5c4b02f0793a0` |
+| Existing section-75 combined guidance corpus | `de9c145f4dbe857015c4a72071c2127dff3ef8fe67f402d283ca6a0e022b2426` |
+| Existing Alpaca coverage receipt | `f4809b356509e30229317794dda1ad3dfea37fdee1e246e68eca8587f058293c` |
+| Existing condition overlay | `0e582d73f7f1f7b064170f1ffb12d705022c3f0de1c1a296c60ebe10bbcb243c` |
+
+### 76.5 Handoff and unchanged attempt controls
+
+Implementation commit `63fc3c094baf35f07bcfc41afa73b05fa4299524` contains
+the new helper, ten focused methods and explicit bundle inventory/capacity
+update. Its range is `b424e939..63fc3c09`: implemented and author-tested,
+independent review pending; no review acceptance is claimed. This lane-record
+commit follows it in the same round, with both included in the one final push.
+
+This bounded preparation increment is ready for its single matching-lane
+non-force publication. The external publication receipt/checkpoint binds its
+eventual exact commit. Private artifacts remain ignored/local; only lane code,
+focused tests and this record are eligible for the push. Required original
+economic, research-family/look/date, rights and execution permissions are not
+made true by an exploratory label. No new statistical family/budget, outcome
+look, retrospective receipt or performance claim is created.
+
+Original `GDR-base372-approved-20261008` remains CLOSED FAILED 3/3, zero manual
+attempts, project 37647834 untouched. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` remains zero unsuccessful attempts /
+zero pending intents, maximum three, no new project/journal. The accepted
+`c589b3dd` producing-source custody and invented 372-frame fixture are unchanged
+and receive no real data. A separate exploratory preparation is not a reset
+or a fourth attempt for that exhausted candidate. No automatic review,
+monitor, recovery or further implementation starts at handoff.

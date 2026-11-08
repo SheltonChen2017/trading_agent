@@ -1,6 +1,13 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Guidance bindings and predecessor/Alpaca condition dispositions recorded in section 74, 2026-11-07.
+Status: **Existing-source gap-closure audit documented in section 75, 2026-11-07; the lane is not backtesting ready.
+Nine additional reconstruction bindings are verified locally: six CUSIP references and three CRM forecast-EPS definitions; all six profiles remain refused.
+Six existing-account EODHD conference-news requests succeed with 73 scoped rows; no new predecessor link is verified.
+The owner confirms only FirstRate USB bars/actions are owned; that inventory does not supply historical quotes.
+Alpaca's twenty unknown-condition windows remain unresolved; all 96 windows stay represented and unqualified.
+No QC, purchase or backtest occurs. One final matching-lane publication is authorized for this bounded audit.
+Its base is `91bcdad4`; monitor stays PAUSED and no automatic review/recovery loop is armed.
+Guidance bindings and predecessor/Alpaca condition dispositions recorded in section 74, 2026-11-07.
 Forty null bindings across six CRM/HUBS records are resolved with source context and exact unit normalization; all six remain refused.
 Six intervening issuer-listed webcasts leave four immediate-predecessor links unverified; unavailable content is not treated as absent guidance.
 Alpaca's supported-schema limit and unknown-state handling are documented; original conditions for 20 windows are not recovered.
@@ -188,7 +195,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 74. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 75. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -12087,3 +12094,320 @@ of the completed evidence/rebind round to the matching lane branch. Preserve
 final refs and publication receipt in the paused checkpoint. Do not start
 another audit, create accounts, buy data, access QC or rearm a monitor
 without a later owner instruction.
+
+
+## 75. Existing-source gap-closure audit and remaining evidence limits, 2026-11-07
+
+### 75.1 Owner scope, base and single final publication
+
+Owner: **"Proceed with closing the remaining guidance-history and quote-condition
+gaps using my existing subscriptions. Don’t access QC or buy anything, and
+push once when done."** The bounded existing-source audit is complete with
+the unresolved findings below; **the gaps themselves are not all closed**.
+The owner supplies the exact existing EODHD Keychain item label and confirms
+**"Only the USB bar/action data"** for FirstRate. These answers resolve the
+earlier access-information wait. Six authorized EODHD checks now succeed;
+there is no pending access answer at handoff. Nine further reconstruction
+bindings are retained, but no new comparable predecessor or original quote
+condition is verified. Make **exactly one successful guarded final push** of
+this round; do not repeat section 74's completed publication.
+
+Clean starting local HEAD and independently observed live matching remote:
+`91bcdad48ed472e6c3965a65c41d9588e0d06f6a`. All repository commands, artifacts,
+validation and commits use
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+branch `codex/strategy-guidance-revision-drift`, sole origin
+`https://github.com/SheltonChen2017/trading_agent.git`. Section 74's publication
+is closed once, not repeated. No new Claude commit appears; consumed
+`1870b9c9` / `6375401b` and older dispositions stay consumed. Only this lane
+record changes in tracked Git. Private evidence remains local-only. Parallel
+source/build/QA assistants are implementer assistance, not independent review.
+
+No QC page/API/docs/project/resource/compute, backtest, order, purchase, new
+account, provider correspondence or licensing review occurs. The scoped
+licensing-check omission persists without changing verified-rights fields.
+Six authenticated data-only provider requests occur, using only the exact
+owner-named Keychain item and an in-memory Bearer header. No key value is
+displayed, saved, placed in a URL or committed. Earlier metadata-only discovery
+and the initial stopped local invocation are retained chronologically below.
+The monitor remains **PAUSED**; a pending direct task does not rearm it.
+
+### 75.2 Nine additional source-bound reconstruction fields
+
+A new immutable version adds **six CUSIP-namespaced security references**:
+CRM `CUSIP_79466L302` and HUBS `CUSIP_443573100`, each bound to the existing
+issuer and three exact 2023 event-date records. Dated SEC common-stock/CUSIP
+snapshots, event-date 8-K common-class/ticker covers and 2023 N-PX corroboration
+support the reconstruction. CUSIP check digits verify syntax only; dated source
+content supplies the identity evidence. No CIK or ticker is substituted as a
+security ID. Full event-date continuity, corporate-action coverage and original
+historical delivery remain unproved and are mandatory issues, not silently
+certified by these non-null fields.
+
+A pre-merge concern about HUBS CIK 1364742 is verified as a **false inference
+from a filing archive path**, not an incorrect issuer value in the V1 overlay.
+V1 already contains HUBS `CIK_0001404655` and CRM `CIK_0001108524`. V2 adds
+explicit subject/person-filing attribution: retained SEC submissions identify
+each issuer and matching accession, while the 13G separately identifies
+BlackRock as the person filing. Literal full FILED BY headers are not claimed
+as retrieved. V2 also canonicalizes equivalent UTC clocks to Z without changing
+the instant. V1 is retained, superseded before merge, and its eighteen checks
+are not retrospectively expanded. V2's 39 checks include exact existing-issuer
+regressions and rejection of filer-CIK substitution.
+
+Three CRM **forecast adjusted-EPS definitions** are source-bound to the narrow
+common FY2024 policy: stock compensation, purchased-intangible amortization,
+Restructuring Plan and income-tax adjustments, with the same 23.5% non-GAAP tax
+and no future strategic-portfolio-change assumptions. The retained May/August
+EPS-specific policy paragraphs match; March's forecast reconciliation and
+footnotes supply the corresponding categories/assumptions. This does not
+approve whole acquisition/share-scope comparability or erase prior issues.
+
+HUBS's three adjustment definitions and three forecast GAAP-revenue bindings
+remain null. In particular, its February provider `content` ends with an
+ellipsis before the forecast reconciliation. A complete, hash-matching HTTP
+response is **not complete issuer-release content**. A new explicit quality
+flag preserves that distinction without altering captured bytes or discarding
+the previously grounded forecast ranges. The source-quality issue remains
+visible in the new profile.
+
+The merged corpus still contains **17 profiles / 31 retained captures /
+65,417,715 bytes**. All financial values, issuer/fiscal/date/currency/unit
+bindings and prior issues are preserved; all eleven Adobe objects and
+dispositions are byte-canonical unchanged. Combined dispositions remain
+baseline 2, structural comparable pair 3, refused 12; all six CRM/HUBS profiles
+still refuse. All PIT, source authenticity/completeness, rights, approved-input
+and execution gates remain false. These nine bindings are reconstruction
+progress, not nine closed readiness gates or new qualifying signals.
+
+### 75.3 Existing-subscription routes and resolved access information
+
+Current primary documentation identifies [EODHD News](https://eodhd.com/financial-apis/stock-market-financial-news-api)
+as included with EOD All World. Six exact three-day conference windows are
+queried with ticker parameter **s**, not topic parameter t:
+
+| Symbol | Conference date | Inclusive news dates | HTTP / retained rows |
+|---|---|---|---|
+| CRM.US | March 7, 2023 | March 6--8 | 200 / 30 |
+| CRM.US | June 7, 2023 | June 6--8 | 200 / 20 |
+| CRM.US | June 12, 2023 | June 11--13 | 200 / 20 |
+| HUBS.US | March 8, 2023 | March 7--9 | 200 / 1 |
+| HUBS.US | May 22, 2023 | May 21--23 | 200 / 0 |
+| HUBS.US | June 8, 2023 | June 7--9 | 200 / 2 |
+
+The proposal freezes direction 1, limit 100, explicit offset paging, maximum
+five pages/window / thirty requests. Articles may corroborate management
+statements; an empty response or complete requested page chain cannot establish
+complete webcast content or prove the immediate predecessor. No returns,
+threshold decisions, protected-date requests or study-date substitution are
+permitted. The previously authorized EODHD key-use scope persists; the owner
+is not asked to repeat permission or rotate the accepted existing key.
+
+Initial metadata-only discovery finds the API key absent from the three named
+runtime EODHD variables. Seven
+exact generic-service, six exact generic-label and three exact Internet-server
+Keychain **metadata-only** lookups find no matching items (return code 44).
+No password value, broad Keychain dump, credential-file search, cookie/token
+copy or access-control change follows. Existing in-app provider tabs are absent;
+Safari is not selected, preserving the no-QC boundary. These observations do
+not establish that the owner's account/subscription/key does not exist.
+
+The owner then identifies **`trading-agent-eodhd`** (item label only). Exact
+item lookup succeeds. The first invocation stops **before HTTP, zero requests**:
+its local character validator incorrectly excludes a period permitted in an
+opaque Bearer token. Structural inspection exposes no secret value. V2
+accepts the standard token character set while retaining whitespace/CRLF and
+container refusal. Eight invented red/green checks cover the correction;
+V1 and its stopped receipt are preserved, not overwritten. This is a local
+helper defect, not an authentication denial, QC failure or native attempt.
+
+V2 requests only the official news endpoint with the frozen six windows.
+It refuses redirects, non-200s, malformed/duplicate/nonfinite JSON, date/symbol
+mismatches and credential-echo responses, with no token-in-URL fallback or
+automatic retry. **All six requests return HTTP 200, 73 rows total, each with
+a short first page; 327,721 response bytes are retained and hashed.**
+This establishes bounded news access and captured-page delivery, not complete
+management guidance, original historical delivery or point-in-time data.
+The original eight preparation checks are separate invented checks, not
+provider evidence. No credential/access-control change is made.
+
+The owner confirms **only FirstRate USB bars/actions are owned**, resolving
+the separate Tick Data question without another account or purchase. The current
+[Tick Data product](https://firstratedata.com/tick-data) describes a distinct
+trade/quote route; this is not assumed included in the known bar purchase or
+a guaranteed condition/NBBO substitute. The SANDISK manifest remains byte-exact
+`c681af584244d38e3f9dea2ff765cc2c991cb383107a3e542115a4338ee4cdf8`.
+A names-only check of 748 market files finds no standalone tick/quote/NBBO
+basename. Tickers filenames are not mistaken for tick products. No market
+payload or API_Access file is opened, and no USB file is written. This does
+not independently inspect the provider account; the scope conclusion combines
+the names-only inventory with the owner's explicit ownership answer.
+
+The documented FMP Starter tier excludes transcripts and limits stock-news
+history to one year; no account-specific grandfathering is inferred. Massive
+Basic does not establish historical NBBO, while Sharadar daily data, EODHD
+trade ticks/current quotes and the known FirstRate bars do not recover original
+historical quote conditions. These are documented product-fit limits, not new
+authenticated account denials or reasons to purchase anything automatically.
+No equivalent Alpaca query is repeated: section 74's supported-interface limit
+and all 96 retained windows / twenty unknown windows remain unchanged.
+
+### 75.4 Exact local artifacts and preparation validation
+
+Ignored base:
+`artifacts/guidance_revision_drift/existing-source-gap-closure-20261107/`.
+
+| Artifact | SHA-256 |
+|---|---|
+| `definitions/merged-combined-dataset-private-v1.json` | `de9c145f4dbe857015c4a72071c2127dff3ef8fe67f402d283ca6a0e022b2426` |
+| `definitions/merged-new-dataset-private-v1.json` | `3e86fd5bf7c0342c152c0a69db9c1d2f4c349c52cd2070e1482a7a516aa6a671` |
+| `definitions/merged-compile-receipt-v1.json` | `d7d94e5139d658f5f1b76c1f3530b0d8be890b2b7e0069b73d0c354ed8ecaea0` |
+| `definitions/merged-author-verification-v1.json` | `6c0eeb8870eb2fcd0fe483d6fab3e2bcafdb3ac42da5c67028c2ce4e048c6b4e` |
+| `definitions/merged-focused-author-QA-v1.json` | `5636c373f975092d07014837ffdcfa9fdaae4d774fd5f7913d2bc78d2d7239e4` |
+| `definitions/provider-content-quality-v1.json` | `cdb2f982a6a658e72ee907c777eba0752af2bf714394d75148729319a71e4c99` |
+| `security/security-facts-private-v2.json` | `b22eaa596d0f40d60d319fbe7e87f576e1ef708762735ea3d0c3a291930bf2c4` |
+| `coverage/coverage-manifest-v1.json` | `13c4d754f7aefad2f0736af4809e3bca2da535b218cce61bb8a07fcfd1331d9c` |
+| `coverage/eodhd-conference-news-proposal-v1.json` | `aca44414c9dc4456b1e2fafe2a7e9faedf9bee6afd432c109986ad2bcfadd13d` |
+| `eodhd_conference_probe_v1.py` | `104465fd6492e61f0b68c70808f34e109b26587ee144036296f41cd4205f4e93` |
+| `eodhd-prepared-probe-qa-v1.json` | `4e7ec0381cd21a8f49aea0ac676cab99d3a15d261e597291ec7a0901187ffde0` |
+| `access-preflight-v1.json` | `be799f06cee30b9608e7108d702cbbf796801d175d9bad973d8ce6594a287b8b` |
+| `root-merged-verification-v1.json` | `d0545cacf18c31fb96ace95ab6732e3e9c1e305290f5f680b394150a768d535e` |
+
+Definition, corrected-attribution and merged-corpus author checks pass (eight,
+39 and eighteen respectively; overlapping version checks are not summed as
+independent repository methods). Root separately verifies all nine gains,
+unchanged prior financial/issuer/fiscal/unit values and issues, old Adobe
+profiles/dispositions, 31 source paths, exact corpus hashes, persistent six
+refusals and the new truncation caveat. Initial use of unsupported system
+Python stops before dataset work; supported Python 3.13 detects noncanonical
+UTC serialization before the merge. V2 preserves the instant in canonical Z.
+No failed local helper is mislabeled a QC or provider attempt.
+
+All 63 lane source members remain unchanged, full source SHA-256
+`a91368303bbfddf5b5c1e52a1e1c0f058216a65648bd54095e2921e7d57aa312`;
+semantic draft
+`b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`
+and raw draft
+`1dd9b5969853924d7682b4b566734ea7e90f061340d6378912118fb93d132110`
+are unchanged. No strategy/economic/settlement/SPY/native-runtime or permission
+change occurs. No full lane/repository suite is run. Private captures and
+corpora are ignored and not transferred by any future Git push. Current data
+work does not confer independent acceptance on prior unreviewed source.
+
+The pre-answer `access-preflight-v1.json` and
+`root-merged-verification-v1.json` retain their original pending/zero-request
+state. The owner answers and six successful requests in 75.3 supersede that
+operational state; these immutable artifacts are not silently rewritten.
+
+Four immediate predecessors, full guidance/correction history, original quote
+conditions, qualified common quote history, full dated security continuity,
+remaining HUBS metric definitions, historical delivery and real-runner/
+settlement/SPY parity remain unresolved. Backtest readiness is false. Original
+`GDR-base372-approved-20261008` stays CLOSED FAILED 3/3, zero remaining manual
+attempts, project 37647834 untouched. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` stays zero unsuccessful attempts /
+zero pending intents, maximum three failures, no new project/journal. Accepted
+`c589b3dd` custody and the invented fixture are not rebound. Monitor stays
+**PAUSED**; do not automatically rearm, start another review loop, create
+accounts, buy data or access QC. The final audit and focused closure below
+complete this bounded round's work before its one authorized publication.
+
+### 75.5 Retained news census and findings
+
+Every one of the **73 response rows** is retained in a separate source/row/
+content-hashed census with JSON pointers, lexical offsets and article-clock
+context. There are **72 unique article/content pairs**; one cross-symbol
+listicle appears twice and both occurrences remain visible. Twenty-five
+contents are shorter than 500 characters; explicit excerpts and continuation
+links remain content-completeness caveats. A short HTTP page is not evidence
+of a complete original article, complete webcast or absence of intervening
+guidance. The six news captures remain separate from the 31-source compiled
+guidance corpus; the news audit does not inflate its profile or source count.
+
+The strongest retained management evidence is a March 6 provider republication
+of the **March 1 CRM earnings call**. Its body explicitly names the original
+event date and corroborates the existing FY2024 revenue/adjusted-EPS profile.
+It does not become a March 7 conference event. The Q&A is behind a continuation
+link and is not captured here. A non-reiteration in that same transcript
+concerns a different fiscal horizon, FY2026; it cannot be relabeled as a
+withdrawal of FY2024 guidance.
+
+June CRM articles refer retrospectively to May 31 sales guidance; their
+publication dates do not establish a new management reaffirmation. AI Day
+product releases and a CEO interview are management/product context without
+a new comparable full-year revenue/adjusted-EPS pair. The HUBS June numbers
+are explicitly analyst consensus, not issuer guidance. No corresponding new
+forecast definition or GAAP-revenue binding is justified. No new event,
+correction, withdrawal or predecessor link is inserted into the dataset.
+
+The **four supplied links remain unverified**: CRM March 1 to May 31 and
+May 31 to August 30; HUBS February 16 to May 3 and May 3 to August 2. Six
+conference dates still lack complete management-event/Q&A content and a
+complete intervening correction/withdrawal census. These are missing evidence,
+not a claim that an intervening guidance change occurred or did not occur.
+The existing 17-profile corpus and all its refusal/PIT/permission fields stay
+unchanged by this news follow-up.
+
+| New ignored artifact, relative to the section-75 base | SHA-256 |
+|---|---|
+| `eodhd-conference-result-v1.json` (stopped locally, zero HTTP requests) | `bfb52dd16d68b85158fc2530a58711d0cc04a99f13ad602f5a8d5fb05e980750` |
+| `eodhd_conference_probe_v2.py` | `ce830ea0313db70f3ee6ada271ad124e306052619940dc85126d9635813cd696` |
+| `eodhd-v2-token-qa-v1.json` | `ba6940fabb8170c26c048437d30204ed8707430a7b47aa3fbd9b464636ed88ee` |
+| `eodhd-conference-result-v2.json` (six HTTP 200 responses) | `2a797bb10253b72a35eb1f1cc625d01b344fb0917aa49f58a0456bf9304061da` |
+| `news-followup/news-row-census-private-v1.json` | `df545562ef9f6dbabb82494585c7001ebdfee697febba608bd1d345987077968` |
+| `news-followup/news-guidance-evidence-private-v1.json` | `e1d72ae6cc510b46e9484379c6f62bf0a6087561ae26de2e8e5a06ec7facd9c5` |
+| `news-followup/news-analysis-summary-v1.json` | `54bed82696058522f9612ced014279edc50bf203938a02b374cf91d7d70b9a9f` |
+| `news-followup/news-analysis-author-QA-v1.json` | `e6abfbf2354d10aa09cc03cd87f4b81a047db6c7034120a3c88cd311b287332d` |
+| `news-author-qa/news-second-author-qa-v1.json` | `ab03069ae1be8157dc840beed3fe02405ceae06d4a1f6d265301f48d338d3ff2` |
+| `owner-answers-and-access-disposition-v1.json` | `7d7ffe538b0698edcd0c01a45a0daca3aa6c17b893b77d19941b39f8cabd2ef2` |
+| `root-source-news-verification-v1.json` | `9717a7a9fc153e0015fc8589c84bb1eafb716ce1aee56306c017088515cb9d2f` |
+
+### 75.6 Finding dispositions, final verification and next boundary
+
+| ID | Priority / disposition | Evidence and effect |
+|---|---|---|
+| GDR-75-001 | P3 / false alarm, no issuer correction | CIK 1364742 is the filer archive context, not HUBS's subject CIK. V1 literal issuer IDs were correct. V2 attribution and canonical UTC serialization are verified; no incorrect financial/security value is silently repaired. |
+| GDR-75-002 | P2 / open source-content gap | The February HUBS HTTP body is intact but its article content ends before the forecast reconciliation. Preserve the truncation issue and null forecast definitions/basis; complete retained bytes cannot certify full disclosure content. |
+| GDR-75-003 | P3 / local helper corrected | V1's token-character validator incorrectly excludes period. V1 stops before HTTP; V2 and eight invented red/green checks restore standard opaque-Bearer acceptance with injection refusal. All six scoped calls then succeed; no provider bypass or credential change. |
+| GDR-75-004 | P2 / predecessor evidence remains open | Full row census and exact locators support prior-event corroboration and analyst/product exclusions, not a complete event/correction history. Zero of the four supplied predecessor links is newly verified. |
+| GDR-75-005 | P2 / original quote metadata remains unavailable | Section 74's supported-interface limit persists: 20 of 96 windows contain undefined original conditions. No original condition is recovered; known FirstRate holdings contain no tick/quote product. All 96 windows remain represented and unqualified. |
+| GDR-75-006 | P3 / documentation corrected before staging | Final table verification catches the focused-QA hash paired with the inventory-receipt filename. The two original files and original publishing records match: inventory `6c0eeb88`, eighteen-check QA `5636c373`. Correct both table mappings; no artifact overwrite, dataset change or publication occurred. |
+
+Under **Python 3.13.15**, six focused repository methods pass, **6 passed /
+0 failed / 0 skipped, 0.095s**, with no warnings: canonical detached dataset
+round-trip; source/content/clock/URI/binding mutation refusal; changed fiscal/
+share/scope/adjustment refusal; explicit unknown/predecessor handling;
+unsupported units/bases; and active lane/draft document consistency.
+The news author analysis separately passes thirteen checks and a second author
+QA passes 49 checks, including twenty exact claim/continuation spans; source/definition/
+merged author checks remain the versioned counts in 75.4. These checks overlap
+in purpose and are not added into a misleading repository-suite total.
+
+Root independently rehashes the six responses and new corpus/evidence pins,
+reproduces the 73-row / 72-link / 327,721-byte totals and all date/symbol tags,
+and compiles **62 Python files in memory** across the unchanged 63-member
+source manifest. No source byte, strategy rule, draft permission, quote
+condition, study date or economic candidate is changed. Final document-history,
+diff, ignored-artifact and exact branch/ref checks accompany the one final
+publication. The private corpora, raw news, scripts and QA receipts stay ignored
+and do not travel with the Git push. No full lane/repository suite is run.
+Author/subagent QA is not independent Claude acceptance of the data or prior
+unreviewed adapter source.
+
+**Next evidence needed:** complete management disclosures/Q&A and intervening
+corrections/withdrawals for the scoped guidance chains; HUBS forecast metric
+basis/definition evidence; original usable quote-condition/withdrawal semantics
+and a qualified common history; then dated identity/action continuity and the
+remaining real-runner, settlement and matched-SPY integration/parity proof.
+Original delivery is still required for PIT claims, separately from explicitly
+non-PIT reconstruction. Rights remain unverified; licensing was deliberately
+not rechecked. The frozen study/family/look permissions and separately bounded
+run requirements remain in force. This audit does not authorize a launch.
+
+No new purchase is established as necessary or sufficient by these samples.
+Do not repeat equivalent Alpaca requests or convert missing conference/news
+content into an unchanged-guidance claim. No QC work or automatic monitor/
+review/recovery continuation follows this handoff. The scoped audit concludes
+with a single guarded non-force publication from the mandatory worktree to
+`origin/codex/strategy-guidance-revision-drift`; the external publication
+receipt/memory binds its eventual exact commit without a recursive record edit.

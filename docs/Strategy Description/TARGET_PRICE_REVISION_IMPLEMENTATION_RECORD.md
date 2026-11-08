@@ -1,34 +1,31 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current section122 cash-exclusion variant / native startup failure (2026-11-08 UTC):**
-The owner-authorized separate five-arm study
-TPR-SIX-UNIVERSE-FIVE-ARM-SID-CASH-20261107-v1 is built and locally verified:
-construct the original portfolios first, remove only the fixed exact SID from
-both execution maps, leave its final weight in cash without refill or
-redistribution, and retain20REMX rows quarantined. This changes economics;
-original study/results/failures remain separate and unresolved.
-Source commit09a82c16b31caa0884ca80f57e1e8fc8ebded7c6 is LOCAL ONLY.
-Fresh OFF private/collaborator/zero-active/source preflights passed; all13
-cloud files matched after upload, compile, launch and a later saved-source
-read. One actual financial variant attempt launched job
-ba19f090efb3c9370292a7737f650823 in OFF38609822, named
-SID-CASH-20261107-OFF-A1. Its first exact-job native read reports
-Runtime Error/completedTRUE. A bounded fixed-category comparison confirms
-the managed multiple-inheritance load refusal at main.py956, before an
-accepted financial result. The same heartbeat is explicitly appPAUSED.
-Section122.8 records exact identities, receipts and limits.
+**Current section123 single-base startup correction:**
+The owner's genuine Mia diagnosis was submitted and read. All13 saved cloud
+files match the pre-Mia snapshot. Mia located the class-assembly failure but
+could not retrieve the terminal exception; unverified base-order suggestions
+and its erroneous10REMX count are rejected. The actual saved native error and
+QuantConnect's published Python bridge confirm multiple-inheritance refusal.
+The separate SID-to-cash study keeps the one excluded stock's final allocation
+in cash with no redistribution; original study/failures remain unpooled.
 
-The genuine Mia draft TPR122-SID-CASH-DIAG-001 is verified in OFF's message
-box and remains UNSENT. Mouse and both documented keyboard paths failed;
-owner was asked for exactly one Send click. No current Mia reply/tool use is
-claimed. Earlier submitted section120/121 Mia replies supplied no verified
-input correction and remain history. A prospective static single-base source
-builder correction needs its own reviewed epoch/commit and native checks;
-no unchanged relaunch or additional stock exclusion is authorized.
-Other four new variant arms are not launched. All accepted full-window
-metrics remain NULL; native accounting/chart/origin/rights/PIT/canonical
-acceptance remains unproved. Native Safari stayed untouched. Skip Claude.
-Round120 push041a54db is consumed: NO ADDITIONAL PUSH THIS ROUND.
+Four NEW single_base source modules and four tests implement the fixed
+TPR-SID-CASH-SINGLE-BASE-20261107-v2 source epoch, preserving every financial/
+cash/census method body, cooperative callback order, v1 policy/calendar/input
+bytes and only Main visible to the loader. Focused software checks passed:
+builder46unchanged cases plus5corrected-fixture cases; financialactions59;
+resultchecker80; nativeverifier/observer84. Independent source judgment
+accepted. Oldsource/tests, failedOFFattempt1 and every claim/receipt remain.
+This is software verification; native single-base compatibility is pending.
+The exact source must be committed LOCALLY before fresh OFFattempt2 preflight,
+compile and launch. No second financialjob has been launched yet.
+
+OFF38609822 jobba19f090efb3c9370292a7737f650823 remains retained Runtime Error/
+completedTRUE at class construction. Other four new variant arms are not
+launched. All accepted full-window metrics remain NULL; native accounting/
+chart/origin/rights/PIT/canonical gates remain unproved. The same heartbeat
+is appPAUSED. Keep all20REMX rows quarantined, skip Claude and make
+NO ADDITIONAL PUSH; round120 push041a54db is already consumed.
 
 **Published section120 handoff before the current owner continuation (2026-11-07):** The in-app browser is
 authenticated on own OFF38609822/code; nativeSafari remains untouched.
@@ -37346,3 +37343,159 @@ Fresh122 claim BEFORE effect {"HEAD":"09a82c16b31caa0884ca80f57e1e8fc8ebded7c6",
 122 final remote scope observation {"QC_requests": 0, "actual_remote_head": "041a54dbd53d54ba02a42f8740580eba7be3f298", "expected_remote_head": "041a54dbd53d54ba02a42f8740580eba7be3f298", "operation_id": "TPR-R122-GIT-FINAL-REMOTE-READ-001", "proof": {"bytes": 244, "name": "TPR-R122-GIT-FINAL-REMOTE-READ-001.safe.json", "sha256": "f2567689cae0d1c3cf89aebf67f59cd5a295b9f8d429a37367b5a80a5cd19f60"}, "pushes": 0, "requests": 1, "scope_matches": true}
 
 122 final handoff QA: all10 source/testworkingbytes equal their committed09 hashes; publishedsections9..120 exact3534430B/SHA024b59c6ab35c632d906d80360104684611235707d7f01a54048c86103e0af06 retained verbatim. InitialQA included an extra separatornewline (3534431B) and stopped before edit/staging; correctedextraction proves exactretention. Targetremote041a54dbd53d54ba02a42f8740580eba7be3f298 freshly matched; no push. Currentpreamble371focusedchecks passed above; followingrecord-onlyreceipt/QA facts do not claim retestedsource ornativecompatibility. Next localrecord-onlycommit preserves realOFFattempt1 failure and pendingownerMiaSend. No other durablefiles changed.
+
+123 owner confirms Sent for exact TPR122-SID-CASH-DIAG-001. Treat as manual delivery confirmation only; genuine DOMresponse/tool/sourceverification follows underfreshscope. OwnerSentdoesnotresetattempts, grantnewstockexclusions, reopen20REMXrows or authorizeanotherpush.
+
+Fresh122 claim BEFORE effect {"HEAD":"b834af1576e7619848ee89388d32c00425a550ed","bounds":{"DOM_text_total_chars_max":1048576,"UI_reads_max":1,"existing_OFF_Mia_frame":"IAB2/tab1/f139903a-75d3-4ef9-be53-0490c05f7bce/active-frame","nonce":"TPR122-SID-CASH-DIAG-001","owner_manual_Send_confirmed":"Sent","purpose":"read genuine built-in Mia submittedprompt/reply/toolproof only; no new Mia tools or messages/source/job/account mutation","returned_current_nonce_tail_chars_max":65536},"manifest":{"bytes":6721,"name":"TPR-R123-MIA-REPLY-READ-001.claim.json","sha256":"6111b86973921f9ceb28558bd9b2c574875aebbfa4e62c0aebf933892a1c8f35"},"operation_id":"TPR-R123-MIA-REPLY-READ-001"}
+
+123 Miareply read001 returned browser.userunavailable before DOMresult; no reply orMiatool read is claimed. Documentation refreshed; freshsamebrowser/tabbinding follows, no resubmission.
+
+Fresh122 claim BEFORE effect {"HEAD":"b834af1576e7619848ee89388d32c00425a550ed","bounds":{"UI_reads_max":1,"existing_browser":"selectedIAB2","existing_tab":"1","expected_project":38609822,"purpose":"rebind staleOFFtab after priorhandle returned browser.userunavailable; no navigation/reload/newmessage/source/jobmutation"},"manifest":{"bytes":6562,"name":"TPR-R123-MIA-TAB-REBIND-001.claim.json","sha256":"86d63025694ec71a4a7adeb8a5e67f4283b814559e9b04c90733141b4f4f01d0"},"operation_id":"TPR-R123-MIA-TAB-REBIND-001"}
+
+Fresh122 claim BEFORE effect {"HEAD":"b834af1576e7619848ee89388d32c00425a550ed","bounds":{"UI_tab_reads_max":1,"existing_tab":"1","fallback_limit":"one reset only, then diagnose actual available surfaces","purpose":"refresh stale persistentcomputerusewrapper after currentAPI reports browser.userunavailable onbothscopedreadandrebind; no tabsclosed/navigation/resubmission/source/jobs","runtime_resets_max":1,"selected_browser":"sameIAB"},"manifest":{"bytes":6698,"name":"TPR-R123-MIA-RUNTIME-REFRESH-001.claim.json","sha256":"7a9edc7caf1b677c01ad52572cf3eb0b0e7d1ddcf17ef529bdac2807a49e18d3"},"operation_id":"TPR-R123-MIA-RUNTIME-REFRESH-001"}
+
+123 one computeruse runtime reset restored existing IAB2/tab1 with no navigation/reload/newsession/message. ActualMia currentnonce issubmitted, UI Running with one targetederrorlogsearch returningnomatches; no edits/jobsobserved. Staticnewsourcebuilder work proceeds locally in8newexplicitfiles; committedv1source remainsfixed. UI/oldreadonlysource observerclaims may allowONLYthese unuseduntrackednewfiles; never usethemuncommitted forproduction. No new nativeattempt yet.
+
+Fresh122 claim BEFORE effect {"HEAD":"b834af1576e7619848ee89388d32c00425a550ed","bounds":{"DOM_text_total_chars_max":1048576,"Mia_newtools_or_submissions":0,"UI_reads_max":1,"current_nonce":"TPR122-SID-CASH-DIAG-001","current_nonce_tail_max":65536,"purpose":"read actualsubmittedmessage/currentdiagnosis afterfreshruntime fixedstaleinterface; do not replayread001scope","source_closure":"committedunchanged predecessor/observer39files; explicit8newunuseduntrackedpublicfilesallowed forlocalbuild only, not loaded or productionauthorized"},"manifest":{"bytes":6779,"name":"TPR-R123-MIA-REPLY-READ-002.claim.json","sha256":"f5e98bac4d91d60655afde88cd245accfeb77688cec971557a408e429ec1c627"},"operation_id":"TPR-R123-MIA-REPLY-READ-002"}
+
+Fresh122 claim BEFORE effect {"HEAD":"b834af1576e7619848ee89388d32c00425a550ed","bounds":{"QC_requests":0,"input":"exact genuine currentMia replyobservedDOM afterownermanualSend; archivedwithout UIfooter","input_chars":3685,"private_archive_writes_max":1,"private_in_memory_processing_max":1,"private_reads":0,"processing":"retain fullreply privately anddocumentverifiablelocation vsunsupportedclaims;20REMXunchanged;no extraMiatools/sourceports"},"manifest":{"bytes":6701,"name":"TPR-R123-MIA-REPLY-ARCHIVE-001.claim.json","sha256":"d326e58ae35ffe4180793c1dcc861a4067a956c487f0e0fa88a42293cf74a37c"},"operation_id":"TPR-R123-MIA-REPLY-ARCHIVE-001"}
+
+123 genuine Mia reply disposition {"Mia_read_count_reported": 2, "Mia_source_ported": false, "REMX_claim_rejected": "Mia says10; owner20quarantinesremainexactlyunchanged", "accepted_diagnosis": "class assembly location only; actual managedmultipleinheritance category independently verified from originalnativeerror +primaryQCfork", "extraMia_messages": 0, "financial_metrics": null, "genuine_current_reply_observed": true, "literal_engine_error_available_to_Mia": false, "main_read_reported_bytes": 47218, "nonce": "TPR122-SID-CASH-DIAG-001", "owner_manual_Send_confirmed": true, "proof": {"bytes": 3699, "name": "TPR-R123-GENUINE-MIA-DIAG-001.txt", "sha256": "95978066aa79d2e701d8be0ca32cfcb2a9e3871f2fe22768a69da6a4fec3498d"}, "rejected_unproved_suggestions": ["merebaseordering/attributealignment is not a verified repair for knownmanagedmultipleinheritance restriction", "threeandonlythreecauses/nativezeroorderproof", "unrelated100projectsourceaccepted"], "verified_log_search_no_matches": true}
+
+Fresh122 claim BEFORE effect {"HEAD":"b834af1576e7619848ee89388d32c00425a550ed","bounds":{"QC_requests_max":1,"compiles":0,"endpoint":"files/read","expected_all13_source_inventory_sha256":"9c7c520d93541f21ee0769832cdeea1b796ed21bec6e1e9ce410eda242625267","jobs":0,"private_reads_max":1,"production_readonly_closure":"oldcommittedAPI bytes;8newuntrackedlocalbuilderfiles unused/notloaded","project_id":38609822,"purpose":"retrieve EVERY saved cloudfile aftergenuineMiaresponse; fullwirearchive andperfilehashcompare; no provider/packet/market/result processing","registry_bytes":3573,"registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","request_seconds_max":20,"response_bytes_max":2097152,"source_writes":0},"manifest":{"bytes":7010,"name":"TPR-R123-SOURCE-AFTER-MIA-READ-001.claim.json","sha256":"e3275c5ba6955f34b238105fc6dcec1565392c7536462961a615025ccc8465b5"},"operation_id":"TPR-R123-SOURCE-AFTER-MIA-READ-001"}
+
+123source_after_genuineMia PREeffect {"bytes": 5938, "name": "TPR-CMP29-API-R123-SOURCE-AFTER-MIA-001.prepared.json", "sha256": "e8e2c6580d25de4902db5f20a791baff2061ada50d53055f641ab822573811ed"}
+
+123source_after_genuineMia result {"financial_acceptance": false, "proof": {"bytes": 2395, "name": "TPR-CMP29-API-R123-SOURCE-AFTER-MIA-001.safe.json", "sha256": "21cc3b4a993dd03b80bddd4e681ebe5e2eaf52cb4ed1c792102b8c97c48639b9"}, "receipt": {"bytes": 3573, "name": "TPR-CMP29-API-R123-SOURCE-AFTER-MIA-001.result.json", "sha256": "d43cd66564c38f3f75d811c2666b534b9d35beb98fecde87716b5f64cbf5ca96"}, "status": "completed"}
+
+## 123. Genuine Mia read / prospective single-base correction epoch
+
+Owner confirms the preparedTPR122-SID-CASH-DIAG-001 message was Sent.
+A one-time computer-use runtime refresh restored the existing IAB tab without
+navigation/reload/newsession/resubmission. Genuine reply is archived3699B/SHA
+95978066aa79d2e701d8be0ca32cfcb2a9e3871f2fe22768a69da6a4fec3498d.
+Mia consumed/reported two technical reads: the targeted errorlog search had
+no matches; it reports reading current47218B main and identifies class956
+assembly. Its literal terminal-error access was limited. Conditional base
+reordering/attribute suggestions and claims of onlythree causes, nativezero
+orders and10REMX rows are unverified/rejected. Owner20REMX quarantine remains
+exactly unchanged. No further Mia message/tools or unreviewed source port.
+Actual prior native error plus primary QCpythonnet rule already confirms
+managed multiple-inheritance refusal; consultation is complete for this error.
+
+Fresh all13 cloudfile capture AFTER genuine Mia returned exact same352366B/
+SHA5ed1cd671c495a3fe4254b04fbc2e4257c0a57f4c0eb17253b82f1658eb7f369
+and inventory9c7c520d93541f21ee0769832cdeea1b796ed21bec6e1e9ce410eda242625267.
+Receipt3573B/SHAd43cd66564c38f3f75d811c2666b534b9d35beb98fecde87716b5f64cbf5ca96;
+prefixTPR-CMP29-API-R123-SOURCE-AFTER-MIA-001 in the fixed old readonly APIroot.
+EVERYfile is retained/compared, notebook/helper unchanged. Mia made no saved
+cloud source change; no sourcecorrection is silently imported.
+
+Prospective software correction BEFORE further native effects:
+SOURCE_EPOCH=TPR-SID-CASH-SINGLE-BASE-20261107-v2, SAME
+STUDY_ID=TPR-SIX-UNIVERSE-FIVE-ARM-SID-CASH-20261107-v1.
+Keep the v1 cash-policy/calendar hashes and all actual calendar/input/
+capital/timing/fees/slippage/nativeRAW/actions/volume/selection/ranking/
+60slots/mask/cash/census semantics fixed. The original study remains separate.
+New fixed public builder wraps the exact pinned v1 producer and statically
+changes only class headers/import placement: one internal resource layer
+inherits the fixed Candidate, Main carries the unchanged cash class body and
+inherits only that resource layer; delete only the internal layer's public
+module alias after definition so Lean sees only Main. Preserve EVERY method/
+helper body and cooperative super closure/order; no function transplant,
+unbound mixin, type()/exec/monkeypatch or override flag. Source stays readable
+and every cloudfile<=60000B. Metadata/template/config/driver/hash and native
+proof/result bindings must use the new fixed epoch, not relabel an old receipt.
+
+Old source/tests/failedjob/claims remain immutable. Eight explicitly new
+single_base builder/actions/results/native_results source/test paths are
+owned by this bounded local correction. Author agents may write only those
+paths; root independently checks diffs/tests/sourcepins, all production
+source must be committed in actualHEAD before effect. Old committed observer
+closure may read UI/source while these new files remain unused/untracked;
+it grants no uncommitted builder upload or production execution.
+Focused tests use isolated49/52runtime+syntheticDB before imports, network/DNS/
+realQCcredential denial, no fullsuite. NativeABI acceptance still requires
+a fresh actual job; intended OFFfinancialattempt2 retains failedattempt1.
+Fresh allphase/private/registry/source/owner/HEAD/access/attempt/look claims,
+sharedlock/privacy/collaborator/zeroactive/sourcebeforeafter and eight native
+compileproofs remain prerequisites. No unchanged failing retry, dateextension,
+additional stock exclusion, financial result admission or verification waiver.
+
+No further QC effect beyond the one sourcecapture yet in123; no second
+financiallaunch. Existing heartbeat remains explicitlyPAUSED. Skip Claude;
+NO ADDITIONAL PUSH. User-facing date follows America/Los_Angeles2026-11-07;
+claim/evidence clocks remain actual UTC.
+
+
+### 123.1 Fixed source snapshot / verification before local commit
+
+Source builder13565B/SHAfb75e8cde2f99b1ace170e42d74d00b77714b3611a1dc7c117f5ec3f614e0dd1;
+buildertests17736B/SHA76d9d24cb511a536741adfe2c4ba848fd0d15af003543dce986ebb1d8a07ec72.
+Financialactions58757B/SHAc463d076f9606e2c929c3f6a44b28bdb1cdd26b36fa31e35d6d08ff8b361dc91;
+actiontests26585B/SHA5747d08baf2a36f591bf1e41b3d43501081c345c2a72451e0048981d7448a1cf.
+Resultchecker85128B/SHA7e5ac45900b93049491ca27312da166a33c61b7b5511f34a9e749fa1259e86a9;
+resulttests31716B/SHAe6e40efa8edde9484f04d4ed36ff7770cad54f0b6ebcc8751b1d410aa0a4e5d2.
+Nativeverifier/observer82050B/SHA09d482b841b56d7e184dedf19c7f1f446e14303f665478b34c775c09441677a7;
+nativetests36960B/SHAdfefe38190e9f3de465774f947d450d43688b4bf0e5559f716609d3769149f9d.
+
+Root independent source judgment accepts the exact builder and checker.
+The builder wraps pinned ae945v1, checks EVERY method/class-body/global
+statement against the retained producer and preserves exact source segments.
+Only candidate import placement/two static class headers/final alias deletion
+change runtime structure. Only main/config/driver EXPECTED_CONFIG assignment
+change financial files; no new policy/calendar/input values. The main remains
+readable and bounded. Source/config identities are new; native compatibility
+is FALSE pending actual run. No fake CLR fixture is called native proof.
+Checker34of36 top-level definitions are exact fcb7 AST; only fixedv2 expected
+schema/epoch refusal and helper-report sourceepoch metadata differ.
+Independent controller review accepts c463/09d4: all custody/TLS/locks/deadlines/
+request limits/8proofs/claim-before-read/privacy/decodedframing/nestedlineage/
+dispatch/observer guard logic is unchanged. Fixed new modules/pins/epochs/
+folders/joblabels are the sole deltas. No generic override or retired mutation
+executor. Actual pure import/source discovery agrees on closures32financial/
+29results/38native/40includingAGENTS+CLAUDE, allbelow48. Status parser unchanged.
+
+All root tests isolated49/52runtime+syntheticDB BEFORE dispatch/config imports,
+with socket/DNS/realQCcredential denial, Python3.13.15. No full lane/repo suite.
+Newchecker80passed80.39s/80.48s on7e5a/e6e4, all source/test hashesstable.
+Newfinancialactions59passed131.19s/131.28s on c463/5747, full frozen closurestable.
+Newnative84passed266.29s/266.38s on09d4/dfefe, full frozen closurestable.
+The -k selectors included the new file's single_base name; these counts cover
+each focused new file, not a full lane suite.
+
+Retained negative software history: first builder test f9a9bfa1c5ae25b533266071bbd981d7fe6282aaf290f9b356c9b8e6270f48a2
+produced46passed/5failed32.70s/32.79s, sourcefb75 stable. The five failures were
+the test's tree.body.index using a node from a DIFFERENT ast.parse; the actual
+renderer uses nodes from the same tree. TESTONLY correction looks up the
+same-tree class node; every other assertion stays exact. Reversing only that
+11byte delta reconstructs f9a exactly. Affected5passed/46deselected8.55s/8.64s
+on final76d9; the46 untouched cases retain their passing result. No source
+behavior or valid guard assertion was weakened.
+Earlier actiontest a88ab81670ffba11612be6c8a8c27f44394e62cb49cbdfed319391e1af8784e4/26586B
+had an unterminated bytes literal, independently caught BEFORE execution.
+Removing one physical newline preserves the renderer-pin mutation refusal
+case and yields5747. No failed test execution is invented for that source catch.
+All prior software/native failures and snapshots remain retained.
+
+This closes the confirmed source-load defect in software only; it does not
+repair or admit original source inputs, prove full-window financial results,
+native order/cash/census ABI, engine chart agreement, rights/PIT or canonical
+criteria. New fixed financial source epoch is
+TPR-SID-CASH-SINGLE-BASE-20261107-v2; new native result epoch is
+TPR-SID-CASH-SINGLE-BASE-NATIVE-RESULTS-20261107-v2. Economicstudy stays SID-CASHv1.
+Next is ONE LOCAL source commit of these8newfiles+sole record, then fresh
+source/HEAD/owner/registry/access/operation/attempt/look claims before fixed
+OFFattempt2 upload/compile/build/launch; preserve attempt1failure unpooled.
+SourceHEAD stays fixed through launch. A later record-only parent handoff
+commit is permitted; later childverifier sequence keeps one actualHEAD from
+upload through observe. All20REMX rows remain quarantined. Skip Claude.
+NO ADDITIONAL PUSH, no source/job change yet after Mia beyond readonlycapture.
+
+123 current/preamble371passed/520deselected7.87s/7.97s onrecordb22ff4794e157a7a3fa089dd4b7321897ae0d060e75c45d8e751d182fdef39cc withstablehashes. Initialfinaldiffcheck flagged onlymynewrecordfooterblankEOF; trimmedthatseparatorbeforethisvalidationfooter, no sourcechange. All8newsource/tests parse/compileinmemory andLF/whitespacechecks passed; all10v1source/tests stillbyteexactHEAD; published9..120 exact3534430B retained. No fullsuite ornewnativeeffect.
+
+Fresh122 claim BEFORE effect {"HEAD":"b834af1576e7619848ee89388d32c00425a550ed","bounds":{"Git_readonly_requests_max":1,"QC_requests":0,"exact_ref":"refs/heads/codex/strategy-target-price-revisions","exact_remote":"origin","existing_Git_auth_only":true,"expected_remote_head":"041a54dbd53d54ba02a42f8740580eba7be3f298","pushes":0,"request_seconds_max":30,"stdout_stderr_each_bytes_max":4096},"manifest":{"bytes":6676,"name":"TPR-R123-GIT-PRECOMMIT-REMOTE-READ-001.claim.json","sha256":"c792648640051f908b6c829a867b34e6f52fb46d8a8d90a9c45783b293fcdb67"},"operation_id":"TPR-R123-GIT-PRECOMMIT-REMOTE-READ-001"}
+
+123 precommit remote scope observation {"QC_requests": 0, "actual_remote_head": "041a54dbd53d54ba02a42f8740580eba7be3f298", "expected_remote_head": "041a54dbd53d54ba02a42f8740580eba7be3f298", "operation_id": "TPR-R123-GIT-PRECOMMIT-REMOTE-READ-001", "proof": {"bytes": 248, "name": "TPR-R123-GIT-PRECOMMIT-REMOTE-READ-001.safe.json", "sha256": "4fe1c1f25ac63f3ef3ad161859f79c539a1c61b251e08e310ab6345b928c1949"}, "pushes": 0, "requests": 1, "scope_matches": true}
+
+123 final precommit QA passed onall8newfiles/frozenhashes withLF/inmemorycompile; old10source/tests andpublished3534430B history remainexact. Targetremote041a54dbd53d54ba02a42f8740580eba7be3f298 freshlyverifiedunchanged throughboundedreadonlyGitclaim; no push. The following LOCALONLYcommitcontains exactly4newsource/4newtests+sole record. Core source nowrequiresfixedsinglebasepreflight/nativeattempt2; no nativecompatibility/financialcompletion claimed.

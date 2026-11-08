@@ -54,6 +54,26 @@ def test_running_python_binding_matches_parent_without_duplicating_full_policy(m
     assert m.running_command_binding("0" * 64) != launch
 
 
+def test_known_fingerprinted_macos_framework_relaunch_preserves_launch_binding(monkeypatch):
+    from research import insider_buying_pilot_readback_isolation_v2 as isolation
+    profile, launch = bindings()
+    actual = list(command()[3:])
+    image = isolation.SUPPORTED_BASE / "Resources/Python.app/Contents/MacOS/Python"
+    actual[0] = str(image)
+    monkeypatch.setattr(m.sys, "orig_argv", actual)
+    monkeypatch.setattr(isolation, "runtime_layout", lambda: ((), (image,), ()))
+    assert m.running_command_binding(profile) == launch
+
+
+@pytest.mark.parametrize("image", ("/Volumes/untrusted/Python", "/tmp/Python", "/usr/bin/python3"))
+def test_framework_normalization_cannot_accept_an_arbitrary_python_image(monkeypatch, image):
+    profile, _launch = bindings()
+    actual = list(command()[3:]); actual[0] = image
+    monkeypatch.setattr(m.sys, "orig_argv", actual)
+    with pytest.raises(m.PreparedError, match="command_refused"):
+        m.running_command_binding(profile)
+
+
 @pytest.mark.parametrize("fault", ("eof", "newline", "whitespace", "duplicate", "float", "nan",
     "role", "identity", "profile", "command", "extra", "oversize"))
 def test_activation_refuses_ambiguous_or_rebound_frames(fault):

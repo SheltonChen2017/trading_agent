@@ -146,8 +146,19 @@ def command_binding(command):
 
 
 def running_command_binding(profile_sha256):
-    """Worker-side binding from Python's actual initial argv and intended profile."""
-    args = _python_argv(sys.orig_argv)
+    """Bind actual argv, allowing only the pinned macOS framework relaunch."""
+    args = tuple(sys.orig_argv)
+    if args and args[0] != sys.executable:
+        from research import insider_buying_pilot_readback_isolation_v2 as isolation
+        _directories, images, _libraries = isolation.runtime_layout()
+        image = isolation.SUPPORTED_BASE / "Resources/Python.app/Contents/MacOS/Python"
+        need(sys.executable == str(isolation.SUPPORTED_PYTHON)
+             and args[0] == str(image) and image in images, "command_refused")
+        # CPython's supported framework replaces only argv[0] when relaunching
+        # this exact image. All flags and code stay byte-for-byte bound; both
+        # the invoked venv image and relaunch image have runtime fingerprints.
+        args = (sys.executable, *args[1:])
+    args = _python_argv(args)
     return hashlib.sha256(raw(["/usr/bin/sandbox-exec", "-p",
         {"profile_sha256": _digest(profile_sha256)}, *args])).hexdigest()
 

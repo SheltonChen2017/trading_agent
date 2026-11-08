@@ -46981,3 +46981,30 @@ as source_dirty (1.068s,stderr0). No saved DATA or PDF body is read.
 One temporary source diagnostic has a generated-code syntax refusal before
 any diagnostic step; it is corrected locally, not called a product success.
 Runner56 PASS1.24s (outer2.209s,stderr0) covers fixed directory planning.
+
+Third ordinary zero-DATA health at already-existing clean
+975dee3a7dde0c7fbe5bf59a41cc2e6a746b07fb: exit2 after42.319s, same52B
+refusal/stdout hash,stderr0. Source preflight and all219 current source
+images pass; first prepared reader refuses READY. A source-only native
+diagnostic (41.377s outer,stderr0) passes worker native/memory/current-source
+checks and identifies the precise argv mismatch: supported macOS framework
+relaunch has the exact Resources/Python.app/Contents/MacOS/Python image as
+orig_argv[0], while sys.executable remains the supported venv launcher.
+No saved leaf is opened. One new targeted test produces1 expected FAIL1.10s
+(outer2.031s,stderr0) before correction. Normalize ONLY this exact supported
+framework image, only when runtime_layout accepts it and inventories it with
+the independently fingerprinted runtime images; all remaining flags/code
+stay byte-for-byte bound. Arbitrary /Volumes, /tmp and system Python images
+remain refused. This qualifies earlier 'exact argv' shorthand: the command
+binding records the invoked venv path and this one explicit relaunch
+normalization, not a claim that the observed two argv[0] strings are equal.
+No speculative argv relaxation or general same-basename matching is used.
+
+An initial placement error in the NEW test moves an older local assertion
+into the parameterized negatives, causing3 NameError failures/474PASS3.21s;
+restore that assertion to its original test before committing. This is a
+test-authoring error, not another native product failure. The ordinary CLI
+health must still pass on the corrected committed tree before saved DATA.
+
+Corrected relevant focused477 PASS3.04s, zero skips/warnings
+(outer3.943s,stderr0), including relaunch positive/arbitrary-image negatives.

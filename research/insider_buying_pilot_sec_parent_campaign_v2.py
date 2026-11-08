@@ -64,6 +64,10 @@ POLICY={"source_periods":list(audit.PERIODS),"pilot_periods":list(audit.PILOT_PE
     "archive_membership_unknown_is_not_zero_exposure_or_an_accession_claim":True,
     "new_archive_requests":0,"full_population_source_metadata_is_not_parent_completion":True}
 AUTHORITY=dict(audit._AUTHORITY)
+# Section 342 (Claude review): later one-shot capture namespaces whose consumed
+# accessions this planner does not yet chain. While one exists, planning stops,
+# so no successor batch can request one of its filings again.
+UNCHAINED_LATER_CAPTURE_PARTS=(("artifacts","insider_buying","pilot_sec_required21_v1"),)
 
 
 class CampaignError(ValueError):pass
@@ -82,13 +86,19 @@ def _safe_failure(error):
     phase=getattr(error,"_campaign_phase","initial_isolation")
     if phase not in PHASES:phase="initial_isolation"
     codes={"campaign_old_exposure_changed":"prior_consumption_changed","campaign_original_full_audit_changed":"source_population_changed",
-        "campaign_late_repeat_requires_reconciliation":"late_repeat_reconciliation_required"}
+        "campaign_late_repeat_requires_reconciliation":"late_repeat_reconciliation_required",
+        "campaign_unchained_later_capture_consumption":"prior_consumption_changed"}
     code=codes.get(str(error),"native_or_control_refused") if type(error) is CampaignError else "native_or_control_refused"
     return {"schema":SCHEMA+"/worker-refusal","phase":phase,"code":code}
 
 
 def _need(value,code):
     if not value:raise CampaignError(code)
+
+
+def _no_unchained_later_capture(root=LANE_ROOT):
+    for parts in UNCHAINED_LATER_CAPTURE_PARTS:
+        _need(not os.path.lexists(root.joinpath(*parts)),"campaign_unchained_later_capture_consumption")
 
 
 def _copy(value):return json.loads(_raw(value))
@@ -438,7 +448,8 @@ def _next_consumption(number,pins,identity):
 def _plan_worker(identity,number,predecessor_pins=None):
     prior_hold=accepted=intake=failed=None;holds=[];phase="initial_isolation"
     try:
-        _isolated();phase="source_identity";_current(identity);_previous_pins(number,predecessor_pins);phase="stopped_launch_custody"
+        _isolated();phase="source_identity";_current(identity);_previous_pins(number,predecessor_pins)
+        _no_unchained_later_capture();phase="stopped_launch_custody"
         failed=_FailedLaunchHold(LANE_ROOT);phase="prior_custody"
         prior_hold=source.retained._PriorHold();prior=prior_hold.report()
         accepted=base.prior._Held(LANE_ROOT);base.prior._selector(accepted,base.prior.ACTUAL_ANCHORS)
@@ -577,6 +588,7 @@ def prepare_actual_batch(expected_head,*,batch_number=1,predecessor_pins=None):
     _launcher_health(identity)
     lineage=_stopped_launch_lineage(identity)
     _need(_raw(lineage)==_raw(_launch_lineage()) and _identity(expected_head)==identity,"campaign_stopped_launch_lineage_changed")
+    _no_unchained_later_capture()
     reservation={"schema":SCHEMA+"/reservation","batch_number":batch_number,"execution_identity":identity,"policy":_copy(POLICY),"authority":dict(AUTHORITY),"predecessor_pins":_copy(predecessor_pins),"stopped_launch_lineage":lineage}
     _need(_decode(_raw(reservation))==reservation,"campaign_production_reservation_roundtrip")
     try:

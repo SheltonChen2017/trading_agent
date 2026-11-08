@@ -34,7 +34,7 @@ shape,nc,route=inherited.pure.shape,inherited.pure,binder.route
 _raw,_sha=inherited._raw,inherited._sha
 FROZEN={**inherited.FROZEN,inherited.SELF_PATH:"cb66d434f0cefeb38bc85659feab8fce2f2b7431b03aef9a7d72550940d6d3df",
     inherited.TEST_PATH:"7fb1bd8ea5626595defdb2ad7ec94dd14d5008b98cafef7ce156a560028da107",
-    binder.SELF_PATH:"833a9e4a0a192a4e1aa3405d189a7b89047749e644902251c80e069fdd788f60",
+    binder.SELF_PATH:"fc35213a9815dee68840deaef702941b36f772f94bfe8062797fea103a20bafc",
     binder.TEST_PATH:"a3f724d471ccc10a7c6718a860a1bc86a73e84e1debe94ee1340e95f13ddb457",**binder.CODE_PINS}
 _PHASES=frozenset({"arguments","source","native_preflight","inputs","input","privacy","collection","routes","source17","final","cleanup"})
 _CODES=frozenset({"private_arguments_refused","private_contact_mode_refused","fixed_actual_front_required","source_changed",
@@ -48,7 +48,7 @@ _BINDER_CODES=frozenset({"exact_NC_source_binding_required","exact_fixture_boole
     "matching_source_occurrence_bound_refused","source_derivation_refused","complete_source_callback_accounting_refused",
     "route_batch_changed_during_source_scan","public_witness_byte_bound_refused"})
 _REASONS=frozenset({"nonregular_or_extension_not_examined","unsupported_header_not_examined","non_NC_name_suffix_not_examined",
-    "partial_physical_payload_not_examined","complete_payload_over_profile_not_examined","unsupported_header_semantics_not_examined",
+    "partial_physical_payload_not_examined","nonzero_padding_member_not_examined","complete_payload_over_profile_not_examined","unsupported_header_semantics_not_examined",
     "collected_complete_observed_NC_payload"})
 
 
@@ -317,6 +317,9 @@ def _collect(raw,private,fixture):
         elif row["magic_pattern_observation"]=="unknown" or not row["header_checksum_matches"]:reason="unsupported_header_not_examined"
         elif not row["fixed_name_fields_have_nc_suffix"]:reason="non_NC_name_suffix_not_examined"
         elif not row["complete_physical_span_observed_within_prefix"]:reason="partial_physical_payload_not_examined"
+        # Section 342 (Claude review): the frozen shape observer stops framing at
+        # non-zero member padding; such a member is not examined or routed.
+        elif not row["observed_payload_padding_all_zero"]:reason="nonzero_padding_member_not_examined"
         elif row["declared_payload_bytes"]>MAX_PAYLOAD:reason="complete_payload_over_profile_not_examined"
         else:selected.append(row["ordinal"]);total+=row["declared_payload_bytes"];reason="collected_complete_observed_NC_payload"
         dispositions[row["ordinal"]]=reason

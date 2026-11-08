@@ -15,6 +15,7 @@ from types import SimpleNamespace
 import pytest
 
 
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 from research import insider_buying_qc_sdk_metadata_supervisor as supervisor
 from research import insider_buying_qc_sdk_metadata_cell as cell
 HERE = Path(supervisor.__file__).parent

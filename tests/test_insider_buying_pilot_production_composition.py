@@ -11,6 +11,8 @@ import json
 import pytest
 
 from data.hashing import hash_bytes, hash_payload
+
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 from research import insider_buying_pilot_production_composition as m
 from research.insider_buying.sec_bulk_parsed_snapshot import (
     LoadedSecBulkParsedSnapshot, ParsedSecBulkAccession, _source_row_id,

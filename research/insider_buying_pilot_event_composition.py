@@ -11,9 +11,18 @@ or required reference was not fully known at MOO. No affected event is silently
 dropped, delayed or replaced. All canonical lineage remains in the private
 assessment even on temporal refusal.
 
+The clock is the frozen SEC acceptance MODEL. These mathematical cutoff
+checks do not authenticate historical public availability at either cutoff;
+separately qualified filing/version known-by evidence remains required.
+
 The economic replay matches the frozen first50k, pre-open additions, consumed
 lot, known-amendment and issuer/entry merge policy. Existing pure Decimal,
 classification, first-open and v3 reference validators remain unchanged.
+Pre-source economic-lot facts are projected only when their acceptance cannot
+have this target as its literal first open. They stay in the genuine complete
+source inventory and ordered row accounting. A target-interval member of any
+pre-source lot still refuses the whole window: missing historical threshold
+or consumed state is never supplied as zero or as an invented carry-in.
 No files, artifacts, transport, credentials, QC, outcomes or orders are read
 or executed. Actual source/reference authenticity, 252-open factor history,
 both retrospective earnings diagnostics, final population/look registration
@@ -25,6 +34,7 @@ from bisect import bisect_right
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field, fields
 from decimal import Decimal, localcontext
+import hashlib
 import heapq
 import json
 import weakref
@@ -41,6 +51,7 @@ from research.insider_buying import backtest_source_stream as source_factory
 
 SCHEMA = "insider-pilot-firstopen-two-cutoff-composition-v1"
 REFERENCE_SCHEMA = SCHEMA + "/entry-reference"
+PRE_SOURCE_TARGET_RELEVANCE_POLICY = "literal-first-open-interval-no-historical-carryin-v1"
 MAX_REFERENCE_BYTES = clock.MAX_BYTES
 MAX_OUTPUT_BYTES = 128 * 1024 * 1024
 _TOKEN = object()
@@ -143,6 +154,10 @@ def _replay(*, source, mappings, calendar_raw, calendar_sha256, exceptions_raw, 
     reasons = Counter()
     late_members = ordinary_overrides = 0
     target_index = sessions.index(target)
+    _need(target_index > 0, "previous_regular_open_for_target_relevance_required")
+    previous_open, target_open = opens[target_index - 1], opens[target_index]
+    pre_source_outside_target_count = 0
+    pre_source_outside_target_digest = hashlib.sha256()
 
     def finalize(until):
         while pending and pending[0][0] <= until:
@@ -197,7 +212,23 @@ def _replay(*, source, mappings, calendar_raw, calendar_sha256, exceptions_raw, 
             if outcomes not in (["eligible_for_lot_aggregation"], ["exclude_non_common_stock"]):
                 reasons.update(outcomes)
                 continue
-            _need(metadata["source_start"] <= row["transaction_date"], "economic_lot_precedes_complete_source_scope")
+            if row["transaction_date"] < metadata["source_start"]:
+                # A threshold can cross only upon a lot member's acceptance.
+                # Any unseen pre-source member predates this complete source
+                # scope. An outside-interval row could affect this target only
+                # through an inside-interval member of the SAME old lot; that
+                # member still refuses below, regardless of its visible value.
+                # Thus no old lot is initialized, reset, replayed or carried in.
+                _need(not previous_open <= accepted < target_open,
+                      "economic_lot_precedes_complete_source_scope")
+                pre_source_outside_target_count += 1
+                # The genuine source still owns the full row and its original
+                # parent inventory. Bind this small projection through that
+                # row's full-content digest without copying footnotes/output.
+                descriptor = {name:row[name] for name in
+                              ("event_id", "transaction_sha256", "accepted_at_utc", "transaction_date")}
+                pre_source_outside_target_digest.update(_raw(descriptor) + b"\n")
+                continue
             _need(row["transaction_date"] <= accepted.astimezone(base.ZoneInfo("America/New_York")).date().isoformat(),
                   "transaction_date_after_availability")
             candidates = [item for item in mapping_index.get(
@@ -264,7 +295,10 @@ def _replay(*, source, mappings, calendar_raw, calendar_sha256, exceptions_raw, 
         "counts": {"economic_lots_at_target": sum(len(row["payload"]["lots"]) for row in lineage),
             "below_threshold_lots": sum(lot["entry_index"] is None for lot in lots.values()),
             "late_members_not_reset_or_retraded": late_members, "ordinary_share_exception_count": ordinary_overrides,
-            "pending_first_opens_after_target": len(pending)}, "reason_counts": dict(sorted(reasons.items()))}
+            "pending_first_opens_after_target": len(pending),
+            "pre_source_facts_outside_target_first_open": pre_source_outside_target_count},
+        "pre_source_outside_target_rows_sha256": pre_source_outside_target_digest.hexdigest(),
+        "reason_counts": dict(sorted(reasons.items()))}
 
 
 @dataclass(frozen=True, slots=True, weakref_slot=True, eq=False)
@@ -365,18 +399,27 @@ def _compose(entry_source, first_open_source, security_master_raw, calendar_raw,
         reasons.append("canonical_lot_or_entry_changed_after_moo_cutoff")
     if base._utc(context["latest_prerequisite_knowledge_at_utc"]) > cutoff:
         reasons.append("required_prerequisite_after_moo_cutoff")
-    schedule = entry["entry_context_assessment"]
+    # Window exclusions belong to the genuine plan's fixed phase schedule.
+    # The separately retained entry-context assessment describes ONE security;
+    # its listing age cannot exclude every other event in this window. Actual
+    # per-security seasoning remains enforced by _reference and _replay above.
+    schedule = next(row for row in plan["scheduled_entries"] if row["entry_session"] == target)
     disposition = ("REFUSED_TEMPORAL_INCOMPATIBILITY" if reasons else "PILOT_SCHEDULE_EXCLUDED"
-                   if schedule["metadata_disposition"] == "EXCLUDED_METADATA" else "SOURCE_EVENTS_MOO_COMPATIBLE")
+                   if schedule["schedule_disposition"] == "EXCLUDED" else "SOURCE_EVENTS_MOO_COMPATIBLE")
     summary = {"schema": SCHEMA, "trust_scope": roots.trust_scope, **hashes,
+        "event_clock_basis": "SEC_ACCEPTANCE_MODEL", "historical_public_known_by_verified_here": False,
         "pilot_registration_sha256": entry["pilot_registration_sha256"], "entry_session": target,
         "asof_moo_cutoff_utc": before["decision_cutoff_utc"], "canonical_corroboration_cutoff_utc": after["decision_cutoff_utc"],
         "disposition": disposition, "whole_window_refusal_reasons": reasons,
-        "pilot_schedule_exclusion_reasons": schedule["exclusion_reasons"],
+        "pilot_schedule_exclusion_reasons": schedule["schedule_exclusion_reasons"],
         "provisional_event_count": len(provisional["events"]), "canonical_event_count": len(canonical["events"]),
         "canonical_event_inventory_sha256": hash_payload(canonical["events"]),
         "canonical_lineage_sha256": hash_payload(canonical["lineage"]),
         "provisional_counts": provisional["counts"], "canonical_counts": canonical["counts"],
+        "pre_source_target_relevance_policy": PRE_SOURCE_TARGET_RELEVANCE_POLICY,
+        "provisional_pre_source_outside_target_rows_sha256": provisional["pre_source_outside_target_rows_sha256"],
+        "canonical_pre_source_outside_target_rows_sha256": canonical["pre_source_outside_target_rows_sha256"],
+        "historical_pre_source_lot_replay_or_carryin_used": False,
         "provisional_exclusion_reason_counts": provisional["reason_counts"], "canonical_exclusion_reason_counts": canonical["reason_counts"],
         "all_six_form_source_counts": before["source_form_counts"], "source_submission_count": before["source_submission_count"],
         "relevant_original_count": before["stream_corroborated_form4_count"],

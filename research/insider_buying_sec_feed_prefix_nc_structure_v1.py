@@ -356,7 +356,7 @@ def validate_prefix_nc_observation(value,*,fixture_only):
         enum(member["type_class_observation"],{"regular","directory","hardlink","symlink","pax","pax-global","gnu-longname","gnu-longlink","gnu-sparse","other"})
         boolean(member["complete_physical_span_observed_within_prefix"])
         enum(member["inspection_disposition"],{"nonregular_or_extension_not_examined","unsupported_header_not_examined","non_NC_name_suffix_not_examined",
-            "partial_physical_payload_not_examined","complete_payload_over_profile_not_examined","unsupported_header_semantics_not_examined",
+            "partial_physical_payload_not_examined","nonzero_padding_member_not_examined","complete_payload_over_profile_not_examined","unsupported_header_semantics_not_examined",
             "examined_complete_observed_NC_payload"})
         pattern=member["name_pattern"];keys(pattern,{"basename_pattern","basename_bytes","has_nc_suffix","hyphen_present","underscore_present","directory_components_observed"})
         enum(pattern["basename_pattern"],{"dashed_accession_shape","compact_accession_shape","other_numeric_shape","other_digit_hyphen_shape","digit_underscore_shape","other_opaque_shape"})
@@ -457,6 +457,9 @@ def qualify_prefix_nc_structure(raw,privacy_contact,fixture_only=False,limits=No
         elif row["magic_pattern_observation"]=="unknown" or not row["header_checksum_matches"]:reason="unsupported_header_not_examined"
         elif not row["fixed_name_fields_have_nc_suffix"]:reason="non_NC_name_suffix_not_examined"
         elif not row["complete_physical_span_observed_within_prefix"]:reason="partial_physical_payload_not_examined"
+        # Section 342 (Claude review): the frozen shape observer stops framing at
+        # non-zero member padding; such a member is not examined or routed.
+        elif not row["observed_payload_padding_all_zero"]:reason="nonzero_padding_member_not_examined"
         elif row["declared_payload_bytes"]>limits.payload_bytes:reason="complete_payload_over_profile_not_examined"
         else:
             selected.append(row["ordinal"]);total+=row["declared_payload_bytes"];reason="examined_complete_observed_NC_payload"

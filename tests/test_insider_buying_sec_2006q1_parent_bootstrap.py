@@ -6,6 +6,10 @@ import hashlib
 import json
 import os
 from pathlib import Path
+
+import pytest
+
+pytest.importorskip("fcntl", reason="IBWIN-CR01: POSIX custody support; Windows custody port deferred")
 import fcntl
 import stat
 from dataclasses import replace
@@ -13,7 +17,6 @@ import subprocess
 import sys
 import io
 
-import pytest
 
 if os.name != "posix":
     pytest.skip("IBWIN-CR01: POSIX custody supported; Windows port deferred", allow_module_level=True)

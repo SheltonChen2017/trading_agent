@@ -47123,3 +47123,170 @@ name-only comparison finds ZERO modified old captured source images from
 originalcbd2897c through currentHEAD (outer2.445s,stderr0); new additions are
 not mislabelled modifications. All8 new images compile, frozen17/four pins
 remain exact (outer0.695s,stderr0). Commit before final native qualification.
+
+### 386.10 Final observed native qualification and narrow resolution
+
+Final implementation4fe8c8207b883afb0b3cb4802c249a39624d1649 ALREADY EXISTS
+and is clean for both ordinary CLI calls. Source/admin preparation is trusted
+source-only bootstrap; every Git runs in a natively fenced source worker.
+Both prepared roles and the controller independently prove their applicable
+network/read/write/helper/fork fences before saved activation. Root's bounded
+outer launcher supplies isolated Python flags, minimal PATH/LANG, process
+group cleanup, capped stdout/stderr and a600s outer deadline; it does not
+claim the bootstrap Python is already Seatbelt-contained before its explicit
+controller install. No retained DATA is read in that bootstrap stage.
+
+Final ordinary HEALTH PASSES exit0 in67.422s,stdout1811B/hash
+4fb578686b76225dd63e0cb684e883c403d1d90dfde70d6bf18c7b9f0a402801,
+stderr0:233 current reader images, zero saved DATA leaves and files written.
+After a fresh exact root/branch/HEAD/clean status check, THIRD ordinary saved
+READBACK PASSES exit0 in82.125s,stdout3293B/hash
+cf70f703d77ebd7dde5b25467df3b18590a6f94f368d7ef5eeeed21b340036d0,
+stderr0. This is a later independently authenticated readback of the saved
+379 operation, NOT another execution of379's20 original inputs. It validates
+the exact FIVE saved leaves through held/native readers and external complete
+anchor, original177-image source map/Git bytes and all233 current reader
+images/Git bytes, both final source results and all cleanup. Zero original
+input leaves replayed, zero real files written, zero historical gates closed.
+Both earlier saved-readback calls remain FAILED as386.7-8 records them.
+
+| Final execution binding | SHA-256 / exact value |
+|---|---|
+| Reader execution HEAD | 4fe8c8207b883afb0b3cb4802c249a39624d1649 |
+| Reader233-image source inventory | bf8ca22dbae653724e2b6d1194931dcd9d1e1e0adadb44882655d8e183f6adea |
+| Original177-image inventory, original executioncbd2897c | 226cf2c05005b659faa3b0c4130c39c53dddd49fd5b0dc0db9822f35a556ee25 |
+| Saved external complete anchor | e55a9aaaf6f56c1f12b248fe3b6befdf04d00fcbffa90f27d64733f880a5039e |
+| Controller read-only profile | 347ba0e8d2b318f5d1ca634b158e2ca4cc74fb4a49c224e3247b329a8600adf5 |
+| Actual saved-reader profile | 0d0ee1f6f21074ddef58c9a168204149f38d229dbeddf1bbb8e3d24eaf123488 |
+| Actual saved-reader normalized launch binding | 09c0193847db7f99b21c7fb03f4a89af52c266083ed4d30a41ed9e78bc5504a0 |
+| Source-verifier profile | 3ad6f1b93d803ed7858c3c1f73a6b4483dbfdfab36b4cfdce62a6dd3dee3ec5e |
+| Actual source-verifier normalized launch binding | bf73bb77aa9519296fa9d8cc1edb844354d4469836ffcbe711254fb754d80a9b |
+| Seven-entry admin/config/absence inventory | e295b9bd2b612d048bd727cd410df1dceca87fc2e120466b2d86c86264dc8b13 |
+| Runtime-image fingerprint inventory | 7ce60fe29a58fa79c264a4bb45d7c55dc3654c5f034a8a2f3c194ba0026b11ef |
+| Working/committed ignore inventory | 36214a67e080694fe566a064807daa65ec3658466c9aa2297a2cbb0fa6012d62 |
+
+The stored12 controls/11 issuers/13 owner occurrences and distinct owners/
+37 title occurrences are the unchanged379 dossier's literal counts, not new
+original reparses or title/PIT admission. Transition/dossier/reference hashes
+remain386.2's anchors. historical_storage_identity_reauthenticated and
+full_historical_environment_replayed stay FALSE. All source/authenticity/
+availability/PIT/rights/canonical/population/look/QC/backtest/execution
+authority remains FALSE/zero. The generic 'source authentication' gate here
+means source DATA provenance; verified CODE/Git identity does not close it.
+
+No P0/P1. IBPIT-POLICY-CCR38401 is RESOLVED FOR THIS QUALIFIED v2 saved-dossier
+successor ONLY: protected-runtime overlap/alias refusal, fenced role scopes,
+source/admin/config authentication and actual five-leaf acceptance are now
+observed. Frozen legacy constructors remain UNQUALIFIED and BARRED from
+actual reuse; their migration/retirement requires its own bounded qualified
+work, not implied thaw. The15 carried P2s keep371.4's exact OPEN scopes.
+IBRUN-OBS38308 gains v2-only mitigation for excess parent capability, typed
+result acceptance, source/Git trust and later-reader HEAD separation; old
+paths/discovery ordering restrictions stay. Other383/369 P3 scopes remain,
+including title normalization and old physical-proof anchoring. This is
+Codex implementation/self-validation with advisory source inspection, not
+new independent Claude acceptance of Codex's own work.
+
+## 387. Separate durable handoff for the isolated offline readback round
+
+Owner scope is386.1: bounded isolation repair plus offline saved readback,
+existing data only, preserve bound sources/receipts, no purchases or QC,
+one final push. Incoming review range after baseline
+88935f65f6a7cba1f77ea7291c1374a3f034e53f is EMPTY; no Claude commit is
+silently declared reviewed. This handoff is committed separately AFTER all
+seven implementation/correction hashes exist:
+
+| Exact Codex commit | Role and current self-validated disposition |
+|---|---|
+| d2f16ead220dab86aa2f4a06c7ddde2615c832e0 | Additive four-module/four-test candidate and prospective386 scope. Initial zero-DATA health refuses; retained. |
+| 2ca0c46fe66031cd4cec6de6928343303bff546e | Authenticate empty source images, exact Git null sink and scrubbed preflight bootstrap; native source controls qualify corrections. |
+| 975dee3a7dde0c7fbe5bf59a41cc2e6a746b07fb | Exact two optional directory traversal literals preserve full clean-status checks; no contained bodies. |
+| 2060371e1d37aac77e397173f88a6d67b9e6500a | Strict supported framework relaunch normalization; ordinary health accepted, first saved readback refused and preserved. |
+| 0dd3f6d66d2096ff6ad0ba3821a1d574e72f1b07 | Finite private-safe refusal diagnostics; ordinary health accepted, second saved readback precisely refuses source-map overlap. |
+| 1189457ef50d4deef83dc49b30db3167507b114d | Transitive code-string verifier inventory;233 candidates, meaningful red/green; native SOURCE status correction still required. |
+| 4fe8c8207b883afb0b3cb4802c249a39624d1649 | Exact record/attribute SOURCE controls and optional admin pin; final native health and five-leaf/original177/current233 readback fully PASS386.10. This is the final ACTUAL execution HEAD. |
+
+Completed technical milestone: the additive supported macOS/POSIX successor
+uses bounded source-only native Git/authenticated admin/runtime/config,
+prepared role/normalized argv/profile binding and a read-only/no-exec
+controller before DATA activation. Exact typed externally anchored saved
+receipt validation and separate old/current Git checks work at a later HEAD.
+Unsafe runtime prefixes/physical overlaps, malformed activation/results,
+unreviewed attributes, private exception disclosure and surviving Git-child
+cleanup paths refuse. No bound production/test image, saved receipt, proof,
+namespace or original input is rewritten; no source operation is resumed.
+
+Plain-language result: the saved dossier can now be checked safely on the
+newer code snapshot. Its bytes and the code that originally produced it are
+verified without reopening the original financial inputs. Several real
+qualification failures were fixed and remain documented. This does not
+create the missing historical availability or PIT identity archive, make
+the original storage proof current, or make the lane ready for backtesting.
+
+Observed root evidence: final focused481 PASS3.65s (outer4.578s,stderr0),
+plus earlier meaningful runtime/cleanup/controller/empty-source/framework/
+unloaded-verifier red/green controls preserved386. All tests/probes use the
+native DATA/network/write/helper fences and real VM/sampled RSS controls;
+unit mocks do not stand in for the ordinary native runs. Final boundary/
+record/active-document/import/EXACT and compilation checks follow this
+handoff text. No full lane/repository suite or Windows host is run. All
+actual execution HEADs/timings are386; this later handoff did not exist
+during those executions. Quality assessment8/10 for bounded engineering:
+strong independent native stages and honest failure provenance, with frozen
+legacy paths, unreviewed-new-code status and factual history gates explicit;
+this is not a strategy score or a readiness score.
+
+All four frozen v3 hashes and17 frozen tests stay exact; all177 originally
+bound images independently match their original Git bytes. IB1C v1/scale/
+pilot, stoppedv3 unresolved1846/1847, separate7373B/report206e6db9 diagnostic,
+required21 eight originals/20,052 consumption chain/eight NON-DISPATCH,
+legacy19,846/99,394 and79,548 originally unattempted, strictD23 seven nonexact/
+no82-quarter digest, frozen study/pilot/warm-up populations/economics and both
+earnings diagnostics remain unchanged. Both incident classifications remain
+distinct and nonretroactive as385; no conditional estimate becomes measured
+requests/bytes. Existing historical/PIT/rights/canonical/population/parity
+blockers remain; no new owner approval is manufactured or requested here.
+
+Next action: retain this qualified reader for separately scoped read-only
+saved-custody checks; obtain genuine version-linked historical available-by
+and dated issuer/share-class/listing evidence under later existing-source
+work before any readiness promotion. This round starts no new data or QC
+milestone. No vendor correspondence, SEC/provider/credential/Keychain/new
+licensed-row/USB/original/reference acquisition or replay, purchase/upgrade/
+trial/renewal/paid export, QC/Safari/API/SDK/upload/job/history/outcome/backtest,
+broker/operator-database/scheduler/deployment/capital/funded/paper/live/order/
+trading action. No monitor is rearmed, no other chat is messaged. Shared
+records, Action Plan and SESSION_HANDOFF remain frozen; this is the lane's
+durable handoff.
+
+All seven new code commits are local-only before this handoff publication;
+there has been no interim push. Reverify designated root/branch/exactHEAD,
+expected record-only status and matching-only unchanged origin88935f65
+before this separate handoff commit and final push. Make exactly ONE
+successful push only to origin/codex/strategy-insider-buying, then verify
+exact remote tip, clean status and zero ahead/behind. Remote availability
+must be established by that independent check, not inferred from this plan.
+
+Final completed386/387 boundary/platform/record/active-document/lane-import/
+ML-import/EXACT selection229 PASS26.60s, zero skips/warnings
+(outer27.602s,stderr0), under the same native DATA/network/write/helper and
+VM/RSS fences with required Git-child capability. All8 new images compile
+in memory;17 frozen tests/four frozen v3 pins remain exact (outer0.694s,
+stderr0). Round scope is exactly NINE paths: eight new code/test images plus
+this record, zero old source modifications. Added-line scan finds zero mail
+address/private-key/secret-value assignment patterns; whitespace passes.
+No saved or original input is reopened by these final document checks.
+
+Final production image pins, unchanged from actual execution4fe8c820:
+
+| New production image | Bytes | SHA-256 |
+|---|---:|---|
+| insider_buying_pilot_readback_isolation_v2.py | 20831 | e301bcbe293e6c86b9fd55f0c5c3681e89d0b4c97b4c4b41d346b61b5db7c83d |
+| insider_buying_pilot_readback_prepared_v2.py | 15220 | daad9d02e18ddd95f3fdd420756782ac2d4ccf99b11dbde4e6017ce98cb40def |
+| insider_buying_pilot_saved_dossier_readback_v2.py | 16338 | 1266d30ccb2984e62163f43e012616b9da5b3dcaa30de5fcbfadd7b29b58b832 |
+| insider_buying_pilot_saved_dossier_readback_runner_v2.py | 29905 | 44f81c9ca94434bf22cf2d10e9a63d31913dd8eefa393643af94d42e2bdbe0e5 |
+
+Only this validation tail is appended after the final checks; it introduces
+no production/test behavior, historical evidence, authority or data access.
+The separate handoff commit and one matching-lane publication follow the
+fresh root/branch/exactHEAD/status and unchanged-origin verification above.

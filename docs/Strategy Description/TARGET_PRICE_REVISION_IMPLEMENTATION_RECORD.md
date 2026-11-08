@@ -1,34 +1,35 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current section123 OFF attempt2 / status unknown:**
-The single-base correction is committed LOCALLY at
-5f47205aad43015f1c64981cf15200ae7482919e. Genuine Mia was consulted and all13
-saved files were compared; its unverified suggestions were not ported.
-Focused software checks passed; native runtime/financial acceptance is pending.
+**Current section124 OFF attempt2 / native in progress:**
+One freshly claimed exact-job metadata read now accepts In Progress...,
+completedFALSE for OFF38609822/job46b3b10ca11481a9d6d8352e6602ac7b,
+SID-CASH-SINGLE-BASE-20261107-OFF-A2. The unchanged dedicated status parser
+validated the entire1559B response; no financial fields were interpreted.
+The earlier1319B refused response remains unexplained UNKNOWN history and
+was not retained or relabeled. One request is consumed this wake; no retry.
 
-Corrected OFF project38609822 job46b3b10ca11481a9d6d8352e6602ac7b was actually
-created as SID-CASH-SINGLE-BASE-20261107-OFF-A2, financial attempt2, config
-a01f769b4e712453956c64f8f2945c8b4c404f788bbf32490ce026852164b6ab.
-All13 source files matched before/after compile and launch, inventory
-86d421a10ec6ccfb8059a8336983e2bf92a592e829f19810399eb56765f06a76.
-The first exact-job status read returned HTTP200/1319B but failed local
-whole-wire validation before retention. Metadata/raw/projection are NULL.
-CURRENT NATIVE STATUS IS UNKNOWN; neither completion, failure nor successful
-initialization is inferred. No second request in the launching turn.
+Financial sourceHEAD5f47205aad43015f1c64981cf15200ae7482919e, fixed single-base
+source epoch and configa01f769b4e712453956c64f8f2945c8b4c404f788bbf32490ce026852164b6ab
+remain unchanged. Last full cloud-source comparison was the123 compile/launch
+all13 inventory86d421a10ec6ccfb8059a8336983e2bf92a592e829f19810399eb56765f06a76;
+no new cloud-source read/change occurred in124. Actual observationHEAD3b19c337
+is the record-only123 handoff, distinct from parent financial sourceHEAD.
 
-The SAME heartbeat is appACTIVE and its exact new job/prompt/same-chat binding
-was freshly read back. Next wake permits one fresh bounded metadata request;
-pause this heartbeat BEFORE processing an actual terminal transition.
-Preserve current job/source/notebooks untouched while waiting. Section123.2
-records full provenance, failed-read receipt and body-free diagnostic limits.
+The SAME heartbeat remains appACTIVE and its fresh exact-job/status prompt
+was read back with the same chat/name/schedule/creation. Continue one fresh
+bounded metadata request per new wake; pause BEFORE processing any actual
+terminal transition. Preserve current job/project/source/notebooks untouched.
+The one-time body-free CALL-only diagnostic recorded zero refusal gates;
+no diagnosis of the earlier refusal or parser correction is implied.
 
-The separate fixed-SID-to-cash study keeps exactly one excluded stock's final
-allocation in cash, with no redistribution. Failed OFF attempt1 and original
-study/history remain separate and unpooled. Other four new variant arms are
-not launched. All accepted full-window metrics remain NULL; native accounting,
-chart/origin/rights/PIT/canonical gates remain unproved. Keep all20REMX rows
-quarantined, skip Claude, and make NO ADDITIONAL PUSH. Round120 push041a54db
-is already consumed; the source and this handoff remain LOCAL ONLY.
+Runtime/financial completion remains unproved. Other four new variant arms
+and native child verifier are not launched; all accepted full-window metrics
+remain NULL. Native orders/fills/fees/cash/actions/NAV/exposure/clock/full
+coverage, chart/origin/rights/PIT/canonical gates remain unclosed.
+The separate one-SID-to-cash study retains the excluded final allocation in
+cash with no redistribution; original study/failedA1 history remain unpooled.
+Keep all20REMX rows quarantined, skip Claude, NO ADDITIONAL PUSH. Round120
+push041a54db is consumed; local source/handoff commits remain LOCAL ONLY.
 
 **Published section120 handoff before the current owner continuation (2026-11-07):** The in-app browser is
 authenticated on own OFF38609822/code; nativeSafari remains untouched.
@@ -37672,3 +37673,93 @@ is intentionally behind; NO ADDITIONAL PUSH. This handoff is LOCAL ONLY.
 123.2 final record audit identified the initial123 pre-implementation PAUSED/no-second-launch paragraph as unlabeled historical state. Labeled it explicitly BEFORE source5f/effects123.2, preserving all words/history. Current preamble/123.2 remain actual OFF46b3 created, statusUNKNOWN, sameheartbeatACTIVE. First final current-document run371passed/520deselected8.01s/8.10s onrecord49021bcb3ca892a7bcede45959f18da5419f3c389a707095920be24bddce9506; final labeled-record check follows. All8newsource/test hashes/LF/inmemorycompile, old10source/test bytes and published3534430B history verified unchanged; no source/native/push effect.
 
 123.2 final labeled-record focused current/preamble/exact-next-step validation371passed/520deselected8.43s/8.53s onrecord87609e58ffa79d5eea41b9fb0b68b1f88ead96702ec4efd998090bdb295a20e2, unchanged before/after; all tests isolated49/52runtime+syntheticDB with network/DNS/realQCcredential denial. Final readonly record audit accepted after explicitly labeling stale pre-implementation123 paragraph; no further findings. All8newsource/tests and old10source/tests plus3534430B published history remain byteexact; no fullsuite. Native requests remain34, job46b3 statusUNKNOWN, SAMEmonitor actualACTIVE,20REMXquarantined, no additionalpush. Following LOCAL record-only handoff commit changes no production source; future claims use actual resulting HEAD and retain financial source5f separately.
+
+## 124. Fresh exact OFF attempt2 status observation
+
+Current actualHEAD3b19c33787c5ed2760dd2ba2edd9cb078f30510a is the prior record-only handoff; parent financial sourceHEAD5f47205 is unchanged. One new-wake request only under fresh scope;20REMXquarantined/no additionalpush. No other active controller.
+
+Fresh124 claim BEFORE effect {"HEAD":"3b19c33787c5ed2760dd2ba2edd9cb078f30510a","bounds":{"JSON_depth_max":32,"JSON_nodes_max":4194304,"backtest_id":"46b3b10ca11481a9d6d8352e6602ac7b","candidate_config_sha256":"a01f769b4e712453956c64f8f2945c8b4c404f788bbf32490ce026852164b6ab","compiles":0,"endpoint":"backtests/read","financial_attempt":2,"financial_source_head":"5f47205aad43015f1c64981cf15200ae7482919e","jobs":0,"native_requests_max":1,"private_reads_max":1,"project_id":38609822,"registry_bytes":3573,"registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","request_seconds_max":30,"response_bytes_max":4194304,"retention":"whole wire plus every decoded key/string credential screening before any raw response persistence; exactjob status metadata only; refused bytes discarded","source_epoch":"TPR-SID-CASH-SINGLE-BASE-20261107-v2","source_writes":0,"trace":{"events":"CALL only exact status._fail.__code__","immediate_caller_allowlist":"same committed status module code identities; public basename/function/line only","inspect_locals_arguments_values_exception_text":false,"max_records":12,"parser_admission_limits_changes":0,"replace_existing_hook":false,"restore_prior_hook_finally":true}},"manifest":{"bytes":7685,"name":"TPR-R124-OFF-V2-STATUS-EFFECT-001.claim.json","sha256":"f77c50763c6c0407050fcb94c46c6717e3717ee6c2b2e760fa456c0f23837b63"},"operation_id":"TPR-R124-OFF-V2-STATUS-EFFECT-001"}
+
+124 OFFv2 exact-job STATUS PREeffect {"financial_projection_or_performance_interpretation": false, "job": "46b3b10ca11481a9d6d8352e6602ac7b", "project_id": 38609822, "proof": {"bytes": 6193, "name": "TPR-CMP29-API-R124-SINGLE-BASE-OFF-STATUS-001.prepared.json", "sha256": "bcab62fd233d11770a111426bd4f5abc2f0c7ca5048d3a7343cc56af91de076f"}, "requests": 1, "response_bound": 4194304, "screened_full_wire_retention_intended_after_validation": true}
+
+124 body-free public refusal gate diagnostic {"gates": [], "no_job_status_inferred": true, "proof": {"bytes": 197, "name": "TPR-CMP29-API-R124-SINGLE-BASE-OFF-STATUS-001.body-free-gates.json", "sha256": "b80721d5d76bfd119df43cce391916a87bf53af888c8b09bde098f857ad137b9"}}
+
+124 OFFv2 exact-job status result {"economics_accepted": false, "lock_cleanup_complete": true, "metadata": {"backtest_completed": false, "backtest_id": "46b3b10ca11481a9d6d8352e6602ac7b", "backtest_status": "In Progress...", "credential_echo_refused_before_retention": true, "economics_accepted": false, "entire_wire_validated": true, "financial_fields_projected": false, "json_value_nodes": 67, "max_json_depth": 32, "max_json_nodes": 4194304, "native_origin_independently_attested": false, "original_wire_bytes": 1559, "original_wire_sha256": "cbc775e7b11bd7ff7f5cd54d6ba15d4b225ed603ffd9571bda8965a2d3b4a8ad", "project_id": 38609822, "schema": "tpr-cmp30-job-status-projection-v1"}, "projection": {"bytes": 548, "name": "TPR-CMP29-API-R124-SINGLE-BASE-OFF-STATUS-001.job.projection.json", "sha256": "b23147af6dac22827d928eb878fd8403818d94a543b7bace5c38ebd9956d7eaf"}, "proof": {"bytes": 1919, "name": "TPR-CMP29-API-R124-SINGLE-BASE-OFF-STATUS-001.safe.json", "sha256": "11dcbf8a73c31c22570ae0849ef2953b7f505041c43ef915a5bb6ff2ea336d4a"}, "receipt": {"bytes": 1751, "name": "TPR-CMP29-API-R124-SINGLE-BASE-OFF-STATUS-001.result.json", "sha256": "5b4a844d209d58511e38440ad05e936cd1cb9a0fc2131060f5e0cce7b9070367"}, "receipt_published": true, "status": "completed"}
+
+Fresh124 claim BEFORE effect {"HEAD":"3b19c33787c5ed2760dd2ba2edd9cb078f30510a","bounds":{"QC_requests":0,"exact_file":"$CODEX_HOME/automations/target-price-qc-job-remaining-backtests/automation.toml","private_bytes_max":65536,"private_reads_max":1,"purpose":"preserve exact same ACTIVE heartbeat fields before refreshing last accepted nonterminal metadata; no new automation"},"manifest":{"bytes":6854,"name":"TPR-R124-APP-HEARTBEAT-CONFIG-READ-001.claim.json","sha256":"a5d0aaeb1a1c5eb8820bc3afbbeb89545188349afed9723c5116ccc4d107eae3"},"operation_id":"TPR-R124-APP-HEARTBEAT-CONFIG-READ-001"}
+
+124 existing heartbeat bounded configuration read {"id": "target-price-qc-job-remaining-backtests", "keys": ["created_at", "id", "kind", "name", "prompt", "rrule", "status", "target_thread_id", "updated_at", "version"], "kind": "heartbeat", "name": "Target-Price QC job \u2192 remaining backtests", "prompt_sha256": "ade420231608edbd186ec74f012672f2aa47da444712add0f4ea04fdc16d70c4", "proof": {"bytes": 10705, "name": "TPR-R124-APP-HEARTBEAT-CONFIG-001.safe.json", "sha256": "e4a8058491b02e0df6cfa15777f02de8ae668f8e53458e22058d7792e209c7e1"}, "status": "ACTIVE", "target_thread_id": "01a0fd4c-ebeb-72b0-863d-33bd1f7affeb", "version": 1}
+
+Fresh124 claim BEFORE effect {"HEAD":"3b19c33787c5ed2760dd2ba2edd9cb078f30510a","bounds":{"QC_requests":0,"app_updates_max":1,"exact_automation":"target-price-qc-job-remaining-backtests","job":"46b3b10ca11481a9d6d8352e6602ac7b","new_automations":0,"project_id":38609822,"purpose":"refresh last accepted In Progress completedFALSE metadata and consumed diagnostic; preserve exact job/schedule/name/chat and quiet monitoring; no native continuation","status_from":"ACTIVE","status_to":"ACTIVE","target_thread":"01a0fd4c-ebeb-72b0-863d-33bd1f7affeb"},"manifest":{"bytes":7033,"name":"TPR-R124-APP-HEARTBEAT-PROMPT-UPDATE-001.claim.json","sha256":"1677aa20d9953b921ed66f609cd8b174fae674fac4b7c7bff758bc282a672b31"},"operation_id":"TPR-R124-APP-HEARTBEAT-PROMPT-UPDATE-001"}
+
+Fresh124 claim BEFORE effect {"HEAD":"3b19c33787c5ed2760dd2ba2edd9cb078f30510a","bounds":{"QC_requests":0,"exact_file":"$CODEX_HOME/automations/target-price-qc-job-remaining-backtests/automation.toml","private_bytes_max":65536,"private_reads_max":1,"purpose":"verify same ACTIVE exact OFF monitor after last accepted nonterminal status prompt refresh; preserve name/schedule/chat/creation"},"manifest":{"bytes":6868,"name":"TPR-R124-APP-HEARTBEAT-CONFIG-READ-002.claim.json","sha256":"4111d569c3f06bd999173cf0fa0bc369dd75f7a3b980577aa57446dc5a9919e8"},"operation_id":"TPR-R124-APP-HEARTBEAT-CONFIG-READ-002"}
+
+124 existing heartbeat bounded configuration read {"id": "target-price-qc-job-remaining-backtests", "keys": ["created_at", "id", "kind", "name", "prompt", "rrule", "status", "target_thread_id", "updated_at", "version"], "kind": "heartbeat", "name": "Target-Price QC job \u2192 remaining backtests", "prompt_sha256": "f43628187b6eb5bec57f51f807ef534e590945e7d3304042f14d275f5d36b838", "proof": {"bytes": 11107, "name": "TPR-R124-APP-HEARTBEAT-CONFIG-ACTIVE-002.safe.json", "sha256": "71e708347841e939d6624502e2dd5aa0131ce16d62a303eb9892b122d7d68757"}, "status": "ACTIVE", "target_thread_id": "01a0fd4c-ebeb-72b0-863d-33bd1f7affeb", "version": 1}
+
+### 124.1 Accepted nonterminal metadata / prior refusal preserved
+
+One fresh claim TPR-R124-OFF-V2-STATUS-EFFECT-001.claim.json,7685B/
+SHAf77c50763c6c0407050fcb94c46c6717e3717ee6c2b2e760fa456c0f23837b63
+preceded the sole private registry read3573B, pure plan and exact fixed native
+backtests/read request. All status.REQUIRED_SOURCES were committed in actual
+observationHEAD3b19c33787c5ed2760dd2ba2edd9cb078f30510a; outer claim pins40sources.
+Registry immutable creation authorityEA2D and latest owner54a40 remain separate.
+
+Actual op TPR-CMP29-API-R124-SINGLE-BASE-OFF-STATUS-001:
+project38609822/job46b3b10ca11481a9d6d8352e6602ac7b;
+financial attempt2/configa01f769b4e712453956c64f8f2945c8b4c404f788bbf32490ce026852164b6ab.
+HTTP200/1559B, whole wire validated67nodes under unchanged4MiB/depth32/
+node4194304/exactnumbers/duplicate/UTF8/raw+decodedcredentials guards.
+Metadata In Progress..., completedFALSE. Request result.status=completed
+means the metadata request succeeded, NOT native backtest completion.
+No financial fields projected/interpreted; no initialization, economic,
+full-window completion or native-origin acceptance inferred.
+
+Safe result1919B/SHA11dcbf8a73c31c22570ae0849ef2953b7f505041c43ef915a5bb6ff2ea336d4a;
+fixed status-root receipt1751B/SHA5b4a844d209d58511e38440ad05e936cd1cb9a0fc2131060f5e0cce7b9070367;
+screened raw1559B/SHAcbc775e7b11bd7ff7f5cd54d6ba15d4b225ed603ffd9571bda8965a2d3b4a8ad;
+projection548B/SHAb23147af6dac22827d928eb878fd8403818d94a543b7bace5c38ebd9956d7eaf.
+Requestclaim402B/SHAbd197e3edb06450c227346ad81ad9cd44f6ffc888b60dbb7c4b6e37f240040e5;
+receipt published and shared lock cleanup TRUE. No second native request.
+
+The preclaimed one-time CALL-only exact _fail code diagnostic used precomputed
+same-committed-module immediate caller code identity allowlist, at most12
+public basename/function/line records, no locals/arguments/values/exception
+text/arbitrary stack walking. It refused replacing an active hook and restored
+priorNone in finally. Actual zero refusal gates,197B/
+SHAb80721d5d76bfd119df43cce391916a87bf53af888c8b09bde098f857ad137b9.
+No parser/source modification. Zero gates do NOT diagnose prior1319B refusal.
+That earlier123 receipt stays failed_or_uncertain, metadata/projection/rawNULL,
+prior native stateUNKNOWN, no refused body retained. Independent public-source
+review confirms no reader correction or native continuation indicated now.
+No new Mia request, source read/upload/compile/job/financial outcome acceptance.
+
+The SAME heartbeat was updated ACTIVE-to-ACTIVE with fresh last accepted
+nonterminal metadata, preserving exact job/name/schedule/chat/creation and
+quiet unchanged/nonactionable intent. No duplicate automation/controller.
+Update claim7033B/SHA1677aa20d9953b921ed66f609cd8b174fae674fac4b7c7bff758bc282a672b31;
+actual appACTIVE. Fresh readback claim6868B/
+SHA4111d569c3f06bd999173cf0fa0bc369dd75f7a3b980577aa57446dc5a9919e8;
+readback11107B/SHA71e708347841e939d6624502e2dd5aa0131ce16d62a303eb9892b122d7d68757;
+promptSHAf43628187b6eb5bec57f51f807ef534e590945e7d3304042f14d275f5d36b838.
+Existing chat01a0fd4c-ebeb-72b0-863d-33bd1f7affeb binding verified.
+The prior one-time trace instruction is marked consumed, not recycled.
+One fresh metadata request per NEW wake; pause this same heartbeat via app
+BEFORE actual terminal transition processing. While nonterminal, job/project/
+source/notebooks remain untouched. No performance interpretation while waiting.
+
+This124 wake consumed exactly1 direct native status request; cumulative123+124
+direct APIrequests35. Financialvariant launches remain2 (retained failedA1
+and currentA2), four other arms/native child verifier not launched. Current
+financial sourceHEAD5f47205 and all8newsource/tests remain unchanged; no new
+all-filecloud capture is claimed. A subsequent local record-only handoffHEAD
+may differ; future manifests must use actualHEAD and preserve parent financial
+sourceHEAD separately. All accepted full-window metrics NULL and all financial/
+chart/origin/rights/PIT/canonical gates remain unproved.20REMXquarantined,
+one excluded SID cash allocation unchanged, original study unpooled, skipClaude.
+No additional push; last observed remote041a54db remains the publication
+snapshot. Routine nonterminal polling is quiet; no owner action needed.
+
+124 local record edit first refused a stale in-memory preamble whitespace expectation BEFORE mutation/private/nativeeffect. Matched the actual prior committed stanza exactly and corrected only current preamble; no source, claim, read or request was replayed.
+
+124 final focused current/preamble/exact-next-step checks371passed/520deselected8.42s/8.52s onrecorde1fbe028229af3df550e93ede664274282c6f5e21690a16b5654d774fe0eed8f, unchanged before/after, isolated49/52runtime+syntheticDB before imports with network/DNS/realQCcredential denial. No fullsuite. All40outer committed sources unchanged; one statusrequest thiswake, no cloudsource/job changes, actual latest metadata InProgress/completedFALSE; financialacceptanceFALSE. SameheartbeatACTIVE readback verified;20REMX/noadditionalpush. Following local record-only handoff commit preserves sourceHEAD5f and observationHEAD3b19 separately; future claims use actual resultingHEAD.

@@ -29,8 +29,8 @@ from research.guidance_revision_drift.reporting import source_manifest
 
 
 MAX_BUNDLE_BYTES = 4 * 1024 * 1024
-# 63 explicitly enumerated source members plus the sidecar and manifest.
-MAX_BUNDLE_MEMBERS = 65
+# 64 explicitly enumerated source members plus the sidecar and manifest.
+MAX_BUNDLE_MEMBERS = 66
 MANIFEST_PATH = "gdr-bundle-manifest.json"
 SIDECAR_PATH = "research/guidance_revision_drift/lean/gdr-synthetic.jsonl"
 _CANDIDATE_PATH = "research/guidance_revision_drift/specs/gdr0a.draft.json"
@@ -44,7 +44,7 @@ _FILE_MODE = (stat.S_IFREG | 0o444) << 16
 _MODULES = (
     "__init__", "__main__", "archive", "artifacts", "assessment", "bundle",
     "callback_plan", "comparison", "completion_evidence", "contracts", "controls", "corporate_actions", "coverage_preflight", "evaluation", "events", "execution_contract",
-    "firstrate", "fixtures", "formulas", "guidance_dataset", "guidance_decoder", "guidance_inputs", "historical_market", "input_contracts",
+    "exploratory_preparation", "firstrate", "fixtures", "formulas", "guidance_dataset", "guidance_decoder", "guidance_inputs", "historical_market", "input_contracts",
     "input_preparation", "integration", "lean_bridge", "lineage", "order_planning", "pre_qc", "research_reference",
     "market_inputs", "multi_session", "native_bundle", "native_observation", "trace_transport", "cloud_inventory", "evaluation_cycle",
     "paired_bridge", "persistence", "qc_adapter", "qc_native_quotes", "qc_quote_parity", "qc_project", "readable_transport", "readiness",

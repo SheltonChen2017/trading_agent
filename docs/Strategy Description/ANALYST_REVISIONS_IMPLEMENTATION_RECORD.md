@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–348 retain the milestone, review, preregistration, QC
+strategy. Sections 1–349 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -904,6 +904,9 @@ Section 342 is Claude's review of section 341: accepted with notes, no defect
 found, and a new test audits all 20 generated quarantine files.
 Section343 records the owner's old-six October extension, counter-review of
 both342commits, and passed/spent offline preparation with seven source bundles.
+Section 349 is Claude's after-the-fact review of the seventeen Codex commits of
+sections 345–348: all accepted, no P0 or P1, four P2s, and new guards for a
+result reader that could never succeed and an unchecked notebook deletion.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1309,6 +1312,21 @@ formula, while observed provider availability/history governs factual data
 claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
+
+Section 349 is Claude's independent after-the-fact review of the seventeen
+Codex commits of sections 345–348 (`12889740..30b7d161`). All are accepted,
+with no P0 or P1. New `fd266692` holds two defects in spent code as strict
+expected failures: the D1 reader's uppercase journal marker, which meant it
+could never read a result (`ARV2R349-001`), and the v3 recovery's unchecked
+deletion of `research.ipynb` (`ARV2R349-002`). Before any further one-use QC
+operation, test each caller's real Store and transport together and check
+required fields against QC's documented model (`ARV2R349-003`). Measure or
+justify the 1 MiB response cap before the next result read (`ARV2R349-004`).
+A diagnosis of A4's runtime error should first rule the plain reader's
+`contains_key` precheck in or out (`ARV2R349-005`). No A5 or remaining arm is
+authorized, and 344/260/59/699 is unchanged. The immediate next step is that
+Codex counter-reviews section 349 and its new test file; the external Mia
+step below is unchanged.
 
 The owner explicitly waives Claude review of section 348 for A4 validation
 and conditional remaining old-six AR continuation. Actual D1 atbf8e6064
@@ -2581,8 +2599,8 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 343 (sections 328, 330, 340, 342 and 344, and the
-snapshots R333 and R337); for section 250 the owner
+the pushed range through section 348 (sections 328, 330, 340, 342, 344 and 349,
+and the snapshots R333 and R337); for section 250 the owner
 directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
@@ -4456,6 +4474,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-07 | Codex owner-triggered available-Safari/Mia checkpoint and offline plain preparation; section346 | `baf8e396` -> `8ee19d57` freeze -> this final result/handoff; exactly2commits | Qualified Mia diagnosis; six real plain-data objects and seven unchanged-economic source proposals retained locally | Sole committed local producer/collector actual0/0; original stdout validated; R346 nowSPENT; no QC upload/run; sourcepolicycauseUNKNOWN | 159distinct focused passes21.42s; cold170source/pubic-FD checks; expected13omission failures; initial9failed/33passed/38fixture-errors fixed before private use; no full suite | AR1003/3 exhausted; originalclaim pin omitted/CR346005 open for future scope;8data/report files pinned;3new displayed infrastructure builds bookfloor343/259/59/699,0newcells | One matching-lane final push; separately explicit post-three-failure recovery plus fresh current source/access/data/storage/run gates before any further candidate mutation; no rename/reset/Mia-run inference |
 | 2026-11-07 | Codex owner-authorized additional same-project A4 plain recovery; section347 | `67e1970d` -> `2befc75b` -> `1a5759f9` -> this final result/handoff; exactly3commits | Current source/access reconciliation, exact8leaf plaintext consumer, fresh own context,15source writes/3skips/mainlast/all18readback, one compile/launch | Sole A4actual0; observed In Progress... backtest007d4ab27c26d337ae53acb492a83410 in39054561; original output11501B/e0f7afb2... and report11390B/06b62d92... validated; no results read | Final373distinct focused passes1.51s; public176pin cold guard +169in-memory Python syntax checks; expected3red omission failures; all earlier fixture/doc failures qualified; no fullsuite | CR347002 resolved prospectively; prior3attempts and A4spent; source-policyhistoricalcauseUNKNOWN, metadataMD5notremoteSHA, allformalreadinessfalse; ONEshared+development look =>344/260/59/699,0newcells | Exactly one final matching-lane push; next separate exact terminal/result gate for this known run, no automatic rerun/other-arm/comparison/live action |
 | 2026-11-07 | Codex A4 terminal validation, failed-job diagnosis and Mia resource barrier; section348 | `4117c1a4` -> `bf8e6064` -> `e55d2175` -> this final result/handoff; exactly3commits | New source/DATA-bound D1 status/result contract; separate D2 error-only observer; unused continuation closure corrected, A4 acceptance remains unselected | D1actual2, known A4Runtime Error/all18sources exact; no selected statistics. D2actual2 unknown/no usable error projection. Mia blocked by occupied coding sessions, other projects untouched | Pre-D1 focused251passes5.90s; supplemental122passes0.77s overlap, not summed; native cold213-source guard/203Python compile and two expected red mutations; no fullsuite | I348001 masked logging category confirmed/spent reader frozen; unused closure fixed; runtime cause and Mia consultation remain OPEN. No new launch/look/cell;344/260/59/699 | ONE final matching-lane push, then coding-session release for diagnosis-only Mia; no A5, remaining-six launch, result acceptance or next milestone |
+| 2026-11-07 PST /08 UTC | Claude independent review of the seventeen Codex commits `12889740..30b7d161` (sections 345–348), after the fact | `30b7d161` -> `fd266692` (tests) -> this record commit | All seventeen accepted; section 349 | New guards: a marker scan over the R345–R348 callers and engines, with the spent D1 reader and the v3 notebook deletion held as strict expected failures; fake-versus-real and response-cap requirements documented | 24 range test files 1,323 passed; new file 11 passed, 2 expected failures; final selection 350 passed, 2 expected failures; 3/3 flip proofs; no full suite, no QC/Safari/Mia/provider access; 0 looks, 344/260/59/699 unchanged | 0 P0, 0 P1, 4 P2 (two held by strict expected failures, two documented requirements), 5 P3 | Codex counter-reviews section 349; meet `ARV2R349-003` and `-004` before any further one-use QC operation |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -79700,3 +79719,164 @@ all focused/static checks; no private/control/credential/QC/Safari operation
 followed D2. Diff check clean; matching live remote still4117c1a4 before
 final record commit. Source checks are endpoint observations, not continuous
 whole-tree/host integrity or proof of no earlier effects.
+
+## 349. Independent Claude review of `12889740..30b7d161`: the seventeen Codex commits of sections 345–348, reviewed after the fact, 2026-11-07
+
+### 349.1 Scope, synchronization and method
+
+The owner directed: "review all unreviewed commits. apply corrections where
+necessary. push once when done". The owner had waived Claude review of
+sections 345–348 before that work, so this is an after-the-fact review, not a
+gate those rounds waited on.
+
+**Starting state.** A fetch showed local, tracking and live heads equal at
+`30b7d161`, with a clean worktree. The range after the Windows-host Claude
+review `12889740` (section 344) holds seventeen Codex commits and no Claude
+commit. Besides 65 new files, it changes only the lane record and an append to
+`docs/research/alpha-result.md`, which deletes no line.
+
+**Method.** Five read-only reviewers each took one sub-range: the A1 preparation
+and submitter, the A2/A3 recoveries, the plain-data bridge and preparation, the
+A4 launch, and the section-348 reader, observer and conditional runner. They
+ran no repository code, used no network and read nothing under `artifacts/`.
+Two of them ran one no-op `python3 -c 1` by mistake, and two wrote scratch
+files outside the repository. Claude checked every finding above P3 against
+the source personally, and read sections 345–348 and the new ledger entries.
+
+**Access.** No QC, Safari, provider, credential or Keychain access occurred.
+Claude's artifacts census read `stat` metadata under `artifacts/` and no
+artifact content.
+
+### 349.2 What happened in the range
+
+A1, A2 and A3 of the AR100 pilot in new project 39054561 were refused before
+any compile, so they added no look. A1 stopped on an undocumented `isLibrary`
+field (`ARV2D345-001`) and A2 on a technical-row shape (`ARV2D345-002`). A3
+stopped when QC refused the fourth source file under its source policy
+(`ARV2D345-003`). The five QC editor builds seen in Safari were booked as
+infrastructure looks. After a diagnosis-only Mia checkpoint, Codex shipped the
+same data as plain files. The owner then authorized one more attempt, and A4
+compiled, launched and was booked as one development look. Section 348's
+reader then found A4 in `Runtime Error`. A bounded error observer returned
+nothing usable, and Mia could not be consulted because no coding session was
+free. None of the six remaining arms was launched.
+
+### 349.3 Per-commit dispositions
+
+| Commit | Section | Disposition | Basis |
+|---|---|---|---|
+| `5a2f3989` | 345 | Accepted with notes | Read-only availability check and A1 submitter. See `-003`, `-004` and `-008`. |
+| `1ca29735` | 345 | Accepted | Moves the R323.9 block back verbatim. |
+| `05d1bd53` | 345 | Accepted with notes | A1 freeze. Its suite required the undocumented field that refused A1 (`-003`). |
+| `4f9dde69` | 345 | Accepted with notes | A2 recovery. Its fake encoded the row shape that refused A2 (`-003`), and it adds the unchecked deletion (`-002`). |
+| `b342c841` | 345 | Accepted with notes | Read-only lock-shape diagnosis. Its fake still models the old row (`-003`). |
+| `f2c5984f` | 345 | Accepted with notes | A3 recovery. Its deletion ran (`-002`). |
+| `9026b4c6` | 345 | Accepted with notes | A3 refusal record. See `-007`(a) and (b). |
+| `5f5280db` | 345 | Accepted with notes | Plain bridge. Economics preserved; see `-005` and `-009`. |
+| `baf8e396` | 345 | Accepted | Record only. |
+| `8ee19d57` | 346 | Accepted with notes | Offline plain preparation. Its validator accepts a report with no bridge change (`-009`). |
+| `67e1970d` | 346 | Accepted | Record and fact. |
+| `2befc75b` | 347 | Accepted with notes | Read-only reconciliation and data guards. See `-008`. |
+| `1a5759f9` | 347 | Accepted with notes | A4 launch. See `-006` and `-008`. |
+| `4117c1a4` | 347 | Accepted with notes | A4 record and ledger append. Accounting checked; see `-006`. |
+| `bf8e6064` | 348 | Accepted with an open defect | Result reader and runner. See `-001`, `-004` and `-008`. |
+| `e55d2175` | 348 | Accepted with notes | Error observer and an edit to the runner before any use. See `-003` and `-004`. |
+| `30b7d161` | 348 | Accepted with notes | Record and ledger append. See `-007`(f). |
+
+**Checked and found correct:**
+
+- **Pins:** every new file's byte count and SHA-256 match the record, and no spent file was edited later.
+- **Facts:** each failure fact reproduces its original stdout pin. The facts contain no credential, organization or user ID, raw error, traceback or licensed row.
+- **Economics:** unchanged. The plain shards carry the same bytes as the old decompressed shards, 16 of 18 source files are identical in every cell, and only the input reader and `main.py` differ. The `main.py` change is the 2-byte shorter activation key. The section-348 result check enforces the old-six rules: 10 bps a side, 302 decisions, 1,451 sessions and an end date of 2026-10-13.
+- **Safety:** no path reaches a live, paper, broker, order, settings, project-delete or object-write endpoint. Credentials come only from the environment, after the claim and the data guard, and never reach argv or output.
+- **Remaining-arm gate:** `A4_RESULT_FACT_PIN` is `None`, its plan was never committed, and the runner refuses before any data or contact.
+- **Looks:** 338/259/54/699 moves to 343/259/59/699 for the five editor builds, and A4 then makes it 344/260/59/699. A1–A3 made no compile or backtest dispatch. The ledger keeps its old 542,146-byte prefix.
+
+### 349.4 Findings ledger
+
+| ID | Severity | Finding and disposition |
+|---|---|---|
+| `ARV2R349-001` | P2 | **Open in spent code; guard added in `fd266692`.** This extends Codex's `I348-001`. The D1 reader journals `'known-A4-status'`, but its own Store accepts only `[a-z0-9-]` markers. The reader therefore refuses `output` at that line on every status, before its `Runtime Error` and `Completed.` checks. D1 could never have read a result, even had A4 completed. 348.4, 348.8 and the ledger append call this only a masked category. The tests missed it because their fake Store skipped the marker check. The new scan checks every literal marker in the R345–R348 callers and engines against the pattern its receiver enforces. It passes everywhere except the spent reader, which is held as a strict expected failure. |
+| `ARV2R349-002` | P2 | **Open in spent code; held by a strict expected failure.** The v2 and v3 same-project recoveries delete `research.ipynb` without checking that it is the default notebook (`arv2_r345_legacy_six_qc_v3.py:705`, `:737–739`). Only `main.py` is pinned. 345.7 says only the default notebook may be removed. A3 ran the deletion: its 43 dispatches are one more than the path without it, and later inventories (Mia's report in 346.2, A4's 18 files) show no notebook. 345.11 does not record the deletion. The practical risk was small, because the project was minutes old and owner-only. A successor that reuses a project must refuse an edited notebook. |
+| `ARV2R349-003` | P2 | **Documented; requirement before any further one-use QC operation.** The range's lane-side stops trace to test doubles that encoded a wrong assumption or skipped the real layer. A1's suite supplied `isLibrary` and even required it. This repeats `ARV2E312-003`, where fixtures supplied an undocumented `Project.public`; section 345 does not cite it. A2's fake used `publicId == name`, the R298 row shape QC has since changed. D1's fake Store skipped the marker check (`-001`). D2's tests faked `_exchange`, so the base client's own refusals were never exercised; its classifier maps them all to `unknown` (Codex's `I348-005`). Before the next one-use operation, each caller needs a test that runs its real Store and real transport over a fake HTTP connection. Every required QC field also needs checking against the documented model. |
+| `ARV2R349-004` | P2 | **Suspected; requirement for the next result read.** D2 read `backtests/read` through the R345 base client, whose success-body cap is 1 MiB, and the v3 transport used by any future reader or runner keeps that cap. No record measures a full `backtests/read` for a multi-year run; other lane paths allow 2 MiB and 16 MiB. A larger body refuses `bound`, which D2 reports as `unknown`/`null`. This is not proven to be D2's cause, but it fits a 4-second failure 15 minutes after D1 succeeded against the same host. The same cap applies to the account-wide `projects/read {}` listing that the v1 and R348 engines make at begin, which also loads other lanes' project metadata into memory. Measure or justify the cap before the next read, and prefer the proven small `backtests/list` error fields for diagnosis. |
+| `ARV2R349-005` | P3 | **Documented; first hypothesis for A4's runtime error.** The plain reader (`newrule_plain_input_runtime.py:139–143`) keeps the `contains_key` precheck that the R203 fix removed after it caused that run's refusal (192.4). Codex disclosed this in 346.4, and R298's plain reader later passed input initialization. A4 was the first QC run of the bridged sources, so a diagnosis should rule this in or out first. |
+| `ARV2R349-006` | P3 | **Documented record qualifier.** A4's caller takes the status from the `backtests/create` response and polls only when that says `In Queue...` (`run_arv2_r347_legacy_six_a4.py:572–583`). The output does not record which response showed `In Progress...`, and the 130 dispatches fit either case. Given the later `Runtime Error`, "running observed" may rest on the create response alone. |
+| `ARV2R349-007` | P3 | **Documented record wording.** (a) 345.11 quotes the A3 refusal as banning "encoded or obfuscated" source and asking for "plain" files, splitting or storage. The retained redacted text has "encoding" but not those words, so that sentence is a reconstruction. (b) 345.11 omits the notebook deletion (`-002`). (c) 345.5 omits the account-wide project listing and the second authenticate and reference reads, and its object checks run about eight reads before `backtests/create`, not immediately before it. (d) 345.5's descriptor-leak fix is in `Sources.hold` only; the runner's `Store.__enter__` keeps the pattern. (e) "BOTH-Keychain denial" in 345 is file- and CLI-level. Under `allow default`, mach-lookup to securityd stays open, though no code uses it. (f) 348.4, 348.8 and the ledger append understate `I348-001` (`-001`). (g) 345.12 limited shared-ledger writes to the R298 authority, but 347 appended under the ledger's own rule. The append is right, because the lane gate requires every backtest ID there. |
+| `ARV2R349-008` | P3 | **Documented fail-closed items for successors.** (a) A busy node at begin spends the attempt in the v1, v2, v3, A4 and runner callers, although 345.3 says busy nodes wait. (b) The A4 caller's wrapper would forward mutation endpoints for the reference project 37165262. Only the engine's marker check stops them, and no pinned path uses that route. (c) A4's engine identity gates run after four read-only dispatches. (d) The A4 output validator does not require the look ordinal to be below the dispatch count. (e) The runner's `validate_a4_result_fact` trusts self-declared fields, and its output check never compares `report_pin` with the report. (f) The runner journals all four statistics in one event under a 32 KiB limit their caps exceed. (g) The real transport turns a definitive QC refusal into `request_ambiguous` with no kept ID. (h) D2's hashes of raw error text are dictionary-comparable for short messages. Codex can fix (e) and (f) in the unused runner before use. |
+| `ARV2R349-009` | P3 | **Documented test gaps.** Many refusal tests use a bare `pytest.raises(Refused)`, and some `match=` codes are prefixes of others. The bridge's `economic_ast` check compares a tree with itself, and the emitted loader bytes are never executed. The R346 validator accepts a report in which nothing changed, and the plan-pin test cannot detect an overridden pin. `compute()` has no unit test. Some asserts are tautological, for example on `FALSE_FLAGS` constants. |
+
+Overall: 0 P0, 0 P1, 4 P2 (two held by strict expected failures in new tests,
+two documented requirements), 5 P3. Codex's own open items `ARV2D345-003`,
+`I348-001`, `-003`, `-004` and `-005` stay open, as do the source, identity,
+PIT and formal gates.
+
+**Why `-001` and `-002` are not corrected in place.** The D1 reader and the v3
+engine are spent, and their recorded evidence is bound to those bytes. Neither
+can run again without a new versioned freeze, so there is no present risk.
+Their successors must fix both, and the strict expected failures then force
+the markers to be removed.
+
+Implementation-quality rating for this range: **6/10**. Strengths: honest
+stops, exact pins, careful accounting, preserved economics and no path to a
+real order. Held back because A1, A2 and D1 stopped on lane-side defects that
+their own tests encoded, and D2 returned nothing usable. This is not a
+strategy-efficacy or live-readiness rating.
+
+### 349.5 New test file
+
+`tests/analyst_revisions_v2/test_r349_review_guards.py` (5275 B,
+`37828ac786526e538add022069c23856618907c627d0b0650ae2cb425a0b9269`). It
+reads public code and synthetic values only. The notebook tests reuse the v3
+engine fixture. No production source changes in this round.
+
+### 349.6 Validation
+
+All Python runs used `sandbox-exec`:
+
+- **Sandbox profile:** denies all network, `/usr/bin/security` and every
+  read or write under `artifacts/`. Probes confirmed each denial first.
+- **Python and pytest:** `env -i`, Python 3.13 venv, `-B`,
+  `--noconftest`, `--ignore=artifacts`, plugin autoload and cacheprovider
+  disabled.
+- **Scratch paths:** `TMPDIR`, `--basetemp` and the pycache prefix all
+  under `.pytest_cache/claude-review-349`.
+
+The owner's standing direction is not to run the complete lane suite; it was
+not run.
+
+| Stage | Result |
+|---|---|
+| The range's 24 new test files at the incoming head | **1,323 passed in 28.77 s.** |
+| Record gates with the section-330 redactions and the r340 and r342 files at the incoming head | **136 passed, 2 expected failures, in 10.48 s.** |
+| New test file | **11 passed, 2 expected failures, in 0.24 s.** |
+| Fixes and breakage applied to temporary copies | Lowercasing the reader's marker flips its strict xfail. An uppercase marker in the runner fails the caller guard. A default-notebook check in v3 flips the notebook xfail. **3 of 3 behave as designed**; the unmodified copy passes. |
+| The record gates, redactions, r343 projection and preparation files, the v3 engine tests and the new file, after this section | **350 passed, 2 expected failures, in 25.89 s.** |
+
+Range hygiene: `git diff --check` is clean. The new public fact files hold no
+credential, organization or user ID, raw error or licensed row. The one
+organization hash they carry already appears in R298 sources.
+
+Artifacts metadata census by `stat` only, sorted: 9,251 entries before and after
+the review's test runs, identical in name, inode, size, mtime, ctime, mode and
+link count. These are two endpoint observations, not continuous stability.
+
+### 349.7 Handoff
+
+This review adds two commits, which go out in one push:
+
+- `fd266692`, the new test file;
+- this record commit.
+
+No result cell, look or booking was added: 344/260/59/699 stays. No QC, Safari
+or Mia action was taken, and this review releases nothing.
+
+Before any further one-use QC operation, Codex should meet `-003` and `-004`.
+Any successor result reader must fix `-001`, and any reused-project recovery
+must fix `-002`. The unused runner should fix `-008`(e) and (f) before use. The
+external next step stays as section 348 records it: once a coding session is
+free, a diagnosis-only Mia consultation on A4, starting with `-005`. No A5 and
+no remaining arm is authorized.
+
+The immediate next step is that Codex counter-reviews section 349 and its new
+test file.

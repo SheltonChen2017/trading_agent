@@ -46962,3 +46962,22 @@ allocator variables without global environment mutation or a shell. Git and
 prepared roles already use explicit minimal environments; the observed first
 health's outer launcher also used one. This is hardening of reusable entry,
 not evidence that an injected environment caused the observed refusal.
+
+Second ordinary zero-DATA CLI health, already-existing clean
+2ca0c46fe66031cd4cec6de6928343303bff546e: exit2 after4.126s, same52B finite
+refusal/stdout hash,stderr0. Source-only stage diagnosis localizes the refusal
+to the snapshot worker's Git status. Git returns0 but emits a permission
+warning (66B/hash6d33c20d28c5653417e982504066743d0e6ac1f3189672e7a8e0f659e1307583;
+then71B/hash362e5565f77e36fbe10ea695309edd096436d22ad69e89c9880db262a5b7e916),
+so the ZERO-stderr guard correctly refuses rather than declaring clean.
+It needs exact DIRECTORY traversal literals for existing tmp and tmp/pdfs.
+Add only those two fixed optional directory literals, checked for lexical/
+resolved containment; NO contained file body, subtree or runtime permission
+is granted and any further unknown directory still refuses. Preserve full
+untracked status and zero tolerated stderr; do not substitute a tracked-only
+status or weaken clean identity. With those literals, source-only diagnosis
+passes the warning boundary and correctly reports current uncommitted edits
+as source_dirty (1.068s,stderr0). No saved DATA or PDF body is read.
+One temporary source diagnostic has a generated-code syntax refusal before
+any diagnostic step; it is corrected locally, not called a product success.
+Runner56 PASS1.24s (outer2.209s,stderr0) covers fixed directory planning.

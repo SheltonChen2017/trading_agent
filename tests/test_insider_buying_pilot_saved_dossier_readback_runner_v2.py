@@ -61,6 +61,15 @@ def test_source_manifest_accepts_a_pinned_empty_git_source(monkeypatch):
     assert m.validate_manifest(manifest) is manifest
 
 
+def test_tree_plan_adds_only_the_fixed_optional_directory_not_a_data_subtree(monkeypatch):
+    monkeypatch.setattr(m, "git_position", lambda *a, **k: None)
+    monkeypatch.setattr(m, "git", lambda args, admin: b"research\n" if "-d" in args else b".gitignore\n")
+    monkeypatch.setattr(Path, "is_dir", lambda path: path == m.ROOT / "tmp")
+    tree = m.tree_plan("b" * 40, {})
+    assert tree == {"directories": [str(m.ROOT), str(m.ROOT / "research"), str(m.ROOT / "tmp")],
+                    "ignores": [str(m.ROOT / ".gitignore")]}
+
+
 def _verified(manifest, original):
     return {"schema": m.SCHEMA + "/verified-sources", "completed": True,
             "reader_head": manifest["identity"]["head"],

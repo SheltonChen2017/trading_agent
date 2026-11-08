@@ -200,7 +200,11 @@ def tree_plan(head, admin):
         return str(ROOT / name)
     need(len(directory_rows) <= 4096 and len(files) <= 20000
          and all(len(p) <= 1024 for p in (*directory_rows, *files)), "tree_refused")
-    return {"directories": [str(ROOT), *(relative(p) for p in directory_rows)],
+    # Git must enumerate this existing untracked directory to establish a
+    # clean status. Grant its DIRECTORY literal only, never file bodies or a
+    # subtree. Any other unexpected directory stays denied/fail-closed.
+    optional = [str(ROOT / name) for name in ("tmp", "tmp/pdfs") if (ROOT / name).is_dir()]
+    return {"directories": list(dict.fromkeys([str(ROOT), *(relative(p) for p in directory_rows), *optional])),
             "ignores": [relative(p) for p in files if Path(p).name == ".gitignore"]}
 
 
@@ -298,7 +302,7 @@ def validate_manifest(manifest):
     isolation._layout(manifest["admin"])
     tree = manifest["tree"]
     need(type(tree) is dict and set(tree) == {"directories", "ignores"}
-         and type(tree["directories"]) is list and 0 < len(tree["directories"]) <= 4097
+         and type(tree["directories"]) is list and 0 < len(tree["directories"]) <= 4099
          and type(tree["ignores"]) is list and len(tree["ignores"]) <= 256, "tree_refused")
     isolation._source_directories(tree["directories"]); isolation._ignore_leaves(tree["ignores"])
     pins = manifest["runtime_pins"]

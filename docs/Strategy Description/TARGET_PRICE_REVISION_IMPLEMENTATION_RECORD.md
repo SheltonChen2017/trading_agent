@@ -1,6 +1,6 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current section152 OFF attempt2 / terminal Runtime Error; heartbeat PAUSED:**
+**Current section153 owner-directed push / OFF attempt2 Runtime Error; heartbeat PAUSED:**
 The sole fresh exact-job status request accepted Runtime Error, completedTRUE
 for OFF38609822/job46b3b10ca11481a9d6d8352e6602ac7b,
 SID-CASH-SINGLE-BASE-20261107-OFF-A2. The unchanged status parser validated
@@ -37,7 +37,9 @@ until an actually created next job with exact source/provenance is available.
 Keep all20REMX rows quarantined; exactly one authorized SID allocation stays
 cash, other weights/fixed60slots/calendar/economics unchanged. Original study,
 native accounting/chart/origin/intent/rights/PIT/canonical gates remain unclosed.
-Skip Claude, NO ADDITIONAL PUSH; round120 push041a54db is consumed.
+Skip Claude. Latest owner instruction153: push first. This authorizes one
+additional push of this exact Target lane, superseding the prior push ban only.
+The earlier round120 push041a54db remains consumed historical provenance.
 
 **Published section120 handoff before the current owner continuation (2026-11-07):** The in-app browser is
 authenticated on own OFF38609822/code; nativeSafari remains untouched.
@@ -38998,3 +39000,44 @@ test or shared document changes; no push. Keep heartbeat PAUSED. Next action
 requires genuine Mia access restored by owner sign-in, not an unchanged launch.
 Future guards/manifests must use actual post-handoffHEAD; financial parent source
 remains5f47205aad43015f1c64981cf15200ae7482919e.20REMX/oneSIDcash/NULLmetrics unchanged.
+
+## 153. Owner-directed push of current Target lane
+
+Latest explicit owner instruction: push first. This supersedes the earlier no-additional-push restriction for this one Target-lane push. Other research, review, source, quarantine and paused-Mia boundaries remain unchanged. Fresh Git claim BEFORE effect {"manifest":{"bytes":6239,"name":"TPR-R153-GIT-TARGET-REMOTE-VERIFY-001.claim.json","sha256":"8de5c416d7f054c7f85e4ddd88134cfe28515aa2534968a40455bab5caf36c4c"},"scope":{"access":"existing Git authentication for origin exact Target ref only; no QC/provider/UI/broker effects","attempt_id":"TPR-R153-GIT-TARGET-REMOTE-VERIFY-001","bounds":{"exact_ref":"refs/heads/codex/strategy-target-price-revisions","pushes":0,"raw_output_retained":false,"requests_max":1,"stdout_stderr_each_max_processed_bytes":4096,"timeout_seconds":30},"created_utc":"2026-11-08T19:10:45.544968+00:00","expires_utc":"2026-11-08T19:12:45.544968+00:00","git_head":"1e5e60619928f2c36a33e9b8d29e9edc105e7e22","look_id":"TPR-R153-GIT-TARGET-REMOTE-VERIFY-001","operation_id":"TPR-R153-GIT-TARGET-REMOTE-VERIFY-001","owner_instruction":"push first","owner_instruction_sha256":"33360fb1767c803d6da0397eac6c2dd3f53947983aad5024d4cbdd1640f7568b","schema":"tpr153-owner-directed-push-remote-claim-v1","source_hashes":{"AGENTS.md":"daf233778864ed89020e2682212eed48080d2d82f868eefa0c71f71c90a1f409","CLAUDE.md":"31c231296781537a8172ca8213f9cc4d00df1ab538647c4395f593ed5a470f85","research/__init__.py":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","research/target_price_revisions_development/raw_revision.py":"ea4efcd9b0e73ae0b5c166d820c51e054559a3ed610041a6eb2acc8abca36353","research/target_price_revisions_qc/__init__.py":"3bc79e69bc0c775d8ef0ec154551436011cba407f37690c27ccbeb9000153c59","research/target_price_revisions_qc/cap_observer.py":"cad8a3306f6b459bc8bf187c8fd8b8bb980c7b1dc0d85465fba11dd318b70c4d","research/target_price_revisions_qc/cap_tilt.py":"262f568b7c0fe0b08af8a26896431465c17746bcd32e9addc568f58631e11a5c","research/target_price_revisions_qc/comparison_20261028.py":"e9b1f513fe453fcd47408171ecbc4342a9321195405c2ce31b7591439f5f44c5","research/target_price_revisions_qc/comparison_20261028_accounting.py":"9ff8df1cf142308d8cd73e2950ddfe02d64bbe88c02b5316b424f50cc49b1bc6","research/target_price_revisions_qc/comparison_20261028_algorithm.py":"27c6516b9dfd2d1e71f0ef8fbdb7c371266e36e11bd9e3089e2ce6b76d25aee0","research/target_price_revisions_qc/comparison_20261028_api.py":"a2a160ac951a8a9f96b9531e5b51a5bf6b4e7b116b7873f77515780f059ebc5a","research/target_price_revisions_qc/comparison_20261028_bundle.py":"76637ed47522b6f4eb0a8e19d0962afce5e08cd249d28348dc1204547ee71b6a","research/target_price_revisions_qc/comparison_20261028_completion.py":"d0489d7c4e1c33207870f4c66e9bf0569145ba1be28f76edd4040685317e5467","research/target_price_revisions_qc/comparison_20261028_events.py":"8041ed95e01103007379e4b5761d14b4f5c0425afb6e889d9e295dd6acc9965d","research/target_price_revisions_qc/comparison_20261028_multi_algorithm.py":"2af9c8d3b4762ca0990c0aaf2361653518a0572818e91def07603972f378e6ce","research/target_price_revisions_qc/comparison_20261028_multi_bundle.py":"7015c94867da28d31426627275ec607e9f8fb3d8f6cb38d97cbd6aa5511b7e28","research/target_price_revisions_qc/comparison_20261028_policy.json":"2cfeca1b9058f3587a6d5c98df0e6b1ed10b25cdc4398b24a3525130da6425b2","research/target_price_revisions_qc/comparison_20261028_signal_native.py":"6fdab16bdfe070e138b92977279dec0d03d67e6a05b1be5f9af5e9136bd96935","research/target_price_revisions_qc/comparison_20261029_project_api.py":"680f31f17447e240f919435ee1d56a9a48526f5197e37ac97332b4b70ee42b87","research/target_price_revisions_qc/comparison_20261029_project_bundle.py":"a5534dbebc994f3e6ffe301a721f210d9110384216e539f2c2d42c69e8fcb300","research/target_price_revisions_qc/comparison_20261029_projects.py":"6dc87f33105de9d80e7a267a6cc737bb4262f47e49c43b65247592927a5788d7","research/target_price_revisions_qc/comparison_20261030_job_status.py":"f3e463c22b8a4ae0cb37474456b2215ef0c333e5e43a7b504aeddc55aca9c199","research/target_price_revisions_qc/comparison_20261103_preflight.py":"e16d50cd8bb3fa0716b9e1994552f07b2dcf02554493c6bbf1b41661de847082","research/target_price_revisions_qc/comparison_20261103_project_custody.py":"702d31144a7e62b59a53d374af695078f150809b19f0992415e690d07fa418a4","research/target_price_revisions_qc/comparison_20261107_sid_cash_bundle.py":"ae9455e7371cb4b24c8b5dfe218c28c437441e425e5d44f94eb716159f47ad39","research/target_price_revisions_qc/comparison_20261107_sid_cash_single_base_actions.py":"c463d076f9606e2c929c3f6a44b28bdb1cdd26b36fa31e35d6d08ff8b361dc91","research/target_price_revisions_qc/comparison_20261107_sid_cash_single_base_bundle.py":"fb75e8cde2f99b1ace170e42d74d00b77714b3611a1dc7c117f5ec3f614e0dd1","research/target_price_revisions_qc/comparison_20261107_sid_cash_single_base_native_results.py":"09d482b841b56d7e184dedf19c7f1f446e14303f665478b34c775c09441677a7","research/target_price_revisions_qc/comparison_20261107_sid_cash_single_base_results.py":"7e5ac45900b93049491ca27312da166a33c61b7b5511f34a9e749fa1259e86a9","research/target_price_revisions_qc/extended_algorithm_successor.py":"e0077b7992dc64515384f56687b350725d694c746a8d4523336d18aa144dd9a8","research/target_price_revisions_qc/extended_calendar.json":"3eccdf3cf9a2542ffd249983241d5747c2ecd4e21bc4a71f7f826c77ec1fe53d","research/target_price_revisions_qc/extended_construction.py":"4be72251040a0f133ee4a39245a3b0fe96285715a8510b4328b5d06c276596a6","research/target_price_revisions_qc/extended_core.py":"706ed5efdcb3999400c5349dc8b5200be1d48c4bb01cbfc7fb080608a679d5da","research/target_price_revisions_qc/extended_evidence.py":"a816b1ddca5a8428f07e9029bc3a7f7db3c5e1a1f50521664992dabf556aa2d7","research/target_price_revisions_qc/extended_loader.py":"24c752b0859a04d73306e3afddc10d45cc6d3c7b566e2ff17ef160fd90e6e10b","research/target_price_revisions_qc/extended_metrics.py":"a8cfa235c7a54e8f33366570400dbe1bac0a0e900597e94427e5d0c5b7470414","research/target_price_revisions_qc/extended_operations.py":"824b3f0c180f1aeb7038d8f280c44507b5c39687fcccc87c539f242d9256d167","research/target_price_revisions_qc/extended_runtime_successor.py":"2e6bb5c82f356ee7ece4811c9d634ce57d48533d408d4b57b8aee41de062517b","research/target_price_revisions_qc/sid_cash_exclusion_20261107.py":"5fe401a620bfc455a1aa840bb3e8d1f970e084407fb0a5ea73fdd8b711a53c18","research/target_price_revisions_qc/subscription_recovery_20261103.py":"14083a5213f24e929c21308f507ad28e18fdd92dbfdd6c3d29581749631e253a"},"supersedes":"prior no-additional-push instruction only; other boundaries unchanged","tool_body_sha256":"a119f25c68e29fd677caab9469a69a4007b667c23eccbd7a07f97fd988b78ce4"}}
+
+153 fresh exact Target remote verification {"exact_ref": "refs/heads/codex/strategy-target-price-revisions", "operation_id": "TPR-R153-GIT-TARGET-REMOTE-VERIFY-001", "pushes": 0, "raw_output_retained": false, "remote_head": "041a54dbd53d54ba02a42f8740580eba7be3f298", "stderr_bytes": 0, "stdout_bytes": 90}
+
+### 153.1 Verified publication scope / single authorized push
+
+Owner's latest instruction is exactly "push first", superseding the earlier
+no-additional-push restriction for this one lane publication. SkipClaude and
+all economic/privacy/research boundaries remain unchanged. Native heartbeat
+is stillPAUSED; no QC request, Mia attempt, source repair or new job thisturn.
+
+Fresh exact origin ref verification returned041a54dbd53d54ba02a42f8740580eba7be3f298,
+the last actual remote. One bounded30s Git read, stdout90B/stderr0B;
+no raw remote output/credential text retained. No unexpected remote advance.
+Independent PUBLIC Git audit of041a54db..1e5e60619928f2c36a33e9b8d29e9edc105e7e22:
+34commits; across EVERY commit exactly19expected paths (9Target source modules,
+9matching focused tests, this sole record). No shared/other-lane/private artifact,
+binary/archive/data/symlink/submodule path; all final paths regular100644/text.
+This is a publication-scope check, not a new financial or native acceptance.
+
+Current software validation remains the retained focused source checks in123
+and371current/preamble document checks152 (520deselected). This note changes
+only owner publication authority and retained Git facts; no source/test edits.
+Published sections9..120 remain exact; preserve all failed reads/looks/attempts.
+A1 and A2 runtime failures remain separate, full-window financial metrics NULL;
+50/100/200/pure unlaunched,20REMX quarantined, exactly one SID-to-cash unchanged.
+
+Next commit is record-only and will be included with the already committed
+snapshot in this one owner-directed push. Immediately before the push, verify
+physical cwd/Gitroot/branch/actualHEAD/status and freshly fsync immutable
+TPR-R153-GIT-PUSH-001.claim.json under the existing ignored SID-CASH artifact
+root. It binds the exact actual post-handoffHEAD, source closure, "push first"
+owner SHA, origin Target ref, one bounded push/no force/no tags/no submodules
+and preclaimed bounded remote readback. Persist the sanitized actual outcome
+in TPR-R153-GIT-PUSH-001.result.json in that same private root; do not append
+a post-push source/handoff commit merely to repeat the external receipt.
+No other branch/worktree or push is authorized by this publication step.
+Heartbeat/Mia access blocker and next owner sign-in action remain as152.

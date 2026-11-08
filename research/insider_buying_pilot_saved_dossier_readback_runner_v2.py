@@ -6,6 +6,7 @@ provider, credential, namespace creation, receipt rewrite or QC operation.
 from __future__ import annotations
 
 import argparse
+import ast
 import ctypes
 import errno
 import hashlib
@@ -129,6 +130,17 @@ def source_names():
             for key, value in tuple(vars(module).items()):
                 if key.isupper():
                     collect(value)
+    scanned = set()
+    while found - scanned:
+        need(len(found) <= 1024, "source_refused")
+        name = sorted(found - scanned)[0]; scanned.add(name)
+        data, _observed = code_bytes(name)
+        # String-named frozen/test verifiers can live in statically imported
+        # modules that this particular process has not imported. Inspect code
+        # literals transitively; never execute those modules or read DATA.
+        for node in ast.walk(ast.parse(data, filename=name)):
+            if isinstance(node, ast.Constant) and type(node.value) is str:
+                collect(node.value)
     return tuple(sorted(isolation.validate_source_names(sorted(found))))
 
 

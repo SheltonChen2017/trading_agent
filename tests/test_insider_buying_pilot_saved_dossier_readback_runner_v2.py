@@ -452,9 +452,21 @@ def test_source_names_cover_eight_own_files_and_string_named_verifiers(monkeypat
         patch.setattr(m.custody, "_internal_source_paths", lambda _root: (m.SELF,))
         patch.setattr(m.sys, "modules", {"invented-loaded": module})
         patch.setattr(Path, "is_file", lambda _path: True)
+        patch.setattr(m, "code_bytes", lambda name: (b"", []))
         names = m.source_names()
     assert len(m.OWN) == 8 and set(m.OWN) <= set(names)
     assert frozen in names and set(m.prior.OWN) <= set(names)
+
+
+def test_static_string_paths_in_unloaded_closure_modules_are_captured(monkeypatch):
+    unloaded = "research/invented_unloaded.py"
+    transitive = "research/invented_transitive.py"
+    monkeypatch.setattr(m.custody, "_internal_source_paths", lambda root: (m.SELF, unloaded))
+    monkeypatch.setattr(m.sys, "modules", {})
+    monkeypatch.setattr(Path, "is_file", lambda path: True)
+    monkeypatch.setattr(m, "code_bytes", lambda name: (
+        ("FROZEN={'" + transitive + "':'invented'}").encode() if name == unloaded else b"", []))
+    assert transitive in m.source_names()
 
 
 @pytest.mark.parametrize("entry", ("preflight", "prepare"))

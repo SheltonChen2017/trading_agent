@@ -47052,3 +47052,33 @@ Final-code boundary/platform/document/import/EXACT selection229 PASS29.06s
 (outer30.129s,stderr0), zero skips/warnings. Eight images compile; frozen17
 test/four v3 pins remain exact (outer0.763s,stderr0). Native health acceptance
 alone does NOT yet close the P2 successor qualification or factual gates.
+
+### 386.8 Exact saved refusal and source-inventory correction
+
+Diagnostic implementation0dd3f6d66d2096ff6ad0ba3821a1d574e72f1b07 exists clean.
+Ordinary zero-DATA health PASSES exit0 in62.903s, stdout1811B/hash
+e9fd2e3856de73d9ff71f6c6629cc3680138aaef0c121e6c8f6fc24d8fa02d0a,
+stderr0,219 current images/inventory
+8407bf41cb45fd84ed7b5bed2e83cdb41dc8da5c61f8709060121ff0d74d736b.
+After another clean root/branch/HEAD preflight, SECOND ordinary saved
+readback FAILS exit2 in42.825s,stdout117B/hash
+8883fa1a08540ffd6ae8908a611a5e78b18d6d985f7261c86565c9888bb97916,
+stderr0: phase saved-validate, reason saved_source_overlap_refused. The
+stable five-leaf reader and external complete/reservation extraction finish
+before that phase; original177/current overlap has NOT been accepted and
+the separate original Git verifier is not activated. Do not retroactively
+assign this precise cause to the earlier aggregate refusal without evidence.
+
+Source inspection identifies that current inventory construction scans
+string-named verifier constants only in LOADED modules. The legacy identity
+also includes named images in statically reachable but unloaded modules.
+Add transitive AST string-path inspection of the bounded captured CODE
+closure, without executing those modules or reading DATA; require normalized
+existing relative .py leaves, exclude artifacts and stop above1024 images.
+One invented unloaded-module test first FAILS1.01s (outer1.852s,stderr0),
+then final focused480 PASS3.24s (outer4.088s,stderr0), zero skips/warnings.
+Source-only candidate count becomes233 (outer2.572s,stderr0). The increase
+of14 is a current candidate inventory expansion, not a claimed measured
+count of missing historical images. The next qualified readback still must
+prove the exact original177 subset and every original/current Git byte.
+No overlap guard, old anchor, source hash or receipt is relaxed or rewritten.

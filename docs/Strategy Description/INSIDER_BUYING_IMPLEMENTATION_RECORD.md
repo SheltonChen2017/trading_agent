@@ -46667,3 +46667,102 @@ verified before staging. No branch/worktree/shared/source move or extra local
 commit is bundled. Commit this correction/scope before the separate385
 handoff, then perform the one authorized final publication with independent
 tip/clean/synced verification.
+
+## 385. Separate durable handoff — counter-review only
+
+Exact incoming range478fbff7a425fa005f5b5554d8a8ce6220336ba5..
+6eaffd07426ca34df2f2a927c0f1b9866f841e2c contains TWO commits/zero merges;
+each disposition is384.1. This handoff follows already-existing correction
+45caea8dc80d896cb969c012cddbd961565be880. Every outgoing change belongs to
+this authorized counter-review: one unbound21-case test file, precise
+current-record privacy mitigation and append-only review qualifications.
+No older local-only work, other lane/shared change or next milestone enters
+the single final push. This is not an independent review of Codex's own work.
+
+Completed technical scope: both incoming Claude commits are accepted at their
+qualified scopes, targeted native test sensitivity/probes independently verify
+material findings, direct installer/role-entry coverage is added without
+changing177-image-bound production/test bytes, and the P0-P3 ledger/next-use
+gates distinguish factual source evidence from contract validity and runtime
+capability. No schema/CLI/production/runtime behavior changes or live-assistant
+effects. Four review images compile and frozen hashes remain exact.
+
+Plain-language result: the review's new tests are useful, and several broad
+statements now have precise limits. More tests protect the existing activation
+checks, but they do not repair the production paths or create missing history.
+The record now hides precise subscription dates in its current display while
+preserving the already-pushed audit trail. No data or backtest was run.
+
+Final issue state: no P0/P1. The15 previous P2s retain371.4's exact scopes,
+plus OPEN P2 IBPIT-POLICY-CCR38401, for16. All affected future actual reuse
+requires a qualified successor for protected runtime/admin/source isolation;
+the actual379 runtime/source evidence is not silently relabelled unsafe.
+The six383 P3 observation groups and seven369 P3 groups retain384.3's
+qualified scopes. Incoming three test P3 corrections are accepted; direct
+installer/entry test subgap is corrected in45caea8d only. Privacy finding is
+mitigated in the current tree but historical publication remains recorded;
+complete historic purge would need separate history-remediation authority.
+No history rewrite or retrospective disclosure approval is inferred.
+
+Observed validation:553 focused PASS6.50s;229 boundary/platform/document/
+import/EXACT PASS29.17s; incoming-only18PASS1.17s and new-only21PASS1.17s.
+Three representative incoming reversals show100/78/55 old passing cases
+respectively with4 expected new negatives caught and1positive control.
+Two added-test reversals catch3 expected negatives with8positive controls.
+These are test executions/sensitivity observations, not unique totals or a
+repeat of Claude's24-mutant sweep. The private walk, broader reviewer tests,
+strict fork failures and shared SEP-2 observations remain attributed383.
+No full lane/repository suite, Windows host or private-root replay occurred.
+All root tests/probes use384.4's native DATA/network/write/isolation and real
+VM/RSS controls. The harness remains a temporary test caller, not an actual
+data-operation launcher or a fix for an older committed-controller gap.
+
+**NO NEXT MILESTONE THIS ROUND.** Source/PIT/rights/canonical/full-population/
+look/QC/backtest/execution gates remain FALSE. A real version-linked historical
+available-by archive and dated issuer/share-class/listing/PIT evidence are
+still needed alongside all carried original/lot/context/earnings/processing/
+population/parity gates. Supplier responses/samples remain unqualified; this
+counter-review does not check mail, send a reply or activate a data endpoint.
+No vendor/SEC/provider/credential/licensed-row/original/USB read, acquisition,
+purchase/upgrade/trial/renewal/export, QC/Safari/API/SDK/upload/job/history/
+outcome/backtest, broker/operator-database/scheduler/deployment/capital/
+funded/paper/live/order/trading action. Monitors stay disarmed, no other chat.
+
+All frozen IB1C v1/scale/pilot and four current-byte v3 custody files are
+unchanged; exact aa0d635d validator is not replayed. Stoppedv3 remains1846
+completed/1847 starts unresolved; separate7373B/report206e6db9 diagnostic
+does not resolve it. Required21 eight originals/20,052 consumption chain/eight
+NON-DISPATCH candidates, legacy19,846/99,394 and79,548 unattempted, strictD23
+seven nonexact/no82-quarter digest remain. Preserve frozen82-quarter and
+distinct2021-2025/2020Q4 pilot/warm-up populations/economics/refusal accounting
+and both earnings diagnostics. Both nonretroactive incident classifications
+remain distinct at380: historical authorization provenance not established
+for372 older requests; reviewer-reported probable unintended SEC access,
+exact request count/transferred bytes not established for the other incident.
+
+Quality assessment8/10 for this bounded counter-review: independently observed
+native regression/sensitivity and precise acceptance limits, with unclosed
+successor/isolation and genuine historical-evidence gaps candidly retained.
+This is not a strategy/readiness score. Shared/project records, Action Plan
+and SESSION_HANDOFF stay frozen; this is the sole lane handoff.
+
+Final record/active/import/EXACT, narrow privacy/scope/whitespace/source-state
+checks follow. Before the separate handoff commit and final push, verify fixed
+root/branch/exactHEAD and expected-only/clean status, fetch ONLY matching
+origin and stop if6eaffd07 advances. Make exactly ONE successful matching-lane
+push including45caea8d and this handoff, then independently verify exact remote
+tip and zero ahead/behind. Do not publish an interim checkpoint or rearm a
+monitor. Completed counter-review does not grant actual use of affected
+paths before their recorded successor conditions are satisfied.
+
+Final completed384/385 record/active-document/lane-import/ML-import/EXACT
+selection135 PASS14.03s, zero skips/warnings (outer15.080s,stderr0), under
+the same native/memory/DATA fences and required child capability. Whitespace
+passes. Exact round diff is the lane record plus one unbound test; production
+sources and all other tests are unchanged. Narrow added-line scan finds no
+mail/account address or mail-ID shape, private-key/bearer/API-token pattern,
+or repeated precise subscription lifecycle date. Matching-only origin remains
+exact6eaffd07. Before handoff commit, fixed root/branch/current45caea8d HEAD
+and expected-only record modification are rechecked; one publication and
+independent exact remote-tip/clean/synced checks then follow. No further test
+or production change is introduced by this validation tail.

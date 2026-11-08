@@ -1,11 +1,11 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **381 FMP THEN EODHD EXISTING-PLAN ARCHIVE-SAMPLE INQUIRIES SENT AND
-INDEPENDENTLY READ BACK; ZERO REPLIES/SAMPLES AT EACH CHECK.382 IS THE FINAL
-OUTREACH HANDOFF.379 CURRENT-STORAGE/12-CONTROL DOSSIER AND FIVE-LEAF READBACK
-REMAIN COMPLETED ON cbd2897c; OLD PROOFS/GUARDS/FAILED AUDIT STAY PRESERVED.
-HISTORICAL AVAILABILITY/PIT EVIDENCE AND ENTITLEMENT FOR ANY NEW SAMPLE ARE
-STILL UNESTABLISHED; ALL READINESS GATES REMAIN FALSE. NO PURCHASES OR QC.**
+Status: **383 IS CLAUDE'S REVIEW OF f99c66eb..478fbff7 (18 COMMITS, SECTIONS
+371-382). ALL ACCEPTED; NO P0/P1. 24 GUARDS IN THE PIT AUDIT, DOSSIER AND
+DOSSIER-RUNNER CODE HAD NO TEST THAT CAUGHT THEIR REMOVAL; THREE NEW TEST
+FILES NOW CATCH ALL 24. CODE DEFECTS IN THOSE 177-IMAGE-BOUND MODULES ARE
+SUCCESSOR RULES. 381's INQUIRIES AWAIT REPLIES. HISTORICAL AVAILABILITY/PIT
+EVIDENCE IS STILL MISSING; ALL READINESS GATES REMAIN FALSE. NO PURCHASES OR QC.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -73,6 +73,8 @@ Sections 371-372 are Codex's counter-review and separate durable handoff of
 all three incoming Claude commits. This round is counter-review only.
 The later explicit373 owner direction releases the reply hold for Sharadar
 only and authorizes the bounded retained-input identity audit; no QC release.
+Section 383 is Claude's review of sections 371-382; it adds tests only and
+changes no gate.
 
 ## 1. Canonical V1 contract
 
@@ -336,6 +338,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-07 | Codex counter-review and retained-data/archive feasibility audit | Incoming19060da1..52f4e490; correction84a1be4d; diagnostica99f1e4c; separate378 handoff | Both incoming commits dispositioned; exact-leaf native safety corrected; documentary coverage audit completed at factual blocker | Fresh full audit FAILED storage_binding4.058s; actual three-leaf diagnostic PASS4.285s with bindingfalse/device-only difference. Sharadar archive route unavailable; existing pilot earnings60months retained, no PIT promotion. |294 focused PASS1.95s;229 boundary PASS26.44s before diagnostic addition; final source/docs checks below;12 real REDs and category9caught/14controls; no full suite |15 carried P2s/seven369 P3 groups retained; new runtimeP2 resolved84; current storage P3 OPEN;375 observation retained | Need genuine historical archive/PIT evidence and qualified future custody transition if reused. No purchase/QC/capture/reply or automatic continuation. ONE final matching-lane push only after378. |
 | 2026-11-07 | Codex owner-authorized offline current-storage/dossier implementation | Clean5a0ecb0c, incoming EMPTY;08794595/64ec64af/1c6908d6/cbd2897c then separate380 handoff | Current byte-equivalence qualification and exact12-control original-identity/title dossier COMPLETE; existing inputs only | Committed health PASS34.502s/zero DATA; actual PASS79.077s,20-leaf scope; independent five-leaf readback PASS9.082s.12 originals/37 title occurrences. Historical availability/PIT/readinessfalse. |514 focused PASS6.26s;229 boundary PASS27.27s before final record; eight compile/17 frozen tests/four v3 pins exact; final record checks below; two meaningful reversal groups retained |15 carried P2s and prior scoped observations retained; old storage mismatch/failed audit not rewritten; no new openP0/P1 | Bounded engineering task complete. Need genuine historical available-by and dated issuer/share-class/PIT evidence from existing retained/subscription sources; do not invent it. ONE final push after380; no purchases/QC/acquisition/outreach. |
 | 2026-11-07 | Codex owner-authorized FMP then EODHD archive-sample outreach | Clean747f3db8, incoming EMPTY; prospective scope abeb2542 then separate382 handoff | ONE existing-plan/no-charge archive/identity sample inquiry per provider, in order; no attachments/private-data export | Both sends and separate exact HTML/recipient/subject/SENT readbacks verified;27 seconds apart. No supplier answer/sample at each check; entitlement/rights/coverage unestablished |135 prospective record/active/import/EXACT PASS12.18s under native fences; final record checks below; no source change/full suite/data replay |15 carried P2s/seven369 P3 groups and scoped375/376 observations unchanged; no factual readiness gate closure | Continue in these existing conversations if genuine reply arrives; qualify actual entitlement/rights/sample against retained originals before broader use. ONE final lane push only; no purchase/QC or automatic monitor. |
+| 2026-11-08 | Claude review (macOS session) and corrections | `478fbff7` -> `a92e6839` -> this review record | Review of `f99c66eb..478fbff7`: 18 commits, zero merges. Section 375 reviewed the code of `cf82f573`, `9aa1a4fe`, `c2d34967` and `ab7eb151`; this review adds the record commits `9b12e0eb` and `19060da1`, and covers every commit from `84a1be4d` to `478fbff7`. | All 16 Codex commits accepted; the two Windows-session Claude commits keep their section 376 counter-review. 24 guards could be deleted with every existing test green; three new test files catch all 24 mutants. Code defects in 177-image-bound modules recorded as successor rules. No provider API call, credential read or SEC request in the range; the only new private files are the five dossier-epoch leaves. | 573 new and changed tests pass in the plain sandbox; strict harness 490 passed with the 83 known fork-dependent failures; new files 18 passed plain, strict and with default temp; guards 179 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. No backtest. | IBPIT-TEST38301, IBDOSSIER-TEST38302, IBRUN-TEST38303 fixed; P3 IBPIT-OBS38304, IBPIT-OBS38305, IBDOSSIER-OBS38306, IBTRANS-OBS38307, IBRUN-OBS38308, IBPRIV-OBS38309 open | Codex counter-reviews 383; the next use of these modules carries the 383 successor rules |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -46297,3 +46300,190 @@ shape, raw HTML copy, private-key block or bearer/API-token pattern. All
 source/test/frozen files remain unchanged from747f3db8. Root/branch/exact
 abeb2542 HEAD and expected record-only modification are verified. Matching
 origin remains747f3db8; final matching-only fetch/commit/push/tip checks follow.
+
+
+## 383. Claude review - sections 371-382 (2026-11-08 UTC)
+
+### 383.1 Scope and method
+
+- **Range.** `f99c66eb..478fbff7`, 18 commits, zero merges.
+  - Section 375 (the Windows Claude session) reviewed the code of `cf82f573`,
+    `9aa1a4fe`, `c2d34967` and `ab7eb151`, but not the record commits
+    `9b12e0eb` and `19060da1`. This review covers those two, and every
+    commit from `84a1be4d` to `478fbff7`.
+  - The Windows-session Claude commits `c77e9fb9` and `52f4e490` keep Codex's
+    section 376 counter-review.
+- **Method.**
+  - Three read-only review agents covered the module groups.
+  - Every finding below was checked by this reviewer against code, a mutant
+    or a probe before it was recorded.
+  - All tests, mutants and probes denied network and `/usr/bin/security`
+    exec; mutants also denied writes under `artifacts/` and the private
+    custody store.
+- **No real access.** No Keychain read, and no SEC, provider, mail, QC or
+  browser access. Private files were read for names, key shapes, sizes and
+  hashes only.
+- **Fixability.**
+  - The dossier epoch's reservation binds 177 source images, including the
+    PIT audit, the dossier, the storage transition, the dossier runner, the
+    prepared workers and their own test files, though not the `*_review.py`
+    files.
+  - Its readback rebuilds that identity, so edits to those files are
+    recorded as successor rules rather than made in place.
+  - That readback also binds the execution head, so it cannot be rerun at
+    any later commit; see `IBRUN-OBS38308`.
+
+### 383.2 Real activity verified
+
+- A file-level walk since the section-370 push found new private files only
+  in the dossier epoch `ib-storage-transition-dossier-v1-20261107-once`
+  (5 leaves, 118,812 bytes).
+  - Nothing is new under `artifacts/insider_buying` or in the seven retained
+    SEC roots.
+  - The five leaves contain no email-like string, key parameter, bearer
+    header or token shape.
+  - The record names the hashes of `complete.json`, `transition.json` and
+    `dossier.json`, and they match.
+- **Owner authority for the outreach.**
+  - Section 373 records the owner's direction for the Sharadar reply.
+  - Section 381 records the direction for one FMP then one EODHD inquiry.
+  - The diff adds only those providers' public support addresses. It adds
+    no owner address or mail identifier.
+- No provider API call, credential read or SEC request appears in the range.
+
+### 383.3 Commit dispositions
+
+| Commit | Disposition |
+|---|---|
+| `cf82f573` | Accepted, as in 375. The CRCRLF fixture defect it fixes (`IBWIN-CCR37101`) was in this reviewer's own test. |
+| `9b12e0eb` | Accepted. Sections 371-372 accurately qualify sections 369-370; no correction needed. |
+| `9aa1a4fe`, `c2d34967`, `ab7eb151` | Code as in 375. Their tests and 375's review files were run natively on macOS here and pass, as 375 asked; 373's record is accepted. |
+| `19060da1` | Accepted (record only). |
+| `84a1be4d` | Accepted; `IBPIT-TEST38301`, `IBPIT-OBS38305`. |
+| `a99f1e4c` | Accepted; `IBPIT-OBS38304`. |
+| `5a0ecb0c` | Accepted; `IBPRIV-OBS38309`. |
+| `08794595` | Accepted; `IBDOSSIER-TEST38302`, `IBDOSSIER-OBS38306`, `IBTRANS-OBS38307`. |
+| `64ec64af`, `1c6908d6`, `cbd2897c` | Accepted; `IBRUN-TEST38303`, `IBRUN-OBS38308`. |
+| `747f3db8`, `abeb2542`, `478fbff7` | Accepted (record only). |
+
+### 383.4 Findings
+
+**Corrections (test-only, `a92e6839`).** Each new file is outside every
+recorded identity. Each mutant below survived the existing tests and is
+caught by the new ones.
+
+- **`IBPIT-TEST38301` (P3, FIXED).** In both PIT workers, removing these
+  passes the existing 100 runner tests:
+  - the native isolation proof;
+  - the first or the final source-byte check;
+  - the final recheck of every held leaf;
+  - the storage-qualification pin taken from the provider receipt.
+
+  The existing tests replace those calls with silent no-ops. 12 mutants;
+  the new file catches all 12.
+- **`IBDOSSIER-TEST38302` (P3, FIXED).** The existing serialized-readback
+  faults change a payload without re-signing its reference digest or counts,
+  so those recomputations refuse first. The guards masked this way include:
+  - the exact-row pigeonhole rule that keeps marginal FMP rows from being
+    labelled exact;
+  - the joint-row bounds;
+  - owner de-duplication;
+  - the entry and title count;
+  - category and request conservation;
+  - source-pin validation.
+
+  8 mutants survived the existing 133 tests. The new file re-signs each
+  fault, with a control showing that re-signing an unchanged payload still
+  validates, and catches all 8.
+- **`IBRUN-TEST38303` (P3, FIXED).** The health, readback and discovery read
+  profiles are cut down by unchecked string replacement. 4 mutants of that
+  narrowing survived the existing 100 tests. The new file asserts each
+  role's exact fixed-input literals, after a control that the full profile
+  contains them, and catches all 4.
+
+**Successor rules (OPEN, P3; verified, code bound as in 383.1).**
+
+- **`IBPIT-OBS38304`.** `storage_diagnostic_worker` has no committed caller.
+  - So 377.1's single diagnostic ran under an uncommitted parent, and
+    376.4's statement of its bounds cannot be checked from Git.
+  - `run_actual` accepts any `completed: True`, so a diagnostic result with
+    `binding_passed: false` would pass it.
+  - A successor needs a committed launcher, a distinct success flag and an
+    exact result schema.
+- **`IBPIT-OBS38305`.**
+  - Nothing records that the full audit ran once. `--expected-head` can be
+    rerun, and a later run could pass `storage_binding` if the device number
+    returns.
+  - The interpreter-prefix refusal protects the lane, custody and input
+    roots, but not `/Volumes`, Keychains or sibling app-support trees. A
+    probe with `sys.base_prefix=/Volumes/SANDISK/py` builds a policy granting
+    that subtree.
+  - `storage_difference` can report `binding_passed: false` with no named
+    field, for example when the stored identity has an extra key.
+- **`IBDOSSIER-OBS38306`.**
+  - Title text outside the `value` element is silently dropped: both
+    `PRIVATE TITLE<value>Common</value>` and `<value>Common</value>PRIVATE
+    TITLE` yield `metadata_observed` "Common". This contradicts the module
+    docstring and IBDEC-379-04.
+  - `_execution` accepts the path `./artifacts/private.py`.
+  - A caller can mint a `fixture_only: false` dossier from invented filings
+    with the 12 case IDs. The runner's pinned-body reads are what actually
+    bind them.
+  - Its `_symbol` is a looser copy of the provider-controls version.
+- **`IBTRANS-OBS38307`.**
+  - The transition `validate_payload` rebuilds the old proof from the
+    payload's own historical identity, so the parent and the readback check
+    only self-consistency.
+  - The link to the pinned `e8015245` proof is enforced only inside the
+    worker, by `build_transition`.
+  - A successor should pin the proof's storage-identity digest.
+- **`IBRUN-OBS38308`.**
+  - Every parent profile, including the readback and health controllers,
+    may write the output epoch, and the run controller keeps all 20 data
+    leaves readable.
+  - Discovery's pin is published before the parent validates it.
+  - Health and readback results are accepted on `completed is True` alone.
+  - The readback compares `authority` with `==`, so `qc_jobs: false` would
+    equal `0`.
+  - The Git common-dir read grant is unchecked. Repository Git config is not
+    hashed, and `core.fsmonitor` and replace objects are not disabled for
+    the unsandboxed bootstrap.
+  - The parent one-shot and `prepared_worker` payload checks have no test.
+  - The readback rebuilds the identity at the expected head, which must be
+    the current HEAD. It therefore cannot be rerun after any later commit,
+    including Codex's own 380 and 382 handoffs.
+- **`IBPRIV-OBS38309` (owner decision).** 377.3 commits the Sharadar
+  paid-through and earlier FullHistory end dates. Under IBDEC-362-02,
+  access-end dates were "reported privately to the owner" and kept out of
+  Git. Removing them would need a history rewrite, which is not done. The
+  owner decides whether that matters.
+
+P2 count unchanged: fifteen OPEN as in 371.4. No P0/P1.
+
+### 383.5 Validation
+
+- New and changed test files of the range:
+  - plain sandbox: 573 passed;
+  - strict harness: 490 passed, plus the 83 known fork-dependent
+    custody-platform failures.
+- The three new files: 18 passed in the plain sandbox, under the strict
+  harness and with the default macOS temp. With the custody-platform
+  convention test: 112 passed.
+- Mutants:
+  - 24 of 24 caught by the new files;
+  - the same 24 survive the existing tests;
+  - all run in memory, with no source file changed.
+- Probes: title text, `./artifacts` execution path and `/Volumes`
+  interpreter prefix, as in 383.4.
+- Guards plus record checks: 179 passed and the 2 known SEP-2 failures
+  (`IBSH-CR02`).
+- No complete lane suite, by owner direction. No backtest, QC or trading
+  action.
+
+### 383.6 Next
+
+- Codex counter-reviews this section.
+- Any successor to the PIT audit, dossier or dossier runner carries the 383
+  rules.
+- The FMP and EODHD replies, and the missing historical availability and PIT
+  evidence, remain the lane's real blockers.

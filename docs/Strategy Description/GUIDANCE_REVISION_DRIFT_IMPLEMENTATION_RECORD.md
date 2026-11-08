@@ -1,9 +1,14 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Exploratory backtest preparation implemented in section 76, 2026-11-08; no backtest is launched.
+Status: **Exploratory pilot data collected and local real-data execution adapter implemented in section 77, 2026-11-08.
+Retained 873,472 regular-session minute bars, 2,256 daily bars and 15,720,774 quotes from existing sources.
+Quotes cover 280 complete 09:59--10:06 execution windows, not full sessions; source gaps remain explicit.
+The adapter handles supplied orders/cash only; complete strategy dispatch, valuation/actions and matched-SPY exit parity remain unfinished.
+No actual orders, backtest results, QC access or purchases occur. Monitor remains PAUSED.
+Exploratory backtest preparation implemented in section 76, 2026-11-08; no backtest is launched.
 A separate draft pilot records proposed history/quote assumptions while preserving original source facts, refusals and permissions.
 All 17 profiles remain represented: three baseline placeholders, five pair placeholders and nine exclusions; these are not qualifying signals.
-Continuous market data and a real-data execution adapter are still absent; the preparation package is not runnable.
+At the section-76 handoff, continuous market data and a real-data execution adapter were absent; that preparation package was not runnable.
 No QC access, purchases or outcome calculations occur. Monitor remains PAUSED.
 Existing-source gap-closure audit documented in section 75, 2026-11-07; the lane is not backtesting ready.
 Nine additional reconstruction bindings are verified locally: six CUSIP references and three CRM forecast-EPS definitions; all six profiles remain refused.
@@ -200,7 +205,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 76. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 77. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -12588,3 +12593,221 @@ zero pending intents, maximum three, no new project/journal. The accepted
 and receive no real data. A separate exploratory preparation is not a reset
 or a fourth attempt for that exhausted candidate. No automatic review,
 monitor, recovery or further implementation starts at handoff.
+
+## 77. Continuous pilot bars, retained quote windows and real-data execution adapter, 2026-11-08
+
+### 77.1 Owner scope, source epoch and acquisition boundaries
+
+Owner: **"Proceed with collecting continuous stock/SPY data and building the
+real-data execution adapter for the exploratory pilot. Use my existing
+subscriptions, don’t access QC or buy anything, and push once when done."**
+This activates local source collection and adapter construction, not a backtest,
+real-order operation or performance calculation. No QC page/API/docs/project/
+resource/compute, broker/account/order endpoint, purchase, account change,
+installation or operator-database action occurs. Existing licensing-check
+omission persists without verified-rights claims. Monitor remains **PAUSED**.
+
+Starting clean local/live matching remote:
+`0d1df6ec6139ed2a6c536c4c22585e6a80dfe03e`. Every repository command, edit,
+validation, commit and final push uses
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+branch `codex/strategy-guidance-revision-drift`, sole origin
+`https://github.com/SheltonChen2017/trading_agent.git`. Section 76's one push
+is complete and is not repeated. No new Claude commit appears; prior consumed
+reviews remain consumed once. Parallel authors/QA are not independent Claude
+acceptance. Only lane code/tests and this handoff record change in Git.
+
+The section-76 five-event roster and proposed 2023--2025 study remain intact.
+The **data-acquisition scope** is fixed before provider requests. An optional
+question offered execution-window versus much larger full-session quote tapes.
+After no optional reply during independent work, root states and uses the
+recommended smaller execution-window default. This is not recorded as an
+explicit owner selection or as full-session coverage. No outcome-based dates,
+signals or subset choices are made.
+
+### 77.2 Calendar, continuous bars and exact quote capture
+
+The existing shared runtime
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python` supplies Python
+3.13.15 and already-installed, repository-pinned `pandas_market_calendars==5.4.0`.
+No installation is needed. The unchanged shared calendar helper SHA-256 is
+`174a032efce4082b8661eabe84b0cf6094048e937722bdf1659c8cb6c7decb89`.
+Its derived schedule retains **752 NYSE sessions for 2023--2025**, including
+actual opens/closes, half days and the January 9, 2025 closure. This is a
+market-session input, not a certificate of settlement service days.
+
+Each of the five events has a 23-session core spanning all three permitted
+entry dates and their corresponding session-21 time exits. A predeclared
+five-session data tail is included without claiming it completes every
+possible partial exit or cash settlement.
+
+| Event | Entry opportunities | Scheduled exit opportunities | Core / data-tail end |
+|---|---|---|---|
+| CRM May 31, 2023 | June 5--7 | July 5--7 | July 7 / July 14 |
+| CRM August 30, 2023 | September 5--7 | October 3--5 | October 5 / October 12 |
+| ADBE March 18, 2025 | March 21, 24, 25 | April 21--23 | April 23 / April 30 |
+| ADBE June 12, 2025 | June 17, 18, 20 | July 17, 18, 21 | July 21 / July 28 |
+| ADBE September 11, 2025 | September 16--18 | October 14--16 | October 16 / October 23 |
+
+From the owner-licensed USB, exact UNADJUSTED ADBE/CRM/SPY minute members are
+unique across the six candidate stock/ETF letter archives. Scoped raw rows
+and normalized reconciled rows are retained locally. Date gates precede
+financial parsing/hashing; no USB file or credential/API_Access payload changes.
+The USB manifest remains
+`c681af584244d38e3f9dea2ff765cc2c991cb383107a3e542115a4338ee4cdf8`.
+
+| Symbol | Regular-session minutes retained, 2023--2025 | Missing expected minute keys | Daily bars retained |
+|---|---:|---:|---:|
+| ADBE | 290,017 | 1,823 | 752 |
+| CRM | 291,691 | 149 | 752 |
+| SPY | 291,764 | 76 | 752 |
+| Total | **873,472** | **2,048** | **2,256** |
+
+No conflicting or unkeyed minute/daily record survives as an accepted row.
+No gap is filled or converted into a zero-volume claim; absence can be a
+no-trade/provider-coverage issue, and is not diagnosed by these counters alone.
+Within the paired core/tail periods there are **102 stock + 4 SPY missing
+minute keys**. Raw source bytes and refusal/coverage ledgers remain available.
+Daily capture inspects all eleven relevant ZIP inventories and uses all exact
+matching source members, without selecting a winner. A similarly named delisted
+plain-text inventory is classified as metadata and not opened as a ZIP.
+
+Using only the existing in-memory APCA credential pair, the official
+`data.alpaca.markets` single-symbol historical-quote route returns **1,755
+HTTP 200 responses / 280 requested windows / 15,720,774 retained quotes**.
+All page chains terminate; there are no HTTP failures, retries or alternate-feed
+fallbacks. Feed SIP, USD, date-specific asof, ascending order, limit 10,000,
+three workers and a global minimum 0.45-second request interval are fixed.
+The ceiling is 5,000 requests / 40 pages and 64 MiB per window. Credentials are
+header-only, never shown, saved, copied into URLs or committed.
+
+Each window is **09:59:00 through 10:06:00 New York**, inclusive, for both
+stock and SPY on each core/tail date. [Alpaca's official reference](https://docs.alpaca.markets/us/reference/stockquotesingle-1)
+defines both query endpoints as inclusive. All 1,773,488,751 raw response bytes
+are retained in 141,088,278 compressed bytes with raw/compressed hashes.
+Every captured condition occurrence is literal R; **zero `?` conditions occur
+in this new pilot capture**. This does not recover any of section 74's older
+unknown-condition records or qualify other dates, full sessions, NBBO semantics
+or original historical delivery.
+
+Five existing SPY ex/pay-date facts are rebound from retained owned EODHD
+responses; the two section-63 issuer-precision overlays remain exact and separate.
+Payment dates are July 31/October 31, 2023 and April 30/July 31/October 31, 2025.
+They can follow a position's time exit. No new EODHD request, entitlement-share
+calculation, source overwrite or cash posting occurs. Stock action completeness
+and source availability remain unverified.
+
+### 77.3 Local real-data input and explicit-order execution seams
+
+`exploratory_market.py` introduces a separate paired Alpaca/FirstRate contract.
+Prices use exact Decimal lexemes and the reported timestamp retains nanoseconds.
+Missing participant/SIP clocks and native sequence remain null; no Massive/QC
+identity is substituted. Raw sizes retain their dated round-lot convention.
+An explicit source-bound assumption is required to allow unknown conditions in
+the exploratory model; known adverse/missing states, nonpositive/crossed/stale
+quotes and ambiguous equal-clock states still refuse. No source flag is cleared.
+
+Actual **inclusive capture bounds** are mandatory, enter the identity hash, and
+fence both raw rows and quote selection. A quote at 10:06 cannot support a 10:07
+fill merely because it is only 60 seconds old. FirstRate minute starts use
+Eastern/DST; fill inputs require a wholly post-submission, completed minute
+and a subsequent observed quote. The whole unclosed minute is never borrowed.
+
+`exploratory_execution.py` accepts explicit simulated orders and supplied market
+batches. It preserves whole shares, quote-side adverse 5 bp / stress 15 bp
+prices, limits, shared 1% minute-share and 0.1% ADV20-dollar participation,
+per-order cumulative commissions with one minimum, cash/share reservations,
+partial fills, cancellation-request races/acknowledgements and replay checks.
+Unavailable later observations leave sells open/unresolved; no 10:05 sell
+cancellation is invented. Atomic refusals preserve capacity and cash.
+
+The supplied `ExecutionContract` already has a separate settlement-business-day
+inventory: its market calendar validates the trade date only. T+2/T+1 proceeds
+remain unavailable until the modeled due-date observation. Dividend/terminal
+receivables retain explicit or missing payment dates and survive flat positions.
+A separate SPY budget ledger uses actual strategy fill notional plus incremental
+fee, independently supplied SPY fills and visible unmatched/residual budgets,
+consistent with section 56. No cross-sleeve cash transfer or copied fill occurs.
+
+This is **an execution adapter, not the complete strategy runner**. Signal
+decoding, full strategy scheduling, split/entitlement eligibility, valuation,
+cross-session open-order reconciliation, SPY exit scheduling and admission/
+rounding/parity proof remain outside this increment. No real captured data is
+submitted to an order or fill simulation. Source/native/PIT/rights/readiness
+flags stay false; no broker, QC or empirical dispatch path is added.
+
+### 77.4 Author findings, actual-input checks and identities
+
+| ID | Priority / disposition | Evidence, correction and verification |
+|---|---|---|
+| GDR-77-001 | P2 / corrected | External cash IDs could collide with a future modeled fill ID, or reuse a prior buy-fill ID. Bidirectional immutable identity checks now precede state insertion; three red cases pass after correction, including atomic callback/capacity rollback and a different order reusing the valid minute. |
+| GDR-77-002 | P2 / corrected | A fresh quote could extend beyond its actual requested capture interval. Required inclusive bounds now fence decoding and selection and bind identity. Exact-end acceptance and end+1 ns/later-minute refusal are tested; removing the selection fence in memory re-establishes failure. |
+| GDR-77-003 | P3 / false alarm, no API change | Root's initial settlement-calendar concern is contradicted by `ExecutionContract.settlement_on`: business days already live separately in the contract. A market-open bank-holiday regression confirms this; no extra calendar API or cash shortcut is introduced. Source-budget wording also matches section 56 and is retained. |
+| GDR-77-004 | P3 / local capture setup corrected | A direct ignored-script invocation lacks repository import context and stops before capture intent; root launches the unchanged helper from mandatory-root context. A separate daily setup assumes ZIP for a plain-text inventory after three scoped source captures; V2 preserves/reuses exact prior bytes and classifies that inventory without opening it. No provider retry or native attempt results. |
+
+Under Python **3.13.15**, root's final **48 focused methods pass / 0 failed /
+0 skipped / 0.382s**, including 23 market, 21 execution, two dependency/inventory
+and two bundle checks. Final active-document verification follows the record
+update. Agents' prior version checks/mutants are separate author evidence,
+not additional independent methods. No warnings or full lane/repository suite.
+All **65 Python source files** compile in memory across **66 source members**;
+the explicit full-review bundle capacity becomes 68 including sidecar/manifest.
+
+Root rehashes all **1,755** compressed/raw quote payload pairs, verifies request
+identity/counts and all normalized minute bytes. Six predeclared representative
+bindings (first and last captured date per symbol) pass the actual new quote/
+minute constructors, preserving available/missing minute inventories. No order,
+fill, signal or return is evaluated on those captures. Whole-corpus source
+execution qualification is not claimed from six structural bindings.
+
+Producing source SHA-256:
+`a8deef458aea27a0aff6622790f40967f3adf739da37eca6f84decece55e5751`.
+The prior `a76bb787` epoch, source facts and section-76 roster remain retained.
+The semantic draft `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`
+and raw draft `1dd9b5969853924d7682b4b566734ea7e90f061340d6378912118fb93d132110`
+do not change. No generated native project/release is saved or uploaded.
+
+Ignored local base:
+`artifacts/guidance_revision_drift/continuous-pilot-data-20261108/`.
+
+| Artifact | SHA-256 |
+|---|---|
+| `calendar-scope-v1.json` | `730fa8027ec6b32443e645db23e7601e59fe9e4f70756f6b0edf7682e55135e4` |
+| `usb-minute-result-v1.json` | `26a67d5b9efe7e62627e62fb2fb89fdff3ba06dce3b8c4504d1efabbb74199e7` |
+| `daily-capture-result-v1.json` | `6670e1b97321cc018f6d6b1b58d93d836c9cbf50a7eea93a49be016396919d9f` |
+| `quote-capture-intent-v1.json` | `b92da0e57fc42a10292f09f048e8bd633ce42034a7f1e27407584f6a609feb18` |
+| `quote-capture-result-v1.json` | `6a165b218ad2f85e79671f10aad0a584108bd71c62ddb986f51426a6f9e90101` |
+| `actual-input-bindings-verification-v1.json` | `8dcc48f13ad11eb53ae14ab246d43c9cd3db058bc5d9389947afd2e77306e5c0` |
+| `unknown-condition-model-v1.json` | `3de1c26a96ebde96400009f9cdd73e4bd944c61cf2e1ca08595a4b9802258abe` |
+| `SPY-action-bindings-private-v1.json` | `b9c8022f527837dfecf75a40a6017565102da6a1d42767819a667ece7029d1a2` |
+
+### 77.5 Handoff and unchanged launch controls
+
+Implementation commit `c54fb35ad596f85c79a82342b98667283eebd196` contains
+the two input/execution modules, their focused tests and explicit bundle
+inventory update. Range `0d1df6ec..c54fb35a` is implemented and author-tested,
+independent review pending. This lane-record commit follows it in the same
+round; the two commits share one final publication.
+
+This bounded collection/adapter round concludes with exactly one guarded
+non-force push from the mandatory worktree to only its matching lane branch.
+The external publication receipt/checkpoint records exact implementation/record
+commits and the completed push. Private licensed bars, quotes, action facts,
+capture scripts and receipts remain ignored/local and do **not** travel in Git.
+No root handoff, Action Plan, Feature Milestone Record or shared/main fix occurs.
+
+Full strategy dispatch/valuation/action plumbing and matched-SPY exit parity
+still need implementation; complete-session quote coverage is not provided
+by this bounded capture. Dated identity, settlement-service completeness,
+historical availability/rights and native integration are not certified.
+These limits remain visible before any separate run freeze/authorization;
+there is no launch, new family/look allocation or market-edge claim here.
+
+Original `GDR-base372-approved-20261008` stays CLOSED FAILED 3/3, zero manual
+attempts, project 37647834 untouched. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` stays zero unsuccessful attempts /
+zero pending intents, maximum three, no new project/journal. Accepted
+`c589b3dd` custody and the invented 372-frame fixture are not rebound or mixed
+with these real data. Source-changing work remains independently unreviewed;
+author QA does not confer native/empirical acceptance. Monitor stays PAUSED,
+with no automatic review, acquisition, recovery or further-round rearm.

@@ -1,11 +1,12 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **383 IS CLAUDE'S REVIEW OF f99c66eb..478fbff7 (18 COMMITS, SECTIONS
-371-382). ALL ACCEPTED; NO P0/P1. 24 GUARDS IN THE PIT AUDIT, DOSSIER AND
-DOSSIER-RUNNER CODE HAD NO TEST THAT CAUGHT THEIR REMOVAL; THREE NEW TEST
-FILES NOW CATCH ALL 24. CODE DEFECTS IN THOSE 177-IMAGE-BOUND MODULES ARE
-SUCCESSOR RULES. 381's INQUIRIES AWAIT REPLIES. HISTORICAL AVAILABILITY/PIT
-EVIDENCE IS STILL MISSING; ALL READINESS GATES REMAIN FALSE. NO PURCHASES OR QC.**
+Status: **384 COUNTER-REVIEWS BOTH CLAUDE COMMITS THROUGH6eaffd07; TEST
+COMMIT ACCEPTED, RECORD ACCEPTED AFTER APPEND-ONLY SCOPE QUALIFICATIONS AND
+CURRENT-TREE PRIVACY MITIGATION.21 ADDITIVE ACTIVATION TESTS CLOSE A NARROW
+TEST GAP;177-IMAGE-BOUND PRODUCTION SOURCES STAY UNCHANGED. RUNTIME ALLOWLIST
+GAP IS A NEW OPEN P2 BEFORE FUTURE ACTUAL REUSE;16 OPEN P2s/NO P0/P1.
+ARCHIVE/PIT FACTS AND READINESS REMAIN MISSING. NO NEXT MILESTONE, PURCHASE,
+PROVIDER/MAIL ACCESS OR QC THIS ROUND.385 IS THE SEPARATE FINAL HANDOFF.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -339,6 +340,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-07 | Codex owner-authorized offline current-storage/dossier implementation | Clean5a0ecb0c, incoming EMPTY;08794595/64ec64af/1c6908d6/cbd2897c then separate380 handoff | Current byte-equivalence qualification and exact12-control original-identity/title dossier COMPLETE; existing inputs only | Committed health PASS34.502s/zero DATA; actual PASS79.077s,20-leaf scope; independent five-leaf readback PASS9.082s.12 originals/37 title occurrences. Historical availability/PIT/readinessfalse. |514 focused PASS6.26s;229 boundary PASS27.27s before final record; eight compile/17 frozen tests/four v3 pins exact; final record checks below; two meaningful reversal groups retained |15 carried P2s and prior scoped observations retained; old storage mismatch/failed audit not rewritten; no new openP0/P1 | Bounded engineering task complete. Need genuine historical available-by and dated issuer/share-class/PIT evidence from existing retained/subscription sources; do not invent it. ONE final push after380; no purchases/QC/acquisition/outreach. |
 | 2026-11-07 | Codex owner-authorized FMP then EODHD archive-sample outreach | Clean747f3db8, incoming EMPTY; prospective scope abeb2542 then separate382 handoff | ONE existing-plan/no-charge archive/identity sample inquiry per provider, in order; no attachments/private-data export | Both sends and separate exact HTML/recipient/subject/SENT readbacks verified;27 seconds apart. No supplier answer/sample at each check; entitlement/rights/coverage unestablished |135 prospective record/active/import/EXACT PASS12.18s under native fences; final record checks below; no source change/full suite/data replay |15 carried P2s/seven369 P3 groups and scoped375/376 observations unchanged; no factual readiness gate closure | Continue in these existing conversations if genuine reply arrives; qualify actual entitlement/rights/sample against retained originals before broader use. ONE final lane push only; no purchase/QC or automatic monitor. |
 | 2026-11-08 | Claude review (macOS session) and corrections | `478fbff7` -> `a92e6839` -> this review record | Review of `f99c66eb..478fbff7`: 18 commits, zero merges. Section 375 reviewed the code of `cf82f573`, `9aa1a4fe`, `c2d34967` and `ab7eb151`; this review adds the record commits `9b12e0eb` and `19060da1`, and covers every commit from `84a1be4d` to `478fbff7`. | All 16 Codex commits accepted; the two Windows-session Claude commits keep their section 376 counter-review. 24 guards could be deleted with every existing test green; three new test files catch all 24 mutants. Code defects in 177-image-bound modules recorded as successor rules. No provider API call, credential read or SEC request in the range; the only new private files are the five dossier-epoch leaves. | 573 new and changed tests pass in the plain sandbox; strict harness 490 passed with the 83 known fork-dependent failures; new files 18 passed plain, strict and with default temp; guards 179 with the 2 known SEP-2 failures; network and Keychain exec denied. No complete suite. No backtest. | IBPIT-TEST38301, IBDOSSIER-TEST38302, IBRUN-TEST38303 fixed; P3 IBPIT-OBS38304, IBPIT-OBS38305, IBDOSSIER-OBS38306, IBTRANS-OBS38307, IBRUN-OBS38308, IBPRIV-OBS38309 open | Codex counter-reviews 383; the next use of these modules carries the 383 successor rules |
+| 2026-11-07 owner-local | Codex counter-review ONLY | 478fbff7..6eaffd07, TWO incoming/zero merges; correction/scope commit follows | Both commits dispositioned; narrow21-case unbound installer/direct-entry tests and current-tree subscription-date minimization; no177-bound production edits | Accepted/accepted-after-qualification384; source-only probes confirm scoped limitations and generalized runtime prefix P2. Historical actual receipts/readback preserved; no DATA replay |18 incoming tests PASS1.17s;532 baseline focused PASS6.47s;21 new PASS1.17s;3 incoming sensitivity reversals catch4 reds/1control;2 added-test reversals catch3 reds/8controls; final combined/boundary below |16 OPEN P2s including new IBPIT-POLICY-CCR38401; six383 P3 groups retained with precise scopes/partial test/privacy mitigation; no open P0/P1 | NO next milestone. Future actual reuse needs qualified successor safety controls and missing archive/PIT inputs. Separate385 handoff, then ONE final matching-lane push; no purchase/QC/mail/monitor. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -45312,8 +45314,10 @@ The account is now verified; do not ask the owner for that email again.
 Supplier confirms no retained SF2 deliveries/snapshots/logs/accessions/
 original bodies/version manifest or dated identifier archive. Treat that
 requested route as provider-confirmed unavailable, not merely unanswered.
-Existing Personal5-Year paid access ends2026-11-24; earlier FullHistory
-downloads may be used during the paid term, but new downloads follow the
+Existing Personal5-Year paid access is active at this recorded observation;
+exact account lifecycle dates remain in the private supplier conversation
+(current-tree privacy mitigation384.4; old Git history is not rewritten).
+Earlier FullHistory downloads may be used during the paid term, but new downloads follow the
 rolling five-year limit and miss2020Q4/early2021. Supplier confirmation supports
 personal research on owner-controlled local/cloud machines while paid; it
 does not bind every source version to a canonical rights/readiness contract.
@@ -45434,8 +45438,10 @@ or completeness is inferred from an absent new scan.
 
 Connected Gmail readback confirms the same substantive supplier reply:
 the owner supplied the subscriber identity, and Sharadar verified Personal
-Bundle5Years paid through2026-11-24, scheduled to end. Prior FullHistory
-ended2026-10-14. No private mail/account values enter Git. There is no sample,
+Bundle5Years with paid access still active at that observation and cancellation
+scheduled. The earlier FullHistory plan had ended. Exact account lifecycle
+dates are omitted from the current tree under384.4; old Git objects are not
+rewritten. No private mail/account identifiers enter Git. There is no sample,
 attachment or pending account question to repeat.
 
 Supplier explicitly does NOT keep historical SF2 delivery files, dated
@@ -46487,3 +46493,177 @@ P2 count unchanged: fifteen OPEN as in 371.4. No P0/P1.
   rules.
 - The FMP and EODHD replies, and the missing historical availability and PIT
   evidence, remain the lane's real blockers.
+
+## 384. Codex counter-review ONLY — Claude section383 (owner-local 2026-11-07)
+
+### 384.1 Exact captured range and per-commit dispositions
+
+Latest owner direction is "start counter review". This round counter-reviews
+the pushed review and fixes verified lane-owned test/document issues only;
+it does NOT restart continuous build, archive outreach or a next milestone.
+Matching-only fetch captures exact clean local/origin
+6eaffd07426ca34df2f2a927c0f1b9866f841e2c in the designated Insider root and
+codex/strategy-insider-buying. Prior verified outgoing baseline is
+478fbff7a425fa005f5b5554d8a8ce6220336ba5. Ancestry and complete ordered range
+are verified: TWO commits, zero merges, already integrated at the exact tip;
+no checkout/branch move, local-only bundle, reset/merge/cherry-pick or side
+worktree is needed. All concurrent work is preserved.
+
+The pushed record identifies independent Claude review of the exact outgoing
+snapshot, including BOTH abeb2542/478fbff7 outreach commits and the preceding
+storage/dossier implementation. Its declared f99c66eb..478fbff7 range really
+has18 commits:16 Codex plus two previously counter-reviewed Claude commits.
+Its prior-acceptance qualifications for375/376 and the two formerly unreviewed
+record commits are retained. Do not silently narrow the accepted history to
+the last outreach checkpoint or treat old incoming reviews as newly pending.
+
+| Incoming commit | Counter-review disposition | Verified reason / limitation |
+|---|---|---|
+| a92e683959485e00da60238e7b7cd894a7e319f3 | ACCEPTED, unchanged | Complete diff adds three unbound review-test files only. Native incoming18 tests pass; source and targeted reversals confirm useful independent isolation/order, re-signed accounting and role-narrowing guards. No production/shared/frozen source changes. |
+| 6eaffd07426ca34df2f2a927c0f1b9866f841e2c | ACCEPTED AFTER QUALIFICATIONS384.2-4 and privacy mitigation | Complete diff is record-only. Material source findings largely hold; exact caller vs worker, recorded vs machine-enforced once, existing activation coverage and contract-vs-authentication claims need narrower wording. Broad file-walk/private-artifact and reviewer run claims remain attributed, not independently re-executed here. |
+
+Three advisory agents assisted source/test/record inspection; their checks
+are not new independent Claude acceptance of Codex's correction. Root observes
+all reported native tests/probes/reversals below. No actual private input,
+old proof, saved dossier, supplier thread or account is opened this round.
+
+### 384.2 Incoming tests, verified gaps and narrow correction
+
+The new order tests correctly witness BOTH worker isolation/source-before-
+open calls, final held/source rechecks and provider-derived storage pins.
+Their mocks are call-order witnesses, not native isolation evidence. The
+re-sign tests reconstruct counts/reference hashes and include an unchanged-
+payload positive control, so the named guard can be reached. The role tests
+include a full-profile positive control before literal absence assertions;
+they cover WORKER profiles, not controller write/read authority.
+
+Root native strict run: incoming18 PASS1.17s (outer2.184s,stderr0). Relevant
+baseline selection532 PASS6.47s (outer7.391s,stderr0), zero skips/warnings.
+Independent process-local reversals, no on-disk source mutations:
+
+| Reversal | Old-test result under reversal | New incoming-test result |
+|---|---|---|
+| Remove audit worker native proof | Existing PIT runner/original-review100 PASS1.15s | One order negative catches it:1 expected FAIL0.03s. |
+| Remove exact-row pigeonhole relation | Existing dossier78 PASS1.23s | Both re-signed flag negatives catch it:2 expected FAIL0.04s. |
+| Remove health role narrowing | Existing dossier-runner55 PASS1.65s | Health negative catches it/readback positive remains:1 expected FAIL/1PASS0.03s. |
+
+These THREE representative reversals independently validate the new tests'
+value; Claude's remaining24-mutant total/all-legacy-survival claim remains
+attributed. Do not relabel these as a repeated24-mutant sweep.
+
+IBRUN-OBS38308's test-gap wording needs qualification: original tests already
+assert one mocked parent-policy call/order and reject late prepare/launch.
+Missing direct coverage is the REAL install_parent_policy monotonic flag and
+prepared_worker role payload dispatch/refusal. Add ONE unbound
+tests/test_insider_buying_pilot_storage_dossier_runner_v1_activation_counter_review.py;
+do not edit any177-image-bound source/test. Its21 invented cases cover fake
+successful/failed install consumption, refusal of later preparation, canonical
+role positives, extra/missing/nonhex payloads, EOF and cross-role envelopes.
+No real sandbox install/child/data/role worker occurs inside these unit tests;
+the OUTER caller independently enforces actual native/memory controls.
+
+New21 PASS1.17s (outer2.207s,stderr0). Meaningful isolated reversals: removing
+the installer's one-shot check gives1 expected FAIL1.00s; removing direct
+health-payload refusal gives2 expected FAIL/8positive controls1.00s. Originals
+are restored in finally; no bound file is rewritten. This closes ONLY that
+specific test-coverage subfinding, not the open operational successor rules.
+
+### 384.3 Finding-by-finding counter-review and future-use gates
+
+| Finding | Disposition and precise next-use condition |
+|---|---|
+| IBPIT-TEST38301 / IBDOSSIER-TEST38302 / IBRUN-TEST38303, P3 | Incoming test corrections ACCEPTED. Root independently observes the18 green cases and the three representative reversals above. Full reported mutant coverage stays attributed. |
+| IBPIT-OBS38304, P3 OPEN/qualified | No committed production caller for storage_diagnostic_worker is confirmed. Exact historical launcher/activation is not Git-reproducible, but committed worker source DOES expose the three pinned reads, native/memory/final checks and diagnostic-only fields; saying none of376.4's bounds can be checked from Git is too broad. run_actual checks completed-only, but hardcodes worker, not the diagnostic. No ordinary committed path or observed evidence shows a negative diagnostic accepted as full audit. Successor still needs committed dispatch, distinct diagnostic/full success and exact schemas. |
+| IBPIT-OBS38305, P3 remainder OPEN | 376.4 DOES record ONE failed audit. The absence is a machine-enforced one-shot claim. Extra historical identity keys can give bindingfalse with empty named-difference lists; root reproduces this, while the strict binding remains fail-closed. Diagnostic completeness and enforced once remain successor prerequisites. Runtime bullet is split/promoted to the P2 below rather than hidden by P3. |
+| IBPIT-POLICY-CCR38401, P2 OPEN, generalized runtime allowlist gap | Root reproduces permissive policy construction for invented runtime prefixes under /Volumes, Keychains and sibling Application Support: THREE classes in BOTH old PIT and new dossier policy constructors. Protected tuples omit those unrelated private/source trees; disjointness from current lane/input roots alone is insufficient. This is the same exact-leaf safety-contract class as376's P2 correction. Never install those generated policies; zero DATA is read by the probe. Any future actual reuse requires a qualified successor rejecting all global protected roots/physical aliases and trusted runtime/source/admin overlap, with meaningful negative controls. No new source operation or successor is built here; actual379 interpreter disjointness/observed receipts are not retroactively invalidated. |
+| IBDOSSIER-OBS38306, P3 OPEN/qualified | Both mixed-text title probes are confirmed: leading text or value-tail is dropped and Common remains metadata_observed. The ./artifacts path is accepted by the pure execution contract. These are normalization/quarantine gaps, not proof malformed titles/private paths occurred in the actual12 originals. Looser symbol helper is confirmed; actual runner first reprojects through the stricter controls._case. The ability to construct fixture_only=false from invented sealed projections is an ALREADY DOCUMENTED pure-factory trust boundary: native pinned bytes authenticate inputs, unknown intervals/all authority remain false. Do not call it proof the actual dossier is fabricated or PIT authority escaped. |
+| IBTRANS-OBS38307, P3 OPEN/qualified | Root invented payload changes historical device and remains self-consistent under validate_payload, confirming absence of an independently anchored identity digest at that serialized boundary. The pure reader explicitly disclaims byte authentication; native worker pins actual old proof before build, and saved-output readback was externally complete-hash anchored. No actual altered proof/receipt is established. Successor should bind a trusted historical-identity digest without rewriting old proof. |
+| IBRUN-OBS38308, P3 OPEN with test subgap corrected | Parent profiles have excess output-write capability; run retains selected reads. This is capability, not evidence recorded readback wrote. Discovery pin publication precedes parent result validation; role results lack exact schema checks; dictionary equality admits boolean/integer aliases. Worker auth plus external saved-output hash still matter. Git common-dir/config/fsmonitor/replace-object trust needs successor qualification; no historical hook/access event is inferred. Real installer/direct-entry test gap is corrected384.2, while existing mocked call-order/late-launch tests remain acknowledged. Later-HEAD inability is specifically the committed readback CLI: current HEAD identity and original reservation identity conflict. Preserve the successful same-HEAD379 readback; a separately committed receipt reader could solve this without replaying the old operation. |
+| IBPRIV-OBS38309, P3 historical publication OPEN; current display mitigated | Prior private-reporting choice and later committed subscription dates are inconsistent. These are operational term dates, not API keys/account numbers.384.4 removes precise lifecycle values from current376/377 paragraphs without rewriting history. Complete historical purge would require separately authorized history remediation; current-tree minimization does NOT. No retrospective disclosure approval is invented. |
+
+Root source-only native probes also observe TWO mixed-title cases, the dot-
+artifact contract acceptance, historical-identity self-consistency, all-false
+transition authority and extra-key binding refusal/empty difference lists.
+All probes complete exit0 in1.038s; zero retained DATA reads and zero generated
+permissive-profile installations. This is invented contract evidence, not an
+actual replay or a claim about private saved rows/titles. No genuine filing,
+receipt or provider record is forged, altered or reconstructed.
+
+All15 carried P2s remain at371.4's exact scopes; with IBPIT-POLICY-CCR38401
+there are now16 OPEN P2s, no P0/P1. Seven369 P3 groups, scoped375/376
+observations and older resolved findings remain. Six383 observation groups
+remain with the qualifications/test/privacy subdispositions above. Passing
+tests does not close historical availability, PIT identity, rights or any
+other readiness gate. Future use of the affected paths is blocked on those
+successor controls, independently of the existing source-evidence blockers.
+
+### 384.4 Privacy mitigation, evidence attribution and exclusions
+
+IBDEC-384-01: preserve original bound sources/tests/proofs/failed claims and
+actual379 saved-output lineage. Correct test gaps in a NEW unbound review
+file; code/contract remediation requiring a qualified successor is not a next
+milestone smuggled into this review-only round. No data replay is needed.
+
+IBDEC-384-02: minimize precise operational subscription lifecycle dates in
+the CURRENT record, referring to the private supplier conversation instead.
+This routine lane-owned privacy correction changes no entitlement, date of
+actual past use, data-window coverage or licensing fact. It is not a Git
+history rewrite and does not remove already-pushed copies. No extra account
+values or mail headers are read, copied or disclosed; old raw objects remain
+preserved. Full purge is not authorized or required to finish counter-review.
+
+Claude's private-file walk/size/hash/string scans,573 plain/490 strict pass
+counts with83 fork-dependent failures,24 mutants and179-plus-two shared SEP
+results remain REVIEWER-ATTRIBUTED. Root neither repeats a broad private-root
+walk nor treats file/diff inspection as proof all conceivable real activity
+was absent. No claimed177-image byte map is reopened/reconstructed from saved
+private files; new review files were absent at the actual execution commit.
+The actual379 run and same-HEAD five-leaf readback remain their own observed
+evidence, not newly repeated results or full historical environment replay.
+
+This round has NO next milestone, SEC/provider/data/credential/Keychain/mail
+or vendor correspondence, licensed-row/original/USB read, purchase/upgrade/
+trial/renewal/export, QC/Safari/API/SDK/job/upload/history/outcome/backtest,
+broker/operator-database/scheduler/deployment/capital/paper/live/order/trading
+action. Monitors remain disarmed; no other chat or duplicate automation.
+Tests/probes read no actual DATA and enforce native process-tree network/security/fork
+denial, protected DATA denial (whole sibling family except current source/
+shared Git administration, artifacts, user Library, USB and physical aliases),
+fresh TMP/devnull-only writes, initial -I -S -B/empty cache, disabled pytest
+autoload/cache and real Darwin additional-VM/readback plus sampled RSS guard.
+Fork is permitted only for required boundary/Git-import tests, with inherited
+native network/security/DATA/write fences. No hard instantaneous RSS claim.
+
+Combined final focused/boundary/document compilation/pin/hash/diff/status
+checks follow before the correction commit and separate385 handoff. No
+complete lane/repository suite is run. Shared/project-wide records, Action
+Plan and SESSION_HANDOFF remain frozen; this lane record is the handoff.
+
+### 384.5 Final correction validation before commit
+
+Combined relevant original/incoming/counter-review focused selection553
+PASS6.50s, zero skips/warnings (outer7.448s,stderr0). Boundary/platform/lane-
+import/ML-import/active-document/record/EXACT package guard selection229
+PASS29.17s, zero skips/warnings (outer30.159s,stderr0), with required child
+processes permitted under inherited native fences. No complete suite or
+shared SEP-2 test is run; sharedIBSH-CR02 remains open at its prior scope.
+
+Four incoming/new test images compile in memory (outer0.671s,stderr0); all17
+frozen test hashes and four v3 current-byte hashes remain exact. New unbound
+activation file7548B/SHA-256
+`b7019d092b3d9b1ce2288874cd8ea0bb3abe5f8eac8af4577895e4c71940d316`.
+Three incoming test hashes respectively: order review
+`0756b5011280dd5a1357cf2b0fc3a550dbddf343a67ea36ae1bbc282bd507c3f`,
+re-sign review
+`11fda10a997b54d808e93901e1791007840fbf67a332eaf78bdb2cbf9a2d0b20`,
+role review
+`d61fbd3148c90e67e9a084fd45fef08f8f63c06decf8442d1bdf1b7555fffa24`.
+The temporary test caller is not claimed to close the older committed-
+production-harness/reproducibility finding. Actual inputs/epochs are untouched.
+
+Whitespace check passes. Matching-only refetch still yields exact6eaffd07;
+fixed root/branch/HEAD and expected record plus ONE unbound test status are
+verified before staging. No branch/worktree/shared/source move or extra local
+commit is bundled. Commit this correction/scope before the separate385
+handoff, then perform the one authorized final publication with independent
+tip/clean/synced verification.

@@ -46766,3 +46766,165 @@ exact6eaffd07. Before handoff commit, fixed root/branch/current45caea8d HEAD
 and expected-only record modification are rechecked; one publication and
 independent exact remote-tip/clean/synced checks then follow. No further test
 or production change is introduced by this validation tail.
+
+## 386. Codex additive isolation repair and saved-dossier readback successor
+
+### 386.1 Authorization, prospective scope and definition of done
+
+Owner explicitly directs: fix the P2 isolation gap and build the offline
+readback successor; preserve bound files and receipts, use existing data
+only, no purchases or QC, document and push once. This supersedes385's
+no-next-milestone limit for this one engineering round. Starting local and
+matching origin are exact88935f65f6a7cba1f77ea7291c1374a3f034e53f, clean;
+ordered incoming history is empty. All repository operations stay in the
+designated insider worktree and codex/strategy-insider-buying branch.
+
+The additive scope is FOUR new production v2 images (readback isolation,
+prepared transport, pure saved-dossier validation and native runner), FOUR
+new unbound focused-test images and this lane record. No177-image-bound
+production/test source, old policy constructor, proof, receipt or original
+input is rewritten. Source/admin/runtime metadata reads are distinct from
+the only prospective retained DATA operation: read exactly the five saved
+leaves reservation.json, observation-started.json, transition.json,
+dossier.json and complete.json from the existing379 epoch. No namespace is
+created, resumed, reclaimed or retried; no original-parent/reference audit
+is replayed. Success is read-only current-byte/Git authentication, not a new
+historical fact or source acquisition.
+
+Definition of done: meaningful isolation red/green, focused/boundary/record/
+compilation/EXACT checks; qualified committed code; zero-DATA native health;
+then five-leaf readback under native controller/worker fences with separately
+verified original177 Git images and current reader identity. Document actual
+execution HEAD, hashes/timings, any refusal/correction and evidence limits;
+commit a separate final handoff after implementation hashes exist and make
+one final matching-lane push. A source-only health refusal is not permission
+to weaken isolation or retry original data. Any saved-byte refusal remains
+a failure; no semantic original-input rerun or receipt repair is authorized.
+
+### 386.2 Successor behavior and isolation decision
+
+IBPIT-POLICY-CCR38401 is addressed on a NEW path: fixed supported macOS/POSIX
+runtime, lexical/resolved/physical ancestor-overlap refusal against global
+private roots, exact source leaves and runtime libraries, and exact five
+saved leaves only in the readback worker. /Volumes, user Library/Keychains,
+other Application Support, sibling checkouts, Documents/Desktop/Downloads
+and physical aliases cannot become broad runtime grants. Existing unsafe
+constructors remain frozen and barred from future actual reuse; this is no
+blanket legacy-caller repair or retrospective invalidation of379's evidence.
+
+Source-only bootstrap reads fixed no-follow worktree/admin pointers and
+bounded pinned config; it reads no saved DATA and runs no unsandboxed Git.
+Native source workers independently verify exact root/branch/clean HEAD,
+working source bytes against committed Git objects, fixed common-dir and
+worktree admin seals, explicit .gitignore Git bytes and runtime fingerprints.
+Git has a minimal credential-free environment, no replacement objects,
+fsmonitor/hooks/helper/optional locks/maintenance, no external diff/textconv,
+bounded stdout/deadline and zero tolerated stderr. Git inherits the source
+worker's owned process group, so terminal refusal kills its whole group.
+Only shared Git ADMIN metadata is read from the default sibling; its source
+files remain denied. Directory literals permit metadata traversal, never a
+sibling source subtree grant.
+
+Two native workers are prepared before the controller's one-shot read-only
+Seatbelt install: one saved reader (or zero-leaf health role), one source/Git
+verifier with NO saved DATA. READY/activation binds role, current identity,
+full profile digest and exact Python argv/code; EOF is not activation. The
+controller loses saved-DATA, fork/exec and write capability BEFORE either
+activation. Readback requires exact typed receipt/summary/result schemas,
+external complete-hash anchoring, unchanged original177 source-map subset,
+and independent original/current Git authentication. Both role results and
+all cleanup must pass before success. Profile/argv bindings are launch
+provenance, not substitutes for effective native denial probes.
+
+The saved anchor remains complete
+e55a9aaaf6f56c1f12b248fe3b6befdf04d00fcbffa90f27d64733f880a5039e,
+original execution HEAD cbd2897ce4fe4e22362587eb68f6f546e919c341 and177-image
+inventory226cf2c05005b659faa3b0c4130c39c53dddd49fd5b0dc0db9822f35a556ee25.
+Known transition bc3d0577a7ea5a240c497d26930dac2b0f1b8ca6a8a398569b684bd3753b3be1,
+dossier9d42dedbdca0f8f0c8012ad183c250198ec68c9bd762f371bcb2ec830a9df472
+and reference485cc1057bb7d23c4c44052cd53206d7711c0b135787b9b396bf57dc8fcff8b0
+remain expected anchors. No old identity, execution-time commit or receipt
+is relabelled as a later reader run. Runtime image fingerprints do not mean
+the whole historical environment or every system library is reconstructed.
+Real additional VM limits and sampled Python RSS checks are retained; no
+instantaneous or aggregate process-tree RSS ceiling is claimed.
+
+### 386.3 Qualification observations before actual DATA
+
+All root tests/probes use effective process-tree native network denial,
+DATA denial, security-helper denial and real VM/RSS controls. Strict unit
+roles also deny fork; boundary checks retain only their necessary child
+capability. Temporary test callers are not production data launchers.
+Source-only admin canary initially refused required FAMILY/default-checkout
+ancestor DIRECTORY traversal. Exact ancestor directory literals and a canary
+on forbidden sibling README source corrected that test caller: PASS,
+outer1.479s/stderr0, six admin files, seven runtime directories/three Python
+images and219 source candidates. No saved leaf or original was opened.
+
+The old policy accepts THREE invented unsafe runtime classes; the successor
+refuses all THREE (outer0.852s,stderr0). No permissive profile is installed
+and no retained DATA is read by that red/green probe. New four-image test
+selection228 PASS2.53s, zero skips/warnings (outer3.521s,stderr0). These cases
+use invented receipts and mocked transport/native installs inside the
+independently fenced caller; actual native health/readback is still pending
+at this prospective entry. Further focused/boundary/compile and observed
+execution results follow append-only after code qualification.
+
+### 386.4 Issue ledger, factual gates and exclusions
+
+No new P0/P1. The15 carried P2s retain371.4 scopes. The16th P2,
+IBPIT-POLICY-CCR38401, remains OPEN pending actual successor qualification;
+if qualified, close only the successor runtime/admin isolation sub-scope and
+retain frozen legacy reuse/migration restrictions explicitly. The six383
+P3 groups and seven369 groups keep384.3's qualifications. This successor
+does not repair malformed historical titles, independently anchor the old
+physical identity, prove historical physical continuity or convert current
+reference matches to PIT identities. Literal observed37 title occurrences
+are not a new clean-title or historical-admission conclusion.
+
+Existing advisory information says EODHD reports no historical-availability/
+PIT archive and overwrites corrections; that supplier statement supplies no
+sample or dated identity proof. Separate account-email mismatch does not
+prove absence of the owner's subscription. FMP had no substantive inbound
+archive answer at the prior advisory check. These are prior attributed
+observations, not new mail reads in this build. No private mail IDs, account
+values or bodies enter Git; no vendor reply/inquiry is sent.
+
+All source/authenticity/availability/PIT/rights/canonical/population/look/QC/
+backtest/execution gates remain FALSE. Historical version-linked available-by
+and dated issuer/share-class/listing evidence remain factual blockers along
+with carried original/lot/context/earnings/processing/population/parity gates.
+No purchases/upgrades/trials/renewals, provider/SEC/credential/Keychain access,
+new licensed rows, original/reference/USB replay, QC/Safari/API/SDK/upload/
+job/history/outcome/backtest, broker/operator-database/scheduler/deployment/
+capital/funded/paper/live/order/trading action or monitor rearm. No full lane
+or repository suite. Shared records, Action Plan and SESSION_HANDOFF stay
+frozen. All frozen custody bytes, study/pilot windows/economics, D23 state,
+stopped1846/1847 root and both nonretroactive incident classifications remain
+as385; passing engineering tests do not settle any of those factual gates.
+
+### 386.5 Qualified implementation before activation
+
+Initial relevant focused selection465 PASS3.74s (outer5.046s,stderr0),
+boundary/platform/record/document/import/EXACT selection229 PASS32.15s
+(outer33.443s,stderr0), all zero skips/warnings. Eight new images compile
+in memory;17 frozen test pins and four frozen v3 hashes match exactly
+(outer0.860s,stderr0). No full suite or retained DATA is used.
+
+Read-only advisory inspection identifies an exited-leader cleanup defect in
+the new transport: leader poll can be terminal while a same-group Git child
+survives. Root also identifies excess exact-Python exec permission in the
+already-running controller. Two targeted invented tests first produce TWO
+expected FAIL1.17s (outer2.121s,stderr0). Correct the NEW transport to retire
+its owned process group even after leader exit, and give the installed
+controller a distinct strictly boolean role that denies ALL exec/fork and
+cannot gain Git or saved DATA. Prelaunched workers retain only their exact
+initial Python exec allowance; readback cannot fork or exec other helpers.
+Advisory inspection is not independent Claude acceptance. Root observes the
+red/green evidence; final focused green follows before the first code commit.
+
+Final qualified focused green470 PASS3.26s (outer4.299s,stderr0), including
+the two previously failing guards and three controller-role negatives.
+These are invented tests inside native fences, not an actual saved read.
+The first implementation commit now establishes qualified immutable source
+before the planned zero-DATA native health and exact-five-leaf readback.

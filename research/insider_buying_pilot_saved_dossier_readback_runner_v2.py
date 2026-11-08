@@ -38,10 +38,42 @@ OWN = (SELF, "tests/test_insider_buying_pilot_saved_dossier_readback_runner_v2.p
        "tests/test_insider_buying_pilot_saved_dossier_readback_v2.py")
 MAX_IPC = 1024 * 1024
 PARENT_INSTALLED = False
+PHASES = frozenset({"entry", "current", "activation", "source-verify", "saved-open",
+                    "saved-identity", "saved-validate", "final"})
+REASONS = frozenset({"worker_error", "arguments_refused", "custody_refused", "identity_refused",
+    "output_changed", "native_refused", "cleanup_refused", "saved_payload_refused",
+    "saved_pin_refused", "saved_complete_anchor_refused", "saved_original_anchor_refused",
+    "saved_identity_refused", "saved_source_overlap_refused", "saved_storage_refused",
+    "saved_authority_refused", "saved_arguments_refused", "saved_summary_refused", "saved_readback_refused"})
 
 
 class ReadbackError(ValueError):
     """Finite refusals only; never source config, saved fields or exception text."""
+
+
+class WorkerRefusal(ReadbackError):
+    def __init__(self, phase, reason):
+        need(phase in PHASES and reason in REASONS, "refusal_frame_refused")
+        self.phase, self.reason = phase, reason
+        super().__init__("saved_readback_refused")
+
+
+def refusal_frame(phase, error):
+    reason = "worker_error"
+    if isinstance(error, receipt.SavedReadbackError) and str(error) in REASONS:
+        reason = str(error)
+    elif isinstance(error, stable.CustodyError) and error.code in REASONS:
+        reason = error.code
+    return {"schema": SCHEMA + "/refusal", "completed": False,
+            "phase": phase if phase in PHASES else "entry", "reason": reason}
+
+
+def refuse_worker_result(value):
+    if type(value) is dict and value.get("schema") == SCHEMA + "/refusal":
+        need(set(value) == {"schema", "completed", "phase", "reason"} and value["completed"] is False
+             and type(value["phase"]) is str and value["phase"] in PHASES
+             and type(value["reason"]) is str and value["reason"] in REASONS, "refusal_frame_refused")
+        raise WorkerRefusal(value["phase"], value["reason"])
 
 
 def need(ok, code="readback_refused"):
@@ -354,11 +386,11 @@ def verify_sources(manifest, original):
 
 
 def prepared_worker(role, manifest, profile_hash, mode):
-    guard = None
+    guard, phase = None, "entry"
     try:
         need(role in {"source", "readback"} and mode in {"health", "readback"}, "arguments_refused")
         native_proof(source=role == "source"); guard = native._WorkerMemoryGuard()
-        source_current(manifest)
+        phase = "current"; source_current(manifest)
         if role == "source":
             isolation.check_admin(manifest["admin"])
             git_position(manifest["identity"]["head"], manifest["admin"], clean=True)
@@ -367,29 +399,32 @@ def prepared_worker(role, manifest, profile_hash, mode):
         binding = transport.running_command_binding(profile_hash)
         ready = transport.ready_frame(role, manifest["identity"], profile_hash, binding)
         sys.stdout.buffer.write(raw(ready) + b"\n"); sys.stdout.buffer.flush(); guard.check()
+        phase = "activation"
         encoded = sys.stdin.buffer.read(transport.MAX_ACTIVATION + 1)
         payload = transport.validate_activation(encoded, role, manifest["identity"], profile_hash, binding)
         if role == "source":
             need(type(payload) is dict and set(payload) == {"original_identity"}
                  and (mode == "readback" and type(payload["original_identity"]) is dict
                       or mode == "health" and payload["original_identity"] is None), "activation_refused")
-            result = verify_sources(manifest, payload["original_identity"])
+            phase = "source-verify"; result = verify_sources(manifest, payload["original_identity"])
         else:
             need(payload == {} and type(payload) is dict, "activation_refused")
             if mode == "health":
                 result = {"schema": SCHEMA + "/health", "completed": True, "data_leaves": 0,
                           "reader_inventory": manifest["identity"]["source_inventory_sha256"]}
             else:
+                phase = "saved-open"
                 value = stable.read_epoch_controls(prior.AUDIT_ID, receipt.OUTPUT_NAMES,
                     {"complete.json": {"bytes": None, "sha256": receipt.COMPLETE_SHA256}}, memory=guard)
-                original = receipt.extract_original_identity(value)
+                phase = "saved-identity"; original = receipt.extract_original_identity(value)
+                phase = "saved-validate"
                 result = {"schema": SCHEMA + "/saved", "completed": True,
                           "original_identity": original,
                           "summary": receipt.validate_saved(value, original_identity=original,
                                                             reader_identity=manifest["identity"])}
-        source_current(manifest); send(result, guard)
-    except Exception:
-        if guard is not None: send({"schema": SCHEMA + "/refusal", "completed": False}, guard)
+        phase = "final"; source_current(manifest); send(result, guard)
+    except Exception as error:
+        if guard is not None: send(refusal_frame(phase, error), guard)
         else: raise
     finally:
         if guard is not None: guard.close()
@@ -480,6 +515,7 @@ def run(head, *, mode):
         profile = isolation.policy(sources=manifest["identity"]["source_sha256"], controller=True)
         install_parent(profile); native_proof(source=False); source_current(manifest); guard.check()
         value = reader.activate({})
+        refuse_worker_result(value)
         if mode == "health":
             need(raw(value) == raw({"schema": SCHEMA + "/health", "completed": True,
                 "data_leaves": 0, "reader_inventory": manifest["identity"]["source_inventory_sha256"]}), "health_result_refused")
@@ -490,7 +526,9 @@ def run(head, *, mode):
             original = receipt.source_identity(value["original_identity"])
             summary = receipt.validate_summary(value["summary"], original_identity=original,
                                                reader_identity=manifest["identity"])
-        verified = validate_source_result(verifier.activate({"original_identity": original}), manifest, original)
+        verified = verifier.activate({"original_identity": original})
+        refuse_worker_result(verified)
+        verified = validate_source_result(verified, manifest, original)
         source_current(manifest); guard.check()
         return {"schema": SCHEMA + "/complete", "completed": True, "mode": mode,
                 "reader_execution_head": head,
@@ -521,6 +559,10 @@ def main():
     try:
         result = run(args.expected_head, mode="health" if args.health else "readback")
         print(raw(result).decode())
+    except WorkerRefusal as error:
+        print(raw({"completed": False, "code": "saved_readback_refused",
+                   "phase": error.phase, "reason": error.reason}).decode())
+        raise SystemExit(2) from None
     except Exception:
         print('{"completed":false,"code":"saved_readback_refused"}')
         raise SystemExit(2) from None

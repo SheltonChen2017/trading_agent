@@ -47008,3 +47008,47 @@ health must still pass on the corrected committed tree before saved DATA.
 
 Corrected relevant focused477 PASS3.04s, zero skips/warnings
 (outer3.943s,stderr0), including relaunch positive/arbitrary-image negatives.
+
+### 386.7 Ordinary health acceptance and preserved saved-readback refusal
+
+Fourth ordinary health at2060371e1d37aac77e397173f88a6d67b9e6500a refuses
+exit2 after3.817s, same52B stdout/hash,stderr0. Source-only snapshot diagnosis
+returns source_dirty. A subsequent ordinary repository preflight verifies
+the designated root/branch, exact2060371e, clean tree and unchanged origin88935f65.
+With NO source or saved-byte change, ordinary health then PASSES exit0 after
+63.866s: stdout1811B/hashf0a180b5291c4b0240d577c235420ee37c12fd1373c36726cdbb540027022257,
+stderr0. No precise prior index/stat-cache cause is claimed established;
+retain that earlier false refusal and require a fresh full root/HEAD/status
+preflight before actual readback. The native full-status guard stays intact.
+All219 reader images independently verify at inventory
+e2a76296b6d6d38616b044c4862431a200d19765119ff3d35087e16505678cbf;
+zero DATA leaves, zero original replay/files written, all authority FALSE.
+Controller profile da7222af539a5b3b7a64b34963d281045d89cb89649a651b895a7bb8804dca13;
+admin954db4a453fe253d99b71a0a4da848e98e3da54fc959d0c481bb4de07edb77d4,
+runtime7ce60fe29a58fa79c264a4bb45d7c55dc3654c5f034a8a2f3c194ba0026b11ef,
+ignore36214a67e080694fe566a064807daa65ec3658466c9aa2297a2cbb0fa6012d62.
+
+First ordinary saved-readback call uses that SAME already-existing clean2060371e
+after another full root/branch/HEAD/status check. It FAILS exit2 after46.896s,
+same52B finite refusal/hash,stderr0. The old receipt/complete anchors remain
+unchanged. The aggregate refusal does not establish the precise stage or how
+many leaves were read, so do not label all-five validation complete or claim
+zero saved reads. No original input is replayed and no saved file is written.
+This failed call remains FAILED regardless of a later corrected readback.
+
+Add bounded fixed phase/reason telemetry to the NEW successor only. Worker
+errors disclose only enumerated stage/reason tokens, never raw exception
+text, saved fields or paths. Parent validates exact refusal shape and stops
+before source-verifier activation; refusal is never accepted as completion.
+Runner58 PASS1.23s (outer2.146s,stderr0) includes private-error redaction,
+unknown-token refusal and no-verifier-activation controls. Commit this
+diagnostic correction before any further saved-leaf observation. The owner's
+existing-data repair scope permits bounded read-only observation of these
+same saved leaves to diagnose/fix this successor; it grants no source request,
+namespace retry/resume, original-input replay, guard weakening or receipt
+rewrite. Actual input contents/owner/title/account fields remain private.
+
+Final-code boundary/platform/document/import/EXACT selection229 PASS29.06s
+(outer30.129s,stderr0), zero skips/warnings. Eight images compile; frozen17
+test/four v3 pins remain exact (outer0.763s,stderr0). Native health acceptance
+alone does NOT yet close the P2 successor qualification or factual gates.

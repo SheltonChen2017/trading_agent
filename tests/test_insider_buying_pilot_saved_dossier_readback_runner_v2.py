@@ -171,6 +171,25 @@ def test_health_prepares_both_readers_then_installs_before_any_activation(monkey
     assert len(workers) == 2
 
 
+def test_fixed_worker_refusal_retains_phase_and_never_activates_verifier(monkeypatch):
+    def fail(value):
+        value.clear(); value.update(m.refusal_frame("saved-validate", m.receipt.SavedReadbackError("saved_payload_refused")))
+    manifest, _original, events, _workers = _run_setup(monkeypatch, mode="readback", reader_fault=fail)
+    with pytest.raises(m.WorkerRefusal) as caught:
+        m.run(manifest["identity"]["head"], mode="readback")
+    assert caught.value.phase == "saved-validate" and caught.value.reason == "saved_payload_refused"
+    assert not any(isinstance(item, tuple) and item[:2] == ("activate", "source") for item in events)
+
+
+def test_refusal_frame_never_emits_arbitrary_exception_text():
+    value = m.refusal_frame("saved-open", ValueError("PRIVATE SOURCE CONTENT"))
+    assert value["reason"] == "worker_error" and "PRIVATE" not in m.raw(value).decode()
+    for field in ("phase", "reason"):
+        bad = deepcopy(value); bad[field] = "PRIVATE SOURCE CONTENT"
+        with pytest.raises(m.ReadbackError, match="refusal_frame_refused"):
+            m.refuse_worker_result(bad)
+
+
 def test_saved_summary_is_validated_before_original_source_verifier_activation(monkeypatch):
     manifest, original, events, _workers = _run_setup(monkeypatch, mode="readback")
     result = m.run(manifest["identity"]["head"], mode="readback")

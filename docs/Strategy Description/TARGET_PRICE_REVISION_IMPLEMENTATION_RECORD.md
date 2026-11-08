@@ -1,10 +1,10 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current section127 OFF attempt2 / native in progress:**
+**Current section128 OFF attempt2 / native in progress:**
 The fresh exact-job metadata read remains In Progress...,
 completedFALSE for OFF38609822/job46b3b10ca11481a9d6d8352e6602ac7b,
 SID-CASH-SINGLE-BASE-20261107-OFF-A2. The unchanged dedicated status parser
-validated the entire1547B response; no financial fields were interpreted.
+validated the entire1545B response; no financial fields were interpreted.
 The earlier1319B refused response remains unexplained UNKNOWN history and
 was not retained or relabeled. One request is consumed this wake; no retry.
 
@@ -12,8 +12,8 @@ Financial sourceHEAD5f47205aad43015f1c64981cf15200ae7482919e, fixed single-base
 source epoch and configa01f769b4e712453956c64f8f2945c8b4c404f788bbf32490ce026852164b6ab
 remain unchanged. Last full cloud-source comparison was the123 compile/launch
 all13 inventory86d421a10ec6ccfb8059a8336983e2bf92a592e829f19810399eb56765f06a76;
-no new cloud-source read/change occurred in127. Actual observationHEADbcc37db8
-is the record-only126 handoff, distinct from parent financial sourceHEAD.
+no new cloud-source read/change occurred in128. Actual observationHEAD719dd3d2
+is the record-only127 handoff, distinct from parent financial sourceHEAD.
 
 The SAME heartbeat remains appACTIVE and its fresh exact-job/status prompt
 was read back with the same chat/name/schedule/creation. Continue one fresh
@@ -37901,3 +37901,42 @@ policy unchanged, originalstudy unpooled; financial/accounting/chart/origin/
 rights/PIT/canonical unclosed, accepted metricsNULL. SkipClaude/NO ADDITIONAL PUSH.
 Routine factual record only; no repeated tests for unchanged source/semantics.
 Record-path/diff/history/source/root/branch/HEAD/status checks bind local handoff.
+
+## 128. Serialized exact OFF status wake
+
+Actual observationHEAD719dd3d276c0e4d86dfeac0feb9acbaac6133c25 is the prior record-only handoff; financial sourceHEAD5f47205 unchanged. One fresh exact-job request only; no other active controller;20REMX/no additionalpush.
+
+Fresh128 claim BEFORE effect {"HEAD":"719dd3d276c0e4d86dfeac0feb9acbaac6133c25","bounds":{"JSON_depth_max":32,"JSON_nodes_max":4194304,"backtest_id":"46b3b10ca11481a9d6d8352e6602ac7b","candidate_config_sha256":"a01f769b4e712453956c64f8f2945c8b4c404f788bbf32490ce026852164b6ab","compiles":0,"endpoint":"backtests/read","financial_attempt":2,"financial_source_head":"5f47205aad43015f1c64981cf15200ae7482919e","jobs":0,"native_requests_max":1,"private_reads_max":1,"project_id":38609822,"registry_bytes":3573,"registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","request_seconds_max":30,"response_bytes_max":4194304,"retention":"whole wire and every decoded key/string screened before persistence; exactjob metadata only; no tracing or financial interpretation","source_epoch":"TPR-SID-CASH-SINGLE-BASE-20261107-v2","source_writes":0},"manifest":{"bytes":7320,"name":"TPR-R128-OFF-V2-STATUS-EFFECT-001.claim.json","sha256":"723f407d02ad7ea4c2e8c1030a32039bd52bede32659d2abf10d70d425a89612"},"operation_id":"TPR-R128-OFF-V2-STATUS-EFFECT-001"}
+
+128 OFFv2 exact-job STATUS PREeffect {"financial_projection_or_performance_interpretation": false, "job": "46b3b10ca11481a9d6d8352e6602ac7b", "project_id": 38609822, "proof": {"bytes": 6193, "name": "TPR-CMP29-API-R128-SINGLE-BASE-OFF-STATUS-001.prepared.json", "sha256": "4d8076ef7b449c5ca5b92c716321fc49a61b134b9022e7e367ba9475c8fab952"}, "requests": 1, "response_bound": 4194304, "screened_full_wire_retention_intended_after_validation": true}
+
+128 OFFv2 exact-job status result {"economics_accepted": false, "lock_cleanup_complete": true, "metadata": {"backtest_completed": false, "backtest_id": "46b3b10ca11481a9d6d8352e6602ac7b", "backtest_status": "In Progress...", "credential_echo_refused_before_retention": true, "economics_accepted": false, "entire_wire_validated": true, "financial_fields_projected": false, "json_value_nodes": 67, "max_json_depth": 32, "max_json_nodes": 4194304, "native_origin_independently_attested": false, "original_wire_bytes": 1545, "original_wire_sha256": "1ba7084262d5211ff2648ccae6895d794d0b95bcb0e4bb1d468fd6e3c2a2fc5e", "project_id": 38609822, "schema": "tpr-cmp30-job-status-projection-v1"}, "projection": {"bytes": 548, "name": "TPR-CMP29-API-R128-SINGLE-BASE-OFF-STATUS-001.job.projection.json", "sha256": "028da86ee535b8d95fb98c2e6af4a351cd36d817673a7edeb2dd3d929e4bf888"}, "proof": {"bytes": 1919, "name": "TPR-CMP29-API-R128-SINGLE-BASE-OFF-STATUS-001.safe.json", "sha256": "b44b7a7a9ed1b9c81415411e9351ca03f99860f8481dedad0b9ae81451676ed0"}, "receipt": {"bytes": 1751, "name": "TPR-CMP29-API-R128-SINGLE-BASE-OFF-STATUS-001.result.json", "sha256": "7aaea862f740746019a1323d9b414c5e8b4102f8259560acd8603e07afdce76e"}, "receipt_published": true, "status": "completed"}
+
+### 128.1 Unchanged nonterminal metadata / local handoff
+
+Sole freshly claimed TPR-CMP29-API-R128-SINGLE-BASE-OFF-STATUS-001 under observationHEAD719dd3d276c0e4d86dfeac0feb9acbaac6133c25
+accepted In Progress..., completedFALSE for OFF38609822/job46b3b10ca11481a9d6d8352e6602ac7b.
+HTTP200/1545B/67nodes; unchanged full-wire/identity/privacy parser bounds.
+Claim7320B/SHA723f407d02ad7ea4c2e8c1030a32039bd52bede32659d2abf10d70d425a89612;
+safe1919B/SHAb44b7a7a9ed1b9c81415411e9351ca03f99860f8481dedad0b9ae81451676ed0;
+receipt1751B/SHA7aaea862f740746019a1323d9b414c5e8b4102f8259560acd8603e07afdce76e;
+raw1545B/SHA1ba7084262d5211ff2648ccae6895d794d0b95bcb0e4bb1d468fd6e3c2a2fc5e;
+projection548B/SHA028da86ee535b8d95fb98c2e6af4a351cd36d817673a7edeb2dd3d929e4bf888;
+requestclaim402B/SHA39c264ef3849c4e748a8d36a94457e626a3f3a554187a163853dd704a11d056b.
+Above operation prefix/fixed status/private roots bind all. Receipt/lockcleanupTRUE.
+Request.statuscompleted denotes metadata-read success only. No financial
+fields interpreted, initialization/terminal/native-origin proof or economic acceptance.
+
+One native request thiswake; cumulative123..128requests39. Financial launches2,
+fourremainingarms/nativechild unlaunched. All40committed source bytes unchanged;
+parentfinancial sourceHEAD5f47205 distinct from observationrecordHEAD719dd3d2
+and following local handoffHEAD. No cloudsource read/write, Mia,compile,job,
+trace or performance interpretation; lastall13cloudmatch remains123.
+Earlier1319B refusal staysUNKNOWN/unretained/distinct,124trace consumed.
+Same actualjob monitor useful, lastappACTIVE/readback124 unchanged; no appupdate.
+Next newwake one fresh exactjob read; pause SAME heartbeat BEFORE actualterminal
+transition/continuation.20REMX quarantined/oneSIDcash unchanged/originalstudy
+unpooled/accepted metricsNULL/allfinancial/accounting/chart/origin/rights/PIT/
+canonical gates unclosed/skipClaude/NO ADDITIONAL PUSH. No owner action.
+Routine factual record only; no repeated tests for unchanged source/semantics.
+Record-only diff/history/source/root/branch/HEAD/status checks bind local handoff.

@@ -1,35 +1,43 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current section151 OFF attempt2 / native in progress:**
-The fresh exact-job metadata read remains In Progress...,
-completedFALSE for OFF38609822/job46b3b10ca11481a9d6d8352e6602ac7b,
-SID-CASH-SINGLE-BASE-20261107-OFF-A2. The unchanged dedicated status parser
-validated the entire1564B response; no financial fields were interpreted.
-The earlier1319B refused response remains unexplained UNKNOWN history and
-was not retained or relabeled. One request is consumed this wake; no retry.
+**Current section152 OFF attempt2 / terminal Runtime Error; heartbeat PAUSED:**
+The sole fresh exact-job status request accepted Runtime Error, completedTRUE
+for OFF38609822/job46b3b10ca11481a9d6d8352e6602ac7b,
+SID-CASH-SINGLE-BASE-20261107-OFF-A2. The unchanged status parser validated
+the entire1027863B response/47246nodes; no financial fields were interpreted.
+Actual observationHEADa5b3cb0ff20fa9b80f845c9b53ecb63c66656880 is the record-only151
+handoff, distinct from financial sourceHEAD5f47205aad43015f1c64981cf15200ae7482919e.
+Configa01f769b4e712453956c64f8f2945c8b4c404f788bbf32490ce026852164b6ab and
+single-base source epoch remain unchanged. Last all13 cloud comparison is123;
+no new source read/upload/compile/job or source correction occurred in152.
 
-Financial sourceHEAD5f47205aad43015f1c64981cf15200ae7482919e, fixed single-base
-source epoch and configa01f769b4e712453956c64f8f2945c8b4c404f788bbf32490ce026852164b6ab
-remain unchanged. Last full cloud-source comparison was the123 compile/launch
-all13 inventory86d421a10ec6ccfb8059a8336983e2bf92a592e829f19810399eb56765f06a76;
-no new cloud-source read/change occurred in151. Actual observationHEAD77d6eb30
-is the record-only150 handoff, distinct from parent financial sourceHEAD.
+The SAME heartbeat was appPAUSED and verified before terminal error processing.
+A copied, transport-truncated config prompt was restored to its full retained124
+bytes while keeping PAUSED; fresh readback verifies fullpromptSHAf43628187b6eb5bec57f51f807ef534e590945e7d3304042f14d275f5d36b838
+and the same chat/name/schedule/creation. No parallel monitor was created.
+One exact status request is consumed this wake; no repeated status read.
+The earlier1319B refused read remains distinct unexplained UNKNOWN history;
+the124 one-time zero-gate diagnostic is consumed and supplies no diagnosis.
 
-The SAME heartbeat was last verified appACTIVE in124, with its exact-job/status
-prompt read back for the same chat/name/schedule/creation. Continue one fresh
-bounded metadata request per new wake; pause BEFORE processing any actual
-terminal transition. Preserve current job/project/source/notebooks untouched.
-The124 one-time body-free CALL-only diagnostic recorded zero refusal gates;
-no diagnosis of the earlier refusal or parser correction is implied.
+Private technical error projection matches CMP28 mark refusal reason
+minute_or_native_close_wrong_day_or_future, ValueError, _daily_audit/_reject_mark;
+source lines658/854/641. Full error stays private. No stale/future mark
+substitution or additional SID exclusion is accepted. The first managed-
+multiple-inheritance failure and this second failure remain separate/unpooled.
+The fixed accounting child refuses Runtime Error parents; it was not launched.
+All accepted full-window metrics remain NULL; no partial or failed run is pooled.
 
-Runtime/financial completion remains unproved. Other four new variant arms
-and native child verifier are not launched; all accepted full-window metrics
-remain NULL. Native orders/fills/fees/cash/actions/NAV/exposure/clock/full
-coverage, chart/origin/rights/PIT/canonical gates remain unclosed.
-The separate one-SID-to-cash study retains the excluded final allocation in
-cash with no redistribution; original study/failedA1 history remain unpooled.
-Keep all20REMX rows quarantined, skip Claude, NO ADDITIONAL PUSH. Round120
-push041a54db is consumed; local source/handoff commits remain LOCAL ONLY.
+Genuine Mia could not be reached: prior IAB tab1 is gone, same-browser inventory
+was empty, and restored own OFF project tab2 is signed out (Sign In / Log In).
+No new Mia draft/send/tools occurred. Owner action: sign in to QuantConnect
+in that retained OFF project tab so genuine built-in Mia can diagnose this
+actual mark refusal. Do not relaunch an unchanged failing path.
+Remaining50/100/200/pure arms are unlaunched/pending; heartbeat stays PAUSED
+until an actually created next job with exact source/provenance is available.
+Keep all20REMX rows quarantined; exactly one authorized SID allocation stays
+cash, other weights/fixed60slots/calendar/economics unchanged. Original study,
+native accounting/chart/origin/intent/rights/PIT/canonical gates remain unclosed.
+Skip Claude, NO ADDITIONAL PUSH; round120 push041a54db is consumed.
 
 **Published section120 handoff before the current owner continuation (2026-11-07):** The in-app browser is
 authenticated on own OFF38609822/code; nativeSafari remains untouched.
@@ -38840,3 +38848,153 @@ financial/accounting/chart/origin/rights/PIT/canonical unclosed/skipClaude/
 NO ADDITIONAL PUSH/no owner action. Routine factual record only; no repeated
 tests for unchanged source/semantics. Record-path/diff/history/source/root/
 branch/HEAD/status checks bind local handoff and actual future manifestHEAD.
+
+## 152. Serialized exact OFF status wake
+
+Actual observationHEADa5b3cb0ff20fa9b80f845c9b53ecb63c66656880 is the prior record-only handoff; financial sourceHEAD5f47205 unchanged. One fresh exact-job request only; no other active controller;20REMX/no additionalpush.
+
+Fresh152 claim BEFORE effect {"HEAD":"a5b3cb0ff20fa9b80f845c9b53ecb63c66656880","bounds":{"JSON_depth_max":32,"JSON_nodes_max":4194304,"backtest_id":"46b3b10ca11481a9d6d8352e6602ac7b","candidate_config_sha256":"a01f769b4e712453956c64f8f2945c8b4c404f788bbf32490ce026852164b6ab","compiles":0,"endpoint":"backtests/read","financial_attempt":2,"financial_source_head":"5f47205aad43015f1c64981cf15200ae7482919e","jobs":0,"native_requests_max":1,"private_reads_max":1,"project_id":38609822,"registry_bytes":3573,"registry_sha256":"154e8ff056eb776f070fd73922b724367e634b1b37d4052b70a464601d0c94f1","request_seconds_max":30,"response_bytes_max":4194304,"retention":"whole wire and every decoded key/string screened before persistence; exactjob metadata only; no tracing or financial interpretation","source_epoch":"TPR-SID-CASH-SINGLE-BASE-20261107-v2","source_writes":0},"manifest":{"bytes":7320,"name":"TPR-R152-OFF-V2-STATUS-EFFECT-001.claim.json","sha256":"1d1098f49bce63beb702a3b3ed49539d1126b2d561836d326f9d53303c5c3ed8"},"operation_id":"TPR-R152-OFF-V2-STATUS-EFFECT-001"}
+
+152 OFFv2 exact-job STATUS PREeffect {"financial_projection_or_performance_interpretation": false, "job": "46b3b10ca11481a9d6d8352e6602ac7b", "project_id": 38609822, "proof": {"bytes": 6193, "name": "TPR-CMP29-API-R152-SINGLE-BASE-OFF-STATUS-001.prepared.json", "sha256": "4616ecd41d73b79289cd21b10a0fe89e13fc7585e63195a8e2fa19db14186722"}, "requests": 1, "response_bound": 4194304, "screened_full_wire_retention_intended_after_validation": true}
+
+152 OFFv2 exact-job status result {"economics_accepted": false, "lock_cleanup_complete": true, "metadata": {"backtest_completed": true, "backtest_id": "46b3b10ca11481a9d6d8352e6602ac7b", "backtest_status": "Runtime Error", "credential_echo_refused_before_retention": true, "economics_accepted": false, "entire_wire_validated": true, "financial_fields_projected": false, "json_value_nodes": 47246, "max_json_depth": 32, "max_json_nodes": 4194304, "native_origin_independently_attested": false, "original_wire_bytes": 1027863, "original_wire_sha256": "e85a00b77a82b15aa253a7ceb9eb94a0bc84075b392b9688d5c03c57ae350ed3", "project_id": 38609822, "schema": "tpr-cmp30-job-status-projection-v1"}, "projection": {"bytes": 552, "name": "TPR-CMP29-API-R152-SINGLE-BASE-OFF-STATUS-001.job.projection.json", "sha256": "4862ee17a731c9b5256149c2a1fe3cf9dfa2978bedd030d9ee1e193a36ffbb2a"}, "proof": {"bytes": 1929, "name": "TPR-CMP29-API-R152-SINGLE-BASE-OFF-STATUS-001.safe.json", "sha256": "f954fa87508ec0d944aa39b8b24db364606c3c44917c63de9af401899689e2b8"}, "receipt": {"bytes": 1761, "name": "TPR-CMP29-API-R152-SINGLE-BASE-OFF-STATUS-001.result.json", "sha256": "e83faf6062dfade0b9e4b0cf11ed3964607dc8736aa56db6a5d7b6f81e254ffb"}, "receipt_published": true, "status": "completed"}
+
+Fresh152 claim BEFORE effect {"HEAD":"a5b3cb0ff20fa9b80f845c9b53ecb63c66656880","bounds":{"QC_requests":0,"app_config_path":"$CODEX_HOME/automations/target-price-qc-job-remaining-backtests/automation.toml","app_mutations":0,"bytes_max":65536,"only_chat":"01a0fd4c-ebeb-72b0-863d-33bd1f7affeb","only_id":"target-price-qc-job-remaining-backtests","private_reads_max":1,"purpose":"pause SAME heartbeat before terminal transition consumption","terminal_metadata_receipt":{"bytes":1761,"name":"TPR-CMP29-API-R152-SINGLE-BASE-OFF-STATUS-001.result.json","sha256":"e83faf6062dfade0b9e4b0cf11ed3964607dc8736aa56db6a5d7b6f81e254ffb"}},"manifest":{"bytes":7094,"name":"TPR-R152-APP-CONFIG-BEFORE-PAUSE-001.claim.json","sha256":"5de1afedfe95aef65a974fb0fad00b32e3b415b5928cdc4b5f41550ece8cb920"},"operation_id":"TPR-R152-APP-CONFIG-BEFORE-PAUSE-001"}
+
+152 existing heartbeat bounded configuration read {"id": "target-price-qc-job-remaining-backtests", "keys": ["created_at", "id", "kind", "name", "prompt", "rrule", "status", "target_thread_id", "updated_at", "version"], "kind": "heartbeat", "name": "Target-Price QC job \u2192 remaining backtests", "prompt_sha256": "f43628187b6eb5bec57f51f807ef534e590945e7d3304042f14d275f5d36b838", "proof": {"bytes": 11107, "name": "TPR-R152-APP-HEARTBEAT-CONFIG-BEFORE-PAUSE-001.safe.json", "sha256": "71e708347841e939d6624502e2dd5aa0131ce16d62a303eb9892b122d7d68757"}, "status": "ACTIVE", "target_thread_id": "01a0fd4c-ebeb-72b0-863d-33bd1f7affeb", "version": 1}
+
+Fresh152 claim BEFORE effect {"HEAD":"a5b3cb0ff20fa9b80f845c9b53ecb63c66656880","bounds":{"QC_requests":0,"app_mutations_max":1,"app_tool":"mcp__codex_app__automation_update","id":"target-price-qc-job-remaining-backtests","preserve_prompt_name_schedule":true,"private_reads":0,"status_after":"PAUSED","status_before":"ACTIVE","target_chat":"01a0fd4c-ebeb-72b0-863d-33bd1f7affeb","terminal_receipt":{"bytes":1761,"name":"TPR-CMP29-API-R152-SINGLE-BASE-OFF-STATUS-001.result.json","sha256":"e83faf6062dfade0b9e4b0cf11ed3964607dc8736aa56db6a5d7b6f81e254ffb"}},"manifest":{"bytes":7005,"name":"TPR-R152-APP-TERMINAL-PAUSE-001.claim.json","sha256":"8f2bbd298a86de30d7aa74bba587d3059b0363e4dd34b4641673a910ec2cab82"},"operation_id":"TPR-R152-APP-TERMINAL-PAUSE-001"}
+
+Fresh152 claim BEFORE effect {"HEAD":"a5b3cb0ff20fa9b80f845c9b53ecb63c66656880","bounds":{"QC_requests":0,"app_mutations":0,"bytes_max":65536,"expected_prompt_sha256":"f43628187b6eb5bec57f51f807ef534e590945e7d3304042f14d275f5d36b838","only_chat":"01a0fd4c-ebeb-72b0-863d-33bd1f7affeb","only_id":"target-price-qc-job-remaining-backtests","private_reads_max":1,"purpose":"verify SAME heartbeat PAUSED before terminal transition processing"},"manifest":{"bytes":6903,"name":"TPR-R152-APP-CONFIG-AFTER-PAUSE-001.claim.json","sha256":"b27e2fb189f2e039433fe131471b436f0939461656cd916f7cbd25efbafda899"},"operation_id":"TPR-R152-APP-CONFIG-AFTER-PAUSE-001"}
+
+152 paused heartbeat bounded configuration read {"id": "target-price-qc-job-remaining-backtests", "keys": ["created_at", "id", "kind", "name", "prompt", "rrule", "status", "target_thread_id", "updated_at", "version"], "kind": "heartbeat", "name": "Target-Price QC job \u2192 remaining backtests", "prompt_sha256": "d037afe24f571ec9bca646d391df6c31514a78651efe77d0408b8320a41f7ac4", "proof": {"bytes": 2163, "name": "TPR-R152-APP-HEARTBEAT-CONFIG-AFTER-PAUSE-001.safe.json", "sha256": "e079163f76daefdeea478d7a97bac3848d2ebeb64edd352064a57a7ed73748d6"}, "status": "PAUSED", "target_thread_id": "01a0fd4c-ebeb-72b0-863d-33bd1f7affeb", "version": 1}
+
+152 app pause recovery: initial bounded config output was truncated by tool transport inside its prompt; copying that returned prompt into the pause effect changed the saved prompt. Same heartbeat was actually PAUSED before any terminal processing. After-pause exact read saved2163B/SHAe079163f76daefdeea478d7a97bac3848d2ebeb64edd352064a57a7ed73748d6; shell exit0, outer JSON.parse refused truncation. Restore the known full124 prompt from retained in-memory bytes under a fresh claim; keep PAUSED. Future config outputs expose safe metadata only.
+
+Fresh152 claim BEFORE effect {"HEAD":"a5b3cb0ff20fa9b80f845c9b53ecb63c66656880","bounds":{"QC_requests":0,"app_mutations_max":1,"app_tool":"mcp__codex_app__automation_update","expected_prompt_sha256":"f43628187b6eb5bec57f51f807ef534e590945e7d3304042f14d275f5d36b838","id":"target-price-qc-job-remaining-backtests","purpose":"restore exact full124 prompt after tool-output truncation affected prior copied prompt; preserve pause/chat/name/schedule","status_after":"PAUSED"},"manifest":{"bytes":6950,"name":"TPR-R152-APP-PAUSED-PROMPT-RESTORE-001.claim.json","sha256":"4a7ffd66741dff9f4477504991c983545e2011b5ef14fba1ba96ddc598ad9699"},"operation_id":"TPR-R152-APP-PAUSED-PROMPT-RESTORE-001"}
+
+Fresh152 claim BEFORE effect {"HEAD":"a5b3cb0ff20fa9b80f845c9b53ecb63c66656880","bounds":{"QC_requests":0,"bytes_max":65536,"expected_prompt_sha256":"f43628187b6eb5bec57f51f807ef534e590945e7d3304042f14d275f5d36b838","expected_status":"PAUSED","id":"target-price-qc-job-remaining-backtests","output":"safe metadata/hash only; no full config/prompt","private_reads_max":1},"manifest":{"bytes":6823,"name":"TPR-R152-APP-CONFIG-RESTORED-001.claim.json","sha256":"29bd1b8364b533b4f0c95837b8727117ae1d484b5ce6c4b996aa5abdca084477"},"operation_id":"TPR-R152-APP-CONFIG-RESTORED-001"}
+
+152 restored PAUSED heartbeat bounded configuration read {"id": "target-price-qc-job-remaining-backtests", "keys": ["created_at", "id", "kind", "name", "prompt", "rrule", "status", "target_thread_id", "updated_at", "version"], "kind": "heartbeat", "name": "Target-Price QC job \u2192 remaining backtests", "prompt_sha256": "f43628187b6eb5bec57f51f807ef534e590945e7d3304042f14d275f5d36b838", "proof": {"bytes": 11107, "name": "TPR-R152-APP-HEARTBEAT-CONFIG-RESTORED-001.safe.json", "sha256": "69e8ac8c054eeb56c2f68baf592f6f4ab56b09fd3a4aa3d3432d659051e5f68f"}, "status": "PAUSED", "target_thread_id": "01a0fd4c-ebeb-72b0-863d-33bd1f7affeb", "version": 1}
+
+Fresh152 claim BEFORE effect {"HEAD":"a5b3cb0ff20fa9b80f845c9b53ecb63c66656880","bounds":{"QC_requests":0,"after_verified_app_pause":true,"compiles":0,"input":{"bytes":1027863,"name":"TPR-CMP29-API-R152-SINGLE-BASE-OFF-STATUS-001.job.response.raw","sha256":"e85a00b77a82b15aa253a7ceb9eb94a0bc84075b392b9688d5c03c57ae350ed3"},"jobs":0,"output_public_functions_max":64,"output_public_messages_max":32,"private_reads_max":1,"processing":"exact two bounded technical error/stack fields only; no financial interpretation; private archive, output exact public source literals/functions/files/line numbers only","source_writes":0},"manifest":{"bytes":7088,"name":"TPR-R152-OFF-RUNTIME-ERROR-READ-001.claim.json","sha256":"d33c863a95ab345fb7d14ff688254967fb6642c3e43480b5560f715a96c1298a"},"operation_id":"TPR-R152-OFF-RUNTIME-ERROR-READ-001"}
+
+152 terminal runtime error AFTER verified same-heartbeat appPAUSE {"backtest_id": "46b3b10ca11481a9d6d8352e6602ac7b", "completed": true, "error_fields": {"error": {"bytes": 1481, "sha256": "cbc8d1512e71f76925dd3a2ac4cc368e922b516347c31319a445182408eb5186"}, "stacktrace": {"bytes": 1206, "sha256": "ec6c9555dcebac666ad1a2fd0df691b3bfb52546c5e9868b73910ab660c77475"}}, "exact_public_source_message_matches": ["Runtime Error", "TPR-CMP28-OFF-", "TPR-CMP28-OFF-SID-CASH-20261107-", "TPR-SIX-UNIVERSE-FIVE-ARM-SID-CASH-20261107-v1", "comparison_20261028_algorithm", "comparison_20261028_algorithm.py", "expected_date_equals_algorithm", "expected_sha256", "mark-refusal.json", "minute_or_native_close_wrong_day_or_future", "observed_date_equals_session", "observed_equals_expected", "observed_relation", "readback_verified", "strict_minute_or_raw_daily_equal_close_v1", "tpr-cmp28-mark-refusal-pointer-v2", "tpr-cmp28/evidence/", "valuation_verification_mode", "verified_sha256"], "exception_categories": {"AttributeError": false, "ImportError": false, "KeyError": false, "MemoryError": false, "NameError": false, "RuntimeError": false, "TimeoutError": false, "TypeError": false, "ValueError": true}, "financial_metrics": null, "monitor_paused_before_consumption": true, "native_status": "Runtime Error", "project_id": 38609822, "proof": {"bytes": 3007, "name": "TPR-R152-OFF-RUNTIME-ERROR-001.private.json", "sha256": "6486d655ec2b2e7e6f079e71da2e7fcd9aa3356b9804a112bd9954702894ecdb"}, "public_source_files": ["comparison_20261028_algorithm.py", "main.py"], "public_source_functions": ["_daily_audit", "_reject_mark", "attempt", "bytes", "close", "status"], "raw_error_exported": false, "safe_proof": {"bytes": 1630, "name": "TPR-R152-OFF-RUNTIME-ERROR-PUBLIC-001.safe.json", "sha256": "335dd1c0d5dcb2a8b33c3f9f43afdab6357e8b2d24e838d92aa0c72739a7ad04"}, "schema": "tpr152-error-public-source-projection-v1", "source_lines": [658, 854, 641, 658, 854, 641]}
+
+Fresh152 claim BEFORE effect {"HEAD":"a5b3cb0ff20fa9b80f845c9b53ecb63c66656880","bounds":{"Mia_submissions":0,"QC_direct_requests":0,"UI_reads_max":1,"exact_tab":"existing IAB2/tab1 OFF38609822/code","purpose":"locate genuine built-in Mia after actual OFFA2 runtime error; no navigation/source/job/account change"},"manifest":{"bytes":6733,"name":"TPR-R152-MIA-UI-BIND-001.claim.json","sha256":"27d8cd326ab7222c670bf3416877efcb0b3bc55f4e4ad6de8cbf99aa17466abc"},"operation_id":"TPR-R152-MIA-UI-BIND-001"}
+
+152 genuine Mia UI bind001 failed: existing tab1 not found in browser2; no UI content, submitted message or Mia tools read. Fresh same-browser tab inventory follows; no repeated unchanged failing bind.
+
+Fresh152 claim BEFORE effect {"HEAD":"a5b3cb0ff20fa9b80f845c9b53ecb63c66656880","bounds":{"Mia_submissions":0,"QC_direct_requests":0,"UI_metadata_discoveries_max":1,"browser":"existing IAB2","purpose":"prior exacttab1 missing; locate authenticated QC tab without navigation or new controller"},"manifest":{"bytes":6712,"name":"TPR-R152-MIA-UI-TABS-001.claim.json","sha256":"5a8667ecd084eae88fffeb7aab33c78d6c2d900f03ccdde4b26e7966f3d28fdb"},"operation_id":"TPR-R152-MIA-UI-TABS-001"}
+
+152 same-browser tab inventory returned empty. No existing browser controller/tab to duplicate. One own-project UI tab restore is next; no source mutation or cloud job.
+
+Fresh152 claim BEFORE effect {"HEAD":"a5b3cb0ff20fa9b80f845c9b53ecb63c66656880","bounds":{"Mia_submissions":0,"QC_direct_requests":0,"UI_tabs_created_max":1,"browser":"existing IAB2","exact_project":38609822,"jobs":0,"purpose":"restore own OFF project page to genuine Mia after tab inventory empty; authenticated existing subscriptions only","source_writes":0},"manifest":{"bytes":6808,"name":"TPR-R152-MIA-UI-RESTORE-TAB-001.claim.json","sha256":"38f2f3b389c803940d66d5b6e6d9a7af9695f8c297799882063cc3903da9a655"},"operation_id":"TPR-R152-MIA-UI-RESTORE-TAB-001"}
+
+152 genuine Mia unavailable: fresh own-project IAB2/tab2 shows Sign In / Begin Your QuantConnect Journey / Log In instead of authenticated project or Mia. No Mia prompt was entered or sent; no Mia technical read/tool occurred. The standing lane instruction says: If Mia is not accessible to Codex, stop and let the owner use Mia. No generic substitute, source correction or unchanged financial relaunch is authorized. Retain own-project tab for owner login; nativeSafari remains untouched.
+
+Fresh152 claim BEFORE effect {"HEAD":"a5b3cb0ff20fa9b80f845c9b53ecb63c66656880","bounds":{"Mia_submissions":0,"QC_direct_requests":0,"UI_handoff_marks_max":1,"UI_reads":0,"exact_tab":"IAB2/tab2 own OFF38609822","purpose":"retain already observed signed-out own-project page for owner sign-in; no authentication/account/source/job/message effects"},"manifest":{"bytes":6814,"name":"TPR-R152-MIA-OWNER-LOGIN-HANDOFF-001.claim.json","sha256":"26aad85ed51070e0f8ea357e12c1f24e464705d7ff9457cfde0c526dd7a4d30b"},"operation_id":"TPR-R152-MIA-OWNER-LOGIN-HANDOFF-001"}
+
+### 152.1 Actual terminal receipt / pause before error consumption
+
+Exact request TPR-CMP29-API-R152-SINGLE-BASE-OFF-STATUS-001, observationHEADa5b3cb0ff20fa9b80f845c9b53ecb63c66656880,
+accepted Runtime Error, completedTRUE for OFF38609822/job46b3b10ca11481a9d6d8352e6602ac7b.
+HTTP200/1027863B/47246nodes; whole-wire limits4MiB/depth32/node4194304,
+exact numbers/duplicates/UTF8/JSON/raw+decoded credential screening unchanged.
+Claim7320B/SHA1d1098f49bce63beb702a3b3ed49539d1126b2d561836d326f9d53303c5c3ed8;
+safe1929B/SHAf954fa87508ec0d944aa39b8b24db364606c3c44917c63de9af401899689e2b8;
+receipt1761B/SHAe83faf6062dfade0b9e4b0cf11ed3964607dc8736aa56db6a5d7b6f81e254ffb;
+raw1027863B/SHAe85a00b77a82b15aa253a7ceb9eb94a0bc84075b392b9688d5c03c57ae350ed3;
+projection552B/SHA4862ee17a731c9b5256149c2a1fe3cf9dfa2978bedd030d9ee1e193a36ffbb2a;
+requestclaim402B/SHAae9abd1893b732da847ac18e86180b9803a1d10063bc0ea6d1b423cff45f9efc.
+Receipt/sharedlockcleanupTRUE. Request.statuscompleted means request success;
+native terminal is metadata.Runtime Error/completedTRUE, not financial acceptance.
+One native request thiswake; cumulative123..152requests63. New financial variant
+launches remain2 across122/123; no launch, compile, upload or source change152.
+
+SAME heartbeat app pause was executed before any error transition processing.
+Three bounded exact config reads retained before/after/restored history; initial
+full config output transport truncation caused an incidental copied prompt change.
+No lost attempt was erased: after-pause2163B proof and restoration scope above.
+Known full124 prompt was restored under a fresh claim while PAUSED. Final safe
+readback 11107B/SHA69e8ac8c054eeb56c2f68baf592f6f4ab56b09fd3a4aa3d3432d659051e5f68f, promptSHAf43628187b6eb5bec57f51f807ef534e590945e7d3304042f14d275f5d36b838,
+same id/chat/name/schedule/creation; PAUSED. No new automation/controller.
+The direct app pause calls count2 (initial pause, fullprompt restoration); no
+status request or QC source/job effect was repeated during this app recovery.
+
+Technical error-only processing began AFTER verified pause. Error private archive
+3007B/SHA6486d655ec2b2e7e6f079e71da2e7fcd9aa3356b9804a112bd9954702894ecdb; safe public-source projection1630B/SHA335dd1c0d5dcb2a8b33c3f9f43afdab6357e8b2d24e838d92aa0c72739a7ad04.
+Error1481B/SHAcbc8d1512e71f76925dd3a2ac4cc368e922b516347c31319a445182408eb5186;
+stack1206B/SHAec6c9555dcebac666ad1a2fd0df691b3bfb52546c5e9868b73910ab660c77475. Only exact public source literals,
+functions/files/line numbers were returned; no financial tree was interpreted.
+Actual public matches include mark-refusal.json, CMP28 pointer-v2, ValueError,
+minute_or_native_close_wrong_day_or_future and _daily_audit/_reject_mark,
+comparison_20261028_algorithm.py/main.py lines658/854/641. The boolean OR reason
+does not identify which clock predicate failed, a ticker, SID, date or root cause.
+No additional exclusion, stale/future price/clock rewrite, missing-as-zero,
+date extension or financial/source acceptance follows from this projection.
+Public source searches in recovery/preflight and tests/target_price_revisions_qc
+returned no matching diagnostic/doc filenames (exit1); broader public file discovery
+then found tests/test_active_document_consistency.py and the Target document tests.
+
+Independent PUBLIC source check: fixed single_base_native_results._parent_terminal
+requires completedTRUE and Completed/Completed.; _dispatch checks saved terminal
+BEFORE native requests. single_base_results._identity requires terminal_status
+exactlyCompleted. Child aggregate-log extractor is not a parent error extractor.
+No failed-parent accounting API exists; no binding/terminal label was fabricated.
+Child accounting therefore remains BLOCKED for this failed attempt, no child job.
+
+| Arm | Actual job / readiness | Accepted metrics |
+|---|---|---|
+| OFF A1 | ba19f090efb3c9370292a7737f650823 Runtime Error/completedTRUE, managed multiple inheritance, retained separately | NULL |
+| OFF A2 | 46b3b10ca11481a9d6d8352e6602ac7b Runtime Error/completedTRUE, mark clock refusal, genuine Mia pending | NULL |
+| 50% | project38609834, no new variant job; pending verified common-source readiness | NULL |
+| 100% | project38609836, no new variant job; old17-file Mia/owner source still unaccepted | NULL |
+| 200% | project38609837, no new variant job; pending verified common-source readiness | NULL |
+| pureTPR | project38609840, no new variant job; pending verified common-source readiness | NULL |
+
+### 152.2 Genuine Mia access blocker / concrete owner handoff
+
+Old exact IAB2/tab1 binding failed (tab not found); fresh same-browser inventory
+returned[]; fresh own-project tab2 at https://www.quantconnect.com/project/38609822
+shows Sign In, Begin Your QuantConnect Journey and Log In. This authoritative
+signed-out state prevents genuine built-in Mia access. No new draft was entered,
+no message submitted, no Mia technical tools run. Own-project tab2 markedHandoff.
+NativeSafari/account/Terms/security/credential settings remain untouched.
+
+Standing instruction: "If Mia is not accessible to Codex, stop and let the owner
+use Mia." This concrete missing authenticated UI, not a request for renewed
+research authorization, requires owner sign-in. Sign in to the retained OFF
+project tab, then continue this same chat. No generic agent/API impersonation.
+The following bounded prompt is prepared for genuine Mia, NOT sent:
+
+TPR152-OFF-A2-MARK-DIAG-001. Read-only diagnosis of OFF project38609822, exact backtest46b3b10ca11481a9d6d8352e6602ac7b (SID-CASH-SINGLE-BASE-20261107-OFF-A2), now Runtime Error/completedTRUE. Current fixed single-base source epoch is TPR-SID-CASH-SINGLE-BASE-20261107-v2. The actual error contains CMP28_MARK_REFUSAL, reason minute_or_native_close_wrong_day_or_future, ValueError, _daily_audit/_reject_mark at comparison_20261028_algorithm.py lines658/854/641. This is separate from the old managed multiple-inheritance failure. Use at most TWO bounded technical reads: exact job error/log and current relevant source. Diagnose what the evidence proves and what remains unknown; return source locations and aggregate clock predicates/digests, never raw SID, full journal, private prices or P&L. Do not edit/delete source/notebooks, compile, create/cancel jobs, change dates/economics, substitute stale/future marks, or add an exclusion. The owner permits exactly one fixed SID-to-cash mask and all20 REMX fractional rows remain quarantined. Suggest only a verified lane-specific correction if supported; otherwise identify the concrete unresolved input/clock blocker.
+
+After genuine Mia is available, freshly claim prompt submission/technical reads,
+retain its actual reply, retrieve/compare EVERY saved project file under fresh
+scope, and port only verified lane-specific corrections. Preserve both failed
+attempts and original study separately. No unchanged failing relaunch.
+Heartbeat remains PAUSED; rearm SAME id only for an actually created next job.
+Keep20REMX quarantined/one authorized SID-to-cash/no redistribution/60slots/
+fixed1449valuations+301decisions/calendar/economics; financial/accounting/chart/
+origin/intent/rights/PIT/canonical gates unclosed. SkipClaude/NO ADDITIONAL PUSH.
+
+### 152.3 Focused verification / local-only handoff
+
+Current terminal preamble and152.1/152.2 recordSHA
+d492558d9fa24350f549c7983fe88ace53510b246d97cb54e936bafabf7c6dbb
+passed the isolated public current/preamble document selection:
+371passed/520deselected8.13s (8.246s outer). SyntheticDB/runtime49/52 fence
+was installed BEFORE dispatch/config imports; socket/DNS/realcredential reads
+denied. No complete suite, financial rerun, private/provider fixture or Windows
+custody claim. Independent public-record review of that exact3955884B record
+found no concrete factual error; no reviewer edit/effect/private read occurred.
+Following factual QA receipt is not claimed included in that earlier test hash.
+
+All40 production closure files remain byte-equal to actual committedHEADa5b3cb0f;
+published sections9..120 remain exact3534430B/SHA024b59c6ab35c632d906d80360104684611235707d7f01a54048c86103e0af06.
+Only the sole record is staged for the next local handoff commit. No new source,
+test or shared document changes; no push. Keep heartbeat PAUSED. Next action
+requires genuine Mia access restored by owner sign-in, not an unchanged launch.
+Future guards/manifests must use actual post-handoffHEAD; financial parent source
+remains5f47205aad43015f1c64981cf15200ae7482919e.20REMX/oneSIDcash/NULLmetrics unchanged.

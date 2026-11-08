@@ -48,6 +48,13 @@ PREPARATION_FACT = ROOT / 'scripts/arv2_r346_preparation_result_fact.json'
 PREPARATION_FACT_PIN = {'byte_count':43136,'sha256':'c7b22ba9e82558e23097d3d0802f864a87f6ae56d1ef9d415045f4d9cb68b4cd'}
 A4_RESULT_FACT = ROOT / 'scripts/arv2_r348_ar100_result_fact.json'
 A4_RESULT_FACT_PIN = None
+# Historical D1 failed and could not yield an accepted fact. A successor
+# reader needs a new coherent contract; these pins must not auto-refresh.
+D1_BINDING = {'schema':'arv2-r348-ar100-status-result-v1','candidate_id':'R343-AR100','attempt':4,
+    'expected_head':'bf8e6064fb1eafdf099a697876a2406edd6e90e7',
+    'caller_sha256':'d358ba396714685a6547bcb4c2108dc78b36398c0b7f8521c2440fc112c0d5dc',
+    'plan_sha256':'165de7a174f3c4b0cf873a2aae0e434bcbee0a92f9e0c8a533526c006b8e6a9c',
+    'profile_sha256':'216da6ed4fcb55457e3eda975be84b95261304b1f1034672062a788408b02186'}
 CONSUMER_PATH = 'scripts/arv2_r348_plain_submission_data.py'
 CONSUMER_PIN = {'byte_count':8604,'sha256':'f31257edf0d7b56d968818ad59820f7ba1cf3edac4be0a620bab5e87e85682f2'}
 ENGINE_PATH = 'scripts/arv2_r348_legacy_six_qc.py'
@@ -223,7 +230,10 @@ def preflight(args, deadline):
 
 
 def validate_a4_result_fact(raw):
-    """Exact genuine accepted-result prerequisite; no unselected fallback."""
+    """Pinned original-result consistency, followed by fresh DATA semantics.
+
+    Exit observations remain external facts, not process attestation.
+    """
     require(valid_pin(A4_RESULT_FACT_PIN,MAX_PUBLIC), 'a4_result_unselected')
     require(type(raw) is bytes and pin(raw)==A4_RESULT_FACT_PIN and raw.endswith(b'\n'), 'a4_result')
     fact=loads(raw[:-1],MAX_PUBLIC)
@@ -232,9 +242,12 @@ def validate_a4_result_fact(raw):
     observation=fact['observation'];original=fact['original_result']
     require(type(observation.get('actual_exit')) is int and observation['actual_exit']==0
         and observation.get('original_stdout_validated') is True
+        and observation.get('original_stdout_pin')==pin(canonical(original)+b'\n')
+        and set(original)=={'schema','binding','attempt_consumed','result','report_pin'}
         and original.get('schema')=='arv2-r348-ar100-status-result-v1-result'
         and original.get('attempt_consumed') is True and type(original.get('result')) is dict
-        and valid_pin(original.get('report_pin'),MAX_JOURNAL),'a4_result')
+        and original.get('report_pin')==pin(canonical({key:value for key,value in original.items()
+            if key!='report_pin'})),'a4_result')
     result=original['result'];validation=result.get('semantic_validation')
     binding=original.get('binding');source=result.get('source')
     require(result.get('candidate_id')=='R343-AR100' and type(result.get('attempt')) is int
@@ -247,7 +260,8 @@ def validate_a4_result_fact(raw):
         and validation.get('accepted') is True and validation.get('run_valid') is True
         and type(result.get('statistics')) is dict and set(result['statistics'])==set(STATISTICS)
         and result.get('statistics_pin')==pin(canonical(result['statistics']))
-        and type(binding) is dict and binding.get('schema')=='arv2-r348-ar100-status-result-v1'
+        and type(binding) is dict and canonical(binding)==canonical(D1_BINDING)
+        and binding.get('schema')=='arv2-r348-ar100-status-result-v1'
         and binding.get('candidate_id')=='R343-AR100' and type(binding.get('attempt')) is int
         and binding['attempt']==4 and type(binding.get('expected_head')) is str
         and re.fullmatch('[0-9a-f]{40}',binding['expected_head'])
@@ -259,6 +273,25 @@ def validate_a4_result_fact(raw):
             'sha256':'71857bac63298b6b9dd4221ffc180ca4a59f10574edd109220a335d9370a232c'}
         and all(result.get(key) is False for key in FLAGS),'a4_result')
     return fact
+
+
+def validate_a4_prerequisite(fact,submission,validator):
+    """Join the pinned original result to current freshly authenticated DATA."""
+    fact=validate_a4_result_fact(canonical(fact)+b'\n')
+    candidates=[item for item in submission.candidates if item.candidate_id=='R343-AR100']
+    require(len(candidates)==1,'a4_result')
+    result=fact['original_result']['result']
+    identity=loads(submission.source_identity_json,MAX_OUTPUT)
+    require(type(identity) is dict and canonical(result.get('input_source_identity'))==canonical(identity),
+            'a4_result')
+    checked=validator.validate_statistics(result['statistics'],candidate_record=candidates[0].cell_record(),
+        evaluation_sessions=submission.evaluation_sessions)
+    require(type(checked) is dict and len(canonical(checked))<=16384
+        and checked.get('accepted') is True and checked.get('run_valid') is True
+        and canonical(checked)==canonical(result['semantic_validation']),'a4_result')
+    return {'accepted_A4_prerequisite_recomputed':True,
+        'original_stdout_pin':fact['observation']['original_stdout_pin'],
+        'semantic_validation_pin':pin(canonical(checked)),'current_input_identity_pin':pin(canonical(identity))}
 
 
 def build_plan(parent_raw, additional_buffers):
@@ -617,6 +650,19 @@ def selected_statistics(packet,operation):
     return selected
 
 
+def journal_original_statistics(store,statistics):
+    """Keep every original ASCII character in bounded, reconstructable parts."""
+    require(type(statistics) is dict and set(statistics) in (set(STATISTICS[:3]),set(STATISTICS)),'statistics')
+    for index,name in enumerate(sorted(statistics)):
+        text=statistics[name];maximum=16384 if name.endswith('DIAGNOSTICS') else 8192
+        require(type(text) is str and text.isascii() and 0<len(text)<=maximum,'statistics')
+        original_pin=pin(text.encode('ascii'));part_count=(len(text)+4095)//4096
+        for part_index in range(part_count):
+            store.journal(f'statistic-{index:02d}-part-{part_index:03d}',
+                {'name':name,'part_index':part_index,'part_count':part_count,
+                 'original_string_pin':original_pin,'text':text[part_index*4096:(part_index+1)*4096]})
+
+
 def operate(submission, candidate_id, *, engine, validator, api, secret, store, deadline, state,
             sleep=time.sleep):
     """One fresh A1, Completed identity, exact readback and semantic result."""
@@ -660,6 +706,10 @@ def operate(submission, candidate_id, *, engine, validator, api, secret, store, 
             require(operation is not None and payload['projectId']==operation.project_id
                 and not state.get('lock_dispatch_spent',False),'request')
             state['lock_dispatch_spent']=True
+        if endpoint in ('compile/create','backtests/create'):
+            require(operation is not None and type(operation.project_id) is int
+                and operation.project_id!=engine.REFERENCE_PROJECT
+                and payload['projectId']==operation.project_id,'request')
         if endpoint=='backtests/list':require(payload['includeStatistics'] is False,'request')
         if endpoint=='backtests/read':
             require(operation is not None and state.get('result_mode') and state.get('result_access_verified')
@@ -739,7 +789,7 @@ def operate(submission, candidate_id, *, engine, validator, api, secret, store, 
     state['result_read_response_received']=True
     statistics=selected_statistics(packet,operation)
     state['selected_result_read']=True
-    store.journal('selected-original-statistics',{'statistics':statistics})
+    journal_original_statistics(store,statistics)
     state['statistics_pin']=pin(canonical(statistics))
     STAGE='semantic'
     validation=validator.validate_statistics(statistics,candidate_record=candidates[0].cell_record(),
@@ -782,6 +832,8 @@ def run(args):
                     submission = held.value
                 # Only detached immutable buffers survive the DATA guard's
                 # normal return; no secret/contact existed during that read.
+                STAGE='a4_prerequisite'
+                state['a4_prerequisite']=validate_a4_prerequisite(sources.accepted_A4_fact,submission,sources.validator)
                 STAGE = 'credentials'
                 secret = sources.transport.credentials({key: os.environ.get(key) for key in CREDENTIALS})
                 api = sources.transport.API(secret, store, min(deadline, time.monotonic() + 89))
@@ -842,7 +894,9 @@ def validate_original_stdout(raw,*,actual_exit,expected_binding):
     value=loads(raw[:-1],MAX_OUTPUT)
     require(type(value) is dict and set(value)=={'schema','binding','attempt_consumed','result','report_pin'}
         and value['schema']==SCHEMA+'-result' and canonical(value['binding'])==canonical(expected_binding)
-        and value['attempt_consumed'] is True and valid_pin(value['report_pin'],MAX_JOURNAL),'output')
+        and value['attempt_consumed'] is True
+        and value['report_pin']==pin(canonical({key:item for key,item in value.items() if key!='report_pin'})),
+        'output')
     result=value['result'];require(type(result) is dict,'output')
     receipt=result.get('launch_receipt');terminal=result.get('terminal_receipt')
     require(result.get('candidate_id') in CANDIDATES and result['candidate_id']==expected_binding.get('candidate_id')

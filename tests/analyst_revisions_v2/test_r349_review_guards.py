@@ -44,23 +44,70 @@ def receiver_pattern(tree, method):
 
 
 def sample(node):
-    """A representative marker; formatted or concatenated values become '0'."""
+    """Inspect static text; use '0' only for unresolved runtime expressions.
+
+    Dynamic values and their lengths are not proved by this representative
+    scan. Unsupported static formatting refuses inspection rather than being
+    replaced with a value which could conceal an invalid literal marker.
+    """
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
         return node.value
     if isinstance(node, ast.JoinedStr):
-        return ''.join(part.value if isinstance(part, ast.Constant) else '0' for part in node.values)
+        return ''.join(sample(part) for part in node.values)
+    if isinstance(node, ast.FormattedValue):
+        if isinstance(node.value, ast.Constant):
+            value = node.value.value
+        else:
+            value = sample(node.value)
+            if value is None:
+                dynamic = (ast.Name, ast.Call, ast.Attribute, ast.Subscript)
+                return '0' if any(isinstance(part, dynamic) for part in ast.walk(node.value)) \
+                    else '<unsupported-static>'
+        if node.conversion == ord('r'):
+            value = repr(value)
+        elif node.conversion == ord('a'):
+            value = ascii(value)
+        elif node.conversion == ord('s'):
+            value = str(value)
+        spec = '' if node.format_spec is None else sample(node.format_spec)
+        assert spec is not None and len(spec) <= 64
+        assert all(int(width) <= 1024 for width in re.findall(r'\d+', spec))
+        try:
+            return format(value, spec)
+        except (TypeError, ValueError):
+            return '<unsupported-static>'
     if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
         left, right = sample(node.left), sample(node.right)
-        return None if left is None and right is None else (left or '0') + (right or '0')
+        def component(value, expression):
+            if value is not None:
+                return value
+            dynamic = (ast.Name, ast.Call, ast.Attribute, ast.Subscript)
+            return '0' if any(isinstance(part, dynamic) for part in ast.walk(expression)) \
+                else '<unsupported-static>'
+        return None if left is None and right is None else component(left, node.left) + component(right, node.right)
     return None
 
 
 def markers(tree, method):
+    """Scan the named methods and their current free-function equivalents.
+
+    These exact path lists and representative dynamic expressions are a
+    snapshot guard, not exhaustive validation of future callers or lengths.
+    """
     found = []
     for node in ast.walk(tree):
-        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
-                and node.func.attr == method and node.args):
-            value = sample(node.args[0])
+        if not isinstance(node, ast.Call):
+            continue
+        position = None
+        if isinstance(node.func, ast.Attribute) and node.func.attr == method:
+            position = 0
+        elif isinstance(node.func, ast.Name):
+            if method == '_call' and node.func.id == '_read_call':
+                position = 2
+            elif method == '_event' and node.func.id == '_event':
+                position = 1
+        if position is not None and len(node.args) > position:
+            value = sample(node.args[position])
             if value is not None:
                 found.append(value)
     return found
@@ -81,6 +128,31 @@ def test_scan_reads_each_marker_form_and_flags_uppercase():
     assert markers(tree, 'journal') == ['ok-1', 'objects-0-intent', 'stat-0', 'known-A4-status']
     assert [value for value in markers(tree, 'journal') if not re.fullmatch(CALLER_JOURNAL, value)] \
         == ['known-A4-status']
+
+
+def test_scan_includes_free_read_call_and_event_marker_positions():
+    tree = ast.parse("_read_call(request, journal, 'BAD-read', 'authenticate', {})\n"
+                     "_event(journal, 'BAD-event', {})\n"
+                     "_read_call(request, journal, 'lower-read', 'authenticate', {})\n"
+                     "_event(journal, 'lower-event', {})\n")
+    assert markers(tree, '_call') == ['BAD-read', 'lower-read']
+    assert markers(tree, '_event') == ['BAD-event', 'lower-event']
+    assert [value for value in markers(tree, '_call') if not re.fullmatch(CALLER_JOURNAL, value)] \
+        == ['BAD-read']
+    assert [value for value in markers(tree, '_event') if not re.fullmatch(CALLER_JOURNAL, value)] \
+        == ['BAD-event']
+
+
+def test_scan_recursively_renders_static_formatted_text_instead_of_zero():
+    tree = ast.parse('s.journal(f"{\'BAD\'}-status", 1)\n'
+                     's.journal(f"{\'BAD\' + \'-constant\'}", 1)\n'
+                     's.journal(f"{f\'BAD\'}-nested", 1)\n'
+                     's.journal(f"{2:02d}-lower", 1)\n'
+                     's.journal(f"{dynamic}-lower", 1)\n')
+    values = markers(tree, 'journal')
+    assert values == ['BAD-status', 'BAD-constant', 'BAD-nested', '02-lower', '0-lower']
+    assert [value for value in values if not re.fullmatch(CALLER_JOURNAL, value)] \
+        == ['BAD-status', 'BAD-constant', 'BAD-nested']
 
 
 @pytest.mark.parametrize('path', CALLERS)

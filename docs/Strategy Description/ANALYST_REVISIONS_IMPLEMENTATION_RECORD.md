@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–349 retain the milestone, review, preregistration, QC
+strategy. Sections 1–350 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -907,6 +907,9 @@ both342commits, and passed/spent offline preparation with seven source bundles.
 Section 349 is Claude's after-the-fact review of the seventeen Codex commits of
 sections 345–348: all accepted, no P0 or P1, four P2s, and new guards for a
 result reader that could never succeed and an unchecked notebook deletion.
+Section 350 counter-reviews both349commits, strengthens the public marker
+guards, corrects the UNUSED continuation's evidence/journal gates, and
+qualifies retrospective cause, deletion, source and validation claims.
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -1313,20 +1316,34 @@ claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
 
-Section 349 is Claude's independent after-the-fact review of the seventeen
-Codex commits of sections 345–348 (`12889740..30b7d161`). All are accepted,
-with no P0 or P1. New `fd266692` holds two defects in spent code as strict
-expected failures: the D1 reader's uppercase journal marker, which meant it
-could never read a result (`ARV2R349-001`), and the v3 recovery's unchecked
-deletion of `research.ipynb` (`ARV2R349-002`). Before any further one-use QC
-operation, test each caller's real Store and transport together and check
-required fields against QC's documented model (`ARV2R349-003`). Measure or
-justify the 1 MiB response cap before the next result read (`ARV2R349-004`).
-A diagnosis of A4's runtime error should first rule the plain reader's
-`contains_key` precheck in or out (`ARV2R349-005`). No A5 or remaining arm is
-authorized, and 344/260/59/699 is unchanged. The immediate next step is that
-Codex counter-reviews section 349 and its new test file; the external Mia
-step below is unchanged.
+Claude should review section 350's corrections at the exact final pushed
+snapshot; no session or message to Claude is started automatically.
+Section 350 records Codex's counter-review and acceptance of Claude's exact TWO-commit review push
+30b7d16139d7c5937788a0eb3a23c9088043a11e..
+29b0aebcb999581709235cf0862d7805f779ab21 after test corrections and documentary
+qualifications. This is a counter-review-only round, no next milestone or QC
+operation. The spent D1 marker blocks EVERY result status, not only its error
+category. Unchecked notebook deletion is confirmed; actual A3 deletion is a
+pinned-path/count inference, not proof of the deleted bytes. Both spent
+sources stay frozen. The UNUSED continuation now binds original report/output
+hashes and exact D1 identity, recomputes prerequisites after fresh DATA return
+before credentials, journals bounded reconstructable chunks, and refuses
+reference-project mutation. A4_RESULT_FACT_PIN is STILL None, no plan/fact
+selection or positive authority exists, and D1 could not have produced an
+accepted fact. Any successor needs a separately coherent version/freeze.
+
+ARV2R349-003/004 remain prerequisites for an applicable future one-use API
+operation: test its real caller/Store/transport composition and authenticate
+required models; justify response bounds without inferring actual D2 cause.
+New synthetic compositions improve evidence but do not clear those gates.
+Mia remains diagnosis-only in existing39054561 when an actual coding session
+is available; the owner's reported release was followed by another visible
+QC refusal, with other sessions untouched and only our blocked tab closed.
+No Mia prompt/reply was obtained. No A5 or remaining arm is authorized and
+344/260/59/699 is unchanged. Conclude ONE review push; do not begin a recovery,
+new reader, new contract, result read or strategy run from this review.
+
+Historical section348 scope and results below are context, not renewed use:
 
 The owner explicitly waives Claude review of section 348 for A4 validation
 and conditional remaining old-six AR continuation. Actual D1 atbf8e6064
@@ -4475,6 +4492,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-11-07 | Codex owner-authorized additional same-project A4 plain recovery; section347 | `67e1970d` -> `2befc75b` -> `1a5759f9` -> this final result/handoff; exactly3commits | Current source/access reconciliation, exact8leaf plaintext consumer, fresh own context,15source writes/3skips/mainlast/all18readback, one compile/launch | Sole A4actual0; observed In Progress... backtest007d4ab27c26d337ae53acb492a83410 in39054561; original output11501B/e0f7afb2... and report11390B/06b62d92... validated; no results read | Final373distinct focused passes1.51s; public176pin cold guard +169in-memory Python syntax checks; expected3red omission failures; all earlier fixture/doc failures qualified; no fullsuite | CR347002 resolved prospectively; prior3attempts and A4spent; source-policyhistoricalcauseUNKNOWN, metadataMD5notremoteSHA, allformalreadinessfalse; ONEshared+development look =>344/260/59/699,0newcells | Exactly one final matching-lane push; next separate exact terminal/result gate for this known run, no automatic rerun/other-arm/comparison/live action |
 | 2026-11-07 | Codex A4 terminal validation, failed-job diagnosis and Mia resource barrier; section348 | `4117c1a4` -> `bf8e6064` -> `e55d2175` -> this final result/handoff; exactly3commits | New source/DATA-bound D1 status/result contract; separate D2 error-only observer; unused continuation closure corrected, A4 acceptance remains unselected | D1actual2, known A4Runtime Error/all18sources exact; no selected statistics. D2actual2 unknown/no usable error projection. Mia blocked by occupied coding sessions, other projects untouched | Pre-D1 focused251passes5.90s; supplemental122passes0.77s overlap, not summed; native cold213-source guard/203Python compile and two expected red mutations; no fullsuite | I348001 masked logging category confirmed/spent reader frozen; unused closure fixed; runtime cause and Mia consultation remain OPEN. No new launch/look/cell;344/260/59/699 | ONE final matching-lane push, then coding-session release for diagnosis-only Mia; no A5, remaining-six launch, result acceptance or next milestone |
 | 2026-11-07 PST /08 UTC | Claude independent review of the seventeen Codex commits `12889740..30b7d161` (sections 345–348), after the fact | `30b7d161` -> `fd266692` (tests) -> this record commit | All seventeen accepted; section 349 | New guards: a marker scan over the R345–R348 callers and engines, with the spent D1 reader and the v3 notebook deletion held as strict expected failures; fake-versus-real and response-cap requirements documented | 24 range test files 1,323 passed; new file 11 passed, 2 expected failures; final selection 350 passed, 2 expected failures; 3/3 flip proofs; no full suite, no QC/Safari/Mia/provider access; 0 looks, 344/260/59/699 unchanged | 0 P0, 0 P1, 4 P2 (two held by strict expected failures, two documented requirements), 5 P3 | Codex counter-reviews section 349; meet `ARV2R349-003` and `-004` before any further one-use QC operation |
+| 2026-11-07 PST /08 UTC | Codex counter-review of Claude349, section350 | `29b0aebc` -> counter-review corrections -> final handoff; exactly2Codexcommits | Incoming `30b7d161..29b0aebc` contains exactly2Claudecommits, both accepted after test/doc corrections; every349finding disposed | Broader marker scan, real Store/transport synthetic compositions, UNUSED fact/report/semantic/chunk/own-ID corrections; no used source or plan refresh | Final478passes/2historicalxfails2.61s;7memoryregressions caught;4changedPython compiled;213selectedpins unchanged; initial2recordfailures and intermediate1 retained in350.5; no fullsuite | No P0/P1 identified; prospective corrections do not close actual A4 Runtime Error, response/caller gates or Mia barrier;344/260/59/699 unchanged | ONE final matching-lane push; Claude should review exact350corrections; no next milestone, QC/Mia call, new reader, A5 or remaining-arm run in this round |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -79880,3 +79898,175 @@ no remaining arm is authorized.
 
 The immediate next step is that Codex counter-reviews section 349 and its new
 test file.
+
+## 350. Codex counter-review of Claude349; unused continuation corrections, 2026-11-07 PST /08 UTC
+
+### 350.1 Exact scope and synchronization
+
+Owner: "start counter review". ONLY the designated Code Analyst root and
+codex/strategy-analyst-revisions-v2, explicit cwd throughout. At start,
+local/tracking/live matching remote were29b0aebcb999581709235cf0862d7805f779ab21,
+clean. Fetched ONLY that matching branch and re-established equality. Previous
+disposed Codex baseline30b7d16139d7c5937788a0eb3a23c9088043a11e. Incoming
+completed Claude range contains EXACTLY TWO commits, in this order:
+fd266692abb88ea039e417dc6d4896f074232c80 and
+29b0aebcb999581709235cf0862d7805f779ab21. The durable349review/handoff,
+not authorship alone, establishes completion. Both complete diffs examined.
+No older review is replayed and no implementation push is a review trigger.
+
+Counter-review/corrections/handoff only. No next operational milestone,
+Mia/QC/Safari/provider/private/USB/credential/Keychain/control/census access,
+new claim, upload, compile, launch, result read or renewed spent protocol.
+The earlier owner-reported session release led to a fresh own-page request,
+a stalled Requesting environment and one own-page refresh; QC again visibly
+reported both other environments occupied. No Stop/Upgrade/other-lane action,
+Mia prompt/reply or code edit followed; only our own new blocked tab was closed.
+No such UI action occurs in THIS counter-review. No attempt/look/cell added.
+
+All used production sources, original facts and source-pin plans stay frozen.
+Only unused continuation code, focused tests and this lane record may change.
+No shared/root/project-wide file or other lane is changed. Accumulate all
+corrections locally, record per-commit dispositions and make ONE final matching
+nonforce push. Stop/reassess unexpected concurrent changes; no reset/rebase/
+force/overwrite, alternate worktree/branch or scratch export. Same-round
+advisory agents are not independent final reviewers.
+
+### 350.2 Incoming commit dispositions
+
+|Commit|Disposition|Reason and retained limits|
+|---|---|---|
+|fd266692abb88ea039e417dc6d4896f074232c80|Accepted after test-only correction|Useful guards reproduce the spent uppercase marker and unpinned notebook deletion; no production source changed. CR350001 strengthens omitted free-function marker positions and static formatted constants. Dynamic marker values/lengths are still not proven. Old strict expected failures remain tied to their OLD frozen files; a successor fix does not automatically flip them.|
+|29b0aebcb999581709235cf0862d7805f779ab21|Accepted after documentary qualification and unused-code corrections|Every349finding disposed below. Core spent-code defects and integration/response-bound gates retained. Historical deletion/cause/economics/isolation claims are limited to actual evidence. CR350002/003/004 correct verified UNUSED continuation instances; no source-stop bypass, A4 acceptance or new operation follows.|
+
+Claude's acceptance of its seventeen-commit12889740..30b7d161 range is retained
+as after-the-fact review, not prospective authorization or independent proof
+of current private bytes. This counter-review does not repeat that entire
+implementation audit or Claude's full test selection. Review-quality judgment
+for the incoming two-commit report/guards:7/10, with substantive useful findings
+but overbroad scan/evidence wording and unresolved operational diagnosis.
+This is not a strategy efficacy or trading-readiness rating.
+
+### 350.3 Every finding and material subclaim
+
+|349finding|Counter-review status and exact disposition|
+|---|---|
+|001/P2|CONFIRMED, broader than a masked category. Real D1 Store rejects known-A4-status before BOTH terminal predicates, so no status can reach backtests/read. New synthetic real Store/_exchange composition reproduces output after an actual synthetic dispatch journal. Correct the interpretation of348.4/348.8 and its associated historical ledger append here; no spent reader/control repair or replay.|
+|002/P2|Core defect CONFIRMED in both v2/v3: research.ipynb content is not authenticated before deletion. A3 occurrence is strongly supported by the pinned path's43 dispatches (42 without deletion) plus later absence; it is NOT an independently retained delete ACK or proof of original/default/edited bytes, actor continuity or valuable data destruction. Age and ownership do not establish preservation. Remains open in frozen code; a successor must refuse an unproven notebook.|
+|003/P2|CONFIRMED fake/real-composition gap, with qualifications. Existing test_r345_qc_availability already exercises real _exchange over fake HTTP, including HTTP/body refusals; what was missing was caller/Store/transport composition and foreign Refused translation. A1's libraries refusal does not identify which isLibrary/libraries conjunct failed. New synthetic compositions cover D1 persistence/transport and D2 observe/Store/_exchange success and oversize refusal. They replace CA/DNS/native-security snapshots and do NOT prove host preflight, credentials, actual endpoints or each future caller. The applicable operation still needs its own real composition and model checks before contact.|
+|004/P2|1MiB cap CONFIRMED for base/v3 transport. Actual oversized D2 body/cause is UNPROVEN; four-second external brackets and prior same-host status success cannot identify or rank a cause. New fake-HTTP Content-Length>cap reproduces base bound becoming D2 unknown before SAFE. This is a possible mechanism, not reconstruction. No cap refresh, larger-body contact or old reader replay. A future full-result bound needs justification; D1's small list response proves its size/status only, not availability of error fields in every listing.|
+|005/P3|Plausible disclosed compatibility hypothesis ONLY. The plain loader retains contains_key and R203's workaround is relevant, but its precise false/stale/binding mechanism was unmeasured and A4's failure field was never obtained. R298 initialization elsewhere is not proof for A4. Mia may rule it in/out once available; no actual diagnosis or source change is inferred.|
+|006/P3|CONFIRMED provenance qualifier. A4 can retain In Progress from create alone, or after a Queue poll; the public output does not identify which.130 dispatches also fit a compile-poll variation. Later Runtime Error does not negate the earlier authenticated running observation or prove it fabricated.|
+|007(a,b)|CONFIRMED wording/omission. The redacted432B A3 policy text supports encoding, not the quoted encoded/obfuscated/plain/split/storage reconstruction. Retain only the qualified policy refusal. Notebook deletion is a path/count inference as002; actual bytes stay unknown. No reread of spent controls to fill history.|
+|007(c,d,e)|CONFIRMED with precision: v1 includes account-wide projects/read{} and repeated authentication/reference reads; there are SEVEN intervening reads after final metadata check before create. Source.hold's descriptor fix does not prove Store.__enter__ leak-free. Keychain denial is selected file/CLI denial under allow default, not securityd mach-lookup/IPC denial or measured no contact. No selected explicit securityd use was found; no shared/security changes.|
+|007(f,g)|CONFIRMED. D1 result reading was impossible, not merely mislabeled. The347ledger append is justified by its ACTIVE rule plus owner progress direction and exact prefix preservation, superseding the earlier pre-use deferral; no missing permission, extra look or new ledger edit is inferred.|
+|008(a)|CONFIRMED but scoped: callers already wait bounded reference-capacity observations; an initial/later begin race can still spend the exclusive USE without a compile/launch/look. Waiting in one stage is not an unconditional guarantee across races. Spent caller unchanged, no attempt restored.|
+|008(b,c,d)|CONFIRMED latent wrapper/ordering/accounting limits. The sealed engine stops reference mutation, but the wrapper alone was permissive; generalized unused compile/create and backtests/create are corrected by CR350004. Four read-only access calls precede engine construction, while DATA already authenticated all vectors; it is not absence of ALL source authentication. Spent A4 ordinal/dispatch consistency remains open, and unused output accounting still needs fuller ordinal coherence before use; no look is counted from these tests.|
+|008(e)|PARTIALLY CORRECT: external SHA/size selection and None already prevent arbitrary unselected fact access, so no current authorization bypass is shown. However enclosed report/output hashes and semantic flags were insufficiently joined. CR350002 recomputes hashes, fixes exact D1 identity and reruns the existing semantic helper against fresh current AR100 DATA BEFORE credentials. This is self-consistency/semantic recomputation, not cryptographic process/exit attestation. D1 failed and could never have produced a valid fact; none is selected or fabricated.|
+|008(f)|CONFIRMED. Four legal statistic caps total40960 characters and can exceed one32768-byte journal event before semantics. CR350003 journals exact strings in bounded reconstructable chunks with per-string pins; no value is dropped, truncated or substituted.|
+|008(g,h)|CONFIRMED with limits: definitive HTTP/API refusal can be converted to request_ambiguous/no allocated ID before engine sees the response, but finite HTTP/redacted evidence can survive; not all evidence is necessarily lost. Raw SHA256 is dictionary-comparable for guessed short errors, not anonymity. No message/cause/credential recovery or new contact occurred. Used transport/observer unchanged.|
+|009/P3|Confirmed coverage limits, with qualifications. Bare raises/prefix matches can miss an earlier wrong refusal. Bridge economic_ast compares its existing tree after literal restoration and does not reparse rendered bytes, BUT a separate seven-cell test independently parses emitted Main and compares masked ASTs; no economic drift is demonstrated. Imported plain loader is tested with evaluator loading replaced; exact normalized emitted flat loader is not executed. R346 no-change fixture/parent-overlay pin-test/compute coverage gaps remain in spent code. Constant false-flag assertions alone are tautological, while separate rehashed readiness-refusal tests are meaningful. No spent producer/bridge rewrite or new private read.|
+
+Additional report qualifications: all THREE activation kwargs change (key,
+byte count4631->5901 and SHA70f644...->ffdc...), although Main's net length
+change8133->8131 comes from the key's two-byte reduction. Plain/old shard byte
+equivalence is supported by the frozen conversion contract and original
+producer facts, not a new private-byte comparison by either review. Candidate
+callers use claim->DATAguard->credentials; read-only probes intentionally have
+no DATA phase. Historical ledger542146B SHA78b1ff...8176 prefix plus2510B
+append is verified from PUBLIC Git only, not artifact contents.
+
+349's reported1323/350 pass selections,3/3 flips and9251-entry stat census are
+reviewer-reported evidence, not replayed here. Endpoint metadata equality is
+not continuous integrity. Its sandbox claim applies to reported validation
+commands, not automatically to advisory no-op Python/outside-root scratch
+work disclosed in349.1. The visible standing AGENTS rule restricts CODEx full
+suites and assigns Claude independent review; an additional owner direction
+restricting Claude's full suite is not supplied in this counter-review. Keep
+the focused-only qualification and do not invent an owner prohibition or run
+a full suite to repair the wording.
+
+### 350.4 Verified corrections and exclusions
+
+|ID|Priority/status|Correction and reason|
+|---|---|---|
+|CR350001|P3 confirmed/corrected|New349test skipped free _read_call third argument/free _event second argument and zeroed static formatted text. Extend AST scan and recursively render bounded static constants/conversions; add regressions. Exact path list and unresolved runtime values/lengths remain qualified. Historical two strict xfails retained.|
+|CR350002|P2 confirmed/corrected in UNUSED caller only|Bind fact report/output hashes and exact D1 freeze, validate current input identity and recompute full retained semantic result with the existing sealed helper after normal DATA return before credentials; verify own stdout report hash. Prevent well-shaped forged/stale nested evidence from supplying acceptance. No new import or ancestor pin refresh; A4_RESULT_FACT_PIN=None remains.|
+|CR350003|P2 confirmed/corrected in UNUSED caller only|Replace combined event with <=4096-character ASCII chunks, explicit name/index/count and original-string pin; exact reconstruction precedes semantic checks. Enforcing sink and real Store.journal with synthetic FD cover all40960 allowed characters and worst JSON quoting. Original descriptors/security are not weakened.|
+|CR350004|P3 confirmed/corrected in UNUSED wrapper only|Compile/create and backtests/create must target the operation's own allocated ID, never the reference project. Negative synthetic calls are rejected before transport, independently of the engine's existing gate.|
+
+No used source, source/profile pin, original producer/fact, strategy economics,
+cost, date, source/identity/price gate, result/cell count or permission changes.
+No continuation plan or accepted A4fact is created, and the old D1 binding is
+NOT renamed/refreshed into a success. Its historical result contract cannot
+become usable from these fixes; any successor requires separate coherent
+versioning, review/run authority and exact freeze. New helpers/required future
+fact stdout pin/chunk journal layout are UNUSED preparation, not readiness.
+No CLI expansion or operational invocation. New a4_prerequisite phase is
+before credentials; failure never falls through to contact.
+
+No P0/P1 identified within this bounded review. Existing P2 runtime failure,
+spent notebook/reader limitations, diagnosis/cap/composition gates and all
+older unresolved findings remain open. Counts stay344shared/260development/
+59infrastructure/699cells. No alpha-ledger append is needed for zero new
+execution. All formal/PIT/master/paper/live flags remain false; no funds,
+broker/real-order/paper/live, paid rights, evidence cleanup, metadata waiver,
+renamed retry or other-lane/session action. Counter-review ends with its one
+push and does not resume Mia or backtests in this round.
+
+### 350.5 Root verification on the final code tree
+
+Native sandbox-exec denied all network, production artifacts, USB/Volumes,
+user/system Keychain files and security CLI. env-i removed inherited secrets;
+Python3.13 -B, plugin autoload disabled, --noconftest --ignore=artifacts,
+no cache provider, all temp/cache/log/pycache support confined to
+.pytest_cache/codex-counterreview350. No shared conftest/dispatch_fence import.
+OS isolation is not contact accounting or whole-interpreter integrity.
+
+Final focused selection **478 passed,2 expected failures in2.61s**, no skips
+or warnings. It includes new/changed guards and continuation tests, new real
+Store/_exchange compositions, the frozen D1/D2/v3/base transport selections,
+lane-record/redaction and active-document checks. Expected failures are the
+two historical spent defects; no valid test is weakened/skipped to hide one.
+Incoming subset268passes/2xfails0.92s, correction subset58passes/2xfails0.49s
+and composition subset3passes0.15s overlap the final selection, not additive.
+No complete lane/repository suite ran.
+
+Initial final-selection run was476passes,2recordfailures,2xfails2.66s because
+the new navigation wrote Section350 without the required space and named only
+a past review, not its next reviewer. First correction left101passes/1record
+failure1.30s. Corrected the document to name section 350 and a prospective
+Claude review of these exact corrections;102record/document checks passed
+1.34s, then the complete focused selection above passed. CR350005/P3 corrected;
+no production failure, owner waiver or changed test expectation is invented.
+
+Seven memory-only red checks caught: enclosed-report pin omission, own-output
+report pin omission, semantic equality omission, own-project mutation check
+omission, combined oversized statistics event, old free-call scan and old
+formatted-constant sampling. Each failed its intended focused assertion;
+module bindings restored in finally and disk sources unchanged. They are
+sensitivity evidence, not additional passes or operational market evidence.
+
+The new three composition cases exercise real Store persistence and
+_exchange with synthetic HTTP: D1 journals a synthetic dispatch then rejects
+its uppercase status marker; D2 can complete a safe unknown-error projection;
+an oversized second response refuses bound and its foreign exception maps to
+unknown before SAFE. Network primitives, CA verification, DNS, credentials,
+native-security snapshots and responses are synthetic; no operational host
+preflight/run is tested. The journal chunk test uses a real synthetic FD and
+real Store.journal size/marker logic with a test verification seam. These
+checks do not clear349-003/004 for an actual future operation.
+
+Four changed Python files compile in memory without bytecode. All213 selected
+source pins still match; used D1 reader and D2 observer equal exact incoming
+Git bytes. Source-parent pins unchanged, alpha-result.md unchanged. New
+unused caller66257B/584015f307dc5d9e5f4561de13d5112efddefbf69d646f48077be9ed048aa9b3;
+its tests23305B/5e64c6af21527d312e56a1d25f14704e2e48d22d70f87f40145cfd8a227049be;
+review guard8779B/43d89d08d5942967d471741c8386659272cc7a3eaa00314e75da737a1e4f7e88;
+composition tests4675B/eea8180afc85ad103a46f17197940aa685e9f34b67c72f3b09b18ab2da74df83.
+These are handoff byte identities, NOT selected operational pins or a run
+freeze. Existing import directions/dependencies unchanged; broker/ML/
+execution/kill-switch internals are out of scope and not re-proven here.
+
+Diff clean; exact matching live remote remained29b0aebc before the correction
+commit. No unrelated dirty work was present or overwritten. Final handoff
+will name the correction commit, recheck local/live state and push once.

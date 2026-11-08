@@ -1,7 +1,9 @@
 """Synthetic prospective caller checks; no private DATA, credentials or QC."""
 import copy
 import json
+import os
 from pathlib import Path
+import re
 import time
 from types import SimpleNamespace
 
@@ -22,14 +24,22 @@ def a4_fact():
         'backtest_name':'ARV2 LEGACY SIX R343-AR100 OCT2026 A4','observed_status':'Completed.',
         'result_read':True,'selected_result_read':True,'semantic_validation':{'accepted':True,'run_valid':True},
         'statistics':stats,'statistics_pin':m.pin(m.canonical(stats)),
+        'input_source_identity':{'synthetic_identity':'matched-current-DATA'},
         'source':{'file_count':18,'source_byte_total':417652,'source_inventory_pin':{'byte_count':2775,
             'sha256':'71857bac63298b6b9dd4221ffc180ca4a59f10574edd109220a335d9370a232c'}},**m.FLAGS}
-    binding={'schema':'arv2-r348-ar100-status-result-v1','candidate_id':'R343-AR100','attempt':4,
-        'expected_head':'a'*40,'caller_sha256':'b'*64,'plan_sha256':'c'*64,'profile_sha256':'d'*64}
-    return {'schema':'arv2-r348-ar100-result-fact-v1',
+    binding=copy.deepcopy(m.D1_BINDING)
+    value={'schema':'arv2-r348-ar100-result-fact-v1',
         'observation':{'actual_exit':0,'original_stdout_validated':True},
         'original_result':{'schema':'arv2-r348-ar100-status-result-v1-result','binding':binding,
             'attempt_consumed':True,'report_pin':{'byte_count':1,'sha256':'e'*64},'result':result}}
+    repin_a4(value)
+    return value
+
+
+def repin_a4(value):
+    original=value['original_result']
+    original['report_pin']=m.pin(m.canonical({key:item for key,item in original.items() if key!='report_pin'}))
+    value['observation']['original_stdout_pin']=m.pin(m.canonical(original)+b'\n')
 
 
 def bind_fact(monkeypatch,value):
@@ -199,7 +209,7 @@ class API:
 class Validator:
     def __init__(self,store,accepted=True):self.store,self.accepted=store,accepted
     def validate_statistics(self,statistics,*,candidate_record,evaluation_sessions):
-        assert self.store.events[-1][0]=='selected-original-statistics'
+        assert self.store.events[-1][0].startswith('statistic-')
         assert len(statistics)==4 and evaluation_sessions==('synthetic-session',)
         return {'accepted':self.accepted,'run_valid':self.accepted,**m.FLAGS}
 
@@ -246,14 +256,15 @@ def test_queue_budget_stops_without_result_read(monkeypatch):
 def test_original_stdout_requires_actual_zero_exit_and_accepted_matching_result():
     value,_,_,_=operate();bound={'schema':m.SCHEMA,'candidate_id':'R343-AR080','attempt':1,
         'expected_head':'a'*40,'caller_sha256':'b'*64,'plan_sha256':'c'*64,'profile_sha256':'d'*64}
-    record={'schema':m.SCHEMA+'-result','binding':bound,'attempt_consumed':True,
-        'result':value,'report_pin':{'byte_count':1,'sha256':'a'*64}}
+    record={'schema':m.SCHEMA+'-result','binding':bound,'attempt_consumed':True,'result':value}
+    record['report_pin']=m.pin(m.canonical(record))
     raw=m.canonical(record)+b'\n'
     assert m.validate_original_stdout(raw,actual_exit=0,expected_binding=bound)==record
     for actual_exit in (2,None,False):
         with pytest.raises(m.Refused,match='output'):
             m.validate_original_stdout(raw,actual_exit=actual_exit,expected_binding=bound)
     record['result']['semantic_validation']['accepted']=False
+    record['report_pin']=m.pin(m.canonical({key:item for key,item in record.items() if key!='report_pin'}))
     with pytest.raises(m.Refused,match='output'):
         m.validate_original_stdout(m.canonical(record)+b'\n',actual_exit=0,expected_binding=bound)
 
@@ -265,3 +276,140 @@ def test_native_scope_and_controls_do_not_include_ar100_or_old_operational_leave
     policy=m.native_profile(m.CANDIDATES[0])
     for name in m.DATA_NAMES:assert str(m.DATA_DIRECTORY/name) in policy
     assert 'claim.json' not in policy and 'object/get' not in policy
+
+
+@pytest.mark.parametrize('field',['expected_head','caller_sha256','plan_sha256','profile_sha256'])
+def test_a4_fact_rehashed_wrong_d1_binding_is_still_refused(monkeypatch,field):
+    fact=a4_fact();fact['original_result']['binding'][field]='f'*(40 if field=='expected_head' else 64)
+    repin_a4(fact)
+    with pytest.raises(m.Refused) as caught:m.validate_a4_result_fact(bind_fact(monkeypatch,fact))
+    assert caught.value.args==('a4_result',)
+
+
+@pytest.mark.parametrize('which',['report','stdout'])
+def test_a4_fact_outer_pin_cannot_hide_forged_enclosed_report_or_stdout_pin(monkeypatch,which):
+    fact=a4_fact()
+    if which=='report':
+        fact['original_result']['report_pin']['sha256']='0'*64
+        fact['observation']['original_stdout_pin']=m.pin(m.canonical(fact['original_result'])+b'\n')
+    else:fact['observation']['original_stdout_pin']['sha256']='0'*64
+    with pytest.raises(m.Refused) as caught:m.validate_a4_result_fact(bind_fact(monkeypatch,fact))
+    assert caught.value.args==('a4_result',)
+
+
+def test_own_stdout_report_pin_is_recomputed_not_merely_well_shaped():
+    result,_,_,_=operate()
+    bound={'schema':m.SCHEMA,'candidate_id':'R343-AR080','attempt':1,'expected_head':'a'*40,
+        'caller_sha256':'b'*64,'plan_sha256':'c'*64,'profile_sha256':'d'*64}
+    value={'schema':m.SCHEMA+'-result','binding':bound,'attempt_consumed':True,'result':result,
+        'report_pin':{'byte_count':1,'sha256':'e'*64}}
+    with pytest.raises(m.Refused) as caught:
+        m.validate_original_stdout(m.canonical(value)+b'\n',actual_exit=0,expected_binding=bound)
+    assert caught.value.args==('output',)
+
+
+@pytest.mark.parametrize('change',['identity','semantics','not_accepted','missing_candidate','duplicate_candidate'])
+def test_a4_prerequisite_recomputes_with_current_candidate_input_and_sessions(monkeypatch,change):
+    fact=a4_fact();bind_fact(monkeypatch,fact)
+    candidate=SimpleNamespace(candidate_id='R343-AR100',cell_record=lambda:{'candidate_id':'R343-AR100'})
+    submission=SimpleNamespace(candidates=(candidate,),source_identity_json=m.canonical(
+        fact['original_result']['result']['input_source_identity']),evaluation_sessions=('synthetic-current-session',))
+    if change=='identity':submission.source_identity_json=m.canonical({'synthetic_identity':'other'})
+    elif change=='missing_candidate':submission.candidates=()
+    elif change=='duplicate_candidate':submission.candidates=(candidate,candidate)
+    recomputed=copy.deepcopy(fact['original_result']['result']['semantic_validation'])
+    if change=='semantics':recomputed['newly_recomputed_field']='differs'
+    if change=='not_accepted':recomputed['accepted']=False
+    class Validator:
+        @staticmethod
+        def validate_statistics(statistics,*,candidate_record,evaluation_sessions):
+            assert candidate_record=={'candidate_id':'R343-AR100'}
+            assert evaluation_sessions==('synthetic-current-session',)
+            assert statistics==fact['original_result']['result']['statistics']
+            return recomputed
+    with pytest.raises(m.Refused) as caught:m.validate_a4_prerequisite(fact,submission,Validator)
+    assert caught.value.args==('a4_result',)
+
+
+def test_matched_a4_prerequisite_returns_only_recomputed_identity_pins(monkeypatch):
+    fact=a4_fact();bind_fact(monkeypatch,fact)
+    candidate=SimpleNamespace(candidate_id='R343-AR100',cell_record=lambda:{'candidate_id':'R343-AR100'})
+    submission=SimpleNamespace(candidates=(candidate,),source_identity_json=m.canonical(
+        fact['original_result']['result']['input_source_identity']),evaluation_sessions=('synthetic-current-session',))
+    validator=SimpleNamespace(validate_statistics=lambda *args,**kwargs:
+        copy.deepcopy(fact['original_result']['result']['semantic_validation']))
+    result=m.validate_a4_prerequisite(fact,submission,validator)
+    assert result['accepted_A4_prerequisite_recomputed'] is True
+    assert result['current_input_identity_pin']==m.pin(submission.source_identity_json)
+
+
+def maximal_statistics():
+    # Canonical JSON strings, at every allowed byte cap, with worst-case
+    # backslash quoting when the original strings enter a JSON journal frame.
+    return {name:m.canonical('\\'*(((16384 if name.endswith('DIAGNOSTICS') else 8192)-2)//2)).decode('ascii')
+        for name in m.STATISTICS}
+
+
+def assert_statistic_parts(events,statistics):
+    grouped={name:[] for name in statistics}
+    for marker,value in events:
+        assert re.fullmatch('[a-z0-9-]{1,120}',marker)
+        assert len(value['text'])<=4096
+        grouped[value['name']].append(value)
+    for name,parts in grouped.items():
+        parts.sort(key=lambda value:value['part_index'])
+        assert [value['part_index'] for value in parts]==list(range(parts[0]['part_count']))
+        joined=''.join(value['text'] for value in parts)
+        assert joined==statistics[name]
+        assert all(value['original_string_pin']==m.pin(joined.encode('ascii')) for value in parts)
+
+
+def test_all_40k_original_characters_fit_enforced_journal_frames_before_semantics():
+    statistics=maximal_statistics();assert sum(len(text) for text in statistics.values())==40960
+    events=[]
+    class BoundedStore:
+        def journal(self,marker,value):
+            raw=m.canonical({'ordinal':len(events),'marker':marker,'value':value})+b'\n'
+            assert len(raw)<=32768
+            events.append((marker,copy.deepcopy(value)))
+    m.journal_original_statistics(BoundedStore(),statistics)
+    assert len(events)==10
+    assert_statistic_parts(events,statistics)
+
+
+def test_maximal_statistics_pass_real_store_journal_size_and_marker_checks(tmp_path):
+    path=tmp_path/'events.jsonl';fd=os.open(path,os.O_CREAT|os.O_EXCL|os.O_RDWR,0o600)
+    store=m.Store.__new__(m.Store)
+    store.journal_fd=fd;store.event_count=0;store.events=bytearray()
+    store.leaves=[['events.jsonl',fd,m.metadata(os.fstat(fd)),None,b'']]
+    def verify():assert os.pread(fd,len(store.events)+1,0)==bytes(store.events)
+    store.verify=verify
+    try:
+        statistics=maximal_statistics();m.journal_original_statistics(store,statistics)
+        rows=[json.loads(raw) for raw in os.pread(fd,len(store.events)+1,0).splitlines()]
+        assert_statistic_parts([(row['marker'],row['value']) for row in rows],statistics)
+        assert store.event_count==len(rows)==10
+    finally:os.close(fd)
+
+
+@pytest.mark.parametrize('endpoint',['compile/create','backtests/create'])
+def test_wrapper_refuses_reference_project_mutations_before_transport(monkeypatch,endpoint):
+    captured=[]
+    if endpoint=='compile/create':
+        original=Operation.begin_once
+        def begin(self):
+            result=original(self)
+            self.request(endpoint,{'projectId':Engine.REFERENCE_PROJECT})
+            return result
+        monkeypatch.setattr(Operation,'begin_once',begin)
+    else:
+        original=Operation.launch_once
+        def launch(self):
+            self.request(endpoint,{'projectId':Engine.REFERENCE_PROJECT,
+                'compileId':self.compile_id,'backtestName':self.backtest_name})
+            return original(self)
+        monkeypatch.setattr(Operation,'launch_once',launch)
+    with pytest.raises(m.Refused) as caught:operate(api_change=captured.append)
+    assert caught.value.args==('request',)
+    assert not any(name==endpoint and payload.get('projectId')==Engine.REFERENCE_PROJECT
+        for name,payload in captured[0].calls)

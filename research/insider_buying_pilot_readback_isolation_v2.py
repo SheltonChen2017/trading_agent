@@ -372,6 +372,10 @@ def policy(*, sources, data_leaves=(), admin=None, git=False, controller=False, 
     profile = "(version 1)(allow default)(deny network*)(deny process-exec)(deny file-write*)(deny file-read-data)"
     if not git:
         profile += "(deny process-fork)"
+    else:
+        # Git opens its discard sink O_RDWR even for rev-parse. This grants
+        # no ordinary file write/create/unlink or saved-DATA capability.
+        profile += '(allow file-write-data (literal "/dev/null"))'
     if not controller:
         profile += "(allow process-exec " + " ".join("(literal " + q(p) + ")" for p in (*images, *((GIT_IMAGE,) if git else ()))) + ")"
     profile += "(allow file-read-data " + " ".join("(subpath " + q(p) + ")" for p in directories)

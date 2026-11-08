@@ -43,6 +43,24 @@ def _runtime_shape(monkeypatch):
         (Path("/opt/invented-runtime"),), (Path("/opt/invented-runtime/bin/python"),), ()))
 
 
+def test_empty_package_initializer_is_authenticated_instead_of_omitted(monkeypatch, tmp_path):
+    leaf = tmp_path / "__init__.py"
+    leaf.write_bytes(b"")
+    monkeypatch.setattr(m, "ROOT", tmp_path)
+    monkeypatch.setattr(m.isolation, "validate_source_names", lambda names: names)
+    body, observed = m.code_bytes("__init__.py")
+    assert body == b"" and observed[6] == 0
+
+
+def test_source_manifest_accepts_a_pinned_empty_git_source(monkeypatch):
+    _runtime_shape(monkeypatch)
+    manifest = _manifest()
+    manifest["versions"][m.SELF][6] = 0
+    manifest["identity"]["source_sha256"][m.SELF] = m.sha(b"")
+    manifest["identity"]["source_inventory_sha256"] = m.sha(m.raw(manifest["identity"]["source_sha256"]))
+    assert m.validate_manifest(manifest) is manifest
+
+
 def _verified(manifest, original):
     return {"schema": m.SCHEMA + "/verified-sources", "completed": True,
             "reader_head": manifest["identity"]["head"],
@@ -204,7 +222,8 @@ def _preflight_setup(monkeypatch, *, tree_fault=None, source_fault=None):
     monkeypatch.setattr(m, "command", lambda function, args, profile: (function, args, profile))
     monkeypatch.setattr(m, "source_current", lambda value: events.append(("current", deepcopy(value))))
     def launch(command, *, timeout):
-        function, args, _profile = command
+        assert command[:4] == ("/usr/bin/env", "-i", "PATH=/usr/bin:/bin:/usr/sbin:/sbin", "LANG=en_US.UTF-8")
+        function, args, _profile = command[4:]
         events.append((function, deepcopy(args), timeout))
         if function == "tree_worker":
             value = {"schema": m.SCHEMA + "/tree", "completed": True,

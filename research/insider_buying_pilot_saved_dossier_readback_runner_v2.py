@@ -71,7 +71,7 @@ def code_bytes(name):
         before = os.fstat(descriptor)
         need(stat.S_ISREG(before.st_mode) and before.st_uid == os.geteuid()
              and before.st_nlink == 1 and not stat.S_IMODE(before.st_mode) & 0o022
-             and 0 < before.st_size <= 4 * 1024 * 1024, "source_refused")
+             and 0 <= before.st_size <= 4 * 1024 * 1024, "source_refused")
         body = os.pread(descriptor, 4 * 1024 * 1024 + 1, 0)
         need(len(body) == before.st_size and version(before) == version(os.fstat(descriptor))
              == version(path.stat(follow_symlinks=False)), "source_changed")
@@ -293,7 +293,7 @@ def validate_manifest(manifest):
     for observed in manifest["versions"].values():
         need(type(observed) is list and len(observed) == 10
              and all(type(field) is int and field >= 0 for field in observed)
-             and stat.S_ISREG(observed[2]) and observed[3] == 1 and 0 < observed[6] <= 4 * 1024 * 1024,
+             and stat.S_ISREG(observed[2]) and observed[3] == 1 and 0 <= observed[6] <= 4 * 1024 * 1024,
              "source_refused")
     isolation._layout(manifest["admin"])
     tree = manifest["tree"]
@@ -403,15 +403,23 @@ def source_profile(names, admin, tree=None):
         gitignore_leaves=() if tree is None else tree["ignores"])
 
 
+def launch_source(argv, *, timeout):
+    # Keep the frozen bounded transport intact. SIP-protected env clears the
+    # inherited environment BEFORE sandbox-exec/interpreter bootstrap; neither
+    # a shell nor a caller-controlled executable or environment entry is used.
+    prefix = ("/usr/bin/env", "-i", "PATH=/usr/bin:/bin:/usr/sbin:/sbin", "LANG=en_US.UTF-8")
+    return stable.source._launch((*prefix, *argv), timeout=timeout)
+
+
 def source_preflight(head):
     need(PARENT_INSTALLED is False, "parent_refused")
     names, admin = source_names(), isolation.discover_admin()
-    result = stable.source._launch(command("tree_worker", (head, names, admin), source_profile(names, admin)), timeout=120)
+    result = launch_source(command("tree_worker", (head, names, admin), source_profile(names, admin)), timeout=120)
     need(type(result) is dict and set(result) == {"schema", "completed", "head", "tree"}
          and result["schema"] == SCHEMA + "/tree" and result["completed"] is True
          and result["head"] == head, "tree_refused")
     tree = result["tree"]
-    result = stable.source._launch(command("source_worker", (head, names, admin, tree), source_profile(names, admin, tree)), timeout=180)
+    result = launch_source(command("source_worker", (head, names, admin, tree), source_profile(names, admin, tree)), timeout=180)
     need(type(result) is dict and set(result) == {"schema", "completed", "manifest"}
          and result["schema"] == SCHEMA + "/source" and result["completed"] is True, "source_refused")
     manifest = result["manifest"]

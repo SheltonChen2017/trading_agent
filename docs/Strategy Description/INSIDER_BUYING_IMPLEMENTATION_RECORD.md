@@ -46928,3 +46928,37 @@ the two previously failing guards and three controller-role negatives.
 These are invented tests inside native fences, not an actual saved read.
 The first implementation commit now establishes qualified immutable source
 before the planned zero-DATA native health and exact-five-leaf readback.
+
+### 386.6 Source-only native health refusal and correction
+
+First native CLI health uses already-existing clean implementation
+d2f16ead220dab86aa2f4a06c7ddde2615c832e0: exit2 after2.345s, stdout52B
+SHA2566168a03e335520b8c456b5913d68d8b89aea76972471d85d02a37c8330fb8c65,
+stderr0, finite saved_readback_refused. No saved leaf activation/read occurs.
+Source-only diagnostics identify an authenticated but empty package
+initializer rejected by the new size-positive guard. Two invented tests
+produce2 expected FAIL1.16s (outer2.114s,stderr0); retain rather than omit
+empty sources by accepting sizeZERO with unchanged regular-file/owner/link/
+mode/full-version/hash/Git checks. Runner55 PASS1.25s, outer2.161s/stderr0.
+
+The next source-only diagnostic stops at Git root discovery. A bounded
+private-stderr classification establishes Git exit128,83 stderr bytes/hash
+d74021aa27bd5db5b3b72fbc249db319725d56e371220518f555c0f59794e812:
+Git opens /dev/null for reading AND writing even for rev-parse. Raw stderr
+is not published. Give ONLY the Git role literal /dev/null file-write-DATA
+permission; no ordinary output, create/unlink, receipt or saved-DATA write is
+granted. Controller/readback retain no writes. This qualifies386.2's broad
+write-denial shorthand: Git has one discard-sink exception, files_written
+still counts real files. Source-only native stages then PASS through native
+proof, memory, admin, every source byte, root/HEAD/branch and tree plan
+(1.547s,stderr0); no saved DATA. Final focused472 PASS3.35s
+(outer4.325s,stderr0), zero skips/warnings. This correction is committed
+before another native health attempt; the failed first health remains failed.
+
+Source preflight also receives a fixed SIP-protected /usr/bin/env -i bootstrap
+with ONLY fixed PATH/LANG before sandbox-exec/Python. This additive wrapper
+keeps the frozen bounded transport unchanged and scrubs inherited loader/
+allocator variables without global environment mutation or a shell. Git and
+prepared roles already use explicit minimal environments; the observed first
+health's outer launcher also used one. This is hardening of reusable entry,
+not evidence that an injected environment caused the observed refusal.

@@ -142,7 +142,9 @@ def test_git_profile_only_adds_exact_admin_and_directory_literals(monkeypatch):
     assert '(literal "' + str(m.ROOT / "research") + '")' in profile
     assert '(literal "' + str(m.ROOT / ".gitignore") + '")' in profile
     assert '(literal "' + str(m.GIT_IMAGE) + '")' in profile
-    assert "(deny process-fork)" not in profile and "(allow file-write" not in profile
+    assert "(deny process-fork)" not in profile
+    assert profile.count("(allow file-write") == 1
+    assert '(allow file-write-data (literal "/dev/null"))' in profile
     assert str(m.EPOCH_ROOT) not in profile
 
 

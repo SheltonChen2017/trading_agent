@@ -1,6 +1,13 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Expanded Alpaca coverage and numeric guidance build recorded in section 73, 2026-11-07.
+Status: **Guidance bindings and predecessor/Alpaca condition dispositions recorded in section 74, 2026-11-07.
+Forty null bindings across six CRM/HUBS records are resolved with source context and exact unit normalization; all six remain refused.
+Six intervening issuer-listed webcasts leave four immediate-predecessor links unverified; unavailable content is not treated as absent guidance.
+Alpaca's supported-schema limit and unknown-state handling are documented; original conditions for 20 windows are not recovered.
+All 96 quote windows remain represented and unqualified; no study dates or strategy rules change.
+No authenticated provider request, QC access, purchase or backtest occurs; licensing checks remain omitted and monitor stays PAUSED.
+Section 73 was published once as `a85bce63`; this follow-up does not repeat it. The lane remains not backtesting ready.
+Expanded Alpaca coverage and numeric guidance build recorded in section 73, 2026-11-07.
 All 96 fixed four-symbol/2020--2025 windows return quotes with complete pagination: 1,747,147 rows in 238 data-only requests.
 Twenty sampled windows carry undefined `?` conditions; six usable quote-history years are not certified.
 Six CRM/HUBS profiles add 12 ranges / 24 bounds to the 17-profile local guidance corpus; all six remain refused as strategy inputs.
@@ -181,7 +188,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 73. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 74. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -11842,3 +11849,241 @@ before commit/push. Make exactly **one guarded non-force final push** of this
 completed round to the matching lane branch; retain final refs/publication
 receipt in the paused checkpoint. Do not automatically start another audit,
 create accounts, buy data, access QC or rearm a monitor.
+
+
+## 74. Guidance bindings, predecessor evidence and Alpaca condition disposition, 2026-11-07
+
+### 74.1 Scope, exact base and ownership
+
+Owner: **"Proceed with resolving the guidance field bindings, predecessor
+verification, and Alpaca’s unknown quote conditions. Use existing subscriptions,
+don’t access QC or buy anything, and push once when done."** Work uses retained
+subscription captures and ordinary public primary sources. The earlier scoped
+omission of licensing checks persists; it does not make verified-rights flags
+true. No QC page/API/project/resource/docs/compute, purchase, account creation,
+backtest, order, performance calculation or provider correspondence occurs.
+There are zero new authenticated provider requests. Targeted environment
+presence booleans are observed; no credentials are used, extracted, displayed,
+saved, regenerated or taken from Keychain. Equibles remains unused.
+
+Clean starting local HEAD and independently observed live matching remote are
+`a85bce636e58308ec372e27e534527359bf0887e`. Every repository command, artifact,
+validation, commit and push uses
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+branch `codex/strategy-guidance-revision-drift`, sole origin
+`https://github.com/SheltonChen2017/trading_agent.git`. Section 73's publication
+is complete once. No new Claude commit appears; consumed `1870b9c9` / `6375401b`
+and earlier dispositions remain consumed. Only this lane record changes in
+tracked Git. Parallel source/build/QA assistants are implementer assistance,
+not independent Claude review. Monitor remains **PAUSED**.
+
+### 74.2 Forty guidance bindings resolved without approving the records
+
+The six existing CRM/HUBS profiles and their 24 original bounds are retained
+in a new version. Two selected reporting-context excerpts from the official
+[Salesforce FY2023 Form 10-K](https://www.sec.gov/Archives/edgar/data/1108524/000110852423000011/crm-20230131.htm)
+and [HubSpot FY2022 Form 10-K](https://www.sec.gov/Archives/edgar/data/1404655/000095017023003077/hubs-20221231.htm)
+provide USD reporting, fiscal-calendar and consolidated-entity context.
+Two ordinary full-byte requests return HTTP403; no retry or bypass follows.
+Retained web contexts are explicitly **selected rendered excerpts**, not
+complete original filings or historical first-delivery captures. Existing
+complete CRM releases and retained EODHD release bodies supply event-specific
+metric, scale and diluted-EPS evidence. No new subscription API is queried.
+
+| Newly non-null semantic binding | Records |
+|---|---:|
+| USD currency | 6 |
+| Revenue unit, USD millions | 6 |
+| EPS unit, USD per share | 6 |
+| Fiscal start from explicit annual-calendar policy and period context | 6 |
+| Reported consolidated-entity scope | 6 |
+| Weighted-average diluted common-share denominator definition | 6 |
+| Explicit CRM forecast GAAP revenue basis | 3 |
+| Previously missing HUBS fiscal end | 1 |
+| Total | 40 |
+
+Calendar starts are **derived**, not misrepresented as literal dates quoted
+in the release: CRM's fixed January 31 year end plus FY2024 context gives
+February 1, 2023; HUBS's December 31 annual calendar plus FY2023 gives
+January 1, 2023. Current reconstruction and no-PIT caveats remain explicit.
+A reporting-context binding does not establish dated permanent-security
+identity, unchanging acquisition scope or complete issuer communication history.
+
+Revenue bounds are normalized from the retained billion-dollar presentation
+to `USD_millions` using the existing exact Decimal multiplication helper.
+All twelve revenue bounds are checked; all twelve EPS bounds/range objects
+remain unchanged. Original as-presented values and source hashes survive in
+the prior immutable corpus and the new fact overlay. No midpoint, revision
+percentage, threshold, eligibility or signal is computed. The compiler's
+existing contracts and all strategy economics remain unchanged.
+
+Share basis means the documented **diluted-common denominator definition**,
+not a promise of identical future weighted share counts. CRM's March/May/
+August future-buyback exclusion windows differ, and event-specific assumptions
+are retained separately. Those words do not alone prove a basic/diluted/split
+basis change or automatic strategy ineligibility. Similarly, different
+non-GAAP exclusion/reconciliation wording is not automatically a changed
+accounting policy. Canonical adjustment-definition equivalence remains null
+until supported; event fingerprints are not substituted for that proof.
+
+Unresolved canonical comparability fields include **six permanent security IDs, six adjustment
+definitions and three HUBS forecast revenue-GAAP bindings**. The latter is not
+filled merely because an annual report follows GAAP. Predecessor/correction/
+withdrawal, source-completeness and historical-version/delivery issues remain.
+All six CRM/HUBS profiles therefore still **refuse strategy-input acceptance**.
+The combined corpus remains 17 profiles: baseline 2, structural comparable
+pair 3, refused 12. All eleven old Adobe profile objects and dispositions are
+byte-canonical unchanged. All PIT, authenticity/completeness, rights, approved-
+input and execution flags remain false. No new comparable pair is certified.
+
+The combined version binds **29 retained captures / 65,405,393 bytes**. Both
+combined and standalone corpora reconstruct byte-exactly. Sixteen author
+checks include precision 2 with Inexact/Rounded/FloatOperation traps,
+unchanged EPS and old Adobe objects, forty binding gains, residual-null
+retention, no new buyback rule, and number/context/approval tamper refusal.
+
+### 74.3 Predecessor investigation: missing channels are explicit
+
+Four supplied scheduled-release links are checked against the retained SEC
+census, complete CRM HTML and issuer event metadata. Six **issuer-listed
+intervening events** are now recorded:
+
+| Issuer | Date | Event | Accessible guidance content |
+|---|---|---|---|
+| CRM | March 7, 2023 | Morgan Stanley TMT | Linked presentation no longer available |
+| CRM | June 7, 2023 | BofA technology conference | Linked replay HTTP404 |
+| CRM | June 12, 2023 | Salesforce AI Day | Linked Salesforce+ page not found |
+| HUBS | March 8, 2023 | Morgan Stanley technology conference | Dated metadata observed; detail page HTTP403 |
+| HUBS | May 22, 2023 | J.P. Morgan technology conference | Linked recording expired |
+| HUBS | June 8, 2023 | BofA technology conference | Linked replay HTTP404 |
+
+Each supplied predecessor interval has at least one unclosed channel. These
+calendar entries are **not automatically guidance disclosures**: no actual
+intervening changed or reaffirmed outlook is recovered, and no quote/forecast
+is invented from an event title. Conversely, unavailable replay content does
+not prove no guidance was given. The four links remain unverified as immediate
+comparable predecessors; none is promoted from scheduled order to complete
+issuer history. An Item 2.02/8-K inventory alone cannot establish that absence.
+
+A separate scoped HUBS August 17 filing/exhibit concerns a board transition
+and Andrew Anagnost's appointment. Its mentorship use of the word guidance
+is not a numeric financial outlook in the inspected text. It falls after the
+last new August 2 profile and outside the four predecessor intervals; the
+source-only disposition does not certify all-channel completeness.
+
+The initial helper V1 makes five ordinary public capture attempts with no
+accepted full HTML, then refuses a source locator because the retained May
+CRM footnote appears twice. Its error/source identity is preserved. Individual
+HTTP statuses were not retained and are **not invented as HTTP403**. V2
+reconciles locally with network access patched out, retains both occurrence
+positions and the exact source hashes, and makes no network retry. A repeated
+footnote is not inferred to be an economic difference. Metadata excerpts,
+terminal states, rejected V1 and supplemental filing disposition remain
+separate immutable artifacts. Complete intervening content remains missing.
+
+### 74.4 Alpaca: supported-interface limit and unknown-state handling resolved
+
+The current official [market-data OpenAPI](https://raw.githubusercontent.com/alpacahq/cli/main/api/specs/market-data-api.json)
+and [SDK quote model](https://github.com/alpacahq/alpaca-py/blob/master/alpaca/data/models/quotes.py)
+expose the same nine quote fields on single- and multi-symbol historical
+routes. There is no inspected parameter for original-condition restoration,
+record version, quote correction history or sequence. `asof` maps symbols;
+it is not a historical payload-version selector. The published correction
+stream concerns **trade corrections**, not archived quote-condition repair.
+Switching to IEX would substitute another feed rather than recover original
+SIP flags. No equivalent authenticated query is repeated to manufacture proof.
+
+The historical 2021 explanation retained in section 73 identifies `?` with
+imported archive provenance, not firm/executable status. This establishes a
+supported-interface limit, **not that no private vendor archive or future
+service could ever restore the data**. Missing originals are not recovered.
+
+A deterministic disposition overlay binds section 73's exact result SHA
+`f4809b356509e30229317794dda1ad3dfea37fdee1e246e68eca8587f058293c`
+and preserves **all 96 windows / 1,747,147 rows**. It explicitly retains
+**20 unknown-condition windows / 283,682 occurrences** and 76 R-only windows.
+Every window has `original_condition_recovered=false` and
+`execution_qualified=false`; R-only is not full qualification. No dates/data
+are removed, `?` is never relabeled R, and no sequence or participant/SIP clock
+is fabricated from the sole timestamp. Unknown state cannot reveal an older
+convenient quote. This overlay is a data disposition, not a production adapter,
+fill policy, research-look allocation or approved replacement data epoch.
+
+Thirteen author assertions check malformed count/bool inputs, unchanged
+custody, mixed/unknown preservation, deterministic rebuild and all 96 refusals.
+Original per-record conditions or a supported, record-bound backfill remain
+necessary to close this gap; no paid tier is assumed to fix missing metadata.
+Six usable common years are still unverified, and dates are not shortened to
+make the available portion fit the plan.
+
+### 74.5 Custody, verification and one-push handoff
+
+Ignored base:
+`artifacts/guidance_revision_drift/guidance-bindings-conditions-20261107/`.
+
+| Artifact | SHA-256 |
+|---|---|
+| `bindings/bound-combined-dataset-private-v1.json` | `f1edb85900dd77ababe6f64c29272d7ba4bfa234ab53150d8d311dce1f5e5d79` |
+| `bindings/bound-new-dataset-private-v1.json` | `5edc991b64e1529158390114d6c5ad8471871179046b483396fb2bf7bbaa92b4` |
+| `bindings/bound-compile-receipt-v1.json` | `6c5bfe01028f1b5742a13de6b4e489eac5658bd6813f6a9fec1f57a1d1e47a2a` |
+| `bindings/bound-author-verification-v1.json` | `9d915846d0d488258dde1bcccc826ed69a0465014e1529bce3dc03ef271e926f` |
+| `predecessors/predecessor-status-v2.json` | `33aa971a2440ecfcff687e1c49992a9af855aeabec689bd279159953529f5517` |
+| `predecessors/predecessor-verification-v1.json` | `3af33676cfd1cf131efe2ba3bb4303b4ac9b9d058dc260eab8c45d649b69f57a` |
+| `predecessors/supplemental-filing-disposition-v1.json` | `0107d3111bb7d80f550a42b041bc4052dc98d6af263c503053f9983598398f38` |
+| `alpaca/condition-dispositions-v1.json` | `0e582d73f7f1f7b064170f1ffb12d705022c3f0de1c1a296c60ebe10bbcb243c` |
+| `alpaca/unknown-condition-assessment-v1.json` | `ea7aa765de7b60073215b44df00dc069aae773029d902bf99f06163de0df8ab2` |
+| `alpaca/overlay-author-verification-v1.json` | `9cd0818c6b43f52d1e19d57749e2b46117e9b7ab9b51271618123c505e7dc564` |
+| `root-guidance-verification-v1.json` | `d268de5813891be93e6c7a10bb96355590673116a16fdffa75e6ad2bb9568809` |
+| `root-condition-verification-v1.json` | `e72b389e7c64d87f3d0314717bad9f76a5f1d0f44f9d780f23d45dc6ccf4a5d4` |
+
+Root independently checks forty null-to-bound changes, twelve exact revenue
+conversions under hostile Decimal context, unchanged EPS, old Adobe profile/
+decision objects, 29 source paths, canonical corpus hashes and six continued
+refusals. All four predecessor links and six event gaps are retained. All 96
+quote-window hashes/counts/flags match the prior result. Local root-QA setup
+first refuses unresolved OpenAPI parameter references and a list passed to a
+dict-only canonical serializer; correct local reference resolution/wrapping
+then passes. These are retained diagnostic dispositions, not production fixes
+or new network/data attempts. Author checks are not independent review or
+additional repository-suite methods.
+
+All 63 production/source members remain unchanged, full source SHA-256
+`a91368303bbfddf5b5c1e52a1e1c0f058216a65648bd54095e2921e7d57aa312`;
+semantic draft
+`b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`
+and raw draft
+`1dd9b5969853924d7682b4b566734ea7e90f061340d6378912118fb93d132110`
+are unchanged. Existing Python **3.13.15** runs **six focused methods, all
+passing in 0.094s**, zero failures/errors/skips or reported warnings: guidance
+canonical round-trip, source-binding mutations, fiscal/share/adjustment
+distinctions, explicit-unknown predecessor retention, unsupported-unit/basis
+refusal and active-document consistency. No strategy/economic/settlement/SPY/
+runtime/permission change or full lane/repository suite occurs. Private corpora/captures remain ignored
+and **are not transferred by Git**; the pushed record carries their custody
+and remaining evidence requirements. Prior production source is not newly
+independently accepted by this data work.
+
+The bounded investigation and rebind are complete, with the requested source
+items **partly resolved**: forty bindings and explicit unknown-condition
+handling are established; four immediate predecessors and the missing original
+quote conditions remain blocked by unavailable evidence. Dated permanent
+security mapping, metric-definition equivalence, HUBS forecast GAAP basis,
+complete comparable guidance history, qualified common quote history and real-
+runner/equity-settlement/matched-SPY parity remain open. No purchase or QC run
+is recommended or authorized by this closure. No original GDR-0..6 stage or
+research/economic/family/look/date freeze is completed. Backtest readiness
+remains false.
+
+Original `GDR-base372-approved-20261008` remains **CLOSED FAILED 3/3**, zero
+manual attempts, project 37647834 untouched. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` remains **zero unsuccessful
+attempts / zero pending intents**, maximum three failures, no new project or
+journal. Accepted `c589b3dd` custody and the fixed invented fixture are not
+rebound by these current-vintage data versions. Monitor remains **PAUSED**.
+
+Verify exact root/branch/HEAD/status, sole origin and independently live matching
+remote before commit/push. Make exactly **one guarded non-force final push**
+of the completed evidence/rebind round to the matching lane branch. Preserve
+final refs and publication receipt in the paused checkpoint. Do not start
+another audit, create accounts, buy data, access QC or rearm a monitor
+without a later owner instruction.

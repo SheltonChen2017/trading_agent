@@ -1,6 +1,12 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Managed native JSON precision and bounded guidance-timeline follow-up recorded in section 71, 2026-11-07.
+Status: **Existing-account Alpaca historical SIP and Equibles Free suitability qualification recorded in section 72, 2026-11-07.
+Eight data-only Alpaca requests succeed; both fixed AAPL/SPY windows paginate completely, totaling 45,880 quote rows.
+Actual Alpaca Basic plan identity, broader coverage, dated size conversion, delivery semantics and cloud rights remain unverified.
+The owner has no Equibles account; its unbounded guidance response mixes later actuals, so no guidance API sample is requested.
+No purchase is recommended; the lane is not backtesting ready. No QC, backtest, order, account creation or monitor rearm occurs.
+Section 71 was published once as `674983e4`; this qualification round does not repeat it.
+Managed native JSON precision and bounded guidance-timeline follow-up recorded in section 71, 2026-11-07.
 The owner explicitly skips review for this round; implementation remains independently unreviewed.
 The invented serializer witness passes; two in-cloud history requests observe exact decimal fields and native 100ns clocks on 91,762 AAPL/SPY quote ticks.
 The research node is released; no raw market rows, prices, sizes or clocks leave QC.
@@ -169,7 +175,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 71. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 72. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -11377,3 +11383,234 @@ guarded non-force end-of-round push**, including `37c9ea77` and this record,
 only to the matching lane branch. Preserve the exact final refs/publication
 receipt in the paused checkpoint. Do not republish sections 69/70, rearm the
 monitor, start a backtest or automatically begin another round.
+
+
+## 72. Alpaca Basic and Equibles Free qualification, 2026-11-07
+
+### 72.1 Scope, exact base and ownership
+
+The owner directs: **"Proceed with qualifying Alpaca Basic and Equibles Free.
+Use existing access, don’t buy anything or launch backtests, and push once
+when done."** This is a bounded data/rights qualification round, not a new
+strategy evaluation or real-data runner milestone. Existing Alpaca credentials
+are used only in memory against the official market-data host. No broker
+account, portfolio, asset/order or execution endpoint is called. No QC page,
+API, resource, research cell, compile, backtest or Mia action is accessed.
+
+Clean starting local HEAD and independently observed live matching remote are
+`674983e4f214d5d54eababb017942c42d475ffb9`. All repository commands, audit
+artifacts, validation, commit and push use
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+branch `codex/strategy-guidance-revision-drift`, sole origin
+`https://github.com/SheltonChen2017/trading_agent.git`. No new Claude commit
+appears; consumed `1870b9c9` / `6375401b` and earlier reviews stay consumed.
+Section 71's one successful push is finished. Public-document assistants and
+local script QA are implementer assistance, not independent Claude review.
+Only this lane record changes in tracked Git. Project-wide documents remain
+frozen and the monitor remains **PAUSED**.
+
+The owner explicitly replies **"I don’t have an Equibles account"**. Its
+existing-access check therefore ends at public suitability assessment. No
+email is submitted, account created, API key generated, MCP connection added
+or subscription purchased. The temporary sign-in tab is closed. Its public
+homepage incidentally displays current market labels while establishing
+sign-in state; these are not used as audit samples, features or outcomes.
+No protected-date data endpoint or performance calculation is requested.
+
+### 72.2 Alpaca documented fit and actual existing-access sample
+
+The official [plans](https://docs.alpaca.markets/us/docs/about-market-data-api)
+list Basic at zero cost, US stock/ETF history since 2016 and 200 historical
+requests/minute. The [FAQ](https://docs.alpaca.markets/us/docs/market-data-faq)
+permits historical SIP queries without a paid plan when the requested end is
+at least 15 minutes old. This differs from free real-time IEX coverage. The
+FAQ and endpoint reference describe defaults differently; this audit always
+sets `feed=sip`. These documents support a possible zero-cost route, not
+proof that the owner's present account is on Basic. No billing/plan or
+broker-account endpoint is queried, so **actual Basic plan identity remains
+unverified**, even though existing-key historical SIP access succeeds.
+
+Alpaca describes its [Quotes API as NBBO](https://alpaca.markets/learn/understanding-alpacas-market-data-api-with-pandas-and-plotly).
+The inspected official [OpenAPI](https://raw.githubusercontent.com/alpacahq/cli/main/api/specs/market-data-api.json)
+specifies paired bid/ask prices, sizes and venues, tape, per-side conditions
+and one timestamp. Zero price denotes an absent side; one condition applies
+to both sides, two to bid then ask. The [dated size notice](https://docs.alpaca.markets/us/v1.1/changelog/marketdata-bid-and-ask-size-display-change)
+states the change from round lots to shares on **November 3, 2025**. Generic
+live-data prose still says round lots. Preserve that discrepancy rather than
+blindly multiplying all quote sizes by 100. For this February 2025 sample,
+raw round-lot sizes stay unconverted; no share capacity is inferred.
+
+The [historical endpoint](https://docs.alpaca.markets/us/reference/stockquotesingle-1)
+has inclusive bounds, dated symbol mapping and pagination. Exactly the
+previously sampled **February 5, 2025, 09:58--10:02 New York** interval is
+queried for **AAPL and SPY**, with explicit `asof=2025-02-05`, `currency=USD`,
+`sort=asc`, `feed=sip`, page limit 10,000 and maximum 20 pages/symbol. A
+remaining token at the cap would mean incomplete coverage. No new independent
+date, return calculation, strategy signal, order or trading request is added.
+
+Exactly **eight authenticated GET requests**, all HTTP200, occur on
+`data.alpaca.markets`: five quote pages, one public exchange mapping and two
+quote-condition mappings for tapes B/C. No fallback feed, automatic retry,
+latest-data probe, credential regeneration or subscription change occurs.
+Redirects are refused to keep authentication on the named host. Existing
+APCA environment values are neither printed nor saved; no Keychain or
+credential-file extraction is used. Only status, byte hashes, counts and
+nonfinancial schema/metadata evidence are retained. Raw market payloads,
+prices, sizes, timestamp values and pagination tokens are not persisted.
+
+| Sample observation | AAPL | SPY |
+|---|---:|---:|
+| Quote rows / completed pages | 9,277 / 1 | 36,603 / 4 |
+| Pagination exhausted | Yes | Yes |
+| Exact numeric price/size fields checked | 37,108 | 146,412 |
+| Sub-microsecond timestamps | 9,273 | 36,326 |
+| Timestamps finer than 100ns | 9,182 | 35,114 |
+| Equal adjacent timestamps | 0 | 950 |
+| Positive locked / crossed rows | 6 / 0 | 83 / 4 |
+| Time decreases / out-of-window rows | 0 / 0 | 0 / 0 |
+| Zero-price / zero-size rows | 0 / 0 | 0 / 0 |
+
+All **45,880 rows** have the expected nine-field shape. Price JSON lexemes
+are parsed as Decimal and timestamps as exact integer nanoseconds; size
+integers remain raw units. All observed conditions are R; current tape-B and
+tape-C mappings give different meanings to that letter. Every observed venue
+and condition code appears in the returned current mapping. Those mappings
+are not certified historical definitions. Locked/crossed rows and equal-time
+order are counted without filtering or running the lane's fill model. The
+sample does not exercise empty/two-flag, withdrawal, non-firm or correction
+cases, and does not prove their completeness. No comparison of source row
+counts is treated as record-level equivalence with section 71's different
+native representation.
+
+The API schema exposes only one clock and no quote sequence/correction ID or
+separate participant/SIP/receipt clocks. Nanosecond text does not establish
+clock origin, historical delivery or point-in-time status. Completed paging
+proves complete delivery of the requested API page chain, not complete market
+coverage, stable equal-time ordering across rebuilds, all issuers or six
+usable years. Response hashes bind bytes observed once; since raw rows are
+not retained, they are not a reproducible raw quote corpus or approved input.
+
+### 72.3 Equibles suitability and licensing assessment
+
+The public [Free plan](https://equibles.com/pricing) includes guidance and
+100 daily requests shared by REST/MCP; [limits](https://equibles.com/docs/rate-limits)
+reset at 00:00 UTC. The $9.99/month Plus plan increases throughput, not
+verified history depth. No upgrade is justified by this qualification.
+
+The [guidance reference](https://equibles.com/docs/api/endpoints/fundamentals#guidance)
+describes release/call extraction, ranges, accounting basis and source
+quotations, but returns newest-first results with **no query parameters**.
+It combines guidance with later actuals, verdicts and prior-actual fields.
+Consequently **zero guidance requests are made**: inventing date parameters
+or fetching the unbounded response and filtering afterwards would not provide
+the scoped, outcome-free qualification intended here. Public documentation
+examples are schema evidence only, not accepted issuer observations.
+
+Its prior-change classification is provider-defined, not the lane's
+immediate comparable predecessor rule. Document counts do not establish an
+exhaustive issuer communication census. Multiyear depth, off-cycle updates,
+corrections, withdrawals, fiscal/currency/share-basis identity and original
+version/delivery evidence remain unverified. Source quotations and current
+records cannot independently establish historical availability.
+
+A possible future **existing-account** check is documented by the
+[filings API](https://equibles.com/docs/api/endpoints/filings): CRM/HUBS,
+January 1--August 31, 2023, EightK, item 2.02, explicit pagination. That can
+compare filing metadata to section 71's SEC census; it does not qualify
+structured guidance coverage, calls or all off-cycle disclosures. Historical
+acceptance can be missing and current ingestion is not first delivery. No
+such authenticated request occurs because no account exists. A provider-
+supported date/field-restricted guidance delivery is still needed before a
+safe structured-guidance sample under the current scope.
+
+[Alpaca terms](https://s3.amazonaws.com/files.alpaca.markets/disclosures/library/TermsAndConditions.pdf)
+allow personal/noncommercial use and incorporate other agreements. They do
+not establish a specific private QC processor/upload or durable retention
+grant for this account. This is missing permission evidence, not proof of a
+cloud prohibition or that a paid tier is necessary. No market rows leave the
+local audit for QC or another processor.
+
+The served [Equibles terms](https://equibles.com/legal/terms) describe research
+use, redistribution restrictions and possible correction/removal without
+retaining earlier versions. An explicit Free-plan private-cloud/retention
+grant is not established. Their displayed update label is **November 8,
+2026**, while the client date is November 7 in America/Los_Angeles; UTC
+capture is already November 8. Record that label without inventing account
+assent, effective version or a terms violation. No signup, click-through
+consent or account-agreement action is performed; no provider is contacted
+on the owner's behalf.
+
+### 72.4 Evidence custody, validation and remaining work
+
+Ignored receipt base:
+`artifacts/guidance_revision_drift/free-provider-qualification-20261107/`.
+
+| Artifact | SHA-256 |
+|---|---|
+| `alpaca_audit_v1.py` | `158b6d4b204e4434637ea65bdc01ad990cbbf99e0a371a50922b703785f0e8ae` |
+| `alpaca-sample-receipt-v1.json` | `c0f0ab4d1e0d50b14973294f9a290814917c5c4350de3577c9476e7bf719b2f9` |
+| `public/capture-manifest-v1.json` | `8f95bcb16c3713444c33dfc25ee196bc6fcda64f48bd043c6a2944a0b73c3f43` |
+| `audit-helper-qa-v1.json` | `0c30397e58d2e54a92984366204210dc54176d6bc029431e0cbc1edaa9478ee5` |
+| `source-identity-v1.json` | `2b967de94965aece2a73d186d34be799f98c0ae01c5526dee7a14e172e8de8bf` |
+| `qualification-assessment-v1.json` | `4068537fc377058e7b805d2b34cca8de600e7c68e9c7441c34fa9b10c045f9b6` |
+
+Eleven complete public document captures return HTTP200 and retain exact
+hashes. Full public HTML/PDF/schema captures are distinguished from actual
+account data. Static author QA identifies two audit-helper issues before its
+single live invocation: atomic no-overwrite receipt publication and the
+schema's allowed empty condition array. Both are corrected before requests;
+there is no hidden data rerun. Eleven invented helper assertions separately
+check exact nanoseconds/Decimal, duplicate/nonfinite JSON refusal, clock/date
+bounds, redirects and the data-host-only path. They are diagnostic QA, not
+repository test counts, independent review or native strategy evidence.
+
+All 63 production source members remain unchanged; full source SHA-256 is
+`a91368303bbfddf5b5c1e52a1e1c0f058216a65648bd54095e2921e7d57aa312`.
+Semantic candidate remains
+`b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`;
+raw draft file SHA remains
+`1dd9b5969853924d7682b4b566734ea7e90f061340d6378912118fb93d132110`.
+No production adapter, fixture, strategy rule, settlement/SPY behavior,
+permission field or accepted recovery source changes. Section 71's source is
+still independently unreviewed; this audit does not confer acceptance.
+
+**Disposition:** Alpaca's existing historical SIP access/schema sample is
+verified and is the first quote alternative to qualify further. Equibles is
+a potential reconstruction aid, with no existing account or bounded guidance
+sample; it is not a verified multiyear archive. **Buy nothing on this evidence.**
+Remaining work before backtesting is:
+
+1. Establish the actual Alpaca plan, applicable retained-use/cloud-processing
+   rights, dated lot conversion, historical venue/condition semantics and
+   correction/withdrawal/clock lineage; audit wider authorized coverage.
+2. Obtain a bounded, outcome-separated, source-bound guidance delivery and
+   verify numeric comparable predecessors, corrections/withdrawals and common
+   multiyear coverage. Equibles account creation is a separate owner action;
+   continuing the existing SEC/issuer/EODHD reconstruction needs no purchase.
+3. Integrate qualified inputs into the real runner and prove equity cash
+   settlement plus matched-SPY execution parity without changing strategy
+   rules. Economic/research/date/family/look freeze, independent review where
+   required and explicit evaluation authorization remain separate gates.
+
+No original GDR-0..6 stage is completed. Original
+`GDR-base372-approved-20261008` stays **CLOSED FAILED 3/3**, project 37647834
+untouched. Separate `GDR-Mia-base372-recovery-authorized-20261011` stays
+**zero unsuccessful attempts / zero pending intents**, maximum three failures,
+no new project/journal; retained `c589b3dd` custody is not rebound. The current
+audit does not consume or reset either ledger. Monitor remains **PAUSED**.
+
+Focused verification uses existing Python **3.13.15**: one active-document
+method passes in **0.020s**. Eleven invented audit-helper assertions are
+separate from that repository count. The one audit script compiles in memory;
+source hashes, receipt manifests, historical body preservation, exact changed
+paths, added-text secret shapes, diff and status are checked. No full lane or
+repository suite is run for this documentation-only round. The source and
+Equibles assistants also check this record against their public sources and
+the aggregate receipt without further account requests; that QA is not
+independent review.
+
+Before commit/push, verify exact root/branch/HEAD/status, sole origin and live
+matching remote. Publish this completed qualification record with exactly
+**one guarded non-force push** to the matching lane, then preserve final refs
+and the publication receipt in the paused checkpoint. Do not automatically
+start another audit, create accounts, launch a backtest or rearm a monitor.

@@ -1,22 +1,24 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-**Current section121 owner continuation (2026-11-07):** SendtoMia/readreply/
-resolveOFFthen frozenarms whenverifiedready;20REMXquarantined; skipClaude;
-NO ADDITIONAL PUSH THIS ROUND. Round120onepush041a54db isalreadyconsumed.
-Owner manuallysubmitted exact1359char TPR120-DELIVERY-DIAG-001; actualnonce1/
-draft0/initialMiarunning verified. GenuineMia performed exactly2visible
-readonlysearches, bothnomatches, thenidle withno writtenfinaldiagnosis.
-All13cloudsourcefileswere freshlyretrieved before/afterMia andmatch exact
-inventorye0ef... andentirewire349013B/SHA d4f957f3... unchanged. No fixported.
-A492char zero-tool finaldiagnosis followup TPR121-FINAL-DIAG-001 isprepared
-butverifiedUNSENT; normal/forceSend clicks andsafeplain-textareafocusclick
-areblocked. NativeCodexhostcontrol isexplicitlydenied for safety; no bypass.
-Owner hasbeenasked toclickSendoncefor thisfollowup. SameIABOFF/code; native
-Safariuntouched. SourceHEAD8f2/job a86d8fdc57cf8a3e1bd8613262ac0a32 remains
-the120Completedwhole-report snapshot, not a newfinancialresult. Financial
-0/5accepted/allmetricsNULL; no unchangedfinancialrelaunch. Current121work is
-local-only record/evidence; followingrecordcommit staysUNPUSHED; noadditional
-push isauthorized. Allpriorhistoryretained.
+**Current section122 owner-directed cash-exclusion variant (2026-11-07):**
+The owner asks to bypass the one identified stock. Build a separately labelled
+five-arm study, TPR-SIX-UNIVERSE-FIVE-ARM-SID-CASH-20261107-v1, which constructs
+the original portfolios first, removes only the fixed exact SID from both
+execution maps, and leaves that final weight in cash without refill or
+redistribution. Section122.1 freezes the prospective contract before effects.
+This changes strategy economics; original results and failures remain
+separate/unresolved. Local source/build/action and result-verifier modules have passed focused
+software checks; commit the exact local source, then perform fresh QC
+preflight and OFF first. No new variant financial job has been launched.
+Both genuine Mia messages were actually submitted and their written replies
+have now been read from message textContent. The earlier innerText-only reads
+missed them. Mia supplied no verified correction; unsupported conclusions and
+numerical claims are rejected in122. The all13 saved cloud files remained
+exactly unchanged before/after Mia. Native Safari is untouched, the same
+heartbeat remains paused, and all20REMX rows remain quarantined.
+Original and new variant accepted full-window metrics are NULL.
+Skip Claude review. Round120 push041a54db is already consumed; NO ADDITIONAL
+PUSH THIS ROUND. Current changes and following source commits remain local.
 
 **Published section120 handoff before the current owner continuation (2026-11-07):** The in-app browser is
 authenticated on own OFF38609822/code; nativeSafari remains untouched.
@@ -171,7 +173,7 @@ owner-answer checkpoint is added by this factual blocked handoff.
 **Current owner amendment, 2026-10-21:** "skip 1, proceed to 2 and 3 directly" applied
 to the section-93 round ONLY; section 94 is the Claude review that follows it.
 
-Status: **SECTION121 OWNER-SUBMITTED GENUINE MIA TURN VERIFIED/TWO READONLY SEARCHES NO MATCHES/NO WRITTEN FINAL DIAGNOSIS; ZERO-TOOL FOLLOWUP DRAFT UNSENT/OWNER SEND ACTION PENDING; EXACT ALL13CLOUDSOURCE UNCHANGED; NATIVE SAFARI UNTOUCHED;20REMXROWS QUARANTINED; SKIP CLAUDE; NO ADDITIONAL PUSH THIS ROUND. FEB10 EXACT-TARGET INPUT/FULL-WINDOW ACCOUNTING/RIGHTS REMAIN UNPROVED;0/5 ACCEPTED FINANCIAL RESULTS; ALL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
+Status: **SECTION122 EXACT-SID CASH-EXCLUSION VARIANT FROZEN/LOCAL IMPLEMENTATION AND FOCUSED VERIFICATION IN PROGRESS; BOTH GENUINE MIA WRITTEN REPLIES READ/NO VERIFIED FIX; ALL13CLOUDSOURCE UNCHANGED; NATIVE SAFARI UNTOUCHED;20REMXROWS QUARANTINED; SKIP CLAUDE; NO ADDITIONAL PUSH. ORIGINAL INPUT ISSUE REMAINS UNRESOLVED; NEW VARIANT HAS NO FINANCIAL JOB YET;0/5 ACCEPTED FULL-WINDOW RESULTS/ALL METRICS NULL.** The exact per-commit counter-review 2cce8dfc..cf5157d8
 in106 remains accepted after its document/current-routing correction.
 Historicalsection105 review/disposition/fullrange remains intact in105.
 
@@ -570,15 +572,19 @@ QC and Safari access are released for this bounded preflight and serialized back
 Authentication is a required input, not renewed task permission.
 The frozen same-session native RAW/SID policy is unchanged.
 
-Currentowner121continuation supersedes publication/unsent1359status below:
-round120push041a54db succeededonce and no additionalpush isauthorized.
-OwnerSend isactuallyverified for1359char TPR120-DELIVERY-DIAG-001. GenuineMia
-ran2readonlyemptysearches, no writtenfinalreply/fix. Freshall13before/after
-sourcecaptureexacte0ef.../whole349013Bd4f957f3 unchanged; noport/rerun.
-492charzero-tool TPR121-FINAL-DIAG-001 followup ispreparedUNSENT, ownerclick
-requestedbecause browserinputisblocked and nativeCodexhostaccessisdenied.
-No security/CSS/DOM/API bypass. Financialreadiness isstillFALSE/0of5/NULLs;
-20REMXquarantine unchanged. No routineClaudecheckpoint or additionalpush.
+Currentowner122continuation supersedes the pending121 reply state:
+both1359char TPR120-DELIVERY-DIAG-001 and492char TPR121-FINAL-DIAG-001
+were actually submitted; genuine written replies are recovered and assessed
+in122. No verified input/code fix was supplied. The exact original study
+remains unresolved. Owner-directed new SID-CASH study retains original
+construction then removes only the fixed exact SID's execution maps, with its
+final intended weight left cash and no refill/redistribution. All five arms
+share the prospective122.1 contract. Codex implements and verifies the new
+versioned runtime/builder/action route locally, commits exact source before
+effects, then fresh preflight/OFF first and remaining arms serialized when
+ready. New economics/results remain distinct from original history.
+20REMX quarantines remain. No routine Claude checkpoint. Round120's one
+push041a54db is consumed; following local commits MUST NOT be pushed.
 
 Section120 latest bounded diagnostic supersedes the earlier118snapshot below:
 actualOFFjob a86d8fdc57cf8a3e1bd8613262ac0a32 isCompleted with exactall13source/
@@ -36625,3 +36631,474 @@ change orfinancialacceptance. Exactpublishedhistory9..120 mustremainbyte-
 equalto041a54db; currentpreamble/section8 andnew121notes areonlychanges.
 
 121final focused current/preamble checks:371passed/520deselected7.47s/7.58sorchestration onrecordSHA5d0565f52c2a3e2e52eb7bc2dbc24e35dcc6f29ed5b368bd2b327624312da625; exactsourceunchanged, sameisolatedPython3.13.15/pytest9.1.1 withsocketDNS/privatecredentialdenial; nofullsuite. Finalrecord-onlycommitLOCALONLY; NO PUSH.
+
+Fresh121 claim BEFORE effect {"HEAD":"21172cec69afcdf6d542dc65aae2f8121aacd7f1","bounds":{"Mia_effects":0,"Mia_tool_lookups_authorized":0,"UI_reads_max":1,"browser":"iab","native_requests":0,"nonce":"TPR121-FINAL-DIAG-001","owner_reported_sent":true,"purpose":"verifyactualownerfollowupSend andreadgenuinewrittenMia conclusion, no resendorcompletionassumption","render_wait_seconds_max":20,"source_mutations":0,"tab":"1","visible_reply_chars_max":18000},"manifest":{"bytes":4356,"name":"TPR-R121-IAB-MIA-FINAL-REPLY-READ-003.claim.json","sha256":"751d1f70486ed8d7d2b8aa582fc194b611feccfb4a7b966464029fa8d5d33298"},"operation_id":"TPR-R121-IAB-MIA-FINAL-REPLY-READ-003"}
+
+Fresh121 claim BEFORE effect {"HEAD":"21172cec69afcdf6d542dc65aae2f8121aacd7f1","bounds":{"Mia_effects":0,"UI_reads_max":1,"browser":"iab","native_requests":0,"projection":"DOMmessageinnerText/textContent lengths andknownnonce/exact-own-text booleans only; nohiddenapplicationstate","purpose":"ownerSent/draft0butinnerTextnonce0; distinguishUIvirtualization fromwrongconversation beforeanyretry","source_mutations":0,"tab":"1"},"manifest":{"bytes":4327,"name":"TPR-R121-IAB-MIA-DOM-TEXT-VERIFY-001.claim.json","sha256":"13d316684af9eac66444c7fd570d97214ff0b4819b43eb4ea101fe721f24736e"},"operation_id":"TPR-R121-IAB-MIA-DOM-TEXT-VERIFY-001"}
+
+Fresh121 claim BEFORE effect {"HEAD":"21172cec69afcdf6d542dc65aae2f8121aacd7f1","bounds":{"DOM_message_chars_max":18000,"Mia_effects":0,"UI_reads_max":1,"browser":"iab","native_requests":0,"nonce":"TPR121-FINAL-DIAG-001","projection":"LASTactualassistantmessageDOMafterexactsubmitteduser; nointernalappstate/reasoningpanels; redactSID/secretlike beforeleavingpage","purpose":"DOMtextContentverifiedwrittenresponses despiteinnerTextzero; readgenuinefinalansweronly andcorrectpriorlimitedUIclaim","source_mutations":0,"tab":"1"},"manifest":{"bytes":4423,"name":"TPR-R121-IAB-MIA-FINAL-DOM-READ-001.claim.json","sha256":"474425a2f1fe582bf8588c8019aca2b8a4a84c17b43ed39d7d282d9c9aa9413c"},"operation_id":"TPR-R121-IAB-MIA-FINAL-DOM-READ-001"}
+
+Fresh121 claim BEFORE effect {"HEAD":"21172cec69afcdf6d542dc65aae2f8121aacd7f1","bounds":{"DOM_message_chars_max":16000,"Mia_effects":0,"UI_reads_max":1,"browser":"iab","native_requests":0,"nonce":"TPR120-DELIVERY-DIAG-001","projection":"lastwrittenassistantanswer beforefollowupuser only; excludesintermediatereasoning/toolbodies; SID/secretredaction inpage","purpose":"recoveroriginalgenuineMiawrittenreply missedbyinnerText andcounterreview anyconcretesupportedcorrectionproposal","source_mutations":0,"tab":"1"},"manifest":{"bytes":4430,"name":"TPR-R121-IAB-MIA-FIRST-FINAL-DOM-READ-001.claim.json","sha256":"33582bd2f2d3d659066f87e1e510c85773518d628cd1a9f9041cb60c18b3df6f"},"operation_id":"TPR-R121-IAB-MIA-FIRST-FINAL-DOM-READ-001"}
+
+## 122. Prospective owner-directed exact-SID cash-exclusion variant
+Owner2026-11-07 asks: can we bypass that specific stock? Rootinterprets this
+as a prospectiveexactSIDexecutionexclusion acrossALL5arms, fromoriginal
+start, finalintendedallocationleftCASH withnoredistribution/refill. This
+narrowlaterinstruction lifts onlythisspecificexclusionboundary; allother
+privateaccess/economic/input/quarantine/scope/safetybounds remain.
+ParentownercontinueOFF+remaining/keep20REMX/skipClaude/NOFURTHERPUSH remains.
+Originalfrozenstudy andallfailures stayretained/unresolved, notsilentlyfixed
+orpooled. NewstudyID TPR-SIX-UNIVERSE-FIVE-ARM-SID-CASH-20261107-v1.
+FixedexcludedSID SHA1122fa5f1349f79e231e106127c098da27ef730836a97052d2154ecc46f1afc1,
+computedfromcanonicalnativeSIDASCII insideQC only; no tickerguess/caller-
+chosenexclusions/rawSIDexport. Newfinancialcandidateepoch, distinctlineage.
+
+122corrects121limitedUIobservations, nothistory: ownerdidactuallysubmit
+both1359charTPR120-DELIVERY-DIAG-001 and492charTPR121-FINAL-DIAG-001.
+MessageDOMtextContent provesbothnonces1; draft0/idle. innerText omitted
+offscreenmessagecontent andearlierreadsmissedwrittenanswers. Retainthose
+failed/limitedreads andlocalrecord-onlycommit21172cecUNPUSHED. Rootcandidly
+correctedearlierstatus. Genuinefirstwrittenanswer9071charsandfollowup2352
+chars recoveredfromLASTnormalassistantmessageonly(excludingintermediate
+reasoning/toolpanels), SID/secretlikepatterns redactedwithinQCbeforeoutput.
+Firstturnused2readonlysearches; followup0toolcards. Bothoffer noVERIFIED
+economic-preservingcorrection; finalrequestsactualselectedruntimefile/resolver
+androw-count/time-rangemetadata. Firstreplycontainslargeincoherent/unsubstantiated
+passages andunsupportednumerical/performanceclaims: inadmissible, neverport
+orfinancialevidence. Finalalsooverstatesotherdays'provider/pathproof and
+exhaustivenessofalternatives; rootrejectstheseunsupportedclaims. Narrow
+verifiedfactremains no exacttargetTradeBar deliveryFeb10underthissensor,
+prior-daycache, notprovider-wideabsence/no-tradeproof.
+
+Publicprimaryinterfaceaudit found noverifiedsupportedcloudQCAlgorithmgetter
+forACTUALselectedreaderfile+rowmetadata. PublicLEANSubscriptionDataReader
+keeps_source/_mapFile/readerprivate; SubscriptionManager exposesconfigs.
+Separatemaplookup/TradeBar.GetSourcecalculations arenotactualruntimeattestation;
+NewDataRequestofferspath/success/error, notparsedrows/resolverbinding and
+cachinglimitsabsenceinference. Publicmasterisnotexactcloudbinaryproof.
+QCcloudrulesrestrictdirectdiskinspection; nofilesystem/reflection/provider-
+replacementprobe willbeused. Thisoriginalinputissue remainsunresolved.
+References:
+https://github.com/QuantConnect/Lean/blob/master/Engine/DataFeeds/SubscriptionDataReader.cs
+https://github.com/QuantConnect/Lean/blob/master/Common/Data/SubscriptionManager.cs
+https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip
+
+### 122.1 Frozen prospective execution-mask contract BEFOREimplementation/effects
+
+1. Regenerate exactpinned20261103INLINEresource-successor financialbaseline
+fromexistingimmutablebuilders. Preserveoldrepo files/actions/sourceepochs/
+receipts. Newversionedruntime/builder/actionmodules ONLY. No genericoverride/
+calleruploadbytes/callerchosenhash or weakeningoldfrozenroute.
+2. Preserve originalsixSTOCKuniverses/caps/scores/classifications/top10rank/
+60slots/1-60denominators/sleeveorder/tiltranks+funding/donorstop0/unfundeddemand/
+pureTPRselection/ARdisabled. Construct eacharm EXACTLYfirst, THENmaskfixed
+SIDfromexecutiontargets andtarget_weights. Removebothkeys, evenzero-weight
+donor. No rank11replacement/pruning/reranking/renormalization/newheadroom or
+insertingintowarning/finalsets. Allotherexactrationalconstructionweights
+unchanged. Theirshareorders/NAV/PnLmaychangebecausecashbudgets/equitychange;
+no falseidenticalorders/outcomes claim.
+3. Preserve originalconstructionreport/selectedslots. Separatelyrecord
+executionper-sleeve/aggregateweights, selectedmaskedslotoccurrences, removed
+finalweight, executiongross/cash andcashincrement. Aggregatecashincrement
+equals sumofexcludedfinalweights acrosssleeves, includingoverlap; zero-
+weight/absentexcludedname increment0. Sumremaininggross+cash=1 exactly.
+Originaltop-levelcoverage vs executioncoverage mustbeunambiguous.
+4. Startfresh100000USDcash from2021-01-04, warmup2020-09-01, end2026-10-09;
+same1449valuations/301weeklydecisions/timestamps andsourcecalendarSHA. New
+identity/policy/calendarhashes maychangewheremetadata includesnewstudy/policy,
+butallactualsession/cutoffrowsmustbeidentical. No date/coverageexclusions.
+5. Excludednativeposition/independentquantityledger/openorders/submittedand
+filled-ordercensus mustremain0 frominitialization throughcompletion.
+Guardbeforerebalance/valuation andatorder-submission/event/completion.
+Unexpectedexcludedholding/fill mustFAIL, neverignorevaluation/accounting,
+silentlyzeroaquantity, sellatstaleprice or fabricatecash/actionsettlement.
+Keepmembership/subscription/actioncustody; excludeonlyexecution-price
+requirementforneverheld/nevertargetedfixedSID. Othermissingheldmarksrefuse.
+6. Preserve chosenFINANCIALepoch's actualsubscriptions, money/actions/fees/
+slippage/timing/sizing/priorNAV/settledcash97%/volume/whole-share/MOO/cancel/
+mark/corroboration/clock/resourceguards. Financialensure_raw_subscription
+usesfill_forward=True; diagnosticnoFFsubscriptionisdifferent. DoNOTsilently
+replacefinancialsubscriptionpolicy; acceptedfinancialmarks stillrejectFF/
+stale/future/wrongSID asbefore. Nativeorigin/rights/PIT/canonical/financial
+acceptance remainseparategates, noirrelevantpolicyrepair.
+7. NewcomparisonSTUDY_ID+policy declaresownerexclusion+parentstudy/policy.
+Rebindnewcandidate/config/policy/calendar/template/source/journal/summary/
+orderintentidentities. Leaveoriginalevents/signal-nativepacketinputSTUDY
+andimmutable280MBpacketdescriptorEXACT; thisisparentinputprovenance, notnew
+policyoutput. No localpacket/provider/USB/D0reopening. No source-unit/PITclaim.
+8. NewreadablefixedMain(CashExclusionMixin,ResourceRecoveryMixin,candidate
+OfforMulti). Existingresourcefix remainsafterparentactionaccounting; no
+ordinaryunheldpruning orcapraise. Allcloudfiles<=60000bytes; no compression,
+codecs/runtimeexec/ObjectStore-code/hiddenengineaccess/newpackages.
+9. Freshboundedmanifests/claims+actualcommittedHEAD/source/custody/deadline/
+sameowner/privateproject/zeroactivejobs/allfilesbefore-after/8compileproofs/
+reservation+receipthistory beforeeachprivate/nativeeffect. Existingprotected
+projectsOFF38609822/5038609834/10038609836/20038609837/pure38609840.
+No cancellation/cleanup/otherlanechanges. Legacypublichelperextra17368/hash8ab9
+mayberetainedONLYatexactknownbytes; otherunknownextrasrefusependingreview.
+10. Rootfocusedtestswithpreimport49/52syntheticDB/socketDNS/privatecredential
+denial; independentCodexsourcejudgment; localcommittednewsource beforeeffects.
+No fullsuite/routineClaude. Testsall5arms, positive/negative/zero/absent
+excludedweights+multiple-sleeveoverlap, remainingweightsidentical, no refill/
+rerank, exactcashreconcile, excludedmarkspynevercalled, othermissingheldmark
+stillrefuses, unknownholding/openorder/fillfail, wronghash/source/variant
+bindingrefuse, sourceclosure/MRO/60000caps/oldsourceimmutability.
+11. ThenfreshQCpreflight, OFFfirst, other4serializedonlywhenready. Eachnew
+financialattempt/look distinctnewvariantprovenance; retainalloriginal8fails/
+otherjobs and2nonfinancialCompleted. No automaticbypassofadditionalstocks.
+Anyindependentdatafailure getsverifieddiagnosis/genuineMia; no unchangedretry/
+outcome-chasing. No live/broker/paper/deploy/accountpurchase/securitychanges.
+12.20REMXrowsremainquarantined. Currentoriginalfinancial0/5/allmetricsNULL.
+NewcashvariantNOJOBYET/metricsNULL/readinesspendingimplementation+checks.
+NOADDITIONALPUSHTHISROUND. Localcommitsallowedforsourceguards, nonepublished.
+
+
+Fresh121 claim BEFORE effect {"HEAD":"21172cec69afcdf6d542dc65aae2f8121aacd7f1","bounds":{"Mia_effects":0,"final_message_chars":2352,"first_message_chars":9071,"native_requests":0,"private_reads":0,"processing_existing_sanitized_Mia_answers":true,"purpose":"retainactualgenuinefinalconclusion androotrejectionofunsupportedclaims; correctinnerTextlimitedreads","rawSID_export":false},"manifest":{"bytes":4210,"name":"TPR-R122-MIA-FINAL-RETENTION-001.claim.json","sha256":"f9702744e6f1f6265720b0b0cfec9f1efd5d2f27fe38b9f55418e3dee4b2f4a5"},"operation_id":"TPR-R122-MIA-FINAL-RETENTION-001"}
+
+122genuineMiawrittenfinal retained/reviewed {"proof": {"bytes": 1165, "name": "TPR-R122-MIA-WRITTEN-FINAL-REVIEW-001.json", "sha256": "0d0662423ae16545fb57d0aa6ce7e26dced6f777b0ac6970cc8d6d3266882bc7"}, "verified_fix": false}
+
+
+### 122.2 Local implementation and focused verification in progress
+
+New versioned runtime17045B/SHA
+99a3927879fa0e09a95a24cdce54fcd3e12021878193af94680e5fb06d6e754a
+and pure builder15615B/SHA
+4979f3b8613682be5650424a3fc089c0a89776550c44c1260deae241bf1a4810
+are local, not yet committed or used for private/native effects.
+Root isolated runtime check initially85passed/5failed1.60s on testSHAc25a06...
+because the synthetic Multi signal-provider fixture did not bind the actual
+journal/config. The real runtime gate was retained; correcting that fixture
+alone produced90passed1.46s/1.57s orchestration on test21818B/SHA
+0a942c2682c739ecddc7c122b032084d9f13afc3e86a5f999262bda3836201e6;
+runtime99a3 bytes remained unchanged before/after both checks.
+Root builder66passed26.99s/27.09s orchestration on test18010B/SHA
+a183c6749bd06789ffbe4fb3b7d171995030eacfe7ea9d499af11d63a27f605f;
+builder/runtime/test hashes were stable. These are synthetic/public-source
+software checks, not native execution or financial evidence.
+All root checks use Python3.13.15/pytest9.1.1, preimport isolated49/52runtime
+plus syntheticDB and socket/DNS/realQCcredential denial. No full suite.
+Current/preamble record371passed/520deselected8.33s/8.45s orchestration on
+record593ac4fef249db202f61382d04c66ba99d9032225021755b040eba3ecbc29a30.
+Later factual additions are not claimed validated by that earlier record hash.
+
+Source findings before any new native effect:
+- The old Nov3 financial action delegated its mutation transport without
+  embedded fresh owner/privacy/collaborator/zero-active-job checks. It remains
+  unchanged historical source. New SID-CASH action has its own fixed genuine
+  TLS transport, fresh embedded preflights and shared lock plus eight build
+  proofs; tests and independent source judgment are still pending.
+- Existing completion/accounting/native readers pin the original study,
+  policy, template schema and retired projects. They cannot truthfully accept
+  this variant through an override or monkeypatch. A fixed versioned checker,
+  readable in-QC rendering and its claimed native custody/action path must be
+  ready before launch and before any financial acceptance. No raw journal/SID
+  export or runtime-code-from-string workaround is authorized.
+- Published sections9..120 retain every original byte. The first preservation
+  assertion compared the newly appended blank separator too and failed; the
+  corrected original-byte-prefix check passed, historical3534430B/SHA
+  024b59c6ab35c632d906d80360104684611235707d7f01a54048c86103e0af06.
+  Existing tracked research/test files have no changes.
+Independent Codex read-only source judgment is in progress, not a Claude
+checkpoint. All20REMX quarantines remain unchanged. New variant jobs/attempts/
+outcome looks0; original and new full-window metrics remain NULL. No push.
+
+
+### 122.3 Prospective native accounting census BEFORE financial launch
+
+Read-only source audit identifies a concrete missing artifact: the old local
+API order compact cannot be produced while raw native SIDs remain inside QC,
+and a later verifier job has only its own empty native transaction history.
+Do not fabricate that old compact or upload QC credentials.
+Before the first new financial launch, extend only the new SID-CASH runtime
+with a fixed bounded typed native end-order/ticket-event census, appended as
+private COVERAGE journal rows before the parent's export. Preserve unchanged
+economic construction/execution, strict marks and all original source files.
+Use actual public transactions.get_orders() and get_order_ticket(id).order_events,
+with typed native Order/OrderTicket/OrderEvent guards, exact finite quantities/
+prices/fees, stable unique identity, full bounded history and zero-open census.
+Each order and event is a bounded row; no giant unbounded journal record.
+Unexpected excluded holdings/orders/fills or missing/unknown native fields
+refuse, never silently omit or substitute zero. Retain raw SIDs only in QC.
+A final census summary must reconcile count/hash, ticket fill quantities and
+full event history; a new pure independent checker compares that census to
+producer intents/FILL/action/quantity/cash/NAV/clock/exposure journal evidence.
+Existing daily native cash/NAV/held RAW marks support independent ledger replay.
+An aggregate engine chart may be compared later without exporting SIDs;
+missing independent chart evidence remains an explicit unclosed acceptance
+limit, not an invented exact result.
+
+This is a prospective evidence extension, not an economic repair or a new
+market-data fallback. Earlier90/66 checks and source hashes remain attributed
+to their prior bytes; new runtime pins, tests, builder/action closure and
+independent source judgment must be refreshed before any effect. The fixed
+native reader/custody successor uses this exact new evidence schema, not an
+override to original-study validators and not a fabricated API observation.
+Official public source capability references (not proof of the deployed build):
+https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Securities/SecurityTransactionManager.cs
+https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Orders/OrderTicket.cs
+All20REMX quarantines and NO ADDITIONAL PUSH remain unchanged. No financial
+job or native source effect has occurred during this local build.
+
+
+122 prior financial-action verification: root132passed189.87s/189.99s
+orchestration on source58661B/SHA
+4646cf0b4b7c7849e1d139d4996c455e6f9fdf29517d5be5e6f8d42c2db3581e,
+tests44873B/SHA
+c5639f92f5f64c33135961a2b044ccccee423f7294f2f8f25619634b731cb596,
+builder4979/runtime99a3; all hashes stable. Same preimport isolation/network/
+credential denial; no full suite or native effect.
+Independent Codex source judgment reviewed these exact six files, confirming
+constructor-then-both-map mask, exact cash/weights, MRO/global isolation and
+fixed native transport/preflights/claims/deadline/custody/8proofs/reservations.
+Its missing _native_integer allegation was a stale in-progress snapshot
+false alarm: helper exists in final4646 at758, final hash independently
+verified and allegation withdrawn. No fix or native failure is inferred.
+That judgment does not cover the subsequent122.3 census extension or the
+still-being-authored result/custody successors, all of which need final checks.
+Official chart endpoint is /backtests/chart/read with fixed Strategy Equity
+name and exact parentjob/calendar/count bounds; a loading response is not
+complete evidence. Root public documentation read only, zero QC API calls.
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/charts
+
+
+### 122.4 Native-census source checks and result-checker corrections before effects
+
+New native-census runtime33970B/SHA
+5fe401a620bfc455a1aa840bb3e8d1f970e084407fb0a5ea73fdd8b711a53c18,
+tests37463B/SHA
+6397c6bf35d1801bc3a5456e5a167832e5416392a75077075cd9a87bbcd035c4:
+root128passed2.78s/2.91s orchestration, exact hashes stable.
+It preserves the mask and economic paths, adds one bounded durable in-QC
+ObjectStore claim before two typed native order/ticket-event passes, stable
+actual config/project/job/clocks/cash/NAV/holdings snapshots, per-order/event
+count/hash reconciliation and zero-open/excluded checks. Native average fill
+price is bounded captured metadata, not a newly invented exact CLR-division
+calculation or cash input. Empty/null native currencies are preserved only
+for exact zero amounts; nonzero fill/fee currencies requireUSD.
+Independent Codex source judgment accepted this exact extension, qualifying
+same-node claim verification vs backend durability(FALSE), simulated capture
+time vs wall deadline, and external committedHEAD vs native sourceclosure.
+This remains software/source judgment, not native ABI or outcome evidence.
+
+Root changed only the runtime pin in the new builder, then only that builder
+pin in the new financial action. Final builder15615B/SHA
+ae9455e7371cb4b24c8b5dfe218c28c437441e425e5d44f94eb716159f47ad39:
+66passed26.13s/26.23s orchestration with unchangeda183 testbytes.
+Financial action58661B/SHA
+2bbf3ce7a5b9171bd680345e447031fa450e98fbc110d5de97daddb9d0cb9dac:
+39passed/93deselected55.44s/55.54s orchestration on c563 testbytes.
+The selected checks cover allfive regenerated arms, actual fixed dispatch/
+launch/proofs/plan changes/production guards/source bounds. Prior132 checks
+at4646 remain attributed history; no unnecessary complete-suite repeat.
+All root tests use preimport isolated49/52runtime, syntheticDB and network/
+DNS/realcredential denial in Python3.13.15; source hashes stable throughout.
+
+Initial result checker82458B/SHA
+f8aab6df3c514e494cd52854454dd6bad15c13e751946825e77d662ac9cb8982,
+tests23172B/SHA
+e482c2b2b3dc6c2bc9538bd9847dc87a34cbb2e864e11d0c4a400ff687d20d6e:
+60passed/5failed46.34s/46.43s orchestration, hashes stable.
+All five failures are the actual helper renderer's fixed executable-AST
+fingerprint refusal at1267, before file-size/native execution checks.
+Root public stdlib-only comparison proves the cause is AST-dump version
+format: system Python3.9.6 includes empty-list fields by default while
+Python3.13.15 omits them. Author's reconstruction matches its pin under3.9;
+do not call this semantic source drift or weaken source matching. A fixed
+portable semantic fingerprint preserving all meaningful fields is required.
+Independent review also confirms a separate nested-definition renaming defect
+(canonical's nested encode was renamed but its lexical calls were not) and
+P2 independent-check gaps: terminal-only order status, signed/bounded native
+fills/Filled quantity equality, and capture at/after last completed NAV audit.
+The runtime's actual source guards do not excuse omissions in the independent
+artifact checker. Result author is fixing these in only its new two files
+with meaningful regression coverage; this checker is NOT yet ready.
+No old validator/limits/policy is overridden. Any later exact source/test
+hashes and checks must supersede these failed local bytes explicitly.
+
+Native result/custody wrapper initial56825B/SHA
+3de3352c87222e1dbf67f852f175fdee89945ec022afe5cd75848f8da79f071e,
+tests23245B/SHA
+709cc47eabaae8922c11f65ee28e824ceaf55dabf600da44655f465e17e20d63:
+read-only source review finds no confirmed additional defect, but root tests
+are pending and its result-checker pin must move after the verified fixes.
+Parent terminal preflight uses external fixed genuine TLS and the committed
+4MiB/depth32/node4194304 status parser, screening the entire wire and decoded
+strings before retaining ONLY sanitized exact project/job/status/completed.
+No raw financial wire is retained by that path; transient bounded wire access
+is still explicitly declared. In-QC code uses public typed algorithm getters,
+ObjectStore and native SPY clock, no self.api/hidden engine/HTTP/credentials.
+Backend durability, atomicity, native origin, rights/PIT and engine-chart
+agreement remain unproved; all admission flags remain FALSE.
+
+No private registry read, native source upload/compile/job, QC UI/Safari
+operation or financial outcome look has occurred during section122's build.
+Both old and new full-window metrics remain NULL. All20REMX quarantines and
+NO ADDITIONAL PUSH THIS ROUND remain unchanged. Following sources stay local
+until committed for actualHEAD guards; no production effect on uncommitted
+new source is permitted.
+
+
+### 122.5 Executable helper checks and bounded report output recovery
+
+Result source f3359c02f64748633b958a63528047b5c8e824deb5dc48f52ef8c41ddba03073
+corrects the portable semantic-AST and nested-function namespace defects,
+and independently enforces terminal status, fill sign/quantity/Filled equality
+and capture at/after the final NAV audit. Read-only independent Codex judgment
+accepted those corrections; all native/outcome/admission limits remain.
+Its first full check with test9bd41c... was68passed/5failed59.51s/59.61s,
+hashes stable: the five generated-helper tests had a ModuleType registration
+fixture error (dataclass execution needs its module registered before body).
+Fixing only that fixture preserved f335 source exactly, test now26207B/SHA
+f5887bc956a033b90ae80fdb48f7ad9301645bcdc68a3eae5277f906e492f4f8.
+The relevant five-helper rerun then failed5/68deselected12.93s/13.04s,
+now reaching an actual generated-code NameError: Mapping is absent from the
+fixed helper import header used by V_validate_counts. This is a genuine
+readable-helper dependency gap, not grounds to bypass validation or claim QC
+readiness. Author is adding the exact safe stdlib import and auditing selected
+global dependencies. Existing runtime/builder/financial-action bytes stay
+unchanged. No author executed tests or private/native effects.
+
+Native wrapper pin-only9c6187610d8c13aeddd39eec593fec985911e667f4ca367f46c6e134eb408b10
+with tests709cc47e... passed34checks253.95s/254.04s orchestration, source/
+dependency hashes stable, same isolated root harness. This proves its tested
+software behaviors, not actual helper ABI/read success or native results.
+The whole-result output still allowed one32768byte log line. Section120
+proved an8192byte single-line QC truncation; do not repeat that known output
+path. BEFORE any native effect, add fixed plain-ASCII report frames carrying
+at most1000 report characters and at most3000 serialized bytes per line,
+at most33parts/32768 report bytes, exact operation/config/parentjob/actualchild
+identity, unique ordinal/total count/whole length/SHA. A strict closed pure
+reassembler must reject missing/truncated/duplicate/wrong-identity/hash parts
+before interpreting any report. No base64/compression/runtime code or unsafe
+raw-data output is introduced. Existing report SID-like screening remains.
+This changes evidence transport only; original financial functions/economics,
+frozen inputs/calendar and20REMX quarantine remain unchanged. The two new
+result/wrapper source pins and focused relevant checks must be refreshed,
+with final source judgment/local commit before effects. All failed checks
+and attributed prior hashes above remain history. No additional push.
+
+
+### 122.6 Final local evidence path and prospective bounded aggregate capture
+
+Result checker84575B/SHA
+fcb7bba6f1549003b8cd85cafcb1d688f61f10d324e99c090ac03681e0ea79de
+adds only the fixed collections.abc.Mapping import to reviewedf335's rendered
+header. All selected arithmetic/exclusion functions and semanticAST pin stay
+exact. Removing that line independently reproducesf335; selected stdlib
+global-dependency audit foundMapping the sole missing header dependency.
+Final test28031B/SHA
+1f8d41bbdaf7e00c2fff783a51c3023e1913f25fe5edd71c280dcb1caec20792.
+Actual generated three-helper execution now passes allfive arms:
+5passed/69deselected18.70s/18.79s orchestration; additionally4passed/
+70deselected2.79s/2.89s for closed imports/portableAST/nested lexical scope.
+Exact source/test/dependency hashes stable. Previous68 arithmetic/clock/
+accounting checks atf335 remain attributed to unchanged executable bodies,
+not falsely relabelled as a full74-case final run. Independent source review
+accepts the exact header delta, while native ABI/outcome claims remain FALSE.
+
+Initial chunked wrapper63092B/SHA
+fca30ac81cc9112825a978794551a3cc83440e25badcc379a4d10e045315d9a6,
+tests28188B/SHA
+8ab54f675ed53850784d3f14288e768a40c1716a983eced4bff47b98a88339f4:
+31passed/26deselected68.55s/68.63s on allfive renders/runtime private-claim
+shape/native compile/eightproofs/framing/forgery checks, hashes stable.
+Independent review then identified a genuine decoded-string privacy gap:
+a coherently rehashed escaped SID-like string could evade raw-JSON screening.
+No actual data leak or native effect occurred. Require bounded recursive
+decoded key/string screening before return, exact generated normal/error
+top-level report schemas and no authority escalation. This is fixed locally
+in a later wrapper epoch; tests and source judgment must name its actual hash.
+
+Frames alone are not a claimed native read path. Prospectively authorize ONLY
+a fixed one-request /backtests/read/log observer for the actual verifier child:
+exact protected project/parent/child/config/source identities, fixed frame
+keyword query, start0 and bounded end including one overflow sentinel for at
+most33frames. Retain fresh metadata/privacy/collaborator/zero-active/source/
+terminal checks, shared lock/deadline/claims, and source before/after.
+Validate entire transient wire and decoded credential echoes before retention;
+extract only exact native-prefixed frame messages, strictly reassemble/hash/
+screen decoded report keys/strings, and credential-screen the assembled
+decoded report AGAIN before saving ANY frames or aggregate. This catches
+double escaping across the outer log envelope and inner JSON. Retain only
+validated aggregate frames/report and safe projections; no raw log body,
+market rows, download/export URL, arbitrary query/job/range or old executor.
+Completed metadata alone remains insufficient. Treat this as a distinct
+bounded outcome-processing look, preserving all prior look/attempt history.
+No automatic retry or additional native job is implied.
+Official request contract verified by root public documentation read only:
+https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/logs
+The wrapper's new observe path, decoded privacy correction and final hashes/
+relevant checks/source judgment/local commit are prerequisites before use.
+All20REMX quarantines, no further Claude review and NO ADDITIONAL PUSH remain.
+
+
+### 122.7 Final source snapshot ready for local commit / native preflight pending
+
+Final native-results controller81936B/SHA
+1e387750df45ad2e2e943fd4ef5b27e6d5d886e4147d5f675393f8ae8f08877e,
+tests48032B/SHA
+b44395abc76361ae32cd93faa941e1ed9f12efec97a6f154a50111bef18c0aac.
+The initial observe8855/76f8 software version passed93checks396.57s/396.66s.
+The next7a8c/73b1 derived-lineage correction passed53/82deselected179.39s/
+179.49s plus57/78deselected7.35s/7.44s; exact hashes stable.
+The final observe-only status/presence correction passed65/83deselected
+16.84s/16.95s on exact1e38/b443, hashes stable. It enforces exact normal and
+safe-error statuses, paired boolean processing flags, report-presence
+equivalence and complete reports for success, while retaining honest negative
+or end-custody-false evidence. Independent Codex source judgment accepts the
+final delta; reversing it reproduces exact7a8c. No remaining confirmed local
+source blocker is known. Every prior failed check/hash remains attributed.
+These are focused software/source checks, not native ABI or financial proof.
+
+All ten new source/test files are exact reviewed hashes, LF with newline at
+EOF and no trailing whitespace; all ten parse/compile in memory. Existing
+tracked research/tests are unchanged. Original3534430bytes of published
+sections9..120 are retained verbatim. git diff --check passed. The new ignored
+private-output path is artifacts/target_price_qc_sid_cash_20261107; no private
+directory/data is opened by those public checks.
+Current/preamble371passed/520deselected8.53s/8.65s on recordSHA
+882ac5b367c7839823075393ada6d2c1fd5995492c2d49868e5a83a923572993;
+later factual QA notes are not claimed part of that earlier record hash.
+
+Execution constraint: keep one committed HEAD through financial
+upload/compile/build/launch. A later record-only commit after parent launch
+may precede verifier preparation. Then keep one committed HEAD unchanged
+from verifier upload through compile/build/launch/observe, because its source
+embeds that native_spec.git_head. During that sequence, fsynced working-record
+appends and private receipts remain durable and are allowed; defer commits
+until observation finishes. Never invent a separate source-head override.
+The bounded opaque <=512 printable-ASCII log prefix is discarded as transport
+decoration, matching the earlier successful chunked reader's compatibility
+rule; its text is not native identity evidence and is never retained.
+All frame/payload identities, privacy/credential and source guards still bind.
+
+The owner-specific bypass study is an economics-changing continuation chosen
+after the original input failure. It is not proof that the original input was
+repaired or unbiased confirmation. Every remaining weight is unchanged at
+construction, but actual orders, cash, NAV and P&L may differ. No sleeve P&L
+is invented. Original strategy intent/native authenticity/rights/PIT/canonical
+and engine-chart agreement remain separate/unproved.
+Read-only future chart design confirms the ORIGINAL parent already publishes
+EXT26 Account NAV/NAV at16:01NY via native decimal total_portfolio_value.
+Any later chart check must use that exact original account chart and complete
+1449 axis; default Strategy Equity is only diagnostic, never a substitute.
+No financial source change or retrospective chart filtering is authorized.
+A future independently reviewed fixed curve commitment/collector may close
+that comparison; current chart flags remain FALSE/pending. No edits were
+made for that read-only design.
+
+Next: verify actual Target remote scope without a push, locally commit only
+these ten new files and this sole record, then freshly claim exact registry/
+source/owner/HEAD/operation/attempt/look scopes and perform OFF preflight.
+Private source/input/native ABI/capacity and result acceptance remain pending.
+Native effects this build0; new financial jobs/attempts/outcome looks0; all
+financial metrics NULL. Keep20REMX quarantined, skip Claude, NO MORE PUSHES.
+
+Fresh122 Git scope TPR-R122-GIT-TARGET-REMOTE-VERIFY-001 {"access":"read only existing origin exact Target lane ref; existing Git authentication; no source upload/push/account/key changes","attempt_id":"TPR-R122-GIT-TARGET-REMOTE-VERIFY-001","bounds":{"QC_requests":0,"exact_ref":"refs/heads/codex/strategy-target-price-revisions","pushes":0,"raw_output_retained":false,"requests_max":1,"stdout_stderr_each_max_processed_bytes":4096,"timeout_seconds":30},"created_utc":"2026-11-08T06:32:52.284658+00:00","expires_utc":"2026-11-08T06:37:52.284658+00:00","financial_outcome_look":false,"git_head":"21172cec69afcdf6d542dc65aae2f8121aacd7f1","look_id":"TPR-R122-GIT-TARGET-REMOTE-VERIFY-001","operation_id":"TPR-R122-GIT-TARGET-REMOTE-VERIFY-001","owner_instruction":"can we bypass that specific stock?","owner_instruction_sha256":"54a40d169a093baa0ee4efc8963799a0c24483631881708942a21774e751c2fa","schema":"tpr122-fresh-bounded-git-metadata-claim-v1","source_hashes":{"AGENTS.md":"daf233778864ed89020e2682212eed48080d2d82f868eefa0c71f71c90a1f409","CLAUDE.md":"31c231296781537a8172ca8213f9cc4d00df1ab538647c4395f593ed5a470f85"},"tool_body_sha256":"7945f9f47ab68d703fa265389dc2425ef8999f858a0dca9f65a860ae05539552"}
+
+122 Git scope001 was prepared but NEVER executed; retired before any network call to strengthen the immediate pre-append root/branch/HEAD/status recheck. Scope001 preserved, not reused.
+Fresh122 Git scope TPR-R122-GIT-TARGET-REMOTE-VERIFY-002 {"access":"read only existing origin exact Target lane ref; existing Git authentication; no source upload/push/account/key changes","attempt_id":"TPR-R122-GIT-TARGET-REMOTE-VERIFY-002","bounds":{"QC_requests":0,"exact_ref":"refs/heads/codex/strategy-target-price-revisions","pushes":0,"raw_output_retained":false,"requests_max":1,"stdout_stderr_each_max_processed_bytes":4096,"timeout_seconds":30},"created_utc":"2026-11-08T06:33:40.963761+00:00","expires_utc":"2026-11-08T06:38:40.963761+00:00","financial_outcome_look":false,"git_head":"21172cec69afcdf6d542dc65aae2f8121aacd7f1","look_id":"TPR-R122-GIT-TARGET-REMOTE-VERIFY-002","operation_id":"TPR-R122-GIT-TARGET-REMOTE-VERIFY-002","owner_instruction":"can we bypass that specific stock?","owner_instruction_sha256":"54a40d169a093baa0ee4efc8963799a0c24483631881708942a21774e751c2fa","schema":"tpr122-fresh-bounded-git-metadata-claim-v1","source_hashes":{"AGENTS.md":"daf233778864ed89020e2682212eed48080d2d82f868eefa0c71f71c90a1f409","CLAUDE.md":"31c231296781537a8172ca8213f9cc4d00df1ab538647c4395f593ed5a470f85"},"tool_body_sha256":"33aad9599a8a1f209187632230830fbb529873e13452a3b2c5fb752d85762ee5"}
+
+122 Git target remote result {"QC_requests": 0, "actual_remote_head": "041a54dbd53d54ba02a42f8740580eba7be3f298", "expected_remote_head": "041a54dbd53d54ba02a42f8740580eba7be3f298", "operation_id": "TPR-R122-GIT-TARGET-REMOTE-VERIFY-002", "pushes": 0, "raw_remote_output_retained": false, "scope_reestablished": true}
+
+122 precommit current/preamble371passed/520deselected8.66s/8.78s onrecordc7f0b96f7106c2b81418ada27ee7e64c447e7aba138a41c1d4d72cb492d1c587; laterthisfactualvalidationfooter only. ActualTargetremote041a54dbd53d54ba02a42f8740580eba7be3f298 verifiedunderfreshscope002, noadvance/noQCcall/nopush; preparedscope001retireduneffected. NoGitcommit hooks configured/present, no hookbypass orfullsuite. Followingcommit isLOCALONLY and contains onlyfive newsource/five newtests+soleRecord; no additionalpush. Nativepreflightremainsnext underfreshcommittedactualHEAD.

@@ -1,6 +1,12 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Existing-account Alpaca historical SIP and Equibles Free suitability qualification recorded in section 72, 2026-11-07.
+Status: **Expanded Alpaca coverage and numeric guidance build recorded in section 73, 2026-11-07.
+All 96 fixed four-symbol/2020--2025 windows return quotes with complete pagination: 1,747,147 rows in 238 data-only requests.
+Twenty sampled windows carry undefined `?` conditions; six usable quote-history years are not certified.
+Six CRM/HUBS profiles add 12 ranges / 24 bounds to the 17-profile local guidance corpus; all six remain refused as strategy inputs.
+Licensing checks are omitted at the owner's direction, without changing verified-rights flags. No QC, purchase, backtest or monitor rearm occurs.
+Section 72 was published once as `0e588d99`; this round does not repeat it. The lane remains not backtesting ready.
+Existing-account Alpaca historical SIP and Equibles Free suitability qualification recorded in section 72, 2026-11-07.
 Eight data-only Alpaca requests succeed; both fixed AAPL/SPY windows paginate completely, totaling 45,880 quote rows.
 Actual Alpaca Basic plan identity, broader coverage, dated size conversion, delivery semantics and cloud rights remain unverified.
 The owner has no Equibles account; its unbounded guidance response mixes later actuals, so no guidance API sample is requested.
@@ -175,7 +181,7 @@ established. The original economic, empirical, account and trading gates remain
 closed; the scoped EODHD direction (40.3) and the account-metadata checks
 (46.2) are not verified entitlement, PIT evidence, processing or QC-upload
 rights, or real-data evaluation authority.**
-Current scope/evidence are sections 17 through 72. Sections 2 through 6 preserve
+Current scope/evidence are sections 17 through 73. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -11614,3 +11620,225 @@ matching remote. Publish this completed qualification record with exactly
 **one guarded non-force push** to the matching lane, then preserve final refs
 and the publication receipt in the paused checkpoint. Do not automatically
 start another audit, create accounts, launch a backtest or rearm a monitor.
+
+
+## 73. Expanded Alpaca coverage and numeric guidance corpus, 2026-11-07
+
+### 73.1 Owner scope and exact serialized base
+
+Owner: **"Proceed with the remaining Alpaca coverage. do not need to check
+lincensing. continue building the guidance dataset using my existing
+subscriptions. Don’t access QC or buy anything, and push once when done."**
+This authorizes the finite coverage/data-building round below. Licensing
+checks are omitted as requested; no false verified-rights field or blanket
+permission is created. No provider terms are researched or provider contacted.
+No QC browser/API/project/resource/compute access, backtest, order or purchase
+occurs. Equibles has no existing account and is not used or created. Existing
+EODHD captures and public issuer evidence supply the guidance build; no new
+authenticated EODHD/FMP/Sharadar/Massive request or credential read occurs.
+
+Starting clean local HEAD and independently observed live matching remote:
+`0e588d99a34f8bffdcc19e3a3cf2f9b07b087810`. All repository commands, artifacts,
+validation, commit and push use
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`,
+branch `codex/strategy-guidance-revision-drift`, sole origin
+`https://github.com/SheltonChen2017/trading_agent.git`. Section 72's publication
+is closed once. No new Claude commit appears; consumed `1870b9c9` / `6375401b`
+and earlier reviews stay consumed. Only this lane record changes in tracked
+Git. Parallel source/build/static-QA assistants are implementer assistance,
+not independent Claude acceptance. Monitor stays **PAUSED**.
+
+### 73.2 Fixed Alpaca matrix, source custody and delivered coverage
+
+The finite matrix reuses section 68's predeclared **AAPL, JNJ, ADBE, SPY**,
+first Wednesday of February/May/August/November in **2020--2025**,
+**09:58--10:02 America/New_York**: 24 existing dates / 96 windows. No date is
+chosen from returns or substituted after missing data. ZoneInfo binds each
+date's UTC interval; November 2021/2022 still have daylight time and start
+13:58Z, while the other November windows start 14:58Z. This is repeated source
+coverage on previously queried dates, not 24 new independent research looks.
+
+One ordinary readable local audit invocation makes exactly **238 authenticated
+GET requests**, all HTTP200: **237 quote pages and one tape-A condition
+mapping**. Every request uses only `data.alpaca.markets`, an explicit allowed
+path and the existing APCA key pair in memory. No broker/account/asset/order
+endpoint, latest-data probe, credential regeneration, alternate feed or retry
+occurs. Headers are never printed/saved and redirects are refused. Explicit
+SIP/USD/dated-asof/ascending order and inclusive date bounds are supplied.
+Ceilings are 10,000 rows/page, 20 pages/window, 512 total requests and 8 MiB
+per response, with at least 0.65 seconds between request starts. All 96 page
+chains exhaust normally before any ceiling; all windows are nonempty.
+
+Before parsing, the earlier metadata receipt is pinned to
+`c0f0ab4d1e0d50b14973294f9a290814917c5c4350de3577c9476e7bf719b2f9`
+and section 68's matrix intent to
+`273f00d4cc4ec7b65c95960be444d3b64ba82165ff41fc0fe8977d787ccc5f63`.
+Exact verified bytes are reused. Source, matrix and limits are frozen in a
+new ignored intent before requests. Window receipts publish atomically with
+no overwrite. Only hashes/statuses/shape counts/metadata are saved; actual
+prices, sizes, row timestamps, pagination tokens and raw quote bodies are
+not persisted or committed. Monetary lexemes decode as Decimal; timestamp
+precision remains exact integer nanoseconds.
+
+| Year | Nonempty complete windows | Quote rows | Windows with unknown condition | Unknown-condition occurrences |
+|---|---:|---:|---:|---:|
+| 2020 | 16 | 220,842 | 16 | 220,842 |
+| 2021 | 16 | 264,563 | 4 | 62,840 |
+| 2022 | 16 | 415,534 | 0 | 0 |
+| 2023 | 16 | 263,866 | 0 | 0 |
+| 2024 | 16 | 294,888 | 0 | 0 |
+| 2025 | 16 | 287,454 | 0 | 0 |
+| Total | 96 | 1,747,147 | 20 | 283,682 |
+
+All sampled 2020 windows and the four February 3, 2021 windows contain literal
+**`?`** conditions, absent from the current tape-A/B/C dictionaries. The other
+**1,463,465 rows** carry R. No unknown venue code occurs against the retained
+current mapping. **Do not relabel `?` as Regular**, drop it to resurrect an
+older valid state, or silently shorten the study to later dates. Six calendar
+years returning rows do not establish the plan's six usable common years.
+The later 76 windows still do not certify all dates/issuers or full semantics.
+
+A June 10, 2021 [Alpaca-hosted forum response](https://forum.alpaca.markets/t/where-can-i-find-trade-conditions-meaning/5935)
+by Mallory explains `?` as third-party historical imports, distinguished from
+Alpaca's then-new own SIP capture, and acknowledges archive gaps being worked
+on. This is historical provenance context, not a current complete-archive
+assurance, recovered original quote condition or precise cutoff guarantee.
+Current delivered samples and the unknown-state refusal remain authoritative.
+
+The diagnostic retains **28,357 positive locked rows, 470 positive crossed
+rows and 128,752 equal-adjacent clocks** in its counts. There are no time
+decreases or out-of-window rows; no zero-side, empty/two-condition rows are
+observed. Absence does not qualify withdrawals, corrections or halt behavior.
+There are 1,613,629 sub-microsecond and 1,575,966 finer-than-100ns clocks.
+One source timestamp still cannot be invented into participant/SIP/receipt
+clocks or a quote sequence.
+
+The dated size contract labels 92 windows round lots and the four
+**November 5, 2025** windows shares, following the documented November 3
+change from section 72. These are source-documented units, not units proved
+from numeric values. No historical lot-size conversion is performed. Current
+metadata has no dated historical mapping; no current lot size is backfilled.
+The existing Massive-shaped HistoricalQuote requires two named clocks and a
+sequence. It is deliberately not populated with duplicate/fabricated Alpaca
+fields. This coverage round does not add an execution adapter or change fill
+rules, and current Basic billing-tier identity is not probed through a broker
+or account page.
+
+### 73.3 Numeric guidance build from retained subscriptions and originals
+
+The prior six-event CRM/HUBS timeline now becomes **six numeric source-bound
+profiles**, twelve revenue/adjusted-EPS ranges containing **24 literal
+bounds**, four explicitly supplied predecessor links and five source-explicit
+fiscal end dates. Dates remain CRM March 1 / May 31 / August 30, 2023 for
+FY2024 and HUBS February 16 / May 3 / August 2, 2023 for FY2023. No revision
+percentage, threshold decision, eligibility, price join or return is computed.
+
+Source classes remain distinct: **two retained complete CRM issuer HTML
+captures, one CRM rendered issuer excerpt and three retained complete EODHD
+provider responses** supply the six primary records. The five prior EODHD
+release-body captures are rehashed and used for corroboration. Provider
+syndication is not mislabeled as original issuer bytes or historical first
+receipt. Four ordinary missing-issuer HTML requests and three ordinary HUBS
+web opens return HTTP403; there is no repeat/header/path/format bypass.
+Unavailable originals remain explicit. The CRM rendered excerpt is labeled
+as such, never a full-HTML capture.
+
+The extraction retains exact source hashes, JSON pointers/character locators,
+as-presented scale/currency symbols, share/adjustment assumptions and explicit
+unknowns. A dollar symbol alone does not prove ISO USD, nor does an issuer
+name bind a dated permanent security. Canonical currency/units, fiscal start,
+security identity, accounting-definition/share-scope equivalence and complete
+immediate-predecessor/correction/withdrawal history remain unresolved. Bounds
+are not silently multiplied into guessed units. Historical capture clocks
+remain current reconstruction custody rather than backdated delivery.
+
+The unchanged strict compiler produces both a **six-profile standalone
+corpus** and a **17-profile combined corpus**, extending the eleven prior
+Adobe profiles. The combined corpus binds **27 retained captures totaling
+65,401,337 bytes**. Every old Adobe profile object and decision remains
+byte-canonical unchanged: baseline 2, structural comparable pair 3, refused 6.
+All six new CRM/HUBS profiles are **refused as strategy inputs** on their
+explicit issues/unknown fields; combined dispositions are baseline 2,
+structural comparable pair 3, refused 12. No new qualifying pair or signal is
+manufactured. All PIT, authenticity/completeness, historical availability,
+rights, approved-input and execution-ready fields remain false.
+
+A first source-facts extraction is retained as rejected after Decimal QA
+finds trailing sentence punctuation in two EPS lexemes. Version 2 corrects
+only extraction, leaving source bytes unchanged. Four missing-source records
+verify 16 bounds and 25 locators; combined with the two prior CRM source
+facts, the new corpus verifies 24 bounds. Both final datasets reconstruct
+byte-exactly from retained profiles/captures. Four in-memory tamper controls
+reject changed numbers without rebinding, a forged approved-input gate,
+changed retained bytes and a forged comparable disposition. No production
+compiler change or strategy-rule alteration is required.
+
+### 73.4 Receipt anchors, validation and bounded outcome
+
+Ignored base:
+`artifacts/guidance_revision_drift/alpaca-guidance-expansion-20261107/`.
+
+| Receipt/artifact | SHA-256 |
+|---|---|
+| `alpaca_coverage_v1.py` | `499c5e9c024638013a3637b771001ee9a4be85ad41443dc4a1d65347613983f9` |
+| `alpaca-coverage-result-v1.json` | `f4809b356509e30229317794dda1ad3dfea37fdee1e246e68eca8587f058293c` |
+| `alpaca-author-qa-v2.json` | `a076af916e6971282bbc1e084b7e8f08d38c546ee7850baf825130929f5aa672` |
+| `alpaca-condition-context-v1.json` | `908f3a5e5d65afab73dcf17962394ee790c90a3f76488de51a80c8368aad50a6` |
+| `guidance/combined-dataset-private-v1.json` | `e4b6c2a626f5abbe9def973a9ee9bb80af93738a7c4cd8cddfc5c3b0a9edb032` |
+| `guidance/new-dataset-private-v1.json` | `6ee7669969c3839b548b95dafd1090dceaf8ad300996dbec53da11de275025e7` |
+| `guidance/compile-receipt-v1.json` | `afdd3e7b1f0b2c5a839616e91666693ea93d66417bf5969b1bad11bf643c4d3a` |
+| `guidance/source-manifest-v1.json` | `1129326778b5094410b11380bd68a7141702a2276c64c3abe2519bf17f18c9b3` |
+| `guidance/author-verification-v1.json` | `7c7d23be6e21fe492ce9206105f1a6c68fca39efc4c7e4e6f334e152d734d9a4` |
+| `originals/missing-source-facts-v2.json` | `196da744655c6876f9e2cc715e31a6a8c8c3da8a9928931bc11da0ee9e148106` |
+| `root-data-verification-v1.json` | `925d6174fae4c7563ebc7b2d221bdc33da06ea2d92bfa211cf3b856b35e51b03` |
+
+Root verification independently checks all 96 saved window hashes against
+the result/intent, all 238 statuses, summed counts, 27 guidance capture paths,
+eight build-artifact anchors, canonical dataset loading and all 24 finite
+bounds. Seventeen invented Alpaca-helper assertions cover exact nanoseconds,
+DST, size-date labels, duplicate/nonfinite refusal, no redirects, atomic
+no-overwrite publication and retained input pins. Before its single API
+invocation, author QA adds the missing custody pins and precise request-symbol
+labels; the prior pre-correction helper-QA receipt is retained, not a hidden
+provider retry. These diagnostic checks and the four data-tamper controls
+are not repository-suite counts or independent Claude review.
+
+All 63 lane source members are unchanged, full source SHA-256
+`a91368303bbfddf5b5c1e52a1e1c0f058216a65648bd54095e2921e7d57aa312`.
+Semantic draft remains
+`b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`;
+raw draft file remains
+`1dd9b5969853924d7682b4b566734ea7e90f061340d6378912118fb93d132110`.
+The audit/builder scripts compile in memory. Existing Python **3.13.15** runs
+**four focused methods, all passing in 0.041s**, with no failures/errors/skips
+or reported warnings: canonical guidance round-trip, source-byte/clock/URI/
+binding mutation refusal, explicit-unknown predecessor retention and active
+document consistency. These accompany final diff, status,
+source/receipt identity, added-text secret-shape and historical-body checks.
+No full lane/repository suite, installation or shared/main correction occurs.
+Private guidance data and ignored captures are **not transferred by Git**;
+only their durable lane handoff is pushed. Prior unreviewed production source
+is not accepted by these data checks.
+
+This finite coverage-and-corpus-build round is complete; the lane is **not
+backtesting ready**. Immediate next data work is resolving the unknown older
+quote conditions without relabeling/date selection, binding dated lot/venue/
+clock semantics, and filling the new guidance records' canonical reference,
+unit/currency/definition and predecessor/correction history. Wider complete
+common history and real-runner/equity-settlement/matched-SPY parity remain
+open. Licensing verification is outside this round at the owner's direction,
+not a reason to stop the authorized data build. Original research/economic/
+family/look/date and evaluation gates are not automatically frozen or opened.
+
+Original `GDR-base372-approved-20261008` stays **CLOSED FAILED 3/3** with zero
+manual attempts; project 37647834 is untouched. Separate
+`GDR-Mia-base372-recovery-authorized-20261011` stays **zero unsuccessful
+attempts / zero pending intents**, maximum three failures, no new project or
+journal. Accepted `c589b3dd` recovery custody and invented fixture are not
+rebound by real-data audit hashes. Monitor remains **PAUSED**.
+
+Recheck exact root, branch, HEAD, status, sole origin and live matching remote
+before commit/push. Make exactly **one guarded non-force final push** of this
+completed round to the matching lane branch; retain final refs/publication
+receipt in the paused checkpoint. Do not automatically start another audit,
+create accounts, buy data, access QC or rearm a monitor.
